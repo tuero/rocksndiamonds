@@ -90,8 +90,8 @@ void setLevelInfoToDefaults_MM()
   lev_fieldx = native_mm_level.fieldx = STD_LEV_FIELDX;
   lev_fieldy = native_mm_level.fieldy = STD_LEV_FIELDY;
 
-  for(x=0; x<MAX_LEV_FIELDX; x++)
-    for(y=0; y<MAX_LEV_FIELDY; y++)
+  for (x = 0; x < MAX_LEV_FIELDX; x++)
+    for (y = 0; y < MAX_LEV_FIELDY; y++)
       native_mm_level.field[x][y] = Feld[x][y] = Ur[x][y] = EL_EMPTY;
 
   native_mm_level.time = 100;
@@ -103,15 +103,15 @@ void setLevelInfoToDefaults_MM()
   native_mm_level.laser_green = FALSE;
   native_mm_level.laser_blue = TRUE;
 
-  for(i=0; i<MAX_LEVEL_NAME_LEN; i++)
+  for (i = 0; i < MAX_LEVEL_NAME_LEN; i++)
     native_mm_level.name[i] = '\0';
-  for(i=0; i<MAX_LEVEL_AUTHOR_LEN; i++)
+  for (i = 0; i < MAX_LEVEL_AUTHOR_LEN; i++)
     native_mm_level.author[i] = '\0';
 
   strcpy(native_mm_level.name, NAMELESS_LEVEL_NAME);
   strcpy(native_mm_level.author, ANONYMOUS_NAME);
 
-  for(i=0; i<LEVEL_SCORE_ELEMENTS; i++)
+  for (i = 0; i < LEVEL_SCORE_ELEMENTS; i++)
     native_mm_level.score[i] = 10;
 
   native_mm_level.field[0][0] = Feld[0][0] = Ur[0][0] = EL_MCDUFFIN_RIGHT;
@@ -131,14 +131,16 @@ static int checkLevelElement(int element)
   return element;
 }
 
-static int LoadLevel_MM_VERS(File *file, int chunk_size, struct LevelInfo_MM *level)
+static int LoadLevel_MM_VERS(File *file, int chunk_size,
+			     struct LevelInfo_MM *level)
 {
-  ReadChunk_MM_VERS(file, &(level->file_version), &(level->game_version));
+  ReadChunk_MM_VERS(file, &level->file_version, &level->game_version);
 
   return chunk_size;
 }
 
-static int LoadLevel_MM_HEAD(File *file, int chunk_size, struct LevelInfo_MM *level)
+static int LoadLevel_MM_HEAD(File *file, int chunk_size,
+			     struct LevelInfo_MM *level)
 {
   int i;
   int laser_color;
@@ -149,11 +151,11 @@ static int LoadLevel_MM_HEAD(File *file, int chunk_size, struct LevelInfo_MM *le
   level->time           = getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN);
   level->kettles_needed = getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN);
 
-  for(i=0; i<MAX_LEVEL_NAME_LEN; i++)
+  for (i = 0; i < MAX_LEVEL_NAME_LEN; i++)
     level->name[i] = getFile8Bit(file);
   level->name[MAX_LEVEL_NAME_LEN] = 0;
 
-  for(i=0; i<LEVEL_SCORE_ELEMENTS; i++)
+  for (i = 0; i < LEVEL_SCORE_ELEMENTS; i++)
     level->score[i] = getFile8Bit(file);
 
   level->auto_count_kettles	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
@@ -172,18 +174,20 @@ static int LoadLevel_MM_HEAD(File *file, int chunk_size, struct LevelInfo_MM *le
   return chunk_size;
 }
 
-static int LoadLevel_MM_AUTH(File *file, int chunk_size, struct LevelInfo_MM *level)
+static int LoadLevel_MM_AUTH(File *file, int chunk_size,
+			     struct LevelInfo_MM *level)
 {
   int i;
 
-  for(i=0; i<MAX_LEVEL_AUTHOR_LEN; i++)
+  for (i = 0; i < MAX_LEVEL_AUTHOR_LEN; i++)
     level->author[i] = getFile8Bit(file);
   level->author[MAX_LEVEL_NAME_LEN] = 0;
 
   return chunk_size;
 }
 
-static int LoadLevel_MM_BODY(File *file, int chunk_size, struct LevelInfo_MM *level)
+static int LoadLevel_MM_BODY(File *file, int chunk_size,
+			     struct LevelInfo_MM *level)
 {
   int x, y;
   int chunk_size_expected = level->fieldx * level->fieldy;
@@ -199,11 +203,12 @@ static int LoadLevel_MM_BODY(File *file, int chunk_size, struct LevelInfo_MM *le
   if (chunk_size_expected != chunk_size)
   {
     ReadUnusedBytesFromFile(file, chunk_size);
+
     return chunk_size_expected;
   }
 
-  for(y=0; y<level->fieldy; y++)
-    for(x=0; x<level->fieldx; x++)
+  for (y = 0; y < level->fieldy; y++)
+    for (x = 0; x < level->fieldx; x++)
       native_mm_level.field[x][y] = Feld[x][y] = Ur[x][y] =
 	checkLevelElement(level->encoding_16bit_field ?
 			  getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN) :
@@ -253,6 +258,7 @@ boolean LoadNativeLevel_MM(char *filename, boolean level_info_only)
     if (strcmp(chunk_name, "CAVE") != 0)
     {
       Error(ERR_WARN, "unknown format of level file '%s'", filename);
+
       closeFile(file);
 
       return FALSE;
@@ -268,14 +274,17 @@ boolean LoadNativeLevel_MM(char *filename, boolean level_info_only)
     if (!checkCookieString(cookie, LEVEL_COOKIE_TMPL))
     {
       Error(ERR_WARN, "unknown format of level file '%s'", filename);
+
       closeFile(file);
 
       return FALSE;
     }
 
-    if ((native_mm_level.file_version = getFileVersionFromCookieString(cookie)) == -1)
+    if ((native_mm_level.file_version = getFileVersionFromCookieString(cookie))
+	== -1)
     {
       Error(ERR_WARN, "unsupported version of level file '%s'", filename);
+
       closeFile(file);
 
       return FALSE;
@@ -294,6 +303,7 @@ boolean LoadNativeLevel_MM(char *filename, boolean level_info_only)
     {
       Error(ERR_WARN, "unknown chunk '%s' in level file '%s'",
 	    chunk_name, filename);
+
       ReadUnusedBytesFromFile(file, chunk_size);
     }
     else if (chunk_info[i].size != -1 &&
@@ -301,6 +311,7 @@ boolean LoadNativeLevel_MM(char *filename, boolean level_info_only)
     {
       Error(ERR_WARN, "wrong size (%d) of chunk '%s' in level file '%s'",
 	    chunk_size, chunk_name, filename);
+
       ReadUnusedBytesFromFile(file, chunk_size);
     }
     else
@@ -313,10 +324,8 @@ boolean LoadNativeLevel_MM(char *filename, boolean level_info_only)
 	 chunks first (like "HEAD" and "BODY") that contain some header
 	 information, so check them here */
       if (chunk_size_expected != chunk_size)
-      {
 	Error(ERR_WARN, "wrong size (%d) of chunk '%s' in level file '%s'",
 	      chunk_size, chunk_name, filename);
-      }
     }
   }
 
@@ -336,10 +345,10 @@ static void SaveLevel_MM_HEAD(FILE *file, struct LevelInfo_MM *level)
   putFile16BitInteger(file, level->time,           BYTE_ORDER_BIG_ENDIAN);
   putFile16BitInteger(file, level->kettles_needed, BYTE_ORDER_BIG_ENDIAN);
 
-  for(i=0; i<MAX_LEVEL_NAME_LEN; i++)
+  for (i = 0; i < MAX_LEVEL_NAME_LEN; i++)
     fputc(level->name[i], file);
 
-  for(i=0; i<LEVEL_SCORE_ELEMENTS; i++)
+  for (i = 0; i < LEVEL_SCORE_ELEMENTS; i++)
     fputc(level->score[i], file);
 
   fputc((level->auto_count_kettles ? 1 : 0), file);
@@ -360,7 +369,7 @@ static void SaveLevel_MM_AUTH(FILE *file, struct LevelInfo_MM *level)
 {
   int i;
 
-  for(i=0; i<MAX_LEVEL_AUTHOR_LEN; i++)
+  for (i = 0; i < MAX_LEVEL_AUTHOR_LEN; i++)
     fputc(level->author[i], file);
 }
 
@@ -368,8 +377,8 @@ static void SaveLevel_MM_BODY(FILE *file, struct LevelInfo_MM *level)
 {
   int x, y;
 
-  for(y=0; y<level->fieldy; y++)
-    for(x=0; x<level->fieldx; x++)
+  for (y = 0; y < level->fieldy; y++)
+    for (x = 0; x < level->fieldx; x++)
       if (level->encoding_16bit_field)
 	putFile16BitInteger(file, Ur[x][y], BYTE_ORDER_BIG_ENDIAN);
       else
@@ -385,18 +394,21 @@ void SaveNativeLevel_MM(char *filename)
   if (!(file = fopen(filename, MODE_WRITE)))
   {
     Error(ERR_WARN, "cannot save level file '%s'", filename);
+
     return;
   }
 
   /* check level field for 16-bit elements */
   native_mm_level.encoding_16bit_field = FALSE;
-  for(y=0; y<native_mm_level.fieldy; y++)
-    for(x=0; x<native_mm_level.fieldx; x++)
+
+  for (y = 0; y < native_mm_level.fieldy; y++)
+    for (x = 0; x < native_mm_level.fieldx; x++)
       if (Ur[x][y] > 255)
 	native_mm_level.encoding_16bit_field = TRUE;
 
   body_chunk_size =
-    native_mm_level.fieldx * native_mm_level.fieldy * (native_mm_level.encoding_16bit_field ? 2 : 1);
+    native_mm_level.fieldx * native_mm_level.fieldy *
+    (native_mm_level.encoding_16bit_field ? 2 : 1);
 
   putFileChunk(file, "MMII", CHUNK_SIZE_UNDEFINED, BYTE_ORDER_BIG_ENDIAN);
   putFileChunk(file, "CAVE", CHUNK_SIZE_NONE,      BYTE_ORDER_BIG_ENDIAN);

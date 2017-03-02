@@ -21,10 +21,17 @@
 #define SCREENY(a)      (a)
 #define LEVELX(a)       (a)
 #define LEVELY(a)       (a)
-#define IN_VIS_FIELD(x,y) ((x)>=0 && (x)<SCR_FIELDX && (y)>=0 &&(y)<SCR_FIELDY)
-#define IN_SCR_FIELD(x,y) ((x)>=BX1 && (x)<=BX2 && (y)>=BY1 &&(y)<=BY2)
-#define IN_LEV_FIELD(x,y) ((x)>=0 && (x)<lev_fieldx && (y)>=0 &&(y)<lev_fieldy)
-#define IN_PIX_FIELD(x,y) ((x)>=0 && (x)<SXSIZE && (y)>=0 && (y)<SYSIZE)
+
+#define IN_FIELD(x, y, xsize, ysize)	((x) >= 0 && (x) < (xsize) &&	   \
+					 (y) >= 0 && (y) < (ysize))
+#define IN_FIELD_MINMAX(x, y, xmin, ymin, xmax, ymax)			   \
+					((x) >= (xmin) && (x) <= (xmax) && \
+					 (y) >= (ymin) && (y) <= (ymax))
+
+#define IN_PIX_FIELD(x, y)	IN_FIELD(x, y, SXSIZE, SYSIZE)
+#define IN_VIS_FIELD(x, y)	IN_FIELD(x, y, SCR_FIELDX, SCR_FIELDY)
+#define IN_LEV_FIELD(x, y)	IN_FIELD(x, y, lev_fieldx, lev_fieldy)
+#define IN_SCR_FIELD(x, y)	IN_FIELD_MINMAX(x, y, BX1, BY1, BX2, BY2)
 
 /* values for 'Elementeigenschaften' */
 #define EP_BIT_GRID		(1 << 0)
@@ -166,8 +173,8 @@ struct EditorInfo
 };
 
 extern Bitmap	       *pix[];
-extern DrawBuffer     *fieldbuffer;
-extern DrawBuffer     *drawto_field;
+extern DrawBuffer      *fieldbuffer;
+extern DrawBuffer      *drawto_field;
 
 extern int		joystick_device;
 extern char	       *joystick_device_name[];
@@ -204,16 +211,16 @@ extern short		AmoebaCnt[MAX_NUM_AMOEBA], AmoebaCnt2[MAX_NUM_AMOEBA];
 extern unsigned int	Elementeigenschaften[MAX_ELEMENTS];
 
 extern int		level_nr;
-extern int		lev_fieldx,lev_fieldy, scroll_x,scroll_y;
+extern int		lev_fieldx, lev_fieldy, scroll_x, scroll_y;
 
-extern int		FX,FY, ScrollStepSize;
+extern int		FX, FY, ScrollStepSize;
 extern int		ScreenMovDir, ScreenMovPos, ScreenGfxPos;
 extern int		GameFrameDelay;
 extern int		FfwdFrameDelay;
-extern int		BX1,BY1, BX2,BY2;
+extern int		BX1, BY1, BX2, BY2;
 extern int		SBX_Left, SBX_Right;
 extern int		SBY_Upper, SBY_Lower;
-extern int		ZX,ZY, ExitX,ExitY;
+extern int		ZX, ZY, ExitX, ExitY;
 extern int		AllPlayersGone;
 extern int		TimeFrames, TimePlayed, TimeLeft;
 extern boolean		SiebAktiv;
@@ -228,8 +235,8 @@ extern struct LaserInfo		laser;
 extern struct EditorInfo	editor;
 extern struct GlobalInfo	global;
 
-extern short 		LX,LY, XS,YS, ELX,ELY;
-extern short 		CT,Ct;
+extern short 		LX, LY, XS, YS, ELX, ELY;
+extern short 		CT, Ct;
 
 extern Pixel		pen_fg, pen_bg, pen_ray, pen_magicolor[2];
 extern int		color_status;
@@ -237,10 +244,10 @@ extern int		color_status;
 extern struct XY	Step[];
 extern short		Sign[16];
 
-extern char		*sound_name[];
+extern char	       *sound_name[];
 extern int		background_loop[];
 extern int		num_bg_loops;
-extern char		*element_info[];
+extern char	       *element_info[];
 extern int		num_element_info;
 
 /* often used screen positions */
@@ -457,38 +464,38 @@ extern int		num_element_info;
 #define EL_MM_END_1		155
 
 #define EL_CHAR_START		160
-#define EL_CHAR_ASCII0		(EL_CHAR_START-32)
-#define EL_CHAR_AUSRUF		(EL_CHAR_ASCII0+33)
-#define EL_CHAR_ZOLL		(EL_CHAR_ASCII0+34)
-#define EL_CHAR_RAUTE		(EL_CHAR_ASCII0+35)
-#define EL_CHAR_DOLLAR		(EL_CHAR_ASCII0+36)
-#define EL_CHAR_PROZ		(EL_CHAR_ASCII0+37)
-#define EL_CHAR_AMPERSAND	(EL_CHAR_ASCII0+38)
-#define EL_CHAR_APOSTR		(EL_CHAR_ASCII0+39)
-#define EL_CHAR_KLAMM1		(EL_CHAR_ASCII0+40)
-#define EL_CHAR_KLAMM2		(EL_CHAR_ASCII0+41)
-#define EL_CHAR_MULT		(EL_CHAR_ASCII0+42)
-#define EL_CHAR_PLUS		(EL_CHAR_ASCII0+43)
-#define EL_CHAR_KOMMA		(EL_CHAR_ASCII0+44)
-#define EL_CHAR_MINUS		(EL_CHAR_ASCII0+45)
-#define EL_CHAR_PUNKT		(EL_CHAR_ASCII0+46)
-#define EL_CHAR_SLASH		(EL_CHAR_ASCII0+47)
-#define EL_CHAR_0		(EL_CHAR_ASCII0+48)
-#define EL_CHAR_9		(EL_CHAR_ASCII0+57)
-#define EL_CHAR_DOPPEL		(EL_CHAR_ASCII0+58)
-#define EL_CHAR_SEMIKL		(EL_CHAR_ASCII0+59)
-#define EL_CHAR_LT		(EL_CHAR_ASCII0+60)
-#define EL_CHAR_GLEICH		(EL_CHAR_ASCII0+61)
-#define EL_CHAR_GT		(EL_CHAR_ASCII0+62)
-#define EL_CHAR_FRAGE		(EL_CHAR_ASCII0+63)
-#define EL_CHAR_AT		(EL_CHAR_ASCII0+64)
-#define EL_CHAR_A		(EL_CHAR_ASCII0+65)
-#define EL_CHAR_Z		(EL_CHAR_ASCII0+90)
-#define EL_CHAR_AE		(EL_CHAR_ASCII0+91)
-#define EL_CHAR_OE		(EL_CHAR_ASCII0+92)
-#define EL_CHAR_UE		(EL_CHAR_ASCII0+93)
-#define EL_CHAR_COPY		(EL_CHAR_ASCII0+94)
-#define EL_CHAR_END		(EL_CHAR_START+79)
+#define EL_CHAR_ASCII0		(EL_CHAR_START - 32)
+#define EL_CHAR_AUSRUF		(EL_CHAR_ASCII0 + 33)
+#define EL_CHAR_ZOLL		(EL_CHAR_ASCII0 + 34)
+#define EL_CHAR_RAUTE		(EL_CHAR_ASCII0 + 35)
+#define EL_CHAR_DOLLAR		(EL_CHAR_ASCII0 + 36)
+#define EL_CHAR_PROZ		(EL_CHAR_ASCII0 + 37)
+#define EL_CHAR_AMPERSAND	(EL_CHAR_ASCII0 + 38)
+#define EL_CHAR_APOSTR		(EL_CHAR_ASCII0 + 39)
+#define EL_CHAR_KLAMM1		(EL_CHAR_ASCII0 + 40)
+#define EL_CHAR_KLAMM2		(EL_CHAR_ASCII0 + 41)
+#define EL_CHAR_MULT		(EL_CHAR_ASCII0 + 42)
+#define EL_CHAR_PLUS		(EL_CHAR_ASCII0 + 43)
+#define EL_CHAR_KOMMA		(EL_CHAR_ASCII0 + 44)
+#define EL_CHAR_MINUS		(EL_CHAR_ASCII0 + 45)
+#define EL_CHAR_PUNKT		(EL_CHAR_ASCII0 + 46)
+#define EL_CHAR_SLASH		(EL_CHAR_ASCII0 + 47)
+#define EL_CHAR_0		(EL_CHAR_ASCII0 + 48)
+#define EL_CHAR_9		(EL_CHAR_ASCII0 + 57)
+#define EL_CHAR_DOPPEL		(EL_CHAR_ASCII0 + 58)
+#define EL_CHAR_SEMIKL		(EL_CHAR_ASCII0 + 59)
+#define EL_CHAR_LT		(EL_CHAR_ASCII0 + 60)
+#define EL_CHAR_GLEICH		(EL_CHAR_ASCII0 + 61)
+#define EL_CHAR_GT		(EL_CHAR_ASCII0 + 62)
+#define EL_CHAR_FRAGE		(EL_CHAR_ASCII0 + 63)
+#define EL_CHAR_AT		(EL_CHAR_ASCII0 + 64)
+#define EL_CHAR_A		(EL_CHAR_ASCII0 + 65)
+#define EL_CHAR_Z		(EL_CHAR_ASCII0 + 90)
+#define EL_CHAR_AE		(EL_CHAR_ASCII0 + 91)
+#define EL_CHAR_OE		(EL_CHAR_ASCII0 + 92)
+#define EL_CHAR_UE		(EL_CHAR_ASCII0 + 93)
+#define EL_CHAR_COPY		(EL_CHAR_ASCII0 + 94)
+#define EL_CHAR_END		(EL_CHAR_START + 79)
 
 #define EL_CHAR(x)		((x) == CHAR_BYTE_UMLAUT_A ? EL_CHAR_AE : \
 				 (x) == CHAR_BYTE_UMLAUT_O ? EL_CHAR_OE : \
@@ -1071,13 +1078,13 @@ extern int		num_element_info;
 #define SETUP			8
 
 /* return values for GameActions */
-#define ACT_GO_ON	0
-#define ACT_GAME_OVER	1
-#define ACT_NEW_GAME	2
+#define ACT_GO_ON		0
+#define ACT_GAME_OVER		1
+#define ACT_NEW_GAME		2
 
 /* values for color_status */
-#define STATIC_COLORS   0
-#define DYNAMIC_COLORS  1
+#define STATIC_COLORS		0
+#define DYNAMIC_COLORS		1
 
 #define PROGRAM_VERSION_MAJOR	2
 #define PROGRAM_VERSION_MINOR	0
@@ -1123,6 +1130,6 @@ extern int		num_element_info;
 
 /* sound control */
 
-#define ST(x)           (((x)-8)*16)
+#define ST(x)           (((x) - 8) * 16)
 
 #endif	/* MM_MAIN_H */

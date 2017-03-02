@@ -55,15 +55,15 @@
 #define IS_MUSIC_SOUND(s)	((s) == SND_TYGER || (s) == SND_VOYAGER)
 
 /* game button identifiers */
-#define GAME_CTRL_ID_LEFT		0
-#define GAME_CTRL_ID_MIDDLE		1
-#define GAME_CTRL_ID_RIGHT		2
+#define GAME_CTRL_ID_LEFT	0
+#define GAME_CTRL_ID_MIDDLE	1
+#define GAME_CTRL_ID_RIGHT	2
 
-#define NUM_GAME_BUTTONS		3
+#define NUM_GAME_BUTTONS	3
 
 /* values for DrawLaser() */
-#define DL_LASER_DISABLED		0
-#define DL_LASER_ENABLED		1
+#define DL_LASER_DISABLED	0
+#define DL_LASER_ENABLED	1
 
 /* values for 'click_delay_value' in ClickElement() */
 #define CLICK_DELAY_SHORT	125
@@ -114,9 +114,9 @@ static void InitMovDir_MM(int x, int y)
   int element = Feld[x][y];
   static int direction[3][4] =
   {
-    { MV_RIGHT, MV_UP,   MV_LEFT,  MV_DOWN },
-    { MV_LEFT,  MV_DOWN, MV_RIGHT, MV_UP },
-    { MV_LEFT,  MV_RIGHT, MV_UP, MV_DOWN }
+    { MV_RIGHT, MV_UP,    MV_LEFT,  MV_DOWN },
+    { MV_LEFT,  MV_DOWN,  MV_RIGHT, MV_UP   },
+    { MV_LEFT,  MV_RIGHT, MV_UP,    MV_DOWN }
   };
 
   switch(element)
@@ -222,9 +222,9 @@ static void InitCycleElements()
   if (game_mm.num_cycle == 0)	/* no elements to cycle */
     return;
 
-  for(i=0; i<16; i++)
+  for (i = 0; i < 16; i++)
   {
-    for(j=0; j<game_mm.num_cycle; j++)
+    for (j = 0; j < game_mm.num_cycle; j++)
     {
       int x = game_mm.cycle[j].x;
       int y = game_mm.cycle[j].y;
@@ -315,7 +315,7 @@ void InitGameEngine_MM()
   laser.start_edge.y = 0;
   laser.start_angle = 0;
 
-  for (i=0; i<MAX_NUM_BEAMERS; i++)
+  for (i = 0; i < MAX_NUM_BEAMERS; i++)
     laser.beamer[i][0].num = laser.beamer[i][1].num = 0;
 
   laser.overloaded = FALSE;
@@ -328,9 +328,9 @@ void InitGameEngine_MM()
 
   CT = Ct = 0;
 
-  for (x=0; x<lev_fieldx; x++)
+  for (x = 0; x < lev_fieldx; x++)
   {
-    for (y=0; y<lev_fieldy; y++)
+    for (y = 0; y < lev_fieldy; y++)
     {
       Feld[x][y] = Ur[x][y];
       Hit[x][y] = Box[x][y] = 0;
@@ -390,7 +390,7 @@ void InitGameEngine_MM_AfterFadingIn()
     PlaySoundExt(SND_FUEL, SOUND_MAX_VOLUME, SOUND_MAX_RIGHT, SND_CTRL_PLAY_LOOP);
 
 #if 0 // !!! TEMPORARILY DISABLED !!!
-  for(i=0; i<=game_mm.energy_left; i+=2)
+  for (i = 0; i <= game_mm.energy_left; i += 2)
   {
     if (!setup.sound_loops)
       PlaySoundStereo(SND_FUEL, SOUND_MAX_RIGHT);
@@ -433,6 +433,7 @@ void AddLaserEdge(int lx, int ly)
   if (lx < -2 || ly < -2 || lx >= SXSIZE + 2 || ly >= SYSIZE + 2)
   {
     Error(ERR_WARN, "AddLaserEdge: out of bounds: %d, %d", lx, ly);
+
     return;
   }
 
@@ -464,8 +465,8 @@ boolean StepBehind()
 
     return ((x - last_x) * XS < 0 || (y - last_y) * YS < 0);
   }
-  else
-    return FALSE;
+
+  return FALSE;
 }
 
 static int getMaskFromElement(int element)
@@ -505,7 +506,7 @@ int ScanPixel()
     }
 #endif
 
-    for (i=0; i<4; i++)
+    for (i = 0; i < 4; i++)
     {
       int px = LX + (i % 2) * 2;
       int py = LY + (i / 2) * 2;
@@ -588,6 +589,7 @@ void ScanLaser()
     {
       end = 1;
       laser.overloaded = TRUE;
+
       break;
     }
 
@@ -677,6 +679,7 @@ void ScanLaser()
       if (HitBlock(element, hit_mask))
       {
 	rf = 1;
+
 	break;
       }
     }
@@ -731,6 +734,7 @@ void ScanLaser()
 
     LX -= XS;
     LY -= YS;
+
     AddLaserEdge(LX, LY);
   }
 
@@ -758,12 +762,14 @@ void DrawLaserExt(int start_edge, int num_edges, int mode)
   if (start_edge < 0)
   {
     Error(ERR_WARN, "DrawLaserExt: start_edge < 0");
+
     return;
   }
 
   if (num_edges < 0)
   {
     Error(ERR_WARN, "DrawLaserExt: num_edges < 0");
+
     return;
   }
 
@@ -792,18 +798,19 @@ void DrawLaserExt(int start_edge, int num_edges, int mode)
     /* determine the starting edge, from which graphics need to be restored */
     if (start_edge > 0)
     {
-      for(i=0; i<laser.num_damages; i++)
+      for (i = 0; i < laser.num_damages; i++)
       {
 	if (laser.damage[i].edge == start_edge + 1)
 	{
 	  damage_start = i;
+
 	  break;
 	}
       }
     }
 
     /* restore graphics from this starting edge to the end of damage list */
-    for(i=damage_start; i<laser.num_damages; i++)
+    for (i = damage_start; i < laser.num_damages; i++)
     {
       int lx = laser.damage[i].x;
       int ly = laser.damage[i].y;
@@ -829,7 +836,7 @@ void DrawLaserExt(int start_edge, int num_edges, int mode)
     {
       int i;
 
-      for (i=0; i<laser.num_beamers; i++)
+      for (i = 0; i < laser.num_beamers; i++)
 	printf("-> %d\n", laser.beamer_edge[i]);
       printf("DrawLaserExt: IS_BEAMER: [%d]: Hit[%d][%d] == %d [%d]\n",
 	     mode, elx, ely, Hit[elx][ely], start_edge);
@@ -844,6 +851,7 @@ void DrawLaserExt(int start_edge, int num_edges, int mode)
     {
       /* element is outgoing beamer */
       laser.num_damages = damage_start + 1;
+
       if (IS_BEAMER(element))
 	laser.current_angle = get_element_angle(element);
     }
@@ -866,6 +874,7 @@ void DrawLaserExt(int start_edge, int num_edges, int mode)
   laser.num_edges = start_edge + 1;
   if (start_edge == 0)
     laser.current_angle = laser.start_angle;
+
   LX = laser.edge[start_edge].x - (SX + 2);
   LY = laser.edge[start_edge].y - (SY + 2);
   XS = 2 * Step[laser.current_angle].x;
@@ -936,6 +945,7 @@ void DrawLaser(int start_edge, int mode)
   if (laser.num_edges - start_edge < 0)
   {
     Error(ERR_WARN, "DrawLaser: laser.num_edges - start_edge < 0");
+
     return;
   }
 
@@ -949,7 +959,7 @@ void DrawLaser(int start_edge, int mode)
       int tmp_start_edge = start_edge;
 
       /* draw laser segments forward from the start to the last beamer */
-      for (i=0; i<laser.num_beamers; i++)
+      for (i = 0; i < laser.num_beamers; i++)
       {
 	int tmp_num_edges = laser.beamer_edge[i] - tmp_start_edge;
 
@@ -962,6 +972,7 @@ void DrawLaser(int start_edge, int mode)
 #endif
 
 	DrawLaserExt(tmp_start_edge, tmp_num_edges, DL_LASER_ENABLED);
+
 	tmp_start_edge = laser.beamer_edge[i];
       }
 
@@ -976,7 +987,7 @@ void DrawLaser(int start_edge, int mode)
       int num_beamers = laser.num_beamers;
 
       /* delete laser segments backward from the end to the first beamer */
-      for (i=num_beamers-1; i>=0; i--)
+      for (i = num_beamers-1; i >= 0; i--)
       {
 	int tmp_num_edges = last_num_edges - laser.beamer_edge[i];
 
@@ -984,6 +995,7 @@ void DrawLaser(int start_edge, int mode)
 	  break;
 
 	DrawLaserExt(laser.beamer_edge[i], tmp_num_edges, DL_LASER_DISABLED);
+
 	last_num_edges = laser.beamer_edge[i];
 	laser.num_beamers--;
       }
@@ -999,7 +1011,9 @@ void DrawLaser(int start_edge, int mode)
     }
   }
   else
+  {
     DrawLaserExt(start_edge, laser.num_edges - start_edge, mode);
+  }
 }
 
 boolean HitElement(int element, int hit_mask)
@@ -1070,6 +1084,7 @@ boolean HitElement(int element, int hit_mask)
        (element - EL_POLAR_START) / 2 != laser.current_angle % 8))
   {
     PlaySoundStereo(SND_KINK, ST(ELX));
+
     laser.num_damages--;
 
     return TRUE;
@@ -1079,6 +1094,7 @@ boolean HitElement(int element, int hit_mask)
       (element - EL_POLAR_CROSS_START) != laser.current_angle % 4)
   {
     PlaySoundStereo(SND_KINK, ST(ELX));
+
     laser.num_damages--;
 
     return TRUE;
@@ -1098,6 +1114,7 @@ boolean HitElement(int element, int hit_mask)
 
     LX = ELX * TILEX + 14;
     LY = ELY * TILEY + 14;
+
     AddLaserEdge(LX, LY);
   }
 
@@ -1114,7 +1131,9 @@ boolean HitElement(int element, int hit_mask)
     int step_size;
 
     laser.num_damages--;
+
     AddDamagedField(ELX, ELY);
+
     laser.damage[laser.num_damages - 1].is_mirror = TRUE;
 
     if (!Hit[ELX][ELY])
@@ -1209,9 +1228,9 @@ boolean HitElement(int element, int hit_mask)
 
         PlaySoundStereo(SND_KLING, ST(ELX));
 
-	for(y=0; y<lev_fieldy; y++)
+	for (y = 0; y < lev_fieldy; y++)
 	{
-	  for(x=0; x<lev_fieldx; x++)
+	  for (x = 0; x < lev_fieldx; x++)
 	  {
 	    /* initiate opening animation of exit door */
 	    if (Feld[x][y] == EL_EXIT_CLOSED)
@@ -1229,6 +1248,7 @@ boolean HitElement(int element, int hit_mask)
 	      if (IN_LEV_FIELD(blocking_x, blocking_y))
 	      {
 		Feld[blocking_x][blocking_y] = EL_EMPTY;
+
 		DrawField_MM(blocking_x, blocking_y);
 	      }
 	    }
@@ -1239,9 +1259,13 @@ boolean HitElement(int element, int hit_mask)
       }
     }
     else if (element == EL_KEY)
+    {
       game_mm.num_keys++;
+    }
     else if (element == EL_LIGHTBALL)
+    {
       RaiseScore_MM(10);
+    }
     else if (IS_PACMAN(element))
     {
       DeletePacMan(ELX, ELY);
@@ -1304,8 +1328,10 @@ boolean HitElement(int element, int hit_mask)
 
       LX = ELX * TILEX + 14;
       LY = ELY * TILEY + 14;
+
       AddLaserEdge(LX, LY);
       AddDamagedField(ELX, ELY);
+
       laser.damage[laser.num_damages - 1].is_mirror = TRUE;
 
       if (!Hit[ELX][ELY])
@@ -1326,8 +1352,10 @@ boolean HitElement(int element, int hit_mask)
       }
 
       laser.beamer_edge[laser.num_beamers] = laser.num_edges;
+
       AddLaserEdge(LX, LY);
       AddDamagedField(ELX, ELY);
+
       laser.damage[laser.num_damages - 1].is_mirror = TRUE;
 
       if (!Hit[ELX][ELY])
@@ -1388,6 +1416,7 @@ boolean HitOnlyAnEdge(int element, int hit_mask)
     }
 
     AddDamagedField((LX + 2 * dx) / TILEX, (LY + 2 * dy) / TILEY);
+
     LX += XS;
     LY += YS;
 
@@ -1462,14 +1491,22 @@ boolean HitPolarizer(int element, int hit_mask)
       return FALSE;
     }
     else if (IS_GRID_STEEL_FIXED(element) || IS_GRID_STEEL_AUTO(element))
+    {
       return HitReflectingWalls(element, hit_mask);
+    }
     else
+    {
       return HitAbsorbingWalls(element, hit_mask);
+    }
   }
   else if (IS_GRID_STEEL(element))
+  {
     return HitReflectingWalls(element, hit_mask);
+  }
   else	/* IS_GRID_WOOD */
+  {
     return HitAbsorbingWalls(element, hit_mask);
+  }
 
   return TRUE;
 }
@@ -1490,7 +1527,7 @@ boolean HitBlock(int element, int hit_mask)
 
     check = TRUE;
 
-    for(i=1; i<32; i++)
+    for (i = 1; i < 32; i++)
     {
       x = LX + i * XS;
       y = LY + i * YS;
@@ -1524,6 +1561,7 @@ boolean HitBlock(int element, int hit_mask)
 	(hit_mask & hit_mask_diagonal2) == hit_mask_diagonal2)
     {
       laser.overloaded = (element == EL_GATE_STONE);
+
       return TRUE;
     }
 
@@ -1541,6 +1579,7 @@ boolean HitBlock(int element, int hit_mask)
     Bang_MM(ELX, ELY);
 
     game_mm.num_keys--;
+
     if (element == EL_GATE_STONE && Box[ELX][ELY])
     {
       DrawLaser(Box[ELX][ELY] - 1, DL_LASER_DISABLED);
@@ -1582,6 +1621,7 @@ boolean HitBlock(int element, int hit_mask)
 
     LX = ELX * TILEX + 14;
     LY = ELY * TILEY + 14;
+
     AddLaserEdge(LX, LY);
 
     laser.stops_inside_element = TRUE;
@@ -1653,8 +1693,10 @@ boolean HitReflectingWalls(int element, int hit_mask)
 					    hit_mask == HIT_MASK_BOTTOM))
   {
     PlaySoundStereo(SND_HUI, ST(ELX));
+
     LX -= XS;
     LY -= YS;
+
     if (!IS_DF_GRID(element))
       AddLaserEdge(LX, LY);
 
@@ -1675,6 +1717,7 @@ boolean HitReflectingWalls(int element, int hit_mask)
       }
 
       AddLaserEdge(LX, LY);
+
       XS = 2 * Step[laser.current_angle].x;
       YS = 2 * Step[laser.current_angle].y;
 
@@ -1749,6 +1792,7 @@ boolean HitReflectingWalls(int element, int hit_mask)
 	 ANG_MIRROR_135 : ANG_MIRROR_45);
 
       PlaySoundStereo(SND_HUI, ST(ELX));
+
       AddDamagedField(ELX, ELY);
       AddLaserEdge(LX, LY);
 
@@ -1759,6 +1803,7 @@ boolean HitReflectingWalls(int element, int hit_mask)
 
       LX += XS;
       LY += YS;
+
       AddLaserEdge(LX, LY);
 
       return FALSE;
@@ -1783,9 +1828,11 @@ boolean HitReflectingWalls(int element, int hit_mask)
 	 ANG_MIRROR_135 : ANG_MIRROR_45);
 
       PlaySoundStereo(SND_HUI, ST(ELX));
+
       /*
       AddDamagedField(ELX, ELY);
       */
+
       AddLaserEdge(LX - XS, LY - YS);
       AddLaserEdge(LX - XS + (ABS(XS) == 4 ? XS/2 : 0),
 		   LY - YS + (ABS(YS) == 4 ? YS/2 : 0));
@@ -1797,6 +1844,7 @@ boolean HitReflectingWalls(int element, int hit_mask)
 
       LX += XS;
       LY += YS;
+
       AddLaserEdge(LX, LY);
 
       return FALSE;
@@ -1817,6 +1865,7 @@ boolean HitReflectingWalls(int element, int hit_mask)
       if (LX != last_LX || LY != last_LY || hit_mask == last_hit_mask)
       {
 	AddDamagedField(ELX, ELY);
+
 	LX += 8 * XS;
 	LY += 8 * YS;
 
@@ -1832,6 +1881,7 @@ boolean HitReflectingWalls(int element, int hit_mask)
   if (!HitOnlyAnEdge(element, hit_mask))
   {
     laser.overloaded = TRUE;
+
     return TRUE;
   }
 
@@ -1847,6 +1897,7 @@ boolean HitAbsorbingWalls(int element, int hit_mask)
       (hit_mask == HIT_MASK_LEFT || hit_mask == HIT_MASK_RIGHT))
   {
     AddLaserEdge(LX - XS, LY - YS);
+
     LX = LX + XS / 2;
     LY = LY + YS;
   }
@@ -1855,6 +1906,7 @@ boolean HitAbsorbingWalls(int element, int hit_mask)
       (hit_mask == HIT_MASK_TOP || hit_mask == HIT_MASK_BOTTOM))
   {
     AddLaserEdge(LX - XS, LY - YS);
+
     LX = LX + XS;
     LY = LY + YS / 2;
   }
@@ -1869,6 +1921,7 @@ boolean HitAbsorbingWalls(int element, int hit_mask)
       element == EL_GATE_WOOD)
   {
     PlaySoundStereo(SND_HOLZ, ST(ELX));
+
     return TRUE;
   }
 
@@ -1887,7 +1940,7 @@ boolean HitAbsorbingWalls(int element, int hit_mask)
     {
       int i;
 
-      for(i=0; i<4; i++)
+      for (i = 0; i < 4; i++)
       {
 	if (mask == (1 << i) && (XS > 0) == (i % 2) && (YS > 0) == (i / 2))
 	  mask = 15 - (8 >> i);
@@ -1916,6 +1969,7 @@ boolean HitAbsorbingWalls(int element, int hit_mask)
     if (element2 != EL_EMPTY && !IS_WALL_AMOEBA(element2))
     {
       laser.dest_element = EL_EMPTY;
+
       return TRUE;
     }
 
@@ -1949,6 +2003,7 @@ void OpenExit(int x, int y)
 
     MovDelay[x][y]--;
     phase = MovDelay[x][y] / delay;
+
     if (!(MovDelay[x][y] % delay) && IN_SCR_FIELD(x, y))
       DrawGraphicAnimation_MM(x, y, IMG_MM_EXIT_OPENING, 3 - phase);
 
@@ -1970,6 +2025,7 @@ void OpenSurpriseBall(int x, int y)
   if (MovDelay[x][y])		/* wait some time before next frame */
   {
     MovDelay[x][y]--;
+
     if (!(MovDelay[x][y] % delay) && IN_SCR_FIELD(x, y))
     {
       Bitmap *bitmap;
@@ -1978,8 +2034,10 @@ void OpenSurpriseBall(int x, int y)
       int dx = RND(26), dy = RND(26);
 
       getGraphicSource(graphic, 0, &bitmap, &gx, &gy);
+
       BlitBitmap(bitmap, drawto, gx + dx, gy + dy, 6, 6,
 		 SX + x * TILEX + dx, SY + y * TILEY + dy);
+
       MarkTileDirty(x, y);
     }
 
@@ -2023,7 +2081,7 @@ void MeltIce(int x, int y)
       if (Feld[x][y] == EL_WALL_ICE)
 	Feld[x][y] = EL_EMPTY;
 
-      for (i = (laser.num_damages > 0 ? laser.num_damages - 1 : 0); i>=0; i--)
+      for (i = (laser.num_damages > 0 ? laser.num_damages - 1 : 0); i >= 0; i--)
 	if (laser.damage[i].is_mirror)
 	  break;
 
@@ -2069,7 +2127,9 @@ void GrowAmoeba(int x, int y)
       DrawLaser(0, DL_LASER_ENABLED);
     }
     else if (!(MovDelay[x][y] % delay) && IN_SCR_FIELD(x, y))
+    {
       DrawWallsAnimation_MM(x, y, real_element, phase, wall_mask);
+    }
   }
 }
 
@@ -2090,6 +2150,7 @@ static void Explode_MM(int x, int y, int phase, int mode)
       /* put moving element to center field (and let it explode there) */
       center_element = MovingOrBlocked2Element_MM(x, y);
       RemoveMovingField_MM(x, y);
+
       Feld[x][y] = center_element;
     }
 
@@ -2097,6 +2158,7 @@ static void Explode_MM(int x, int y, int phase, int mode)
       Store[x][y] = center_element;
     else
       Store[x][y] = EL_EMPTY;
+
     Store2[x][y] = mode;
     Feld[x][y] = EL_EXPLODING_OPAQUE;
     MovDir[x][y] = MovPos[x][y] = MovDelay[x][y] = 0;
@@ -2136,6 +2198,7 @@ static void Explode_MM(int x, int y, int phase, int mode)
     Feld[x][y] = Store[x][y];
     Store[x][y] = Store2[x][y] = 0;
     MovDir[x][y] = MovPos[x][y] = MovDelay[x][y] = 0;
+
     InitField(x, y, FALSE);
     DrawField_MM(x, y);
   }
@@ -2149,7 +2212,9 @@ static void Explode_MM(int x, int y, int phase, int mode)
     if (Store2[x][y] == EX_KETTLE)
     {
       if (graphic_phase < 3)
+      {
 	graphic = IMG_MM_KETTLE_EXPLODING;
+      }
       else if (graphic_phase < 5)
       {
 	graphic_phase += 3;
@@ -2163,7 +2228,9 @@ static void Explode_MM(int x, int y, int phase, int mode)
     else if (Store2[x][y] == EX_SHORT)
     {
       if (graphic_phase < 4)
+      {
 	graphic_phase += 4;
+      }
       else
       {
 	graphic = IMG_EMPTY;
@@ -2175,6 +2242,7 @@ static void Explode_MM(int x, int y, int phase, int mode)
 
     BlitBitmap(bitmap, drawto_field, src_x, src_y, TILEX, TILEY,
 	       FX + x * TILEX, FY + y * TILEY);
+
     MarkTileDirty(x, y);
   }
 }
@@ -2250,7 +2318,7 @@ void TurnRound(int x, int y)
   int right_dir = turn[old_move_dir].right;
   int back_dir = turn[old_move_dir].back;
   int right_dx = move_xy[right_dir].x, right_dy = move_xy[right_dir].y;
-  int right_x = x+right_dx, right_y = y+right_dy;
+  int right_x = x + right_dx, right_y = y + right_dy;
 
   if (element == EL_PACMAN)
   {
@@ -2298,6 +2366,7 @@ static void StartMoving_MM(int x, int y)
     {
       Store[newx][newy] = Feld[newx][newy];
       Feld[newx][newy] = EL_EMPTY;
+
       DrawField_MM(newx, newy);
     }
     else if (!IN_LEV_FIELD(newx, newy) || !IS_FREE(newx, newy) ||
@@ -2360,7 +2429,9 @@ static void ContinueMoving_MM(int x, int y)
     }
   }
   else				/* still moving on */
+  {
     DrawField_MM(x, y);
+  }
 
   laser.redraw = TRUE;
 }
@@ -2412,6 +2483,7 @@ void ClickElement(int mx, int my, int button)
     if (!laser.fuse_off)
     {
       DrawLaser(0, DL_LASER_DISABLED);
+
       /*
       BackToFront();
       */
@@ -2424,9 +2496,11 @@ void ClickElement(int mx, int my, int button)
 
     Feld[x][y] = element;
     DrawField_MM(x, y);
+
     /*
     BackToFront();
     */
+
     if (!laser.fuse_off)
       ScanLaser();
   }
@@ -2495,7 +2569,9 @@ void RotateMirror(int x, int y, int button)
       hold_y = y;
     }
     else if (button == MB_RIGHTBUTTON && (hold_x != x || hold_y != y))
+    {
       Feld[x][y] = get_rotated_element(Feld[x][y], ROTATE_RIGHT);
+    }
   }
 
   if (IS_GRID_STEEL_AUTO(Feld[x][y]) || IS_GRID_WOOD_AUTO(Feld[x][y]))
@@ -2565,9 +2641,9 @@ void AutoRotateMirrors()
   if (!DelayReached(&rotate_delay, AUTO_ROTATE_DELAY))
     return;
 
-  for (x=0; x<lev_fieldx; x++)
+  for (x = 0; x < lev_fieldx; x++)
   {
-    for (y=0; y<lev_fieldy; y++)
+    for (y = 0; y < lev_fieldy; y++)
     {
       int element = Feld[x][y];
 
@@ -2595,7 +2671,7 @@ boolean ObjHit(int obx, int oby, int bits)
 
   if (bits & HIT_POS_EDGE)
   {
-    for(i=0; i<4; i++)
+    for (i = 0; i < 4; i++)
       if (ReadPixel(drawto,
 		    SX + obx + 31 * (i % 2),
 		    SY + oby + 31 * (i / 2)) == pen_ray)
@@ -2604,7 +2680,7 @@ boolean ObjHit(int obx, int oby, int bits)
 
   if (bits & HIT_POS_BETWEEN)
   {
-    for(i=0; i<4; i++)
+    for (i = 0; i < 4; i++)
       if (ReadPixel(drawto,
 		    SX + 4 + obx + 22 * (i % 2),
 		    SY + 4 + oby + 22 * (i / 2)) == pen_ray)
@@ -2626,16 +2702,16 @@ void DeletePacMan(int px, int py)
     return;
   }
 
-  for(i=0; i<game_mm.num_pacman; i++)
+  for (i = 0; i < game_mm.num_pacman; i++)
     if (game_mm.pacman[i].x == px && game_mm.pacman[i].y == py)
       break;
 
   game_mm.num_pacman--;
 
-  for(j=i; j<game_mm.num_pacman; j++)
+  for (j = i; j < game_mm.num_pacman; j++)
   {
-    game_mm.pacman[j].x = game_mm.pacman[j + 1].x;
-    game_mm.pacman[j].y = game_mm.pacman[j + 1].y;
+    game_mm.pacman[j].x   = game_mm.pacman[j + 1].x;
+    game_mm.pacman[j].y   = game_mm.pacman[j + 1].y;
     game_mm.pacman[j].dir = game_mm.pacman[j + 1].dir;
   }
 }
@@ -2667,6 +2743,7 @@ void ColorCycling(void)
       mult =- mult / 16;
       old = color;
       new = new << 4;
+
       if (new > 0x100)
 	new = 0x001;
     }
@@ -2696,10 +2773,10 @@ static void GameActions_MM_Ext(byte action[MAX_PLAYERS], boolean warp_mode)
 
   WaitUntilDelayReached(&action_delay, GameFrameDelay);
 
-  for (y=0; y<lev_fieldy; y++) for (x=0; x<lev_fieldx; x++)
+  for (y = 0; y < lev_fieldy; y++) for (x = 0; x < lev_fieldx; x++)
     Stop[x][y] = FALSE;
 
-  for (y=0; y<lev_fieldy; y++) for (x=0; x<lev_fieldx; x++)
+  for (y = 0; y < lev_fieldy; y++) for (x = 0; x < lev_fieldx; x++)
   {
     element = Feld[x][y];
 
@@ -2760,7 +2837,7 @@ static void GameActions_MM_Ext(byte action[MAX_PLAYERS], boolean warp_mode)
     {
       int i;
 
-      for(i=15; i>=0; i--)
+      for (i = 15; i >= 0; i--)
       {
 #if 0
 	SetRGB(pen_ray, 0x0000, 0x0000, i * color_scale);
@@ -2769,6 +2846,7 @@ static void GameActions_MM_Ext(byte action[MAX_PLAYERS], boolean warp_mode)
 				  native_mm_level.laser_red   * 0x11 * i,
 				  native_mm_level.laser_green * 0x11 * i,
 				  native_mm_level.laser_blue  * 0x11 * i);
+
 	DrawLaser(0, DL_LASER_ENABLED);
 	BackToFront();
 	Delay(50);
@@ -2844,10 +2922,12 @@ static void GameActions_MM_Ext(byte action[MAX_PLAYERS], boolean warp_mode)
       SetRGB(pen_ray, (laser.overload_value / 6) * color_scale, 0x0000,
 	     (15 - (laser.overload_value / 6)) * color_scale);
 #endif
-      pen_ray = GetPixelFromRGB(window,
-				(native_mm_level.laser_red  ? 0xFF : color_up),
-				(native_mm_level.laser_green ? color_down : 0x00),
-				(native_mm_level.laser_blue  ? color_down : 0x00));
+      pen_ray =
+	GetPixelFromRGB(window,
+			(native_mm_level.laser_red  ? 0xFF : color_up),
+			(native_mm_level.laser_green ? color_down : 0x00),
+			(native_mm_level.laser_blue  ? color_down : 0x00));
+
       DrawLaser(0, DL_LASER_ENABLED);
       BackToFront();
     }
@@ -2855,7 +2935,8 @@ static void GameActions_MM_Ext(byte action[MAX_PLAYERS], boolean warp_mode)
     if (laser.overloaded)
     {
       if (setup.sound_loops)
-	PlaySoundExt(SND_WARNTON, SOUND_MAX_VOLUME, SOUND_MAX_RIGHT, SND_CTRL_PLAY_LOOP);
+	PlaySoundExt(SND_WARNTON, SOUND_MAX_VOLUME, SOUND_MAX_RIGHT,
+		     SND_CTRL_PLAY_LOOP);
       else
 	PlaySoundStereo(SND_WARNTON, SOUND_MAX_RIGHT);
     }
@@ -2891,19 +2972,21 @@ static void GameActions_MM_Ext(byte action[MAX_PLAYERS], boolean warp_mode)
     {
       int i;
 
-      for(i=15; i>=0; i--)
+      for (i = 15; i >= 0; i--)
       {
 #if 0
 	SetRGB(pen_ray, i * color_scale, 0x0000, 0x0000);
 #endif
 
 	pen_ray = GetPixelFromRGB(window, 0x11 * i, 0x00, 0x00);
+
 	DrawLaser(0, DL_LASER_ENABLED);
 	BackToFront();
 	Delay(50);
       }
 
       DrawLaser(0, DL_LASER_DISABLED);
+
       game_mm.game_over = TRUE;
       game_mm.game_over_cause = GAME_OVER_OVERLOADED;
 
@@ -2972,6 +3055,7 @@ static void GameActions_MM_Ext(byte action[MAX_PLAYERS], boolean warp_mode)
     laser.fuse_off = TRUE;
     laser.fuse_x = ELX;
     laser.fuse_y = ELY;
+
     DrawLaser(0, DL_LASER_DISABLED);
     DrawGraphic_MM(ELX, ELY, IMG_MM_FUSE);
   }
@@ -3030,7 +3114,7 @@ static void GameActions_MM_Ext(byte action[MAX_PLAYERS], boolean warp_mode)
 
     graphic = el2gfx(element);
 
-    for(i=0; i<50; i++)
+    for (i = 0; i < 50; i++)
     {
       int x = RND(26);
       int y = RND(26);
@@ -3099,8 +3183,6 @@ static void GameActions_MM_Ext(byte action[MAX_PLAYERS], boolean warp_mode)
   {
     PlaySoundStereo(SND_SLURP, ST(ELX));
 
-
-
     {
       Feld[ELX][ELY] = Feld[ELX][ELY] - EL_WALL_ICE + EL_WALL_CHANGING;
       Store[ELX][ELY] = EL_WALL_ICE;
@@ -3111,10 +3193,7 @@ static void GameActions_MM_Ext(byte action[MAX_PLAYERS], boolean warp_mode)
       return;
     }
 
-
-
-
-    for(i=0; i<5; i++)
+    for (i = 0; i < 5; i++)
     {
       int phase = i + 1;
 
@@ -3138,7 +3217,7 @@ static void GameActions_MM_Ext(byte action[MAX_PLAYERS], boolean warp_mode)
     LY = laser.edge[laser.num_edges].y - (SY + 2);
 */
 
-    for (i = (laser.num_damages > 0 ? laser.num_damages - 1 : 0); i>=0; i--)
+    for (i = (laser.num_damages > 0 ? laser.num_damages - 1 : 0); i >= 0; i--)
       if (laser.damage[i].is_mirror)
 	break;
 
@@ -3160,7 +3239,7 @@ static void GameActions_MM_Ext(byte action[MAX_PLAYERS], boolean warp_mode)
     if (element2 != EL_EMPTY && !IS_WALL_AMOEBA(element))
       return;
 
-    for (i = laser.num_damages - 1; i>=0; i--)
+    for (i = laser.num_damages - 1; i >= 0; i--)
       if (laser.damage[i].is_mirror)
 	break;
 
@@ -3180,10 +3259,11 @@ static void GameActions_MM_Ext(byte action[MAX_PLAYERS], boolean warp_mode)
 
       x = laser.damage[k1].x;
       y = laser.damage[k1].y;
+
       DrawField_MM(x, y);
     }
 
-    for(i=0; i<4; i++)
+    for (i = 0; i < 4; i++)
     {
       if (laser.wall_mask & (1 << i))
       {
@@ -3200,7 +3280,7 @@ static void GameActions_MM_Ext(byte action[MAX_PLAYERS], boolean warp_mode)
 
     k2 = i;
 
-    for(i=0; i<4; i++)
+    for (i = 0; i < 4; i++)
     {
       if (laser.wall_mask & (1 << i))
       {
@@ -3220,29 +3300,26 @@ static void GameActions_MM_Ext(byte action[MAX_PLAYERS], boolean warp_mode)
     {
       laser.num_edges = r;
       laser.num_damages = d;
+
       DrawLaser(0, DL_LASER_DISABLED);
     }
 
     Feld[ELX][ELY] = element | laser.wall_mask;
+
     dx = ELX;
     dy = ELY;
     de = Feld[ELX][ELY];
     dm = laser.wall_mask;
-
-
 
 #if 1
     {
       int x = ELX, y = ELY;
       int wall_mask = laser.wall_mask;
 
-
       ScanLaser();
       DrawLaser(0, DL_LASER_ENABLED);
 
       PlaySoundStereo(SND_AMOEBE, ST(dx));
-
-
 
       Feld[x][y] = Feld[x][y] - EL_WALL_AMOEBA + EL_WALL_CHANGING;
       Store[x][y] = EL_WALL_AMOEBA;
@@ -3252,17 +3329,16 @@ static void GameActions_MM_Ext(byte action[MAX_PLAYERS], boolean warp_mode)
     }
 #endif
 
-
-
     DrawWallsAnimation_MM(dx, dy, de, 4, dm);
     ScanLaser();
     DrawLaser(0, DL_LASER_ENABLED);
 
     PlaySoundStereo(SND_AMOEBE, ST(dx));
 
-    for(i=4; i>=0; i--)
+    for (i = 4; i >= 0; i--)
     {
       DrawWallsAnimation_MM(dx, dy, de, i, dm);
+
       BackToFront();
       Delay(20);
     }
@@ -3285,12 +3361,12 @@ static void GameActions_MM_Ext(byte action[MAX_PLAYERS], boolean warp_mode)
     if (XS < YS)
       k += 2;
 
-    for(i=0; i<4; i++)
+    for (i = 0; i < 4; i++)
     {
       if (i)
 	k++;
       if (k > 3)
-	k=0;
+	k = 0;
 
       x = ELX + Step[k * 4].x;
       y = ELY + Step[k * 4].y;
@@ -3307,6 +3383,7 @@ static void GameActions_MM_Ext(byte action[MAX_PLAYERS], boolean warp_mode)
     if (i > 3)
     {
       laser.overloaded = (element == EL_BLOCK_STONE);
+
       return;
     }
 
@@ -3331,7 +3408,7 @@ static void GameActions_MM_Ext(byte action[MAX_PLAYERS], boolean warp_mode)
 
   if (element == EL_FUEL_FULL && CT > 200)
   {
-    for(i=game_mm.energy_left; i<=MAX_LASER_ENERGY; i+=2)
+    for (i = game_mm.energy_left; i <= MAX_LASER_ENERGY; i+=2)
     {
 #if 0
       BlitBitmap(pix[PIX_DOOR], drawto,
@@ -3376,9 +3453,10 @@ void MovePacMen()
 
   if (++p >= game_mm.num_pacman)
     p = 0;
+
   game_mm.pacman[p].dir--;
 
-  for(l=1; l<5; l++)
+  for (l = 1; l < 5; l++)
   {
     game_mm.pacman[p].dir++;
 
@@ -3401,6 +3479,7 @@ void MovePacMen()
     nx = ox + mx;
     ny = oy + my;
     element = Feld[nx][ny];
+
     if (nx < 0 || nx > 15 || ny < 0 || ny > 11)
       continue;
 
@@ -3434,12 +3513,13 @@ void MovePacMen()
       ox = SX + ox * TILEX;
       oy = SY + oy * TILEY;
 
-      for(i=1; i<33; i+=2)
+      for (i = 1; i < 33; i += 2)
 	BlitBitmap(bitmap, window,
 		   src_x, src_y, TILEX, TILEY,
 		   ox + i * mx, oy + i * my);
       Ct = Ct + Counter() - CT;
     }
+
     DrawField_MM(nx, ny);
     BackToFront();
 
@@ -3450,14 +3530,13 @@ void MovePacMen()
       if (ObjHit(nx, ny, HIT_POS_BETWEEN))
       {
 	AddDamagedField(nx, ny);
+
 	laser.damage[laser.num_damages - 1].edge = 0;
       }
     }
 
     if (element == EL_BOMB)
-    {
       DeletePacMan(nx, ny);
-    }
 
     if (IS_WALL_AMOEBA(element) &&
 	(LX + 2 * XS) / TILEX == nx &&
@@ -3466,6 +3545,7 @@ void MovePacMen()
       laser.num_edges--;
       ScanLaser();
     }
+
     break;
   }
 }
@@ -3485,9 +3565,10 @@ void GameWon_MM()
   if (game_mm.energy_left)
   {
     if (setup.sound_loops)
-      PlaySoundExt(SND_SIRR, SOUND_MAX_VOLUME, SOUND_MAX_RIGHT, SND_CTRL_PLAY_LOOP);
+      PlaySoundExt(SND_SIRR, SOUND_MAX_VOLUME, SOUND_MAX_RIGHT,
+		   SND_CTRL_PLAY_LOOP);
 
-    while(game_mm.energy_left > 0)
+    while (game_mm.energy_left > 0)
     {
       if (!setup.sound_loops)
 	PlaySoundStereo(SND_SIRR, SOUND_MAX_RIGHT);
@@ -3521,9 +3602,10 @@ void GameWon_MM()
   else if (native_mm_level.time == 0)		/* level without time limit */
   {
     if (setup.sound_loops)
-      PlaySoundExt(SND_SIRR, SOUND_MAX_VOLUME, SOUND_MAX_RIGHT, SND_CTRL_PLAY_LOOP);
+      PlaySoundExt(SND_SIRR, SOUND_MAX_VOLUME, SOUND_MAX_RIGHT,
+		   SND_CTRL_PLAY_LOOP);
 
-    while(TimePlayed < 999)
+    while (TimePlayed < 999)
     {
       if (!setup.sound_loops)
 	PlaySoundStereo(SND_SIRR, SOUND_MAX_RIGHT);
@@ -3568,15 +3650,19 @@ void GameWon_MM()
   if ((hi_pos = NewHiScore_MM()) >= 0)
   {
     game_status = HALLOFFAME;
+
     // DrawHallOfFame(hi_pos);
+
     if (raise_level)
       level_nr++;
   }
   else
   {
     game_status = MAINMENU;
+
     if (raise_level)
       level_nr++;
+
     // DrawMainMenu();
   }
 
@@ -3594,7 +3680,7 @@ int NewHiScore_MM()
       game_mm.score < highscore[MAX_SCORE_ENTRIES - 1].Score)
     return -1;
 
-  for (k=0; k<MAX_SCORE_ENTRIES; k++)
+  for (k = 0; k < MAX_SCORE_ENTRIES; k++)
   {
     if (game_mm.score > highscore[k].Score)
     {
@@ -3605,14 +3691,14 @@ int NewHiScore_MM()
 	int m = MAX_SCORE_ENTRIES - 1;
 
 #ifdef ONE_PER_NAME
-	for (l=k; l<MAX_SCORE_ENTRIES; l++)
+	for (l = k; l < MAX_SCORE_ENTRIES; l++)
 	  if (!strcmp(setup.player_name, highscore[l].Name))
 	    m = l;
 	if (m == k)	/* player's new highscore overwrites his old one */
 	  goto put_into_list;
 #endif
 
-	for (l=m; l>k; l--)
+	for (l = m; l>k; l--)
 	{
 	  strcpy(highscore[l].Name, highscore[l - 1].Name);
 	  highscore[l].Score = highscore[l - 1].Score;
@@ -3626,6 +3712,7 @@ int NewHiScore_MM()
       highscore[k].Name[MAX_PLAYER_NAME_LEN] = '\0';
       highscore[k].Score = game_mm.score;
       position = k;
+
       break;
     }
 
@@ -3650,6 +3737,7 @@ static void InitMovingField_MM(int x, int y, int direction)
 
   MovDir[x][y] = direction;
   MovDir[newx][newy] = direction;
+
   if (Feld[newx][newy] == EL_EMPTY)
     Feld[newx][newy] = EL_BLOCKED;
 }
@@ -3692,10 +3780,11 @@ static int MovingOrBlocked2Element_MM(int x, int y)
     int oldx, oldy;
 
     Blocked2Moving_MM(x, y, &oldx, &oldy);
+
     return Feld[oldx][oldy];
   }
-  else
-    return element;
+
+  return element;
 }
 
 #if 0
@@ -3778,6 +3867,7 @@ void PlaySoundLevel(int x, int y, int sound_nr)
 static void RaiseScore_MM(int value)
 {
   game_mm.score += value;
+
 #if 0
   DrawText(DX_SCORE, DY_SCORE, int2str(game_mm.score, 4),
 	   FONT_TEXT_2);
@@ -3791,9 +3881,11 @@ void RaiseScoreElement_MM(int element)
     case EL_PACMAN:
       RaiseScore_MM(native_mm_level.score[SC_PACMAN]);
       break;
+
     case EL_KEY:
       RaiseScore_MM(native_mm_level.score[SC_KEY]);
       break;
+
     default:
       break;
   }

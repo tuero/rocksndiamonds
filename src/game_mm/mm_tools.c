@@ -49,6 +49,7 @@ void DrawGraphic_MM(int x, int y, int graphic)
 #endif
 
   DrawGraphicExt_MM(drawto_field, FX + x*TILEX, FY + y*TILEY, graphic);
+
   MarkTileDirty(x, y);
 }
 
@@ -58,6 +59,7 @@ void DrawGraphicExt_MM(DrawBuffer *d, int x, int y, int graphic)
   int src_x, src_y;
 
   getGraphicSource(graphic, 0, &bitmap, &src_x, &src_y);
+
   BlitBitmap(bitmap, d, src_x, src_y, TILEX, TILEY, x, y);
 }
 
@@ -72,7 +74,9 @@ void DrawGraphicThruMask_MM(int x, int y, int graphic)
   }
 #endif
 
-  DrawGraphicThruMaskExt_MM(drawto_field, FX + x*TILEX, FY + y*TILEY, graphic);
+  DrawGraphicThruMaskExt_MM(drawto_field, FX + x * TILEX, FY + y * TILEY,
+			    graphic);
+
   MarkTileDirty(x,y);
 }
 
@@ -92,8 +96,10 @@ void DrawGraphicThruMaskExt_MM(DrawBuffer *d, int dest_x, int dest_y,
 
 void DrawMiniGraphic_MM(int x, int y, int graphic)
 {
-  DrawMiniGraphicExt_MM(drawto, SX + x*MINI_TILEX, SY + y*MINI_TILEY, graphic);
-  MarkTileDirty(x/2, y/2);
+  DrawMiniGraphicExt_MM(drawto, SX + x * MINI_TILEX, SY + y * MINI_TILEY,
+			graphic);
+
+  MarkTileDirty(x / 2, y / 2);
 }
 
 void getMicroGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
@@ -107,6 +113,7 @@ void DrawMiniGraphicExt_MM(DrawBuffer *d, int x, int y, int graphic)
   int src_x, src_y;
 
   getMiniGraphicSource(graphic, &bitmap, &src_x, &src_y);
+
   BlitBitmap(bitmap, d, src_x, src_y, MINI_TILEX, MINI_TILEY, x, y);
 }
 
@@ -121,6 +128,7 @@ void DrawGraphicShifted_MM(int x,int y, int dx,int dy, int graphic,
   if (graphic < 0)
   {
     DrawGraphic_MM(x, y, graphic);
+
     return;
   }
 
@@ -183,9 +191,13 @@ void DrawGraphicShifted_MM(int x,int y, int dx,int dy, int graphic,
       MarkTileDirty(x, y + 1);
     }				/* Element verläßt unten das Bild */
     else if (dy > 0 && (y == BY2 || cut_mode == CUT_BELOW))
+    {
       height -= dy;
+    }
     else if (dy)		/* allg. Bewegung in y-Richtung */
+    {
       MarkTileDirty(x, y + SIGN(dy));
+    }
   }
 
   getGraphicSource(graphic, 0, &src_bitmap, &src_x, &src_y);
@@ -206,10 +218,8 @@ void DrawGraphicShifted_MM(int x,int y, int dx,int dy, int graphic,
 #endif
 
   if (mask_mode == USE_MASKING)
-  {
     BlitBitmapMasked(src_bitmap, drawto_field,
 		     src_x, src_y, TILEX, TILEY, dest_x, dest_y);
-  }
   else
     BlitBitmap(src_bitmap, drawto_field,
 	       src_x, src_y, width, height, dest_x, dest_y);
@@ -220,7 +230,7 @@ void DrawGraphicShifted_MM(int x,int y, int dx,int dy, int graphic,
 void DrawGraphicShiftedThruMask_MM(int x,int y, int dx,int dy, int graphic,
 				int cut_mode)
 {
-  DrawGraphicShifted_MM(x,y, dx,dy, graphic, cut_mode, USE_MASKING);
+  DrawGraphicShifted_MM(x, y, dx, dy, graphic, cut_mode, USE_MASKING);
 }
 
 void DrawScreenElementExt_MM(int x, int y, int dx, int dy, int element,
@@ -323,23 +333,31 @@ void DrawScreenField_MM(int x, int y)
     int horiz_move;
 
     Blocked2Moving(x, y, &oldx, &oldy);
+
     sx = SCREENX(oldx);
     sy = SCREENY(oldy);
     horiz_move = (MovDir[oldx][oldy] == MV_LEFT ||
 		  MovDir[oldx][oldy] == MV_RIGHT);
 
     DrawScreenElement_MM(x, y, EL_EMPTY);
+
     element = Feld[oldx][oldy];
 
     if (horiz_move)
-      DrawScreenElementShifted_MM(sx,sy, MovPos[oldx][oldy],0,element,NO_CUTTING);
+      DrawScreenElementShifted_MM(sx, sy, MovPos[oldx][oldy], 0, element,
+				  NO_CUTTING);
     else
-      DrawScreenElementShifted_MM(sx,sy, 0,MovPos[oldx][oldy],element,NO_CUTTING);
+      DrawScreenElementShifted_MM(sx, sy, 0, MovPos[oldx][oldy], element,
+				  NO_CUTTING);
   }
   else if (IS_DRAWABLE(element))
+  {
     DrawScreenElement_MM(x, y, element);
+  }
   else
+  {
     DrawScreenElement_MM(x, y, EL_EMPTY);
+  }
 }
 
 void DrawLevelField_MM(int x, int y)
@@ -354,10 +372,12 @@ void DrawMiniElement_MM(int x, int y, int element)
   if (!element)
   {
     DrawMiniGraphic_MM(x, y, IMG_EMPTY);
+
     return;
   }
 
   graphic = el2gfx(element);
+
   DrawMiniGraphic_MM(x, y, graphic);
 }
 
@@ -384,8 +404,8 @@ void DrawLevel_MM()
 
   ClearWindow();
 
-  for (x=0; x<lev_fieldx; x++)
-    for (y=0; y<lev_fieldy; y++)
+  for (x = 0; x < lev_fieldx; x++)
+    for (y = 0; y < lev_fieldy; y++)
       DrawField_MM(x, y);
 
   redraw_mask |= REDRAW_FIELD;
@@ -411,7 +431,7 @@ void DrawWallsExt_MM(int x, int y, int element, int draw_mask)
     gy += MINI_TILEY;
   */
 
-  for(i=0; i<4; i++)
+  for (i = 0; i < 4; i++)
   {
     int dest_x = SX + x * TILEX + MINI_TILEX * (i % 2);
     int dest_y = SY + y * TILEY + MINI_TILEY * (i / 2);
@@ -511,7 +531,7 @@ void DrawMicroWalls_MM(int x, int y, int element)
 
   getMicroGraphicSource(graphic, &bitmap, &gx, &gy);
 
-  for (i=0; i<4; i++)
+  for (i = 0; i < 4; i++)
   {
     int xpos = MICROLEV_XPOS + x * MICRO_TILEX + MICRO_WALLX * (i % 2);
     int ypos = MICROLEV_YPOS + y * MICRO_TILEY + MICRO_WALLY * (i / 2);
@@ -535,6 +555,7 @@ void DrawMicroElement_MM(int x, int y, int element)
   if (IS_WALL(element))
   {
     DrawMicroWalls_MM(x, y, element);
+
     return;
   }
 
@@ -546,12 +567,12 @@ void DrawMicroElement_MM(int x, int y, int element)
 
 void DrawMicroLevelExt_MM(int xpos, int ypos)
 {
-  int x,y;
+  int x, y;
 
   ClearRectangle(drawto, xpos, ypos, MICROLEV_XSIZE, MICROLEV_YSIZE);
 
-  for (x=0; x<STD_LEV_FIELDX; x++)
-    for (y=0; y<STD_LEV_FIELDY; y++)
+  for (x = 0; x < STD_LEV_FIELDX; x++)
+    for (y = 0; y < STD_LEV_FIELDY; y++)
       DrawMicroElement_MM(x, y, Ur[x][y]);
 
   redraw_mask |= REDRAW_FIELD;
@@ -559,10 +580,10 @@ void DrawMicroLevelExt_MM(int xpos, int ypos)
 
 void DrawMiniLevel_MM(int size_x, int size_y, int scroll_x, int scroll_y)
 {
-  int x,y;
+  int x, y;
 
-  for(x=0; x<size_x; x++)
-    for(y=0; y<size_y; y++)
+  for(x = 0; x < size_x; x++)
+    for(y = 0; y < size_y; y++)
       DrawMiniElementOrWall_MM(x, y, scroll_x, scroll_y);
 
   redraw_mask |= REDRAW_FIELD;
@@ -570,13 +591,14 @@ void DrawMiniLevel_MM(int size_x, int size_y, int scroll_x, int scroll_y)
 
 int REQ_in_range(int x, int y)
 {
-  if (y > DY+249 && y < DY+278)
+  if (y > DY + 249 && y < DY + 278)
   {
-    if (x > DX+1 && x < DX+48)
+    if (x > DX + 1 && x < DX + 48)
       return 1;
-    else if (x > DX+51 && x < DX+98)
+    else if (x > DX + 51 && x < DX + 98)
       return 2;
   }
+
   return 0;
 }
 

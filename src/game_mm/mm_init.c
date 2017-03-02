@@ -37,7 +37,7 @@ void InitElementProperties_MM()
     EL_GRID_WOOD_02,
     EL_GRID_WOOD_03,
   };
-  static int ep_grid_num = sizeof(ep_grid)/sizeof(int);
+  static int ep_grid_num = sizeof(ep_grid) / sizeof(int);
 
   static int ep_mcduffin[] =
   {
@@ -46,7 +46,7 @@ void InitElementProperties_MM()
     EL_MCDUFFIN_LEFT,
     EL_MCDUFFIN_DOWN,
   };
-  static int ep_mcduffin_num = sizeof(ep_mcduffin)/sizeof(int);
+  static int ep_mcduffin_num = sizeof(ep_mcduffin) / sizeof(int);
 
   static int ep_rectangle[] =
   {
@@ -59,7 +59,7 @@ void InitElementProperties_MM()
     EL_GATE_STONE,
     EL_GATE_WOOD
   };
-  static int ep_rectangle_num = sizeof(ep_rectangle)/sizeof(int);
+  static int ep_rectangle_num = sizeof(ep_rectangle) / sizeof(int);
 
   static int ep_mirror[] =
   {
@@ -80,7 +80,7 @@ void InitElementProperties_MM()
     EL_MIRROR_14,
     EL_MIRROR_15,
   };
-  static int ep_mirror_num = sizeof(ep_mirror)/sizeof(int);
+  static int ep_mirror_num = sizeof(ep_mirror) / sizeof(int);
 
   static int ep_mirror_fixed[] =
   {
@@ -89,7 +89,7 @@ void InitElementProperties_MM()
     EL_MIRROR_FIXED_02,
     EL_MIRROR_FIXED_03,
   };
-  static int ep_mirror_fixed_num = sizeof(ep_mirror_fixed)/sizeof(int);
+  static int ep_mirror_fixed_num = sizeof(ep_mirror_fixed) / sizeof(int);
 
   static int ep_polar[] =
   {
@@ -110,7 +110,7 @@ void InitElementProperties_MM()
     EL_POLAR_14,
     EL_POLAR_15,
   };
-  static int ep_polar_num = sizeof(ep_polar)/sizeof(int);
+  static int ep_polar_num = sizeof(ep_polar) / sizeof(int);
 
   static int ep_polar_cross[] =
   {
@@ -119,7 +119,7 @@ void InitElementProperties_MM()
     EL_POLAR_CROSS_02,
     EL_POLAR_CROSS_03,
   };
-  static int ep_polar_cross_num = sizeof(ep_polar_cross)/sizeof(int);
+  static int ep_polar_cross_num = sizeof(ep_polar_cross) / sizeof(int);
 
   static int ep_beamer[] =
   {
@@ -140,27 +140,27 @@ void InitElementProperties_MM()
     EL_BEAMER_14,
     EL_BEAMER_15,
   };
-  static int ep_beamer_num = sizeof(ep_beamer)/sizeof(int);
+  static int ep_beamer_num = sizeof(ep_beamer) / sizeof(int);
 
   static int ep_reflecting[] =
   {
   };
-  static int ep_reflecting_num = sizeof(ep_reflecting)/sizeof(int);
+  static int ep_reflecting_num = sizeof(ep_reflecting) / sizeof(int);
 
   static int ep_absorbing[] =
   {
   };
-  static int ep_absorbing_num = sizeof(ep_absorbing)/sizeof(int);
+  static int ep_absorbing_num = sizeof(ep_absorbing) / sizeof(int);
 
   static int ep_inactive[] =
   {
   };
-  static int ep_inactive_num = sizeof(ep_inactive)/sizeof(int);
+  static int ep_inactive_num = sizeof(ep_inactive) / sizeof(int);
 
   static int ep_wall[] =
   {
   };
-  static int ep_wall_num = sizeof(ep_wall)/sizeof(int);
+  static int ep_wall_num = sizeof(ep_wall) / sizeof(int);
 
   static int ep_pacman[] =
   {
@@ -169,7 +169,7 @@ void InitElementProperties_MM()
     EL_PACMAN_LEFT,
     EL_PACMAN_DOWN,
   };
-  static int ep_pacman_num = sizeof(ep_pacman)/sizeof(int);
+  static int ep_pacman_num = sizeof(ep_pacman) / sizeof(int);
 
   static long ep_bit[] =
   {
@@ -219,19 +219,19 @@ void InitElementProperties_MM()
     &ep_wall_num,
     &ep_pacman_num,
   };
-  static int num_properties = sizeof(ep_num)/sizeof(int *);
+  static int num_properties = sizeof(ep_num) / sizeof(int *);
 
-  for(i=0; i<MAX_ELEMENTS; i++)
+  for(i = 0; i < MAX_ELEMENTS; i++)
     Elementeigenschaften[i] = 0;
 
-  for(i=0; i<num_properties; i++)
-    for(j=0; j<*(ep_num[i]); j++)
+  for(i = 0; i < num_properties; i++)
+    for(j = 0; j < *(ep_num[i]); j++)
       Elementeigenschaften[(ep_array[i])[j]] |= ep_bit[i];
 
-  for(i=EL_CHAR_START; i<=EL_CHAR_END; i++)
+  for(i = EL_CHAR_START; i <= EL_CHAR_END; i++)
     Elementeigenschaften[i] |= (EP_BIT_CHAR | EP_BIT_INACTIVE);
 
-  for(i=EL_WALL_START; i<=EL_WALL_END; i++)
+  for(i = EL_WALL_START; i <= EL_WALL_END; i++)
     Elementeigenschaften[i] |= EP_BIT_WALL;
 }
 
