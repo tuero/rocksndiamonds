@@ -685,8 +685,15 @@
 				 ((e) >= EL_DF_WALL_START &&		\
 				  (e) <= EL_DF_WALL_END))
 
-#define IS_DF_WALL(e)		(((e) >= EL_DF_WALL_START &&		\
-				  (e) <= EL_DF_WALL_END))
+#define IS_DF_WALL(e)		((e) >= EL_DF_WALL_START &&		\
+				 (e) <= EL_DF_WALL_END)
+
+#define IS_MM_WALL_EDITOR(e)	((e) == EL_MM_STEEL_WALL ||		\
+				 (e) == EL_MM_WOODEN_WALL ||		\
+				 (e) == EL_MM_ICE_WALL ||		\
+				 (e) == EL_MM_AMOEBA_WALL ||		\
+				 (e) == EL_DF_STEEL_WALL ||		\
+				 (e) == EL_DF_WOODEN_WALL)
 
 #define IS_ENVELOPE(e)		((e) >= EL_ENVELOPE_1 &&		\
 	 			 (e) <= EL_ENVELOPE_4)
@@ -776,6 +783,9 @@
 
 #define IS_DC_STEELWALL_2(e)	((e) >= EL_DC_STEELWALL_2_LEFT &&	\
 				 (e) <= EL_DC_STEELWALL_2_SINGLE)
+
+#define MM_WALL_BASE(e)		((e) & 0xfff0)
+#define MM_WALL_BITS(e)		((e) & 0x000f)
 
 #define GFX_ELEMENT(e)		(element_info[e].gfx_element)
 
