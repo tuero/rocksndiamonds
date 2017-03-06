@@ -5296,6 +5296,26 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "extra energy ball (empty)"
   },
   {
+    "mm_unused_156",
+    "unused",
+    "(not used)"
+  },
+  {
+    "mm_unused_157",
+    "unused",
+    "(not used)"
+  },
+  {
+    "mm_unused_158",
+    "unused",
+    "(not used)"
+  },
+  {
+    "mm_unused_159",
+    "unused",
+    "(not used)"
+  },
+  {
     "df_mirror_1",
     "df_mirror",
     "mirror (DF style) (0\xb0)"
