@@ -6207,7 +6207,7 @@ static void CreateDrawingAreas()
 
     event_mask =
       GD_EVENT_PRESSED | GD_EVENT_RELEASED | GD_EVENT_MOVING |
-      GD_EVENT_OFF_BORDERS;
+      GD_EVENT_OFF_BORDERS | GD_EVENT_PIXEL_PRECISE;
 
     /* determine horizontal position to the right of specified gadget */
     if (drawingarea_info[i].gadget_id_align != GADGET_ID_NONE)
@@ -10136,10 +10136,28 @@ static int getClosedChip(int x, int y)
   return getChipFromOpenDirectionNotEmpty(direction_new, element_old);
 }
 
-static void SetElementSimple(int x, int y, int element, boolean change_level)
+static void SetElementSimpleExt(int x, int y, int dx, int dy, int element,
+				boolean change_level)
 {
   int sx = x - level_xpos;
   int sy = y - level_ypos;
+  int old_element = Feld[x][y];
+  unsigned int new_bitmask = (dx + 1) << (dy * 2);
+
+  if (IS_MM_WALL_EDITOR(element))
+  {
+    element = map_mm_wall_element_editor(element) | new_bitmask;
+
+    if (IS_MM_WALL(old_element))
+      element |= MM_WALL_BITS(old_element);
+  }
+  else if (IS_MM_WALL(old_element) && element == EL_EMPTY)
+  {
+    int element_changed = old_element & ~new_bitmask;
+
+    if (MM_WALL_BITS(element_changed) != 0)
+      element = element_changed;
+  }
 
   IntelliDrawBuffer[x][y] = element;
 
@@ -10148,6 +10166,11 @@ static void SetElementSimple(int x, int y, int element, boolean change_level)
 
   if (IN_ED_FIELD(sx, sy))
     DrawEditorElement(sx, sy, element);
+}
+
+static void SetElementSimple(int x, int y, int element, boolean change_level)
+{
+  SetElementSimpleExt(x, y, 0, 0, element, change_level);
 }
 
 static void MergeAndCloseNeighbourElements(int x1, int y1, int *element1,
@@ -10667,25 +10690,26 @@ static void ResetIntelliDraw()
   SetElementIntelliDraw(-1, -1, EL_UNDEFINED, FALSE, -1);
 }
 
-static void SetElementExt(int x, int y, int element, boolean change_level,
-			  int button)
+static void SetElementExt(int x, int y, int dx, int dy, int element,
+			  boolean change_level, int button)
 {
   if (element < 0)
     SetElementSimple(x, y, Feld[x][y], change_level);
   else if (GetKeyModState() & KMOD_Shift)
     SetElementIntelliDraw(x, y, element, change_level, button);
   else
-    SetElementSimple(x, y, element, change_level);
+    SetElementSimpleExt(x, y, dx, dy, element, change_level);
 }
 
 static void SetElement(int x, int y, int element)
 {
-  SetElementExt(x, y, element, TRUE, -1);
+  SetElementExt(x, y, 0, 0, element, TRUE, -1);
 }
 
-static void SetElementButton(int x, int y, int element, int button)
+static void SetElementButton(int x, int y, int dx, int dy, int element,
+			     int button)
 {
-  SetElementExt(x, y, element, TRUE, button);
+  SetElementExt(x, y, dx, dy, element, TRUE, button);
 }
 
 static void DrawLineElement(int sx, int sy, int element, boolean change_level)
@@ -10693,7 +10717,7 @@ static void DrawLineElement(int sx, int sy, int element, boolean change_level)
   int lx = sx + level_xpos;
   int ly = sy + level_ypos;
 
-  SetElementExt(lx, ly, element, change_level, -1);
+  SetElementExt(lx, ly, 0, 0, element, change_level, -1);
 }
 
 static void DrawLine(int from_x, int from_y, int to_x, int to_y,
@@ -11322,6 +11346,8 @@ void WrapLevel(int dx, int dy)
 static void HandleDrawingAreas(struct GadgetInfo *gi)
 {
   static boolean started_inside_drawing_area = FALSE;
+  static int last_sx = -1, last_sy = -1;
+  static int last_sx2 = -1, last_sy2 = -1;
   int id = gi->custom_id;
   int type_id = gi->custom_type_id;
   boolean button_press_event;
@@ -11335,16 +11361,41 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
   int min_sx = 0, min_sy = 0;
   int max_sx = gi->drawing.area_xsize - 1, max_sy = gi->drawing.area_ysize - 1;
   int item_xsize = gi->drawing.item_xsize, item_ysize = gi->drawing.item_ysize;
+  int mini_item_xsize = item_xsize / 2, mini_item_ysize = item_ysize / 2;
+  int sx2 = gi->event.mx / mini_item_xsize;
+  int sy2 = gi->event.my / mini_item_ysize;
+  int dx = sx2 % 2;
+  int dy = sy2 % 2;
   int lx = 0, ly = 0;
   int min_lx = 0, min_ly = 0;
   int max_lx = lev_fieldx - 1, max_ly = lev_fieldy - 1;
   int x, y;
 
-  /* handle info callback for each invocation of action callback */
-  gi->callback_info(gi);
-
   button_press_event = (gi->event.type == GD_EVENT_PRESSED);
   button_release_event = (gi->event.type == GD_EVENT_RELEASED);
+
+  if (button_release_event)
+  {
+    last_sx = -1;
+    last_sy = -1;
+    last_sx2 = -1;
+    last_sy2 = -1;
+  }
+  else if (!button_press_event)
+  {
+    if ((sx == last_sx && sy == last_sy &&
+	 !IS_MM_WALL_EDITOR(new_element) && new_element != EL_EMPTY) ||
+	(sx2 == last_sx2 && sy2 == last_sy2))
+      return;
+  }
+
+  last_sx = sx;
+  last_sy = sy;
+  last_sx2 = sx2;
+  last_sy2 = sy2;
+
+  /* handle info callback for each invocation of action callback */
+  gi->callback_info(gi);
 
   /* make sure to stay inside drawing area boundaries */
   sx = (sx < min_sx ? min_sx : sx > max_sx ? max_sx : sx);
@@ -11430,7 +11481,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 		  SetElement(x, y, EL_EMPTY);
 	  }
 
-	  SetElementButton(lx, ly, new_element, button);
+	  SetElementButton(lx, ly, dx, dy, new_element, button);
 	}
       }
       else if (!button_release_event)
