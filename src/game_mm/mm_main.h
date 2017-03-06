@@ -640,7 +640,7 @@ extern int		num_element_info;
 #define EL_BEAMER_BLUE_START	404
 #define EL_BEAMER_BLUE_END	(EL_BEAMER_BLUE_START + 15)
 
-/* (currently unused, but potentially useful element definitions) */
+/* element definitions partially used for drawing graphics */
 #define EL_MCDUFFIN		420
 #define EL_PACMAN		421
 #define EL_FUSE_OFF		422
