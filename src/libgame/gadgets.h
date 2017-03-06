@@ -50,6 +50,7 @@
 #define GD_EVENT_TEXT_LEAVING		(1 << 6)
 #define GD_EVENT_INFO_ENTERING		(1 << 7)
 #define GD_EVENT_INFO_LEAVING		(1 << 8)
+#define GD_EVENT_PIXEL_PRECISE		(1 << 9)
 
 /* gadget button states */
 #define GD_BUTTON_UNPRESSED		0
@@ -143,6 +144,7 @@ struct GadgetEvent
 {
   unsigned int type;			/* event type */
   int button;				/* button number for button events */
+  int mx, my;				/* raw gadget position at event time */
   int x, y;				/* gadget position at event time */
   boolean off_borders;			/* mouse pointer outside gadget? */
   int item_x, item_y, item_position;	/* new item position */

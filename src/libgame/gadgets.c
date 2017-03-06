@@ -1681,16 +1681,20 @@ boolean HandleGadgets(int mx, int my, int button)
   {
     int last_x = gi->event.x;
     int last_y = gi->event.y;
+    int last_mx = gi->event.mx;
+    int last_my = gi->event.my;
 
-    gi->event.x = mx - gi->x;
-    gi->event.y = my - gi->y;
+    gi->event.x = gi->event.mx = mx - gi->x;
+    gi->event.y = gi->event.my = my - gi->y;
 
     if (gi->type == GD_TYPE_DRAWING_AREA)
     {
       gi->event.x /= gi->drawing.item_xsize;
       gi->event.y /= gi->drawing.item_ysize;
 
-      if (last_x != gi->event.x || last_y != gi->event.y)
+      if (last_x != gi->event.x || last_y != gi->event.y ||
+	  ((last_mx != gi->event.mx || last_my != gi->event.my) &&
+	   gi->event_mask & GD_EVENT_PIXEL_PRECISE))
 	changed_position = TRUE;
     }
     else if (gi->type & GD_TYPE_TEXT_INPUT && button != 0 && !motion_status)
