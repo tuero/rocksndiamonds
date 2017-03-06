@@ -7365,6 +7365,21 @@ int map_mm_wall_element(int element)
 	  element);
 }
 
+int map_mm_wall_element_editor(int element)
+{
+  switch (element)
+  {
+    case EL_MM_STEEL_WALL:	return EL_MM_STEEL_WALL_START;
+    case EL_MM_WOODEN_WALL:	return EL_MM_WOODEN_WALL_START;
+    case EL_MM_ICE_WALL:	return EL_MM_ICE_WALL_START;
+    case EL_MM_AMOEBA_WALL:	return EL_MM_AMOEBA_WALL_START;
+    case EL_DF_STEEL_WALL:	return EL_DF_STEEL_WALL_START;
+    case EL_DF_WOODEN_WALL:	return EL_DF_WOODEN_WALL_START;
+
+    default:			return element;
+  }
+}
+
 int get_next_element(int element)
 {
   switch (element)
