@@ -1635,6 +1635,14 @@ void DrawSizedGraphic(int x, int y, int graphic, int frame, int tilesize)
   MarkTileDirty(x / tilesize, y / tilesize);
 }
 
+void DrawSizedGraphicThruMask(int x, int y, int graphic, int frame,
+			      int tilesize)
+{
+  DrawSizedGraphicThruMaskExt(drawto, SX + x * tilesize, SY + y * tilesize,
+			      graphic, frame, tilesize);
+  MarkTileDirty(x / tilesize, y / tilesize);
+}
+
 void DrawSizedGraphicExt(DrawBuffer *d, int x, int y, int graphic, int frame,
 			 int tilesize)
 {
@@ -1643,6 +1651,16 @@ void DrawSizedGraphicExt(DrawBuffer *d, int x, int y, int graphic, int frame,
 
   getSizedGraphicSource(graphic, frame, tilesize, &src_bitmap, &src_x, &src_y);
   BlitBitmap(src_bitmap, d, src_x, src_y, tilesize, tilesize, x, y);
+}
+
+void DrawSizedGraphicThruMaskExt(DrawBuffer *d, int x, int y, int graphic,
+				 int frame, int tilesize)
+{
+  Bitmap *src_bitmap;
+  int src_x, src_y;
+
+  getSizedGraphicSource(graphic, frame, tilesize, &src_bitmap, &src_x, &src_y);
+  BlitBitmapMasked(src_bitmap, d, src_x, src_y, tilesize, tilesize, x, y);
 }
 
 void DrawMiniGraphic(int x, int y, int graphic)
@@ -2456,8 +2474,8 @@ void DrawLevelField(int x, int y)
   }
 }
 
-void DrawSizedWall_MM(int dst_x, int dst_y, int element, int tilesize,
-		      int (*el2img_function)(int))
+static void DrawSizedWallExt_MM(int dst_x, int dst_y, int element, int tilesize,
+				int (*el2img_function)(int), boolean masked)
 {
   int element_base = map_mm_wall_element(element);
   int element_bits = (IS_DF_WALL(element) ?
@@ -2477,27 +2495,56 @@ void DrawSizedWall_MM(int dst_x, int dst_y, int element, int tilesize,
     int dst_draw_y = dst_y + (i / 2) * tilesize_draw;
 
     if (element_bits & (1 << i))
-      BlitBitmap(src_bitmap, drawto, src_x, src_y, tilesize_draw, tilesize_draw,
-		 dst_draw_x, dst_draw_y);
+    {
+      if (masked)
+	BlitBitmapMasked(src_bitmap, drawto, src_x, src_y,
+			 tilesize_draw, tilesize_draw, dst_draw_x, dst_draw_y);
+      else
+	BlitBitmap(src_bitmap, drawto, src_x, src_y,
+		   tilesize_draw, tilesize_draw, dst_draw_x, dst_draw_y);
+    }
     else
-      ClearRectangle(drawto, dst_draw_x, dst_draw_y,
-		     tilesize_draw, tilesize_draw);
+    {
+      if (!masked)
+	ClearRectangle(drawto, dst_draw_x, dst_draw_y,
+		       tilesize_draw, tilesize_draw);
+    }
   }
 }
 
-void DrawSizedElement(int x, int y, int element, int tilesize)
+void DrawSizedWall_MM(int dst_x, int dst_y, int element, int tilesize,
+		      int (*el2img_function)(int))
+{
+  DrawSizedWallExt_MM(dst_x, dst_y, element, tilesize, el2img_function, FALSE);
+}
+
+void DrawSizedElementExt(int x, int y, int element, int tilesize,
+			 boolean masked)
 {
   if (IS_MM_WALL(element))
   {
-    DrawSizedWall_MM(SX + x * tilesize, SY + y * tilesize,
-		     element, tilesize, el2edimg);
+    DrawSizedWallExt_MM(SX + x * tilesize, SY + y * tilesize,
+			element, tilesize, el2edimg, masked);
   }
   else
   {
     int graphic = el2edimg(element);
 
-    DrawSizedGraphic(x, y, graphic, 0, tilesize);
+    if (masked)
+      DrawSizedGraphicThruMask(x, y, graphic, 0, tilesize);
+    else
+      DrawSizedGraphic(x, y, graphic, 0, tilesize);
   }
+}
+
+void DrawSizedElement(int x, int y, int element, int tilesize)
+{
+  DrawSizedElementExt(x, y, element, tilesize, FALSE);
+}
+
+void DrawSizedElementThruMask(int x, int y, int element, int tilesize)
+{
+  DrawSizedElementExt(x, y, element, tilesize, TRUE);
 }
 
 void DrawMiniElement(int x, int y, int element)

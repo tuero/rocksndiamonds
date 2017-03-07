@@ -157,6 +157,8 @@ void DrawFixedGraphicThruMaskExt(DrawBuffer *, int, int, int, int);
 
 void DrawSizedGraphic(int, int, int, int, int);
 void DrawSizedGraphicExt(DrawBuffer *, int, int, int, int, int);
+void DrawSizedGraphicThruMask(int, int, int, int, int);
+void DrawSizedGraphicThruMaskExt(DrawBuffer *, int, int, int, int, int);
 
 void DrawMiniGraphic(int, int, int);
 void DrawMiniGraphicExt(DrawBuffer *, int, int, int);
@@ -177,6 +179,7 @@ void DrawScreenField(int, int);
 void DrawLevelField(int, int);
 
 void DrawSizedElement(int, int, int, int);
+void DrawSizedElementThruMask(int, int, int, int);
 void DrawSizedElementOrWall(int, int, int, int, int);
 
 void DrawMiniElement(int, int, int);
