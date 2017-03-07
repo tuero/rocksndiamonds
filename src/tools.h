@@ -119,8 +119,8 @@ void RedrawGlobalBorder();
 
 void MarkTileDirty(int, int);
 void SetBorderElement();
-void FloodFillLevel(int, int, int, short[MAX_LEV_FIELDX][MAX_LEV_FIELDY],
-		    int, int);
+void FloodFillLevel(int, int, int, short[][MAX_LEV_FIELDY], int, int);
+void FloodFillLevelExt(int, int, int, int, int y, short field[][y], int, int);
 
 void SetRandomAnimationValue(int, int);
 int getGraphicAnimationFrame(int, int);

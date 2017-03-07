@@ -1377,9 +1377,10 @@ void SetBorderElement()
   }
 }
 
-void FloodFillLevel(int from_x, int from_y, int fill_element,
-		    short field[MAX_LEV_FIELDX][MAX_LEV_FIELDY],
-		    int max_fieldx, int max_fieldy)
+void FloodFillLevelExt(int from_x, int from_y, int fill_element,
+		       int max_array_fieldx, int max_array_fieldy,
+		       short field[max_array_fieldx][max_array_fieldy],
+		       int max_fieldx, int max_fieldy)
 {
   int i,x,y;
   int old_element;
@@ -1404,10 +1405,20 @@ void FloodFillLevel(int from_x, int from_y, int fill_element,
     y = from_y + check[i][1];
 
     if (IN_FIELD(x, y, max_fieldx, max_fieldy) && field[x][y] == old_element)
-      FloodFillLevel(x, y, fill_element, field, max_fieldx, max_fieldy);
+      FloodFillLevelExt(x, y, fill_element, max_array_fieldx, max_array_fieldy,
+			field, max_fieldx, max_fieldy);
   }
 
   safety--;
+}
+
+void FloodFillLevel(int from_x, int from_y, int fill_element,
+		    short field[MAX_LEV_FIELDX][MAX_LEV_FIELDY],
+		    int max_fieldx, int max_fieldy)
+{
+  FloodFillLevelExt(from_x, from_y, fill_element,
+		    MAX_LEV_FIELDX, MAX_LEV_FIELDY, field,
+		    max_fieldx, max_fieldy);
 }
 
 void SetRandomAnimationValue(int x, int y)
