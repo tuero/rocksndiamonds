@@ -5721,6 +5721,11 @@ static void DrawEditorElement(int x, int y, int element)
   DrawSizedElement(x, y, element, ed_tilesize);
 }
 
+static void DrawEditorElementThruMask(int x, int y, int element)
+{
+  DrawSizedElementThruMask(x, y, element, ed_tilesize);
+}
+
 static void DrawEditorElementOrWall(int x, int y, int scroll_x, int scroll_y)
 {
   DrawSizedElementOrWall(x, y, scroll_x, scroll_y, ed_tilesize);
@@ -8431,6 +8436,9 @@ static void PickDrawingElement(int button, int element)
   if (button < 1 || button > 3)
     return;
 
+  if (IS_MM_WALL(element))
+    element = map_mm_wall_element(element);
+
   de = drawing_elements[button - 1];
 
   *de.new_element = element;	// update global drawing element variable
@@ -10143,6 +10151,7 @@ static void SetElementSimpleExt(int x, int y, int dx, int dy, int element,
   int sy = y - level_ypos;
   int old_element = Feld[x][y];
   unsigned int new_bitmask = (dx + 1) << (dy * 2);
+  boolean draw_masked = FALSE;
 
   if (IS_MM_WALL_EDITOR(element))
   {
@@ -10150,6 +10159,9 @@ static void SetElementSimpleExt(int x, int y, int dx, int dy, int element,
 
     if (IS_MM_WALL(old_element))
       element |= MM_WALL_BITS(old_element);
+
+    if (!change_level)
+      draw_masked = TRUE;
   }
   else if (IS_MM_WALL(old_element) && element == EL_EMPTY)
   {
@@ -10165,7 +10177,12 @@ static void SetElementSimpleExt(int x, int y, int dx, int dy, int element,
     Feld[x][y] = element;
 
   if (IN_ED_FIELD(sx, sy))
-    DrawEditorElement(sx, sy, element);
+  {
+    if (draw_masked)
+      DrawEditorElementThruMask(sx, sy, element);
+    else
+      DrawEditorElement(sx, sy, element);
+  }
 }
 
 static void SetElementSimple(int x, int y, int element, boolean change_level)
@@ -10695,7 +10712,7 @@ static void SetElementExt(int x, int y, int dx, int dy, int element,
 {
   if (element < 0)
     SetElementSimple(x, y, Feld[x][y], change_level);
-  else if (GetKeyModState() & KMOD_Shift)
+  else if (GetKeyModState() & KMOD_Shift && !IS_MM_WALL_EDITOR(element))
     SetElementIntelliDraw(x, y, element, change_level, button);
   else
     SetElementSimpleExt(x, y, dx, dy, element, change_level);
@@ -10712,12 +10729,49 @@ static void SetElementButton(int x, int y, int dx, int dy, int element,
   SetElementExt(x, y, dx, dy, element, TRUE, button);
 }
 
-static void DrawLineElement(int sx, int sy, int element, boolean change_level)
+static void SetElementHiRes(int sx2, int sy2, int element, boolean change_level)
 {
-  int lx = sx + level_xpos;
-  int ly = sy + level_ypos;
+  int lx = sx2 / 2 + level_xpos;
+  int ly = sy2 / 2 + level_ypos;
+  int dx = sx2 % 2;
+  int dy = sy2 % 2;
 
-  SetElementExt(lx, ly, 0, 0, element, change_level, -1);
+  SetElementExt(lx, ly, dx, dy, element, change_level, -1);
+}
+
+static void SetLevelElementHiRes(int lx2, int ly2, int element)
+{
+  int lx = lx2 / 2;
+  int ly = ly2 / 2;
+  int dx = lx2 % 2;
+  int dy = ly2 % 2;
+
+  SetElementExt(lx, ly, dx, dy, element, TRUE, -1);
+}
+
+static int getLevelElementHiRes(int lx2, int ly2)
+{
+  int lx = lx2 / 2;
+  int ly = ly2 / 2;
+  int dx = lx2 % 2;
+  int dy = ly2 % 2;
+  int element = Feld[lx][ly];
+  unsigned int bitmask = (dx + 1) << (dy * 2);
+
+  if (IS_MM_WALL(element))
+  {
+    if (element & bitmask)
+      return map_mm_wall_element(element);
+    else
+      return EL_EMPTY;
+  }
+
+  return element;
+}
+
+static void DrawLineElement(int sx2, int sy2, int element, boolean change_level)
+{
+  SetElementHiRes(sx2, sy2, element, change_level);
 }
 
 static void DrawLine(int from_x, int from_y, int to_x, int to_y,
@@ -10805,32 +10859,32 @@ static void DrawArcExt(int from_x, int from_y, int to_x2, int to_y2,
 
   for (x = 0; x <= radius; x++)
   {
-    int sx, sy, lx, ly;
+    int sx2, sy2, lx, ly;
 
     y = (int)(sqrt((float)(radius * radius - x * x)) + 0.5);
 
-    sx = from_x + x * (from_x < to_x2 ? +1 : -1);
-    sy = from_y + y * (from_y < to_y2 ? +1 : -1);
-    lx = sx + level_xpos;
-    ly = sy + level_ypos;
+    sx2 = from_x + x * (from_x < to_x2 ? +1 : -1);
+    sy2 = from_y + y * (from_y < to_y2 ? +1 : -1);
+    lx = sx2 / 2 + level_xpos;
+    ly = sy2 / 2 + level_ypos;
 
-    if (IN_ED_FIELD(sx, sy) && IN_LEV_FIELD(lx, ly))
-      DrawLineElement(sx, sy, element, change_level);
+    if (IN_ED_FIELD(sx2 / 2, sy2 / 2) && IN_LEV_FIELD(lx, ly))
+      DrawLineElement(sx2, sy2, element, change_level);
   }
 
   for (y = 0; y <= radius; y++)
   {
-    int sx, sy, lx, ly;
+    int sx2, sy2, lx, ly;
 
     x = (int)(sqrt((float)(radius * radius - y * y)) + 0.5);
 
-    sx = from_x + x * (from_x < to_x2 ? +1 : -1);
-    sy = from_y + y * (from_y < to_y2 ? +1 : -1);
-    lx = sx + level_xpos;
-    ly = sy + level_ypos;
+    sx2 = from_x + x * (from_x < to_x2 ? +1 : -1);
+    sy2 = from_y + y * (from_y < to_y2 ? +1 : -1);
+    lx = sx2 / 2 + level_xpos;
+    ly = sy2 / 2 + level_ypos;
 
-    if (IN_ED_FIELD(sx, sy) && IN_LEV_FIELD(lx, ly))
-      DrawLineElement(sx, sy, element, change_level);
+    if (IN_ED_FIELD(sx2 / 2, sy2 / 2) && IN_LEV_FIELD(lx, ly))
+      DrawLineElement(sx2, sy2, element, change_level);
   }
 }
 
@@ -10888,11 +10942,17 @@ static void DrawAreaBorder(int from_x, int from_y, int to_x, int to_y)
     redraw_mask |= REDRAW_FIELD;
 }
 
+static void DrawAreaBox(int from_x, int from_y, int to_x, int to_y,
+			int element, boolean change_level)
+{
+  DrawBox(from_x * 2, from_y * 2, to_x * 2, to_y * 2, element, change_level);
+}
+
 static void SelectArea(int from_x, int from_y, int to_x, int to_y,
 		       int element, boolean change_level)
 {
   if (element == -1 || change_level)
-    DrawBox(from_x, from_y, to_x, to_y, -1, FALSE);
+    DrawAreaBox(from_x, from_y, to_x, to_y, -1, FALSE);
   else
     DrawAreaBorder(from_x, from_y, to_x, to_y);
 }
@@ -10904,6 +10964,11 @@ static void SelectArea(int from_x, int from_y, int to_x, int to_y,
 #define CB_DELETE_OLD_CURSOR	3
 #define CB_DUMP_BRUSH		4
 #define CB_DUMP_BRUSH_SMALL	5
+
+static void DrawBrushElement(int sx, int sy, int element, boolean change_level)
+{
+  DrawLineElement(sx * 2, sy * 2, element, change_level);
+}
 
 static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
 			 int button, int mode)
@@ -10977,7 +11042,7 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
 	brush_buffer[x][y] = Feld[from_lx + x][from_ly + y];
 
 	if (button != 1)
-	  DrawLineElement(from_x + x, from_y + y, new_element, TRUE);
+	  DrawBrushElement(from_x + x, from_y + y, new_element, TRUE);
       }
     }
 
@@ -11030,7 +11095,7 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
 	  else if (sy > border_to_y)
 	    border_to_y = sy;
 
-	  DrawLineElement(sx, sy, element, change_level);
+	  DrawBrushElement(sx, sy, element, change_level);
 	}
       }
     }
@@ -11078,6 +11143,28 @@ void DumpBrush_Small()
 static void FloodFill(int from_x, int from_y, int fill_element)
 {
   FloodFillLevel(from_x, from_y, fill_element, Feld, lev_fieldx, lev_fieldy);
+}
+
+static void FloodFillWall_MM(int from_sx2, int from_sy2, int fill_element)
+{
+  int from_x = from_sx2 + 2 * level_xpos;
+  int from_y = from_sy2 + 2 * level_ypos;
+  int max_fillx = lev_fieldx * 2;
+  int max_filly = lev_fieldy * 2;
+  short FillFeld[max_fillx][max_filly];
+  int x, y;
+
+  for (x = 0; x < max_fillx; x++)
+    for (y = 0; y < max_filly; y++)
+      FillFeld[x][y] = getLevelElementHiRes(x, y);
+
+  FloodFillLevelExt(from_x, from_y, fill_element, max_fillx, max_filly,
+		    FillFeld, max_fillx, max_filly);
+
+  for (x = 0; x < max_fillx; x++)
+    for (y = 0; y < max_filly; y++)
+      if (FillFeld[x][y] == fill_element)
+	SetLevelElementHiRes(x, y, FillFeld[x][y]);
 }
 
 /* values for DrawLevelText() modes */
@@ -11374,29 +11461,6 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
   button_press_event = (gi->event.type == GD_EVENT_PRESSED);
   button_release_event = (gi->event.type == GD_EVENT_RELEASED);
 
-  if (button_release_event)
-  {
-    last_sx = -1;
-    last_sy = -1;
-    last_sx2 = -1;
-    last_sy2 = -1;
-  }
-  else if (!button_press_event)
-  {
-    if ((sx == last_sx && sy == last_sy &&
-	 !IS_MM_WALL_EDITOR(new_element) && new_element != EL_EMPTY) ||
-	(sx2 == last_sx2 && sy2 == last_sy2))
-      return;
-  }
-
-  last_sx = sx;
-  last_sy = sy;
-  last_sx2 = sx2;
-  last_sy2 = sy2;
-
-  /* handle info callback for each invocation of action callback */
-  gi->callback_info(gi);
-
   /* make sure to stay inside drawing area boundaries */
   sx = (sx < min_sx ? min_sx : sx > max_sx ? max_sx : sx);
   sy = (sy < min_sy ? min_sy : sy > max_sy ? max_sy : sy);
@@ -11419,6 +11483,39 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
     sy = ly - level_ypos;
   }
 
+  /* also correct MM wall-sized (double) drawing area positions accordingly */
+  if (sx2 / 2 < sx || sx2 / 2 > sx)
+  {
+    sx2 = sx * 2;
+    dx = (sx2 / 2 < sx ? 0 : 1);
+  }
+  if (sy2 / 2 < sy || sy2 / 2 > sy)
+  {
+    sy2 = sy * 2;
+    dy = (sy2 / 2 < sy ? 0 : 1);
+  }
+
+  if (button_release_event)
+  {
+    last_sx = -1;
+    last_sy = -1;
+    last_sx2 = -1;
+    last_sy2 = -1;
+  }
+  else if (!button_press_event)
+  {
+    /* prevent handling events for every pixel position when moving mouse */
+    if ((sx == last_sx && sy == last_sy &&
+	 !IS_MM_WALL_EDITOR(new_element) && new_element != EL_EMPTY) ||
+	(sx2 == last_sx2 && sy2 == last_sy2))
+      return;
+  }
+
+  last_sx = sx;
+  last_sy = sy;
+  last_sx2 = sx2;
+  last_sy2 = sy2;
+
   if (button_press_event)
     started_inside_drawing_area = inside_drawing_area;
 
@@ -11430,6 +11527,9 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 
   if (!button && !button_release_event)
     return;
+
+  /* handle info callback for each invocation of action callback */
+  gi->callback_info(gi);
 
   /* automatically switch to 'single item' drawing mode, if needed */
   actual_drawing_function =
@@ -11525,6 +11625,9 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 
 	if (button)
 	{
+	  sx = sx2;
+	  sy = sy2;
+
 	  if (!button_press_event)
 	    DrawLine(last_sx, last_sy, sx, sy, new_element, TRUE);
 
@@ -11538,6 +11641,9 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
     case GADGET_ID_ARC:
     case GADGET_ID_RECTANGLE:
     case GADGET_ID_FILLED_BOX:
+      sx = sx2;
+      sy = sy2;
+      /* FALLTHROUGH */
     case GADGET_ID_GRAB_BRUSH:
     case GADGET_ID_TEXT:
       {
@@ -11588,6 +11694,8 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	else if (last_sx != sx || last_sy != sy)
 	{
 	  draw_func(start_sx, start_sy, last_sx, last_sy, -1, FALSE);
+          if (IS_MM_WALL_EDITOR(new_element))	/* clear wall background */
+            draw_func(start_sx, start_sy, sx, sy, EL_EMPTY, FALSE);
 	  draw_func(start_sx, start_sy, sx, sy, new_element, FALSE);
 	  last_sx = sx;
 	  last_sy = sy;
@@ -11598,7 +11706,11 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
     case GADGET_ID_FLOOD_FILL:
       if (button_press_event && Feld[lx][ly] != new_element)
       {
-	FloodFill(lx, ly, new_element);
+	if (IS_MM_WALL_EDITOR(new_element))
+	  FloodFillWall_MM(sx2, sy2, new_element);
+	else
+	  FloodFill(lx, ly, new_element);
+
 	DrawEditorLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
 	CopyLevelToUndoBuffer(UNDO_IMMEDIATE);
       }
