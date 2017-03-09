@@ -8914,6 +8914,8 @@ void ResetFontStatus()
 
 void ChangeViewportPropertiesIfNeeded()
 {
+  boolean use_mini_tilesize = (level.game_engine_type == GAME_ENGINE_TYPE_MM ?
+			       FALSE : setup.small_game_graphics);
   int gfx_game_mode = game_status;
   int gfx_game_mode2 = (game_status == GAME_MODE_EDITOR ? GAME_MODE_DEFAULT :
 			game_status);
@@ -8945,9 +8947,7 @@ void ChangeViewportPropertiesIfNeeded()
   int new_ey		= vp_door_3->y;
   int new_exsize	= vp_door_3->width;
   int new_eysize	= vp_door_3->height;
-  int new_tilesize_var =
-    (setup.small_game_graphics ? MINI_TILESIZE : game.tile_size);
-
+  int new_tilesize_var = (use_mini_tilesize ? MINI_TILESIZE : game.tile_size);
   int tilesize = (gfx_game_mode == GAME_MODE_PLAYING ? new_tilesize_var :
 		  gfx_game_mode == GAME_MODE_EDITOR ? MINI_TILESIZE : TILESIZE);
   int new_scr_fieldx = new_sxsize / tilesize;
