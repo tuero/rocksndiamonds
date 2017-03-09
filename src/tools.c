@@ -3973,7 +3973,9 @@ static int RequestHandleEvents(unsigned int req_state)
   {
     if (level_solved)
     {
-      SetDrawtoField(DRAW_TO_FIELDBUFFER);
+      /* the MM game engine does not use a special (scrollable) field buffer */
+      if (level.game_engine_type != GAME_ENGINE_TYPE_MM)
+	SetDrawtoField(DRAW_TO_FIELDBUFFER);
 
       HandleGameActions();
 
