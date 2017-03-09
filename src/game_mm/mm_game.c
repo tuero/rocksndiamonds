@@ -2444,6 +2444,10 @@ void ClickElement(int mx, int my, int button)
   int element;
   int x = (mx - SX) / TILEX, y = (my - SY) / TILEY;
 
+  /* do not rotate objects hit by the laser after the game was solved */
+  if (game_mm.level_solved && Hit[x][y])
+    return;
+
   if (button == MB_RELEASED)
   {
     new_button = TRUE;
@@ -2646,6 +2650,10 @@ void AutoRotateMirrors()
     for (y = 0; y < lev_fieldy; y++)
     {
       int element = Feld[x][y];
+
+      /* do not rotate objects hit by the laser after the game was solved */
+      if (game_mm.level_solved && Hit[x][y])
+	continue;
 
       if (IS_DF_MIRROR_AUTO(element) ||
 	  IS_GRID_WOOD_AUTO(element) ||
