@@ -12417,7 +12417,12 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       InitZoomLevelSettings();
 
       if (edit_mode == ED_MODE_DRAWING)
+      {
 	DrawDrawingWindow();
+
+	/* redraw zoom gadget info text */
+	PrintEditorGadgetInfoText(level_editor_gadget[id]);
+      }
 
       break;
 
