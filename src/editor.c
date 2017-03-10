@@ -12909,7 +12909,7 @@ void PrintEditorGadgetInfoText(struct GadgetInfo *gi)
       else if (gi->custom_id == GADGET_ID_UNDO)
 	sprintf(shortcut, " ('%c/Shift-U')", key);
       else if (gi->custom_id == GADGET_ID_ZOOM)
-	sprintf(shortcut, " ('%c', '0', '+')", key);
+	sprintf(shortcut, " ('%c', '0', '-')", key);
       else
 	sprintf(shortcut, " ('%s%c')",
 		(key >= 'A' && key <= 'Z' ? "Shift-" : ""), key);
