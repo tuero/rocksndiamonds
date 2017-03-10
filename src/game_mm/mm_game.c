@@ -571,6 +571,10 @@ void ScanLaser()
   int element;
   int end = 0, rf = laser.num_edges;
 
+  /* do not scan laser again after the game was lost for whatever reason */
+  if (game_mm.game_over)
+    return;
+
   laser.overloaded = FALSE;
   laser.stops_inside_element = FALSE;
 
