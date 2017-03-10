@@ -12442,6 +12442,9 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       break;
 
     case GADGET_ID_UNDO:
+      if (button == 1 && GetKeyModState() & (KMOD_Shift|KMOD_Control))
+	button = 3;
+
       if (button == 1 && undo_buffer_steps == 0)
       {
 	Request("Undo buffer empty!", REQ_CONFIRM);
