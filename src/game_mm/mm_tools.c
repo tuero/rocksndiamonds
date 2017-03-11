@@ -420,8 +420,7 @@ void DrawWallsExt_MM(int x, int y, int element, int draw_mask)
 
   getMiniGraphicSource(graphic, &bitmap, &gx, &gy);
 
-  if (game_status != LEVELED || !editor.draw_walls_masked)
-    DrawGraphic_MM(x, y, IMG_EMPTY);
+  DrawGraphic_MM(x, y, IMG_EMPTY);
 
   /*
   if (IS_WALL_WOOD(element) || IS_WALL_AMOEBA(element) ||
@@ -442,7 +441,7 @@ void DrawWallsExt_MM(int x, int y, int element, int draw_mask)
     if (element & (1 << i))
       BlitBitmap(bitmap, drawto, gx, gy, MINI_TILEX, MINI_TILEY,
 		 dest_x, dest_y);
-    else if (!editor.draw_walls_masked)
+    else
       ClearRectangle(drawto, dest_x, dest_y, MINI_TILEX, MINI_TILEY);
   }
 

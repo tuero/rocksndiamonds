@@ -292,9 +292,6 @@ void InitGameEngine_MM()
 {
   int i, x, y;
 
-  /* set global editor control values */
-  editor.draw_walls_masked = FALSE;
-
   /* set global game control values */
   game_mm.num_cycle = 0;
   game_mm.num_pacman = 0;

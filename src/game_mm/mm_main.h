@@ -167,11 +167,6 @@ struct HiScore
   int Score;
 };
 
-struct EditorInfo
-{
-  boolean draw_walls_masked;
-};
-
 extern Bitmap	       *pix[];
 extern DrawBuffer      *fieldbuffer;
 extern DrawBuffer      *drawto_field;
@@ -232,7 +227,6 @@ extern struct TapeInfo		tape;
 extern struct SetupInfo		setup;
 extern struct GameInfo_MM	game_mm;
 extern struct LaserInfo		laser;
-extern struct EditorInfo	editor;
 extern struct GlobalInfo	global;
 
 extern short 		LX, LY, XS, YS, ELX, ELY;
