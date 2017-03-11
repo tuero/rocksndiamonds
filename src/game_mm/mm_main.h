@@ -161,7 +161,7 @@
 #define MICROLEVEL_SCROLL_DELAY	50	/* delay for scrolling micro level */
 #define MICROLEVEL_LABEL_DELAY	250	/* delay for micro level label */
 
-struct HiScore
+struct HiScore_MM
 {
   char Name[MAX_PLAYER_NAME_LEN + 1];
   int Score;
@@ -222,7 +222,7 @@ extern boolean		SiebAktiv;
 extern int		SiebCount;
 
 extern struct LevelInfo_MM	native_mm_level;
-extern struct HiScore		highscore[];
+extern struct HiScore_MM	highscore[];
 extern struct TapeInfo		tape;
 extern struct SetupInfo		setup;
 extern struct GameInfo_MM	game_mm;
