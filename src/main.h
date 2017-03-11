@@ -680,6 +680,12 @@
 #define IS_DF_ELEMENT(e)	((e) >= EL_DF_START &&			\
 				 (e) <= EL_DF_END)
 
+#define IS_MM_MCDUFFIN(e)	((e) >= EL_MM_MCDUFFIN_START &&		\
+				 (e) <= EL_MM_MCDUFFIN_END)
+
+#define IS_DF_LASER(e)		((e) >= EL_DF_LASER_START &&		\
+				 (e) <= EL_DF_LASER_END)
+
 #define IS_MM_WALL(e)		(((e) >= EL_MM_WALL_START &&		\
 				  (e) <= EL_MM_WALL_END) ||		\
 				 ((e) >= EL_DF_WALL_START &&		\
@@ -2949,6 +2955,7 @@ struct LevelInfo
 
   int time;				/* available time (seconds) */
   int gems_needed;
+  boolean auto_count_gems;
 
   char name[MAX_LEVEL_NAME_LEN + 1];
   char author[MAX_LEVEL_AUTHOR_LEN + 1];
@@ -3034,6 +3041,11 @@ struct LevelInfo
   boolean block_snap_field;	/* snapping blocks field to show animation */
   boolean block_last_field;	/* player blocks previous field while moving */
   boolean sp_block_last_field;	/* player blocks previous field while moving */
+
+  /* values for MM/DF elements */
+  boolean mm_laser_red, mm_laser_green, mm_laser_blue;
+  boolean df_laser_red, df_laser_green, df_laser_blue;
+  int mm_time_fuse;
 
   /* ('int' instead of 'boolean' because used as selectbox value in editor) */
   int use_step_counter;		/* count steps instead of seconds for level */

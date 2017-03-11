@@ -246,6 +246,12 @@ static struct LevelFileConfigInfo chunk_config_INFO[] =
 
   {
     -1,					-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(10),
+    &li.auto_count_gems,		FALSE
+  },
+
+  {
+    -1,					-1,
     -1,					-1,
     NULL,				-1
   }
@@ -798,6 +804,44 @@ static struct LevelFileConfigInfo chunk_config_ELEM[] =
     TYPE_CONTENT_LIST,			CONF_VALUE_BYTES(1),
     &li.ball_content,			EL_EMPTY, NULL,
     &li.num_ball_contents,		4, MAX_ELEMENT_CONTENTS
+  },
+
+  {
+    EL_MM_MCDUFFIN,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(1),
+    &li.mm_laser_red,			FALSE
+  },
+  {
+    EL_MM_MCDUFFIN,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(2),
+    &li.mm_laser_green,			FALSE
+  },
+  {
+    EL_MM_MCDUFFIN,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(3),
+    &li.mm_laser_blue,			TRUE
+  },
+
+  {
+    EL_DF_LASER,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(1),
+    &li.df_laser_red,			TRUE
+  },
+  {
+    EL_DF_LASER,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(2),
+    &li.df_laser_green,			TRUE
+  },
+  {
+    EL_DF_LASER,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(3),
+    &li.df_laser_blue,			FALSE
+  },
+
+  {
+    EL_MM_FUSE,				-1,
+    TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
+    &li.mm_time_fuse,			0
   },
 
   /* ---------- unused values ----------------------------------------------- */
@@ -3941,10 +3985,11 @@ void CopyNativeLevel_RND_to_MM(struct LevelInfo *level)
 
   level_mm->time = level->time;
   level_mm->kettles_needed = level->gems_needed;
-  level_mm->auto_count_kettles = FALSE;
-  level_mm->laser_red = FALSE;
-  level_mm->laser_green = FALSE;
-  level_mm->laser_blue = TRUE;
+  level_mm->auto_count_kettles = level->auto_count_gems;
+
+  level_mm->laser_red = level->mm_laser_red;
+  level_mm->laser_green = level->mm_laser_green;
+  level_mm->laser_blue = level->mm_laser_blue;
 
   strcpy(level_mm->name, level->name);
   strcpy(level_mm->author, level->author);
@@ -3954,7 +3999,7 @@ void CopyNativeLevel_RND_to_MM(struct LevelInfo *level)
   level_mm->score[SC_TIME_BONUS] = level->score[SC_TIME_BONUS];
 
   level_mm->amoeba_speed = level->amoeba_speed;
-  level_mm->time_fuse = 0;
+  level_mm->time_fuse = level->mm_time_fuse;
 
   for (x = 0; x < level->fieldx; x++)
     for (y = 0; y < level->fieldy; y++)
@@ -3976,6 +4021,11 @@ void CopyNativeLevel_MM_to_RND(struct LevelInfo *level)
 
   level->time = level_mm->time;
   level->gems_needed = level_mm->kettles_needed;
+  level->auto_count_gems = level_mm->auto_count_kettles;
+
+  level->mm_laser_red = level_mm->laser_red;
+  level->mm_laser_green = level_mm->laser_green;
+  level->mm_laser_blue = level_mm->laser_blue;
 
   strcpy(level->name, level_mm->name);
 
@@ -3988,21 +4038,11 @@ void CopyNativeLevel_MM_to_RND(struct LevelInfo *level)
   level->score[SC_TIME_BONUS] = level_mm->score[SC_TIME_BONUS];
 
   level->amoeba_speed = level_mm->amoeba_speed;
+  level->mm_time_fuse = level_mm->time_fuse;
 
   for (x = 0; x < level->fieldx; x++)
     for (y = 0; y < level->fieldy; y++)
       level->field[x][y] = map_element_MM_to_RND(level_mm->field[x][y]);
-
-  if (level_mm->auto_count_kettles)
-  {
-    level->gems_needed = 0;
-
-    for (x = 0; x < level->fieldx; x++)
-      for (y = 0; y < level->fieldy; y++)
-	if (level->field[x][y] == EL_MM_KETTLE ||
-	    level->field[x][y] == EL_DF_CELL)
-	  level->gems_needed++;
-  }
 }
 
 
