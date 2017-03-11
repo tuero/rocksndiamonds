@@ -3643,6 +3643,7 @@ static void DrawPaletteWindow();
 static void UpdateCustomElementGraphicGadgets();
 static boolean checkPropertiesConfig(int);
 static void SetAutomaticNumberOfGemsNeeded();
+static void ClearEditorGadgetInfoText();
 static void CopyLevelToUndoBuffer(int);
 static void HandleDrawingAreas(struct GadgetInfo *);
 static void HandleCounterButtons(struct GadgetInfo *);
@@ -10679,10 +10680,14 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
       { EL_EM_EXIT_CLOSED,		EL_EM_EXIT_OPEN			},
       { EL_EM_STEEL_EXIT_CLOSED,	EL_EM_STEEL_EXIT_OPEN		},
       { EL_QUICKSAND_FAST_EMPTY,	EL_QUICKSAND_FAST_FULL		},
+      { EL_MM_EXIT_CLOSED,		EL_MM_EXIT_OPEN			},
+      { EL_MM_FUSE,			EL_MM_FUSE_ACTIVE		},
+      { EL_MM_LIGHTBULB,		EL_MM_LIGHTBULB_ACTIVE		},
+      { EL_MM_FUEL_EMPTY,		EL_MM_FUEL_FULL			},
 
       { -1,				-1				},
     };
-    static int rotatable_elements[][4] =
+    static int rotatable_elements_4[][4] =
     {
       {
 	EL_BUG_UP,
@@ -10690,95 +10695,344 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
 	EL_BUG_DOWN,
 	EL_BUG_LEFT
       },
-
       {
 	EL_SPACESHIP_UP,
 	EL_SPACESHIP_RIGHT,
 	EL_SPACESHIP_DOWN,
 	EL_SPACESHIP_LEFT
       },
-
       {
 	EL_BD_BUTTERFLY_UP,
 	EL_BD_BUTTERFLY_RIGHT,
 	EL_BD_BUTTERFLY_DOWN,
 	EL_BD_BUTTERFLY_LEFT
       },
-
       {
 	EL_BD_FIREFLY_UP,
 	EL_BD_FIREFLY_RIGHT,
 	EL_BD_FIREFLY_DOWN,
 	EL_BD_FIREFLY_LEFT
       },
-
       {
 	EL_PACMAN_UP,
 	EL_PACMAN_RIGHT,
 	EL_PACMAN_DOWN,
 	EL_PACMAN_LEFT
       },
-
       {
 	EL_YAMYAM_UP,
 	EL_YAMYAM_RIGHT,
 	EL_YAMYAM_DOWN,
 	EL_YAMYAM_LEFT
       },
-
       {
 	EL_ARROW_UP,
 	EL_ARROW_RIGHT,
 	EL_ARROW_DOWN,
 	EL_ARROW_LEFT
       },
-
       {
 	EL_SP_PORT_UP,
 	EL_SP_PORT_RIGHT,
 	EL_SP_PORT_DOWN,
 	EL_SP_PORT_LEFT
       },
-
       {
 	EL_SP_GRAVITY_PORT_UP,
 	EL_SP_GRAVITY_PORT_RIGHT,
 	EL_SP_GRAVITY_PORT_DOWN,
 	EL_SP_GRAVITY_PORT_LEFT
       },
-
       {
 	EL_SP_GRAVITY_ON_PORT_UP,
 	EL_SP_GRAVITY_ON_PORT_RIGHT,
 	EL_SP_GRAVITY_ON_PORT_DOWN,
 	EL_SP_GRAVITY_ON_PORT_LEFT
       },
-
       {
 	EL_SP_GRAVITY_OFF_PORT_UP,
 	EL_SP_GRAVITY_OFF_PORT_RIGHT,
 	EL_SP_GRAVITY_OFF_PORT_DOWN,
 	EL_SP_GRAVITY_OFF_PORT_LEFT
       },
-
       {
 	EL_MOLE_UP,
 	EL_MOLE_RIGHT,
 	EL_MOLE_DOWN,
 	EL_MOLE_LEFT
       },
-
       {
 	EL_BALLOON_SWITCH_UP,
 	EL_BALLOON_SWITCH_RIGHT,
 	EL_BALLOON_SWITCH_DOWN,
 	EL_BALLOON_SWITCH_LEFT
       },
+      {
+	EL_MM_MCDUFFIN_UP,
+	EL_MM_MCDUFFIN_RIGHT,
+	EL_MM_MCDUFFIN_DOWN,
+	EL_MM_MCDUFFIN_LEFT
+      },
+      {
+	EL_MM_MIRROR_FIXED_1,
+	EL_MM_MIRROR_FIXED_4,
+	EL_MM_MIRROR_FIXED_3,
+	EL_MM_MIRROR_FIXED_2
+      },
+      {
+	EL_MM_STEEL_GRID_FIXED_1,
+	EL_MM_STEEL_GRID_FIXED_4,
+	EL_MM_STEEL_GRID_FIXED_2,
+	EL_MM_STEEL_GRID_FIXED_3
+      },
+      {
+	EL_MM_WOODEN_GRID_FIXED_1,
+	EL_MM_WOODEN_GRID_FIXED_4,
+	EL_MM_WOODEN_GRID_FIXED_2,
+	EL_MM_WOODEN_GRID_FIXED_3
+      },
+      {
+	EL_MM_POLARISATOR_CROSS_1,
+	EL_MM_POLARISATOR_CROSS_4,
+	EL_MM_POLARISATOR_CROSS_3,
+	EL_MM_POLARISATOR_CROSS_2
+      },
+      {
+	EL_MM_PACMAN_UP,
+	EL_MM_PACMAN_RIGHT,
+	EL_MM_PACMAN_DOWN,
+	EL_MM_PACMAN_LEFT
+      },
+      {
+	EL_DF_LASER_UP,
+	EL_DF_LASER_RIGHT,
+	EL_DF_LASER_DOWN,
+	EL_DF_LASER_LEFT
+      },
+      {
+	EL_DF_RECEIVER_UP,
+	EL_DF_RECEIVER_RIGHT,
+	EL_DF_RECEIVER_DOWN,
+	EL_DF_RECEIVER_LEFT
+      },
 
       {
 	-1,
+      },
+    };
+    static int rotatable_elements_8[][8] =
+    {
+      {
+	EL_DF_STEEL_GRID_FIXED_1,
+	EL_DF_STEEL_GRID_FIXED_8,
+	EL_DF_STEEL_GRID_FIXED_7,
+	EL_DF_STEEL_GRID_FIXED_6,
+	EL_DF_STEEL_GRID_FIXED_5,
+	EL_DF_STEEL_GRID_FIXED_4,
+	EL_DF_STEEL_GRID_FIXED_3,
+	EL_DF_STEEL_GRID_FIXED_2
+      },
+      {
+	EL_DF_WOODEN_GRID_FIXED_1,
+	EL_DF_WOODEN_GRID_FIXED_8,
+	EL_DF_WOODEN_GRID_FIXED_7,
+	EL_DF_WOODEN_GRID_FIXED_6,
+	EL_DF_WOODEN_GRID_FIXED_5,
+	EL_DF_WOODEN_GRID_FIXED_4,
+	EL_DF_WOODEN_GRID_FIXED_3,
+	EL_DF_WOODEN_GRID_FIXED_2
+      },
+      {
+	EL_DF_STEEL_GRID_ROTATING_1,
+	EL_DF_STEEL_GRID_ROTATING_8,
+	EL_DF_STEEL_GRID_ROTATING_7,
+	EL_DF_STEEL_GRID_ROTATING_6,
+	EL_DF_STEEL_GRID_ROTATING_5,
+	EL_DF_STEEL_GRID_ROTATING_4,
+	EL_DF_STEEL_GRID_ROTATING_3,
+	EL_DF_STEEL_GRID_ROTATING_2
+      },
+      {
+	EL_DF_WOODEN_GRID_ROTATING_1,
+	EL_DF_WOODEN_GRID_ROTATING_8,
+	EL_DF_WOODEN_GRID_ROTATING_7,
+	EL_DF_WOODEN_GRID_ROTATING_6,
+	EL_DF_WOODEN_GRID_ROTATING_5,
+	EL_DF_WOODEN_GRID_ROTATING_4,
+	EL_DF_WOODEN_GRID_ROTATING_3,
+	EL_DF_WOODEN_GRID_ROTATING_2
+      },
+
+      {
 	-1,
-	-1,
+      },
+    };
+    static int rotatable_elements_16[][16] =
+    {
+      {
+	EL_MM_MIRROR_1,
+	EL_MM_MIRROR_16,
+	EL_MM_MIRROR_15,
+	EL_MM_MIRROR_14,
+	EL_MM_MIRROR_13,
+	EL_MM_MIRROR_12,
+	EL_MM_MIRROR_11,
+	EL_MM_MIRROR_10,
+	EL_MM_MIRROR_9,
+	EL_MM_MIRROR_8,
+	EL_MM_MIRROR_7,
+	EL_MM_MIRROR_6,
+	EL_MM_MIRROR_5,
+	EL_MM_MIRROR_4,
+	EL_MM_MIRROR_3,
+	EL_MM_MIRROR_2
+      },
+      {
+	EL_MM_BEAMER_5,
+	EL_MM_BEAMER_4,
+	EL_MM_BEAMER_3,
+	EL_MM_BEAMER_2,
+	EL_MM_BEAMER_1,
+	EL_MM_BEAMER_16,
+	EL_MM_BEAMER_15,
+	EL_MM_BEAMER_14,
+	EL_MM_BEAMER_13,
+	EL_MM_BEAMER_12,
+	EL_MM_BEAMER_11,
+	EL_MM_BEAMER_10,
+	EL_MM_BEAMER_9,
+	EL_MM_BEAMER_8,
+	EL_MM_BEAMER_7,
+	EL_MM_BEAMER_6
+      },
+      {
+	EL_MM_BEAMER_RED_5,
+	EL_MM_BEAMER_RED_4,
+	EL_MM_BEAMER_RED_3,
+	EL_MM_BEAMER_RED_2,
+	EL_MM_BEAMER_RED_1,
+	EL_MM_BEAMER_RED_16,
+	EL_MM_BEAMER_RED_15,
+	EL_MM_BEAMER_RED_14,
+	EL_MM_BEAMER_RED_13,
+	EL_MM_BEAMER_RED_12,
+	EL_MM_BEAMER_RED_11,
+	EL_MM_BEAMER_RED_10,
+	EL_MM_BEAMER_RED_9,
+	EL_MM_BEAMER_RED_8,
+	EL_MM_BEAMER_RED_7,
+	EL_MM_BEAMER_RED_6
+      },
+      {
+	EL_MM_BEAMER_YELLOW_5,
+	EL_MM_BEAMER_YELLOW_4,
+	EL_MM_BEAMER_YELLOW_3,
+	EL_MM_BEAMER_YELLOW_2,
+	EL_MM_BEAMER_YELLOW_1,
+	EL_MM_BEAMER_YELLOW_16,
+	EL_MM_BEAMER_YELLOW_15,
+	EL_MM_BEAMER_YELLOW_14,
+	EL_MM_BEAMER_YELLOW_13,
+	EL_MM_BEAMER_YELLOW_12,
+	EL_MM_BEAMER_YELLOW_11,
+	EL_MM_BEAMER_YELLOW_10,
+	EL_MM_BEAMER_YELLOW_9,
+	EL_MM_BEAMER_YELLOW_8,
+	EL_MM_BEAMER_YELLOW_7,
+	EL_MM_BEAMER_YELLOW_6
+      },
+      {
+	EL_MM_BEAMER_GREEN_5,
+	EL_MM_BEAMER_GREEN_4,
+	EL_MM_BEAMER_GREEN_3,
+	EL_MM_BEAMER_GREEN_2,
+	EL_MM_BEAMER_GREEN_1,
+	EL_MM_BEAMER_GREEN_16,
+	EL_MM_BEAMER_GREEN_15,
+	EL_MM_BEAMER_GREEN_14,
+	EL_MM_BEAMER_GREEN_13,
+	EL_MM_BEAMER_GREEN_12,
+	EL_MM_BEAMER_GREEN_11,
+	EL_MM_BEAMER_GREEN_10,
+	EL_MM_BEAMER_GREEN_9,
+	EL_MM_BEAMER_GREEN_8,
+	EL_MM_BEAMER_GREEN_7,
+	EL_MM_BEAMER_GREEN_6
+      },
+      {
+	EL_MM_BEAMER_BLUE_5,
+	EL_MM_BEAMER_BLUE_4,
+	EL_MM_BEAMER_BLUE_3,
+	EL_MM_BEAMER_BLUE_2,
+	EL_MM_BEAMER_BLUE_1,
+	EL_MM_BEAMER_BLUE_16,
+	EL_MM_BEAMER_BLUE_15,
+	EL_MM_BEAMER_BLUE_14,
+	EL_MM_BEAMER_BLUE_13,
+	EL_MM_BEAMER_BLUE_12,
+	EL_MM_BEAMER_BLUE_11,
+	EL_MM_BEAMER_BLUE_10,
+	EL_MM_BEAMER_BLUE_9,
+	EL_MM_BEAMER_BLUE_8,
+	EL_MM_BEAMER_BLUE_7,
+	EL_MM_BEAMER_BLUE_6
+      },
+      {
+	EL_MM_POLARISATOR_1,
+	EL_MM_POLARISATOR_16,
+	EL_MM_POLARISATOR_15,
+	EL_MM_POLARISATOR_14,
+	EL_MM_POLARISATOR_13,
+	EL_MM_POLARISATOR_12,
+	EL_MM_POLARISATOR_11,
+	EL_MM_POLARISATOR_10,
+	EL_MM_POLARISATOR_9,
+	EL_MM_POLARISATOR_8,
+	EL_MM_POLARISATOR_7,
+	EL_MM_POLARISATOR_6,
+	EL_MM_POLARISATOR_5,
+	EL_MM_POLARISATOR_4,
+	EL_MM_POLARISATOR_3,
+	EL_MM_POLARISATOR_2
+      },
+      {
+	EL_DF_MIRROR_1,
+	EL_DF_MIRROR_16,
+	EL_DF_MIRROR_15,
+	EL_DF_MIRROR_14,
+	EL_DF_MIRROR_13,
+	EL_DF_MIRROR_12,
+	EL_DF_MIRROR_11,
+	EL_DF_MIRROR_10,
+	EL_DF_MIRROR_9,
+	EL_DF_MIRROR_8,
+	EL_DF_MIRROR_7,
+	EL_DF_MIRROR_6,
+	EL_DF_MIRROR_5,
+	EL_DF_MIRROR_4,
+	EL_DF_MIRROR_3,
+	EL_DF_MIRROR_2
+      },
+      {
+	EL_DF_MIRROR_ROTATING_1,
+	EL_DF_MIRROR_ROTATING_16,
+	EL_DF_MIRROR_ROTATING_15,
+	EL_DF_MIRROR_ROTATING_14,
+	EL_DF_MIRROR_ROTATING_13,
+	EL_DF_MIRROR_ROTATING_12,
+	EL_DF_MIRROR_ROTATING_11,
+	EL_DF_MIRROR_ROTATING_10,
+	EL_DF_MIRROR_ROTATING_9,
+	EL_DF_MIRROR_ROTATING_8,
+	EL_DF_MIRROR_ROTATING_7,
+	EL_DF_MIRROR_ROTATING_6,
+	EL_DF_MIRROR_ROTATING_5,
+	EL_DF_MIRROR_ROTATING_4,
+	EL_DF_MIRROR_ROTATING_3,
+	EL_DF_MIRROR_ROTATING_2
+      },
+
+      {
 	-1,
       },
     };
@@ -10793,18 +11047,60 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
 	new_element = (old_element == element1 ? element2 : element1);
     }
 
-    for (i = 0; rotatable_elements[i][0] != -1; i++)
+    for (i = 0; rotatable_elements_4[i][0] != -1; i++)
     {
       for (j = 0; j < 4; j++)
       {
-	int element = rotatable_elements[i][j];
+	int element = rotatable_elements_4[i][j];
 
 	if (old_element == element)
-	  new_element = (button == 1 ? rotatable_elements[i][(j + 3) % 4] :
-			 button == 2 ? rotatable_elements[i][0]           :
-			 button == 3 ? rotatable_elements[i][(j + 1) % 4] :
+	  new_element = (button == 1 ? rotatable_elements_4[i][(j + 3) % 4] :
+			 button == 2 ? rotatable_elements_4[i][0]           :
+			 button == 3 ? rotatable_elements_4[i][(j + 1) % 4] :
 			 old_element);
       }
+    }
+
+    for (i = 0; rotatable_elements_8[i][0] != -1; i++)
+    {
+      for (j = 0; j < 8; j++)
+      {
+	int element = rotatable_elements_8[i][j];
+
+	if (old_element == element)
+	  new_element = (button == 1 ? rotatable_elements_8[i][(j + 7) % 8] :
+			 button == 2 ? rotatable_elements_8[i][0]           :
+			 button == 3 ? rotatable_elements_8[i][(j + 1) % 8] :
+			 old_element);
+      }
+    }
+
+    for (i = 0; rotatable_elements_16[i][0] != -1; i++)
+    {
+      for (j = 0; j < 16; j++)
+      {
+	int element = rotatable_elements_16[i][j];
+
+	if (old_element == element)
+	  new_element = (button == 1 ? rotatable_elements_16[i][(j + 15) % 16] :
+			 button == 2 ? rotatable_elements_16[i][0]             :
+			 button == 3 ? rotatable_elements_16[i][(j + 1)  % 16] :
+			 old_element);
+      }
+    }
+
+    if (old_element != new_element)
+    {
+      int max_infotext_len = getMaxInfoTextLength();
+      char infotext[MAX_OUTPUT_LINESIZE + 1];
+
+      strncpy(infotext, getElementInfoText(new_element), max_infotext_len);
+      infotext[max_infotext_len] = '\0';
+
+      ClearEditorGadgetInfoText();
+
+      DrawTextS(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY, INFOTEXT_FONT,
+		infotext);
     }
   }
 
@@ -12644,8 +12940,8 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       if (edit_mode != ED_MODE_DRAWING)
 	ChangeEditModeWindow(ED_MODE_DRAWING);
 
-      for (x = 0; x < MAX_LEV_FIELDX; x++) 
-	for (y = 0; y < MAX_LEV_FIELDY; y++) 
+      for (x = 0; x < MAX_LEV_FIELDX; x++)
+	for (y = 0; y < MAX_LEV_FIELDY; y++)
 	  Feld[x][y] = (button == 1 ? EL_EMPTY : new_element);
 
       CopyLevelToUndoBuffer(GADGET_ID_CLEAR);
@@ -13013,7 +13309,7 @@ void HandleLevelEditorIdle()
   FrameCounter++;	/* increase animation frame counter */
 }
 
-void ClearEditorGadgetInfoText()
+static void ClearEditorGadgetInfoText()
 {
   DrawBackground(INFOTEXT_XPOS, INFOTEXT_YPOS, INFOTEXT_XSIZE, INFOTEXT_YSIZE);
 }
