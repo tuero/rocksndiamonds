@@ -4931,7 +4931,7 @@ struct ConfigInfo image_config[] =
   { "mm_kettle",				"RocksMM.png"		},
   { "mm_kettle.xpos",				"12"			},
   { "mm_kettle.ypos",				"1"			},
-  { "mm_kettle.frames",				"4"			},
+  { "mm_kettle.frames",				"1"			},
   { "mm_kettle.exploding",			"RocksMM.png"		},
   { "mm_kettle.exploding.xpos",			"13"			},
   { "mm_kettle.exploding.ypos",			"1"			},
