@@ -11895,17 +11895,17 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
 
   if (counter_id == ED_COUNTER_ID_SELECT_LEVEL)
   {
-      LoadLevel(level_nr);
-      LoadScore(level_nr);
+    LoadLevel(level_nr);
+    LoadScore(level_nr);
 
-      SaveLevelSetup_SeriesInfo();
+    SaveLevelSetup_SeriesInfo();
 
-      TapeErase();
+    TapeErase();
 
-      ResetUndoBuffer();
-      DrawEditModeWindow();
+    ResetUndoBuffer();
+    DrawEditModeWindow();
 
-      return;
+    return;
   }
 
   switch (counter_id)
