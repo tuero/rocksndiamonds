@@ -11895,6 +11895,8 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
 
   if (counter_id == ED_COUNTER_ID_SELECT_LEVEL)
   {
+    int last_game_engine_type = level.game_engine_type;
+
     LoadLevel(level_nr);
     LoadScore(level_nr);
 
@@ -11904,6 +11906,13 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
 
     ResetUndoBuffer();
     DrawEditModeWindow();
+
+    if (level.game_engine_type != last_game_engine_type)
+    {
+      /* update element selection list */
+      ReinitializeElementList();
+      ModifyEditorElementList();
+    }
 
     return;
   }
