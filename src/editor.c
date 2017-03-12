@@ -11121,6 +11121,30 @@ static void ResetIntelliDraw()
   SetElementIntelliDraw(-1, -1, EL_UNDEFINED, FALSE, -1);
 }
 
+static boolean draw_mode_hires = FALSE;
+
+static void SetDrawModeHiRes(int element)
+{
+  draw_mode_hires =
+    (level.game_engine_type == GAME_ENGINE_TYPE_MM &&
+     (IS_MM_WALL_EDITOR(element) || element == EL_EMPTY));
+}
+
+static boolean getDrawModeHiRes()
+{
+  return draw_mode_hires;
+}
+
+static int getLoResScreenPos(int pos)
+{
+  return (getDrawModeHiRes() ? pos / 2 : pos);
+}
+
+static int getLoResScreenMod(int pos)
+{
+  return (getDrawModeHiRes() ? pos % 2 : 0);
+}
+
 static void SetElementExt(int x, int y, int dx, int dy, int element,
 			  boolean change_level, int button)
 {
@@ -11145,10 +11169,10 @@ static void SetElementButton(int x, int y, int dx, int dy, int element,
 
 static void SetElementHiRes(int sx2, int sy2, int element, boolean change_level)
 {
-  int lx = sx2 / 2 + level_xpos;
-  int ly = sy2 / 2 + level_ypos;
-  int dx = sx2 % 2;
-  int dy = sy2 % 2;
+  int lx = getLoResScreenPos(sx2) + level_xpos;
+  int ly = getLoResScreenPos(sy2) + level_ypos;
+  int dx = getLoResScreenMod(sx2);
+  int dy = getLoResScreenMod(sy2);
 
   SetElementExt(lx, ly, dx, dy, element, change_level, -1);
 }
@@ -11183,9 +11207,9 @@ static int getLevelElementHiRes(int lx2, int ly2)
   return element;
 }
 
-static void DrawLineElement(int sx2, int sy2, int element, boolean change_level)
+static void DrawLineElement(int x, int y, int element, boolean change_level)
 {
-  SetElementHiRes(sx2, sy2, element, change_level);
+  SetElementHiRes(x, y, element, change_level);
 }
 
 static void DrawLine(int from_x, int from_y, int to_x, int to_y,
@@ -11273,31 +11297,35 @@ static void DrawArcExt(int from_x, int from_y, int to_x2, int to_y2,
 
   for (x = 0; x <= radius; x++)
   {
-    int sx2, sy2, lx, ly;
+    int sx, sy, sx2, sy2, lx, ly;
 
     y = (int)(sqrt((float)(radius * radius - x * x)) + 0.5);
 
     sx2 = from_x + x * (from_x < to_x2 ? +1 : -1);
     sy2 = from_y + y * (from_y < to_y2 ? +1 : -1);
-    lx = sx2 / 2 + level_xpos;
-    ly = sy2 / 2 + level_ypos;
+    sx = getLoResScreenPos(sx2);
+    sy = getLoResScreenPos(sy2);
+    lx = sx + level_xpos;
+    ly = sy + level_ypos;
 
-    if (IN_ED_FIELD(sx2 / 2, sy2 / 2) && IN_LEV_FIELD(lx, ly))
+    if (IN_ED_FIELD(sx, sy) && IN_LEV_FIELD(lx, ly))
       DrawLineElement(sx2, sy2, element, change_level);
   }
 
   for (y = 0; y <= radius; y++)
   {
-    int sx2, sy2, lx, ly;
+    int sx, sy, sx2, sy2, lx, ly;
 
     x = (int)(sqrt((float)(radius * radius - y * y)) + 0.5);
 
     sx2 = from_x + x * (from_x < to_x2 ? +1 : -1);
     sy2 = from_y + y * (from_y < to_y2 ? +1 : -1);
-    lx = sx2 / 2 + level_xpos;
-    ly = sy2 / 2 + level_ypos;
+    sx = getLoResScreenPos(sx2);
+    sy = getLoResScreenPos(sy2);
+    lx = sx + level_xpos;
+    ly = sy + level_ypos;
 
-    if (IN_ED_FIELD(sx2 / 2, sy2 / 2) && IN_LEV_FIELD(lx, ly))
+    if (IN_ED_FIELD(sx, sy) && IN_LEV_FIELD(lx, ly))
       DrawLineElement(sx2, sy2, element, change_level);
   }
 }
@@ -11359,7 +11387,7 @@ static void DrawAreaBorder(int from_x, int from_y, int to_x, int to_y)
 static void DrawAreaBox(int from_x, int from_y, int to_x, int to_y,
 			int element, boolean change_level)
 {
-  DrawBox(from_x * 2, from_y * 2, to_x * 2, to_y * 2, element, change_level);
+  DrawBox(from_x, from_y, to_x, to_y, element, change_level);
 }
 
 static void SelectArea(int from_x, int from_y, int to_x, int to_y,
@@ -11381,7 +11409,7 @@ static void SelectArea(int from_x, int from_y, int to_x, int to_y,
 
 static void DrawBrushElement(int sx, int sy, int element, boolean change_level)
 {
-  DrawLineElement(sx * 2, sy * 2, element, change_level);
+  DrawLineElement(sx, sy, element, change_level);
 }
 
 static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
@@ -11963,6 +11991,8 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
       ResetIntelliDraw();
   }
 
+  SetDrawModeHiRes(-1);		/* reset to normal draw mode */
+
   switch (actual_drawing_function)
   {
     case GADGET_ID_SINGLE_ITEMS:
@@ -12039,8 +12069,13 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 
 	if (button)
 	{
-	  sx = sx2;
-	  sy = sy2;
+	  SetDrawModeHiRes(new_element);
+
+	  if (getDrawModeHiRes())
+	  {
+	    sx = sx2;
+	    sy = sy2;
+	  }
 
 	  if (!button_press_event)
 	    DrawLine(last_sx, last_sy, sx, sy, new_element, TRUE);
@@ -12055,8 +12090,13 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
     case GADGET_ID_ARC:
     case GADGET_ID_RECTANGLE:
     case GADGET_ID_FILLED_BOX:
-      sx = sx2;
-      sy = sy2;
+      SetDrawModeHiRes(new_element);
+
+      if (getDrawModeHiRes())
+      {
+	sx = sx2;
+	sy = sy2;
+      }
       /* FALLTHROUGH */
     case GADGET_ID_GRAB_BRUSH:
     case GADGET_ID_TEXT:
