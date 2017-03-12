@@ -11928,13 +11928,13 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
   /* also correct MM wall-sized (double) drawing area positions accordingly */
   if (sx2 / 2 < sx || sx2 / 2 > sx)
   {
-    sx2 = sx * 2;
     dx = (sx2 / 2 < sx ? 0 : 1);
+    sx2 = sx * 2 + dx;
   }
   if (sy2 / 2 < sy || sy2 / 2 > sy)
   {
-    sy2 = sy * 2;
     dy = (sy2 / 2 < sy ? 0 : 1);
+    sy2 = sy * 2 + dy;
   }
 
   if (button_release_event)
