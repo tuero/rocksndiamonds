@@ -5659,7 +5659,7 @@ static void ReinitializeElementList()
 
 void PrintEditorElementList()
 {
-  boolean *stop = &setup.editor.el_user_defined;
+  boolean *stop = &setup_editor_el_user_defined;
   int i, j;
 
   for (i = 0; editor_elements_info[i].setup_value != stop; i++)
