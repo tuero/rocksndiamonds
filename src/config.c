@@ -69,14 +69,23 @@ char *getWindowTitleString()
   window_title_string = checked_malloc(strlen(getProgramInitString()) + 20 +
 				       strlen(getSourceDateString()) + 2 + 1);
 
-  sprintf(window_title_string, "%s (%d %%) [%s]",
-	  getProgramInitString(), video.window_scaling_percent,
-	  getSourceDateString());
+  if (setup.internal.show_scaling_in_title)
+    sprintf(window_title_string, "%s (%d %%) [%s]",
+	    getProgramInitString(), video.window_scaling_percent,
+	    getSourceDateString());
+  else
+    sprintf(window_title_string, "%s [%s]",
+	    getProgramInitString(),
+	    getSourceDateString());
 #else
   window_title_string = checked_malloc(strlen(getProgramInitString()) + 20);
 
-  sprintf(window_title_string, "%s (%d %%)",
-	  getProgramInitString(), video.window_scaling_percent);
+  if (setup.internal.show_scaling_in_title)
+    sprintf(window_title_string, "%s (%d %%)",
+	    getProgramInitString(), video.window_scaling_percent);
+  else
+    sprintf(window_title_string, "%s",
+	    getProgramInitString());
 #endif
 
 #else

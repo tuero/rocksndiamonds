@@ -8077,10 +8077,11 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_INT_FALLBACK_MUSIC_FILE	13
 #define SETUP_TOKEN_INT_DEFAULT_LEVEL_SERIES	14
 #define SETUP_TOKEN_INT_CHOOSE_FROM_TOP_LEVELDIR 15
-#define SETUP_TOKEN_INT_DEFAULT_WINDOW_WIDTH	16
-#define SETUP_TOKEN_INT_DEFAULT_WINDOW_HEIGHT	17
+#define SETUP_TOKEN_INT_SHOW_SCALING_IN_TITLE	16
+#define SETUP_TOKEN_INT_DEFAULT_WINDOW_WIDTH	17
+#define SETUP_TOKEN_INT_DEFAULT_WINDOW_HEIGHT	18
 
-#define NUM_INTERNAL_SETUP_TOKENS		18
+#define NUM_INTERNAL_SETUP_TOKENS		19
 
 /* debug setup */
 #define SETUP_TOKEN_DEBUG_FRAME_DELAY_0		0
@@ -8272,6 +8273,7 @@ static struct TokenInfo internal_setup_tokens[] =
   { TYPE_STRING, &sxi.fallback_music_file,	"fallback_music_file"	},
   { TYPE_STRING, &sxi.default_level_series,	"default_level_series"	},
   { TYPE_BOOLEAN,&sxi.choose_from_top_leveldir,	"choose_from_top_leveldir" },
+  { TYPE_BOOLEAN,&sxi.show_scaling_in_title,	"show_scaling_in_title" },
   { TYPE_INTEGER,&sxi.default_window_width,	"default_window_width"	},
   { TYPE_INTEGER,&sxi.default_window_height,	"default_window_height"	},
 };
@@ -8470,6 +8472,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
 
   si->internal.default_level_series = getStringCopy(UNDEFINED_LEVELSET);
   si->internal.choose_from_top_leveldir = FALSE;
+  si->internal.show_scaling_in_title = TRUE;
 
   si->internal.default_window_width  = WIN_XSIZE_DEFAULT;
   si->internal.default_window_height = WIN_YSIZE_DEFAULT;

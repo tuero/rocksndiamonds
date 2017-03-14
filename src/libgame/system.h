@@ -1090,6 +1090,7 @@ struct SetupInternalInfo
   int default_window_height;
 
   boolean choose_from_top_leveldir;
+  boolean show_scaling_in_title;
 };
 
 struct SetupDebugInfo
