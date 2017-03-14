@@ -8148,8 +8148,16 @@ static int getMaxEdFieldY(boolean has_scrollbar)
   return max_ed_fieldy;
 }
 
-void InitZoomLevelSettings()
+void InitZoomLevelSettings(int zoom_tilesize)
 {
+  if (zoom_tilesize == -1)
+    zoom_tilesize = setup.auto_setup.editor_zoom_tilesize;
+
+  // limit zoom tilesize by upper and lower bound
+  zoom_tilesize = MIN(MAX(MICRO_TILESIZE, zoom_tilesize), TILESIZE);
+
+  ed_tilesize = setup.auto_setup.editor_zoom_tilesize = zoom_tilesize;
+
   MAX_ED_FIELDX = getMaxEdFieldX(FALSE);
   MAX_ED_FIELDY = getMaxEdFieldY(FALSE);
 }
@@ -8170,7 +8178,7 @@ void DrawLevelEd()
 
   ClearField();
 
-  InitZoomLevelSettings();
+  InitZoomLevelSettings(-1);
 
   OpenDoor(DOOR_OPEN_1 | DOOR_OPEN_2 | DOOR_NO_DELAY);
 
@@ -12881,7 +12889,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       // limit zoom level by upper and lower bound
       ed_tilesize = MIN(MAX(MICRO_TILESIZE, ed_tilesize), TILESIZE);
 
-      InitZoomLevelSettings();
+      InitZoomLevelSettings(ed_tilesize);
 
       if (edit_mode == ED_MODE_DRAWING)
       {
@@ -12890,6 +12898,9 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	/* redraw zoom gadget info text */
 	PrintEditorGadgetInfoText(level_editor_gadget[id]);
       }
+
+      /* save current editor zoom tilesize */
+      SaveSetup_AutoSetup();
 
       break;
 

@@ -60,6 +60,9 @@ void LoadSetupFromFilename(char *);
 void LoadSetup();
 void SaveSetup();
 
+void LoadSetup_AutoSetup();
+void SaveSetup_AutoSetup();
+
 void LoadSetup_EditorCascade();
 void SaveSetup_EditorCascade();
 

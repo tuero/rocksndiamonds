@@ -8251,6 +8251,11 @@ void SaveScore(int nr)
 
 #define NUM_GLOBAL_SETUP_TOKENS			44
 
+/* auto setup */
+#define SETUP_TOKEN_AUTO_EDITOR_ZOOM_TILESIZE	0
+
+#define NUM_AUTO_SETUP_TOKENS			1
+
 /* editor setup */
 #define SETUP_TOKEN_EDITOR_EL_CLASSIC		0
 #define SETUP_TOKEN_EDITOR_EL_CUSTOM		1
@@ -8389,6 +8394,7 @@ void SaveScore(int nr)
 
 
 static struct SetupInfo si;
+static struct SetupAutoSetupInfo sasi;
 static struct SetupEditorInfo sei;
 static struct SetupEditorCascadeInfo seci;
 static struct SetupShortcutInfo ssi;
@@ -8444,6 +8450,11 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_STRING, &si.touch.control_type,      "touch.control_type"	},
   { TYPE_INTEGER,&si.touch.move_distance,     "touch.move_distance"	},
   { TYPE_INTEGER,&si.touch.drop_distance,     "touch.drop_distance"	},
+};
+
+static struct TokenInfo auto_setup_tokens[] =
+{
+  { TYPE_INTEGER,&sasi.editor_zoom_tilesize,	"editor.zoom_tilesize"	},
 };
 
 static struct TokenInfo editor_setup_tokens[] =
@@ -8789,6 +8800,11 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
 #endif
 }
 
+static void setSetupInfoToDefaults_AutoSetup(struct SetupInfo *si)
+{
+  si->auto_setup.editor_zoom_tilesize = MINI_TILESIZE;
+}
+
 static void setSetupInfoToDefaults_EditorCascade(struct SetupInfo *si)
 {
   si->editor_cascade.el_bd		= TRUE;
@@ -8938,6 +8954,22 @@ static void decodeSetupFileHash(SetupFileHash *setup_file_hash)
   setup.options = soi;
 }
 
+static void decodeSetupFileHash_AutoSetup(SetupFileHash *setup_file_hash)
+{
+  int i;
+
+  if (!setup_file_hash)
+    return;
+
+  /* auto setup */
+  sasi = setup.auto_setup;
+  for (i = 0; i < NUM_AUTO_SETUP_TOKENS; i++)
+    setSetupInfo(auto_setup_tokens, i,
+		 getHashEntry(setup_file_hash,
+			      auto_setup_tokens[i].text));
+  setup.auto_setup = sasi;
+}
+
 static void decodeSetupFileHash_EditorCascade(SetupFileHash *setup_file_hash)
 {
   int i;
@@ -9010,6 +9042,26 @@ void LoadSetup()
   LoadSetupFromFilename(filename);
 
   LoadSetup_SpecialPostProcessing();
+}
+
+void LoadSetup_AutoSetup()
+{
+  char *filename = getPath2(getSetupDir(), AUTOSETUP_FILENAME);
+  SetupFileHash *setup_file_hash = NULL;
+
+  /* always start with reliable default values */
+  setSetupInfoToDefaults_AutoSetup(&setup);
+
+  setup_file_hash = loadSetupFileHash(filename);
+
+  if (setup_file_hash)
+  {
+    decodeSetupFileHash_AutoSetup(setup_file_hash);
+
+    freeSetupFileHash(setup_file_hash);
+  }
+
+  free(filename);
 }
 
 void LoadSetup_EditorCascade()
@@ -9160,6 +9212,34 @@ void SaveSetup()
   fclose(file);
 
   SetFilePermissions(filename, PERMS_PRIVATE);
+}
+
+void SaveSetup_AutoSetup()
+{
+  char *filename = getPath2(getSetupDir(), AUTOSETUP_FILENAME);
+  FILE *file;
+  int i;
+
+  InitUserDataDirectory();
+
+  if (!(file = fopen(filename, MODE_WRITE)))
+  {
+    Error(ERR_WARN, "cannot write auto setup file '%s'", filename);
+    free(filename);
+    return;
+  }
+
+  fprintFileHeader(file, AUTOSETUP_FILENAME);
+
+  sasi = setup.auto_setup;
+  for (i = 0; i < NUM_AUTO_SETUP_TOKENS; i++)
+    fprintf(file, "%s\n", getSetupLine(auto_setup_tokens, "", i));
+
+  fclose(file);
+
+  SetFilePermissions(filename, PERMS_PRIVATE);
+
+  free(filename);
 }
 
 void SaveSetup_EditorCascade()

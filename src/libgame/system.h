@@ -517,6 +517,7 @@
 /* file names and filename extensions */
 #define LEVELSETUP_DIRECTORY	"levelsetup"
 #define SETUP_FILENAME		"setup.conf"
+#define AUTOSETUP_FILENAME	"autosetup.conf"
 #define LEVELSETUP_FILENAME	"levelsetup.conf"
 #define EDITORSETUP_FILENAME	"editorsetup.conf"
 #define EDITORCASCADE_FILENAME	"editorcascade.conf"
@@ -1016,6 +1017,11 @@ struct SetupEditorInfo
   boolean use_template_for_new_levels;
 };
 
+struct SetupAutoSetupInfo
+{
+  int editor_zoom_tilesize;
+};
+
 struct SetupEditorCascadeInfo
 {
   boolean el_bd;
@@ -1155,6 +1161,7 @@ struct SetupInfo
   int volume_loops;
   int volume_music;
 
+  struct SetupAutoSetupInfo auto_setup;
   struct SetupEditorInfo editor;
   struct SetupEditorCascadeInfo editor_cascade;
   struct SetupShortcutInfo shortcut;
