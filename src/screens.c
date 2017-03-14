@@ -3312,6 +3312,13 @@ void DrawInfoScreen_Version()
   DrawTextF(xstart1, ystart2, font_header, "Version");
   DrawTextF(xstart2, ystart2, font_text, getProgramVersionString());
 
+  if (!strEqual(getProgramVersionString(), getProgramRealVersionString()))
+  {
+    ystart2 += ystep;
+    DrawTextF(xstart1, ystart2, font_header, "Version (real)");
+    DrawTextF(xstart2, ystart2, font_text, getProgramRealVersionString());
+  }
+
   ystart2 += ystep;
   DrawTextF(xstart1, ystart2, font_header, "Platform");
   DrawTextF(xstart2, ystart2, font_text, PLATFORM_STRING);

@@ -68,7 +68,7 @@ int			FrameCounter = 0;
 void InitProgramInfo(char *argv0, char *config_filename, char *userdata_subdir,
 		     char *program_title, char *icon_title,
 		     char *icon_filename, char *cookie_prefix,
-		     int program_version)
+		     char *program_version_string, int program_version)
 {
   program.command_basepath = getBasePath(argv0);
   program.command_basename = getBaseName(argv0);
@@ -91,6 +91,8 @@ void InitProgramInfo(char *argv0, char *config_filename, char *userdata_subdir,
   program.version_patch = VERSION_PATCH(program_version);
   program.version_build = VERSION_BUILD(program_version);
   program.version_ident = program_version;
+
+  program.version_string = program_version_string;
 
   program.log_filename[LOG_OUT_ID] = getLogFilename(LOG_OUT_BASENAME);
   program.log_filename[LOG_ERR_ID] = getLogFilename(LOG_ERR_BASENAME);

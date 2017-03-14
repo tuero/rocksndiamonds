@@ -5738,13 +5738,20 @@ static void print_usage()
 
 static void print_version()
 {
-  Print("%s %d.%d.%d.%d%s\n",
-	PROGRAM_TITLE_STRING,
-	PROGRAM_VERSION_MAJOR,
-	PROGRAM_VERSION_MINOR,
-	PROGRAM_VERSION_PATCH,
-	PROGRAM_VERSION_BUILD,
-	PROGRAM_VERSION_EXTRA);
+  Print("%s", getProgramInitString());
+
+  if (!strEqual(getProgramVersionString(), getProgramRealVersionString()))
+  {
+    Print(" (%s %d.%d.%d.%d%s)",
+	  PROGRAM_TITLE_STRING,
+	  PROGRAM_VERSION_MAJOR,
+	  PROGRAM_VERSION_MINOR,
+	  PROGRAM_VERSION_PATCH,
+	  PROGRAM_VERSION_BUILD,
+	  PROGRAM_VERSION_EXTRA);
+  }
+
+  Print("\n");
 
   if (options.debug)
   {
@@ -5780,6 +5787,7 @@ static void InitProgramConfig(char *command_filename)
 {
   char *program_title = PROGRAM_TITLE_STRING;
   char *program_icon_file = PROGRAM_ICON_FILENAME;
+  char *program_version = getProgramRealVersionString();
   char *config_filename = getProgramConfigFilename(command_filename);
   char *userdata_basename = getBaseNameNoSuffix(command_filename);
   char *userdata_subdir;
@@ -5804,6 +5812,11 @@ static void InitProgramConfig(char *command_filename)
   if (setup.internal.program_title != NULL &&
       strlen(setup.internal.program_title) > 0)
     program_title = getStringCopy(setup.internal.program_title);
+
+  // set program version from potentially redefined program version
+  if (setup.internal.program_version != NULL &&
+      strlen(setup.internal.program_version) > 0)
+    program_version = getStringCopy(setup.internal.program_version);
 
   // set program icon file from potentially redefined program icon file
   if (setup.internal.program_icon_file != NULL &&
@@ -5833,6 +5846,7 @@ static void InitProgramConfig(char *command_filename)
 		  program_title,
 		  program_icon_file,
 		  COOKIE_PREFIX,
+		  program_version,
 		  GAME_VERSION_ACTUAL);
 }
 

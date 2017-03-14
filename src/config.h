@@ -16,6 +16,7 @@
 
 char *getSourceDateString(void);
 char *getProgramTitleString(void);
+char *getProgramRealVersionString(void);
 char *getProgramVersionString(void);
 char *getProgramInitString(void);
 char *getWindowTitleString(void);

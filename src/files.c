@@ -20,6 +20,7 @@
 #include "init.h"
 #include "tools.h"
 #include "tape.h"
+#include "config.h"
 
 #define ENABLE_UNUSED_CODE	0	/* currently unused functions */
 #define ENABLE_HISTORIC_CHUNKS	0	/* only for historic reference */
@@ -8061,24 +8062,25 @@ void SaveScore(int nr)
 
 /* internal setup */
 #define SETUP_TOKEN_INT_PROGRAM_TITLE		0
-#define SETUP_TOKEN_INT_PROGRAM_AUTHOR		1
-#define SETUP_TOKEN_INT_PROGRAM_EMAIL		2
-#define SETUP_TOKEN_INT_PROGRAM_WEBSITE		3
-#define SETUP_TOKEN_INT_PROGRAM_COPYRIGHT	4
-#define SETUP_TOKEN_INT_PROGRAM_COMPANY		5
-#define SETUP_TOKEN_INT_PROGRAM_ICON_FILE	6
-#define SETUP_TOKEN_INT_DEFAULT_GRAPHICS_SET	7
-#define SETUP_TOKEN_INT_DEFAULT_SOUNDS_SET	8
-#define SETUP_TOKEN_INT_DEFAULT_MUSIC_SET	9
-#define SETUP_TOKEN_INT_FALLBACK_GRAPHICS_FILE	10
-#define SETUP_TOKEN_INT_FALLBACK_SOUNDS_FILE	11
-#define SETUP_TOKEN_INT_FALLBACK_MUSIC_FILE	12
-#define SETUP_TOKEN_INT_DEFAULT_LEVEL_SERIES	13
-#define SETUP_TOKEN_INT_CHOOSE_FROM_TOP_LEVELDIR 14
-#define SETUP_TOKEN_INT_DEFAULT_WINDOW_WIDTH	15
-#define SETUP_TOKEN_INT_DEFAULT_WINDOW_HEIGHT	16
+#define SETUP_TOKEN_INT_PROGRAM_VERSION		1
+#define SETUP_TOKEN_INT_PROGRAM_AUTHOR		2
+#define SETUP_TOKEN_INT_PROGRAM_EMAIL		3
+#define SETUP_TOKEN_INT_PROGRAM_WEBSITE		4
+#define SETUP_TOKEN_INT_PROGRAM_COPYRIGHT	5
+#define SETUP_TOKEN_INT_PROGRAM_COMPANY		6
+#define SETUP_TOKEN_INT_PROGRAM_ICON_FILE	7
+#define SETUP_TOKEN_INT_DEFAULT_GRAPHICS_SET	8
+#define SETUP_TOKEN_INT_DEFAULT_SOUNDS_SET	9
+#define SETUP_TOKEN_INT_DEFAULT_MUSIC_SET	10
+#define SETUP_TOKEN_INT_FALLBACK_GRAPHICS_FILE	11
+#define SETUP_TOKEN_INT_FALLBACK_SOUNDS_FILE	12
+#define SETUP_TOKEN_INT_FALLBACK_MUSIC_FILE	13
+#define SETUP_TOKEN_INT_DEFAULT_LEVEL_SERIES	14
+#define SETUP_TOKEN_INT_CHOOSE_FROM_TOP_LEVELDIR 15
+#define SETUP_TOKEN_INT_DEFAULT_WINDOW_WIDTH	16
+#define SETUP_TOKEN_INT_DEFAULT_WINDOW_HEIGHT	17
 
-#define NUM_INTERNAL_SETUP_TOKENS		17
+#define NUM_INTERNAL_SETUP_TOKENS		18
 
 /* debug setup */
 #define SETUP_TOKEN_DEBUG_FRAME_DELAY_0		0
@@ -8255,6 +8257,7 @@ static struct TokenInfo system_setup_tokens[] =
 static struct TokenInfo internal_setup_tokens[] =
 {
   { TYPE_STRING, &sxi.program_title,		"program_title"		},
+  { TYPE_STRING, &sxi.program_version,		"program_version"	},
   { TYPE_STRING, &sxi.program_author,		"program_author"	},
   { TYPE_STRING, &sxi.program_email,		"program_email"		},
   { TYPE_STRING, &sxi.program_website,		"program_website"	},
@@ -8448,6 +8451,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->system.audio_fragment_size = DEFAULT_AUDIO_FRAGMENT_SIZE;
 
   si->internal.program_title     = getStringCopy(PROGRAM_TITLE_STRING);
+  si->internal.program_version   = getStringCopy(getProgramRealVersionString());
   si->internal.program_author    = getStringCopy(PROGRAM_AUTHOR_STRING);
   si->internal.program_email     = getStringCopy(PROGRAM_EMAIL_STRING);
   si->internal.program_website   = getStringCopy(PROGRAM_WEBSITE_STRING);

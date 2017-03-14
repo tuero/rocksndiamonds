@@ -25,7 +25,7 @@ char *getProgramTitleString()
   return program.program_title;
 }
 
-char *getProgramVersionString()
+char *getProgramRealVersionString()
 {
   static char program_version_string[32];
 
@@ -34,6 +34,11 @@ char *getProgramVersionString()
 	  PROGRAM_VERSION_BUILD, PROGRAM_VERSION_EXTRA);
 
   return program_version_string;
+}
+
+char *getProgramVersionString()
+{
+  return program.version_string;
 }
 
 char *getProgramInitString()

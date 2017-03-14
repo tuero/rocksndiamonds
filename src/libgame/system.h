@@ -779,6 +779,8 @@ struct ProgramInfo
   int version_build;
   int version_ident;
 
+  char *version_string;
+
   char *(*window_title_function)(void);
   void (*exit_message_function)(char *, va_list);
   void (*exit_function)(int);
@@ -1065,6 +1067,7 @@ struct SetupSystemInfo
 struct SetupInternalInfo
 {
   char *program_title;
+  char *program_version;
   char *program_author;
   char *program_email;
   char *program_website;
@@ -1448,7 +1451,7 @@ extern int			FrameCounter;
 /* function definitions */
 
 void InitProgramInfo(char *, char *, char *, char *, char *, char *, char *,
-		     int);
+		     char *, int);
 
 void InitScoresInfo();
 void SetWindowTitle();
