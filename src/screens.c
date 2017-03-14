@@ -1482,6 +1482,8 @@ void DrawMainMenu()
   LoadLevel(level_nr);
   LoadScore(level_nr);
 
+  SaveLevelSetup_SeriesInfo();
+
   // set this after "ChangeViewportPropertiesIfNeeded()" (which may reset it)
   SetDrawDeactivationMask(REDRAW_NONE);
   SetDrawBackgroundMask(REDRAW_FIELD);
@@ -1784,6 +1786,8 @@ void HandleMainMenu_SelectLevel(int step, int direction, int selected_level_nr)
     TapeErase();
     LoadTape(level_nr);
     DrawCompleteVideoDisplay();
+
+    SaveLevelSetup_SeriesInfo();
 
     /* needed because DrawPreviewLevelInitial() takes some time */
     BackToFront();

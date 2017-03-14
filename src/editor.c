@@ -11366,6 +11366,8 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
       LoadLevel(level_nr);
       LoadScore(level_nr);
 
+      SaveLevelSetup_SeriesInfo();
+
       TapeErase();
 
       ResetUndoBuffer();
