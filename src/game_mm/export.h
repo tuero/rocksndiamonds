@@ -145,6 +145,8 @@ struct GameInfo_MM
 
   boolean cheat_no_overload;
   boolean cheat_no_explosion;
+
+  int laser_overload_value;
 };
 
 struct LevelInfo_MM

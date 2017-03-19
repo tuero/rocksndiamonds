@@ -307,6 +307,8 @@ void InitGameEngine_MM()
   game_mm.game_over = FALSE;
   game_mm.game_over_cause = 0;
 
+  game_mm.laser_overload_value = 0;
+
   /* set global laser control values (must be set before "InitLaser()") */
   laser.start_edge.x = 0;
   laser.start_edge.y = 0;
@@ -2921,6 +2923,8 @@ static void GameActions_MM_Ext(byte action[MAX_PLAYERS], boolean warp_mode)
       laser.overloaded = FALSE;
       laser.overload_value = 0;
     }
+
+    game_mm.laser_overload_value = laser.overload_value;
 
     if (laser.overload_value < MAX_LASER_OVERLOAD - 8)
     {

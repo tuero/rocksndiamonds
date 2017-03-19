@@ -2922,6 +2922,9 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
 
     if (string_has_parameter(value, "inner_corners"))
       result |= STYLE_INNER_CORNERS;
+
+    if (string_has_parameter(value, "reverse"))
+      result |= STYLE_REVERSE;
   }
   else if (strEqual(suffix, ".fade_mode"))
   {

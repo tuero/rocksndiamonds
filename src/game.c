@@ -122,87 +122,90 @@
 #define GAME_PANEL_TIME_HH			32
 #define GAME_PANEL_TIME_MM			33
 #define GAME_PANEL_TIME_SS			34
-#define GAME_PANEL_FRAME			35
-#define GAME_PANEL_SHIELD_NORMAL		36
-#define GAME_PANEL_SHIELD_NORMAL_TIME		37
-#define GAME_PANEL_SHIELD_DEADLY		38
-#define GAME_PANEL_SHIELD_DEADLY_TIME		39
-#define GAME_PANEL_EXIT				40
-#define GAME_PANEL_EMC_MAGIC_BALL		41
-#define GAME_PANEL_EMC_MAGIC_BALL_SWITCH	42
-#define GAME_PANEL_LIGHT_SWITCH			43
-#define GAME_PANEL_LIGHT_SWITCH_TIME		44
-#define GAME_PANEL_TIMEGATE_SWITCH		45
-#define GAME_PANEL_TIMEGATE_SWITCH_TIME		46
-#define GAME_PANEL_SWITCHGATE_SWITCH		47
-#define GAME_PANEL_EMC_LENSES			48
-#define GAME_PANEL_EMC_LENSES_TIME		49
-#define GAME_PANEL_EMC_MAGNIFIER		50
-#define GAME_PANEL_EMC_MAGNIFIER_TIME		51
-#define GAME_PANEL_BALLOON_SWITCH		52
-#define GAME_PANEL_DYNABOMB_NUMBER		53
-#define GAME_PANEL_DYNABOMB_SIZE		54
-#define GAME_PANEL_DYNABOMB_POWER		55
-#define GAME_PANEL_PENGUINS			56
-#define GAME_PANEL_SOKOBAN_OBJECTS		57
-#define GAME_PANEL_SOKOBAN_FIELDS		58
-#define GAME_PANEL_ROBOT_WHEEL			59
-#define GAME_PANEL_CONVEYOR_BELT_1		60
-#define GAME_PANEL_CONVEYOR_BELT_2		61
-#define GAME_PANEL_CONVEYOR_BELT_3		62
-#define GAME_PANEL_CONVEYOR_BELT_4		63
-#define GAME_PANEL_CONVEYOR_BELT_1_SWITCH	64
-#define GAME_PANEL_CONVEYOR_BELT_2_SWITCH	65
-#define GAME_PANEL_CONVEYOR_BELT_3_SWITCH	66
-#define GAME_PANEL_CONVEYOR_BELT_4_SWITCH	67
-#define GAME_PANEL_MAGIC_WALL			68
-#define GAME_PANEL_MAGIC_WALL_TIME		69
-#define GAME_PANEL_GRAVITY_STATE		70
-#define GAME_PANEL_GRAPHIC_1			71
-#define GAME_PANEL_GRAPHIC_2			72
-#define GAME_PANEL_GRAPHIC_3			73
-#define GAME_PANEL_GRAPHIC_4			74
-#define GAME_PANEL_GRAPHIC_5			75
-#define GAME_PANEL_GRAPHIC_6			76
-#define GAME_PANEL_GRAPHIC_7			77
-#define GAME_PANEL_GRAPHIC_8			78
-#define GAME_PANEL_ELEMENT_1			79
-#define GAME_PANEL_ELEMENT_2			80
-#define GAME_PANEL_ELEMENT_3			81
-#define GAME_PANEL_ELEMENT_4			82
-#define GAME_PANEL_ELEMENT_5			83
-#define GAME_PANEL_ELEMENT_6			84
-#define GAME_PANEL_ELEMENT_7			85
-#define GAME_PANEL_ELEMENT_8			86
-#define GAME_PANEL_ELEMENT_COUNT_1		87
-#define GAME_PANEL_ELEMENT_COUNT_2		88
-#define GAME_PANEL_ELEMENT_COUNT_3		89
-#define GAME_PANEL_ELEMENT_COUNT_4		90
-#define GAME_PANEL_ELEMENT_COUNT_5		91
-#define GAME_PANEL_ELEMENT_COUNT_6		92
-#define GAME_PANEL_ELEMENT_COUNT_7		93
-#define GAME_PANEL_ELEMENT_COUNT_8		94
-#define GAME_PANEL_CE_SCORE_1			95
-#define GAME_PANEL_CE_SCORE_2			96
-#define GAME_PANEL_CE_SCORE_3			97
-#define GAME_PANEL_CE_SCORE_4			98
-#define GAME_PANEL_CE_SCORE_5			99
-#define GAME_PANEL_CE_SCORE_6			100
-#define GAME_PANEL_CE_SCORE_7			101
-#define GAME_PANEL_CE_SCORE_8			102
-#define GAME_PANEL_CE_SCORE_1_ELEMENT		103
-#define GAME_PANEL_CE_SCORE_2_ELEMENT		104
-#define GAME_PANEL_CE_SCORE_3_ELEMENT		105
-#define GAME_PANEL_CE_SCORE_4_ELEMENT		106
-#define GAME_PANEL_CE_SCORE_5_ELEMENT		107
-#define GAME_PANEL_CE_SCORE_6_ELEMENT		108
-#define GAME_PANEL_CE_SCORE_7_ELEMENT		109
-#define GAME_PANEL_CE_SCORE_8_ELEMENT		110
-#define GAME_PANEL_PLAYER_NAME			111
-#define GAME_PANEL_LEVEL_NAME			112
-#define GAME_PANEL_LEVEL_AUTHOR			113
+#define GAME_PANEL_TIME_ANIM			35
+#define GAME_PANEL_HEALTH			36
+#define GAME_PANEL_HEALTH_ANIM			37
+#define GAME_PANEL_FRAME			38
+#define GAME_PANEL_SHIELD_NORMAL		39
+#define GAME_PANEL_SHIELD_NORMAL_TIME		40
+#define GAME_PANEL_SHIELD_DEADLY		41
+#define GAME_PANEL_SHIELD_DEADLY_TIME		42
+#define GAME_PANEL_EXIT				43
+#define GAME_PANEL_EMC_MAGIC_BALL		44
+#define GAME_PANEL_EMC_MAGIC_BALL_SWITCH	45
+#define GAME_PANEL_LIGHT_SWITCH			46
+#define GAME_PANEL_LIGHT_SWITCH_TIME		47
+#define GAME_PANEL_TIMEGATE_SWITCH		48
+#define GAME_PANEL_TIMEGATE_SWITCH_TIME		49
+#define GAME_PANEL_SWITCHGATE_SWITCH		50
+#define GAME_PANEL_EMC_LENSES			51
+#define GAME_PANEL_EMC_LENSES_TIME		52
+#define GAME_PANEL_EMC_MAGNIFIER		53
+#define GAME_PANEL_EMC_MAGNIFIER_TIME		54
+#define GAME_PANEL_BALLOON_SWITCH		55
+#define GAME_PANEL_DYNABOMB_NUMBER		56
+#define GAME_PANEL_DYNABOMB_SIZE		57
+#define GAME_PANEL_DYNABOMB_POWER		58
+#define GAME_PANEL_PENGUINS			59
+#define GAME_PANEL_SOKOBAN_OBJECTS		60
+#define GAME_PANEL_SOKOBAN_FIELDS		61
+#define GAME_PANEL_ROBOT_WHEEL			62
+#define GAME_PANEL_CONVEYOR_BELT_1		63
+#define GAME_PANEL_CONVEYOR_BELT_2		64
+#define GAME_PANEL_CONVEYOR_BELT_3		65
+#define GAME_PANEL_CONVEYOR_BELT_4		66
+#define GAME_PANEL_CONVEYOR_BELT_1_SWITCH	67
+#define GAME_PANEL_CONVEYOR_BELT_2_SWITCH	68
+#define GAME_PANEL_CONVEYOR_BELT_3_SWITCH	69
+#define GAME_PANEL_CONVEYOR_BELT_4_SWITCH	70
+#define GAME_PANEL_MAGIC_WALL			71
+#define GAME_PANEL_MAGIC_WALL_TIME		72
+#define GAME_PANEL_GRAVITY_STATE		73
+#define GAME_PANEL_GRAPHIC_1			74
+#define GAME_PANEL_GRAPHIC_2			75
+#define GAME_PANEL_GRAPHIC_3			76
+#define GAME_PANEL_GRAPHIC_4			77
+#define GAME_PANEL_GRAPHIC_5			78
+#define GAME_PANEL_GRAPHIC_6			79
+#define GAME_PANEL_GRAPHIC_7			80
+#define GAME_PANEL_GRAPHIC_8			81
+#define GAME_PANEL_ELEMENT_1			82
+#define GAME_PANEL_ELEMENT_2			83
+#define GAME_PANEL_ELEMENT_3			84
+#define GAME_PANEL_ELEMENT_4			85
+#define GAME_PANEL_ELEMENT_5			86
+#define GAME_PANEL_ELEMENT_6			87
+#define GAME_PANEL_ELEMENT_7			88
+#define GAME_PANEL_ELEMENT_8			89
+#define GAME_PANEL_ELEMENT_COUNT_1		90
+#define GAME_PANEL_ELEMENT_COUNT_2		91
+#define GAME_PANEL_ELEMENT_COUNT_3		92
+#define GAME_PANEL_ELEMENT_COUNT_4		93
+#define GAME_PANEL_ELEMENT_COUNT_5		94
+#define GAME_PANEL_ELEMENT_COUNT_6		95
+#define GAME_PANEL_ELEMENT_COUNT_7		96
+#define GAME_PANEL_ELEMENT_COUNT_8		97
+#define GAME_PANEL_CE_SCORE_1			98
+#define GAME_PANEL_CE_SCORE_2			99
+#define GAME_PANEL_CE_SCORE_3			100
+#define GAME_PANEL_CE_SCORE_4			101
+#define GAME_PANEL_CE_SCORE_5			102
+#define GAME_PANEL_CE_SCORE_6			103
+#define GAME_PANEL_CE_SCORE_7			104
+#define GAME_PANEL_CE_SCORE_8			105
+#define GAME_PANEL_CE_SCORE_1_ELEMENT		106
+#define GAME_PANEL_CE_SCORE_2_ELEMENT		107
+#define GAME_PANEL_CE_SCORE_3_ELEMENT		108
+#define GAME_PANEL_CE_SCORE_4_ELEMENT		109
+#define GAME_PANEL_CE_SCORE_5_ELEMENT		110
+#define GAME_PANEL_CE_SCORE_6_ELEMENT		111
+#define GAME_PANEL_CE_SCORE_7_ELEMENT		112
+#define GAME_PANEL_CE_SCORE_8_ELEMENT		113
+#define GAME_PANEL_PLAYER_NAME			114
+#define GAME_PANEL_LEVEL_NAME			115
+#define GAME_PANEL_LEVEL_AUTHOR			116
 
-#define NUM_GAME_PANEL_CONTROLS			114
+#define NUM_GAME_PANEL_CONTROLS			117
 
 struct GamePanelOrderInfo
 {
@@ -218,6 +221,8 @@ struct GamePanelControlInfo
 
   struct TextPosInfo *pos;
   int type;
+
+  int graphic, graphic_active;
 
   int value, last_value;
   int frame, last_frame;
@@ -401,6 +406,27 @@ static struct GamePanelControlInfo game_panel_controls[] =
     GAME_PANEL_TIME_SS,
     &game.panel.time_ss,
     TYPE_INTEGER,
+  },
+  {
+    GAME_PANEL_TIME_ANIM,
+    &game.panel.time_anim,
+    TYPE_GRAPHIC,
+
+    IMG_GFX_GAME_PANEL_TIME_ANIM,
+    IMG_GFX_GAME_PANEL_TIME_ANIM_ACTIVE
+  },
+  {
+    GAME_PANEL_HEALTH,
+    &game.panel.health,
+    TYPE_INTEGER,
+  },
+  {
+    GAME_PANEL_HEALTH_ANIM,
+    &game.panel.health_anim,
+    TYPE_GRAPHIC,
+
+    IMG_GFX_GAME_PANEL_HEALTH_ANIM,
+    IMG_GFX_GAME_PANEL_HEALTH_ANIM_ACTIVE
   },
   {
     GAME_PANEL_FRAME,
@@ -2179,6 +2205,8 @@ void UpdateGameControlValues()
 		     local_player->gems_still_needed > 0 ||
 		     local_player->sokobanfields_still_needed > 0 ||
 		     local_player->lights_still_needed > 0);
+  int health = (level.game_engine_type == GAME_ENGINE_TYPE_MM ?
+		MIN(MAX(0, 100 - game_mm.laser_overload_value), 100) : 100);
 
   UpdatePlayfieldElementCount();
 
@@ -2268,6 +2296,14 @@ void UpdateGameControlValues()
   game_panel_controls[GAME_PANEL_TIME_HH].value = time / 3600;
   game_panel_controls[GAME_PANEL_TIME_MM].value = (time / 60) % 60;
   game_panel_controls[GAME_PANEL_TIME_SS].value = time % 60;
+
+  if (game.no_time_limit)
+    game_panel_controls[GAME_PANEL_TIME_ANIM].value = 100;
+  else
+    game_panel_controls[GAME_PANEL_TIME_ANIM].value = time * 100 / level.time;
+
+  game_panel_controls[GAME_PANEL_HEALTH].value = health;
+  game_panel_controls[GAME_PANEL_HEALTH_ANIM].value = health;
 
   game_panel_controls[GAME_PANEL_FRAME].value = FrameCounter;
 
@@ -2425,6 +2461,36 @@ void UpdateGameControlValues()
 	  gfx.anim_random_frame = last_anim_random_frame;
       }
     }
+    else if (gpc->type == TYPE_GRAPHIC)
+    {
+      if (gpc->graphic != IMG_UNDEFINED)
+      {
+	int last_anim_random_frame = gfx.anim_random_frame;
+	int graphic = gpc->graphic;
+
+	if (gpc->value != gpc->last_value)
+	{
+	  gpc->gfx_frame = 0;
+	  gpc->gfx_random = INIT_GFX_RANDOM();
+	}
+	else
+	{
+	  gpc->gfx_frame++;
+
+	  if (ANIM_MODE(graphic) == ANIM_RANDOM &&
+	      IS_NEXT_FRAME(gpc->gfx_frame, graphic))
+	    gpc->gfx_random = INIT_GFX_RANDOM();
+	}
+
+	if (ANIM_MODE(graphic) == ANIM_RANDOM)
+	  gfx.anim_random_frame = gpc->gfx_random;
+
+	gpc->frame = getGraphicAnimationFrame(graphic, gpc->gfx_frame);
+
+	if (ANIM_MODE(graphic) == ANIM_RANDOM)
+	  gfx.anim_random_frame = last_anim_random_frame;
+      }
+    }
   }
 }
 
@@ -2535,6 +2601,94 @@ void DisplayGameControlValues()
 
 	width  = graphic_info[graphic].width  * size / TILESIZE;
 	height = graphic_info[graphic].height * size / TILESIZE;
+
+	if (draw_masked)
+	  BlitBitmapMasked(src_bitmap, drawto, src_x, src_y, width, height,
+			   dst_x, dst_y);
+	else
+	  BlitBitmap(src_bitmap, drawto, src_x, src_y, width, height,
+		     dst_x, dst_y);
+      }
+    }
+    else if (type == TYPE_GRAPHIC)
+    {
+      int graphic        = gpc->graphic;
+      int graphic_active = gpc->graphic_active;
+      Bitmap *src_bitmap;
+      int src_x, src_y;
+      int width, height;
+      int dst_x = PANEL_XPOS(pos);
+      int dst_y = PANEL_YPOS(pos);
+      boolean skip = (pos->class == get_hash_from_key("mm_engine_only") &&
+		      level.game_engine_type != GAME_ENGINE_TYPE_MM);
+
+      if (graphic != IMG_UNDEFINED && !skip)
+      {
+	if (pos->style == STYLE_REVERSE)
+	  value = 100 - value;
+
+	getGraphicSource(graphic_active, frame, &src_bitmap, &src_x, &src_y);
+
+	if (pos->direction & MV_HORIZONTAL)
+	{
+	  width  = graphic_info[graphic_active].width * value / 100;
+	  height = graphic_info[graphic_active].height;
+
+	  if (pos->direction == MV_LEFT)
+	  {
+	    src_x += graphic_info[graphic_active].width - width;
+	    dst_x += graphic_info[graphic_active].width - width;
+	  }
+	}
+	else
+	{
+	  width  = graphic_info[graphic_active].width;
+	  height = graphic_info[graphic_active].height * value / 100;
+
+	  if (pos->direction == MV_UP)
+	  {
+	    src_y += graphic_info[graphic_active].height - height;
+	    dst_y += graphic_info[graphic_active].height - height;
+	  }
+	}
+
+	if (draw_masked)
+	  BlitBitmapMasked(src_bitmap, drawto, src_x, src_y, width, height,
+			   dst_x, dst_y);
+	else
+	  BlitBitmap(src_bitmap, drawto, src_x, src_y, width, height,
+		     dst_x, dst_y);
+
+	getGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
+
+	if (pos->direction & MV_HORIZONTAL)
+	{
+	  if (pos->direction == MV_RIGHT)
+	  {
+	    src_x += width;
+	    dst_x += width;
+	  }
+	  else
+	  {
+	    dst_x = PANEL_XPOS(pos);
+	  }
+
+	  width = graphic_info[graphic].width - width;
+	}
+	else
+	{
+	  if (pos->direction == MV_DOWN)
+	  {
+	    src_y += height;
+	    dst_y += height;
+	  }
+	  else
+	  {
+	    dst_y = PANEL_YPOS(pos);
+	  }
+
+	  height = graphic_info[graphic].height - height;
+	}
 
 	if (draw_masked)
 	  BlitBitmapMasked(src_bitmap, drawto, src_x, src_y, width, height,

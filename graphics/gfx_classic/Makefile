@@ -26,6 +26,7 @@ FILES = RocksBusy.$(EXT)		\
 	RocksDF.$(EXT)			\
 	RocksDoor.$(EXT)		\
 	RocksDoor2.$(EXT)		\
+	RocksDoorMM.$(EXT)		\
 	RocksEMC.$(EXT)			\
 	RocksElements.$(EXT)		\
 	RocksFontBig.$(EXT)		\

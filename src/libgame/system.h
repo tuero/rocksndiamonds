@@ -321,6 +321,7 @@
 #define STYLE_NONE		0
 #define STYLE_ACCURATE_BORDERS	(1 << 0)
 #define STYLE_INNER_CORNERS	(1 << 1)
+#define STYLE_REVERSE		(1 << 2)
 
 #define STYLE_DEFAULT		STYLE_NONE
 
@@ -1415,6 +1416,10 @@ struct TextPosInfo
   boolean draw_player;		/* special case for network player buttons */
   int sort_priority;		/* also used for suffix ".draw_order" */
   int id;
+
+  int direction;		/* needed for panel time/health graphics */
+  int class;			/* needed for panel time/health graphics */
+  int style;			/* needed for panel time/health graphics */
 };
 
 struct LevelStats
