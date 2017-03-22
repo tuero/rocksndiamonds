@@ -350,7 +350,7 @@ void InitGameEngine_MM()
   DrawLevel_MM();
 }
 
-void InitGameEngine_MM_AfterFadingIn()
+void InitGameActions_MM()
 {
   InitCycleElements();
   InitLaser();

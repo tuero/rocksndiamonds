@@ -199,7 +199,7 @@ void InitElementProperties_MM();
 extern void InitGfxBuffers_MM();
 
 extern void InitGameEngine_MM();
-extern void InitGameEngine_MM_AfterFadingIn();
+extern void InitGameActions_MM();
 extern void GameActions_MM(byte *, boolean);
 
 extern void ClickElement(int, int, int);
