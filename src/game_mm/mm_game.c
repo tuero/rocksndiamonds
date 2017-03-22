@@ -68,7 +68,10 @@
 /* values for 'click_delay_value' in ClickElement() */
 #define CLICK_DELAY_SHORT	125
 #define CLICK_DELAY_LONG	250
+
 #define AUTO_ROTATE_DELAY	CLICK_DELAY_SHORT
+#define INIT_GAME_ACTIONS_DELAY	ONE_SECOND_DELAY
+#define NUM_INIT_CYCLE_STEPS	16
 
 /* forward declaration for internal use */
 static int MovingOrBlocked2Element_MM(int, int);
@@ -215,41 +218,28 @@ static void InitField(int x, int y, boolean init_game)
   }
 }
 
-static void InitCycleElements()
+static void InitCycleElements_RotateSingleStep()
 {
-  int i, j;
+  int i;
 
   if (game_mm.num_cycle == 0)	/* no elements to cycle */
     return;
 
-  for (i = 0; i < 16; i++)
+  for (i = 0; i < game_mm.num_cycle; i++)
   {
-    for (j = 0; j < game_mm.num_cycle; j++)
-    {
-      int x = game_mm.cycle[j].x;
-      int y = game_mm.cycle[j].y;
-      int step = SIGN(game_mm.cycle[j].steps);
-      int last_element = Feld[x][y];
-      int next_element = get_rotated_element(last_element, step);
+    int x = game_mm.cycle[i].x;
+    int y = game_mm.cycle[i].y;
+    int step = SIGN(game_mm.cycle[i].steps);
+    int last_element = Feld[x][y];
+    int next_element = get_rotated_element(last_element, step);
 
-      if (!game_mm.cycle[j].steps)
-	continue;
-
-      Feld[x][y] = next_element;
-
-      DrawField_MM(x, y);
-      game_mm.cycle[j].steps -= step;
-    }
-
-    BackToFront();
-    ColorCycling();
-
-#ifdef DEBUG
-    if (setup.quick_doors)
+    if (!game_mm.cycle[i].steps)
       continue;
-#endif
 
-    Delay(AUTO_ROTATE_DELAY);
+    Feld[x][y] = next_element;
+
+    DrawField_MM(x, y);
+    game_mm.cycle[i].steps -= step;
   }
 }
 
@@ -352,9 +342,10 @@ void InitGameEngine_MM()
 
 void InitGameActions_MM()
 {
+  int num_init_game_frames = INIT_GAME_ACTIONS_DELAY / GAME_FRAME_DELAY;
+  int cycle_steps_done = 0;
   int i;
 
-  InitCycleElements();
   InitLaser();
 
 #if 0
@@ -390,14 +381,21 @@ void InitGameActions_MM()
   if (setup.sound_loops)
     PlaySoundExt(SND_FUEL, SOUND_MAX_VOLUME, SOUND_MAX_RIGHT, SND_CTRL_PLAY_LOOP);
 
-  for (i = 0; i <= native_mm_level.time; i += 2)
+  for (i = 0; i <= num_init_game_frames; i++)
   {
     if (!setup.sound_loops)
       PlaySoundStereo(SND_FUEL, SOUND_MAX_RIGHT);
 
-    game_mm.energy_left = i;
+    game_mm.energy_left = native_mm_level.time * i / num_init_game_frames;
 
     UpdateAndDisplayGameControlValues();
+
+    while (cycle_steps_done < NUM_INIT_CYCLE_STEPS * i / num_init_game_frames)
+    {
+      InitCycleElements_RotateSingleStep();
+
+      cycle_steps_done++;
+    }
 
     BackToFront();
 
@@ -408,8 +406,6 @@ void InitGameActions_MM()
       continue;
 #endif
   }
-
-  game_mm.energy_left = native_mm_level.time;
 
   if (setup.sound_loops)
     StopSound(SND_FUEL);
