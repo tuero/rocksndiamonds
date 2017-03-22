@@ -297,7 +297,7 @@ void InitGameEngine_MM()
   game_mm.num_pacman = 0;
 
   game_mm.score = 0;
-  game_mm.energy_left = native_mm_level.time;
+  game_mm.energy_left = 0;	// later set to "native_mm_level.time"
   game_mm.kettles_still_needed =
     (native_mm_level.auto_count_kettles ? 0 : native_mm_level.kettles_needed);
   game_mm.lights_still_needed = 0;
@@ -352,6 +352,8 @@ void InitGameEngine_MM()
 
 void InitGameActions_MM()
 {
+  int i;
+
   InitCycleElements();
   InitLaser();
 
@@ -388,21 +390,15 @@ void InitGameActions_MM()
   if (setup.sound_loops)
     PlaySoundExt(SND_FUEL, SOUND_MAX_VOLUME, SOUND_MAX_RIGHT, SND_CTRL_PLAY_LOOP);
 
-#if 0 // !!! TEMPORARILY DISABLED !!!
-  for (i = 0; i <= game_mm.energy_left; i += 2)
+  for (i = 0; i <= native_mm_level.time; i += 2)
   {
     if (!setup.sound_loops)
       PlaySoundStereo(SND_FUEL, SOUND_MAX_RIGHT);
 
-#if 0
-    BlitBitmap(pix[PIX_DOOR], drawto,
-	       DOOR_GFX_PAGEX4 + XX_ENERGY,
-	       DOOR_GFX_PAGEY1 + YY_ENERGY + ENERGY_YSIZE - i,
-	       ENERGY_XSIZE, i,
-	       DX_ENERGY, DY_ENERGY + ENERGY_YSIZE - i);
-#endif
+    game_mm.energy_left = i;
 
-    redraw_mask |= REDRAW_DOOR_1;
+    UpdateAndDisplayGameControlValues();
+
     BackToFront();
 
     ColorCycling();
@@ -411,13 +407,12 @@ void InitGameActions_MM()
     if (setup.quick_doors)
       continue;
 #endif
-
-    Delay(20);
   }
+
+  game_mm.energy_left = native_mm_level.time;
 
   if (setup.sound_loops)
     StopSound(SND_FUEL);
-#endif
 
 #if 0
   if (setup.sound_music && num_bg_loops)
