@@ -1325,7 +1325,7 @@ void HandleButton(int mx, int my, int button, int button_nr)
       break;
 
     case GAME_MODE_PLAYING:
-      if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
+      if (level.game_engine_type == GAME_ENGINE_TYPE_MM && !tape.pausing)
 	ClickElement(mx, my, button);
 #if defined(TARGET_SDL2)
       else
