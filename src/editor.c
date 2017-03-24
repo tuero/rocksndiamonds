@@ -832,7 +832,7 @@
 #define ED_NUM_SELECTBOX			29
 
 #define ED_SELECTBOX_ID_LEVEL_FIRST	ED_SELECTBOX_ID_TIME_OR_STEPS
-#define ED_SELECTBOX_ID_LEVEL_LAST	ED_SELECTBOX_ID_WIND_DIRECTION
+#define ED_SELECTBOX_ID_LEVEL_LAST	ED_SELECTBOX_ID_GAME_ENGINE_TYPE
 
 #define ED_SELECTBOX_ID_CUSTOM1_FIRST	ED_SELECTBOX_ID_CUSTOM_ACCESS_TYPE
 #define ED_SELECTBOX_ID_CUSTOM1_LAST	ED_SELECTBOX_ID_CUSTOM_WALK_TO_ACTION
@@ -1332,7 +1332,7 @@ static struct
     "score for each second/step left:",	NULL, NULL
   },
   {
-    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(13),
+    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(12),
     0,					9999,
     GADGET_ID_LEVEL_RANDOM_SEED_DOWN,	GADGET_ID_LEVEL_RANDOM_SEED_UP,
     GADGET_ID_LEVEL_RANDOM_SEED_TEXT,	GADGET_ID_NONE,
@@ -2347,24 +2347,24 @@ static struct
     NULL, "(0 => no limit)",		"time or step limit"
   },
   {
-    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(12),
+    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(11),
     GADGET_ID_GAME_ENGINE_TYPE,		GADGET_ID_NONE,
     -1,
     options_game_engine_type,
     &level.game_engine_type,
     "game engine:", NULL,		"game engine"
   },
+
+  /* ---------- element settings: configure (several elements) ------------- */
+
   {
-    ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(11),
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(0),
     GADGET_ID_WIND_DIRECTION,		GADGET_ID_NONE,
     -1,
     options_wind_direction,
     &level.wind_direction_initial,
     "initial wind direction:", NULL,	"initial wind direction"
   },
-
-  /* ---------- element settings: configure (several elements) ------------- */
-
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(7),
     GADGET_ID_PLAYER_SPEED,		GADGET_ID_NONE,
@@ -9245,6 +9245,7 @@ static boolean checkPropertiesConfig(int element)
   if (IS_GEM(element) ||
       IS_CUSTOM_ELEMENT(element) ||
       IS_GROUP_ELEMENT(element) ||
+      IS_BALLOON_ELEMENT(element) ||
       IS_ENVELOPE(element) ||
       IS_MM_MCDUFFIN(element) ||
       IS_DF_LASER(element) ||
@@ -9458,7 +9459,8 @@ static void DrawPropertiesConfig()
       ED_ELEMENT_SETTINGS_XPOS(IS_CUSTOM_ELEMENT(properties_element) ? 1 : 0);
     checkbutton_info[ED_CHECKBUTTON_ID_CAN_MOVE_INTO_ACID].y =
       ED_ELEMENT_SETTINGS_YPOS(IS_CUSTOM_ELEMENT(properties_element) ? 6 :
-		       HAS_EDITOR_CONTENT(properties_element) ? 1 : 0);
+			       IS_BALLOON_ELEMENT(properties_element) ||
+			       HAS_EDITOR_CONTENT(properties_element) ? 1 : 0);
 
     MapCheckbuttonGadget(ED_CHECKBUTTON_ID_CAN_MOVE_INTO_ACID);
   }
@@ -9484,6 +9486,9 @@ static void DrawPropertiesConfig()
       properties_element == EL_SOKOBAN_FIELD_EMPTY ||
       properties_element == EL_SOKOBAN_FIELD_FULL)
     MapCheckbuttonGadget(ED_CHECKBUTTON_ID_AUTO_EXIT_SOKOBAN);
+
+  if (IS_BALLOON_ELEMENT(properties_element))
+    MapSelectboxGadget(ED_SELECTBOX_ID_WIND_DIRECTION);
 
   if (IS_ENVELOPE(properties_element))
   {

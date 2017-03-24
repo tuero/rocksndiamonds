@@ -704,6 +704,14 @@
 #define IS_ENVELOPE(e)		((e) >= EL_ENVELOPE_1 &&		\
 	 			 (e) <= EL_ENVELOPE_4)
 
+#define IS_BALLOON_ELEMENT(e)	((e) == EL_BALLOON ||			\
+				 (e) == EL_BALLOON_SWITCH_LEFT ||	\
+				 (e) == EL_BALLOON_SWITCH_RIGHT ||	\
+				 (e) == EL_BALLOON_SWITCH_UP ||		\
+				 (e) == EL_BALLOON_SWITCH_DOWN ||	\
+				 (e) == EL_BALLOON_SWITCH_ANY ||	\
+				 (e) == EL_BALLOON_SWITCH_NONE)
+
 #define IS_RND_KEY(e)		((e) >= EL_KEY_1 &&			\
 	 			 (e) <= EL_KEY_4)
 #define IS_EM_KEY(e)		((e) >= EL_EM_KEY_1 &&			\
