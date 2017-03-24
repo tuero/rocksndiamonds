@@ -914,6 +914,9 @@ byte *TapePlayAction()
 
 void TapeStop()
 {
+  if (tape.pausing)
+    TapeTogglePause(TAPE_TOGGLE_MANUAL);
+
   TapeStopRecording();
   TapeStopPlaying();
 
