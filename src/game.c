@@ -10974,6 +10974,22 @@ static byte PlayerActions(struct PlayerInfo *player, byte player_action)
   }
 }
 
+static void SetMouseActionFromTapeAction(struct MouseActionInfo *mouse_action,
+					 byte *tape_action)
+{
+  mouse_action->lx     = tape_action[TAPE_ACTION_LX];
+  mouse_action->ly     = tape_action[TAPE_ACTION_LY];
+  mouse_action->button = tape_action[TAPE_ACTION_BUTTON];
+}
+
+static void SetTapeActionFromMouseAction(byte *tape_action,
+					 struct MouseActionInfo *mouse_action)
+{
+  tape_action[TAPE_ACTION_LX]     = mouse_action->lx;
+  tape_action[TAPE_ACTION_LY]     = mouse_action->ly;
+  tape_action[TAPE_ACTION_BUTTON] = mouse_action->button;
+}
+
 static void CheckLevelTime()
 {
   int i;
@@ -11301,6 +11317,10 @@ void GameActionsExt()
   /* when playing tape, read previously recorded player input from tape data */
   recorded_player_action = (tape.playing ? TapePlayAction() : NULL);
 
+  if (recorded_player_action != NULL)
+    SetMouseActionFromTapeAction(&local_player->mouse_action,
+				 recorded_player_action);
+
   /* TapePlayAction() may return NULL when toggling to "pause before death" */
   if (tape.pausing)
     return;
@@ -11356,6 +11376,8 @@ void GameActionsExt()
 	!tape.player_participates[i])
       tape.player_participates[i] = TRUE;
   }
+
+  SetTapeActionFromMouseAction(tape_action, &local_player->mouse_action);
 
   /* only record actions from input devices, but not programmed actions */
   if (tape.recording)

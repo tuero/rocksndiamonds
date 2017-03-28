@@ -544,6 +544,8 @@ void TapeErase()
 
   tape.centered_player_nr_next = -1;
   tape.set_centered_player = FALSE;
+
+  tape.use_mouse = (level.game_engine_type == GAME_ENGINE_TYPE_MM);
 }
 
 static void TapeRewind()
@@ -709,7 +711,7 @@ void TapeRecordAction(byte action_raw[MAX_PLAYERS])
   for (i = 0; i < MAX_PLAYERS; i++)
     action[i] = action_raw[i];
 
-  if (tape.set_centered_player)
+  if (!tape.use_mouse && tape.set_centered_player)
   {
     for (i = 0; i < MAX_PLAYERS; i++)
       if (tape.centered_player_nr_next == i ||
@@ -887,16 +889,19 @@ byte *TapePlayAction()
   tape.set_centered_player = FALSE;
   tape.centered_player_nr_next = -999;
 
-  for (i = 0; i < MAX_PLAYERS; i++)
+  if (!tape.use_mouse)
   {
-    if (action[i] & KEY_SET_FOCUS)
+    for (i = 0; i < MAX_PLAYERS; i++)
     {
-      tape.set_centered_player = TRUE;
-      tape.centered_player_nr_next =
-	(tape.centered_player_nr_next == -999 ? i : -1);
-    }
+      if (action[i] & KEY_SET_FOCUS)
+      {
+	tape.set_centered_player = TRUE;
+	tape.centered_player_nr_next =
+	  (tape.centered_player_nr_next == -999 ? i : -1);
+      }
 
-    action[i] &= ~KEY_SET_FOCUS;
+      action[i] &= ~KEY_SET_FOCUS;
+    }
   }
 
   tape.delay_played++;

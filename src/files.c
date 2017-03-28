@@ -57,7 +57,7 @@
 
 #define TAPE_CHUNK_VERS_SIZE	8	/* size of file version chunk */
 #define TAPE_CHUNK_HEAD_SIZE	20	/* size of tape file header   */
-#define TAPE_CHUNK_HEAD_UNUSED	3	/* unused tape header bytes   */
+#define TAPE_CHUNK_HEAD_UNUSED	2	/* unused tape header bytes   */
 
 #define LEVEL_CHUNK_CNT3_SIZE(x)	 (LEVEL_CHUNK_CNT3_HEADER + (x))
 #define LEVEL_CHUNK_CUS3_SIZE(x)	 (2 + (x) * LEVEL_CPART_CUS3_SIZE)
@@ -7564,6 +7564,8 @@ static int LoadTape_HEAD(File *file, int chunk_size, struct TapeInfo *tape)
       }
     }
 
+    tape->use_mouse = (getFile8Bit(file) == 1 ? TRUE : FALSE);
+
     ReadUnusedBytesFromFile(file, TAPE_CHUNK_HEAD_UNUSED);
 
     engine_version = getFileVersion(file);
@@ -7599,8 +7601,9 @@ static int LoadTape_INFO(File *file, int chunk_size, struct TapeInfo *tape)
 static int LoadTape_BODY(File *file, int chunk_size, struct TapeInfo *tape)
 {
   int i, j;
-  int chunk_size_expected =
-    (tape->num_participating_players + 1) * tape->length;
+  int tape_pos_size =
+    (tape->use_mouse ? 3 : tape->num_participating_players) + 1;
+  int chunk_size_expected = tape_pos_size * tape->length;
 
   if (chunk_size_expected != chunk_size)
   {
@@ -7622,12 +7625,23 @@ static int LoadTape_BODY(File *file, int chunk_size, struct TapeInfo *tape)
       break;
     }
 
-    for (j = 0; j < MAX_PLAYERS; j++)
+    if (tape->use_mouse)
     {
-      tape->pos[i].action[j] = MV_NONE;
+      tape->pos[i].action[TAPE_ACTION_LX]     = getFile8Bit(file);
+      tape->pos[i].action[TAPE_ACTION_LY]     = getFile8Bit(file);
+      tape->pos[i].action[TAPE_ACTION_BUTTON] = getFile8Bit(file);
 
-      if (tape->player_participates[j])
-	tape->pos[i].action[j] = getFile8Bit(file);
+      tape->pos[i].action[TAPE_ACTION_UNUSED] = 0;
+    }
+    else
+    {
+      for (j = 0; j < MAX_PLAYERS; j++)
+      {
+	tape->pos[i].action[j] = MV_NONE;
+
+	if (tape->player_participates[j])
+	  tape->pos[i].action[j] = getFile8Bit(file);
+      }
     }
 
     tape->pos[i].delay = getFile8Bit(file);
@@ -7684,7 +7698,7 @@ static int LoadTape_BODY(File *file, int chunk_size, struct TapeInfo *tape)
   }
 
   if (i != tape->length)
-    chunk_size = (tape->num_participating_players + 1) * i;
+    chunk_size = tape_pos_size * i;
 
   return chunk_size;
 }
@@ -7953,6 +7967,8 @@ static void SaveTape_HEAD(FILE *file, struct TapeInfo *tape)
 
   putFile8Bit(file, store_participating_players);
 
+  putFile8Bit(file, (tape->use_mouse ? 1 : 0));
+
   /* unused bytes not at the end here for 4-byte alignment of engine_version */
   WriteUnusedBytesToFile(file, TAPE_CHUNK_HEAD_UNUSED);
 
@@ -7978,9 +7994,18 @@ static void SaveTape_BODY(FILE *file, struct TapeInfo *tape)
 
   for (i = 0; i < tape->length; i++)
   {
-    for (j = 0; j < MAX_PLAYERS; j++)
-      if (tape->player_participates[j])
-	putFile8Bit(file, tape->pos[i].action[j]);
+    if (tape->use_mouse)
+    {
+      putFile8Bit(file, tape->pos[i].action[TAPE_ACTION_LX]);
+      putFile8Bit(file, tape->pos[i].action[TAPE_ACTION_LY]);
+      putFile8Bit(file, tape->pos[i].action[TAPE_ACTION_BUTTON]);
+    }
+    else
+    {
+      for (j = 0; j < MAX_PLAYERS; j++)
+	if (tape->player_participates[j])
+	  putFile8Bit(file, tape->pos[i].action[j]);
+    }
 
     putFile8Bit(file, tape->pos[i].delay);
   }
@@ -7991,6 +8016,7 @@ void SaveTape(int nr)
   char *filename = getTapeFilename(nr);
   FILE *file;
   int num_participating_players = 0;
+  int tape_pos_size;
   int info_chunk_size;
   int body_chunk_size;
   int i;
@@ -8011,8 +8037,10 @@ void SaveTape(int nr)
     if (tape.player_participates[i])
       num_participating_players++;
 
+  tape_pos_size = (tape.use_mouse ? 3 : num_participating_players) + 1;
+
   info_chunk_size = 2 + (strlen(tape.level_identifier) + 1) + 2;
-  body_chunk_size = (num_participating_players + 1) * tape.length;
+  body_chunk_size = tape_pos_size * tape.length;
 
   putFileChunkBE(file, "RND1", CHUNK_SIZE_UNDEFINED);
   putFileChunkBE(file, "TAPE", CHUNK_SIZE_NONE);

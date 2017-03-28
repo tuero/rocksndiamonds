@@ -21,6 +21,12 @@
 /* values for tape properties */
 #define MAX_TAPE_LEN		(1000 * FRAMES_PER_SECOND) /* max.time x fps */
 
+/* values for tape mouse actions */
+#define TAPE_ACTION_LX		0
+#define TAPE_ACTION_LY		1
+#define TAPE_ACTION_BUTTON	2
+#define TAPE_ACTION_UNUSED	3
+
 /* some positions in the video tape control window */
 #define VIDEO_DISPLAY1_XPOS	5
 #define VIDEO_DISPLAY1_YPOS	5
@@ -181,6 +187,8 @@ struct TapeInfo
   int num_participating_players;
   int centered_player_nr_next;
   boolean set_centered_player;
+
+  boolean use_mouse;
 
   struct
   {
