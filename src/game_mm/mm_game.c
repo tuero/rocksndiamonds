@@ -2430,13 +2430,12 @@ static void ContinueMoving_MM(int x, int y)
   laser.redraw = TRUE;
 }
 
-void ClickElement(int mx, int my, int button)
+void ClickElement(int x, int y, int button)
 {
   static unsigned int click_delay = 0;
   static int click_delay_value = CLICK_DELAY_SHORT;
   static boolean new_button = TRUE;
   int element;
-  int x = (mx - SX) / TILEX, y = (my - SY) / TILEY;
 
   /* do not rotate objects hit by the laser after the game was solved */
   if (game_mm.level_solved && Hit[x][y])
@@ -2459,7 +2458,7 @@ void ClickElement(int mx, int my, int button)
   if (button == MB_MIDDLEBUTTON)	/* middle button has no function */
     return;
 
-  if (!IN_PIX_FIELD(mx - SX, my - SY))
+  if (!IN_LEV_FIELD(x, y))
     return;
 
   if (Feld[x][y] == EL_EMPTY)
@@ -2762,7 +2761,7 @@ void ColorCycling(void)
   }
 }
 
-static void GameActions_MM_Ext(byte action[MAX_PLAYERS], boolean warp_mode)
+static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
 {
   static unsigned int action_delay = 0;
   static unsigned int pacman_delay = 0;
@@ -3440,10 +3439,9 @@ static void GameActions_MM_Ext(byte action[MAX_PLAYERS], boolean warp_mode)
   return;
 }
 
-void GameActions_MM(byte action[MAX_PLAYERS], boolean warp_mode)
+void GameActions_MM(struct MouseActionInfo action, boolean warp_mode)
 {
-  if (!button_status)
-    ClickElement(0, 0, MB_NOT_PRESSED);
+  ClickElement(action.lx, action.ly, action.button);
 
   GameActions_MM_Ext(action, warp_mode);
 }

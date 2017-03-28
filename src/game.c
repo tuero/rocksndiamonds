@@ -3330,6 +3330,10 @@ void InitGame()
     player->effective_action = 0;
     player->programmed_action = 0;
 
+    player->mouse_action.lx = 0;
+    player->mouse_action.ly = 0;
+    player->mouse_action.button = 0;
+
     player->score = 0;
     player->score_final = 0;
 
@@ -11509,14 +11513,9 @@ void GameActions_SP_Main()
 
 void GameActions_MM_Main()
 {
-  byte effective_action[MAX_PLAYERS];
   boolean warp_mode = (tape.playing && tape.warp_forward && !tape.pausing);
-  int i;
 
-  for (i = 0; i < MAX_PLAYERS; i++)
-    effective_action[i] = stored_player[i].effective_action;
-
-  GameActions_MM(effective_action, warp_mode);
+  GameActions_MM(local_player->mouse_action, warp_mode);
 }
 
 void GameActions_RND_Main()

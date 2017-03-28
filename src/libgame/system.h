@@ -1422,6 +1422,12 @@ struct TextPosInfo
   int style;			/* needed for panel time/health graphics */
 };
 
+struct MouseActionInfo
+{
+  int lx, ly;
+  int button;
+};
+
 struct LevelStats
 {
   int played;

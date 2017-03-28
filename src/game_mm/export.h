@@ -200,7 +200,7 @@ extern void InitGfxBuffers_MM();
 
 extern void InitGameEngine_MM();
 extern void InitGameActions_MM();
-extern void GameActions_MM(byte *, boolean);
+extern void GameActions_MM(struct MouseActionInfo, boolean);
 
 extern void ClickElement(int, int, int);
 

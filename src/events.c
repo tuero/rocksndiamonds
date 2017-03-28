@@ -370,6 +370,13 @@ void ClearEventQueue()
   }
 }
 
+void ClearPlayerMouseAction()
+{
+  local_player->mouse_action.lx = 0;
+  local_player->mouse_action.ly = 0;
+  local_player->mouse_action.button = 0;
+}
+
 void ClearPlayerAction()
 {
   int i;
@@ -380,6 +387,22 @@ void ClearPlayerAction()
     stored_player[i].action = 0;
 
   ClearJoystickState();
+  ClearPlayerMouseAction();
+}
+
+void SetPlayerMouseAction(int mx, int my, int button)
+{
+  int lx = getLevelFromScreenX(mx);
+  int ly = getLevelFromScreenY(my);
+
+  ClearPlayerMouseAction();
+
+  if (!IN_GFX_FIELD_PLAY(mx, my) || !IN_LEV_FIELD(lx, ly))
+    return;
+
+  local_player->mouse_action.lx = lx;
+  local_player->mouse_action.ly = ly;
+  local_player->mouse_action.button = button;
 }
 
 void SleepWhileUnmapped()
@@ -1325,11 +1348,10 @@ void HandleButton(int mx, int my, int button, int button_nr)
       break;
 
     case GAME_MODE_PLAYING:
-      if (level.game_engine_type == GAME_ENGINE_TYPE_MM && !tape.pausing)
-	ClickElement(mx, my, button);
+      SetPlayerMouseAction(mx, my, button);
+
 #if defined(TARGET_SDL2)
-      else
-	HandleFollowFinger(mx, my, button);
+      HandleFollowFinger(mx, my, button);
 #endif
 
 #ifdef DEBUG
