@@ -403,6 +403,13 @@ void SetPlayerMouseAction(int mx, int my, int button)
   local_player->mouse_action.lx = lx;
   local_player->mouse_action.ly = ly;
   local_player->mouse_action.button = button;
+
+  if (tape.recording && tape.pausing && tape.use_mouse)
+  {
+    /* prevent button release or motion events from un-pausing a paused game */
+    if (button && !motion_status)
+      TapeTogglePause(TAPE_TOGGLE_MANUAL);
+  }
 }
 
 void SleepWhileUnmapped()
@@ -1647,7 +1654,7 @@ void HandleKey(Key key, int key_status)
 	  has_snapped[pnr] = FALSE;
 	}
       }
-      else if (tape.recording && tape.pausing)
+      else if (tape.recording && tape.pausing && !tape.use_mouse)
       {
 	/* prevent key release events from un-pausing a paused game */
 	if (key_status == KEY_PRESSED && key_action & KEY_ACTION)
