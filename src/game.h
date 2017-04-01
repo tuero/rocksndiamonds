@@ -384,6 +384,10 @@ void ScrollLevel(int, int);
 void InitPlayLevelSound();
 void PlayLevelSound_EM(int, int, int, int);
 void PlayLevelSound_SP(int, int, int, int);
+void PlayLevelSound_MM(int, int, int, int);
+void PlaySound_MM(int);
+void PlaySoundLoop_MM(int);
+void StopSound_MM(int);
 
 void RaiseScore(int);
 void RaiseScoreElement(int);

@@ -50,6 +50,9 @@
 #define EL_MM_EMPTY_NATIVE		0
 #define EL_DF_EMPTY_NATIVE		304
 
+/* sounds */
+#define SND_MM_GAME_LEVELTIME_CHARGING	0
+
 
 /* ------------------------------------------------------------------------- */
 /* data structure definitions                                                */

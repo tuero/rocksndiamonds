@@ -14695,6 +14695,47 @@ void PlayLevelSound_SP(int xx, int yy, int element_sp, int action_sp)
   PlayLevelSoundElementAction(x, y, element, action);
 }
 
+void PlayLevelSound_MM(int xx, int yy, int element_mm, int action_mm)
+{
+  int element = map_element_MM_to_RND(element_mm);
+  int action = map_action_MM_to_RND(action_mm);
+  int offset = 0;
+  int x = xx - offset;
+  int y = yy - offset;
+
+  PlayLevelSoundElementAction(x, y, element, action);
+}
+
+void PlaySound_MM(int sound_mm)
+{
+  int sound = map_sound_MM_to_RND(sound_mm);
+
+  if (sound == SND_UNDEFINED)
+    return;
+
+  PlaySound(sound);
+}
+
+void PlaySoundLoop_MM(int sound_mm)
+{
+  int sound = map_sound_MM_to_RND(sound_mm);
+
+  if (sound == SND_UNDEFINED)
+    return;
+
+  PlaySoundLoop(sound);
+}
+
+void StopSound_MM(int sound_mm)
+{
+  int sound = map_sound_MM_to_RND(sound_mm);
+
+  if (sound == SND_UNDEFINED)
+    return;
+
+  StopSound(sound);
+}
+
 void RaiseScore(int value)
 {
   local_player->score += value;

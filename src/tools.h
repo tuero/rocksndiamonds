@@ -224,6 +224,8 @@ int map_action_SP_to_RND(int);
 
 int map_element_RND_to_MM(int);
 int map_element_MM_to_RND(int);
+int map_action_MM_to_RND(int);
+int map_sound_MM_to_RND(int);
 int map_mm_wall_element(int);
 int map_mm_wall_element_editor(int);
 

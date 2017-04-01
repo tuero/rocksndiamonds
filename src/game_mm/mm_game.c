@@ -378,13 +378,14 @@ void InitGameActions_MM()
   OpenDoor(DOOR_OPEN_ALL);
 #endif
 
-  if (setup.sound_loops)
-    PlaySoundExt(SND_FUEL, SOUND_MAX_VOLUME, SOUND_MAX_RIGHT, SND_CTRL_PLAY_LOOP);
-
   for (i = 0; i <= num_init_game_frames; i++)
   {
-    if (!setup.sound_loops)
-      PlaySoundStereo(SND_FUEL, SOUND_MAX_RIGHT);
+    if (i == num_init_game_frames)
+      StopSound_MM(SND_MM_GAME_LEVELTIME_CHARGING);
+    else if (setup.sound_loops)
+      PlaySoundLoop_MM(SND_MM_GAME_LEVELTIME_CHARGING);
+    else
+      PlaySound_MM(SND_MM_GAME_LEVELTIME_CHARGING);
 
     game_mm.energy_left = native_mm_level.time * i / num_init_game_frames;
 
@@ -406,9 +407,6 @@ void InitGameActions_MM()
       continue;
 #endif
   }
-
-  if (setup.sound_loops)
-    StopSound(SND_FUEL);
 
 #if 0
   if (setup.sound_music && num_bg_loops)

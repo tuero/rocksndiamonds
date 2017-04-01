@@ -7396,6 +7396,24 @@ int map_element_MM_to_RND(int element_mm)
 	  EL_EMPTY);
 }
 
+int map_action_MM_to_RND(int action_mm)
+{
+  /* all MM actions are defined to exactly match their RND counterparts */
+  return action_mm;
+}
+
+int map_sound_MM_to_RND(int sound_mm)
+{
+  switch (sound_mm)
+  {
+    case SND_MM_GAME_LEVELTIME_CHARGING:
+      return SND_GAME_LEVELTIME_CHARGING;
+
+    default:
+      return SND_UNDEFINED;
+  }
+}
+
 int map_mm_wall_element(int element)
 {
   return (element >= EL_MM_STEEL_WALL_START &&

@@ -240,8 +240,11 @@ struct ConfigInfo sound_config[] =
 
   /* sounds for other game actions */
   { "game.starting",			UNDEFINED_FILENAME		},
+  { "game.leveltime_charging",		"fuel.wav"			},
+  { "game.health_charging",		UNDEFINED_FILENAME		},
   { "game.running_out_of_time",		"gong.wav"			},
   { "game.leveltime_bonus",		"sirr.wav"			},
+  { "game.health_bonus",		"sirr.wav"			},
   { "game.losing",			"lachen.wav"			},
   { "game.winning",			UNDEFINED_FILENAME		},
   { "game.sokoban_solving",		"buing.wav"			},
