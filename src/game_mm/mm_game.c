@@ -1075,7 +1075,7 @@ boolean HitElement(int element, int hit_mask)
       ((element - EL_POLAR_START) % 2 ||
        (element - EL_POLAR_START) / 2 != laser.current_angle % 8))
   {
-    PlaySoundStereo(SND_KINK, ST(ELX));
+    PlayLevelSound_MM(ELX, ELY, element, MM_ACTION_HITTING);
 
     laser.num_damages--;
 
@@ -1085,7 +1085,7 @@ boolean HitElement(int element, int hit_mask)
   if (IS_POLAR_CROSS(element) &&
       (element - EL_POLAR_CROSS_START) != laser.current_angle % 4)
   {
-    PlaySoundStereo(SND_KINK, ST(ELX));
+    PlayLevelSound_MM(ELX, ELY, element, MM_ACTION_HITTING);
 
     laser.num_damages--;
 
@@ -1163,7 +1163,7 @@ boolean HitElement(int element, int hit_mask)
 
     if ((!IS_POLAR(element) && !IS_POLAR_CROSS(element)) &&
 	current_angle != laser.current_angle)
-      PlaySoundStereo(SND_LASER, ST(ELX));
+      PlayLevelSound_MM(ELX, ELY, element, MM_ACTION_HITTING);
 
     laser.overloaded =
       (get_opposite_angle(laser.current_angle) ==
@@ -1181,7 +1181,7 @@ boolean HitElement(int element, int hit_mask)
 
   if (element == EL_BOMB || element == EL_MINE)
   {
-    PlaySoundStereo(SND_KINK, ST(ELX));
+    PlayLevelSound_MM(ELX, ELY, element, MM_ACTION_HITTING);
 
     if (element == EL_MINE)
       laser.overloaded = TRUE;
@@ -1209,6 +1209,7 @@ boolean HitElement(int element, int hit_mask)
 
       if (game_mm.kettles_still_needed == 0)
       {
+	int exit_element = (element == EL_KETTLE ? EL_EXIT_OPEN : EL_RECEIVER);
 	int x, y;
 	static int xy[4][2] =
 	{
@@ -1218,7 +1219,7 @@ boolean HitElement(int element, int hit_mask)
 	  {  0, +1 }
 	};
 
-        PlaySoundStereo(SND_KLING, ST(ELX));
+	PlayLevelSound_MM(ELX, ELY, exit_element, MM_ACTION_OPENING);
 
 	for (y = 0; y < lev_fieldy; y++)
 	{
@@ -1269,7 +1270,7 @@ boolean HitElement(int element, int hit_mask)
 
   if (element == EL_LIGHTBULB_OFF || element == EL_LIGHTBULB_ON)
   {
-    PlaySoundStereo(SND_KINK, ST(ELX));
+    PlayLevelSound_MM(ELX, ELY, element, MM_ACTION_HITTING);
 
     DrawLaser(0, DL_LASER_ENABLED);
 
@@ -1626,13 +1627,14 @@ boolean HitBlock(int element, int hit_mask)
 
 boolean HitLaserSource(int element, int hit_mask)
 {
-   if (HitOnlyAnEdge(element, hit_mask))
-     return FALSE;
+  if (HitOnlyAnEdge(element, hit_mask))
+    return FALSE;
 
-   PlaySoundStereo(SND_AUTSCH, ST(ELX));
-   laser.overloaded = TRUE;
+  PlayLevelSound_MM(ELX, ELY, element, MM_ACTION_HITTING);
 
-   return TRUE;
+  laser.overloaded = TRUE;
+
+  return TRUE;
 }
 
 boolean HitLaserDestination(int element, int hit_mask)
@@ -1645,7 +1647,8 @@ boolean HitLaserDestination(int element, int hit_mask)
 	game_mm.kettles_still_needed == 0 &&
 	laser.current_angle == get_opposite_angle(get_element_angle(element))))
   {
-    PlaySoundStereo(SND_HOLZ, ST(ELX));
+    PlayLevelSound_MM(ELX, ELY, element, MM_ACTION_HITTING);
+
     return TRUE;
   }
 
@@ -1684,7 +1687,7 @@ boolean HitReflectingWalls(int element, int hit_mask)
 					    hit_mask == HIT_MASK_RIGHT ||
 					    hit_mask == HIT_MASK_BOTTOM))
   {
-    PlaySoundStereo(SND_HUI, ST(ELX));
+    PlayLevelSound_MM(ELX, ELY, element, MM_ACTION_HITTING);
 
     LX -= XS;
     LY -= YS;
@@ -1783,7 +1786,7 @@ boolean HitReflectingWalls(int element, int hit_mask)
 	(hit_mask == HIT_MASK_TOPRIGHT || hit_mask == HIT_MASK_BOTTOMLEFT ?
 	 ANG_MIRROR_135 : ANG_MIRROR_45);
 
-      PlaySoundStereo(SND_HUI, ST(ELX));
+      PlayLevelSound_MM(ELX, ELY, element, MM_ACTION_HITTING);
 
       AddDamagedField(ELX, ELY);
       AddLaserEdge(LX, LY);
@@ -1819,7 +1822,7 @@ boolean HitReflectingWalls(int element, int hit_mask)
 	 hit_mask == (HIT_MASK_ALL ^ HIT_MASK_TOPRIGHT) ?
 	 ANG_MIRROR_135 : ANG_MIRROR_45);
 
-      PlaySoundStereo(SND_HUI, ST(ELX));
+      PlayLevelSound_MM(ELX, ELY, element, MM_ACTION_HITTING);
 
       /*
       AddDamagedField(ELX, ELY);
@@ -1912,7 +1915,7 @@ boolean HitAbsorbingWalls(int element, int hit_mask)
       element == EL_BLOCK_WOOD ||
       element == EL_GATE_WOOD)
   {
-    PlaySoundStereo(SND_HOLZ, ST(ELX));
+    PlayLevelSound_MM(ELX, ELY, element, MM_ACTION_HITTING);
 
     return TRUE;
   }
@@ -2265,13 +2268,13 @@ static void Bang_MM(int x, int y)
   }
 
   if (IS_PACMAN(element))
-    PlaySoundStereo(SND_QUIEK, ST(x));
+    PlayLevelSound_MM(x, y, element, MM_ACTION_EXPLODING);
   else if (element == EL_BOMB || IS_MCDUFFIN(element))
-    PlaySoundStereo(SND_ROAAAR, ST(x));
+    PlayLevelSound_MM(x, y, element, MM_ACTION_EXPLODING);
   else if (element == EL_KEY)
-    PlaySoundStereo(SND_KLING, ST(x));
+    PlayLevelSound_MM(x, y, element, MM_ACTION_EXPLODING);
   else
-    PlaySoundStereo((mode == EX_SHORT ? SND_WHOOSH : SND_KABUMM), ST(x));
+    PlayLevelSound_MM(x, y, element, MM_ACTION_EXPLODING);
 
   Explode_MM(x, y, EX_PHASE_START, mode);
 }
@@ -2851,7 +2854,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
 	Delay(50);
       }
 
-      StopSound(SND_WARNTON);
+      StopSound_MM(SND_MM_GAME_HEALTH_CHARGING);
       FadeMusic();
 
       DrawLaser(0, DL_LASER_DISABLED);
@@ -2933,17 +2936,12 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
       BackToFront();
     }
 
-    if (laser.overloaded)
-    {
-      if (setup.sound_loops)
-	PlaySoundExt(SND_WARNTON, SOUND_MAX_VOLUME, SOUND_MAX_RIGHT,
-		     SND_CTRL_PLAY_LOOP);
-      else
-	PlaySoundStereo(SND_WARNTON, SOUND_MAX_RIGHT);
-    }
-
     if (!laser.overloaded)
-      StopSound(SND_WARNTON);
+      StopSound_MM(SND_MM_GAME_HEALTH_CHARGING);
+    else if (setup.sound_loops)
+      PlaySoundLoop_MM(SND_MM_GAME_HEALTH_CHARGING);
+    else
+      PlaySound_MM(SND_MM_GAME_HEALTH_CHARGING);
 
     if (laser.overloaded)
     {
@@ -3182,7 +3180,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
 
   if (IS_WALL_ICE(element) && CT > 1000)
   {
-    PlaySoundStereo(SND_SLURP, ST(ELX));
+    PlayLevelSound_MM(ELX, ELY, element, MM_ACTION_SHRINKING);
 
     {
       Feld[ELX][ELY] = Feld[ELX][ELY] - EL_WALL_ICE + EL_WALL_CHANGING;
@@ -3320,7 +3318,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
       ScanLaser();
       DrawLaser(0, DL_LASER_ENABLED);
 
-      PlaySoundStereo(SND_AMOEBE, ST(dx));
+      PlayLevelSound_MM(dx, dy, element, MM_ACTION_GROWING);
 
       Feld[x][y] = Feld[x][y] - EL_WALL_AMOEBA + EL_WALL_CHANGING;
       Store[x][y] = EL_WALL_AMOEBA;
@@ -3334,7 +3332,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
     ScanLaser();
     DrawLaser(0, DL_LASER_ENABLED);
 
-    PlaySoundStereo(SND_AMOEBE, ST(dx));
+    PlayLevelSound_MM(dx, dy, element, MM_ACTION_GROWING);
 
     for (i = 4; i >= 0; i--)
     {
@@ -3388,7 +3386,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
       return;
     }
 
-    PlaySoundStereo(SND_BONG, ST(ELX));
+    PlayLevelSound_MM(ELX, ELY, element, MM_ACTION_PUSHING);
 
     Feld[ELX][ELY] = 0;
     Feld[x][y] = element;

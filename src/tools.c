@@ -7409,6 +7409,9 @@ int map_sound_MM_to_RND(int sound_mm)
     case SND_MM_GAME_LEVELTIME_CHARGING:
       return SND_GAME_LEVELTIME_CHARGING;
 
+    case SND_MM_GAME_HEALTH_CHARGING:
+      return SND_GAME_HEALTH_CHARGING;
+
     default:
       return SND_UNDEFINED;
   }

@@ -52,6 +52,7 @@
 
 /* sounds */
 #define SND_MM_GAME_LEVELTIME_CHARGING	0
+#define SND_MM_GAME_HEALTH_CHARGING	1
 
 
 /* ------------------------------------------------------------------------- */
