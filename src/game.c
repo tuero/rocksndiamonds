@@ -14703,6 +14703,9 @@ void PlayLevelSound_MM(int xx, int yy, int element_mm, int action_mm)
   int x = xx - offset;
   int y = yy - offset;
 
+  if (!IS_MM_ELEMENT(element))
+    element = EL_MM_DEFAULT;
+
   PlayLevelSoundElementAction(x, y, element, action);
 }
 
