@@ -1048,6 +1048,8 @@ void InitElementGraphicInfo()
 	default_action_graphic = element_info[EL_SP_DEFAULT].graphic[act];
       if (IS_SB_ELEMENT(i) && element_info[EL_SB_DEFAULT].graphic[act] != -1)
 	default_action_graphic = element_info[EL_SB_DEFAULT].graphic[act];
+      if (IS_MM_ELEMENT(i) && element_info[EL_MM_DEFAULT].graphic[act] != -1)
+	default_action_graphic = element_info[EL_MM_DEFAULT].graphic[act];
 
       if (IS_BD_ELEMENT(i) && element_info[EL_BD_DEFAULT].crumbled[act] != -1)
 	default_action_crumbled = element_info[EL_BD_DEFAULT].crumbled[act];
@@ -1055,6 +1057,8 @@ void InitElementGraphicInfo()
 	default_action_crumbled = element_info[EL_SP_DEFAULT].crumbled[act];
       if (IS_SB_ELEMENT(i) && element_info[EL_SB_DEFAULT].crumbled[act] != -1)
 	default_action_crumbled = element_info[EL_SB_DEFAULT].crumbled[act];
+      if (IS_MM_ELEMENT(i) && element_info[EL_MM_DEFAULT].crumbled[act] != -1)
+	default_action_crumbled = element_info[EL_MM_DEFAULT].crumbled[act];
 
       /* !!! needed because EL_EMPTY_SPACE treated as IS_SP_ELEMENT !!! */
       /* !!! make this better !!! */
@@ -1927,6 +1931,8 @@ static void InitElementSoundInfo()
 	default_action_sound = element_info[EL_SP_DEFAULT].sound[act];
       if (IS_SB_ELEMENT(i) && element_info[EL_SB_DEFAULT].sound[act] != -1)
 	default_action_sound = element_info[EL_SB_DEFAULT].sound[act];
+      if (IS_MM_ELEMENT(i) && element_info[EL_MM_DEFAULT].sound[act] != -1)
+	default_action_sound = element_info[EL_MM_DEFAULT].sound[act];
 
       /* !!! needed because EL_EMPTY_SPACE treated as IS_SP_ELEMENT !!! */
       /* !!! make this better !!! */
