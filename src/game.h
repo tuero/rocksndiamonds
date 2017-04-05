@@ -232,7 +232,8 @@ struct PlayerInfo
   byte programmed_action;	/* action forced by game itself (like moving
 				   through doors); overrides other actions */
 
-  struct MouseActionInfo mouse_action;		/* (used by MM engine only) */
+  struct MouseActionInfo mouse_action;		 /* (used by MM engine only) */
+  struct MouseActionInfo effective_mouse_action; /* (used by MM engine only) */
 
   int jx, jy, last_jx, last_jy;
   int MovDir, MovPos, GfxDir, GfxPos;

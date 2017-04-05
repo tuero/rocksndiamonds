@@ -3334,6 +3334,10 @@ void InitGame()
     player->mouse_action.ly = 0;
     player->mouse_action.button = 0;
 
+    player->effective_mouse_action.lx = 0;
+    player->effective_mouse_action.ly = 0;
+    player->effective_mouse_action.button = 0;
+
     player->score = 0;
     player->score_final = 0;
 
@@ -11323,8 +11327,10 @@ void GameActionsExt()
   /* when playing tape, read previously recorded player input from tape data */
   recorded_player_action = (tape.playing ? TapePlayAction() : NULL);
 
+  local_player->effective_mouse_action = local_player->mouse_action;
+
   if (recorded_player_action != NULL)
-    SetMouseActionFromTapeAction(&local_player->mouse_action,
+    SetMouseActionFromTapeAction(&local_player->effective_mouse_action,
 				 recorded_player_action);
 
   /* TapePlayAction() may return NULL when toggling to "pause before death" */
@@ -11383,7 +11389,8 @@ void GameActionsExt()
       tape.player_participates[i] = TRUE;
   }
 
-  SetTapeActionFromMouseAction(tape_action, &local_player->mouse_action);
+  SetTapeActionFromMouseAction(tape_action,
+			       &local_player->effective_mouse_action);
 
   /* only record actions from input devices, but not programmed actions */
   if (tape.recording)
@@ -11543,7 +11550,7 @@ void GameActions_MM_Main()
 {
   boolean warp_mode = (tape.playing && tape.warp_forward && !tape.pausing);
 
-  GameActions_MM(local_player->mouse_action, warp_mode);
+  GameActions_MM(local_player->effective_mouse_action, warp_mode);
 }
 
 void GameActions_RND_Main()
