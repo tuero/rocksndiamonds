@@ -914,6 +914,9 @@ void DrawLine(Bitmap *bitmap, int from_x, int from_y,
 {
   int x, y;
 
+  if (program.headless)
+    return;
+
   for (x = 0; x < line_width; x++)
   {
     for (y = 0; y < line_width; y++)
@@ -949,6 +952,9 @@ void DrawLines(Bitmap *bitmap, struct XY *points, int num_points, Pixel pixel)
 
 Pixel GetPixel(Bitmap *bitmap, int x, int y)
 {
+  if (program.headless)
+    return BLACK_PIXEL;
+
   if (x < 0 || x >= bitmap->width ||
       y < 0 || y >= bitmap->height)
     return BLACK_PIXEL;
@@ -959,6 +965,9 @@ Pixel GetPixel(Bitmap *bitmap, int x, int y)
 Pixel GetPixelFromRGB(Bitmap *bitmap, unsigned int color_r,
 		      unsigned int color_g, unsigned int color_b)
 {
+  if (program.headless)
+    return BLACK_PIXEL;
+
   return SDL_MapRGB(bitmap->surface->format, color_r, color_g, color_b);
 }
 
