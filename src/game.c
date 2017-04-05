@@ -10977,6 +10977,9 @@ static byte PlayerActions(struct PlayerInfo *player, byte player_action)
 static void SetMouseActionFromTapeAction(struct MouseActionInfo *mouse_action,
 					 byte *tape_action)
 {
+  if (!tape.use_mouse)
+    return;
+
   mouse_action->lx     = tape_action[TAPE_ACTION_LX];
   mouse_action->ly     = tape_action[TAPE_ACTION_LY];
   mouse_action->button = tape_action[TAPE_ACTION_BUTTON];
@@ -10985,6 +10988,9 @@ static void SetMouseActionFromTapeAction(struct MouseActionInfo *mouse_action,
 static void SetTapeActionFromMouseAction(byte *tape_action,
 					 struct MouseActionInfo *mouse_action)
 {
+  if (!tape.use_mouse)
+    return;
+
   tape_action[TAPE_ACTION_LX]     = mouse_action->lx;
   tape_action[TAPE_ACTION_LY]     = mouse_action->ly;
   tape_action[TAPE_ACTION_BUTTON] = mouse_action->button;
