@@ -66,12 +66,17 @@
 #define DL_LASER_ENABLED	1
 
 /* values for 'click_delay_value' in ClickElement() */
-#define CLICK_DELAY_SHORT	125
-#define CLICK_DELAY_LONG	250
+#define CLICK_DELAY_FIRST	12	/* delay (frames) after first click */
+#define CLICK_DELAY		6	/* delay (frames) for pressed butten */
 
-#define AUTO_ROTATE_DELAY	CLICK_DELAY_SHORT
-#define INIT_GAME_ACTIONS_DELAY	ONE_SECOND_DELAY
+#define AUTO_ROTATE_DELAY	CLICK_DELAY
+#define INIT_GAME_ACTIONS_DELAY	(ONE_SECOND_DELAY / GAME_FRAME_DELAY)
 #define NUM_INIT_CYCLE_STEPS	16
+#define PACMAN_MOVE_DELAY	12
+#define ENERGY_DELAY		(4 * ONE_SECOND_DELAY / GAME_FRAME_DELAY)
+#define HEALTH_DEC_DELAY	3
+#define HEALTH_INC_DELAY	9
+#define HEALTH_DELAY(x)		((x) ? HEALTH_DEC_DELAY : HEALTH_INC_DELAY)
 
 /* forward declaration for internal use */
 static int MovingOrBlocked2Element_MM(int, int);
@@ -342,7 +347,7 @@ void InitGameEngine_MM()
 
 void InitGameActions_MM()
 {
-  int num_init_game_frames = INIT_GAME_ACTIONS_DELAY / GAME_FRAME_DELAY;
+  int num_init_game_frames = INIT_GAME_ACTIONS_DELAY;
   int cycle_steps_done = 0;
   int i;
 
@@ -2434,7 +2439,7 @@ static void ContinueMoving_MM(int x, int y)
 void ClickElement(int x, int y, int button)
 {
   static unsigned int click_delay = 0;
-  static int click_delay_value = CLICK_DELAY_SHORT;
+  static int click_delay_value = CLICK_DELAY;
   static boolean new_button = TRUE;
   int element;
 
@@ -2445,7 +2450,7 @@ void ClickElement(int x, int y, int button)
   if (button == MB_RELEASED)
   {
     new_button = TRUE;
-    click_delay_value = CLICK_DELAY_SHORT;
+    click_delay_value = CLICK_DELAY;
 
     /* release eventually hold auto-rotating mirror */
     RotateMirror(x, y, MB_RELEASED);
@@ -2453,7 +2458,7 @@ void ClickElement(int x, int y, int button)
     return;
   }
 
-  if (!DelayReached(&click_delay, click_delay_value) && !new_button)
+  if (!FrameReached(&click_delay, click_delay_value) && !new_button)
     return;
 
   if (button == MB_MIDDLEBUTTON)	/* middle button has no function */
@@ -2530,7 +2535,7 @@ void ClickElement(int x, int y, int button)
     DrawLaser(0, DL_LASER_ENABLED);
   }
 
-  click_delay_value = (new_button ? CLICK_DELAY_LONG : CLICK_DELAY_SHORT);
+  click_delay_value = (new_button ? CLICK_DELAY_FIRST : CLICK_DELAY);
   new_button = FALSE;
 }
 
@@ -2636,7 +2641,7 @@ void AutoRotateMirrors()
   static unsigned int rotate_delay = 0;
   int x, y;
 
-  if (!DelayReached(&rotate_delay, AUTO_ROTATE_DELAY))
+  if (!FrameReached(&rotate_delay, AUTO_ROTATE_DELAY))
     return;
 
   for (x = 0; x < lev_fieldx; x++)
@@ -2764,7 +2769,6 @@ void ColorCycling(void)
 
 static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
 {
-  static unsigned int action_delay = 0;
   static unsigned int pacman_delay = 0;
   static unsigned int energy_delay = 0;
   static unsigned int overload_delay = 0;
@@ -2772,8 +2776,6 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
   int x, y, i;
 
   int r, d;
-
-  WaitUntilDelayReached(&action_delay, GameFrameDelay);
 
   for (y = 0; y < lev_fieldy; y++) for (x = 0; x < lev_fieldx; x++)
     Stop[x][y] = FALSE;
@@ -2811,7 +2813,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
 
   CT = Counter();
 
-  if (game_mm.num_pacman && DelayReached(&pacman_delay, 250))
+  if (game_mm.num_pacman && FrameReached(&pacman_delay, PACMAN_MOVE_DELAY))
   {
     MovePacMen();
 
@@ -2822,7 +2824,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
     }
   }
 
-  if (DelayReached(&energy_delay, 4000))
+  if (FrameReached(&energy_delay, ENERGY_DELAY))
   {
     game_mm.energy_left--;
     if (game_mm.energy_left >= 0)
@@ -2902,7 +2904,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
 
   if (((laser.overloaded && laser.overload_value < MAX_LASER_OVERLOAD) ||
        (!laser.overloaded && laser.overload_value > 0)) &&
-      DelayReached(&overload_delay, 60 + !laser.overloaded * 120))
+      FrameReached(&overload_delay, HEALTH_DELAY(laser.overloaded)))
   {
     if (laser.overloaded)
       laser.overload_value++;
