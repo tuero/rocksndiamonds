@@ -2935,7 +2935,9 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
 			(native_mm_level.laser_blue  ? color_down : 0x00));
 
       DrawLaser(0, DL_LASER_ENABLED);
+#if 0
       BackToFront();
+#endif
     }
 
     if (!laser.overloaded)
