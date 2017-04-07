@@ -275,6 +275,9 @@ static void InitLaser()
   laser.num_beamers = 0;
   laser.beamer_edge[0] = 0;
 
+  laser.dest_element = EL_EMPTY;
+  laser.wall_mask = 0;
+
   AddLaserEdge(LX, LY);		/* set laser starting edge */
 
   pen_ray = GetPixelFromRGB(window,
@@ -2181,9 +2184,8 @@ static void Explode_MM(int x, int y, int phase, int mode)
   {
     if (Store[x][y] == EL_BOMB)
     {
-      laser.num_damages--;
       DrawLaser(0, DL_LASER_DISABLED);
-      laser.num_edges = 0;
+      InitLaser();
 
       Bang_MM(laser.start_edge.x, laser.start_edge.y);
       Store[x][y] = EL_EMPTY;
