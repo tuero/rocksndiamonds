@@ -2187,11 +2187,12 @@ static void Explode_MM(int x, int y, int phase, int mode)
 
       Bang_MM(laser.start_edge.x, laser.start_edge.y);
       Store[x][y] = EL_EMPTY;
+
+      game_mm.game_over = TRUE;
+      game_mm.game_over_cause = GAME_OVER_BOMB;
     }
     else if (IS_MCDUFFIN(Store[x][y]))
     {
-      game_mm.game_over = TRUE;
-      game_mm.game_over_cause = GAME_OVER_BOMB;
       Store[x][y] = EL_EMPTY;
     }
 
