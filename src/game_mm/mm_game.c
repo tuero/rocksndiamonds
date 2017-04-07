@@ -738,7 +738,7 @@ void ScanLaser()
   if (rf)
     DrawLaser(rf - 1, DL_LASER_ENABLED);
 
-  Ct = CT = Counter();
+  Ct = CT = FrameCounter;
 
 #if 0
     if (!IN_LEV_FIELD(ELX, ELY))
@@ -2736,9 +2736,9 @@ void ColorCycling(void)
   if (color_status == STATIC_COLORS)
     return;
 
-  CC = Counter();
+  CC = FrameCounter;
 
-  if (CC < Cc || CC > Cc + 50)
+  if (CC < Cc || CC > Cc + 2)
   {
     Cc = CC;
 
@@ -2814,7 +2814,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
   laser.redraw = FALSE;
 #endif
 
-  CT = Counter();
+  CT = FrameCounter;
 
   if (game_mm.num_pacman && FrameReached(&pacman_delay, PACMAN_MOVE_DELAY))
   {
@@ -3018,7 +3018,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
 
   CT -= Ct;
 
-  if (element == EL_BOMB && CT > 1500)
+  if (element == EL_BOMB && CT > 75)
   {
     if (game_mm.cheat_no_explosion)
       return;
@@ -3056,7 +3056,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
     return;
   }
 
-  if (element == EL_FUSE_ON && CT > 500)
+  if (element == EL_FUSE_ON && CT > 25)
   {
     laser.fuse_off = TRUE;
     laser.fuse_x = ELX;
@@ -3066,7 +3066,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
     DrawGraphic_MM(ELX, ELY, IMG_MM_FUSE);
   }
 
-  if (element == EL_BALL_GRAY && CT > 1500)
+  if (element == EL_BALL_GRAY && CT > 75)
   {
     static int new_elements[] =
     {
@@ -3185,7 +3185,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
     return;
   }
 
-  if (IS_WALL_ICE(element) && CT > 1000)
+  if (IS_WALL_ICE(element) && CT > 50)
   {
     PlayLevelSound_MM(ELX, ELY, element, MM_ACTION_SHRINKING);
 
@@ -3237,7 +3237,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
     return;
   }
 
-  if (IS_WALL_AMOEBA(element) && CT > 1200)
+  if (IS_WALL_AMOEBA(element) && CT > 60)
   {
     int k1, k2, k3, dx, dy, de, dm;
     int element2 = Feld[ELX][ELY];
@@ -3355,7 +3355,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
   }
 
   if ((element == EL_BLOCK_WOOD || element == EL_BLOCK_STONE) &&
-      laser.stops_inside_element && CT > 1500)
+      laser.stops_inside_element && CT > 75)
   {
     int x, y;
     int k;
@@ -3412,7 +3412,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
     return;
   }
 
-  if (element == EL_FUEL_FULL && CT > 200)
+  if (element == EL_FUEL_FULL && CT > 10)
   {
     for (i = game_mm.energy_left; i <= MAX_LASER_ENERGY; i+=2)
     {
@@ -3514,7 +3514,7 @@ void MovePacMen()
 
       getGraphicSource(graphic, 0, &bitmap, &src_x, &src_y);
 
-      CT = Counter();
+      CT = FrameCounter;
       ox = SX + ox * TILEX;
       oy = SY + oy * TILEY;
 
@@ -3522,7 +3522,7 @@ void MovePacMen()
 	BlitBitmap(bitmap, window,
 		   src_x, src_y, TILEX, TILEY,
 		   ox + i * mx, oy + i * my);
-      Ct = Ct + Counter() - CT;
+      Ct = Ct + FrameCounter - CT;
     }
 
     DrawField_MM(nx, ny);
