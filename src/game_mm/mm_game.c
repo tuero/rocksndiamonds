@@ -2190,6 +2190,8 @@ static void Explode_MM(int x, int y, int phase, int mode)
 
       game_mm.game_over = TRUE;
       game_mm.game_over_cause = GAME_OVER_BOMB;
+
+      laser.overloaded = FALSE;
     }
     else if (IS_MCDUFFIN(Store[x][y]))
     {
