@@ -5991,6 +5991,7 @@ void OpenAll()
 
   print_timestamp_time("[init setup/config stuff]");
 
+  InitVideoDefaults();
   InitVideoDisplay();
   InitVideoBuffer(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH, setup.fullscreen);
 

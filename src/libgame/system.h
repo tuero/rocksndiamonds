@@ -1514,6 +1514,7 @@ void SetRedrawMaskFromArea(int, int, int, int);
 
 void LimitScreenUpdates(boolean);
 
+void InitVideoDefaults(void);
 void InitVideoDisplay(void);
 void CloseVideoDisplay(void);
 void InitVideoBuffer(int, int, int, boolean);

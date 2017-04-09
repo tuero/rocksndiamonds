@@ -421,6 +421,11 @@ void LimitScreenUpdates(boolean enable)
   SDLLimitScreenUpdates(enable);
 }
 
+void InitVideoDefaults(void)
+{
+  video.default_depth = 32;
+}
+
 void InitVideoDisplay(void)
 {
   if (program.headless)
