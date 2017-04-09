@@ -88,54 +88,7 @@ static void ContinueMoving_MM(int, int);
 static void Moving2Blocked_MM(int, int, int *, int *);
 
 
-#if 0
-// =============================================================================
-// TMP_dump_masks_MM (code)
-// =============================================================================
-
-void TMP_dump_masks_MM()
-{
-  int i;
-
-  printf("static const char mm_masks[10][16][16] =\n");
-  printf("{\n");
-
-  for (i = EL_MM_MASK_MCDUFFIN_RIGHT; i <= EL_MM_MASK_CIRCLE; i++)
-  {
-    int graphic_mask = el2gfx(i);
-    Bitmap *bitmap;
-    int src_x, src_y;
-    int x, y;
-
-    getGraphicSource(graphic_mask, 0, &bitmap, &src_x, &src_y);
-
-    printf("  {\n");
-
-    for (y = 0; y < TILEY; y += 2)
-    {
-      printf("    \"");
-
-      for (x = 0; x < TILEX; x += 2)
-      {
-	Pixel pixel = GetPixel(bitmap, src_x + x, src_y + y);
-
-	printf("%c", (pixel ? 'X' : ' '));
-      }
-
-      printf("\",\n");
-    }
-
-    printf("  },\n");
-  }
-
-  printf("};\n");
-}
-#endif
-
-// =============================================================================
-// TMP_dump_masks_MM (result)
-// =============================================================================
-
+/* element masks for scanning pixels of MM elements */
 static const char mm_masks[10][16][16 + 1] =
 {
   {
@@ -521,10 +474,6 @@ static void InitLaser()
 void InitGameEngine_MM()
 {
   int i, x, y;
-
-#if 0
-  TMP_dump_masks_MM();
-#endif
 
   /* set global game control values */
   game_mm.num_cycle = 0;
