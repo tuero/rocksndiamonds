@@ -78,6 +78,16 @@
 #define HEALTH_INC_DELAY	9
 #define HEALTH_DELAY(x)		((x) ? HEALTH_DEC_DELAY : HEALTH_INC_DELAY)
 
+#define BEGIN_NO_HEADLESS			\
+  {						\
+    boolean last_headless = program.headless;	\
+						\
+    program.headless = FALSE;			\
+
+#define END_NO_HEADLESS				\
+    program.headless = last_headless;		\
+  }						\
+
 /* forward declaration for internal use */
 static int MovingOrBlocked2Element_MM(int, int);
 static void Bang_MM(int, int);
@@ -87,6 +97,8 @@ static void InitMovingField_MM(int, int, int);
 static void ContinueMoving_MM(int, int);
 static void Moving2Blocked_MM(int, int, int *, int *);
 
+/* bitmap for laser beam detection */
+static Bitmap *laser_bitmap = NULL;
 
 /* element masks for scanning pixels of MM elements */
 static const char mm_masks[10][16][16 + 1] =
@@ -302,6 +314,33 @@ static int get_mirrored_angle(int laser_angle, int mirror_angle)
   return (reflected_angle + 16) % 16;
 }
 
+static void DrawLaserLines(struct XY *points, int num_points, int mode)
+{
+  Pixel pixel_drawto = (mode == DL_LASER_ENABLED ? pen_ray     : pen_bg);
+  Pixel pixel_buffer = (mode == DL_LASER_ENABLED ? WHITE_PIXEL : BLACK_PIXEL);
+
+  DrawLines(drawto, points, num_points, pixel_drawto);
+
+  BEGIN_NO_HEADLESS
+  {
+    DrawLines(laser_bitmap, points, num_points, pixel_buffer);
+  }
+  END_NO_HEADLESS
+}
+
+static boolean CheckLaserPixel(int x, int y)
+{
+  Pixel pixel;
+
+  BEGIN_NO_HEADLESS
+  {
+    pixel = ReadPixel(laser_bitmap, x, y);
+  }
+  END_NO_HEADLESS
+
+  return (pixel == WHITE_PIXEL);
+}
+
 static void InitMovDir_MM(int x, int y)
 {
   int element = Feld[x][y];
@@ -474,6 +513,14 @@ static void InitLaser()
 void InitGameEngine_MM()
 {
   int i, x, y;
+
+  BEGIN_NO_HEADLESS
+  {
+    /* initialize laser bitmap to current playfield (screen) size */
+    ReCreateBitmap(&laser_bitmap, drawto->width, drawto->height);
+    ClearRectangle(laser_bitmap, 0, 0, drawto->width, drawto->height);
+  }
+  END_NO_HEADLESS
 
   /* set global game control values */
   game_mm.num_cycle = 0;
@@ -958,8 +1005,7 @@ void DrawLaserExt(int start_edge, int num_edges, int mode)
 #endif
 
   /* now draw the laser to the backbuffer and (if enabled) to the screen */
-  DrawLines(drawto, &laser.edge[start_edge], num_edges,
-	    (mode == DL_LASER_ENABLED ? pen_ray : pen_bg));
+  DrawLaserLines(&laser.edge[start_edge], num_edges, mode);
 
   redraw_mask |= REDRAW_FIELD;
 
@@ -2854,25 +2900,24 @@ boolean ObjHit(int obx, int oby, int bits)
 
   if (bits & HIT_POS_CENTER)
   {
-    if (ReadPixel(drawto, SX + obx + 15, SY + oby + 15) == pen_ray)
+    if (CheckLaserPixel(SX + obx + 15,
+			SY + oby + 15))
       return TRUE;
   }
 
   if (bits & HIT_POS_EDGE)
   {
     for (i = 0; i < 4; i++)
-      if (ReadPixel(drawto,
-		    SX + obx + 31 * (i % 2),
-		    SY + oby + 31 * (i / 2)) == pen_ray)
+      if (CheckLaserPixel(SX + obx + 31 * (i % 2),
+			  SY + oby + 31 * (i / 2)))
 	return TRUE;
   }
 
   if (bits & HIT_POS_BETWEEN)
   {
     for (i = 0; i < 4; i++)
-      if (ReadPixel(drawto,
-		    SX + 4 + obx + 22 * (i % 2),
-		    SY + 4 + oby + 22 * (i / 2)) == pen_ray)
+      if (CheckLaserPixel(SX + 4 + obx + 22 * (i % 2),
+			  SY + 4 + oby + 22 * (i / 2)))
 	return TRUE;
   }
 
@@ -3452,13 +3497,12 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
     {
       if (laser.wall_mask & (1 << i))
       {
-	if (ReadPixel(drawto,
-		      SX + ELX * TILEX + 14 + (i % 2) * 2,
-		      SY + ELY * TILEY + 31 * (i / 2)) == pen_ray)
+	if (CheckLaserPixel(SX + ELX * TILEX + 14 + (i % 2) * 2,
+			    SY + ELY * TILEY + 31 * (i / 2)))
 	  break;
-	if (ReadPixel(drawto,
-		      SX + ELX * TILEX + 31 * (i % 2),
-		      SY + ELY * TILEY + 14 + (i / 2) * 2) == pen_ray)
+
+	if (CheckLaserPixel(SX + ELX * TILEX + 31 * (i % 2),
+			    SY + ELY * TILEY + 14 + (i / 2) * 2))
 	  break;
       }
     }
@@ -3469,9 +3513,8 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
     {
       if (laser.wall_mask & (1 << i))
       {
-	if (ReadPixel(drawto,
-		      SX + ELX * TILEX + 31 * (i % 2),
-		      SY + ELY * TILEY + 31 * (i / 2)) == pen_ray)
+	if (CheckLaserPixel(SX + ELX * TILEX + 31 * (i % 2),
+			    SY + ELY * TILEY + 31 * (i / 2)))
 	  break;
       }
     }
@@ -3480,8 +3523,8 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
 
     if (laser.num_beamers > 0 ||
 	k1 < 1 || k2 < 4 || k3 < 4 ||
-	ReadPixel(drawto, SX + ELX * TILEX + 14, SY + ELY * TILEY + 14)
-	== pen_ray)
+	CheckLaserPixel(SX + ELX * TILEX + 14,
+			SY + ELY * TILEY + 14))
     {
       laser.num_edges = r;
       laser.num_damages = d;
