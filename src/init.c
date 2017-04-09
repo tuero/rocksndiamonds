@@ -5878,6 +5878,10 @@ void KeyboardAutoRepeatOffUnlessAutoplay()
 
 void DisplayExitMessage(char *format, va_list ap)
 {
+  // also check for initialized video (headless flag may be temporarily unset)
+  if (program.headless || !video.initialized)
+    return;
+
   // check if draw buffer and fonts for exit message are already available
   if (drawto == NULL || font_initial[NUM_INITIAL_FONTS - 1].bitmap == NULL)
     return;
