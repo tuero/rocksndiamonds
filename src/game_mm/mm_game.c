@@ -88,6 +88,238 @@ static void ContinueMoving_MM(int, int);
 static void Moving2Blocked_MM(int, int, int *, int *);
 
 
+#if 0
+// =============================================================================
+// TMP_dump_masks_MM (code)
+// =============================================================================
+
+void TMP_dump_masks_MM()
+{
+  int i;
+
+  printf("static const char mm_masks[10][16][16] =\n");
+  printf("{\n");
+
+  for (i = EL_MM_MASK_MCDUFFIN_RIGHT; i <= EL_MM_MASK_CIRCLE; i++)
+  {
+    int graphic_mask = el2gfx(i);
+    Bitmap *bitmap;
+    int src_x, src_y;
+    int x, y;
+
+    getGraphicSource(graphic_mask, 0, &bitmap, &src_x, &src_y);
+
+    printf("  {\n");
+
+    for (y = 0; y < TILEY; y += 2)
+    {
+      printf("    \"");
+
+      for (x = 0; x < TILEX; x += 2)
+      {
+	Pixel pixel = GetPixel(bitmap, src_x + x, src_y + y);
+
+	printf("%c", (pixel ? 'X' : ' '));
+      }
+
+      printf("\",\n");
+    }
+
+    printf("  },\n");
+  }
+
+  printf("};\n");
+}
+#endif
+
+// =============================================================================
+// TMP_dump_masks_MM (result)
+// =============================================================================
+
+static const char mm_masks[10][16][16 + 1] =
+{
+  {
+    "                ",
+    "    XXXXX       ",
+    "   XXXXXXX      ",
+    "  XXXXXXXXXXX   ",
+    "  XXXXXXXXXXXXX ",
+    "  XXXXXXXXXXXXXX",
+    "  XXXXXXXXXXXXXX",
+    "  XXXXXXXXXXXXX ",
+    "  XXXXXXXXXXXXX ",
+    "  XXXXXXXXXXXXX ",
+    "  XXXXXXXXXXXXX ",
+    "  XXXXXXXXXXXXX ",
+    "  XXXXXXXXXXXXX ",
+    "  XXXXXXXXXXXXX ",
+    "  XXXXXXXXXXXX  ",
+    "  XXXXXXXXXXXX  ",
+  },
+  {
+    "                ",
+    "    XXXXXXXX    ",
+    "  XXXXXXXXXXXX  ",
+    " XXXXXXXXXXXXXX ",
+    " XXXXXXXXXXXXXX ",
+    " XXXXXXXXXXXXXX ",
+    " XXXXXXXXXXXXXX ",
+    " XXXXXXXXXXXXXX ",
+    " XXXXXXXXXXXXXX ",
+    " XXXXXXXXXXXXXX ",
+    " XXXXXXXXXXXXXX ",
+    " XXXXXXXXXXXXXX ",
+    " XXXXXXXXXXXXXX ",
+    "  XXXXXXXXXXXXX ",
+    "  XXXXXXXXXXXX  ",
+    "  XXXXXXXXXXXX  ",
+  },
+  {
+    "                ",
+    "    XXXXXX      ",
+    "  XXXXXXXXX     ",
+    " XXXXXXXXXXX    ",
+    "XXXXXXXXXXXXX   ",
+    "XXXXXXXXXXXXX   ",
+    "XXXXXXXXXXXXXX  ",
+    " XXXXXXXXXXXXX  ",
+    " XXXXXXXXXXXXX  ",
+    " XXXXXXXXXXXXX  ",
+    " XXXXXXXXXXXXX  ",
+    " XXXXXXXXXXXXX  ",
+    " XXXXXXXXXXXXX  ",
+    " XXXXXXXXXXXXX  ",
+    "  XXXXXXXXXXXX  ",
+    "  XXXXXXXXXXXX  ",
+  },
+  {
+    "                ",
+    "    XXXXXX      ",
+    "   XXXXXXXX     ",
+    "  XXXXXXXXXX    ",
+    "  XXXXXXXXXXX   ",
+    "  XXXXXXXXXXX   ",
+    "  XXXXXXXXXXXX  ",
+    "  XXXXXXXXXXXX  ",
+    "  XXXXXXXXXXXX  ",
+    "  XXXXXXXXXXXX  ",
+    "  XXXXXXXXXXXX  ",
+    "  XXXXXXXXXXXX  ",
+    "  XXXXXXXXXXXX  ",
+    "  XXXXXXXXXXXX  ",
+    "  XXXXXXXXXXXX  ",
+    "  XXXXX  XXXXX  ",
+  },
+  {
+    " XXXXXX  XXXXXX ",
+    "XXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXX",
+    "                ",
+    "                ",
+    "XXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXX",
+    " XXXXXX  XXXXXX ",
+  },
+  {
+    " XXXXXX  XXXXXX ",
+    "XXXXXXX  XXXXXXX",
+    "XXXXXXX  XXXXXXX",
+    "XXXXXXX  XXXXXXX",
+    "XXXXXXX  XXXXXXX",
+    "XXXXXXX  XXXXXXX",
+    "XXXXXXX  XXXXXXX",
+    " XXXXXX  XXXXXX ",
+    " XXXXXX  XXXXXX ",
+    "XXXXXXX  XXXXXXX",
+    "XXXXXXX  XXXXXXX",
+    "XXXXXXX  XXXXXXX",
+    "XXXXXXX  XXXXXXX",
+    "XXXXXXX  XXXXXXX",
+    "XXXXXXX  XXXXXXX",
+    " XXXXXX  XXXXXX ",
+  },
+  {
+    "     XX  XXXXX  ",
+    "    XXX  XXXX   ",
+    "   XXXX  XXX   X",
+    "  XXXXXXXXX   XX",
+    " XXXXXXXXX   XXX",
+    "XXXXXXXXX   XXXX",
+    "XXXXXXXX   XXXXX",
+    "   XXXX   XXX   ",
+    "   XXX   XXXX   ",
+    "XXXXX   XXXXXXXX",
+    "XXXX   XXXXXXXXX",
+    "XXX   XXXXXXXXX ",
+    "XX   XXXXXXXXX  ",
+    "X   XXX  XXXX   ",
+    "   XXXX  XXX    ",
+    "  XXXXX  XX     ",
+  },
+  {
+    "  XXXXX  XX     ",
+    "   XXXX  XXX    ",
+    "X   XXX  XXXX   ",
+    "XX   XXXXXXXXX  ",
+    "XXX   XXXXXXXXX ",
+    "XXXX   XXXXXXXXX",
+    "XXXXX   XXXXXXXX",
+    "   XXX   XXXX   ",
+    "   XXXX   XXX   ",
+    "XXXXXXXX   XXXXX",
+    "XXXXXXXXX   XXXX",
+    " XXXXXXXXX   XXX",
+    "  XXXXXXXXX   XX",
+    "   XXXX  XXX   X",
+    "    XXX  XXXX   ",
+    "     XX  XXXXX  ",
+  },
+  {
+    "XXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXX",
+    "XXXXXXXXXXXXXXXX",
+  },
+  {
+    "                ",
+    "      XXXX      ",
+    "    XXXXXXXX    ",
+    "   XXXXXXXXXX   ",
+    "  XXXXXXXXXXXX  ",
+    "  XXXXXXXXXXXX  ",
+    " XXXXXXXXXXXXXX ",
+    " XXXXXXXXXXXXXX ",
+    " XXXXXXXXXXXXXX ",
+    " XXXXXXXXXXXXXX ",
+    "  XXXXXXXXXXXX  ",
+    "  XXXXXXXXXXXX  ",
+    "   XXXXXXXXXX   ",
+    "    XXXXXXXX    ",
+    "      XXXX      ",
+    "                ",
+  },
+};
+
 static int get_element_angle(int element)
 {
   int element_phase = get_element_phase(element);
@@ -289,6 +521,10 @@ static void InitLaser()
 void InitGameEngine_MM()
 {
   int i, x, y;
+
+#if 0
+  TMP_dump_masks_MM();
+#endif
 
   /* set global game control values */
   game_mm.num_cycle = 0;
@@ -528,17 +764,9 @@ int ScanPixel()
 	}
 	else
 	{
-	  int graphic_mask = getMaskFromElement(element);
-	  Bitmap *bitmap;
-	  int src_x, src_y;
-	  int mask_x, mask_y;
+	  int pos = getMaskFromElement(element) - IMG_MM_MASK_MCDUFFIN_RIGHT;
 
-	  getGraphicSource(graphic_mask, 0, &bitmap, &src_x, &src_y);
-
-	  mask_x = src_x + dx;
-	  mask_y = src_y + dy;
-
-	  pixel = (ReadPixel(bitmap, mask_x, mask_y) ? 1 : 0);
+	  pixel = (mm_masks[pos][dy / 2][dx / 2] == 'X' ? 1 : 0);
 	}
       }
       else
