@@ -151,6 +151,10 @@ static int LoadLevel_MM_HEAD(File *file, int chunk_size,
   level->time           = getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN);
   level->kettles_needed = getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN);
 
+  // one time unit was equivalent to four seconds in level files up to 2.0.x
+  if (level->file_version <= MM_FILE_VERSION_2_0)
+    level->time *= 4;
+
   for (i = 0; i < MAX_LEVEL_NAME_LEN; i++)
     level->name[i] = getFile8Bit(file);
   level->name[MAX_LEVEL_NAME_LEN] = 0;
