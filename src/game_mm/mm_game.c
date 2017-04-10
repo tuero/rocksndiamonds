@@ -100,6 +100,19 @@ static void Moving2Blocked_MM(int, int, int *, int *);
 /* bitmap for laser beam detection */
 static Bitmap *laser_bitmap = NULL;
 
+/* variables for laser control */
+static int last_LX = 0, last_LY = 0, last_hit_mask = 0;
+static int hold_x = -1, hold_y = -1;
+
+/* variables for pacman control */
+static int pacman_nr = -1;
+
+/* various game engine delay counters */
+static unsigned int rotate_delay = 0;
+static unsigned int pacman_delay = 0;
+static unsigned int energy_delay = 0;
+static unsigned int overload_delay = 0;
+
 /* element masks for scanning pixels of MM elements */
 static const char mm_masks[10][16][16 + 1] =
 {
@@ -555,7 +568,23 @@ void InitGameEngine_MM()
   laser.dest_element = EL_EMPTY;
   laser.wall_mask = 0;
 
+  last_LX = 0;
+  last_LY = 0;
+  last_hit_mask = 0;
+
+  hold_x = -1;
+  hold_y = -1;
+
+  pacman_nr = -1;
+
   CT = Ct = 0;
+
+  rotate_delay = 0;
+  pacman_delay = 0;
+  energy_delay = 0;
+  overload_delay = 0;
+
+  ClickElement(-1, -1, -1);
 
   for (x = 0; x < lev_fieldx; x++)
   {
@@ -2090,8 +2119,6 @@ boolean HitReflectingWalls(int element, int hit_mask)
 	(IS_VERT_ANGLE(laser.current_angle) &&
 	 (!(hit_mask & HIT_MASK_LEFT) || !(hit_mask & HIT_MASK_RIGHT))))
     {
-      static int last_LX = 0, last_LY = 0, last_hit_mask = 0;
-
       /* laser at last step touched nothing or the same side of the wall */
       if (LX != last_LX || LY != last_LY || hit_mask == last_hit_mask)
       {
@@ -2676,6 +2703,16 @@ void ClickElement(int x, int y, int button)
   static boolean new_button = TRUE;
   int element;
 
+  if (button == -1)
+  {
+    /* initialize static variables */
+    click_delay = 0;
+    click_delay_value = CLICK_DELAY;
+    new_button = TRUE;
+
+    return;
+  }
+
   /* do not rotate objects hit by the laser after the game was solved */
   if (game_mm.level_solved && Hit[x][y])
     return;
@@ -2774,8 +2811,6 @@ void ClickElement(int x, int y, int button)
 
 void RotateMirror(int x, int y, int button)
 {
-  static int hold_x = -1, hold_y = -1;
-
   if (button == MB_RELEASED)
   {
     /* release eventually hold auto-rotating mirror */
@@ -2871,7 +2906,6 @@ void RotateMirror(int x, int y, int button)
 
 void AutoRotateMirrors()
 {
-  static unsigned int rotate_delay = 0;
   int x, y;
 
   if (!FrameReached(&rotate_delay, AUTO_ROTATE_DELAY))
@@ -3001,9 +3035,6 @@ void ColorCycling(void)
 
 static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
 {
-  static unsigned int pacman_delay = 0;
-  static unsigned int energy_delay = 0;
-  static unsigned int overload_delay = 0;
   int element;
   int x, y, i;
 
@@ -3678,36 +3709,35 @@ void GameActions_MM(struct MouseActionInfo action, boolean warp_mode)
 
 void MovePacMen()
 {
-  static int p = -1;
   int mx, my, ox, oy, nx, ny;
   int element;
   int l;
 
-  if (++p >= game_mm.num_pacman)
-    p = 0;
+  if (++pacman_nr >= game_mm.num_pacman)
+    pacman_nr = 0;
 
-  game_mm.pacman[p].dir--;
+  game_mm.pacman[pacman_nr].dir--;
 
   for (l = 1; l < 5; l++)
   {
-    game_mm.pacman[p].dir++;
+    game_mm.pacman[pacman_nr].dir++;
 
-    if (game_mm.pacman[p].dir > 4)
-      game_mm.pacman[p].dir = 1;
+    if (game_mm.pacman[pacman_nr].dir > 4)
+      game_mm.pacman[pacman_nr].dir = 1;
 
-    if (game_mm.pacman[p].dir % 2)
+    if (game_mm.pacman[pacman_nr].dir % 2)
     {
       mx = 0;
-      my = game_mm.pacman[p].dir - 2;
+      my = game_mm.pacman[pacman_nr].dir - 2;
     }
     else
     {
       my = 0;
-      mx = 3 - game_mm.pacman[p].dir;
+      mx = 3 - game_mm.pacman[pacman_nr].dir;
     }
 
-    ox = game_mm.pacman[p].x;
-    oy = game_mm.pacman[p].y;
+    ox = game_mm.pacman[pacman_nr].x;
+    oy = game_mm.pacman[pacman_nr].y;
     nx = ox + mx;
     ny = oy + my;
     element = Feld[nx][ny];
@@ -3724,11 +3754,11 @@ void MovePacMen()
     Feld[ox][oy] = EL_EMPTY;
     Feld[nx][ny] =
       EL_PACMAN_RIGHT - 1 +
-      (game_mm.pacman[p].dir - 1 +
-       (game_mm.pacman[p].dir % 2) * 2);
+      (game_mm.pacman[pacman_nr].dir - 1 +
+       (game_mm.pacman[pacman_nr].dir % 2) * 2);
 
-    game_mm.pacman[p].x = nx;
-    game_mm.pacman[p].y = ny;
+    game_mm.pacman[pacman_nr].x = nx;
+    game_mm.pacman[pacman_nr].y = ny;
 
     DrawGraphic_MM(ox, oy, IMG_EMPTY);
 
