@@ -1239,7 +1239,7 @@ void DrawLaser(int start_edge, int mode)
       int num_beamers = laser.num_beamers;
 
       /* delete laser segments backward from the end to the first beamer */
-      for (i = num_beamers-1; i >= 0; i--)
+      for (i = num_beamers - 1; i >= 0; i--)
       {
 	int tmp_num_edges = last_num_edges - laser.beamer_edge[i];
 
