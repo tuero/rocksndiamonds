@@ -3886,6 +3886,19 @@ static int RequestHandleEvents(unsigned int req_state)
 	    break;
 	  }
 
+#if defined(TARGET_SDL2)
+      case SDL_WINDOWEVENT:
+	HandleWindowEvent((WindowEvent *) &event);
+	break;
+
+      case SDL_APP_WILLENTERBACKGROUND:
+      case SDL_APP_DIDENTERBACKGROUND:
+      case SDL_APP_WILLENTERFOREGROUND:
+      case SDL_APP_DIDENTERFOREGROUND:
+	HandlePauseResumeEvent((PauseResumeEvent *) &event);
+	break;
+#endif
+
 	  case EVENT_KEYPRESS:
 	  {
 	    Key key = GetEventKey((KeyEvent *)&event, TRUE);
