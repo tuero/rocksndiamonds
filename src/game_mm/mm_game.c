@@ -3089,9 +3089,10 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
 
   if (FrameReached(&energy_delay, ENERGY_DELAY))
   {
-    game_mm.energy_left--;
-    if (game_mm.energy_left >= 0)
+    if (game_mm.energy_left > 0)
     {
+      game_mm.energy_left--;
+
 #if 0
       BlitBitmap(pix[PIX_DOOR], drawto,
 		 DOOR_GFX_PAGEX5 + XX_ENERGY, DOOR_GFX_PAGEY1 + YY_ENERGY,
@@ -3100,7 +3101,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
 #endif
       redraw_mask |= REDRAW_DOOR_1;
     }
-    else if (setup.time_limit)
+    else if (setup.time_limit && !game_mm.game_over)
     {
       int i;
 
