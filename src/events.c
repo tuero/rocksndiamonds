@@ -532,8 +532,8 @@ void HandleWindowEvent(WindowEvent *event)
       if (new_window_width  != video.window_width ||
 	  new_window_height != video.window_height)
       {
-	int new_xpercent = (100 * new_window_width  / video.screen_width);
-	int new_ypercent = (100 * new_window_height / video.screen_height);
+	int new_xpercent = 100.0 * new_window_width  / video.screen_width  + .5;
+	int new_ypercent = 100.0 * new_window_height / video.screen_height + .5;
 
 	// (extreme window scaling allowed, but cannot be saved permanently)
 	video.window_scaling_percent = MIN(new_xpercent, new_ypercent);
