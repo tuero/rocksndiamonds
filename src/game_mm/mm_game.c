@@ -1229,6 +1229,11 @@ void DrawLaser(int start_edge, int mode)
 	       last_num_edges, start_edge);
 #endif
 
+      // special case when rotating first beamer: delete laser edge on beamer
+      // (but do not start scanning on previous edge to prevent mirror sound)
+      if (last_num_edges - start_edge == 1 && start_edge > 0)
+	DrawLaserLines(&laser.edge[start_edge - 1], 2, DL_LASER_DISABLED);
+
       /* delete first segment from start to the first beamer */
       DrawLaserExt(start_edge, last_num_edges - start_edge, DL_LASER_DISABLED);
     }
