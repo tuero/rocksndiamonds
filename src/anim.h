@@ -18,4 +18,6 @@ int getAnimationFrame(int, int, int, int, int);
 void InitGlobalAnimations(void);
 void DrawGlobalAnimations(int, int);
 
+void HandleGlobalAnimClicks(int, int, int);
+
 #endif

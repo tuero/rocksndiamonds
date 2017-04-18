@@ -1233,6 +1233,8 @@ void HandleButton(int mx, int my, int button, int button_nr)
   }
 #endif
 
+  HandleGlobalAnimClicks(mx, my, button);
+
   if (button_hold && game_status == GAME_MODE_PLAYING && tape.pausing)
     return;
 

@@ -2782,6 +2782,14 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
     if (string_has_parameter(value, "static_panel"))
       result |= ANIM_STATIC_PANEL;
   }
+  else if (strEqual(suffix, ".init_event") ||
+	   strEqual(suffix, ".anim_event"))
+  {
+    result = ANIM_EVENT_DEFAULT;
+
+    if (string_has_parameter(value, "click"))
+      result |= ANIM_EVENT_CLICK;
+  }
   else if (strEqual(suffix, ".class"))
   {
     result = (strEqual(value, ARG_UNDEFINED) ? ARG_UNDEFINED_VALUE :

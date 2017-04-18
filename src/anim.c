@@ -9,6 +9,8 @@
 // anim.c
 // ============================================================================
 
+#include "libgame/libgame.h"
+
 #include "anim.h"
 #include "main.h"
 #include "tools.h"
@@ -89,6 +91,9 @@ struct GlobalAnimPartControlInfo
   int init_delay_counter;
   int anim_delay_counter;
   int post_delay_counter;
+
+  boolean init_event_state;
+  boolean anim_event_state;
 
   int drawing_stage;
 
@@ -185,6 +190,10 @@ static int anim_status_last = GAME_MODE_DEFAULT;
 static int anim_classes_last = ANIM_CLASS_NONE;
 
 static boolean drawing_to_fading_buffer = FALSE;
+
+static boolean anim_click_event = FALSE;
+static int anim_click_mx = 0;
+static int anim_click_my = 0;
 
 
 /* ========================================================================= */
@@ -881,11 +890,43 @@ static void StopGlobalAnimSoundAndMusic(struct GlobalAnimPartControlInfo *part)
   StopGlobalAnimMusic(part);
 }
 
+static boolean getPartClickEvent(struct GlobalAnimPartControlInfo *part)
+{
+  struct GraphicInfo *g = &part->graphic_info;
+  int part_x = part->viewport_x + part->x;
+  int part_y = part->viewport_y + part->y;
+  int part_width  = g->width;
+  int part_height = g->height;
+  int mx = anim_click_mx;
+  int my = anim_click_my;
+
+  // check if mouse click event was detected at all
+  if (!anim_click_event)
+    return FALSE;
+
+  // check if mouse click is inside the animation part's viewport
+  if (mx <  part->viewport_x ||
+      mx >= part->viewport_x + part->viewport_width ||
+      my <  part->viewport_y ||
+      my >= part->viewport_y + part->viewport_height)
+    return FALSE;
+
+  // check if mouse click is inside the animation part's graphic
+  if (mx <  part_x ||
+      mx >= part_x + part_width ||
+      my <  part_y ||
+      my >= part_y + part_height)
+    return FALSE;
+
+  return TRUE;
+}
+
 int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
 {
   struct GraphicInfo *g = &part->graphic_info;
   struct GraphicInfo *c = &part->control_info;
   boolean viewport_changed = SetGlobalAnimPart_Viewport(part);
+  boolean part_click_event = getPartClickEvent(part);
 
   if (viewport_changed)
     state |= ANIM_STATE_RESTART;
@@ -904,6 +945,9 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
 
     part->anim_delay_counter =
       (c->anim_delay_fixed + GetSimpleRandom(c->anim_delay_random));
+
+    part->init_event_state = c->init_event;
+    part->anim_event_state = c->anim_event;
 
     part->initial_anim_sync_frame =
       (g->anim_global_sync ? 0 : anim_sync_frame + part->init_delay_counter);
@@ -981,8 +1025,30 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
     if (c->step_yoffset != ARG_UNDEFINED_VALUE)
       part->step_yoffset = c->step_yoffset;
 
-    if (part->init_delay_counter == 0)
+    if (part->init_delay_counter == 0 &&
+	part->init_event_state == ANIM_EVENT_NONE)
       PlayGlobalAnimSoundAndMusic(part);
+  }
+
+  if (part_click_event &&
+      part->init_event_state != ANIM_EVENT_NONE)
+  {
+    if (part->initial_anim_sync_frame > 0)
+      part->initial_anim_sync_frame -= part->init_delay_counter - 1;
+
+    part->init_delay_counter = 1;
+    part->init_event_state = ANIM_EVENT_NONE;
+
+    anim_click_event = FALSE;
+  }
+
+  if (part_click_event &&
+      part->anim_event_state != ANIM_EVENT_NONE)
+  {
+    part->anim_delay_counter = 1;
+    part->anim_event_state = ANIM_EVENT_NONE;
+
+    anim_click_event = FALSE;
   }
 
   if (part->init_delay_counter > 0)
@@ -990,10 +1056,17 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
     part->init_delay_counter--;
 
     if (part->init_delay_counter == 0)
+    {
+      part->init_event_state = ANIM_EVENT_NONE;
+
       PlayGlobalAnimSoundAndMusic(part);
+    }
 
     return ANIM_STATE_WAITING;
   }
+
+  if (part->init_event_state != ANIM_EVENT_NONE)
+    return ANIM_STATE_WAITING;
 
   // check if moving animation has left the visible screen area
   if ((part->x <= -g->width              && part->step_xoffset <= 0) ||
@@ -1001,6 +1074,9 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
       (part->y <= -g->height             && part->step_yoffset <= 0) ||
       (part->y >=  part->viewport_height && part->step_yoffset >= 0))
   {
+    // do not wait for "anim" events for off-screen animations
+    part->anim_event_state = ANIM_EVENT_NONE;
+
     // do not stop animation before "anim" or "post" counter are finished
     if (part->anim_delay_counter == 0 &&
 	part->post_delay_counter == 0)
@@ -1024,6 +1100,8 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
 
     if (part->anim_delay_counter == 0)
     {
+      part->anim_event_state = ANIM_EVENT_NONE;
+
       StopGlobalAnimSoundAndMusic(part);
 
       part->post_delay_counter =
@@ -1262,4 +1340,21 @@ static void DoAnimationExt()
   // force screen redraw in next frame to continue drawing global animations
   redraw_mask = REDRAW_ALL;
 #endif
+}
+
+void HandleGlobalAnimClicks(int mx, int my, int button)
+{
+  static int last_button = 0;
+  boolean press_event;
+  boolean release_event;
+
+  /* check if button state has changed since last invocation */
+  press_event   = (button != 0 && last_button == 0);
+  release_event = (button == 0 && last_button != 0);
+  last_button = button;
+
+  anim_click_mx = mx;
+  anim_click_my = my;
+  anim_click_event = (press_event   ? TRUE  :
+		      release_event ? FALSE : anim_click_event);
 }

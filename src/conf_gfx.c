@@ -60,6 +60,8 @@ struct ConfigTypeInfo image_config_suffix[] =
   { ".anim_delay_random",		ARG_UNDEFINED,	TYPE_INTEGER	},
   { ".post_delay_fixed",		ARG_UNDEFINED,	TYPE_INTEGER	},
   { ".post_delay_random",		ARG_UNDEFINED,	TYPE_INTEGER	},
+  { ".init_event",			ARG_UNDEFINED,	TYPE_STRING	},
+  { ".anim_event",			ARG_UNDEFINED,	TYPE_STRING	},
   { ".name",				ARG_UNDEFINED,	TYPE_STRING	},
   { ".scale_up_factor",			ARG_UNDEFINED,	TYPE_INTEGER	},
   { ".tile_size",			ARG_UNDEFINED,	TYPE_INTEGER	},

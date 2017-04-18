@@ -324,6 +324,11 @@
 
 #define STYLE_DEFAULT		STYLE_NONE
 
+#define ANIM_EVENT_NONE		0
+#define ANIM_EVENT_CLICK	(1 << 0)
+
+#define ANIM_EVENT_DEFAULT	ANIM_EVENT_NONE
+
 /* values for fade mode */
 #define FADE_TYPE_NONE		0
 #define FADE_TYPE_FADE_IN	(1 << 0)
