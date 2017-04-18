@@ -95,6 +95,9 @@ struct GlobalAnimPartControlInfo
   boolean init_event_state;
   boolean anim_event_state;
 
+  boolean clickable;
+  boolean clicked;
+
   int drawing_stage;
 
   int state;
@@ -178,6 +181,8 @@ struct AnimClassGameMode
 /* forward declaration for internal use */
 static void HandleGlobalAnim(int, int);
 static void DoAnimationExt(void);
+static void ResetGlobalAnim_Clickable();
+static void ResetGlobalAnim_Clicked();
 
 static struct GlobalAnimControlInfo global_anim_ctrl[NUM_GAME_MODES];
 
@@ -190,10 +195,6 @@ static int anim_status_last = GAME_MODE_DEFAULT;
 static int anim_classes_last = ANIM_CLASS_NONE;
 
 static boolean drawing_to_fading_buffer = FALSE;
-
-static boolean anim_click_event = FALSE;
-static int anim_click_mx = 0;
-static int anim_click_my = 0;
 
 
 /* ========================================================================= */
@@ -737,7 +738,13 @@ void DrawGlobalAnimationsExt(int drawing_target, int drawing_stage)
 
 void DrawGlobalAnimations(int drawing_target, int drawing_stage)
 {
+  if (drawing_stage == DRAW_GLOBAL_ANIM_STAGE_1)
+    ResetGlobalAnim_Clickable();
+
   DrawGlobalAnimationsExt(drawing_target, drawing_stage);
+
+  if (drawing_stage == DRAW_GLOBAL_ANIM_STAGE_2)
+    ResetGlobalAnim_Clicked();
 }
 
 boolean SetGlobalAnimPart_Viewport(struct GlobalAnimPartControlInfo *part)
@@ -890,18 +897,25 @@ static void StopGlobalAnimSoundAndMusic(struct GlobalAnimPartControlInfo *part)
   StopGlobalAnimMusic(part);
 }
 
-static boolean getPartClickEvent(struct GlobalAnimPartControlInfo *part)
+static boolean isClickablePart(struct GlobalAnimPartControlInfo *part)
+{
+  struct GraphicInfo *c = &part->control_info;
+
+  return (c->init_event & ANIM_EVENT_CLICK ||
+	  c->anim_event & ANIM_EVENT_CLICK);
+}
+
+static boolean isClickedPart(struct GlobalAnimPartControlInfo *part,
+			     int mx, int my, boolean clicked)
 {
   struct GraphicInfo *g = &part->graphic_info;
   int part_x = part->viewport_x + part->x;
   int part_y = part->viewport_y + part->y;
   int part_width  = g->width;
   int part_height = g->height;
-  int mx = anim_click_mx;
-  int my = anim_click_my;
 
-  // check if mouse click event was detected at all
-  if (!anim_click_event)
+  // check if mouse click was detected at all
+  if (!clicked)
     return FALSE;
 
   // check if mouse click is inside the animation part's viewport
@@ -926,7 +940,6 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
   struct GraphicInfo *g = &part->graphic_info;
   struct GraphicInfo *c = &part->control_info;
   boolean viewport_changed = SetGlobalAnimPart_Viewport(part);
-  boolean part_click_event = getPartClickEvent(part);
 
   if (viewport_changed)
     state |= ANIM_STATE_RESTART;
@@ -1030,7 +1043,9 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
       PlayGlobalAnimSoundAndMusic(part);
   }
 
-  if (part_click_event &&
+  part->clickable = isClickablePart(part);
+
+  if (part->clicked &&
       part->init_event_state != ANIM_EVENT_NONE)
   {
     if (part->initial_anim_sync_frame > 0)
@@ -1039,16 +1054,16 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
     part->init_delay_counter = 1;
     part->init_event_state = ANIM_EVENT_NONE;
 
-    anim_click_event = FALSE;
+    part->clicked = FALSE;
   }
 
-  if (part_click_event &&
+  if (part->clicked &&
       part->anim_event_state != ANIM_EVENT_NONE)
   {
     part->anim_delay_counter = 1;
     part->anim_event_state = ANIM_EVENT_NONE;
 
-    anim_click_event = FALSE;
+    part->clicked = FALSE;
   }
 
   if (part->init_delay_counter > 0)
@@ -1342,19 +1357,91 @@ static void DoAnimationExt()
 #endif
 }
 
-void HandleGlobalAnimClicks(int mx, int my, int button)
+static void InitGlobalAnim_Clickable()
 {
+  int mode_nr;
+
+  for (mode_nr = 0; mode_nr < NUM_GAME_MODES; mode_nr++)
+  {
+    struct GlobalAnimControlInfo *ctrl = &global_anim_ctrl[mode_nr];
+    int anim_nr;
+
+    for (anim_nr = 0; anim_nr < NUM_GLOBAL_ANIMS_AND_TOONS; anim_nr++)
+    {
+      struct GlobalAnimMainControlInfo *anim = &ctrl->anim[anim_nr];
+      int part_nr;
+
+      for (part_nr = 0; part_nr < NUM_GLOBAL_ANIM_PARTS_AND_TOONS; part_nr++)
+      {
+	struct GlobalAnimPartControlInfo *part = &anim->part[part_nr];
+
+	part->clickable = FALSE;
+      }
+    }
+  }
+}
+
+static boolean InitGlobalAnim_Clicked(int mx, int my, boolean clicked)
+{
+  boolean any_part_clicked = FALSE;
+  int mode_nr;
+
+  for (mode_nr = 0; mode_nr < NUM_GAME_MODES; mode_nr++)
+  {
+    struct GlobalAnimControlInfo *ctrl = &global_anim_ctrl[mode_nr];
+    int anim_nr;
+
+    for (anim_nr = 0; anim_nr < NUM_GLOBAL_ANIMS_AND_TOONS; anim_nr++)
+    {
+      struct GlobalAnimMainControlInfo *anim = &ctrl->anim[anim_nr];
+      int part_nr;
+
+      for (part_nr = 0; part_nr < NUM_GLOBAL_ANIM_PARTS_AND_TOONS; part_nr++)
+      {
+	struct GlobalAnimPartControlInfo *part = &anim->part[part_nr];
+
+	part->clicked = FALSE;
+
+	if (part->clickable && isClickedPart(part, mx, my, clicked))
+	  any_part_clicked = part->clicked = TRUE;
+      }
+    }
+  }
+
+  return any_part_clicked;
+}
+
+static void ResetGlobalAnim_Clickable()
+{
+  InitGlobalAnim_Clickable();
+}
+
+static void ResetGlobalAnim_Clicked()
+{
+  InitGlobalAnim_Clicked(-1, -1, FALSE);
+}
+
+boolean HandleGlobalAnimClicks(int mx, int my, int button)
+{
+  static boolean click_consumed = FALSE;
   static int last_button = 0;
   boolean press_event;
   boolean release_event;
+  boolean click_consumed_current = click_consumed;
 
   /* check if button state has changed since last invocation */
   press_event   = (button != 0 && last_button == 0);
   release_event = (button == 0 && last_button != 0);
   last_button = button;
 
-  anim_click_mx = mx;
-  anim_click_my = my;
-  anim_click_event = (press_event   ? TRUE  :
-		      release_event ? FALSE : anim_click_event);
+  if (press_event)
+  {
+    click_consumed = InitGlobalAnim_Clicked(mx, my, TRUE);
+    click_consumed_current = click_consumed;
+  }
+
+  if (release_event)
+    click_consumed = FALSE;
+
+  return click_consumed_current;
 }

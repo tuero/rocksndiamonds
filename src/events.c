@@ -1233,7 +1233,11 @@ void HandleButton(int mx, int my, int button, int button_nr)
   }
 #endif
 
-  HandleGlobalAnimClicks(mx, my, button);
+  if (HandleGlobalAnimClicks(mx, my, button))
+  {
+    /* do not handle this button event anymore */
+    mx = my = -32;	/* force mouse event to be outside screen tiles */
+  }
 
   if (button_hold && game_status == GAME_MODE_PLAYING && tape.pausing)
     return;
