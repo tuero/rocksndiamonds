@@ -84,6 +84,10 @@ static int copy_properties[][5] =
 };
 
 
+/* forward declaration for internal use */
+static int get_graphic_parameter_value(char *, char *, int);
+
+
 void DrawInitAnim()
 {
   struct GraphicInfo *graphic_info_last = graphic_info;
@@ -604,6 +608,19 @@ void InitGlobalAnimGraphicInfo()
       special = GFX_SPECIAL_ARG_DEFAULT;
 
     global_anim_info[anim_nr].graphic[part_nr][special] = graphic;
+
+    /* fix default value for ".draw_masked" (for backward compatibility) */
+    struct GraphicInfo *g = &graphic_info[graphic];
+    struct FileInfo *image = getImageListEntryFromImageID(graphic);
+    char **parameter_raw = image->parameter;
+    int p = GFX_ARG_DRAW_MASKED;
+    int draw_masked = get_graphic_parameter_value(parameter_raw[p],
+						  image_config_suffix[p].token,
+						  image_config_suffix[p].type);
+
+    /* if ".draw_masked" parameter is undefined, use default value "TRUE" */
+    if (draw_masked == ARG_UNDEFINED_VALUE)
+      g->draw_masked = TRUE;
   }
 
 #if 0
@@ -1260,6 +1277,7 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   g->post_delay_random = 0;
   g->init_event = ANIM_EVENT_DEFAULT;
   g->anim_event = ANIM_EVENT_DEFAULT;
+  g->draw_masked = FALSE;
   g->draw_order = 0;
   g->fade_mode = FADE_MODE_DEFAULT;
   g->fade_delay = -1;
@@ -1496,8 +1514,14 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   g->draw_xoffset = parameter[GFX_ARG_DRAW_XOFFSET];
   g->draw_yoffset = parameter[GFX_ARG_DRAW_YOFFSET];
 
-  /* this is only used for drawing envelope graphics */
-  g->draw_masked = parameter[GFX_ARG_DRAW_MASKED];
+  /* use a different default value for global animations and toons */
+  if ((graphic >= IMG_GFX_GLOBAL_ANIM_1 && graphic <= IMG_GFX_GLOBAL_ANIM_8) ||
+      (graphic >= IMG_TOON_1            && graphic <= IMG_TOON_20))
+    g->draw_masked = TRUE;
+
+  /* this is used for drawing envelopes, global animations and toons */
+  if (parameter[GFX_ARG_DRAW_MASKED] != ARG_UNDEFINED_VALUE)
+    g->draw_masked = parameter[GFX_ARG_DRAW_MASKED];
 
   /* used for toon animations and global animations */
   if (parameter[GFX_ARG_DRAW_ORDER] != ARG_UNDEFINED_VALUE)

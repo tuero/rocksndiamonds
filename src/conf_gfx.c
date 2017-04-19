@@ -52,7 +52,7 @@ struct ConfigTypeInfo image_config_suffix[] =
   { ".position",			ARG_UNDEFINED,	TYPE_STRING	},
   { ".draw_xoffset",			"0",		TYPE_INTEGER	},
   { ".draw_yoffset",			"0",		TYPE_INTEGER	},
-  { ".draw_masked",			"false",	TYPE_BOOLEAN	},
+  { ".draw_masked",			ARG_UNDEFINED,	TYPE_BOOLEAN	},
   { ".draw_order",			ARG_UNDEFINED,	TYPE_INTEGER	},
   { ".init_delay_fixed",		ARG_UNDEFINED,	TYPE_INTEGER	},
   { ".init_delay_random",		ARG_UNDEFINED,	TYPE_INTEGER	},

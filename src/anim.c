@@ -698,6 +698,10 @@ void DrawGlobalAnimationsExt(int drawing_target, int drawing_stage)
 	int cut_y = 0;
 	int sync_frame;
 	int frame;
+	void (*blit_bitmap)(Bitmap *, Bitmap *, int, int, int, int, int, int) =
+	  (g->draw_masked ? BlitBitmapMasked : BlitBitmap);
+	void (*blit_screen)(Bitmap *, int, int, int, int, int, int) =
+	  (g->draw_masked ? BlitToScreenMasked : BlitToScreen);
 
 	if (!(part->state & ANIM_STATE_RUNNING))
 	  continue;
@@ -741,11 +745,11 @@ void DrawGlobalAnimationsExt(int drawing_target, int drawing_stage)
 	src_y += cut_y;
 
 	if (drawing_target == DRAW_TO_SCREEN)
-	  BlitToScreenMasked(src_bitmap, src_x, src_y, width, height,
-			     dst_x, dst_y);
+	  blit_screen(src_bitmap, src_x, src_y, width, height,
+		      dst_x, dst_y);
 	else
-	  BlitBitmapMasked(src_bitmap, fade_bitmap, src_x, src_y, width, height,
-			   dst_x, dst_y);
+	  blit_bitmap(src_bitmap, fade_bitmap, src_x, src_y, width, height,
+		      dst_x, dst_y);
       }
     }
   }
