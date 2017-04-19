@@ -2716,6 +2716,78 @@ static boolean string_has_parameter(char *s, char *s_contained)
   return string_has_parameter(substring, s_contained);
 }
 
+static boolean string_has_anim_parameter(char *s, char *s_contained)
+{
+  char *s_copy = getStringCopy(s);
+  boolean has_parameter = FALSE;
+  int len_s_copy = strlen(s_copy);
+  int i;
+
+  // replace all "anim" and "part" numbers with 'X'
+  for (i = 0; i < len_s_copy; i++)
+    if (s_copy[i] >= '1' && s_copy[i] <= '8')
+      s_copy[i] = 'X';
+
+  has_parameter = string_has_parameter(s_copy, s_contained);
+
+  checked_free(s_copy);
+
+  return has_parameter;
+}
+
+int get_anim_parameter_value(char *s)
+{
+  char *pattern_1 = "click:anim_";
+  char *pattern_2 = ".part_";
+  char *matching_char = NULL;
+  char *s_ptr = s;
+  int result = ANIM_EVENT_NONE;
+
+  matching_char = strstr(s_ptr, pattern_1);
+  if (matching_char == NULL)
+    return result;
+
+  s_ptr = matching_char + strlen(pattern_1);
+  if (*s_ptr == '\0')
+    return result;
+
+  // check for "click:anim_X"
+  if (*s_ptr >= '1' && *s_ptr <= '8')
+  {
+    result |= ANIM_EVENT_CLICK_ANIM_1 << (*s_ptr - '1');
+    s_ptr++;
+
+    // check for "click:anim_X.part_X"
+    if (strPrefix(s_ptr, pattern_2))
+    {
+      s_ptr += strlen(pattern_2);
+
+      if (*s_ptr >= '1' && *s_ptr <= '8')
+      {
+	result |= ANIM_EVENT_CLICK_PART_1 << (*s_ptr - '1');
+	s_ptr++;
+      }
+    }
+    else
+    {
+      // no "part_X" specified -- trigger by click on any part
+      result |= ANIM_EVENT_CLICK_PART_ALL;
+    }
+  }
+
+  /* discard result if next character is neither delimiter nor whitespace */
+  if (!(*s_ptr == ',' || *s_ptr == '\0' ||
+	*s_ptr == ' ' || *s_ptr == '\t'))
+    return get_anim_parameter_value(s_ptr);
+
+  /* check if string contains another parameter string after a comma */
+  s_ptr = strchr(s_ptr, ',');
+  if (s_ptr == NULL)	/* string does not contain a comma */
+    return result;
+
+  return result | get_anim_parameter_value(s_ptr);
+}
+
 int get_parameter_value(char *value_raw, char *suffix, int type)
 {
   char *value = getStringToLower(value_raw);
@@ -2788,7 +2860,11 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
     result = ANIM_EVENT_DEFAULT;
 
     if (string_has_parameter(value, "click"))
-      result |= ANIM_EVENT_CLICK;
+      result |= ANIM_EVENT_CLICK_SELF;
+
+    if (string_has_anim_parameter(value, "click:anim_X") ||
+	string_has_anim_parameter(value, "click:anim_X.part_X"))
+      result |= get_anim_parameter_value(value);
   }
   else if (strEqual(suffix, ".class"))
   {

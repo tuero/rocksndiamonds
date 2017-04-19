@@ -66,9 +66,14 @@
 
 struct GlobalAnimPartControlInfo
 {
+  int old_nr;		// position before mapping animation parts linearly
+  int old_anim_nr;	// position before mapping animations linearly
+
   int nr;
   int anim_nr;
   int mode_nr;
+
+  boolean is_base;	// animation part is base/main/default animation part
 
   int sound;
   int music;
@@ -114,11 +119,12 @@ struct GlobalAnimMainControlInfo
 
   struct GraphicInfo control_info;
 
-  int num_parts;
+  int num_parts;	// number of animation parts, but without base part
+  int num_parts_all;	// number of animation parts, including base part
   int part_counter;
   int active_part_nr;
 
-  boolean has_base;
+  boolean has_base;	// animation has base/main/default animation part
 
   int init_delay_counter;
 
@@ -328,6 +334,7 @@ static void InitToonControls()
   anim->control_info = graphic_info[control];
 
   anim->num_parts = 0;
+  anim->num_parts_all = 0;
   anim->part_counter = 0;
   anim->active_part_nr = 0;
 
@@ -350,9 +357,13 @@ static void InitToonControls()
     part->nr = part_nr;
     part->anim_nr = anim_nr;
     part->mode_nr = mode_nr;
+
+    part->is_base = FALSE;
+
     part->sound = sound;
     part->music = music;
     part->graphic = graphic;
+
     part->graphic_info = graphic_info[graphic];
     part->control_info = graphic_info[control];
 
@@ -373,6 +384,8 @@ static void InitToonControls()
     part->last_anim_status = -1;
 
     anim->num_parts++;
+    anim->num_parts_all++;
+
     part_nr++;
   }
 
@@ -414,6 +427,7 @@ void InitGlobalAnimControls()
       anim->control_info = graphic_info[control];
 
       anim->num_parts = 0;
+      anim->num_parts_all = 0;
       anim->part_counter = 0;
       anim->active_part_nr = 0;
 
@@ -448,12 +462,17 @@ void InitGlobalAnimControls()
 	       m, a, p, mode_nr, anim_nr, part_nr, sound);
 #endif
 
+	part->old_nr = p;
+	part->old_anim_nr = a;
+
 	part->nr = part_nr;
 	part->anim_nr = anim_nr;
 	part->mode_nr = mode_nr;
+
 	part->sound = sound;
 	part->music = music;
 	part->graphic = graphic;
+
 	part->graphic_info = graphic_info[graphic];
 	part->control_info = graphic_info[control];
 
@@ -465,13 +484,19 @@ void InitGlobalAnimControls()
 	part->state = ANIM_STATE_INACTIVE;
 	part->last_anim_status = -1;
 
+	anim->num_parts_all++;
+
 	if (p < GLOBAL_ANIM_ID_PART_BASE)
 	{
+	  part->is_base = FALSE;
+
 	  anim->num_parts++;
 	  part_nr++;
 	}
 	else
 	{
+	  part->is_base = TRUE;
+
 	  anim->base = *part;
 	  anim->has_base = TRUE;
 	}
@@ -897,12 +922,27 @@ static void StopGlobalAnimSoundAndMusic(struct GlobalAnimPartControlInfo *part)
   StopGlobalAnimMusic(part);
 }
 
-static boolean isClickablePart(struct GlobalAnimPartControlInfo *part)
+static boolean matchesAnimEventMask(int bits, int mask)
+{
+  return (bits & (mask & ANIM_EVENT_CLICK_ANIM_ALL) &&
+	  bits & (mask & ANIM_EVENT_CLICK_PART_ALL));
+}
+
+static boolean isClickablePart(struct GlobalAnimPartControlInfo *part, int mask)
 {
   struct GraphicInfo *c = &part->control_info;
 
-  return (c->init_event & ANIM_EVENT_CLICK ||
-	  c->anim_event & ANIM_EVENT_CLICK);
+  boolean clickable_self = FALSE;
+  boolean clickable_triggered = FALSE;
+
+  if (mask & ANIM_EVENT_CLICK_SELF)
+    clickable_self = (c->init_event & ANIM_EVENT_CLICK_SELF ||
+		      c->anim_event & ANIM_EVENT_CLICK_SELF);
+
+  clickable_triggered = (matchesAnimEventMask(c->init_event, mask) ||
+			 matchesAnimEventMask(c->anim_event, mask));
+
+  return (clickable_self || clickable_triggered);
 }
 
 static boolean isClickedPart(struct GlobalAnimPartControlInfo *part,
@@ -1043,8 +1083,6 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
       PlayGlobalAnimSoundAndMusic(part);
   }
 
-  part->clickable = isClickablePart(part);
-
   if (part->clicked &&
       part->init_event_state != ANIM_EVENT_NONE)
   {
@@ -1082,6 +1120,9 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
 
   if (part->init_event_state != ANIM_EVENT_NONE)
     return ANIM_STATE_WAITING;
+
+  // animation part is now running/visible and therefore clickable
+  part->clickable = TRUE;
 
   // check if moving animation has left the visible screen area
   if ((part->x <= -g->width              && part->step_xoffset <= 0) ||
@@ -1366,12 +1407,12 @@ static void InitGlobalAnim_Clickable()
     struct GlobalAnimControlInfo *ctrl = &global_anim_ctrl[mode_nr];
     int anim_nr;
 
-    for (anim_nr = 0; anim_nr < NUM_GLOBAL_ANIMS_AND_TOONS; anim_nr++)
+    for (anim_nr = 0; anim_nr < ctrl->num_anims; anim_nr++)
     {
       struct GlobalAnimMainControlInfo *anim = &ctrl->anim[anim_nr];
       int part_nr;
 
-      for (part_nr = 0; part_nr < NUM_GLOBAL_ANIM_PARTS_AND_TOONS; part_nr++)
+      for (part_nr = 0; part_nr < anim->num_parts_all; part_nr++)
       {
 	struct GlobalAnimPartControlInfo *part = &anim->part[part_nr];
 
@@ -1391,19 +1432,71 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, boolean clicked)
     struct GlobalAnimControlInfo *ctrl = &global_anim_ctrl[mode_nr];
     int anim_nr;
 
-    for (anim_nr = 0; anim_nr < NUM_GLOBAL_ANIMS_AND_TOONS; anim_nr++)
+    for (anim_nr = 0; anim_nr < ctrl->num_anims; anim_nr++)
     {
       struct GlobalAnimMainControlInfo *anim = &ctrl->anim[anim_nr];
       int part_nr;
 
-      for (part_nr = 0; part_nr < NUM_GLOBAL_ANIM_PARTS_AND_TOONS; part_nr++)
+      for (part_nr = 0; part_nr < anim->num_parts_all; part_nr++)
       {
 	struct GlobalAnimPartControlInfo *part = &anim->part[part_nr];
 
-	part->clicked = FALSE;
+	if (!clicked)
+	{
+	  part->clicked = FALSE;
 
-	if (part->clickable && isClickedPart(part, mx, my, clicked))
-	  any_part_clicked = part->clicked = TRUE;
+	  continue;
+	}
+
+	if (part->clickable &&
+	    isClickedPart(part, mx, my, clicked))
+	{
+#if 0
+	  printf("::: %d.%d CLICKED\n", anim_nr, part_nr);
+#endif
+
+	  if (isClickablePart(part, ANIM_EVENT_CLICK_SELF))
+	    any_part_clicked = part->clicked = TRUE;
+
+	  // check if this click is defined to trigger other animations
+	  int old_anim_nr = part->old_anim_nr;
+	  int old_part_nr = part->old_nr;
+	  int mask = ANIM_EVENT_CLICK_ANIM_1 << old_anim_nr;
+
+	  if (part->is_base)
+	    mask |= ANIM_EVENT_CLICK_PART_ALL;
+	  else
+	    mask |= ANIM_EVENT_CLICK_PART_1 << old_part_nr;
+
+	  int anim2_nr;
+
+	  for (anim2_nr = 0; anim2_nr < ctrl->num_anims; anim2_nr++)
+	  {
+	    struct GlobalAnimMainControlInfo *anim2 = &ctrl->anim[anim2_nr];
+	    int part2_nr;
+
+	    for (part2_nr = 0; part2_nr < anim2->num_parts_all; part2_nr++)
+	    {
+	      struct GlobalAnimPartControlInfo *part2 = &anim2->part[part2_nr];
+
+	      if (isClickablePart(part2, mask))
+		any_part_clicked = part2->clicked = TRUE;
+
+#if 0
+	      struct GraphicInfo *c = &part2->control_info;
+
+	      printf("::: - %d.%d: 0x%08x, 0x%08x [0x%08x]",
+		     anim2_nr, part2_nr, c->init_event, c->anim_event, mask);
+
+	      if (isClickablePart(part2, mask))
+		printf(" <--- TRIGGERED BY %d.%d",
+		       anim_nr, part_nr);
+
+	      printf("\n");
+#endif
+	    }
+	  }
+	}
       }
     }
   }
