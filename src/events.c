@@ -1703,6 +1703,15 @@ void HandleKey(Key key, int key_status)
     return;
   }
 
+  if (HandleGlobalAnimClicks(-1, -1, (key == KSYM_space ||
+				      key == KSYM_Return ||
+				      key == KSYM_Escape)))
+  {
+    /* do not handle this key event anymore */
+    if (key != KSYM_Escape)	/* always allow ESC key to be handled */
+      return;
+  }
+
   if (game_status == GAME_MODE_PLAYING && AllPlayersGone &&
       (key == KSYM_Return || key == setup.shortcut.toggle_pause))
   {
@@ -1956,6 +1965,12 @@ void HandleJoystick()
   int newbutton	= (AnyJoystickButton() == JOY_BUTTON_NEW_PRESSED);
   int dx	= (left ? -1	: right ? 1	: 0);
   int dy	= (up   ? -1	: down  ? 1	: 0);
+
+  if (HandleGlobalAnimClicks(-1, -1, newbutton))
+  {
+    /* do not handle this button event anymore */
+    return;
+  }
 
   switch (game_status)
   {

@@ -2859,6 +2859,9 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
   {
     result = ANIM_EVENT_DEFAULT;
 
+    if (string_has_parameter(value, "any"))
+      result |= ANIM_EVENT_CLICK_ANY;
+
     if (string_has_parameter(value, "click"))
       result |= ANIM_EVENT_CLICK_SELF;
 

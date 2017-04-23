@@ -936,8 +936,13 @@ static boolean isClickablePart(struct GlobalAnimPartControlInfo *part, int mask)
 {
   struct GraphicInfo *c = &part->control_info;
 
+  boolean clickable_any = FALSE;
   boolean clickable_self = FALSE;
   boolean clickable_triggered = FALSE;
+
+  if (mask & ANIM_EVENT_CLICK_ANY)
+    clickable_any = (c->init_event & ANIM_EVENT_CLICK_ANY ||
+		     c->anim_event & ANIM_EVENT_CLICK_ANY);
 
   if (mask & ANIM_EVENT_CLICK_SELF)
     clickable_self = (c->init_event & ANIM_EVENT_CLICK_SELF ||
@@ -946,7 +951,7 @@ static boolean isClickablePart(struct GlobalAnimPartControlInfo *part, int mask)
   clickable_triggered = (matchesAnimEventMask(c->init_event, mask) ||
 			 matchesAnimEventMask(c->anim_event, mask));
 
-  return (clickable_self || clickable_triggered);
+  return (clickable_any || clickable_self || clickable_triggered);
 }
 
 static boolean isClickedPart(struct GlobalAnimPartControlInfo *part,
@@ -1452,8 +1457,13 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, boolean clicked)
 	  continue;
 	}
 
-	if (part->clickable &&
-	    isClickedPart(part, mx, my, clicked))
+	if (!part->clickable)
+	  continue;
+
+	if (isClickablePart(part, ANIM_EVENT_CLICK_ANY))
+	  any_part_clicked = part->clicked = TRUE;
+
+	if (isClickedPart(part, mx, my, clicked))
 	{
 #if 0
 	  printf("::: %d.%d CLICKED\n", anim_nr, part_nr);

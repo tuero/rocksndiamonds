@@ -342,6 +342,7 @@
 #define ANIM_EVENT_CLICK_PART_7	(1 << 14)
 #define ANIM_EVENT_CLICK_PART_8	(1 << 15)
 #define ANIM_EVENT_CLICK_SELF	(1 << 16)
+#define ANIM_EVENT_CLICK_ANY	(1 << 17)
 
 #define ANIM_EVENT_CLICK_ANIM_ALL	(ANIM_EVENT_CLICK_ANIM_1 |	\
                                          ANIM_EVENT_CLICK_ANIM_2 |	\
