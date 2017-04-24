@@ -397,6 +397,7 @@
 #define POS_LOWER		5
 #define POS_BOTTOM		6
 #define POS_ANY			7
+#define POS_LAST		8
 
 /* values for text alignment */
 #define ALIGN_LEFT		(1 << 0)

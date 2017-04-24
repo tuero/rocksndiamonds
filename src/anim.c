@@ -126,6 +126,8 @@ struct GlobalAnimMainControlInfo
 
   boolean has_base;	// animation has base/main/default animation part
 
+  int last_x, last_y;
+
   int init_delay_counter;
 
   int state;
@@ -340,6 +342,9 @@ static void InitToonControls()
 
   anim->has_base = FALSE;
 
+  anim->last_x = POS_OFFSCREEN;
+  anim->last_y = POS_OFFSCREEN;
+
   anim->init_delay_counter = 0;
 
   anim->state = ANIM_STATE_INACTIVE;
@@ -432,6 +437,9 @@ void InitGlobalAnimControls()
       anim->active_part_nr = 0;
 
       anim->has_base = FALSE;
+
+      anim->last_x = POS_OFFSCREEN;
+      anim->last_y = POS_OFFSCREEN;
 
       anim->init_delay_counter = 0;
 
@@ -986,6 +994,8 @@ static boolean isClickedPart(struct GlobalAnimPartControlInfo *part,
 
 int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
 {
+  struct GlobalAnimControlInfo *ctrl = &global_anim_ctrl[part->mode_nr];
+  struct GlobalAnimMainControlInfo *anim = &ctrl->anim[part->anim_nr];
   struct GraphicInfo *g = &part->graphic_info;
   struct GraphicInfo *c = &part->control_info;
   boolean viewport_changed = SetGlobalAnimPart_Viewport(part);
@@ -1081,6 +1091,14 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
       part->x = c->x;
     if (c->y != ARG_UNDEFINED_VALUE)
       part->y = c->y;
+
+    if (c->position == POS_LAST &&
+	anim->last_x > -g->width  && anim->last_x < part->viewport_width &&
+	anim->last_y > -g->height && anim->last_y < part->viewport_height)
+    {
+      part->x = anim->last_x;
+      part->y = anim->last_y;
+    }
 
     if (c->step_xoffset != ARG_UNDEFINED_VALUE)
       part->step_xoffset = c->step_xoffset;
@@ -1208,6 +1226,9 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
 
   part->x += part->step_xoffset;
   part->y += part->step_yoffset;
+
+  anim->last_x = part->x;
+  anim->last_y = part->y;
 
   return ANIM_STATE_RUNNING;
 }
