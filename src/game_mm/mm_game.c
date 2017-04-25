@@ -354,6 +354,60 @@ static boolean CheckLaserPixel(int x, int y)
   return (pixel == WHITE_PIXEL);
 }
 
+static void CheckExitMM()
+{
+  int exit_element = EL_EMPTY;
+  int exit_x = 0;
+  int exit_y = 0;
+  int x, y;
+  static int xy[4][2] =
+  {
+    { +1,  0 },
+    {  0, -1 },
+    { -1,  0 },
+    {  0, +1 }
+  };
+
+  for (y = 0; y < lev_fieldy; y++)
+  {
+    for (x = 0; x < lev_fieldx; x++)
+    {
+      if (Feld[x][y] == EL_EXIT_CLOSED)
+      {
+	/* initiate opening animation of exit door */
+	Feld[x][y] = EL_EXIT_OPENING;
+
+	exit_element = EL_EXIT_OPEN;
+	exit_x = x;
+	exit_y = y;
+      }
+      else if (IS_RECEIVER(Feld[x][y]))
+      {
+	/* remove field that blocks receiver */
+	int phase = Feld[x][y] - EL_RECEIVER_START;
+	int blocking_x, blocking_y;
+
+	blocking_x = x + xy[phase][0];
+	blocking_y = y + xy[phase][1];
+
+	if (IN_LEV_FIELD(blocking_x, blocking_y))
+	{
+	  Feld[blocking_x][blocking_y] = EL_EMPTY;
+
+	  DrawField_MM(blocking_x, blocking_y);
+	}
+
+	exit_element = EL_RECEIVER;
+	exit_x = x;
+	exit_y = y;
+      }
+    }
+  }
+
+  if (exit_element != EL_EMPTY)
+    PlayLevelSound_MM(exit_x, exit_y, exit_element, MM_ACTION_OPENING);
+}
+
 static void InitMovDir_MM(int x, int y)
 {
   int element = Feld[x][y];
@@ -683,6 +737,9 @@ void InitGameActions_MM()
 #endif
 
   ScanLaser();
+
+  if (game_mm.kettles_still_needed == 0)
+    CheckExitMM();
 }
 
 void AddLaserEdge(int lx, int ly)
@@ -1474,44 +1531,7 @@ boolean HitElement(int element, int hit_mask)
 
       if (game_mm.kettles_still_needed == 0)
       {
-	int exit_element = (element == EL_KETTLE ? EL_EXIT_OPEN : EL_RECEIVER);
-	int x, y;
-	static int xy[4][2] =
-	{
-	  { +1,  0 },
-	  {  0, -1 },
-	  { -1,  0 },
-	  {  0, +1 }
-	};
-
-	PlayLevelSound_MM(ELX, ELY, exit_element, MM_ACTION_OPENING);
-
-	for (y = 0; y < lev_fieldy; y++)
-	{
-	  for (x = 0; x < lev_fieldx; x++)
-	  {
-	    /* initiate opening animation of exit door */
-	    if (Feld[x][y] == EL_EXIT_CLOSED)
-	      Feld[x][y] = EL_EXIT_OPENING;
-
-	    /* remove field that blocks receiver */
-	    if (IS_RECEIVER(Feld[x][y]))
-	    {
-	      int phase = Feld[x][y] - EL_RECEIVER_START;
-	      int blocking_x, blocking_y;
-
-	      blocking_x = x + xy[phase][0];
-	      blocking_y = y + xy[phase][1];
-
-	      if (IN_LEV_FIELD(blocking_x, blocking_y))
-	      {
-		Feld[blocking_x][blocking_y] = EL_EMPTY;
-
-		DrawField_MM(blocking_x, blocking_y);
-	      }
-	    }
-	  }
-	}
+	CheckExitMM();
 
 	DrawLaser(0, DL_LASER_ENABLED);
       }
