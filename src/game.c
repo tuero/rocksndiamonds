@@ -1002,6 +1002,8 @@ static struct GamePanelControlInfo game_panel_controls[] =
 #define IS_PASSABLE_FROM(e, d)		(IS_PASSABLE(e)   && ACCESS_FROM(e, d))
 #define IS_ACCESSIBLE_FROM(e, d)	(IS_ACCESSIBLE(e) && ACCESS_FROM(e, d))
 
+#define MM_HEALTH(x)		(MIN(MAX(0, MAX_HEALTH - (x)), MAX_HEALTH))
+
 /* game button identifiers */
 #define GAME_CTRL_ID_STOP		0
 #define GAME_CTRL_ID_PAUSE		1
@@ -2205,8 +2207,11 @@ void UpdateGameControlValues()
 		     local_player->gems_still_needed > 0 ||
 		     local_player->sokobanfields_still_needed > 0 ||
 		     local_player->lights_still_needed > 0);
-  int health = (level.game_engine_type == GAME_ENGINE_TYPE_MM ?
-		MIN(MAX(0, 100 - game_mm.laser_overload_value), 100) : 100);
+  int health = (local_player->LevelSolved ?
+		local_player->LevelSolved_CountingHealth :
+		level.game_engine_type == GAME_ENGINE_TYPE_MM ?
+		MM_HEALTH(game_mm.laser_overload_value) :
+		local_player->health);
 
   UpdatePlayfieldElementCount();
 
@@ -3341,6 +3346,9 @@ void InitGame()
     player->score = 0;
     player->score_final = 0;
 
+    player->health = MAX_HEALTH;
+    player->health_final = MAX_HEALTH;
+
     player->gems_still_needed = level.gems_needed;
     player->sokobanfields_still_needed = 0;
     player->lights_still_needed = 0;
@@ -3476,8 +3484,10 @@ void InitGame()
     player->LevelSolved_PanelOff = FALSE;
     player->LevelSolved_SaveTape = FALSE;
     player->LevelSolved_SaveScore = FALSE;
+
     player->LevelSolved_CountingTime = 0;
     player->LevelSolved_CountingScore = 0;
+    player->LevelSolved_CountingHealth = 0;
 
     map_player_action[i] = i;
   }
@@ -4450,20 +4460,27 @@ static void PlayerWins(struct PlayerInfo *player)
 			 level.game_engine_type == GAME_ENGINE_TYPE_MM ?
 			 game_mm.score :
 			 player->score);
+  player->health_final = (level.game_engine_type == GAME_ENGINE_TYPE_MM ?
+			  MM_HEALTH(game_mm.laser_overload_value) :
+			  player->health);
 
   player->LevelSolved_CountingTime = (game.no_time_limit ? TimePlayed :
 				      TimeLeft);
   player->LevelSolved_CountingScore = player->score_final;
+  player->LevelSolved_CountingHealth = player->health_final;
 }
 
 void GameWon()
 {
   static int time, time_final;
   static int score, score_final;
+  static int health, health_final;
   static int game_over_delay_1 = 0;
   static int game_over_delay_2 = 0;
+  static int game_over_delay_3 = 0;
   int game_over_delay_value_1 = 50;
-  int game_over_delay_value_2 = 50;
+  int game_over_delay_value_2 = 25;
+  int game_over_delay_value_3 = 50;
 
   if (!local_player->LevelSolved_GameWon)
   {
@@ -4490,10 +4507,12 @@ void GameWon()
     TapeStop();
 
     game_over_delay_1 = game_over_delay_value_1;
-    game_over_delay_2 = game_over_delay_value_2;
+    game_over_delay_2 = 0;
+    game_over_delay_3 = game_over_delay_value_3;
 
     time = time_final = (game.no_time_limit ? TimePlayed : TimeLeft);
     score = score_final = local_player->score_final;
+    health = health_final = local_player->health_final;
 
     if (TimeLeft > 0)
     {
@@ -4506,7 +4525,16 @@ void GameWon()
       score_final += (999 - TimePlayed) * level.score[SC_TIME_BONUS];
     }
 
+    if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
+    {
+      health_final = 0;
+      score_final += health * level.score[SC_TIME_BONUS];
+
+      game_over_delay_2 = game_over_delay_value_2;
+    }
+
     local_player->score_final = score_final;
+    local_player->health_final = health_final;
 
     if (level_editor_test_game)
     {
@@ -4601,11 +4629,43 @@ void GameWon()
     return;
   }
 
-  local_player->LevelSolved_PanelOff = TRUE;
-
   if (game_over_delay_2 > 0)
   {
     game_over_delay_2--;
+
+    return;
+  }
+
+  if (health != health_final)
+  {
+    int health_count_dir = (health < health_final ? +1 : -1);
+
+    health += health_count_dir;
+    score  += level.score[SC_TIME_BONUS];
+
+    local_player->LevelSolved_CountingHealth = health;
+    local_player->LevelSolved_CountingScore = score;
+
+    game_panel_controls[GAME_PANEL_HEALTH].value = health;
+    game_panel_controls[GAME_PANEL_SCORE].value = score;
+
+    DisplayGameControlValues();
+
+    if (health == health_final)
+      StopSound(SND_GAME_LEVELTIME_BONUS);
+    else if (setup.sound_loops)
+      PlaySoundLoop(SND_GAME_LEVELTIME_BONUS);
+    else
+      PlaySound(SND_GAME_LEVELTIME_BONUS);
+
+    return;
+  }
+
+  local_player->LevelSolved_PanelOff = TRUE;
+
+  if (game_over_delay_3 > 0)
+  {
+    game_over_delay_3--;
 
     return;
   }

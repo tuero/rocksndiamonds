@@ -17,6 +17,8 @@
 
 #define MAX_INVENTORY_SIZE		1000
 
+#define MAX_HEALTH			100
+
 #define STD_NUM_KEYS			4
 #define MAX_NUM_KEYS			8
 
@@ -259,8 +261,10 @@ struct PlayerInfo
   boolean LevelSolved_PanelOff;
   boolean LevelSolved_SaveTape;
   boolean LevelSolved_SaveScore;
+
   int LevelSolved_CountingTime;
   int LevelSolved_CountingScore;
+  int LevelSolved_CountingHealth;
 
   int last_move_dir;
 
@@ -325,6 +329,9 @@ struct PlayerInfo
 
   int score;
   int score_final;
+
+  int health;
+  int health_final;
 
   int gems_still_needed;
   int sokobanfields_still_needed;
