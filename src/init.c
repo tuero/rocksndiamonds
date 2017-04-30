@@ -413,7 +413,7 @@ void InitFontGraphicInfo()
     int special = property_mapping[i].ext3_index;
     int graphic = property_mapping[i].artwork_index;
 
-    if (font_nr < 0)
+    if (font_nr < 0 || font_nr >= NUM_FONTS)
       continue;
 
     if (IS_SPECIAL_GFX_ARG(special))
