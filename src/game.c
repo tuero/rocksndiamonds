@@ -4506,7 +4506,7 @@ void GameWon()
 
     TapeStop();
 
-    game_over_delay_1 = game_over_delay_value_1;
+    game_over_delay_1 = 0;
     game_over_delay_2 = 0;
     game_over_delay_3 = game_over_delay_value_3;
 
@@ -4514,27 +4514,32 @@ void GameWon()
     score = score_final = local_player->score_final;
     health = health_final = local_player->health_final;
 
-    if (TimeLeft > 0)
+    if (level.score[SC_TIME_BONUS] > 0)
     {
-      time_final = 0;
-      score_final += TimeLeft * level.score[SC_TIME_BONUS];
-    }
-    else if (game.no_time_limit && TimePlayed < 999)
-    {
-      time_final = 999;
-      score_final += (999 - TimePlayed) * level.score[SC_TIME_BONUS];
-    }
+      if (TimeLeft > 0)
+      {
+	time_final = 0;
+	score_final += TimeLeft * level.score[SC_TIME_BONUS];
+      }
+      else if (game.no_time_limit && TimePlayed < 999)
+      {
+	time_final = 999;
+	score_final += (999 - TimePlayed) * level.score[SC_TIME_BONUS];
+      }
 
-    if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
-    {
-      health_final = 0;
-      score_final += health * level.score[SC_TIME_BONUS];
+      game_over_delay_1 = game_over_delay_value_1;
 
-      game_over_delay_2 = game_over_delay_value_2;
+      if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
+      {
+	health_final = 0;
+	score_final += health * level.score[SC_TIME_BONUS];
+
+	game_over_delay_2 = game_over_delay_value_2;
+      }
+
+      local_player->score_final = score_final;
+      local_player->health_final = health_final;
     }
-
-    local_player->score_final = score_final;
-    local_player->health_final = health_final;
 
     if (level_editor_test_game)
     {
