@@ -934,32 +934,23 @@ static void StopGlobalAnimSoundAndMusic(struct GlobalAnimPartControlInfo *part)
   StopGlobalAnimMusic(part);
 }
 
-static boolean matchesAnimEventMask(int bits, int mask)
-{
-  return (bits & (mask & ANIM_EVENT_CLICK_ANIM_ALL) &&
-	  bits & (mask & ANIM_EVENT_CLICK_PART_ALL));
-}
-
 static boolean isClickablePart(struct GlobalAnimPartControlInfo *part, int mask)
 {
   struct GraphicInfo *c = &part->control_info;
+  int trigger_mask = ANIM_EVENT_ANIM_MASK | ANIM_EVENT_PART_MASK;
+  int mask_anim_only = mask & ANIM_EVENT_ANIM_MASK;
 
-  boolean clickable_any = FALSE;
-  boolean clickable_self = FALSE;
-  boolean clickable_triggered = FALSE;
-
-  if (mask & ANIM_EVENT_CLICK_ANY)
-    clickable_any = (c->init_event & ANIM_EVENT_CLICK_ANY ||
-		     c->anim_event & ANIM_EVENT_CLICK_ANY);
-
-  if (mask & ANIM_EVENT_CLICK_SELF)
-    clickable_self = (c->init_event & ANIM_EVENT_CLICK_SELF ||
-		      c->anim_event & ANIM_EVENT_CLICK_SELF);
-
-  clickable_triggered = (matchesAnimEventMask(c->init_event, mask) ||
-			 matchesAnimEventMask(c->anim_event, mask));
-
-  return (clickable_any || clickable_self || clickable_triggered);
+  if (mask & ANIM_EVENT_ANY)
+    return (c->init_event & ANIM_EVENT_ANY ||
+	    c->anim_event & ANIM_EVENT_ANY);
+  else if (mask & ANIM_EVENT_SELF)
+    return (c->init_event & ANIM_EVENT_SELF ||
+	    c->anim_event & ANIM_EVENT_SELF);
+  else
+    return ((c->init_event & trigger_mask) == mask ||
+	    (c->anim_event & trigger_mask) == mask ||
+	    (c->init_event & trigger_mask) == mask_anim_only ||
+	    (c->anim_event & trigger_mask) == mask_anim_only);
 }
 
 static boolean isClickedPart(struct GlobalAnimPartControlInfo *part,
@@ -1481,7 +1472,7 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, boolean clicked)
 	if (!part->clickable)
 	  continue;
 
-	if (isClickablePart(part, ANIM_EVENT_CLICK_ANY))
+	if (isClickablePart(part, ANIM_EVENT_ANY))
 	  any_part_clicked = part->clicked = TRUE;
 
 	if (isClickedPart(part, mx, my, clicked))
@@ -1490,18 +1481,16 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, boolean clicked)
 	  printf("::: %d.%d CLICKED\n", anim_nr, part_nr);
 #endif
 
-	  if (isClickablePart(part, ANIM_EVENT_CLICK_SELF))
+	  if (isClickablePart(part, ANIM_EVENT_SELF))
 	    any_part_clicked = part->clicked = TRUE;
 
 	  // check if this click is defined to trigger other animations
-	  int old_anim_nr = part->old_anim_nr;
-	  int old_part_nr = part->old_nr;
-	  int mask = ANIM_EVENT_CLICK_ANIM_1 << old_anim_nr;
+	  int gic_anim_nr = part->old_anim_nr + 1;	// X as in "anim_X"
+	  int gic_part_nr = part->old_nr + 1;		// Y as in "part_Y"
+	  int mask = gic_anim_nr << ANIM_EVENT_ANIM_BIT;
 
-	  if (part->is_base)
-	    mask |= ANIM_EVENT_CLICK_PART_ALL;
-	  else
-	    mask |= ANIM_EVENT_CLICK_PART_1 << old_part_nr;
+	  if (!part->is_base)
+	    mask |= gic_part_nr << ANIM_EVENT_PART_BIT;
 
 	  int anim2_nr;
 

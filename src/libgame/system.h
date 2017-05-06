@@ -324,43 +324,16 @@
 
 #define STYLE_DEFAULT		STYLE_NONE
 
+/* values for special global animation events */
 #define ANIM_EVENT_NONE		0
-#define ANIM_EVENT_CLICK_ANIM_1	(1 << 0)
-#define ANIM_EVENT_CLICK_ANIM_2	(1 << 1)
-#define ANIM_EVENT_CLICK_ANIM_3	(1 << 2)
-#define ANIM_EVENT_CLICK_ANIM_4	(1 << 3)
-#define ANIM_EVENT_CLICK_ANIM_5	(1 << 4)
-#define ANIM_EVENT_CLICK_ANIM_6	(1 << 5)
-#define ANIM_EVENT_CLICK_ANIM_7	(1 << 6)
-#define ANIM_EVENT_CLICK_ANIM_8	(1 << 7)
-#define ANIM_EVENT_CLICK_PART_1	(1 << 8)
-#define ANIM_EVENT_CLICK_PART_2	(1 << 9)
-#define ANIM_EVENT_CLICK_PART_3	(1 << 10)
-#define ANIM_EVENT_CLICK_PART_4	(1 << 11)
-#define ANIM_EVENT_CLICK_PART_5	(1 << 12)
-#define ANIM_EVENT_CLICK_PART_6	(1 << 13)
-#define ANIM_EVENT_CLICK_PART_7	(1 << 14)
-#define ANIM_EVENT_CLICK_PART_8	(1 << 15)
-#define ANIM_EVENT_CLICK_SELF	(1 << 16)
-#define ANIM_EVENT_CLICK_ANY	(1 << 17)
+#define ANIM_EVENT_SELF		(1 << 16)
+#define ANIM_EVENT_ANY		(1 << 17)
 
-#define ANIM_EVENT_CLICK_ANIM_ALL	(ANIM_EVENT_CLICK_ANIM_1 |	\
-                                         ANIM_EVENT_CLICK_ANIM_2 |	\
-                                         ANIM_EVENT_CLICK_ANIM_3 |	\
-                                         ANIM_EVENT_CLICK_ANIM_4 |	\
-                                         ANIM_EVENT_CLICK_ANIM_5 |	\
-                                         ANIM_EVENT_CLICK_ANIM_6 |	\
-                                         ANIM_EVENT_CLICK_ANIM_7 |	\
-                                         ANIM_EVENT_CLICK_ANIM_8)
+#define ANIM_EVENT_ANIM_BIT	0
+#define ANIM_EVENT_PART_BIT	8
 
-#define ANIM_EVENT_CLICK_PART_ALL	(ANIM_EVENT_CLICK_PART_1 |	\
-                                         ANIM_EVENT_CLICK_PART_2 |	\
-                                         ANIM_EVENT_CLICK_PART_3 |	\
-                                         ANIM_EVENT_CLICK_PART_4 |	\
-                                         ANIM_EVENT_CLICK_PART_5 |	\
-                                         ANIM_EVENT_CLICK_PART_6 |	\
-                                         ANIM_EVENT_CLICK_PART_7 |	\
-                                         ANIM_EVENT_CLICK_PART_8)
+#define ANIM_EVENT_ANIM_MASK	(0xff << ANIM_EVENT_ANIM_BIT)
+#define ANIM_EVENT_PART_MASK	(0xff << ANIM_EVENT_PART_BIT)
 
 #define ANIM_EVENT_DEFAULT	ANIM_EVENT_NONE
 
@@ -468,6 +441,10 @@
 
 /* maximum number of levels in a level set */
 #define MAX_LEVELS		1000
+
+/* maximum number of global animation and parts */
+#define MAX_GLOBAL_ANIMS		32
+#define MAX_GLOBAL_ANIM_PARTS		32
 
 /* default name for empty highscore entry */
 #define EMPTY_PLAYER_NAME	"no name"

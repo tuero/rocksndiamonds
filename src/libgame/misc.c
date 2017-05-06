@@ -2655,6 +2655,30 @@ char *get_special_base_token(struct ArtworkListInfo *artwork_info, char *token)
     { "global.anim_6"	},
     { "global.anim_7"	},
     { "global.anim_8"	},
+    { "global.anim_9"	},
+    { "global.anim_10"	},
+    { "global.anim_11"	},
+    { "global.anim_12"	},
+    { "global.anim_13"	},
+    { "global.anim_14"	},
+    { "global.anim_15"	},
+    { "global.anim_16"	},
+    { "global.anim_17"	},
+    { "global.anim_18"	},
+    { "global.anim_19"	},
+    { "global.anim_20"	},
+    { "global.anim_21"	},
+    { "global.anim_22"	},
+    { "global.anim_23"	},
+    { "global.anim_24"	},
+    { "global.anim_25"	},
+    { "global.anim_26"	},
+    { "global.anim_27"	},
+    { "global.anim_28"	},
+    { "global.anim_29"	},
+    { "global.anim_30"	},
+    { "global.anim_31"	},
+    { "global.anim_32"	},
 
     { NULL		}
   };
@@ -2716,25 +2740,6 @@ static boolean string_has_parameter(char *s, char *s_contained)
   return string_has_parameter(substring, s_contained);
 }
 
-static boolean string_has_anim_parameter(char *s, char *s_contained)
-{
-  char *s_copy = getStringCopy(s);
-  boolean has_parameter = FALSE;
-  int len_s_copy = strlen(s_copy);
-  int i;
-
-  // replace all "anim" and "part" numbers with 'X'
-  for (i = 0; i < len_s_copy; i++)
-    if (s_copy[i] >= '1' && s_copy[i] <= '8')
-      s_copy[i] = 'X';
-
-  has_parameter = string_has_parameter(s_copy, s_contained);
-
-  checked_free(s_copy);
-
-  return has_parameter;
-}
-
 int get_anim_parameter_value(char *s)
 {
   char *pattern_1 = "click:anim_";
@@ -2745,47 +2750,61 @@ int get_anim_parameter_value(char *s)
 
   matching_char = strstr(s_ptr, pattern_1);
   if (matching_char == NULL)
-    return result;
+    return ANIM_EVENT_NONE;
 
   s_ptr = matching_char + strlen(pattern_1);
-  if (*s_ptr == '\0')
-    return result;
 
-  // check for "click:anim_X"
-  if (*s_ptr >= '1' && *s_ptr <= '8')
+  // check for main animation number ("anim_X" or "anim_XX")
+  if (*s_ptr >= '0' && *s_ptr <= '9')
   {
-    result |= ANIM_EVENT_CLICK_ANIM_1 << (*s_ptr - '1');
-    s_ptr++;
+    int gic_anim_nr = (*s_ptr++ - '0');
 
-    // check for "click:anim_X.part_X"
-    if (strPrefix(s_ptr, pattern_2))
+    if (*s_ptr >= '0' && *s_ptr <= '9')
+      gic_anim_nr = 10 * gic_anim_nr + (*s_ptr++ - '0');
+
+    if (gic_anim_nr < 1 || gic_anim_nr > MAX_GLOBAL_ANIMS)
+      return ANIM_EVENT_NONE;
+
+    result |= gic_anim_nr << ANIM_EVENT_ANIM_BIT;
+  }
+  else
+  {
+    // invalid main animation number specified
+
+    return ANIM_EVENT_NONE;
+  }
+
+  // check for animation part number ("part_X" or "part_XX") (optional)
+  if (strPrefix(s_ptr, pattern_2))
+  {
+    s_ptr += strlen(pattern_2);
+
+    if (*s_ptr >= '0' && *s_ptr <= '9')
     {
-      s_ptr += strlen(pattern_2);
+      int gic_part_nr = (*s_ptr++ - '0');
 
-      if (*s_ptr >= '1' && *s_ptr <= '8')
-      {
-	result |= ANIM_EVENT_CLICK_PART_1 << (*s_ptr - '1');
-	s_ptr++;
-      }
+      if (*s_ptr >= '0' && *s_ptr <= '9')
+	gic_part_nr = 10 * gic_part_nr + (*s_ptr++ - '0');
+
+      if (gic_part_nr < 1 || gic_part_nr > MAX_GLOBAL_ANIM_PARTS)
+	return ANIM_EVENT_NONE;
+
+      result |= gic_part_nr << ANIM_EVENT_PART_BIT;
     }
     else
     {
-      // no "part_X" specified -- trigger by click on any part
-      result |= ANIM_EVENT_CLICK_PART_ALL;
+      // invalid animation part number specified
+
+      return ANIM_EVENT_NONE;
     }
   }
 
   /* discard result if next character is neither delimiter nor whitespace */
   if (!(*s_ptr == ',' || *s_ptr == '\0' ||
 	*s_ptr == ' ' || *s_ptr == '\t'))
-    return get_anim_parameter_value(s_ptr);
+    return ANIM_EVENT_NONE;
 
-  /* check if string contains another parameter string after a comma */
-  s_ptr = strchr(s_ptr, ',');
-  if (s_ptr == NULL)	/* string does not contain a comma */
-    return result;
-
-  return result | get_anim_parameter_value(s_ptr);
+  return result;
 }
 
 int get_parameter_value(char *value_raw, char *suffix, int type)
@@ -2861,14 +2880,13 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
     result = ANIM_EVENT_DEFAULT;
 
     if (string_has_parameter(value, "any"))
-      result |= ANIM_EVENT_CLICK_ANY;
+      result |= ANIM_EVENT_ANY;
 
     if (string_has_parameter(value, "click"))
-      result |= ANIM_EVENT_CLICK_SELF;
+      result |= ANIM_EVENT_SELF;
 
-    if (string_has_anim_parameter(value, "click:anim_X") ||
-	string_has_anim_parameter(value, "click:anim_X.part_X"))
-      result |= get_anim_parameter_value(value);
+    // add optional "click:anim_X" or "click:anim_X.part_X" parameter
+    result |= get_anim_parameter_value(value);
   }
   else if (strEqual(suffix, ".class"))
   {

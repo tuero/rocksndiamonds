@@ -1773,9 +1773,33 @@
 #define ACTION_PART_6			89
 #define ACTION_PART_7			90
 #define ACTION_PART_8			91
-#define ACTION_OTHER			92
+#define ACTION_PART_9			92
+#define ACTION_PART_10			93
+#define ACTION_PART_11			94
+#define ACTION_PART_12			95
+#define ACTION_PART_13			96
+#define ACTION_PART_14			97
+#define ACTION_PART_15			98
+#define ACTION_PART_16			99
+#define ACTION_PART_17			100
+#define ACTION_PART_18			101
+#define ACTION_PART_19			102
+#define ACTION_PART_20			103
+#define ACTION_PART_21			104
+#define ACTION_PART_22			105
+#define ACTION_PART_23			106
+#define ACTION_PART_24			107
+#define ACTION_PART_25			108
+#define ACTION_PART_26			109
+#define ACTION_PART_27			110
+#define ACTION_PART_28			111
+#define ACTION_PART_29			112
+#define ACTION_PART_30			113
+#define ACTION_PART_31			114
+#define ACTION_PART_32			115
+#define ACTION_OTHER			116
 
-#define NUM_ACTIONS			93
+#define NUM_ACTIONS			117
 
 #define ACTION_BORING_LAST		ACTION_BORING_10
 #define ACTION_SLEEPING_LAST		ACTION_SLEEPING_3
@@ -1983,19 +2007,19 @@
 #define MAX_NUM_TOONS			20
 
 /* values for global animation configuration (must match those from main.c) */
-#define NUM_GLOBAL_ANIMS		8
-#define NUM_GLOBAL_ANIM_PARTS		8
+#define NUM_GLOBAL_ANIMS		MAX_GLOBAL_ANIMS
+#define NUM_GLOBAL_ANIM_PARTS		MAX_GLOBAL_ANIM_PARTS
 #define NUM_GLOBAL_ANIM_PARTS_ALL	(NUM_GLOBAL_ANIM_PARTS + 1)
 #define NUM_GLOBAL_ANIM_TOKENS		(2 * NUM_GLOBAL_ANIMS)
 
 #define GLOBAL_ANIM_ID_GRAPHIC_FIRST	0
-#define GLOBAL_ANIM_ID_GRAPHIC_LAST	7
-#define GLOBAL_ANIM_ID_CONTROL_FIRST	(NUM_GLOBAL_ANIMS + 0)
-#define GLOBAL_ANIM_ID_CONTROL_LAST	(NUM_GLOBAL_ANIMS + 7)
+#define GLOBAL_ANIM_ID_GRAPHIC_LAST	(NUM_GLOBAL_ANIMS - 1)
+#define GLOBAL_ANIM_ID_CONTROL_FIRST	(NUM_GLOBAL_ANIMS)
+#define GLOBAL_ANIM_ID_CONTROL_LAST	(2 * NUM_GLOBAL_ANIMS - 1)
 
 #define GLOBAL_ANIM_ID_PART_FIRST	0
-#define GLOBAL_ANIM_ID_PART_LAST	7
-#define GLOBAL_ANIM_ID_PART_BASE	8
+#define GLOBAL_ANIM_ID_PART_LAST	(NUM_GLOBAL_ANIM_PARTS - 1)
+#define GLOBAL_ANIM_ID_PART_BASE	(NUM_GLOBAL_ANIM_PARTS)
 
 /* values for global border graphics */
 #define IMG_GLOBAL_BORDER_FIRST		IMG_GLOBAL_BORDER
@@ -2831,6 +2855,11 @@ struct FontInfo
   				/* internal bitmap ID for special graphics */
 };
 
+struct GlobalAnimNameInfo
+{
+  char *token_name;		/* global animation token in config files */
+};
+
 struct GlobalAnimInfo
 {
   char *token_name;		/* global animation token in config files */
@@ -3135,6 +3164,7 @@ extern struct SpecialSuffixInfo special_suffix_info[];
 extern struct TokenIntPtrInfo	image_config_vars[];
 extern struct FontInfo		font_info[];
 extern struct GlobalAnimInfo	global_anim_info[];
+extern struct GlobalAnimNameInfo global_anim_name_info[];
 extern struct MusicPrefixInfo	music_prefix_info[];
 extern struct GraphicInfo      *graphic_info;
 extern struct SoundInfo	       *sound_info;

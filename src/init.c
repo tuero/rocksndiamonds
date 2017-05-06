@@ -4722,6 +4722,16 @@ static void InitGlobal()
     element_info[i].editor_description= element_name_info[i].editor_description;
   }
 
+  for (i = 0; i < NUM_GLOBAL_ANIM_TOKENS + 1; i++)
+  {
+    /* check if global_anim_name_info defined for each entry in "main.h" */
+    if (i < NUM_GLOBAL_ANIM_TOKENS &&
+	global_anim_name_info[i].token_name == NULL)
+      Error(ERR_EXIT, "undefined 'global_anim_name_info' entry for anim %d", i);
+
+    global_anim_info[i].token_name = global_anim_name_info[i].token_name;
+  }
+
   /* create hash from image config list */
   image_config_hash = newSetupFileHash();
   for (i = 0; image_config[i].token != NULL; i++)

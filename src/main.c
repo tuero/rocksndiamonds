@@ -5454,6 +5454,30 @@ struct ElementActionInfo element_action_info[NUM_ACTIONS + 1 + 1] =
   { ".part_6",			ACTION_PART_6,			FALSE	},
   { ".part_7",			ACTION_PART_7,			FALSE	},
   { ".part_8",			ACTION_PART_8,			FALSE	},
+  { ".part_9",			ACTION_PART_9,			FALSE	},
+  { ".part_10",			ACTION_PART_10,			FALSE	},
+  { ".part_11",			ACTION_PART_11,			FALSE	},
+  { ".part_12",			ACTION_PART_12,			FALSE	},
+  { ".part_13",			ACTION_PART_13,			FALSE	},
+  { ".part_14",			ACTION_PART_14,			FALSE	},
+  { ".part_15",			ACTION_PART_15,			FALSE	},
+  { ".part_16",			ACTION_PART_16,			FALSE	},
+  { ".part_17",			ACTION_PART_17,			FALSE	},
+  { ".part_18",			ACTION_PART_18,			FALSE	},
+  { ".part_19",			ACTION_PART_19,			FALSE	},
+  { ".part_20",			ACTION_PART_20,			FALSE	},
+  { ".part_21",			ACTION_PART_21,			FALSE	},
+  { ".part_22",			ACTION_PART_22,			FALSE	},
+  { ".part_23",			ACTION_PART_23,			FALSE	},
+  { ".part_24",			ACTION_PART_24,			FALSE	},
+  { ".part_25",			ACTION_PART_25,			FALSE	},
+  { ".part_26",			ACTION_PART_26,			FALSE	},
+  { ".part_27",			ACTION_PART_27,			FALSE	},
+  { ".part_28",			ACTION_PART_28,			FALSE	},
+  { ".part_29",			ACTION_PART_29,			FALSE	},
+  { ".part_30",			ACTION_PART_30,			FALSE	},
+  { ".part_31",			ACTION_PART_31,			FALSE	},
+  { ".part_32",			ACTION_PART_32,			FALSE	},
   { ".other",			ACTION_OTHER,			FALSE	},
 
   /* empty suffix always matches -- check as last entry in InitSoundInfo() */
@@ -5577,7 +5601,10 @@ struct FontInfo font_info[NUM_FONTS + 1] =
   { NULL			}
 };
 
-struct GlobalAnimInfo global_anim_info[NUM_GLOBAL_ANIM_TOKENS + 1] =
+struct GlobalAnimInfo global_anim_info[NUM_GLOBAL_ANIM_TOKENS + 1];
+
+/* this contains predefined structure elements to init "global_anim_info" */
+struct GlobalAnimNameInfo global_anim_name_info[NUM_GLOBAL_ANIM_TOKENS + 1] =
 {
   /* (real) graphic definitions used to define animation graphics */
   { "gfx.global.anim_1",	},
@@ -5588,6 +5615,30 @@ struct GlobalAnimInfo global_anim_info[NUM_GLOBAL_ANIM_TOKENS + 1] =
   { "gfx.global.anim_6",	},
   { "gfx.global.anim_7",	},
   { "gfx.global.anim_8",	},
+  { "gfx.global.anim_9",	},
+  { "gfx.global.anim_10",	},
+  { "gfx.global.anim_11",	},
+  { "gfx.global.anim_12",	},
+  { "gfx.global.anim_13",	},
+  { "gfx.global.anim_14",	},
+  { "gfx.global.anim_15",	},
+  { "gfx.global.anim_16",	},
+  { "gfx.global.anim_17",	},
+  { "gfx.global.anim_18",	},
+  { "gfx.global.anim_19",	},
+  { "gfx.global.anim_20",	},
+  { "gfx.global.anim_21",	},
+  { "gfx.global.anim_22",	},
+  { "gfx.global.anim_23",	},
+  { "gfx.global.anim_24",	},
+  { "gfx.global.anim_25",	},
+  { "gfx.global.anim_26",	},
+  { "gfx.global.anim_27",	},
+  { "gfx.global.anim_28",	},
+  { "gfx.global.anim_29",	},
+  { "gfx.global.anim_30",	},
+  { "gfx.global.anim_31",	},
+  { "gfx.global.anim_32",	},
 
   /* (dummy) graphic definitions used to define animation controls */
   { "global.anim_1",		},
@@ -5598,6 +5649,30 @@ struct GlobalAnimInfo global_anim_info[NUM_GLOBAL_ANIM_TOKENS + 1] =
   { "global.anim_6",		},
   { "global.anim_7",		},
   { "global.anim_8",		},
+  { "global.anim_9",		},
+  { "global.anim_10",		},
+  { "global.anim_11",		},
+  { "global.anim_12",		},
+  { "global.anim_13",		},
+  { "global.anim_14",		},
+  { "global.anim_15",		},
+  { "global.anim_16",		},
+  { "global.anim_17",		},
+  { "global.anim_18",		},
+  { "global.anim_19",		},
+  { "global.anim_20",		},
+  { "global.anim_21",		},
+  { "global.anim_22",		},
+  { "global.anim_23",		},
+  { "global.anim_24",		},
+  { "global.anim_25",		},
+  { "global.anim_26",		},
+  { "global.anim_27",		},
+  { "global.anim_28",		},
+  { "global.anim_29",		},
+  { "global.anim_30",		},
+  { "global.anim_31",		},
+  { "global.anim_32",		},
 
   { NULL			}
 };
