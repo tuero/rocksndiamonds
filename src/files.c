@@ -3995,7 +3995,7 @@ void CopyNativeLevel_RND_to_MM(struct LevelInfo *level)
   strcpy(level_mm->author, level->author);
 
   level_mm->score[SC_PACMAN]     = level->score[SC_PACMAN];
-  level_mm->score[SC_KEY]        = level->score[SC_PACMAN];
+  level_mm->score[SC_KEY]        = level->score[SC_KEY];
   level_mm->score[SC_TIME_BONUS] = level->score[SC_TIME_BONUS];
 
   level_mm->amoeba_speed = level->amoeba_speed;
@@ -4034,7 +4034,7 @@ void CopyNativeLevel_MM_to_RND(struct LevelInfo *level)
     strcpy(level->author, level_mm->author);
 
   level->score[SC_PACMAN]     = level_mm->score[SC_PACMAN];
-  level->score[SC_KEY]        = level_mm->score[SC_PACMAN];
+  level->score[SC_KEY]        = level_mm->score[SC_KEY];
   level->score[SC_TIME_BONUS] = level_mm->score[SC_TIME_BONUS];
 
   level->amoeba_speed = level_mm->amoeba_speed;
