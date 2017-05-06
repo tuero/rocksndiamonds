@@ -4472,6 +4472,7 @@ static void PlayerWins(struct PlayerInfo *player)
 
 void GameWon()
 {
+  static int time_count_steps;
   static int time, time_final;
   static int score, score_final;
   static int health, health_final;
@@ -4526,6 +4527,8 @@ void GameWon()
 	time_final = 999;
 	score_final += (999 - TimePlayed) * level.score[SC_TIME_BONUS];
       }
+
+      time_count_steps = MAX(1, ABS(time_final - time) / 100);
 
       game_over_delay_1 = game_over_delay_value_1;
 
@@ -4611,7 +4614,9 @@ void GameWon()
   {
     int time_to_go = ABS(time_final - time);
     int time_count_dir = (time < time_final ? +1 : -1);
-    int time_count_steps = (time_to_go > 100 && time_to_go % 10 == 0 ? 10 : 1);
+
+    if (time_to_go < time_count_steps)
+      time_count_steps = 1;
 
     time  += time_count_steps * time_count_dir;
     score += time_count_steps * level.score[SC_TIME_BONUS];
