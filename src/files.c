@@ -843,17 +843,17 @@ static struct LevelFileConfigInfo chunk_config_ELEM[] =
     TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
     &li.mm_time_fuse,			0
   },
+  {
+    EL_MM_LIGHTBALL,			-1,
+    TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
+    &li.score[SC_ELEM_BONUS],		10
+  },
 
   /* ---------- unused values ----------------------------------------------- */
 
   {
     EL_UNKNOWN,				SAVE_CONF_NEVER,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
-    &li.score[SC_UNKNOWN_14],		10
-  },
-  {
-    EL_UNKNOWN,				SAVE_CONF_NEVER,
-    TYPE_INTEGER,			CONF_VALUE_16_BIT(2),
     &li.score[SC_UNKNOWN_15],		10
   },
 
@@ -3990,9 +3990,11 @@ void CopyNativeLevel_RND_to_MM(struct LevelInfo *level)
   strcpy(level_mm->name, level->name);
   strcpy(level_mm->author, level->author);
 
+  level_mm->score[SC_EMERALD]    = level->score[SC_EMERALD];
   level_mm->score[SC_PACMAN]     = level->score[SC_PACMAN];
   level_mm->score[SC_KEY]        = level->score[SC_KEY];
   level_mm->score[SC_TIME_BONUS] = level->score[SC_TIME_BONUS];
+  level_mm->score[SC_ELEM_BONUS] = level->score[SC_ELEM_BONUS];
 
   level_mm->amoeba_speed = level->amoeba_speed;
   level_mm->time_fuse = level->mm_time_fuse;
@@ -4025,9 +4027,11 @@ void CopyNativeLevel_MM_to_RND(struct LevelInfo *level)
   if (!strEqual(level_mm->author, ANONYMOUS_NAME))
     strcpy(level->author, level_mm->author);
 
+  level->score[SC_EMERALD]    = level_mm->score[SC_EMERALD];
   level->score[SC_PACMAN]     = level_mm->score[SC_PACMAN];
   level->score[SC_KEY]        = level_mm->score[SC_KEY];
   level->score[SC_TIME_BONUS] = level_mm->score[SC_TIME_BONUS];
+  level->score[SC_ELEM_BONUS] = level_mm->score[SC_ELEM_BONUS];
 
   level->amoeba_speed = level_mm->amoeba_speed;
   level->mm_time_fuse = level_mm->time_fuse;

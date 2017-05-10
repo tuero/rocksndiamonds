@@ -30,6 +30,16 @@
 #define SCORE_COOKIE		"MIRRORMAGIC_SCORE_FILE_VERSION_1.4"
 
 
+int default_score[LEVEL_SCORE_ELEMENTS] =
+{
+  [SC_COLLECTIBLE]	= 10,
+  [SC_PACMAN]		= 50,
+  [SC_KEY]		= 10,
+  [SC_TIME_BONUS]	= 1,
+  [SC_LIGHTBALL]	= 10,
+};
+
+
 /* ========================================================================= */
 /* level file functions                                                      */
 /* ========================================================================= */
@@ -161,6 +171,12 @@ static int LoadLevel_MM_HEAD(File *file, int chunk_size,
 
   for (i = 0; i < LEVEL_SCORE_ELEMENTS; i++)
     level->score[i] = getFile8Bit(file);
+
+  // scores were 0 and hardcoded in game engine in level files up to 2.0.x
+  if (level->file_version <= MM_FILE_VERSION_2_0)
+    for (i = 0; i < LEVEL_SCORE_ELEMENTS; i++)
+      if (level->score[i] == 0)
+	level->score[i] = default_score[i];
 
   level->auto_count_kettles	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
   level->amoeba_speed		= getFile8Bit(file);

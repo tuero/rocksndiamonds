@@ -156,10 +156,29 @@
 #define MAX_SCORE_ENTRIES	100
 #define MAX_ELEMENTS		700		/* 500 static + 200 runtime */
 
-#define LEVEL_SCORE_ELEMENTS	16	/* level elements with score */
-
 #define MICROLEVEL_SCROLL_DELAY	50	/* delay for scrolling micro level */
 #define MICROLEVEL_LABEL_DELAY	250	/* delay for micro level label */
+
+/* score for elements */
+#define SC_COLLECTIBLE		0
+#define SC_UNUSED_1		1
+#define SC_UNUSED_2		2
+#define SC_UNUSED_3		3
+#define SC_UNUSED_4		4
+#define SC_UNUSED_5		5
+#define SC_PACMAN		6
+#define SC_UNUSED_7		7
+#define SC_UNUSED_8		8
+#define SC_KEY			9
+#define SC_TIME_BONUS		10
+#define SC_UNUSED_11		11
+#define SC_UNUSED_12		12
+#define SC_UNUSED_13		13
+#define SC_LIGHTBALL		14
+#define SC_UNUSED_15		15
+
+#define LEVEL_SCORE_ELEMENTS	16	/* level elements with score */
+
 
 struct HiScore_MM
 {

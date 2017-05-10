@@ -92,6 +92,7 @@
 static int MovingOrBlocked2Element_MM(int, int);
 static void Bang_MM(int, int);
 static void RaiseScore_MM(int);
+static void RaiseScoreElement_MM(int);
 static void RemoveMovingField_MM(int, int);
 static void InitMovingField_MM(int, int, int);
 static void ContinueMoving_MM(int, int);
@@ -1527,8 +1528,6 @@ boolean HitElement(int element, int hit_mask)
       if (game_mm.kettles_still_needed > 0)
 	game_mm.kettles_still_needed--;
 
-      RaiseScore_MM(10);
-
       if (game_mm.kettles_still_needed == 0)
       {
 	CheckExitMM();
@@ -1540,15 +1539,12 @@ boolean HitElement(int element, int hit_mask)
     {
       game_mm.num_keys++;
     }
-    else if (element == EL_LIGHTBALL)
-    {
-      RaiseScore_MM(10);
-    }
     else if (IS_PACMAN(element))
     {
       DeletePacMan(ELX, ELY);
-      RaiseScore_MM(50);
     }
+
+    RaiseScoreElement_MM(element);
 
     return FALSE;
   }
@@ -2821,7 +2817,7 @@ void ClickElement(int x, int y, int button)
   else if (element == EL_LIGHTBALL)
   {
     Bang_MM(x, y);
-    RaiseScore_MM(10);
+    RaiseScoreElement_MM(element);
     DrawLaser(0, DL_LASER_ENABLED);
   }
 
@@ -3893,7 +3889,7 @@ void GameWon_MM()
       if (!setup.sound_loops)
 	PlaySoundStereo(SND_SIRR, SOUND_MAX_RIGHT);
       if (TimePlayed < 999 && !(TimePlayed % 10))
-	RaiseScore_MM(native_mm_level.score[SC_ZEITBONUS]);
+	RaiseScore_MM(native_mm_level.score[SC_TIME_BONUS]);
       if (TimePlayed < 900 && !(TimePlayed % 10))
 	TimePlayed += 10;
       else
@@ -4162,11 +4158,24 @@ void RaiseScoreElement_MM(int element)
   switch(element)
   {
     case EL_PACMAN:
+    case EL_PACMAN_RIGHT:
+    case EL_PACMAN_UP:
+    case EL_PACMAN_LEFT:
+    case EL_PACMAN_DOWN:
       RaiseScore_MM(native_mm_level.score[SC_PACMAN]);
       break;
 
     case EL_KEY:
       RaiseScore_MM(native_mm_level.score[SC_KEY]);
+      break;
+
+    case EL_KETTLE:
+    case EL_CELL:
+      RaiseScore_MM(native_mm_level.score[SC_COLLECTIBLE]);
+      break;
+
+    case EL_LIGHTBALL:
+      RaiseScore_MM(native_mm_level.score[SC_LIGHTBALL]);
       break;
 
     default:
