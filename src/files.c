@@ -3976,10 +3976,6 @@ void CopyNativeLevel_RND_to_MM(struct LevelInfo *level)
   struct LevelInfo_MM *level_mm = level->native_mm_level;
   int x, y;
 
-  level_mm->file_version = level->file_version;
-  level_mm->game_version = level->game_version;
-  level_mm->encoding_16bit_field = level->encoding_16bit_field;
-
   level_mm->fieldx = MIN(level->fieldx, MM_MAX_PLAYFIELD_WIDTH);
   level_mm->fieldy = MIN(level->fieldy, MM_MAX_PLAYFIELD_HEIGHT);
 
@@ -4011,10 +4007,6 @@ void CopyNativeLevel_MM_to_RND(struct LevelInfo *level)
 {
   struct LevelInfo_MM *level_mm = level->native_mm_level;
   int x, y;
-
-  level->file_version = level_mm->file_version;
-  level->game_version = level_mm->game_version;
-  level->encoding_16bit_field = level_mm->encoding_16bit_field;
 
   level->fieldx = MIN(level_mm->fieldx, MAX_LEV_FIELDX);
   level->fieldy = MIN(level_mm->fieldy, MAX_LEV_FIELDY);
