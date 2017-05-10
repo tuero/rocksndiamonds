@@ -376,15 +376,18 @@ void DrawVideoDisplayCurrentState()
   {
     state |= VIDEO_STATE_PLAY_ON;
 
-    if (tape.deactivate_display)
-      state |= VIDEO_STATE_WARP2_ON;
-    else if (tape.warp_forward)
-      state |= VIDEO_STATE_WARP_ON;
-    else if (tape.fast_forward)
-      state |= VIDEO_STATE_FFWD_ON;
+    if (!tape.pausing)
+    {
+      if (tape.deactivate_display)
+	state |= VIDEO_STATE_WARP2_ON;
+      else if (tape.warp_forward)
+	state |= VIDEO_STATE_WARP_ON;
+      else if (tape.fast_forward)
+	state |= VIDEO_STATE_FFWD_ON;
 
-    if (tape.pause_before_end)
-      state |= VIDEO_STATE_PBEND_ON;
+      if (tape.pause_before_end)
+	state |= VIDEO_STATE_PBEND_ON;
+    }
   }
 
   // draw labels and symbols separately to prevent labels overlapping symbols
