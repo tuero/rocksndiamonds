@@ -606,6 +606,7 @@ void InitGameEngine_MM()
   game_mm.game_over_cause = 0;
 
   game_mm.laser_overload_value = 0;
+  game_mm.laser_enabled = FALSE;
 
   /* set global laser control values (must be set before "InitLaser()") */
   laser.start_edge.x = 0;
@@ -1329,6 +1330,13 @@ void DrawLaser(int start_edge, int mode)
   {
     DrawLaserExt(start_edge, laser.num_edges - start_edge, mode);
   }
+
+  game_mm.laser_enabled = mode;
+}
+
+void DrawLaser_MM()
+{
+  DrawLaser(0, game_mm.laser_enabled);
 }
 
 boolean HitElement(int element, int hit_mask)

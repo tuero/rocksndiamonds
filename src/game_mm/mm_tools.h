@@ -100,6 +100,7 @@ void DrawMiniElementOrWall_MM(int, int, int, int);
 
 void DrawField_MM(int, int);
 void DrawLevel_MM(void);
+void DrawLaser_MM(void);
 void DrawElement_MM(int, int, int);
 void DrawWallsExt_MM(int, int, int, int);
 void DrawWalls_MM(int, int, int);

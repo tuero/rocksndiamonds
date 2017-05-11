@@ -739,6 +739,7 @@ int el2gfx(int element)
 void RedrawPlayfield_MM()
 {
   DrawLevel_MM();
+  DrawLaser_MM();
 }
 
 void BlitScreenToBitmap_MM(Bitmap *target_bitmap)

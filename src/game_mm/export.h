@@ -151,6 +151,7 @@ struct GameInfo_MM
   boolean cheat_no_explosion;
 
   int laser_overload_value;
+  boolean laser_enabled;
 };
 
 struct LevelInfo_MM
@@ -205,6 +206,8 @@ extern void InitGfxBuffers_MM();
 extern void InitGameEngine_MM();
 extern void InitGameActions_MM();
 extern void GameActions_MM(struct MouseActionInfo, boolean);
+
+extern void DrawLaser_MM();
 
 extern void ClickElement(int, int, int);
 
