@@ -517,6 +517,11 @@ void DrawElement_MM(int x, int y, int element)
 #endif
   else if (element == EL_PACMAN)
     DrawLevelField_MM(x, y);
+  else if (element == EL_FUSE_ON &&
+	   laser.fuse_off &&
+	   laser.fuse_x == x &&
+	   laser.fuse_y == y)
+    DrawGraphic_MM(x, y, IMG_MM_FUSE);
   else
     DrawGraphic_MM(x, y, el2gfx(element));
 }
