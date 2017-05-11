@@ -171,6 +171,9 @@ struct LevelInfo_MM
   int score[MM_LEVEL_SCORE_ELEMENTS];
   int amoeba_speed;
   int time_fuse;
+  int time_bomb;
+  int time_ball;
+  int time_block;
 
   short field[MAX_PLAYFIELD_WIDTH][MAX_PLAYFIELD_HEIGHT];
 };

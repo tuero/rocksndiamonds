@@ -9114,6 +9114,10 @@ static void DrawPropertiesInfo()
 #define TEXT_CRACKING		"Score for cracking"
 #define TEXT_AMOEBA_SPEED	"Speed of amoeba growth"
 #define TEXT_DURATION		"Duration when activated"
+#define TEXT_DELAY_ON		"Delay before activating"
+#define TEXT_DELAY_OFF		"Delay before deactivating"
+#define TEXT_DELAY_EXPLODING	"Delay before exploding"
+#define TEXT_DELAY_MOVING	"Delay before moving"
 #define TEXT_BALL_DELAY		"Element generation delay"
 #define TEXT_MOVE_SPEED		"Speed of android moving"
 #define TEXT_CLONE_SPEED	"Speed of android cloning"
@@ -9239,10 +9243,11 @@ static struct
   { EL_SPRING,		&level.slurp_score,		TEXT_SLURPING	},
   { EL_EMC_LENSES,	&level.lenses_time,		TEXT_DURATION	},
   { EL_EMC_MAGNIFIER,	&level.magnify_time,		TEXT_DURATION	},
-#if 0
-  /* defined, but currently not used in MM engine */
-  { EL_MM_FUSE_ACTIVE,	&level.mm_time_fuse,		TEXT_DURATION	},
-#endif
+  { EL_MM_FUSE_ACTIVE,	&level.mm_time_fuse,		TEXT_DELAY_OFF	},
+  { EL_MM_BOMB,		&level.mm_time_bomb,		TEXT_DELAY_EXPLODING },
+  { EL_MM_GRAY_BALL,	&level.mm_time_ball,		TEXT_DELAY_ON	},
+  { EL_MM_STEEL_BLOCK,	&level.mm_time_block,		TEXT_DELAY_MOVING },
+  { EL_MM_WOODEN_BLOCK,	&level.mm_time_block,		TEXT_DELAY_MOVING },
 
   { -1,			NULL,				NULL		}
 };

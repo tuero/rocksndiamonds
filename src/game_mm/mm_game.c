@@ -3303,7 +3303,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
 
   CT -= Ct;
 
-  if (element == EL_BOMB && CT > 75)
+  if (element == EL_BOMB && CT > native_mm_level.time_bomb)
   {
     if (game_mm.cheat_no_explosion)
       return;
@@ -3341,7 +3341,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
     return;
   }
 
-  if (element == EL_FUSE_ON && CT > 25)
+  if (element == EL_FUSE_ON && CT > native_mm_level.time_fuse)
   {
     laser.fuse_off = TRUE;
     laser.fuse_x = ELX;
@@ -3351,7 +3351,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
     DrawGraphic_MM(ELX, ELY, IMG_MM_FUSE);
   }
 
-  if (element == EL_BALL_GRAY && CT > 75)
+  if (element == EL_BALL_GRAY && CT > native_mm_level.time_ball)
   {
     static int new_elements[] =
     {
@@ -3638,7 +3638,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
   }
 
   if ((element == EL_BLOCK_WOOD || element == EL_BLOCK_STONE) &&
-      laser.stops_inside_element && CT > 75)
+      laser.stops_inside_element && CT > native_mm_level.time_block)
   {
     int x, y;
     int k;

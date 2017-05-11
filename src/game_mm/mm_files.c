@@ -108,7 +108,10 @@ void setLevelInfoToDefaults_MM()
   native_mm_level.kettles_needed = 0;
   native_mm_level.auto_count_kettles = TRUE;
   native_mm_level.amoeba_speed = 0;
-  native_mm_level.time_fuse = 0;
+  native_mm_level.time_fuse = 25;
+  native_mm_level.time_bomb = 75;
+  native_mm_level.time_ball = 75;
+  native_mm_level.time_block = 75;
   native_mm_level.laser_red = FALSE;
   native_mm_level.laser_green = FALSE;
   native_mm_level.laser_blue = TRUE;
@@ -181,6 +184,10 @@ static int LoadLevel_MM_HEAD(File *file, int chunk_size,
   level->auto_count_kettles	= (getFile8Bit(file) == 1 ? TRUE : FALSE);
   level->amoeba_speed		= getFile8Bit(file);
   level->time_fuse		= getFile8Bit(file);
+
+  // fuse time was 0 and hardcoded in game engine in level files up to 2.0.x
+  if (level->file_version <= MM_FILE_VERSION_2_0)
+    level->time_fuse = 25;
 
   laser_color			= getFile8Bit(file);
   level->laser_red		= (laser_color >> 2) & 0x01;

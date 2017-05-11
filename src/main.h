@@ -3061,6 +3061,9 @@ struct LevelInfo
   boolean mm_laser_red, mm_laser_green, mm_laser_blue;
   boolean df_laser_red, df_laser_green, df_laser_blue;
   int mm_time_fuse;
+  int mm_time_bomb;
+  int mm_time_ball;
+  int mm_time_block;
 
   /* ('int' instead of 'boolean' because used as selectbox value in editor) */
   int use_step_counter;		/* count steps instead of seconds for level */

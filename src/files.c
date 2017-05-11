@@ -839,9 +839,24 @@ static struct LevelFileConfigInfo chunk_config_ELEM[] =
   },
 
   {
-    EL_MM_FUSE,				-1,
+    EL_MM_FUSE_ACTIVE,			-1,
     TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
-    &li.mm_time_fuse,			0
+    &li.mm_time_fuse,			25
+  },
+  {
+    EL_MM_BOMB,				-1,
+    TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
+    &li.mm_time_bomb,			75
+  },
+  {
+    EL_MM_GRAY_BALL,			-1,
+    TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
+    &li.mm_time_ball,			75
+  },
+  {
+    EL_MM_STEEL_BLOCK,			-1,
+    TYPE_INTEGER,			CONF_VALUE_16_BIT(1),
+    &li.mm_time_block,			75
   },
   {
     EL_MM_LIGHTBALL,			-1,
@@ -3997,7 +4012,10 @@ void CopyNativeLevel_RND_to_MM(struct LevelInfo *level)
   level_mm->score[SC_ELEM_BONUS] = level->score[SC_ELEM_BONUS];
 
   level_mm->amoeba_speed = level->amoeba_speed;
-  level_mm->time_fuse = level->mm_time_fuse;
+  level_mm->time_fuse    = level->mm_time_fuse;
+  level_mm->time_bomb    = level->mm_time_bomb;
+  level_mm->time_ball    = level->mm_time_ball;
+  level_mm->time_block   = level->mm_time_block;
 
   for (x = 0; x < level->fieldx; x++)
     for (y = 0; y < level->fieldy; y++)
@@ -4033,8 +4051,11 @@ void CopyNativeLevel_MM_to_RND(struct LevelInfo *level)
   level->score[SC_TIME_BONUS] = level_mm->score[SC_TIME_BONUS];
   level->score[SC_ELEM_BONUS] = level_mm->score[SC_ELEM_BONUS];
 
-  level->amoeba_speed = level_mm->amoeba_speed;
-  level->mm_time_fuse = level_mm->time_fuse;
+  level->amoeba_speed  = level_mm->amoeba_speed;
+  level->mm_time_fuse  = level_mm->time_fuse;
+  level->mm_time_bomb  = level_mm->time_bomb;
+  level->mm_time_ball  = level_mm->time_ball;
+  level->mm_time_block = level_mm->time_block;
 
   for (x = 0; x < level->fieldx; x++)
     for (y = 0; y < level->fieldy; y++)
