@@ -12393,8 +12393,6 @@ static void HandleSelectboxGadgets(struct GadgetInfo *gi)
     }
 
     CopyElementPropertiesToGame(properties_element);
-
-    level.changed = TRUE;
   }
   else if (type_id == ED_SELECTBOX_ID_GAME_ENGINE_TYPE)
   {
@@ -12402,6 +12400,12 @@ static void HandleSelectboxGadgets(struct GadgetInfo *gi)
     ReinitializeElementList();
     ModifyEditorElementList();
   }
+
+  /* do not mark level as modified for certain non-level-changing gadgets */
+  if (type_id == ED_SELECTBOX_ID_SELECT_CHANGE_PAGE)
+    return;
+
+  level.changed = TRUE;
 }
 
 static void HandleTextbuttonGadgets(struct GadgetInfo *gi)
