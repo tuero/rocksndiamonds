@@ -12217,6 +12217,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
   /* do not mark level as modified for certain non-level-changing gadgets */
   if ((type_id >= ED_DRAWING_ID_EDITOR_FIRST &&
        type_id <= ED_DRAWING_ID_EDITOR_LAST) ||
+      actual_drawing_function == GADGET_ID_GRAB_BRUSH ||
       actual_drawing_function == GADGET_ID_PICK_ELEMENT)
     return;
 
