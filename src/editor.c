@@ -3658,6 +3658,7 @@ static void HandleControlButtons(struct GadgetInfo *);
 static void HandleDrawingAreaInfo(struct GadgetInfo *);
 static void PrintEditorGadgetInfoText(struct GadgetInfo *);
 static boolean AskToCopyAndModifyLevelTemplate();
+static boolean getDrawModeHiRes();
 
 static int num_editor_gadgets = 0;	/* dynamically determined */
 
@@ -10296,7 +10297,7 @@ static void SetElementSimpleExt(int x, int y, int dx, int dy, int element,
   int sx = x - level_xpos;
   int sy = y - level_ypos;
   int old_element = Feld[x][y];
-  unsigned int new_bitmask = (dx + 1) << (dy * 2);
+  unsigned int new_bitmask = (getDrawModeHiRes() ? (dx + 1) << (dy * 2) : 0x0f);
   boolean draw_masked = FALSE;
 
   if (IS_MM_WALL_EDITOR(element))
@@ -12043,6 +12044,8 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	}
 	else
 	{
+	  SetDrawModeHiRes(new_element);
+
 	  if (new_element == EL_PLAYER_1)
 	  {
 	    /* remove player at old position */
