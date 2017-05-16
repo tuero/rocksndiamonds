@@ -178,6 +178,7 @@ void DrawLevelElement(int, int, int);
 void DrawScreenField(int, int);
 void DrawLevelField(int, int);
 
+void DrawSizedWallParts_MM(int, int, int, int, boolean, int);
 void DrawSizedElement(int, int, int, int);
 void DrawSizedElementThruMask(int, int, int, int);
 void DrawSizedElementOrWall(int, int, int, int, int);

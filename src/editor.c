@@ -10297,6 +10297,7 @@ static void SetElementSimpleExt(int x, int y, int dx, int dy, int element,
   int sx = x - level_xpos;
   int sy = y - level_ypos;
   int old_element = Feld[x][y];
+  int new_element = element;
   unsigned int new_bitmask = (getDrawModeHiRes() ? (dx + 1) << (dy * 2) : 0x0f);
   boolean draw_masked = FALSE;
 
@@ -10325,7 +10326,9 @@ static void SetElementSimpleExt(int x, int y, int dx, int dy, int element,
 
   if (IN_ED_FIELD(sx, sy))
   {
-    if (draw_masked)
+    if (IS_MM_WALL(old_element) && new_element == EL_EMPTY)
+      DrawSizedWallParts_MM(sx, sy, EL_EMPTY, ed_tilesize, FALSE, new_bitmask);
+    else if (draw_masked)
       DrawEditorElementThruMask(sx, sy, element);
     else
       DrawEditorElement(sx, sy, element);

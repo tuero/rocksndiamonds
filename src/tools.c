@@ -2486,12 +2486,14 @@ void DrawLevelField(int x, int y)
 }
 
 static void DrawSizedWallExt_MM(int dst_x, int dst_y, int element, int tilesize,
-				int (*el2img_function)(int), boolean masked)
+				int (*el2img_function)(int), boolean masked,
+				int element_bits_draw)
 {
   int element_base = map_mm_wall_element(element);
   int element_bits = (IS_DF_WALL(element) ?
 		      element - EL_DF_WALL_START :
-		      element - EL_MM_WALL_START) & 0x000f;
+		      IS_MM_WALL(element) ?
+		      element - EL_MM_WALL_START : EL_EMPTY) & 0x000f;
   int graphic = el2img_function(element_base);
   int tilesize_draw = tilesize / 2;
   Bitmap *src_bitmap;
@@ -2504,6 +2506,9 @@ static void DrawSizedWallExt_MM(int dst_x, int dst_y, int element, int tilesize,
   {
     int dst_draw_x = dst_x + (i % 2) * tilesize_draw;
     int dst_draw_y = dst_y + (i / 2) * tilesize_draw;
+
+    if (!(element_bits_draw & (1 << i)))
+      continue;
 
     if (element_bits & (1 << i))
     {
@@ -2523,10 +2528,18 @@ static void DrawSizedWallExt_MM(int dst_x, int dst_y, int element, int tilesize,
   }
 }
 
+void DrawSizedWallParts_MM(int x, int y, int element, int tilesize,
+			   boolean masked, int element_bits_draw)
+{
+  DrawSizedWallExt_MM(SX + x * tilesize, SY + y * tilesize,
+		      element, tilesize, el2edimg, masked, element_bits_draw);
+}
+
 void DrawSizedWall_MM(int dst_x, int dst_y, int element, int tilesize,
 		      int (*el2img_function)(int))
 {
-  DrawSizedWallExt_MM(dst_x, dst_y, element, tilesize, el2img_function, FALSE);
+  DrawSizedWallExt_MM(dst_x, dst_y, element, tilesize, el2img_function, FALSE,
+		      0x000f);
 }
 
 void DrawSizedElementExt(int x, int y, int element, int tilesize,
@@ -2535,7 +2548,7 @@ void DrawSizedElementExt(int x, int y, int element, int tilesize,
   if (IS_MM_WALL(element))
   {
     DrawSizedWallExt_MM(SX + x * tilesize, SY + y * tilesize,
-			element, tilesize, el2edimg, masked);
+			element, tilesize, el2edimg, masked, 0x000f);
   }
   else
   {
