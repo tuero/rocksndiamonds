@@ -4198,6 +4198,8 @@ void DrawHallOfFame(int highlight_position)
 
   if (highlight_position < 0) 
     LoadScore(level_nr);
+  else
+    SetAnimStatus(GAME_MODE_PSEUDO_SCORESNEW);
 
   FadeSetEnterScreen();
 

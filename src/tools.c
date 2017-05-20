@@ -8547,6 +8547,8 @@ void SetAnimStatus(int anim_status_new)
 {
   if (anim_status_new == GAME_MODE_MAIN)
     anim_status_new = GAME_MODE_PSEUDO_MAINONLY;
+  else if (anim_status_new == GAME_MODE_SCORES)
+    anim_status_new = GAME_MODE_PSEUDO_SCORESOLD;
 
   global.anim_status_next = anim_status_new;
 
