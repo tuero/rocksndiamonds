@@ -107,6 +107,21 @@ void InitScoresInfo()
   program.global_scores = directoryExists(global_scores_dir);
   program.many_scores_per_name = !program.global_scores;
 
+  if (options.debug)
+  {
+    if (program.global_scores)
+    {
+      Error(ERR_DEBUG, "Using global, multi-user scores directory '%s'.",
+	    global_scores_dir);
+      Error(ERR_DEBUG, "Remove to enable single-user scores directory.");
+      Error(ERR_DEBUG, "(This enables multipe score entries per user.)");
+    }
+    else
+    {
+      Error(ERR_DEBUG, "Using private, single-user scores directory.");
+    }
+  }
+
   free(global_scores_dir);
 }
 
