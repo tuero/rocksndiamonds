@@ -82,6 +82,11 @@ LOCAL_SRC_FILES := $(SDL_PATH)/src/main/android/SDL_android_main.c \
 	game_sp/SnikSnaks.c		\
 	game_sp/Sound.c			\
 	game_sp/Zonk.c			\
+	game_mm/mm_init.c		\
+	game_mm/mm_main.c		\
+	game_mm/mm_game.c		\
+	game_mm/mm_files.c		\
+	game_mm/mm_tools.c		\
 	main.c				\
 	conf_gfx.c			\
 	conf_snd.c			\
