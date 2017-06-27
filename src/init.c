@@ -6074,10 +6074,10 @@ void OpenAll()
   Error(ERR_DEBUG, "::: SDL_AndroidGetExternalStoragePath() == '%s'",
 	SDL_AndroidGetExternalStoragePath());
   Error(ERR_DEBUG, "::: SDL_AndroidGetExternalStorageState() == '%s'",
-	(SDL_AndroidGetExternalStorageState() ==
-	 SDL_ANDROID_EXTERNAL_STORAGE_READ ? "read" :
-	 SDL_AndroidGetExternalStorageState() ==
-	 SDL_ANDROID_EXTERNAL_STORAGE_WRITE ? "write" : "not available"));
+	(SDL_AndroidGetExternalStorageState() &
+	 SDL_ANDROID_EXTERNAL_STORAGE_WRITE ? "writable" :
+	 SDL_AndroidGetExternalStorageState() &
+	 SDL_ANDROID_EXTERNAL_STORAGE_READ ? "readable" : "not available"));
 #endif
 #endif
 }
