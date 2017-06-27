@@ -4146,9 +4146,9 @@ void DrawChooseLevelNr()
 		 LevelStats_getSolved(i) ? FC_GREEN :
 		 LevelStats_getPlayed(i) ? FC_YELLOW : FC_RED);
 
-    sprintf(identifier, "%d", value);
-    sprintf(name, "%03d: %s", value,
-	    (level.no_level_file ? "(no file)" : level.name));
+    snprintf(identifier, sizeof(identifier), "%d", value);
+    snprintf(name, sizeof(name), "%03d: %s", value,
+	     (level.no_level_file ? "(no file)" : level.name));
 
     setString(&ti->identifier, identifier);
     setString(&ti->name, name);
