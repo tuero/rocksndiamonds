@@ -2734,6 +2734,22 @@ void HandleJoystickEvent(Event *event)
   switch(event->type)
   {
 #if defined(TARGET_SDL2)
+    case SDL_CONTROLLERDEVICEADDED:
+#if 1
+      Error(ERR_DEBUG, "SDL_CONTROLLERDEVICEADDED: device %d added",
+	    event->cdevice.which);
+#endif
+      InitJoysticks();
+      break;
+
+    case SDL_CONTROLLERDEVICEREMOVED:
+#if 1
+      Error(ERR_DEBUG, "SDL_CONTROLLERDEVICEREMOVED: device %d removed",
+	    event->cdevice.which);
+#endif
+      InitJoysticks();
+      break;
+
     case SDL_CONTROLLERAXISMOTION:
 #if 1
       Error(ERR_DEBUG, "SDL_CONTROLLERAXISMOTION: device %d, axis %d: %d",
