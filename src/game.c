@@ -1619,7 +1619,6 @@ void GetPlayerConfig()
   setup.sound = (setup.sound_simple || setup.sound_loops || setup.sound_music);
 
   SetAudioMode(setup.sound);
-  InitJoysticks();
 }
 
 int GetElementFromGroupElement(int element)

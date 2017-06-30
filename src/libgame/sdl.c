@@ -2591,16 +2591,42 @@ void SDLHandleWindowManagerEvent(Event *event)
 /* joystick functions                                                        */
 /* ========================================================================= */
 
-static SDL_Joystick *sdl_joystick[MAX_PLAYERS] = { NULL, NULL, NULL, NULL };
-static int sdl_js_axis[MAX_PLAYERS][2]   = { {0, 0}, {0, 0}, {0, 0}, {0, 0} };
-static int sdl_js_button[MAX_PLAYERS][2] = { {0, 0}, {0, 0}, {0, 0}, {0, 0} };
+#if defined(TARGET_SDL2)
+static void *sdl_joystick[MAX_PLAYERS];		// game controller or joystick
+#else
+static SDL_Joystick *sdl_joystick[MAX_PLAYERS];	// only joysticks supported
+#endif
+static int sdl_js_axis_raw[MAX_PLAYERS][2];
+static int sdl_js_axis[MAX_PLAYERS][2];
+static int sdl_js_button[MAX_PLAYERS][2];
+static boolean sdl_is_controller[MAX_PLAYERS];
 
 static boolean SDLOpenJoystick(int nr)
 {
   if (nr < 0 || nr > MAX_PLAYERS)
     return FALSE;
 
-  return ((sdl_joystick[nr] = SDL_JoystickOpen(nr)) == NULL ? FALSE : TRUE);
+#if defined(TARGET_SDL2)
+  sdl_is_controller[nr] = SDL_IsGameController(nr);
+#else
+  sdl_is_controller[nr] = FALSE;
+#endif
+
+#if 1
+  Error(ERR_DEBUG, "opening joystick %d (%s)",
+	nr, (sdl_is_controller[nr] ? "game controller" : "joystick"));
+#endif
+
+#if defined(TARGET_SDL2)
+  if (sdl_is_controller[nr])
+    sdl_joystick[nr] = SDL_GameControllerOpen(nr);
+  else
+    sdl_joystick[nr] = SDL_JoystickOpen(nr);
+#else
+  sdl_joystick[nr] = SDL_JoystickOpen(nr);
+#endif
+
+  return (sdl_joystick[nr] != NULL);
 }
 
 static void SDLCloseJoystick(int nr)
@@ -2608,12 +2634,30 @@ static void SDLCloseJoystick(int nr)
   if (nr < 0 || nr > MAX_PLAYERS)
     return;
 
+#if 1
+  Error(ERR_DEBUG, "closing joystick %d", nr);
+#endif
+
+#if defined(TARGET_SDL2)
+  if (sdl_is_controller[nr])
+    SDL_GameControllerClose(sdl_joystick[nr]);
+  else
+    SDL_JoystickClose(sdl_joystick[nr]);
+#else
   SDL_JoystickClose(sdl_joystick[nr]);
+#endif
 
   sdl_joystick[nr] = NULL;
+
+  sdl_js_axis_raw[nr][0] = -1;
+  sdl_js_axis_raw[nr][1] = -1;
+  sdl_js_axis[nr][0] = 0;
+  sdl_js_axis[nr][1] = 0;
+  sdl_js_button[nr][0] = 0;
+  sdl_js_button[nr][1] = 0;
 }
 
-static boolean SDLCheckJoystickOpened(int nr)
+boolean SDLCheckJoystickOpened(int nr)
 {
   if (nr < 0 || nr > MAX_PLAYERS)
     return FALSE;
@@ -2625,23 +2669,142 @@ static boolean SDLCheckJoystickOpened(int nr)
 #endif
 }
 
+static void setJoystickAxis(int nr, int axis_id_raw, int axis_value)
+{
+#if defined(TARGET_SDL2)
+  int axis_id = (axis_id_raw == SDL_CONTROLLER_AXIS_LEFTX ||
+		 axis_id_raw == SDL_CONTROLLER_AXIS_RIGHTX ? 0 :
+		 axis_id_raw == SDL_CONTROLLER_AXIS_LEFTY ||
+		 axis_id_raw == SDL_CONTROLLER_AXIS_RIGHTY ? 1 : -1);
+#else
+  int axis_id = axis_id_raw % 2;
+#endif
+
+  if (axis_id == -1)
+    return;
+
+  // prevent (slightly jittering, but centered) axis A from resetting axis B
+  if (ABS(axis_value) < JOYSTICK_PERCENT * JOYSTICK_MAX_AXIS_POS / 100 &&
+      axis_id_raw != sdl_js_axis_raw[nr][axis_id])
+    return;
+
+  sdl_js_axis[nr][axis_id] = axis_value;
+  sdl_js_axis_raw[nr][axis_id] = axis_id_raw;
+}
+
+static void setJoystickButton(int nr, int button_id_raw, int button_state)
+{
+#if defined(TARGET_SDL2)
+  int button_id = (button_id_raw == SDL_CONTROLLER_BUTTON_A ||
+		   button_id_raw == SDL_CONTROLLER_BUTTON_X ||
+		   button_id_raw == SDL_CONTROLLER_BUTTON_LEFTSHOULDER ||
+		   button_id_raw == SDL_CONTROLLER_BUTTON_LEFTSTICK ||
+		   button_id_raw == SDL_CONTROLLER_BUTTON_RIGHTSTICK ? 0 :
+		   button_id_raw == SDL_CONTROLLER_BUTTON_B ||
+		   button_id_raw == SDL_CONTROLLER_BUTTON_Y ||
+		   button_id_raw == SDL_CONTROLLER_BUTTON_RIGHTSHOULDER ? 1 :
+		   -1);
+
+  if (button_id_raw == SDL_CONTROLLER_BUTTON_DPAD_LEFT)
+    sdl_js_axis[nr][0] = button_state * JOYSTICK_XLEFT;
+  else if (button_id_raw == SDL_CONTROLLER_BUTTON_DPAD_RIGHT)
+    sdl_js_axis[nr][0] = button_state * JOYSTICK_XRIGHT;
+  else if (button_id_raw == SDL_CONTROLLER_BUTTON_DPAD_UP)
+    sdl_js_axis[nr][1] = button_state * JOYSTICK_YUPPER;
+  else if (button_id_raw == SDL_CONTROLLER_BUTTON_DPAD_DOWN)
+    sdl_js_axis[nr][1] = button_state * JOYSTICK_YLOWER;
+
+  if (button_id_raw == SDL_CONTROLLER_BUTTON_DPAD_LEFT ||
+      button_id_raw == SDL_CONTROLLER_BUTTON_DPAD_RIGHT ||
+      button_id_raw == SDL_CONTROLLER_BUTTON_DPAD_UP ||
+      button_id_raw == SDL_CONTROLLER_BUTTON_DPAD_DOWN)
+    sdl_js_axis_raw[nr][0] = sdl_js_axis_raw[nr][1] = -1;
+#else
+  int button_id = button_id_raw % 2;
+#endif
+
+  if (button_id == -1)
+    return;
+
+  sdl_js_button[nr][button_id] = button_state;
+}
+
 void HandleJoystickEvent(Event *event)
 {
   switch(event->type)
   {
+#if defined(TARGET_SDL2)
+    case SDL_CONTROLLERAXISMOTION:
+#if 1
+      Error(ERR_DEBUG, "SDL_CONTROLLERAXISMOTION: device %d, axis %d: %d",
+	    event->caxis.which, event->caxis.axis, event->caxis.value);
+#endif
+      setJoystickAxis(event->caxis.which,
+		      event->caxis.axis,
+		      event->caxis.value);
+      break;
+
+    case SDL_CONTROLLERBUTTONDOWN:
+#if 1
+      Error(ERR_DEBUG, "SDL_CONTROLLERBUTTONDOWN: device %d, button %d",
+	    event->cbutton.which, event->cbutton.button);
+#endif
+      setJoystickButton(event->cbutton.which,
+			event->cbutton.button,
+			TRUE);
+      break;
+
+    case SDL_CONTROLLERBUTTONUP:
+#if 1
+      Error(ERR_DEBUG, "SDL_CONTROLLERBUTTONUP: device %d, button %d",
+	    event->cbutton.which, event->cbutton.button);
+#endif
+      setJoystickButton(event->cbutton.which,
+			event->cbutton.button,
+			FALSE);
+      break;
+#endif
+
     case SDL_JOYAXISMOTION:
-      if (event->jaxis.axis < 2)
-	sdl_js_axis[event->jaxis.which][event->jaxis.axis]= event->jaxis.value;
+      if (sdl_is_controller[event->jaxis.which])
+	break;
+
+#if 1
+      Error(ERR_DEBUG, "SDL_JOYAXISMOTION: device %d, axis %d: %d",
+	    event->jaxis.which, event->jaxis.axis, event->jaxis.value);
+#endif
+      if (event->jaxis.axis < 4)
+	setJoystickAxis(event->jaxis.which,
+			event->jaxis.axis,
+			event->jaxis.value);
       break;
 
     case SDL_JOYBUTTONDOWN:
-      if (event->jbutton.button < 2)
-	sdl_js_button[event->jbutton.which][event->jbutton.button] = TRUE;
+      if (sdl_is_controller[event->jaxis.which])
+	break;
+
+#if 1
+      Error(ERR_DEBUG, "SDL_JOYBUTTONDOWN: device %d, button %d",
+	    event->jbutton.which, event->jbutton.button);
+#endif
+      if (event->jbutton.button < 4)
+	setJoystickButton(event->jbutton.which,
+			  event->jbutton.button,
+			  TRUE);
       break;
 
     case SDL_JOYBUTTONUP:
-      if (event->jbutton.button < 2)
-	sdl_js_button[event->jbutton.which][event->jbutton.button] = FALSE;
+      if (sdl_is_controller[event->jaxis.which])
+	break;
+
+#if 1
+      Error(ERR_DEBUG, "SDL_JOYBUTTONUP: device %d, button %d",
+	    event->jbutton.which, event->jbutton.button);
+#endif
+      if (event->jbutton.button < 4)
+	setJoystickButton(event->jbutton.which,
+			  event->jbutton.button,
+			  FALSE);
       break;
 
     default:
@@ -2653,19 +2816,60 @@ void SDLInitJoysticks()
 {
   static boolean sdl_joystick_subsystem_initialized = FALSE;
   boolean print_warning = !sdl_joystick_subsystem_initialized;
+#if defined(TARGET_SDL2)
+  char *mappings_file = "gamecontrollerdb.txt";
+  int num_mappings;
+#endif
   int i;
 
   if (!sdl_joystick_subsystem_initialized)
   {
     sdl_joystick_subsystem_initialized = TRUE;
 
+#if defined(TARGET_SDL2)
+    SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
+
+    if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) < 0)
+#else
     if (SDL_InitSubSystem(SDL_INIT_JOYSTICK) < 0)
+#endif
     {
       Error(ERR_EXIT, "SDL_Init() failed: %s", SDL_GetError());
       return;
     }
+
+#if defined(TARGET_SDL2)
+    num_mappings = SDL_GameControllerAddMappingsFromFile(mappings_file);
+
+    if (num_mappings != -1)
+      Error(ERR_INFO, "%d game controller mapping(s) added", num_mappings);
+    else
+      Error(ERR_WARN, "no game controller mappings found");
+
+    Error(ERR_INFO, "%d joystick(s) found:", SDL_NumJoysticks());
+
+    for (i = 0; i < SDL_NumJoysticks(); i++)
+    {
+      const char *name, *type;
+
+      if (SDL_IsGameController(i))
+      {
+	name = SDL_GameControllerNameForIndex(i);
+	type = "game controller";
+      }
+      else
+      {
+	name = SDL_JoystickNameForIndex(i);
+	type = "joystick";
+      }
+
+      Error(ERR_INFO, "- joystick %d (%s): '%s'",
+	    i, type, (name ? name : "(Unknown)"));
+    }
+#endif
   }
 
+  /* assign joysticks from configured to connected joystick for all players */
   for (i = 0; i < MAX_PLAYERS; i++)
   {
     /* get configured joystick for this player */
@@ -2682,26 +2886,19 @@ void SDLInitJoysticks()
 
     /* misuse joystick file descriptor variable to store joystick number */
     joystick.fd[i] = joystick_nr;
+  }
 
-    if (joystick_nr == -1)
-      continue;
-
+  /* now open all connected joysticks (regardless if configured or not) */
+  for (i = 0; i < SDL_NumJoysticks(); i++)
+  {
     /* this allows subsequent calls to 'InitJoysticks' for re-initialization */
-    if (SDLCheckJoystickOpened(joystick_nr))
-      SDLCloseJoystick(joystick_nr);
+    if (SDLCheckJoystickOpened(i))
+      SDLCloseJoystick(i);
 
-    if (!setup.input[i].use_joystick)
-      continue;
-
-    if (!SDLOpenJoystick(joystick_nr))
-    {
-      if (print_warning)
-	Error(ERR_WARN, "cannot open joystick %d", joystick_nr);
-
-      continue;
-    }
-
-    joystick.status = JOYSTICK_ACTIVATED;
+    if (SDLOpenJoystick(i))
+      joystick.status = JOYSTICK_ACTIVATED;
+    else if (print_warning)
+      Error(ERR_WARN, "cannot open joystick %d", i);
   }
 }
 

@@ -247,6 +247,11 @@ void HandleOtherEvents(Event *event)
       break;
 
 #if defined(TARGET_SDL)
+#if defined(TARGET_SDL2)
+    case SDL_CONTROLLERAXISMOTION:
+    case SDL_CONTROLLERBUTTONDOWN:
+    case SDL_CONTROLLERBUTTONUP:
+#endif
     case SDL_JOYAXISMOTION:
     case SDL_JOYBUTTONDOWN:
     case SDL_JOYBUTTONUP:
@@ -1930,23 +1935,30 @@ static int HandleJoystickForAllPlayers()
 {
   int i;
   int result = 0;
+  boolean no_joysticks_configured = TRUE;
+  boolean use_as_joystick_nr = (game_status != GAME_MODE_PLAYING);
+  static byte joy_action_last[MAX_PLAYERS];
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+    if (setup.input[i].use_joystick)
+      no_joysticks_configured = FALSE;
+
+  /* if no joysticks configured, map connected joysticks to players */
+  if (no_joysticks_configured)
+    use_as_joystick_nr = TRUE;
 
   for (i = 0; i < MAX_PLAYERS; i++)
   {
     byte joy_action = 0;
 
-    /*
-    if (!setup.input[i].use_joystick)
-      continue;
-      */
-
-    joy_action = Joystick(i);
+    joy_action = JoystickExt(i, use_as_joystick_nr);
     result |= joy_action;
 
-    if (!setup.input[i].use_joystick)
-      continue;
+    if ((setup.input[i].use_joystick || no_joysticks_configured) &&
+	joy_action != joy_action_last[i])
+      stored_player[i].action = joy_action;
 
-    stored_player[i].action = joy_action;
+    joy_action_last[i] = joy_action;
   }
 
   return result;

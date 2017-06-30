@@ -484,6 +484,7 @@ void SDLHandleWindowManagerEvent(Event *);
 void HandleJoystickEvent(Event *);
 void SDLInitJoysticks(void);
 boolean SDLReadJoystick(int, int *, int *, boolean *, boolean *);
+boolean SDLCheckJoystickOpened(int);
 
 void PrepareFadeBitmap(int);
 

@@ -1413,7 +1413,6 @@ void DrawMainMenu()
   ExpireSoundLoops(FALSE);
 
   KeyboardAutoRepeatOn();
-  ActivateJoystick();
 
   audio.sound_deactivated = FALSE;
 
@@ -4190,7 +4189,6 @@ void DrawHallOfFame(int highlight_position)
 
   /* (this is needed when called from GameEnd() after winning a game) */
   KeyboardAutoRepeatOn();
-  ActivateJoystick();
 
   /* (this is needed when called from GameEnd() after winning a game) */
   SetDrawDeactivationMask(REDRAW_NONE);
@@ -5239,14 +5237,12 @@ static void execSetupChooseMusic()
   DrawSetupScreen();
 }
 
-#if !defined(PLATFORM_ANDROID)
 static void execSetupInput()
 {
   setup_mode = SETUP_MODE_INPUT;
 
   DrawSetupScreen();
 }
-#endif
 
 static void execSetupShortcuts()
 {
@@ -5310,12 +5306,8 @@ static struct TokenInfo setup_info_main[] =
   { TYPE_ENTER_MENU,	execSetupGraphics,	"Graphics"		},
   { TYPE_ENTER_MENU,	execSetupSound,		"Sound & Music"		},
   { TYPE_ENTER_MENU,	execSetupArtwork,	"Custom Artwork"	},
-#if !defined(PLATFORM_ANDROID)
   { TYPE_ENTER_MENU,	execSetupInput,		"Input Devices"		},
   { TYPE_ENTER_MENU,	execSetupTouch,		"Touch Controls"	},
-#else
-  { TYPE_ENTER_MENU,	execSetupTouch,		"Touch Controls"	},
-#endif
   { TYPE_ENTER_MENU,	execSetupShortcuts,	"Key Shortcuts"		},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_LEAVE_MENU,	execExitSetup, 		"Exit"			},
@@ -5956,9 +5948,6 @@ void DrawSetupScreen_Input()
 
   DrawTextSCentered(mSY - SY + 16, FONT_TITLE_1, "Setup Input");
 
-  DrawTextSCentered(SYSIZE - 20, FONT_TITLE_2,
-		    "Joysticks deactivated on this screen");
-
   for (i = 0; setup_info[i].type != 0 && i < MAX_MENU_ENTRIES_ON_SCREEN; i++)
   {
     if (setup_info[i].type & (TYPE_ENTER_MENU|TYPE_ENTER_LIST))
@@ -6030,8 +6019,6 @@ static void drawPlayerSetupInputInfo(int player_nr, boolean active)
   };
   int text_font_nr = (active ? FONT_MENU_1_ACTIVE : FONT_MENU_1);
 
-  InitJoysticks();
-
   custom_key = setup.input[player_nr].key;
 
   DrawText(mSX + 11 * 32, mSY + 2 * 32, int2str(player_nr + 1, 1),
@@ -6045,8 +6032,10 @@ static void drawPlayerSetupInputInfo(int player_nr, boolean active)
   if (setup.input[player_nr].use_joystick)
   {
     char *device_name = setup.input[player_nr].joy.device_name;
-    char *text = joystick_name[getJoystickNrFromDeviceName(device_name)];
-    int font_nr = (joystick.fd[player_nr] < 0 ? FONT_VALUE_OLD : FONT_VALUE_1);
+    int joystick_nr = getJoystickNrFromDeviceName(device_name);
+    boolean joystick_active = CheckJoystickOpened(joystick_nr);
+    char *text = joystick_name[joystick_nr];
+    int font_nr = (joystick_active ? FONT_VALUE_1 : FONT_VALUE_OLD);
 
     DrawText(mSX + 8 * 32, mSY + 3 * 32, text, font_nr);
     DrawText(mSX + 32, mSY + 4 * 32, "Calibrate", text_font_nr);
@@ -6201,10 +6190,7 @@ void HandleSetupScreen_Input(int mx, int my, int dx, int dy, int button)
       else if (y == 2)
       {
 	if (setup.input[input_player_nr].use_joystick)
-	{
-	  InitJoysticks();
 	  CalibrateJoystick(input_player_nr);
-	}
 	else
 	  CustomizeKeyboard(input_player_nr);
       }
@@ -6544,8 +6530,6 @@ void CalibrateJoystick(int player_nr)
 
 void DrawSetupScreen()
 {
-  DeactivateJoystick();
-
   if (setup_mode == SETUP_MODE_INPUT)
     DrawSetupScreen_Input();
   else if (setup_mode == SETUP_MODE_CHOOSE_GAME_SPEED)

@@ -1629,3 +1629,8 @@ boolean ReadJoystick(int nr, int *x, int *y, boolean *b1, boolean *b2)
 {
   return SDLReadJoystick(nr, x, y, b1, b2);
 }
+
+boolean CheckJoystickOpened(int nr)
+{
+  return SDLCheckJoystickOpened(nr);
+}

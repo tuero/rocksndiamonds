@@ -34,21 +34,14 @@
 /* get these values from the program 'js' from the joystick package, */
 /* set JOYSTICK_PERCENT to a threshold appropriate for your joystick */
 
-#if defined(TARGET_SDL)
-#define JOYSTICK_XLEFT		-32767
+#define JOYSTICK_MAX_AXIS_POS	32767
+
+#define JOYSTICK_XLEFT		-JOYSTICK_MAX_AXIS_POS
 #define JOYSTICK_XMIDDLE	0
-#define JOYSTICK_XRIGHT		32767
-#define JOYSTICK_YUPPER		-32767
+#define JOYSTICK_XRIGHT		+JOYSTICK_MAX_AXIS_POS
+#define JOYSTICK_YUPPER		-JOYSTICK_MAX_AXIS_POS
 #define JOYSTICK_YMIDDLE	0
-#define JOYSTICK_YLOWER		32767
-#else
-#define JOYSTICK_XLEFT		1
-#define JOYSTICK_XMIDDLE	128
-#define JOYSTICK_XRIGHT		255
-#define JOYSTICK_YUPPER		1
-#define JOYSTICK_YMIDDLE	128
-#define JOYSTICK_YLOWER		255
-#endif
+#define JOYSTICK_YLOWER		+JOYSTICK_MAX_AXIS_POS
 
 #define JOYSTICK_PERCENT	25
 
@@ -77,6 +70,7 @@ char *getDeviceNameFromJoystickNr(int);
 
 void CheckJoystickData(void);
 int Joystick(int);
+int JoystickExt(int, boolean);
 int JoystickButton(int);
 int AnyJoystick(void);
 int AnyJoystickButton(void);

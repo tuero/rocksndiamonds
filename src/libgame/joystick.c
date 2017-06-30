@@ -159,7 +159,7 @@ void CheckJoystickData()
   }
 }
 
-int Joystick(int player_nr)
+int JoystickExt(int player_nr, boolean use_as_joystick_nr)
 {
   int joystick_fd = joystick.fd[player_nr];
   int js_x, js_y;
@@ -167,10 +167,13 @@ int Joystick(int player_nr)
   int left, right, up, down;
   int result = JOY_NO_ACTION;
 
+  if (use_as_joystick_nr)
+    joystick_fd = player_nr;
+
   if (joystick.status != JOYSTICK_ACTIVATED)
     return JOY_NO_ACTION;
 
-  if (joystick_fd < 0 || !setup.input[player_nr].use_joystick)
+  if (joystick_fd < 0)
     return JOY_NO_ACTION;
 
   if (!ReadJoystick(joystick_fd, &js_x, &js_y, &js_b1, &js_b2))
@@ -208,10 +211,15 @@ int Joystick(int player_nr)
   return result;
 }
 
-int JoystickButton(int player_nr)
+int Joystick(int player_nr)
+{
+  return JoystickExt(player_nr, FALSE);
+}
+
+int JoystickButtonExt(int player_nr, boolean use_as_joystick_nr)
 {
   static int last_joy_button[MAX_PLAYERS] = { 0, 0, 0, 0 };
-  int joy_button = (Joystick(player_nr) & JOY_BUTTON);
+  int joy_button = (JoystickExt(player_nr, use_as_joystick_nr) & JOY_BUTTON);
   int result;
 
   if (joy_button)
@@ -233,13 +241,18 @@ int JoystickButton(int player_nr)
   return result;
 }
 
+int JoystickButton(int player_nr)
+{
+  return JoystickButtonExt(player_nr, FALSE);
+}
+
 int AnyJoystick()
 {
   int i;
   int result = 0;
 
   for (i = 0; i < MAX_PLAYERS; i++)
-    result |= Joystick(i);
+    result |= JoystickExt(i, TRUE);
 
   return result;
 }
@@ -251,7 +264,7 @@ int AnyJoystickButton()
 
   for (i = 0; i < MAX_PLAYERS; i++)
   {
-    result = JoystickButton(i);
+    result = JoystickButtonExt(i, TRUE);
     if (result != JOY_BUTTON_NOT_PRESSED)
       break;
   }
