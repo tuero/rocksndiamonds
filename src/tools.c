@@ -3939,6 +3939,34 @@ static int RequestHandleEvents(unsigned int req_state)
 	    ClearPlayerAction();
 	    break;
 
+#if defined(TARGET_SDL2)
+	  case SDL_CONTROLLERBUTTONDOWN:
+	    switch (event.cbutton.button)
+	    {
+	      case SDL_CONTROLLER_BUTTON_A:
+	      case SDL_CONTROLLER_BUTTON_X:
+	      case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
+		result = 1;
+		break;
+
+	      case SDL_CONTROLLER_BUTTON_B:
+	      case SDL_CONTROLLER_BUTTON_Y:
+	      case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
+	      case SDL_CONTROLLER_BUTTON_BACK:
+		result = 0;
+		break;
+	    }
+
+	    if (req_state & REQ_PLAYER)
+	      result = 0;
+
+	    break;
+
+	  case SDL_CONTROLLERBUTTONUP:
+	    ClearPlayerAction();
+	    break;
+#endif
+
 	  default:
 	    HandleOtherEvents(&event);
 	    break;

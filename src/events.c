@@ -248,11 +248,13 @@ void HandleOtherEvents(Event *event)
 
 #if defined(TARGET_SDL)
 #if defined(TARGET_SDL2)
+    case SDL_CONTROLLERBUTTONDOWN:
+    case SDL_CONTROLLERBUTTONUP:
+      HandleSpecialGameControllerButtons(event);
+      /* FALL THROUGH */
     case SDL_CONTROLLERDEVICEADDED:
     case SDL_CONTROLLERDEVICEREMOVED:
     case SDL_CONTROLLERAXISMOTION:
-    case SDL_CONTROLLERBUTTONDOWN:
-    case SDL_CONTROLLERBUTTONUP:
 #endif
     case SDL_JOYAXISMOTION:
     case SDL_JOYBUTTONDOWN:
@@ -350,6 +352,12 @@ void ClearEventQueue()
 	ClearPlayerAction();
 	break;
 
+#if defined(TARGET_SDL2)
+      case SDL_CONTROLLERBUTTONUP:
+	ClearPlayerAction();
+	break;
+#endif
+
       default:
 	HandleOtherEvents(&event);
 	break;
@@ -388,6 +396,12 @@ void SleepWhileUnmapped()
       case EVENT_KEYRELEASE:
 	key_joystick_mapping = 0;
 	break;
+
+#if defined(TARGET_SDL2)
+      case SDL_CONTROLLERBUTTONUP:
+	key_joystick_mapping = 0;
+	break;
+#endif
 
       case EVENT_MAPNOTIFY:
 	window_unmapped = FALSE;
@@ -2031,9 +2045,39 @@ void HandleJoystick()
 	return;
       }
 
+      if (tape.recording && tape.pausing)
+      {
+	if (joystick & JOY_ACTION)
+	  TapeTogglePause(TAPE_TOGGLE_MANUAL);
+      }
+
       break;
 
     default:
       break;
   }
+}
+
+void HandleSpecialGameControllerButtons(Event *event)
+{
+#if defined(TARGET_SDL2)
+  switch (event->type)
+  {
+    case SDL_CONTROLLERBUTTONDOWN:
+      if (event->cbutton.button == SDL_CONTROLLER_BUTTON_START)
+	HandleKey(KSYM_space, KEY_PRESSED);
+      else if (event->cbutton.button == SDL_CONTROLLER_BUTTON_BACK)
+	HandleKey(KSYM_Escape, KEY_PRESSED);
+
+      break;
+
+    case SDL_CONTROLLERBUTTONUP:
+      if (event->cbutton.button == SDL_CONTROLLER_BUTTON_START)
+	HandleKey(KSYM_space, KEY_RELEASED);
+      else if (event->cbutton.button == SDL_CONTROLLER_BUTTON_BACK)
+	HandleKey(KSYM_Escape, KEY_RELEASED);
+
+      break;
+  }
+#endif
 }
