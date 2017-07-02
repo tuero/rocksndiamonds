@@ -2010,10 +2010,23 @@ void HandleJoystick()
     case GAME_MODE_INFO:
     {
       static unsigned int joystickmove_delay = 0;
+      static unsigned int joystickmove_delay_value = GADGET_FRAME_DELAY;
+      static int joystick_last = 0;
 
       if (joystick && !button &&
-	  !DelayReached(&joystickmove_delay, GADGET_FRAME_DELAY))
+	  !DelayReached(&joystickmove_delay, joystickmove_delay_value))
+      {
+	/* delay joystick actions if buttons/axes continually pressed */
 	newbutton = dx = dy = 0;
+      }
+      else
+      {
+	/* start with longer delay, then continue with shorter delay */
+	if (joystick != joystick_last)
+	  joystickmove_delay_value = GADGET_FRAME_DELAY_FIRST;
+	else
+	  joystickmove_delay_value = GADGET_FRAME_DELAY;
+      }
 
       if (game_status == GAME_MODE_TITLE)
 	HandleTitleScreen(0,0,dx,dy, newbutton ? MB_MENU_CHOICE : MB_MENU_MARK);
@@ -2027,6 +2040,9 @@ void HandleJoystick()
 	HandleSetupScreen(0,0,dx,dy, newbutton ? MB_MENU_CHOICE : MB_MENU_MARK);
       else if (game_status == GAME_MODE_INFO)
 	HandleInfoScreen(0,0,dx,dy, newbutton ? MB_MENU_CHOICE : MB_MENU_MARK);
+
+      joystick_last = joystick;
+
       break;
     }
 
