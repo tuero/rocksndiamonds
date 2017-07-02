@@ -3887,16 +3887,16 @@ static int RequestHandleEvents(unsigned int req_state)
 	  }
 
 #if defined(TARGET_SDL2)
-      case SDL_WINDOWEVENT:
-	HandleWindowEvent((WindowEvent *) &event);
-	break;
+	  case SDL_WINDOWEVENT:
+	    HandleWindowEvent((WindowEvent *) &event);
+	    break;
 
-      case SDL_APP_WILLENTERBACKGROUND:
-      case SDL_APP_DIDENTERBACKGROUND:
-      case SDL_APP_WILLENTERFOREGROUND:
-      case SDL_APP_DIDENTERFOREGROUND:
-	HandlePauseResumeEvent((PauseResumeEvent *) &event);
-	break;
+	  case SDL_APP_WILLENTERBACKGROUND:
+	  case SDL_APP_DIDENTERBACKGROUND:
+	  case SDL_APP_WILLENTERFOREGROUND:
+	  case SDL_APP_DIDENTERFOREGROUND:
+	    HandlePauseResumeEvent((PauseResumeEvent *) &event);
+	    break;
 #endif
 
 	  case EVENT_KEYPRESS:
