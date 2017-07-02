@@ -3963,6 +3963,7 @@ static int RequestHandleEvents(unsigned int req_state)
 	    break;
 
 	  case SDL_CONTROLLERBUTTONUP:
+	    HandleJoystickEvent(&event);
 	    ClearPlayerAction();
 	    break;
 #endif

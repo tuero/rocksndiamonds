@@ -354,6 +354,7 @@ void ClearEventQueue()
 
 #if defined(TARGET_SDL2)
       case SDL_CONTROLLERBUTTONUP:
+	HandleJoystickEvent(&event);
 	ClearPlayerAction();
 	break;
 #endif
@@ -399,6 +400,7 @@ void SleepWhileUnmapped()
 
 #if defined(TARGET_SDL2)
       case SDL_CONTROLLERBUTTONUP:
+	HandleJoystickEvent(&event);
 	key_joystick_mapping = 0;
 	break;
 #endif
