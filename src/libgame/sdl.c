@@ -2913,8 +2913,8 @@ void SDLInitJoysticks()
       joystick_nr = -1;
     }
 
-    /* misuse joystick file descriptor variable to store joystick number */
-    joystick.fd[i] = joystick_nr;
+    /* store configured joystick number for each player */
+    joystick.nr[i] = joystick_nr;
   }
 
   /* now open all connected joysticks (regardless if configured or not) */

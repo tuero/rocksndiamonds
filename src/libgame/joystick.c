@@ -161,22 +161,22 @@ void CheckJoystickData()
 
 int JoystickExt(int player_nr, boolean use_as_joystick_nr)
 {
-  int joystick_fd = joystick.fd[player_nr];
+  int joystick_nr = joystick.nr[player_nr];
   int js_x, js_y;
   boolean js_b1, js_b2;
   int left, right, up, down;
   int result = JOY_NO_ACTION;
 
   if (use_as_joystick_nr)
-    joystick_fd = player_nr;
+    joystick_nr = player_nr;
 
   if (joystick.status != JOYSTICK_ACTIVATED)
     return JOY_NO_ACTION;
 
-  if (joystick_fd < 0)
+  if (joystick_nr < 0)
     return JOY_NO_ACTION;
 
-  if (!ReadJoystick(joystick_fd, &js_x, &js_y, &js_b1, &js_b2))
+  if (!ReadJoystick(joystick_nr, &js_x, &js_y, &js_b1, &js_b2))
   {
     Error(ERR_WARN, "cannot read joystick device '%s'",
 	  setup.input[player_nr].joy.device_name);

@@ -1620,7 +1620,7 @@ void InitJoysticks()
   /* always start with reliable default values */
   joystick.status = JOYSTICK_NOT_AVAILABLE;
   for (i = 0; i < MAX_PLAYERS; i++)
-    joystick.fd[i] = -1;		/* joystick device closed */
+    joystick.nr[i] = -1;		/* no joystick configured */
 
   SDLInitJoysticks();
 }

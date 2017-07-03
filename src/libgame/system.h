@@ -947,7 +947,7 @@ struct OverlayInfo
 struct JoystickInfo
 {
   int status;
-  int fd[MAX_PLAYERS];		/* file descriptor of player's joystick */
+  int nr[MAX_PLAYERS];		/* joystick number for each player */
 };
 
 struct SetupJoystickInfo
