@@ -6345,7 +6345,10 @@ static boolean CalibrateJoystickMain(int player_nr)
   int new_joystick_ylower = JOYSTICK_YMIDDLE;
   int new_joystick_xmiddle, new_joystick_ymiddle;
 
-  int joystick_fd = joystick.fd[player_nr];
+  char *device_name = setup.input[player_nr].joy.device_name;
+  int joystick_nr = getJoystickNrFromDeviceName(device_name);
+  boolean joystick_active = CheckJoystickOpened(joystick_nr);
+
   int x, y, last_x, last_y, xpos = 8, ypos = 3;
   boolean check[3][3];
   int check_remaining = 3 * 3;
@@ -6356,7 +6359,7 @@ static boolean CalibrateJoystickMain(int player_nr)
   if (joystick.status == JOYSTICK_NOT_AVAILABLE)
     return FALSE;
 
-  if (joystick_fd < 0 || !setup.input[player_nr].use_joystick)
+  if (!joystick_active || !setup.input[player_nr].use_joystick)
     return FALSE;
 
   FadeSetEnterMenu();
@@ -6381,12 +6384,12 @@ static boolean CalibrateJoystickMain(int player_nr)
   DrawTextSCentered(mSY - SY + 12 * 32, FONT_TITLE_1, "and");
   DrawTextSCentered(mSY - SY + 13 * 32, FONT_TITLE_1, "press any button!");
 
-  joy_value = Joystick(player_nr);
+  joy_value = JoystickExt(joystick_nr, TRUE);
   last_x = (joy_value & JOY_LEFT ? -1 : joy_value & JOY_RIGHT ? +1 : 0);
   last_y = (joy_value & JOY_UP   ? -1 : joy_value & JOY_DOWN  ? +1 : 0);
 
   /* eventually uncalibrated center position (joystick could be uncentered) */
-  if (!ReadJoystick(joystick_fd, &joy_x, &joy_y, NULL, NULL))
+  if (!ReadJoystick(joystick_nr, &joy_x, &joy_y, NULL, NULL))
     return FALSE;
 
   new_joystick_xmiddle = joy_x;
@@ -6396,7 +6399,8 @@ static boolean CalibrateJoystickMain(int player_nr)
 
   FadeIn(REDRAW_FIELD);
 
-  while (Joystick(player_nr) & JOY_BUTTON);	/* wait for released button */
+  /* wait for potentially still pressed button to be released */
+  while (JoystickExt(joystick_nr, TRUE) & JOY_BUTTON);
 
   while (result < 0)
   {
@@ -6436,7 +6440,7 @@ static boolean CalibrateJoystickMain(int player_nr)
       }
     }
 
-    if (!ReadJoystick(joystick_fd, &joy_x, &joy_y, NULL, NULL))
+    if (!ReadJoystick(joystick_nr, &joy_x, &joy_y, NULL, NULL))
       return FALSE;
 
     new_joystick_xleft  = MIN(new_joystick_xleft,  joy_x);
@@ -6453,7 +6457,7 @@ static boolean CalibrateJoystickMain(int player_nr)
 
     CheckJoystickData();
 
-    joy_value = Joystick(player_nr);
+    joy_value = JoystickExt(joystick_nr, TRUE);
 
     if (joy_value & JOY_BUTTON && check_remaining == 0)
       result = 1;
@@ -6482,14 +6486,14 @@ static boolean CalibrateJoystickMain(int player_nr)
   }
 
   /* calibrated center position (joystick should now be centered) */
-  if (!ReadJoystick(joystick_fd, &joy_x, &joy_y, NULL, NULL))
+  if (!ReadJoystick(joystick_nr, &joy_x, &joy_y, NULL, NULL))
     return FALSE;
 
   new_joystick_xmiddle = joy_x;
   new_joystick_ymiddle = joy_y;
 
   /* wait until the last pressed button was released */
-  while (Joystick(player_nr) & JOY_BUTTON)
+  while (JoystickExt(joystick_nr, TRUE) & JOY_BUTTON)
   {
     if (PendingEvent())		/* got event */
     {
