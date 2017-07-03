@@ -531,6 +531,8 @@
 #define TAPEFILE_EXTENSION	"tape"
 #define SCOREFILE_EXTENSION	"score"
 
+#define GAMECONTROLLER_BASENAME	"gamecontrollerdb.txt"
+
 #define LOG_OUT_BASENAME	"stdout.txt"
 #define LOG_ERR_BASENAME	"stderr.txt"
 

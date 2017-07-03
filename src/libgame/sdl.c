@@ -2833,7 +2833,10 @@ void SDLInitJoysticks()
   static boolean sdl_joystick_subsystem_initialized = FALSE;
   boolean print_warning = !sdl_joystick_subsystem_initialized;
 #if defined(TARGET_SDL2)
-  char *mappings_file = "gamecontrollerdb.txt";
+  char *mappings_file_base = getPath2(options.ro_base_directory,
+				      GAMECONTROLLER_BASENAME);
+  char *mappings_file_user = getPath2(getUserGameDataDir(),
+				      GAMECONTROLLER_BASENAME);
   int num_mappings;
 #endif
   int i;
@@ -2855,14 +2858,24 @@ void SDLInitJoysticks()
     }
 
 #if defined(TARGET_SDL2)
-    num_mappings = SDL_GameControllerAddMappingsFromFile(mappings_file);
+    num_mappings = SDL_GameControllerAddMappingsFromFile(mappings_file_base);
 
     if (num_mappings != -1)
-      Error(ERR_INFO, "%d game controller mapping(s) added", num_mappings);
+      Error(ERR_INFO, "%d game controller base mapping(s) added", num_mappings);
     else
-      Error(ERR_WARN, "no game controller mappings found");
+      Error(ERR_WARN, "no game controller base mappings found");
+
+    num_mappings = SDL_GameControllerAddMappingsFromFile(mappings_file_user);
+
+    if (num_mappings != -1)
+      Error(ERR_INFO, "%d game controller user mapping(s) added", num_mappings);
+    else
+      Error(ERR_WARN, "no game controller user mappings found");
 
     Error(ERR_INFO, "%d joystick(s) found:", SDL_NumJoysticks());
+
+    checked_free(mappings_file_base);
+    checked_free(mappings_file_user);
 
     for (i = 0; i < SDL_NumJoysticks(); i++)
     {
