@@ -6404,7 +6404,7 @@ static boolean CalibrateJoystickMain(int player_nr)
 
   while (result < 0)
   {
-    if (PendingEvent())		/* got event */
+    while (PendingEvent())		/* got event */
     {
       Event event;
 
