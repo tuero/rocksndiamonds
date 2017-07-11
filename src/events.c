@@ -1525,6 +1525,14 @@ void HandleKey(Key key, int key_status)
   int joy = 0;
   int i;
 
+#if defined(TARGET_SDL2)
+  /* map special "play/pause" media key to default key for play/pause actions */
+  if (key == KSYM_PlayPause)
+    key = KSYM_space;
+#endif
+
+  HandleSpecialGameControllerKeys(key, key_status);
+
   if (game_status == GAME_MODE_PLAYING)
   {
     /* only needed for single-step tape recording mode */
@@ -2097,5 +2105,35 @@ void HandleSpecialGameControllerButtons(Event *event)
 
       break;
   }
+#endif
+}
+
+void HandleSpecialGameControllerKeys(Key key, int key_status)
+{
+#if defined(TARGET_SDL2)
+#if defined(KSYM_Rewind) && defined(KSYM_FastForward)
+  int button = SDL_CONTROLLER_BUTTON_INVALID;
+
+  /* map keys to joystick buttons (special hack for Amazon Fire TV remote) */
+  if (key == KSYM_Rewind)
+    button = SDL_CONTROLLER_BUTTON_A;
+  else if (key == KSYM_FastForward || key == KSYM_Menu)
+    button = SDL_CONTROLLER_BUTTON_B;
+
+  if (button != SDL_CONTROLLER_BUTTON_INVALID)
+  {
+    Event event;
+
+    event.type = (key_status == KEY_PRESSED ? SDL_CONTROLLERBUTTONDOWN :
+		  SDL_CONTROLLERBUTTONUP);
+
+    event.cbutton.which = 0;	/* first joystick (Amazon Fire TV remote) */
+    event.cbutton.button = button;
+    event.cbutton.state = (key_status == KEY_PRESSED ? SDL_PRESSED :
+			   SDL_RELEASED);
+
+    HandleJoystickEvent(&event);
+  }
+#endif
 #endif
 }

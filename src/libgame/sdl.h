@@ -201,6 +201,11 @@ struct MouseCursorInfo
 #if defined(TARGET_SDL2)
 #define KSYM_Menu		SDLK_MENU
 #define KSYM_Back		SDLK_AC_BACK
+#define KSYM_PlayPause		SDLK_AUDIOPLAY
+#if defined(PLATFORM_ANDROID)
+#define KSYM_Rewind		SDLK_AUDIORWND
+#define KSYM_FastForward	SDLK_AUDIOFFWD
+#endif
 #endif
 
 #define KSYM_space		SDLK_SPACE
