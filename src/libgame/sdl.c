@@ -2603,7 +2603,7 @@ static boolean sdl_is_controller[MAX_PLAYERS];
 
 static boolean SDLOpenJoystick(int nr)
 {
-  if (nr < 0 || nr > MAX_PLAYERS)
+  if (nr < 0 || nr >= MAX_PLAYERS)
     return FALSE;
 
 #if defined(TARGET_SDL2)
@@ -2631,7 +2631,7 @@ static boolean SDLOpenJoystick(int nr)
 
 static void SDLCloseJoystick(int nr)
 {
-  if (nr < 0 || nr > MAX_PLAYERS)
+  if (nr < 0 || nr >= MAX_PLAYERS)
     return;
 
 #if 1
@@ -2659,7 +2659,7 @@ static void SDLCloseJoystick(int nr)
 
 boolean SDLCheckJoystickOpened(int nr)
 {
-  if (nr < 0 || nr > MAX_PLAYERS)
+  if (nr < 0 || nr >= MAX_PLAYERS)
     return FALSE;
 
 #if defined(TARGET_SDL2)
@@ -2679,6 +2679,9 @@ static void setJoystickAxis(int nr, int axis_id_raw, int axis_value)
 #else
   int axis_id = axis_id_raw % 2;
 #endif
+
+  if (nr < 0 || nr >= MAX_PLAYERS)
+    return;
 
   if (axis_id == -1)
     return;
@@ -2722,6 +2725,9 @@ static void setJoystickButton(int nr, int button_id_raw, int button_state)
 #else
   int button_id = button_id_raw % 2;
 #endif
+
+  if (nr < 0 || nr >= MAX_PLAYERS)
+    return;
 
   if (button_id == -1)
     return;
