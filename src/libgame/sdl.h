@@ -199,6 +199,7 @@ struct MouseCursorInfo
 #define KSYM_Page_Down		SDLK_PAGEDOWN
 
 #if defined(TARGET_SDL2)
+#define KSYM_Select		SDLK_SELECT
 #define KSYM_Menu		SDLK_MENU
 #define KSYM_Back		SDLK_AC_BACK
 #define KSYM_PlayPause		SDLK_AUDIOPLAY

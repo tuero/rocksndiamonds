@@ -3912,6 +3912,7 @@ static int RequestHandleEvents(unsigned int req_state)
 
 	      case KSYM_Return:
 #if defined(TARGET_SDL2)
+	      case KSYM_Select:
 	      case KSYM_Menu:
 #if defined(KSYM_Rewind)
 	      case KSYM_Rewind:		/* for Amazon Fire TV remote */

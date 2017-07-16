@@ -1540,9 +1540,11 @@ void HandleKey(Key key, int key_status)
   int i;
 
 #if defined(TARGET_SDL2)
-  /* map special "play/pause" media key to default key for play/pause actions */
+  /* map special keys (media keys / remote control buttons) to default keys */
   if (key == KSYM_PlayPause)
     key = KSYM_space;
+  else if (key == KSYM_Select)
+    key = KSYM_Return;
 #endif
 
   HandleSpecialGameControllerKeys(key, key_status);

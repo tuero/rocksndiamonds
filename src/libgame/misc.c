@@ -1611,8 +1611,14 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
     { KSYM_Page_Down,	"XK_Page_Down",		"page down" },
 
 #if defined(TARGET_SDL2)
+    { KSYM_Select,	"XK_Select",		"select" },
     { KSYM_Menu,	"XK_Menu",		"menu" },	 /* menu key */
     { KSYM_Back,	"XK_Back",		"back" },	 /* back key */
+    { KSYM_PlayPause,	"XK_PlayPause",		"play/pause" },
+#if defined(PLATFORM_ANDROID)
+    { KSYM_Rewind,	"XK_Rewind",		"rewind" },
+    { KSYM_FastForward,	"XK_FastForward",	"fast forward" },
+#endif
 #endif
 
     /* ASCII 0x20 to 0x40 keys (except numbers) */
