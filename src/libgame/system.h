@@ -941,7 +941,8 @@ struct GfxInfo
 
 struct OverlayInfo
 {
-  boolean active;
+  boolean enabled;		/* overlay generally enabled or disabled */
+  boolean active;		/* overlay activated (depending on game mode) */
 };
 
 struct JoystickInfo
@@ -1469,6 +1470,7 @@ void InitGfxDrawGlobalBorderFunction(void (*draw_global_border_function)(int));
 void InitGfxCustomArtworkInfo();
 void InitGfxOtherSettings();
 void InitOverlayInfo();
+void SetOverlayEnabled(boolean);
 void SetOverlayActive(boolean);
 boolean GetOverlayActive();
 void SetDrawDeactivationMask(int);

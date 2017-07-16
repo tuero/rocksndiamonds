@@ -300,7 +300,18 @@ void InitGfxOtherSettings()
 
 void InitOverlayInfo()
 {
+  overlay.enabled = FALSE;
   overlay.active = FALSE;
+
+#if defined(PLATFORM_ANDROID)
+  if (strEqual(setup.touch.control_type, TOUCH_CONTROL_VIRTUAL_BUTTONS))
+    overlay.enabled = TRUE;
+#endif
+}
+
+void SetOverlayEnabled(boolean enabled)
+{
+  overlay.enabled = enabled;
 }
 
 void SetOverlayActive(boolean active)

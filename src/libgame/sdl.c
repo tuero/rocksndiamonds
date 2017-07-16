@@ -2966,11 +2966,12 @@ static void DrawTouchInputOverlay()
   static int alpha_step = 5;
   static int alpha_last = 0;
   static int alpha = 0;
+  boolean active = (overlay.enabled && overlay.active);
 
-  if (!overlay.active && deactivated)
+  if (!active && deactivated)
     return;
 
-  if (overlay.active)
+  if (active)
   {
     if (alpha < alpha_max)
       alpha = MIN(alpha + alpha_step, alpha_max);

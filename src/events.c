@@ -250,7 +250,11 @@ void HandleOtherEvents(Event *event)
 #if defined(TARGET_SDL2)
     case SDL_CONTROLLERBUTTONDOWN:
     case SDL_CONTROLLERBUTTONUP:
+      // for any game controller button event, disable overlay buttons
+      SetOverlayEnabled(FALSE);
+
       HandleSpecialGameControllerButtons(event);
+
       /* FALL THROUGH */
     case SDL_CONTROLLERDEVICEADDED:
     case SDL_CONTROLLERDEVICEREMOVED:
@@ -667,6 +671,9 @@ void HandleFingerEvent(FingerEvent *event)
     char *key_status_name = (key_status == KEY_RELEASED ? "KEY_RELEASED" :
 			     "KEY_PRESSED");
     int i;
+
+    // for any touch input event, enable overlay buttons (if activated)
+    SetOverlayEnabled(TRUE);
 
     Error(ERR_DEBUG, "::: key '%s' was '%s' [fingerId: %lld]",
 	  getKeyNameFromKey(key), key_status_name, event->fingerId);
@@ -1148,9 +1155,16 @@ void HandleKeyEvent(KeyEvent *event)
 #endif
 
 #if defined(PLATFORM_ANDROID)
-  // always map the "back" button to the "escape" key on Android devices
   if (key == KSYM_Back)
+  {
+    // always map the "back" button to the "escape" key on Android devices
     key = KSYM_Escape;
+  }
+  else
+  {
+    // for any key event other than "back" button, disable overlay buttons
+    SetOverlayEnabled(FALSE);
+  }
 #endif
 
   HandleKeyModState(keymod, key_status);
