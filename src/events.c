@@ -378,6 +378,8 @@ void ClearPlayerAction()
   key_joystick_mapping = 0;
   for (i = 0; i < MAX_PLAYERS; i++)
     stored_player[i].action = 0;
+
+  ClearJoystickState();
 }
 
 void SleepWhileUnmapped()
