@@ -5443,7 +5443,7 @@ static struct TokenInfo setup_info_input[] =
 {
   { TYPE_SWITCH,	NULL,			"Player:"		},
   { TYPE_SWITCH,	NULL,			"Device:"		},
-  { TYPE_ENTER_MENU,	NULL,			""			},
+  { TYPE_SWITCH,	NULL,			""			},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_EMPTY,		NULL,			""			},
@@ -6131,7 +6131,6 @@ void HandleSetupScreen_Input(int mx, int my, int dx, int dy, int button)
     if (dx && choice == 0)
       x = (dx < 0 ? 10 : 12);
     else if ((dx && choice == 1) ||
-	     (dx == +1 && choice == 2) ||
 	     (dx == -1 && choice == pos_end))
       button = MB_MENU_CHOICE;
     else if (dy)
