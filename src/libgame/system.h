@@ -1549,5 +1549,6 @@ boolean CheckCloseWindowEvent(ClientMessageEvent *);
 void InitJoysticks();
 boolean ReadJoystick(int, int *, int *, boolean *, boolean *);
 boolean CheckJoystickOpened(int);
+void ClearJoystickState();
 
 #endif /* SYSTEM_H */

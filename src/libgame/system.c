@@ -1645,3 +1645,8 @@ boolean CheckJoystickOpened(int nr)
 {
   return SDLCheckJoystickOpened(nr);
 }
+
+void ClearJoystickState()
+{
+  SDLClearJoystickState();
+}

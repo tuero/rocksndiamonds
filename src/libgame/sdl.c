@@ -2601,6 +2601,21 @@ static int sdl_js_axis[MAX_PLAYERS][2];
 static int sdl_js_button[MAX_PLAYERS][2];
 static boolean sdl_is_controller[MAX_PLAYERS];
 
+void SDLClearJoystickState()
+{
+  int i, j;
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+  {
+    for (j = 0; j < 2; j++)
+    {
+      sdl_js_axis_raw[i][j] = -1;
+      sdl_js_axis[i][j] = 0;
+      sdl_js_button[i][j] = 0;
+    }
+  }
+}
+
 static boolean SDLOpenJoystick(int nr)
 {
   if (nr < 0 || nr >= MAX_PLAYERS)
@@ -2648,13 +2663,6 @@ static void SDLCloseJoystick(int nr)
 #endif
 
   sdl_joystick[nr] = NULL;
-
-  sdl_js_axis_raw[nr][0] = -1;
-  sdl_js_axis_raw[nr][1] = -1;
-  sdl_js_axis[nr][0] = 0;
-  sdl_js_axis[nr][1] = 0;
-  sdl_js_button[nr][0] = 0;
-  sdl_js_button[nr][1] = 0;
 }
 
 boolean SDLCheckJoystickOpened(int nr)
@@ -2935,6 +2943,8 @@ void SDLInitJoysticks()
     else if (print_warning)
       Error(ERR_WARN, "cannot open joystick %d", i);
   }
+
+  SDLClearJoystickState();
 }
 
 boolean SDLReadJoystick(int nr, int *x, int *y, boolean *b1, boolean *b2)
