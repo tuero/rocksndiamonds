@@ -119,6 +119,39 @@ char *getDeviceNameFromJoystickNr(int joystick_nr)
 	  joystick_device_name[joystick_nr] : "");
 }
 
+char *getFormattedJoystickName(const char *name_raw)
+{
+  static char name[MAX_JOYSTICK_NAME_LEN + 1];
+  boolean name_skip_space = TRUE;
+  int i, j;
+
+  if (name_raw == NULL)
+    name_raw = "(unknown joystick)";
+
+  // copy joystick name, cutting leading and multiple spaces
+  for (i = 0, j = 0; i < strlen(name_raw) && i < MAX_JOYSTICK_NAME_LEN; i++)
+  {
+    if (name_raw[i] != ' ')
+    {
+      name[j++] = name_raw[i];
+      name_skip_space = FALSE;
+    }
+    else if (!name_skip_space)
+    {
+      name[j++] = name_raw[i];
+      name_skip_space = TRUE;
+    }
+  }
+
+  // cut trailing space
+  if (j > 0 && name[j - 1] == ' ')
+    j--;
+
+  name[j] = '\0';
+
+  return name;
+}
+
 static int JoystickPositionPercent(int center, int border, int actual)
 {
   int range, position;

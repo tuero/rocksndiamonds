@@ -6519,17 +6519,21 @@ static boolean OLD_CalibrateJoystickMain(int player_nr)
 static boolean ConfigureJoystickMapButtonsAndAxes(SDL_Joystick *joystick)
 {
 #if defined(TARGET_SDL2)
+  static boolean bitmaps_initialized = FALSE;
+  boolean screen_initialized = FALSE;
   static Bitmap *controller, *button, *axis_x, *axis_y;
   Bitmap *marker;
-  boolean bitmaps_initialized = FALSE;
-  boolean screen_initialized = FALSE;
-  const char *name = NULL;
+  char *name;
   boolean success = TRUE;
   boolean done = FALSE, next = FALSE;
   Event event;
   int alpha = 200, alpha_step = -1;
   int alpha_ticks = 0;
   char mapping[4096], temp[4096];
+  int font_name = FONT_TEXT_1;
+  int font_info = FONT_REQUEST;
+  int ystep1 = getFontHeight(font_name) + 2;
+  int ystep2 = getFontHeight(font_info) + 2;
   int i, j;
 
   struct
@@ -6542,27 +6546,27 @@ static boolean ConfigureJoystickMapButtonsAndAxes(SDL_Joystick *joystick)
   }
   *step, *prev_step, steps[] =
   {
-    { 370, 175, MARKER_BUTTON, "a",		},
-    { 410, 142, MARKER_BUTTON, "b",		},
-    { 334, 145, MARKER_BUTTON, "x",		},
-    { 372, 115, MARKER_BUTTON, "y",		},
-    { 176, 145, MARKER_BUTTON, "back",		},
-    { 230, 145, MARKER_BUTTON, "guide",		},
-    { 285, 145, MARKER_BUTTON, "start",		},
-    { 124, 220, MARKER_BUTTON, "dpleft",	},
-    { 160, 248, MARKER_BUTTON, "dpdown",	},
-    { 192, 220, MARKER_BUTTON, "dpright",	},
-    { 160, 192, MARKER_BUTTON, "dpup",		},
-    {  64,  60, MARKER_BUTTON, "leftshoulder",	},
-    { 102,  10, MARKER_AXIS_Y, "lefttrigger",	},
-    { 396,  60, MARKER_BUTTON, "rightshoulder",	},
-    { 360,  10, MARKER_AXIS_Y, "righttrigger",	},
-    {  87, 161, MARKER_BUTTON, "leftstick",	},
-    { 296, 230, MARKER_BUTTON, "rightstick",	},
-    {  87, 161, MARKER_AXIS_X, "leftx",		},
-    {  87, 161, MARKER_AXIS_Y, "lefty",		},
-    { 296, 230, MARKER_AXIS_X, "rightx",	},
-    { 296, 230, MARKER_AXIS_Y, "righty",	},
+    { 356, 155, MARKER_BUTTON, "a",		},
+    { 396, 122, MARKER_BUTTON, "b",		},
+    { 320, 125, MARKER_BUTTON, "x",		},
+    { 358,  95, MARKER_BUTTON, "y",		},
+    { 162, 125, MARKER_BUTTON, "back",		},
+    { 216, 125, MARKER_BUTTON, "guide",		},
+    { 271, 125, MARKER_BUTTON, "start",		},
+    { 110, 200, MARKER_BUTTON, "dpleft",	},
+    { 146, 228, MARKER_BUTTON, "dpdown",	},
+    { 178, 200, MARKER_BUTTON, "dpright",	},
+    { 146, 172, MARKER_BUTTON, "dpup",		},
+    {  50,  40, MARKER_BUTTON, "leftshoulder",	},
+    {  88, -10, MARKER_AXIS_Y, "lefttrigger",	},
+    { 382,  40, MARKER_BUTTON, "rightshoulder",	},
+    { 346, -10, MARKER_AXIS_Y, "righttrigger",	},
+    {  73, 141, MARKER_BUTTON, "leftstick",	},
+    { 282, 210, MARKER_BUTTON, "rightstick",	},
+    {  73, 141, MARKER_AXIS_X, "leftx",		},
+    {  73, 141, MARKER_AXIS_Y, "lefty",		},
+    { 282, 210, MARKER_AXIS_X, "rightx",	},
+    { 282, 210, MARKER_AXIS_Y, "righty",	},
   };
 
   unsigned int event_frame_delay = 0;
@@ -6580,12 +6584,12 @@ static boolean ConfigureJoystickMapButtonsAndAxes(SDL_Joystick *joystick)
     bitmaps_initialized = TRUE;
   }
 
+  name = getFormattedJoystickName(SDL_JoystickName(joystick));
+
   /* print info about the joystick we are watching */
-  name = SDL_JoystickName(joystick);
-  Error(ERR_DEBUG, "Watching joystick %d: (%s)\n",
-	SDL_JoystickInstanceID(joystick),
-	(name ? name : "(unknown joystick)"));
-  Error(ERR_DEBUG, "Joystick has %d axes, %d hats, %d balls, and %d buttons\n",
+  Error(ERR_DEBUG, "watching joystick %d: (%s)\n",
+	SDL_JoystickInstanceID(joystick), name);
+  Error(ERR_DEBUG, "joystick has %d axes, %d hats, %d balls, and %d buttons\n",
 	SDL_JoystickNumAxes(joystick), SDL_JoystickNumHats(joystick),
 	SDL_JoystickNumBalls(joystick), SDL_JoystickNumButtons(joystick));
 
@@ -6593,7 +6597,7 @@ static boolean ConfigureJoystickMapButtonsAndAxes(SDL_Joystick *joystick)
   SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(joystick), temp, sizeof(temp));
 
   snprintf(mapping, sizeof(mapping), "%s,%s,platform:%s,",
-	   temp, name ? name : "Unknown Joystick", SDL_GetPlatform());
+	   temp, name, SDL_GetPlatform());
 
   /* loop through all steps (buttons and axes), getting joystick events */
   for (i = 0; i < SDL_arraysize(steps) && !done;)
@@ -6627,42 +6631,48 @@ static boolean ConfigureJoystickMapButtonsAndAxes(SDL_Joystick *joystick)
 	alpha_step = 1;
       }
 
-      ClearField();
-
-      DrawTextSCentered(mSY - SY + 22 * 16, FONT_REQUEST,
-			"Press buttons and move axes on");
-      DrawTextSCentered(mSY - SY + 23 * 16, FONT_REQUEST,
-			"your controller when indicated.");
-      DrawTextSCentered(mSY - SY + 24 * 16, FONT_REQUEST,
-			"(Your controller may look different.)");
-
-#if defined(PLATFORM_ANDROID)
-      DrawTextSCentered(mSY - SY + 26 * 16, FONT_REQUEST,
-			"To correct a mistake,");
-      DrawTextSCentered(mSY - SY + 27 * 16, FONT_REQUEST,
-			"press the 'back' button.");
-      DrawTextSCentered(mSY - SY + 28 * 16, FONT_REQUEST,
-			"To skip a button or axis,");
-      DrawTextSCentered(mSY - SY + 29 * 16, FONT_REQUEST,
-			"press the 'menu' button.");
-#else
-      DrawTextSCentered(mSY - SY + 26 * 16, FONT_REQUEST,
-			"To correct a mistake,");
-      DrawTextSCentered(mSY - SY + 27 * 16, FONT_REQUEST,
-			"press the 'backspace' key.");
-      DrawTextSCentered(mSY - SY + 28 * 16, FONT_REQUEST,
-			"To skip a button or axis,");
-      DrawTextSCentered(mSY - SY + 29 * 16, FONT_REQUEST,
-			"press the 'return' key.");
-      DrawTextSCentered(mSY - SY + 30 * 16, FONT_REQUEST,
-			"To exit, press the 'escape' key.");
-#endif
-
-      int controller_x = gfx.sx + (gfx.sxsize - controller->width) / 2;
-      int controller_y = gfx.sy;
+      int controller_x = SX + (SXSIZE - controller->width) / 2;
+      int controller_y = SY + ystep2;
 
       int marker_x = controller_x + step->x;
       int marker_y = controller_y + step->y;
+
+      int ystart1 = mSY - 2 * SY + controller_y + controller->height;
+      int ystart2 = ystart1 + ystep1 + ystep2;
+
+      ClearField();
+
+      DrawTextSCentered(ystart1, font_name, name);
+
+      DrawTextSCentered(ystart2 + 0 * ystep2, font_info,
+			"Press buttons and move axes on");
+      DrawTextSCentered(ystart2 + 1 * ystep2, font_info,
+			"your controller when indicated.");
+      DrawTextSCentered(ystart2 + 2 * ystep2, font_info,
+			"(Your controller may look different.)");
+
+#if defined(PLATFORM_ANDROID)
+      DrawTextSCentered(ystart2 + 4 * ystep2, font_info,
+			"To correct a mistake,");
+      DrawTextSCentered(ystart2 + 5 * ystep2, font_info,
+			"press the 'back' button.");
+      DrawTextSCentered(ystart2 + 6 * ystep2, font_info,
+			"To skip a button or axis,");
+      DrawTextSCentered(ystart2 + 7 * ystep2, font_info,
+			"press the 'menu' button.");
+#else
+      DrawTextSCentered(ystart2 + 4 * ystep2, font_info,
+			"To correct a mistake,");
+      DrawTextSCentered(ystart2 + 5 * ystep2, font_info,
+			"press the 'backspace' key.");
+      DrawTextSCentered(ystart2 + 6 * ystep2, font_info,
+			"To skip a button or axis,");
+      DrawTextSCentered(ystart2 + 7 * ystep2, font_info,
+			"press the 'return' key.");
+
+      DrawTextSCentered(ystart2 + 8 * ystep2, font_info,
+			"To exit, press the 'escape' key.");
+#endif
 
       BlitBitmapMasked(controller, drawto, 0, 0,
 		       controller->width, controller->height,

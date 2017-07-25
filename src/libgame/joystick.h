@@ -21,6 +21,8 @@
 #define JOYSTICK_NOT_CONFIGURED	(1 << 3)
 #define JOYSTICK_ACTIVATED	(JOYSTICK_AVAILABLE | JOYSTICK_ACTIVE)
 
+#define MAX_JOYSTICK_NAME_LEN	40
+
 #if defined(PLATFORM_FREEBSD)
 #define DEV_JOYSTICK_0		"/dev/joy0"
 #define DEV_JOYSTICK_1		"/dev/joy1"
@@ -69,6 +71,7 @@ char *getJoyNameFromJoySymbol(int);
 int getJoySymbolFromJoyName(char *);
 int getJoystickNrFromDeviceName(char *);
 char *getDeviceNameFromJoystickNr(int);
+char *getFormattedJoystickName(const char *);
 
 void CheckJoystickData(void);
 int Joystick(int);
