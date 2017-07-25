@@ -6777,13 +6777,18 @@ static boolean ConfigureJoystickMapButtonsAndAxes(SDL_Joystick *joystick)
 	    if (event.key.keysym.sym == KSYM_BackSpace ||
 		event.key.keysym.sym == KSYM_Back)
 	    {
-	      /* undo this step */
-	      if (i > 0)
+	      if (i == 0)
 	      {
-		prev_step = &steps[--i];
-		strcpy(mapping, prev_step->mapping);
-		next = TRUE;
+		/* leave screen */
+		success = FALSE;
+		done = TRUE;
 	      }
+
+	      /* undo this step */
+	      prev_step = &steps[i - 1];
+	      strcpy(mapping, prev_step->mapping);
+	      i--;
+	      next = TRUE;
 
 	      break;
 	    }
@@ -6801,6 +6806,7 @@ static boolean ConfigureJoystickMapButtonsAndAxes(SDL_Joystick *joystick)
 
 	    if (event.key.keysym.sym == KSYM_Escape)
 	    {
+	      /* leave screen */
 	      success = FALSE;
 	      done = TRUE;
 	    }
