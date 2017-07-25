@@ -6003,10 +6003,10 @@ static void drawPlayerSetupInputInfo(int player_nr, boolean active)
     char *text;
   } custom[] =
   {
-    { &custom_key.left,  "Joystick Left"  },
-    { &custom_key.right, "Joystick Right" },
-    { &custom_key.up,    "Joystick Up"    },
-    { &custom_key.down,  "Joystick Down"  },
+    { &custom_key.left,  "Axis/Pad Left"  },
+    { &custom_key.right, "Axis/Pad Right" },
+    { &custom_key.up,    "Axis/Pad Up"    },
+    { &custom_key.down,  "Axis/Pad Down"  },
     { &custom_key.snap,  "Button 1/A/X"   },
     { &custom_key.drop,  "Button 2/B/Y"   }
   };
