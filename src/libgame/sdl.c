@@ -2965,6 +2965,11 @@ boolean SDLReadJoystick(int nr, int *x, int *y, boolean *b1, boolean *b2)
   return TRUE;
 }
 
+
+/* ========================================================================= */
+/* touch input overlay functions                                             */
+/* ========================================================================= */
+
 #if defined(USE_TOUCH_INPUT_OVERLAY)
 static void DrawTouchInputOverlay()
 {
