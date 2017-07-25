@@ -492,6 +492,8 @@ void SDLInitJoysticks(void);
 boolean SDLReadJoystick(int, int *, int *, boolean *, boolean *);
 boolean SDLCheckJoystickOpened(int);
 void SDLClearJoystickState();
+boolean SDLOpenJoystick(int);
+void SDLCloseJoystick(int);
 
 void PrepareFadeBitmap(int);
 

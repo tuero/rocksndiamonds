@@ -163,7 +163,7 @@ static void HandleScreenGadgets(struct GadgetInfo *);
 static void HandleSetupScreen_Generic(int, int, int, int, int);
 static void HandleSetupScreen_Input(int, int, int, int, int);
 static void CustomizeKeyboard(int);
-static void CalibrateJoystick(int);
+static void ConfigureJoystick(int);
 static void execSetupGame(void);
 static void execSetupGraphics(void);
 static void execSetupSound(void);
@@ -6007,8 +6007,8 @@ static void drawPlayerSetupInputInfo(int player_nr, boolean active)
     { &custom_key.right, "Joystick Right" },
     { &custom_key.up,    "Joystick Up"    },
     { &custom_key.down,  "Joystick Down"  },
-    { &custom_key.snap,  "Button 1"       },
-    { &custom_key.drop,  "Button 2"       }
+    { &custom_key.snap,  "Button 1/A/X"   },
+    { &custom_key.drop,  "Button 2/B/Y"   }
   };
   static char *joystick_name[MAX_PLAYERS] =
   {
@@ -6038,7 +6038,7 @@ static void drawPlayerSetupInputInfo(int player_nr, boolean active)
     int font_nr = (joystick_active ? FONT_VALUE_1 : FONT_VALUE_OLD);
 
     DrawText(mSX + 8 * 32, mSY + 3 * 32, text, font_nr);
-    DrawText(mSX + 32, mSY + 4 * 32, "Calibrate", text_font_nr);
+    DrawText(mSX + 32, mSY + 4 * 32, "Configure", text_font_nr);
   }
   else
   {
@@ -6189,7 +6189,7 @@ void HandleSetupScreen_Input(int mx, int my, int dx, int dy, int button)
       else if (y == 2)
       {
 	if (setup.input[input_player_nr].use_joystick)
-	  CalibrateJoystick(input_player_nr);
+	  ConfigureJoystick(input_player_nr);
 	else
 	  CustomizeKeyboard(input_player_nr);
       }
@@ -6336,7 +6336,8 @@ void CustomizeKeyboard(int player_nr)
   DrawSetupScreen_Input();
 }
 
-static boolean CalibrateJoystickMain(int player_nr)
+#if 0
+static boolean OLD_CalibrateJoystickMain(int player_nr)
 {
   int new_joystick_xleft = JOYSTICK_XMIDDLE;
   int new_joystick_xright = JOYSTICK_XMIDDLE;
@@ -6507,23 +6508,398 @@ static boolean CalibrateJoystickMain(int player_nr)
 
   return TRUE;
 }
+#endif
 
-void CalibrateJoystick(int player_nr)
+/* game controller mapping generator by Gabriel Jacobo <gabomdq@gmail.com> */
+
+#define MARKER_BUTTON		1
+#define MARKER_AXIS_X		2
+#define MARKER_AXIS_Y		3
+
+static boolean ConfigureJoystickMapButtonsAndAxes(SDL_Joystick *joystick)
 {
-  if (!CalibrateJoystickMain(player_nr))
+#if defined(TARGET_SDL2)
+  static Bitmap *controller, *button, *axis_x, *axis_y;
+  Bitmap *marker;
+  boolean bitmaps_initialized = FALSE;
+  boolean screen_initialized = FALSE;
+  const char *name = NULL;
+  boolean success = TRUE;
+  boolean done = FALSE, next = FALSE;
+  Event event;
+  int alpha = 200, alpha_step = -1;
+  int alpha_ticks = 0;
+  char mapping[4096], temp[4096];
+  int i, j;
+
+  struct
   {
+    int x, y;
+    int marker;
+    char *field;
+    int axis, button, hat, hat_value;
+    char mapping[4096];
+  }
+  *step, *prev_step, steps[] =
+  {
+    { 370, 175, MARKER_BUTTON, "a",		},
+    { 410, 142, MARKER_BUTTON, "b",		},
+    { 334, 145, MARKER_BUTTON, "x",		},
+    { 372, 115, MARKER_BUTTON, "y",		},
+    { 176, 145, MARKER_BUTTON, "back",		},
+    { 230, 145, MARKER_BUTTON, "guide",		},
+    { 285, 145, MARKER_BUTTON, "start",		},
+    { 124, 220, MARKER_BUTTON, "dpleft",	},
+    { 160, 248, MARKER_BUTTON, "dpdown",	},
+    { 192, 220, MARKER_BUTTON, "dpright",	},
+    { 160, 192, MARKER_BUTTON, "dpup",		},
+    {  64,  60, MARKER_BUTTON, "leftshoulder",	},
+    { 102,  10, MARKER_AXIS_Y, "lefttrigger",	},
+    { 396,  60, MARKER_BUTTON, "rightshoulder",	},
+    { 360,  10, MARKER_AXIS_Y, "righttrigger",	},
+    {  87, 161, MARKER_BUTTON, "leftstick",	},
+    { 296, 230, MARKER_BUTTON, "rightstick",	},
+    {  87, 161, MARKER_AXIS_X, "leftx",		},
+    {  87, 161, MARKER_AXIS_Y, "lefty",		},
+    { 296, 230, MARKER_AXIS_X, "rightx",	},
+    { 296, 230, MARKER_AXIS_Y, "righty",	},
+  };
+
+  unsigned int event_frame_delay = 0;
+  unsigned int event_frame_delay_value = GAME_FRAME_DELAY;
+
+  ResetDelayCounter(&event_frame_delay);
+
+  if (!bitmaps_initialized)
+  {
+    controller = LoadCustomImage("joystick/controller.png");
+    button     = LoadCustomImage("joystick/button.png");
+    axis_x     = LoadCustomImage("joystick/axis_x.png");
+    axis_y     = LoadCustomImage("joystick/axis_y.png");
+
+    bitmaps_initialized = TRUE;
+  }
+
+  /* print info about the joystick we are watching */
+  name = SDL_JoystickName(joystick);
+  Error(ERR_DEBUG, "Watching joystick %d: (%s)\n",
+	SDL_JoystickInstanceID(joystick),
+	(name ? name : "(unknown joystick)"));
+  Error(ERR_DEBUG, "Joystick has %d axes, %d hats, %d balls, and %d buttons\n",
+	SDL_JoystickNumAxes(joystick), SDL_JoystickNumHats(joystick),
+	SDL_JoystickNumBalls(joystick), SDL_JoystickNumButtons(joystick));
+
+  /* initialize mapping with GUID and name */
+  SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(joystick), temp, sizeof(temp));
+
+  snprintf(mapping, sizeof(mapping), "%s,%s,platform:%s,",
+	   temp, name ? name : "Unknown Joystick", SDL_GetPlatform());
+
+  /* loop through all steps (buttons and axes), getting joystick events */
+  for (i = 0; i < SDL_arraysize(steps) && !done;)
+  {
+    step = &steps[i];
+    strcpy(step->mapping, mapping);
+    step->axis = -1;
+    step->button = -1;
+    step->hat = -1;
+    step->hat_value = -1;
+
+    marker = (step->marker == MARKER_BUTTON ? button :
+	      step->marker == MARKER_AXIS_X ? axis_x :
+	      step->marker == MARKER_AXIS_Y ? axis_y : marker);
+
+    next = FALSE;
+
+    while (!done && !next)
+    {
+      alpha += alpha_step * (int)(SDL_GetTicks() - alpha_ticks) / 5;
+      alpha_ticks = SDL_GetTicks();
+
+      if (alpha >= 255)
+      {
+	alpha = 255;
+	alpha_step = -1;
+      }
+      else if (alpha < 128)
+      {
+	alpha = 127;
+	alpha_step = 1;
+      }
+
+      ClearField();
+
+      DrawTextSCentered(mSY - SY + 22 * 16, FONT_REQUEST,
+			"Press buttons and move axes on");
+      DrawTextSCentered(mSY - SY + 23 * 16, FONT_REQUEST,
+			"your controller when indicated.");
+      DrawTextSCentered(mSY - SY + 24 * 16, FONT_REQUEST,
+			"(Your controller may look different.)");
+
+#if defined(PLATFORM_ANDROID)
+      DrawTextSCentered(mSY - SY + 26 * 16, FONT_REQUEST,
+			"To correct a mistake,");
+      DrawTextSCentered(mSY - SY + 27 * 16, FONT_REQUEST,
+			"press the 'back' button.");
+      DrawTextSCentered(mSY - SY + 28 * 16, FONT_REQUEST,
+			"To skip a button or axis,");
+      DrawTextSCentered(mSY - SY + 29 * 16, FONT_REQUEST,
+			"press the 'menu' button.");
+#else
+      DrawTextSCentered(mSY - SY + 26 * 16, FONT_REQUEST,
+			"To correct a mistake,");
+      DrawTextSCentered(mSY - SY + 27 * 16, FONT_REQUEST,
+			"press the 'backspace' key.");
+      DrawTextSCentered(mSY - SY + 28 * 16, FONT_REQUEST,
+			"To skip a button or axis,");
+      DrawTextSCentered(mSY - SY + 29 * 16, FONT_REQUEST,
+			"press the 'return' key.");
+      DrawTextSCentered(mSY - SY + 30 * 16, FONT_REQUEST,
+			"To exit, press the 'escape' key.");
+#endif
+
+      int controller_x = gfx.sx + (gfx.sxsize - controller->width) / 2;
+      int controller_y = gfx.sy;
+
+      int marker_x = controller_x + step->x;
+      int marker_y = controller_y + step->y;
+
+      BlitBitmapMasked(controller, drawto, 0, 0,
+		       controller->width, controller->height,
+		       controller_x, controller_y);
+
+      SDL_SetSurfaceAlphaMod(marker->surface_masked, alpha);
+
+      BlitBitmapMasked(marker, drawto, 0, 0,
+		       marker->width, marker->height,
+		       marker_x, marker_y);
+
+      if (!screen_initialized)
+	FadeIn(REDRAW_FIELD);
+      else
+	BackToFront();
+
+      screen_initialized = TRUE;
+
+      while (NextValidEvent(&event))
+      {
+	switch (event.type)
+	{
+	  case SDL_JOYAXISMOTION:
+	    if (event.jaxis.value > 20000 ||
+		event.jaxis.value < -20000)
+	    {
+	      for (j = 0; j < i; j++)
+		if (steps[j].axis == event.jaxis.axis)
+		  break;
+
+	      if (j == i)
+	      {
+		if (step->marker != MARKER_AXIS_X &&
+		    step->marker != MARKER_AXIS_Y)
+		  break;
+
+		step->axis = event.jaxis.axis;
+		strcat(mapping, step->field);
+		snprintf(temp, sizeof(temp), ":a%u,", event.jaxis.axis);
+		strcat(mapping, temp);
+		i++;
+		next = TRUE;
+	      }
+	    }
+
+	    break;
+
+	  case SDL_JOYHATMOTION:
+	    /* ignore centering; we're probably just coming back
+	       to the center from the previous item we set */
+	    if (event.jhat.value == SDL_HAT_CENTERED)
+	      break;
+
+	    for (j = 0; j < i; j++)
+	      if (steps[j].hat == event.jhat.hat &&
+		  steps[j].hat_value == event.jhat.value)
+		break;
+
+	    if (j == i)
+	    {
+	      step->hat = event.jhat.hat;
+	      step->hat_value = event.jhat.value;
+	      strcat(mapping, step->field);
+	      snprintf(temp, sizeof(temp), ":h%u.%u,",
+		       event.jhat.hat, event.jhat.value );
+	      strcat(mapping, temp);
+	      i++;
+	      next = TRUE;
+	    }
+
+	    break;
+
+	  case SDL_JOYBALLMOTION:
+	    break;
+
+	  case SDL_JOYBUTTONUP:
+	    for (j = 0; j < i; j++)
+	      if (steps[j].button == event.jbutton.button)
+		break;
+
+	    if (j == i)
+	    {
+	      step->button = event.jbutton.button;
+	      strcat(mapping, step->field);
+	      snprintf(temp, sizeof(temp), ":b%u,", event.jbutton.button);
+	      strcat(mapping, temp);
+	      i++;
+	      next = TRUE;
+	    }
+
+	    break;
+
+	  case SDL_FINGERDOWN:
+	  case SDL_MOUSEBUTTONDOWN:
+	    /* skip this step */
+	    i++;
+	    next = TRUE;
+
+	    break;
+
+	  case SDL_KEYDOWN:
+	    if (event.key.keysym.sym == KSYM_BackSpace ||
+		event.key.keysym.sym == KSYM_Back)
+	    {
+	      /* undo this step */
+	      if (i > 0)
+	      {
+		prev_step = &steps[--i];
+		strcpy(mapping, prev_step->mapping);
+		next = TRUE;
+	      }
+
+	      break;
+	    }
+
+	    if (event.key.keysym.sym == KSYM_space ||
+		event.key.keysym.sym == KSYM_Return ||
+		event.key.keysym.sym == KSYM_Menu)
+	    {
+	      /* skip this step */
+	      i++;
+	      next = TRUE;
+
+	      break;
+	    }
+
+	    if (event.key.keysym.sym == KSYM_Escape)
+	    {
+	      success = FALSE;
+	      done = TRUE;
+	    }
+
+	    break;
+
+	  case SDL_QUIT:
+	    program.exit_function(0);
+	    break;
+
+	  default:
+	    break;
+	}
+
+	// do not handle events for longer than standard frame delay period
+	if (DelayReached(&event_frame_delay, event_frame_delay_value))
+	  break;
+      }
+    }
+  }
+
+  if (success)
+  {
+    Error(ERR_DEBUG, "New game controller mapping:\n\n%s\n\n", mapping);
+
+    // activate mapping for this game
+    SDL_GameControllerAddMapping(mapping);
+
+    // save mapping to personal mappings
+    SaveSetup_AddGameControllerMapping(mapping);
+  }
+
+  /* wait until the last pending event was removed from event queue */
+  while (NextValidEvent(&event));
+
+  return success;
+#else
+  return TRUE;
+#endif
+}
+
+static int ConfigureJoystickMain(int player_nr)
+{
+  char *device_name = setup.input[player_nr].joy.device_name;
+  int joystick_nr = getJoystickNrFromDeviceName(device_name);
+  boolean joystick_active = CheckJoystickOpened(joystick_nr);
+  int success = FALSE;
+  int i;
+
+  if (joystick.status == JOYSTICK_NOT_AVAILABLE)
+    return JOYSTICK_NOT_AVAILABLE;
+
+  if (!joystick_active || !setup.input[player_nr].use_joystick)
+    return JOYSTICK_NOT_AVAILABLE;
+
+  FadeSetEnterMenu();
+  FadeOut(REDRAW_FIELD);
+
+  // close all joystick devices (potentially opened as game controllers)
+  for (i = 0; i < SDL_NumJoysticks(); i++)
+    SDLCloseJoystick(i);
+
+  // open joystick device as plain joystick to configure as game controller
+  SDL_Joystick *joystick = SDL_JoystickOpen(joystick_nr);
+
+  // as the joystick was successfully opened before, this should not happen
+  if (joystick == NULL)
+    return FALSE;
+
+  // create new game controller mapping (buttons and axes) for joystick device
+  success = ConfigureJoystickMapButtonsAndAxes(joystick);
+
+  // close joystick (and maybe re-open as configured game controller later)
+  SDL_JoystickClose(joystick);
+
+  // re-open all joystick devices (potentially as game controllers)
+  for (i = 0; i < SDL_NumJoysticks(); i++)
+    SDLOpenJoystick(i);
+
+  // clear all joystick input actions for all joystick devices
+  SDLClearJoystickState();
+
+  return (success ? JOYSTICK_CONFIGURED : JOYSTICK_NOT_CONFIGURED);
+}
+
+void ConfigureJoystick(int player_nr)
+{
+  boolean state = ConfigureJoystickMain(player_nr);
+
+  if (state != JOYSTICK_NOT_CONFIGURED)
+  {
+    boolean success = (state == JOYSTICK_CONFIGURED);
+    char *message = (success ? " IS CONFIGURED! " : " NOT AVAILABLE! ");
     char *device_name = setup.input[player_nr].joy.device_name;
     int nr = getJoystickNrFromDeviceName(device_name) + 1;
     int xpos = mSX - SX;
     int ypos = mSY - SY;
+    unsigned int wait_frame_delay = 0;
+    unsigned int wait_frame_delay_value = 2000;
+
+    ResetDelayCounter(&wait_frame_delay);
 
     ClearField();
 
     DrawTextF(xpos + 16, ypos + 6 * 32, FONT_TITLE_1, "   JOYSTICK %d   ", nr);
-    DrawTextF(xpos + 16, ypos + 7 * 32, FONT_TITLE_1, " NOT AVAILABLE! ");
-    BackToFront();
+    DrawTextF(xpos + 16, ypos + 7 * 32, FONT_TITLE_1, message);
 
-    Delay(2000);		/* show error message for a short time */
+    while (!DelayReached(&wait_frame_delay, wait_frame_delay_value))
+      BackToFront();
 
     ClearEventQueue();
   }

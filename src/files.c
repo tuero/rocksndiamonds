@@ -8690,6 +8690,55 @@ void LoadSetup_EditorCascade()
   free(filename);
 }
 
+static void addGameControllerMappingToHash(SetupFileHash *mappings_hash,
+					   char *mapping_line)
+{
+  char mapping_guid[MAX_LINE_LEN];
+  char *mapping_start, *mapping_end;
+
+  // get GUID from game controller mapping line: copy complete line
+  strncpy(mapping_guid, mapping_line, MAX_LINE_LEN - 1);
+  mapping_guid[MAX_LINE_LEN - 1] = '\0';
+
+  // get GUID from game controller mapping line: cut after GUID part
+  mapping_start = strchr(mapping_guid, ',');
+  if (mapping_start != NULL)
+    *mapping_start = '\0';
+
+  // cut newline from game controller mapping line
+  mapping_end = strchr(mapping_line, '\n');
+  if (mapping_end != NULL)
+    *mapping_end = '\0';
+
+  // add mapping entry to game controller mappings hash
+  setHashEntry(mappings_hash, mapping_guid, mapping_line);
+}
+
+static void LoadSetup_ReadGameControllerMappings(SetupFileHash *mappings_hash,
+						 char *filename)
+{
+  FILE *file;
+
+  if (!(file = fopen(filename, MODE_READ)))
+  {
+    Error(ERR_WARN, "cannot read game controller mappings file '%s'", filename);
+
+    return;
+  }
+
+  while (!feof(file))
+  {
+    char line[MAX_LINE_LEN];
+
+    if (!fgets(line, MAX_LINE_LEN, file))
+      break;
+
+    addGameControllerMappingToHash(mappings_hash, line);
+  }
+
+  fclose(file);
+}
+
 void SaveSetup()
 {
   char *filename = getSetupFilename();
@@ -8796,6 +8845,47 @@ void SaveSetup_EditorCascade()
 
   SetFilePermissions(filename, PERMS_PRIVATE);
 
+  free(filename);
+}
+
+static void SaveSetup_WriteGameControllerMappings(SetupFileHash *mappings_hash,
+						  char *filename)
+{
+  FILE *file;
+
+  if (!(file = fopen(filename, MODE_WRITE)))
+  {
+    Error(ERR_WARN, "cannot write game controller mappings file '%s'",filename);
+
+    return;
+  }
+
+  BEGIN_HASH_ITERATION(mappings_hash, itr)
+  {
+    fprintf(file, "%s\n", HASH_ITERATION_VALUE(itr));
+  }
+  END_HASH_ITERATION(mappings_hash, itr)
+
+  fclose(file);
+}
+
+void SaveSetup_AddGameControllerMapping(char *mapping)
+{
+  char *filename = getPath2(getSetupDir(), GAMECONTROLLER_BASENAME);
+  SetupFileHash *mappings_hash = newSetupFileHash();
+
+  InitUserDataDirectory();
+
+  // load existing personal game controller mappings
+  LoadSetup_ReadGameControllerMappings(mappings_hash, filename);
+
+  // add new mapping to personal game controller mappings
+  addGameControllerMappingToHash(mappings_hash, mapping);
+
+  // save updated personal game controller mappings
+  SaveSetup_WriteGameControllerMappings(mappings_hash, filename);
+
+  freeSetupFileHash(mappings_hash);
   free(filename);
 }
 

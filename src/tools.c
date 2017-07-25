@@ -3759,6 +3759,10 @@ void WaitForEventToContinue()
       {
 	case EVENT_BUTTONPRESS:
 	case EVENT_KEYPRESS:
+#if defined(TARGET_SDL2)
+        case SDL_CONTROLLERBUTTONDOWN:
+#endif
+        case SDL_JOYBUTTONDOWN:
 	  still_wait = FALSE;
 	  break;
 

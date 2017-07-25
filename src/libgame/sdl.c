@@ -2616,7 +2616,7 @@ void SDLClearJoystickState()
   }
 }
 
-static boolean SDLOpenJoystick(int nr)
+boolean SDLOpenJoystick(int nr)
 {
   if (nr < 0 || nr >= MAX_PLAYERS)
     return FALSE;
@@ -2644,7 +2644,7 @@ static boolean SDLOpenJoystick(int nr)
   return (sdl_joystick[nr] != NULL);
 }
 
-static void SDLCloseJoystick(int nr)
+void SDLCloseJoystick(int nr)
 {
   if (nr < 0 || nr >= MAX_PLAYERS)
     return;

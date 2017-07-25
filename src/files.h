@@ -63,6 +63,8 @@ void SaveSetup();
 void LoadSetup_EditorCascade();
 void SaveSetup_EditorCascade();
 
+void SaveSetup_AddGameControllerMapping(char *);
+
 void LoadCustomElementDescriptions();
 void InitMenuDesignSettings_Static();
 void LoadMenuDesignSettings();
