@@ -137,16 +137,27 @@ void readjoy(byte action, struct PLAYER *ply)
   if (action & JOY_BUTTON_2)
     drop = 1;
 
-  ply->joy_snap = snap;
+  /* always update drop action */
   ply->joy_drop = drop;
 
-  if (ply->joy_stick || (north | east | south | west))
+  if (ply->joy_stick || (north | east | south | west))	/* (no "| snap"!) */
   {
     ply->joy_n = north;
     ply->joy_e = east;
     ply->joy_s = south;
     ply->joy_w = west;
+
+    /* when storing last action, only update snap action with direction */
+    /* (prevents clearing direction if snapping stopped before frame 7) */
+    ply->joy_snap = snap;
   }
+
+  /* if no direction was stored before, allow setting snap to current state */
+  if (!ply->joy_n &&
+      !ply->joy_e &&
+      !ply->joy_s &&
+      !ply->joy_w)
+    ply->joy_snap = snap;
 }
 
 void SaveEngineSnapshotValues_EM()
