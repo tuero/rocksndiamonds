@@ -1629,7 +1629,6 @@ void HandleKey(Key key, int key_status)
 	  if (level.game_engine_type == GAME_ENGINE_TYPE_EM ||
 	      level.game_engine_type == GAME_ENGINE_TYPE_SP)
 	  {
-
 	    if (level.game_engine_type == GAME_ENGINE_TYPE_SP &&
 		getRedDiskReleaseFlag_SP() == 0)
 	      stored_player[pnr].action &= ~KEY_BUTTON_DROP;
