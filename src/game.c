@@ -2698,6 +2698,9 @@ static void InitGameEngine()
   game.use_block_last_field_bug =
     (game.engine_version < VERSION_IDENT(3,1,1,0));
 
+  game_em.use_single_button = game_em.use_single_button_initial =
+    (game.engine_version > VERSION_IDENT(4,0,0,2));
+
   /* ---------------------------------------------------------------------- */
 
   /* set maximal allowed number of custom element changes per game frame */

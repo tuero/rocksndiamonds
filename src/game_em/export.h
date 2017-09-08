@@ -666,6 +666,10 @@ struct GameInfo_EM
 {
   boolean any_player_moving;
   boolean any_player_snapping;
+
+  boolean use_single_button_initial;
+  boolean use_single_button;
+
   int last_moving_player;
   int last_player_direction[MAX_PLAYERS];
 };
@@ -678,6 +682,9 @@ struct LevelInfo_EM
 
   struct LEVEL *lev;
   struct PLAYER *ply[MAX_PLAYERS];
+
+  /* used for runtime values */
+  struct GameInfo_EM *game_em;
 };
 
 struct GraphicInfo_EM
@@ -721,6 +728,7 @@ struct EngineSnapshotInfo_EM
 /* ------------------------------------------------------------------------- */
 
 extern struct GlobalInfo_EM global_em_info;
+extern struct GameInfo_EM game_em;
 extern struct LevelInfo_EM native_em_level;
 extern struct GraphicInfo_EM graphic_info_em_object[TILE_MAX][8];
 extern struct GraphicInfo_EM graphic_info_em_player[MAX_PLAYERS][SPR_MAX][8];

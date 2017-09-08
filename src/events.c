@@ -1560,6 +1560,9 @@ void HandleKey(Key key, int key_status)
     static boolean element_dropped[MAX_PLAYERS] = { FALSE,FALSE,FALSE,FALSE };
     int pnr;
 
+    /* initialize unifying snap and drop buttons (EM engine) */
+    game_em.use_single_button = game_em.use_single_button_initial;
+
     for (pnr = 0; pnr < MAX_PLAYERS; pnr++)
     {
       byte key_action = 0;
@@ -1606,6 +1609,9 @@ void HandleKey(Key key, int key_status)
 
       if (tape.single_step && tape.recording && tape.pausing)
       {
+	/* do not unify snap and drop buttons in single-step mode (EM engine) */
+	game_em.use_single_button = FALSE;
+
 	if (key_status == KEY_PRESSED && key_action & KEY_MOTION)
 	{
 	  TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);

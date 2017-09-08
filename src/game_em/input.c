@@ -119,6 +119,9 @@ void readjoy(byte action, struct PLAYER *ply)
   int north = 0, east = 0, south = 0, west = 0;
   int snap = 0, drop = 0;
 
+  if (game_em.use_single_button && action & (JOY_BUTTON_1 | JOY_BUTTON_2))
+    action |= JOY_BUTTON_1 | JOY_BUTTON_2;
+
   if (action & JOY_LEFT)
     west = 1;
 
