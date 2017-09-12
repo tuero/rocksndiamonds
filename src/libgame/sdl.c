@@ -2847,7 +2847,7 @@ void SDLInitJoysticks()
   static boolean sdl_joystick_subsystem_initialized = FALSE;
   boolean print_warning = !sdl_joystick_subsystem_initialized;
 #if defined(TARGET_SDL2)
-  char *mappings_file_base = getPath2(options.ro_base_directory,
+  char *mappings_file_base = getPath2(options.conf_directory,
 				      GAMECONTROLLER_BASENAME);
   char *mappings_file_user = getPath2(getUserGameDataDir(),
 				      GAMECONTROLLER_BASENAME);

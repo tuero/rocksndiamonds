@@ -498,6 +498,7 @@
 #define SCORES_DIRECTORY	"scores"
 #define DOCS_DIRECTORY		"docs"
 #define CACHE_DIRECTORY		"cache"
+#define CONF_DIRECTORY		"conf"
 
 #define GFX_CLASSIC_SUBDIR	"gfx_classic"
 #define SND_CLASSIC_SUBDIR	"snd_classic"
@@ -800,6 +801,7 @@ struct OptionInfo
   char *sounds_directory;
   char *music_directory;
   char *docs_directory;
+  char *conf_directory;
 
   char *execute_command;
 

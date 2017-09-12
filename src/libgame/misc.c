@@ -985,6 +985,7 @@ void GetOptions(int argc, char *argv[],
   options.sounds_directory   = getPath2(ro_base_path, SOUNDS_DIRECTORY);
   options.music_directory    = getPath2(ro_base_path, MUSIC_DIRECTORY);
   options.docs_directory     = getPath2(ro_base_path, DOCS_DIRECTORY);
+  options.conf_directory     = getPath2(ro_base_path, CONF_DIRECTORY);
 
   options.execute_command = NULL;
   options.special_flags = NULL;
@@ -1063,6 +1064,7 @@ void GetOptions(int argc, char *argv[],
       options.sounds_directory   = getPath2(ro_base_path, SOUNDS_DIRECTORY);
       options.music_directory    = getPath2(ro_base_path, MUSIC_DIRECTORY);
       options.docs_directory     = getPath2(ro_base_path, DOCS_DIRECTORY);
+      options.conf_directory     = getPath2(ro_base_path, CONF_DIRECTORY);
     }
     else if (strncmp(option, "-levels", option_len) == 0)
     {
