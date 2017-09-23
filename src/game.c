@@ -3224,6 +3224,8 @@ void InitGame()
     player->was_snapping = FALSE;
     player->was_dropping = FALSE;
 
+    player->force_dropping = FALSE;
+
     player->frame_counter_bored = -1;
     player->frame_counter_sleeping = -1;
 
@@ -10714,7 +10716,9 @@ static void CheckSingleStepMode(struct PlayerInfo *player)
   {
     /* as it is called "single step mode", just return to pause mode when the
        player stopped moving after one tile (or never starts moving at all) */
-    if (!player->is_moving && !player->is_pushing)
+    if (!player->is_moving &&
+	!player->is_pushing &&
+	!player->is_dropping_pressed)
     {
       TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
       SnapField(player, 0, 0);			/* stop snapping */
@@ -11268,6 +11272,14 @@ void GameActions_SP_Main()
     effective_action[i] = stored_player[i].effective_action;
 
   GameActions_SP(effective_action, warp_mode);
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+  {
+    if (stored_player[i].force_dropping)
+      stored_player[i].action |= KEY_BUTTON_DROP;
+
+    stored_player[i].force_dropping = FALSE;
+  }
 }
 
 void GameActions_RND_Main()
@@ -13979,8 +13991,6 @@ static boolean DropElement(struct PlayerInfo *player)
   int drop_side = drop_direction;
   int drop_element = get_next_dropped_element(player);
 
-  player->is_dropping_pressed = TRUE;
-
   /* do not drop an element on top of another element; when holding drop key
      pressed without moving, dropped element must move away before the next
      element can be dropped (this is especially important if the next element
@@ -14007,6 +14017,9 @@ static boolean DropElement(struct PlayerInfo *player)
   /* check if player has anything that can be dropped */
   if (new_element == EL_UNDEFINED)
     return FALSE;
+
+  /* only set if player has anything that can be dropped */
+  player->is_dropping_pressed = TRUE;
 
   /* check if drop key was pressed long enough for EM style dynamite */
   if (new_element == EL_EM_DYNAMITE && player->drop_pressed_delay < 40)

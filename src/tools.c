@@ -8370,8 +8370,15 @@ void CheckSingleStepMode_EM(byte action[MAX_PLAYERS], int frame,
 void CheckSingleStepMode_SP(boolean murphy_is_waiting,
 			    boolean murphy_is_dropping)
 {
+  boolean murphy_starts_dropping = FALSE;
+  int i;
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+    if (stored_player[i].force_dropping)
+      murphy_starts_dropping = TRUE;
+
   if (tape.single_step && tape.recording && !tape.pausing)
-    if (murphy_is_waiting)
+    if (murphy_is_waiting && !murphy_starts_dropping)
       TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
 
   CheckSaveEngineSnapshot_SP(murphy_is_waiting, murphy_is_dropping);

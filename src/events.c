@@ -1554,10 +1554,7 @@ void HandleKey(Key key, int key_status)
   if (game_status == GAME_MODE_PLAYING)
   {
     /* only needed for single-step tape recording mode */
-    static boolean clear_snap_button[MAX_PLAYERS] = { FALSE,FALSE,FALSE,FALSE };
-    static boolean clear_drop_button[MAX_PLAYERS] = { FALSE,FALSE,FALSE,FALSE };
-    static boolean element_snapped[MAX_PLAYERS] = { FALSE,FALSE,FALSE,FALSE };
-    static boolean element_dropped[MAX_PLAYERS] = { FALSE,FALSE,FALSE,FALSE };
+    static boolean has_snapped[MAX_PLAYERS] = { FALSE, FALSE, FALSE, FALSE };
     int pnr;
 
     for (pnr = 0; pnr < MAX_PLAYERS; pnr++)
@@ -1583,22 +1580,6 @@ void HandleKey(Key key, int key_status)
 	    key_action |= key_info[i].action | JOY_BUTTON_SNAP;
       }
 
-      /* clear delayed snap and drop actions in single step mode (see below) */
-      if (tape.single_step)
-      {
-	if (clear_snap_button[pnr])
-	{
-	  stored_player[pnr].action &= ~KEY_BUTTON_SNAP;
-	  clear_snap_button[pnr] = FALSE;
-	}
-
-	if (clear_drop_button[pnr])
-	{
-	  stored_player[pnr].action &= ~KEY_BUTTON_DROP;
-	  clear_drop_button[pnr] = FALSE;
-	}
-      }
-
       if (key_status == KEY_PRESSED)
 	stored_player[pnr].action |= key_action;
       else
@@ -1610,62 +1591,29 @@ void HandleKey(Key key, int key_status)
 	{
 	  TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
 
-	  /* if snap key already pressed, don't snap when releasing (below) */
+	  /* if snap key already pressed, keep pause mode when releasing */
 	  if (stored_player[pnr].action & KEY_BUTTON_SNAP)
-	    element_snapped[pnr] = TRUE;
-
-	  /* if drop key already pressed, don't drop when releasing (below) */
-	  if (stored_player[pnr].action & KEY_BUTTON_DROP)
-	    element_dropped[pnr] = TRUE;
+	    has_snapped[pnr] = TRUE;
 	}
 	else if (key_status == KEY_PRESSED && key_action & KEY_BUTTON_DROP)
 	{
-	  if (level.game_engine_type == GAME_ENGINE_TYPE_EM ||
-	      level.game_engine_type == GAME_ENGINE_TYPE_SP)
-	  {
-	    if (level.game_engine_type == GAME_ENGINE_TYPE_SP &&
-		getRedDiskReleaseFlag_SP() == 0)
-	      stored_player[pnr].action &= ~KEY_BUTTON_DROP;
+	  TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
 
-	    TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
+	  if (level.game_engine_type == GAME_ENGINE_TYPE_SP &&
+	      getRedDiskReleaseFlag_SP() == 0)
+	  {
+	    /* add a single inactive frame before dropping starts */
+	    stored_player[pnr].action &= ~KEY_BUTTON_DROP;
+	    stored_player[pnr].force_dropping = TRUE;
 	  }
 	}
-	else if (key_status == KEY_RELEASED && key_action & KEY_BUTTON)
+	else if (key_status == KEY_RELEASED && key_action & KEY_BUTTON_SNAP)
 	{
-	  if (key_action & KEY_BUTTON_SNAP)
-	  {
-	    /* if snap key was released without moving (see above), snap now */
-	    if (!element_snapped[pnr])
-	    {
-	      TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
+	  /* if snap key was pressed without direction, leave pause mode */
+	  if (!has_snapped[pnr])
+	    TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
 
-	      stored_player[pnr].action |= KEY_BUTTON_SNAP;
-
-	      /* clear delayed snap button on next event */
-	      clear_snap_button[pnr] = TRUE;
-	    }
-
-	    element_snapped[pnr] = FALSE;
-	  }
-
-	  if (key_action & KEY_BUTTON_DROP &&
-	      level.game_engine_type == GAME_ENGINE_TYPE_RND)
-	  {
-	    /* if drop key was released without moving (see above), drop now */
-	    if (!element_dropped[pnr])
-	    {
-	      TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
-
-	      if (level.game_engine_type != GAME_ENGINE_TYPE_SP ||
-		  getRedDiskReleaseFlag_SP() != 0)
-		stored_player[pnr].action |= KEY_BUTTON_DROP;
-
-	      /* clear delayed drop button on next event */
-	      clear_drop_button[pnr] = TRUE;
-	    }
-
-	    element_dropped[pnr] = FALSE;
-	  }
+	  has_snapped[pnr] = FALSE;
 	}
       }
       else if (tape.recording && tape.pausing)

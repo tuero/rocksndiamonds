@@ -281,6 +281,8 @@ struct PlayerInfo
 
   boolean cannot_move;
 
+  boolean force_dropping;	/* needed for single step mode */
+
   int frame_counter_bored;
   int frame_counter_sleeping;
 
