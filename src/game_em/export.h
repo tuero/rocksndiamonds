@@ -667,7 +667,6 @@ struct GameInfo_EM
   boolean any_player_moving;
   boolean any_player_snapping;
 
-  boolean use_single_button_initial;
   boolean use_single_button;
 
   int last_moving_player;

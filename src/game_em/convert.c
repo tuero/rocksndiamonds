@@ -1110,7 +1110,7 @@ void prepare_em_level(void)
   game_em.any_player_moving = FALSE;
   game_em.any_player_snapping = FALSE;
 
-  game_em.use_single_button = game_em.use_single_button_initial = TRUE;
+  game_em.use_single_button = TRUE;
 
   game_em.last_moving_player = 0;	/* default: first player */
 
