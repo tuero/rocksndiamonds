@@ -92,5 +92,8 @@ void GameActions_SP(byte action[MAX_PLAYERS], boolean warp_mode)
 
 int getRedDiskReleaseFlag_SP()
 {
+  /* 0: when Murphy is moving (including the destination tile!) */
+  /* 1: when Murphy is not moving for at least one game frame */
+
   return RedDiskReleaseFlag;
 }
