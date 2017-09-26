@@ -204,8 +204,8 @@ struct MouseCursorInfo
 #define KSYM_Back		SDLK_AC_BACK
 #define KSYM_PlayPause		SDLK_AUDIOPLAY
 #if defined(PLATFORM_ANDROID)
-#define KSYM_Rewind		SDLK_AUDIORWND
-#define KSYM_FastForward	SDLK_AUDIOFFWD
+#define KSYM_Rewind		SDLK_AUDIOREWIND
+#define KSYM_FastForward	SDLK_AUDIOFASTFORWARD
 #endif
 #endif
 
