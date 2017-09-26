@@ -532,11 +532,7 @@ inline static void SDLInitVideoBuffer_VideoBuffer(boolean fullscreen)
   SDLSetWindowIcon(program.icon_filename);
 
   /* set window and icon title */
-#if defined(TARGET_SDL2)
-  SDL_SetWindowTitle(sdl_window, program.window_title);
-#else
-  SDL_WM_SetCaption(program.window_title, program.window_title);
-#endif
+  SDLSetWindowTitle();
 }
 
 inline static void SDLInitVideoBuffer_DrawBuffer()
@@ -830,6 +826,9 @@ boolean SDLSetVideoMode(boolean fullscreen)
 void SDLSetWindowTitle()
 {
 #if defined(TARGET_SDL2)
+  if (sdl_window == NULL)
+    return;
+
   SDL_SetWindowTitle(sdl_window, program.window_title);
 #else
   SDL_WM_SetCaption(program.window_title, program.window_title);
