@@ -174,3 +174,8 @@ d814000000000000cecf000000000000,MC Cthulhu,platform:Mac OS X,leftx:,lefty:,righ
 03000000100800000300000010010000,USB Gamepad,platform:Linux,a:b2,b:b1,x:b3,y:b0,start:b9,back:b8,leftstick:b10,rightstick:b11,leftshoulder:b6,rightshoulder:b7,dpup:h0.1,dpleft:h0.8,dpdown:h0.4,dpright:h0.2,leftx:a0,lefty:a1,rightx:a3,righty:a2,lefttrigger:b4,righttrigger:b5,
 05000000ac0500003232000001000000,VR-BOX,platform:Linux,a:b0,b:b1,x:b2,y:b3,start:b9,back:b8,leftstick:b10,rightstick:b11,leftshoulder:b6,rightshoulder:b7,dpup:h0.1,dpleft:h0.8,dpdown:h0.4,dpright:h0.2,leftx:a0,lefty:a1,rightx:a3,righty:a2,lefttrigger:b4,righttrigger:b5,
 03000000780000000600000010010000,Microntek USB Joystick,platform:Linux,x:b3,a:b2,b:b1,y:b0,back:b8,start:b9,leftshoulder:b6,lefttrigger:b4,rightshoulder:b7,righttrigger:b5,leftx:a0,lefty:a1,
+
+# custom game controller mappings
+756e7520636f6e74726f6c6c65720000,SnakeByte GamePad,platform:Android,x:b2,a:b0,b:b1,y:b3,back:b4,start:b6,dpleft:h0.8,dpdown:h0.4,dpright:h0.2,dpup:h0.1,leftshoulder:b9,lefttrigger:a6,rightshoulder:b10,righttrigger:a7,leftstick:b7,rightstick:b8,leftx:a0,lefty:a1,rightx:a2,righty:a5,
+030000000b0400003365000000010000,Competition Pro Joystick,platform:Linux,x:b2,a:b0,b:b1,y:b3,leftx:a0,lefty:a1,
+416d617a6f6e20466972652054562052,Amazon Fire TV Remote,platform:Android,a:b19,dpup:b11,dpdown:b12,dpleft:b13,dpright:b14,
