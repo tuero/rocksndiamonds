@@ -6581,6 +6581,8 @@ static boolean ConfigureJoystickMapButtonsAndAxes(SDL_Joystick *joystick)
     axis_x     = LoadCustomImage("joystick/axis_x.png");
     axis_y     = LoadCustomImage("joystick/axis_y.png");
 
+    marker = button;	/* initialize with reliable default value */
+
     bitmaps_initialized = TRUE;
   }
 
