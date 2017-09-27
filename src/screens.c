@@ -6522,7 +6522,6 @@ static boolean ConfigureJoystickMapButtonsAndAxes(SDL_Joystick *joystick)
   static boolean bitmaps_initialized = FALSE;
   boolean screen_initialized = FALSE;
   static Bitmap *controller, *button, *axis_x, *axis_y;
-  Bitmap *marker;
   char *name;
   boolean success = TRUE;
   boolean done = FALSE, next = FALSE;
@@ -6581,8 +6580,6 @@ static boolean ConfigureJoystickMapButtonsAndAxes(SDL_Joystick *joystick)
     axis_x     = LoadCustomImage("joystick/axis_x.png");
     axis_y     = LoadCustomImage("joystick/axis_y.png");
 
-    marker = button;	/* initialize with reliable default value */
-
     bitmaps_initialized = TRUE;
   }
 
@@ -6604,6 +6601,8 @@ static boolean ConfigureJoystickMapButtonsAndAxes(SDL_Joystick *joystick)
   /* loop through all steps (buttons and axes), getting joystick events */
   for (i = 0; i < SDL_arraysize(steps) && !done;)
   {
+    Bitmap *marker = button;	/* initialize with reliable default value */
+
     step = &steps[i];
     strcpy(step->mapping, mapping);
     step->axis = -1;
