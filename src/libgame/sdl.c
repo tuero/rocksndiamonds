@@ -17,6 +17,8 @@
 
 #define ENABLE_UNUSED_CODE	0	/* currently unused functions */
 
+#define DEBUG_JOYSTICKS		0
+
 
 /* ========================================================================= */
 /* video functions                                                           */
@@ -2626,7 +2628,7 @@ boolean SDLOpenJoystick(int nr)
   sdl_is_controller[nr] = FALSE;
 #endif
 
-#if 1
+#if DEBUG_JOYSTICKS
   Error(ERR_DEBUG, "opening joystick %d (%s)",
 	nr, (sdl_is_controller[nr] ? "game controller" : "joystick"));
 #endif
@@ -2648,7 +2650,7 @@ void SDLCloseJoystick(int nr)
   if (nr < 0 || nr >= MAX_PLAYERS)
     return;
 
-#if 1
+#if DEBUG_JOYSTICKS
   Error(ERR_DEBUG, "closing joystick %d", nr);
 #endif
 
@@ -2748,7 +2750,7 @@ void HandleJoystickEvent(Event *event)
   {
 #if defined(TARGET_SDL2)
     case SDL_CONTROLLERDEVICEADDED:
-#if 1
+#if DEBUG_JOYSTICKS
       Error(ERR_DEBUG, "SDL_CONTROLLERDEVICEADDED: device %d added",
 	    event->cdevice.which);
 #endif
@@ -2756,7 +2758,7 @@ void HandleJoystickEvent(Event *event)
       break;
 
     case SDL_CONTROLLERDEVICEREMOVED:
-#if 1
+#if DEBUG_JOYSTICKS
       Error(ERR_DEBUG, "SDL_CONTROLLERDEVICEREMOVED: device %d removed",
 	    event->cdevice.which);
 #endif
@@ -2764,7 +2766,7 @@ void HandleJoystickEvent(Event *event)
       break;
 
     case SDL_CONTROLLERAXISMOTION:
-#if 1
+#if DEBUG_JOYSTICKS
       Error(ERR_DEBUG, "SDL_CONTROLLERAXISMOTION: device %d, axis %d: %d",
 	    event->caxis.which, event->caxis.axis, event->caxis.value);
 #endif
@@ -2774,7 +2776,7 @@ void HandleJoystickEvent(Event *event)
       break;
 
     case SDL_CONTROLLERBUTTONDOWN:
-#if 1
+#if DEBUG_JOYSTICKS
       Error(ERR_DEBUG, "SDL_CONTROLLERBUTTONDOWN: device %d, button %d",
 	    event->cbutton.which, event->cbutton.button);
 #endif
@@ -2784,7 +2786,7 @@ void HandleJoystickEvent(Event *event)
       break;
 
     case SDL_CONTROLLERBUTTONUP:
-#if 1
+#if DEBUG_JOYSTICKS
       Error(ERR_DEBUG, "SDL_CONTROLLERBUTTONUP: device %d, button %d",
 	    event->cbutton.which, event->cbutton.button);
 #endif
@@ -2798,7 +2800,7 @@ void HandleJoystickEvent(Event *event)
       if (sdl_is_controller[event->jaxis.which])
 	break;
 
-#if 1
+#if DEBUG_JOYSTICKS
       Error(ERR_DEBUG, "SDL_JOYAXISMOTION: device %d, axis %d: %d",
 	    event->jaxis.which, event->jaxis.axis, event->jaxis.value);
 #endif
@@ -2812,7 +2814,7 @@ void HandleJoystickEvent(Event *event)
       if (sdl_is_controller[event->jaxis.which])
 	break;
 
-#if 1
+#if DEBUG_JOYSTICKS
       Error(ERR_DEBUG, "SDL_JOYBUTTONDOWN: device %d, button %d",
 	    event->jbutton.which, event->jbutton.button);
 #endif
@@ -2826,7 +2828,7 @@ void HandleJoystickEvent(Event *event)
       if (sdl_is_controller[event->jaxis.which])
 	break;
 
-#if 1
+#if DEBUG_JOYSTICKS
       Error(ERR_DEBUG, "SDL_JOYBUTTONUP: device %d, button %d",
 	    event->jbutton.which, event->jbutton.button);
 #endif
@@ -2873,23 +2875,30 @@ void SDLInitJoysticks()
 #if defined(TARGET_SDL2)
     num_mappings = SDL_GameControllerAddMappingsFromFile(mappings_file_base);
 
-    if (num_mappings != -1)
-      Error(ERR_INFO, "%d game controller base mapping(s) added", num_mappings);
-    else
+    /* the included game controller base mappings should always be found */
+    if (num_mappings == -1)
       Error(ERR_WARN, "no game controller base mappings found");
+#if DEBUG_JOYSTICKS
+    else
+      Error(ERR_INFO, "%d game controller base mapping(s) added", num_mappings);
+#endif
 
     num_mappings = SDL_GameControllerAddMappingsFromFile(mappings_file_user);
 
-    if (num_mappings != -1)
-      Error(ERR_INFO, "%d game controller user mapping(s) added", num_mappings);
-    else
+#if DEBUG_JOYSTICKS
+    /* the personal game controller user mappings may or may not be found */
+    if (num_mappings == -1)
       Error(ERR_WARN, "no game controller user mappings found");
+    else
+      Error(ERR_INFO, "%d game controller user mapping(s) added", num_mappings);
 
     Error(ERR_INFO, "%d joystick(s) found:", SDL_NumJoysticks());
+#endif
 
     checked_free(mappings_file_base);
     checked_free(mappings_file_user);
 
+#if DEBUG_JOYSTICKS
     for (i = 0; i < SDL_NumJoysticks(); i++)
     {
       const char *name, *type;
@@ -2908,6 +2917,7 @@ void SDLInitJoysticks()
       Error(ERR_INFO, "- joystick %d (%s): '%s'",
 	    i, type, (name ? name : "(Unknown)"));
     }
+#endif
 #endif
   }
 
