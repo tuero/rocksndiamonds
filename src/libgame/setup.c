@@ -1955,7 +1955,7 @@ static boolean loadSetupFileData(void *setup_file_data, char *filename,
 
   if (!(file = openFile(filename, MODE_READ)))
   {
-    Error(ERR_WARN, "cannot open configuration file '%s'", filename);
+    Error(ERR_DEBUG, "cannot open configuration file '%s'", filename);
 
     return FALSE;
   }
@@ -3684,7 +3684,9 @@ void LoadLevelSetup_LastSeries()
     freeSetupFileHash(level_setup_hash);
   }
   else
-    Error(ERR_WARN, "using default setup values");
+  {
+    Error(ERR_DEBUG, "using default setup values");
+  }
 
   free(filename);
 }
@@ -3852,7 +3854,9 @@ void LoadLevelSetup_SeriesInfo()
     freeSetupFileHash(level_setup_hash);
   }
   else
-    Error(ERR_WARN, "using default setup values");
+  {
+    Error(ERR_DEBUG, "using default setup values");
+  }
 
   free(filename);
 }

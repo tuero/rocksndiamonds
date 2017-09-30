@@ -8624,7 +8624,7 @@ void LoadSetupFromFilename(char *filename)
   }
   else
   {
-    Error(ERR_WARN, "using default setup values");
+    Error(ERR_DEBUG, "using default setup values");
   }
 }
 
