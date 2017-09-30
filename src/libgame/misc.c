@@ -1212,6 +1212,10 @@ void Error(int mode, char *format, ...)
 		      ANDROID_LOG_UNKNOWN);
 #endif
 
+  /* display debug messages only when running in debug mode */
+  if (mode & ERR_DEBUG && !options.debug)
+    return;
+
   /* display warnings only when running in verbose mode */
   if (mode & ERR_WARN && !options.verbose)
     return;
