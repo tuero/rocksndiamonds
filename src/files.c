@@ -8520,6 +8520,21 @@ static void setSetupInfoToDefaults_EditorCascade(struct SetupInfo *si)
   si->editor_cascade.el_dynamic		= FALSE;
 }
 
+static void setSetupInfoFromTokenText(SetupFileHash *setup_file_hash,
+				      struct TokenInfo *token_info,
+				      int token_nr, char *token_text)
+{
+  setSetupInfo(token_info, token_nr, getHashEntry(setup_file_hash, token_text));
+}
+
+static void setSetupInfoFromTokenInfo(SetupFileHash *setup_file_hash,
+				      struct TokenInfo *token_info,
+				      int token_nr)
+{
+  setSetupInfoFromTokenText(setup_file_hash, token_info, token_nr,
+			    token_info[token_nr].text);
+}
+
 static void decodeSetupFileHash(SetupFileHash *setup_file_hash)
 {
   int i, pnr;
@@ -8530,22 +8545,19 @@ static void decodeSetupFileHash(SetupFileHash *setup_file_hash)
   /* global setup */
   si = setup;
   for (i = 0; i < NUM_GLOBAL_SETUP_TOKENS; i++)
-    setSetupInfo(global_setup_tokens, i,
-		 getHashEntry(setup_file_hash, global_setup_tokens[i].text));
+    setSetupInfoFromTokenInfo(setup_file_hash, global_setup_tokens, i);
   setup = si;
 
   /* editor setup */
   sei = setup.editor;
   for (i = 0; i < NUM_EDITOR_SETUP_TOKENS; i++)
-    setSetupInfo(editor_setup_tokens, i,
-		 getHashEntry(setup_file_hash,editor_setup_tokens[i].text));
+    setSetupInfoFromTokenInfo(setup_file_hash, editor_setup_tokens, i);
   setup.editor = sei;
 
   /* shortcut setup */
   ssi = setup.shortcut;
   for (i = 0; i < NUM_SHORTCUT_SETUP_TOKENS; i++)
-    setSetupInfo(shortcut_setup_tokens, i,
-		 getHashEntry(setup_file_hash,shortcut_setup_tokens[i].text));
+    setSetupInfoFromTokenInfo(setup_file_hash, shortcut_setup_tokens, i);
   setup.shortcut = ssi;
 
   /* player setup */
@@ -8561,8 +8573,8 @@ static void decodeSetupFileHash(SetupFileHash *setup_file_hash)
       char full_token[100];
 
       sprintf(full_token, "%s%s", prefix, player_setup_tokens[i].text);
-      setSetupInfo(player_setup_tokens, i,
-		   getHashEntry(setup_file_hash, full_token));
+      setSetupInfoFromTokenText(setup_file_hash, player_setup_tokens, i,
+				full_token);
     }
     setup.input[pnr] = sii;
   }
@@ -8570,29 +8582,25 @@ static void decodeSetupFileHash(SetupFileHash *setup_file_hash)
   /* system setup */
   syi = setup.system;
   for (i = 0; i < NUM_SYSTEM_SETUP_TOKENS; i++)
-    setSetupInfo(system_setup_tokens, i,
-		 getHashEntry(setup_file_hash, system_setup_tokens[i].text));
+    setSetupInfoFromTokenInfo(setup_file_hash, system_setup_tokens, i);
   setup.system = syi;
 
   /* internal setup */
   sxi = setup.internal;
   for (i = 0; i < NUM_INTERNAL_SETUP_TOKENS; i++)
-    setSetupInfo(internal_setup_tokens, i,
-		 getHashEntry(setup_file_hash, internal_setup_tokens[i].text));
+    setSetupInfoFromTokenInfo(setup_file_hash, internal_setup_tokens, i);
   setup.internal = sxi;
 
   /* debug setup */
   sdi = setup.debug;
   for (i = 0; i < NUM_DEBUG_SETUP_TOKENS; i++)
-    setSetupInfo(debug_setup_tokens, i,
-		 getHashEntry(setup_file_hash, debug_setup_tokens[i].text));
+    setSetupInfoFromTokenInfo(setup_file_hash, debug_setup_tokens, i);
   setup.debug = sdi;
 
   /* options setup */
   soi = setup.options;
   for (i = 0; i < NUM_OPTIONS_SETUP_TOKENS; i++)
-    setSetupInfo(options_setup_tokens, i,
-		 getHashEntry(setup_file_hash, options_setup_tokens[i].text));
+    setSetupInfoFromTokenInfo(setup_file_hash, options_setup_tokens, i);
   setup.options = soi;
 }
 
