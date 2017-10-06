@@ -65,6 +65,8 @@ void SaveSetup_EditorCascade();
 
 void SaveSetup_AddGameControllerMapping(char *);
 
+boolean hideSetupEntry(void *);
+
 void LoadCustomElementDescriptions();
 void InitMenuDesignSettings_Static();
 void LoadMenuDesignSettings();

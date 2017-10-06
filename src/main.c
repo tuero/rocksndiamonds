@@ -183,6 +183,7 @@ SetupFileHash	       *image_config_hash = NULL;
 SetupFileHash	       *element_token_hash = NULL;
 SetupFileHash	       *graphic_token_hash = NULL;
 SetupFileHash	       *font_token_hash = NULL;
+SetupFileHash	       *hide_setup_hash = NULL;
 
 
 /* ------------------------------------------------------------------------- */

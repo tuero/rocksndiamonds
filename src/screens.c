@@ -2138,6 +2138,10 @@ static void drawMenuInfoList(int first_entry, int num_page_entries,
 	(value_ptr == &scaling_type_text  && !video.window_scaling_available))
       si->type |= TYPE_GHOSTED;
 
+    /* set some entries to "unchangeable" that should be hidden */
+    if (hideSetupEntry(value_ptr))
+      si->type |= TYPE_GHOSTED;
+
     if (si->type & (TYPE_ENTER_MENU|TYPE_ENTER_LIST))
       initCursor(i, IMG_MENU_BUTTON_ENTER_MENU);
     else if (si->type & (TYPE_LEAVE_MENU|TYPE_LEAVE_LIST))
@@ -5631,7 +5635,9 @@ static Key getSetupKey()
 
 static int getSetupValueFont(int type, void *value)
 {
-  if (type & TYPE_KEY)
+  if (type & TYPE_GHOSTED)
+    return FONT_OPTION_OFF;
+  else if (type & TYPE_KEY)
     return (type & TYPE_QUERY ? FONT_INPUT_1_ACTIVE : FONT_VALUE_1);
   else if (type & TYPE_STRING)
     return FONT_VALUE_2;

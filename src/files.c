@@ -8520,11 +8520,50 @@ static void setSetupInfoToDefaults_EditorCascade(struct SetupInfo *si)
   si->editor_cascade.el_dynamic		= FALSE;
 }
 
+#define MAX_HIDE_SETUP_TOKEN_SIZE		20
+
+static char *getHideSetupToken(void *setup_value)
+{
+  static char hide_setup_token[MAX_HIDE_SETUP_TOKEN_SIZE];
+
+  if (setup_value != NULL)
+    snprintf(hide_setup_token, MAX_HIDE_SETUP_TOKEN_SIZE, "%p", setup_value);
+
+  return hide_setup_token;
+}
+
+static void setHideSetupEntry(void *setup_value_raw)
+{
+  /* !!! DIRTY WORKAROUND; TO BE FIXED AFTER THE MM ENGINE RELEASE !!! */
+  void *setup_value = setup_value_raw - (void *)&si + (void *)&setup;
+
+  char *hide_setup_token = getHideSetupToken(setup_value);
+
+  if (setup_value != NULL)
+    setHashEntry(hide_setup_hash, hide_setup_token, "");
+}
+
+boolean hideSetupEntry(void *setup_value)
+{
+  char *hide_setup_token = getHideSetupToken(setup_value);
+
+  return (setup_value != NULL &&
+	  getHashEntry(hide_setup_hash, hide_setup_token) != NULL);
+}
+
 static void setSetupInfoFromTokenText(SetupFileHash *setup_file_hash,
 				      struct TokenInfo *token_info,
 				      int token_nr, char *token_text)
 {
+  char *token_hide_text = getStringCat2(token_text, ".hide");
+  char *token_hide_value = getHashEntry(setup_file_hash, token_hide_text);
+
+  /* set the value of this setup option in the setup option structure */
   setSetupInfo(token_info, token_nr, getHashEntry(setup_file_hash, token_text));
+
+  /* check if this setup option should be hidden in the setup menu */
+  if (token_hide_value != NULL && get_boolean_from_string(token_hide_value))
+    setHideSetupEntry(token_info[token_nr].value);
 }
 
 static void setSetupInfoFromTokenInfo(SetupFileHash *setup_file_hash,
@@ -8541,6 +8580,9 @@ static void decodeSetupFileHash(SetupFileHash *setup_file_hash)
 
   if (!setup_file_hash)
     return;
+
+  if (hide_setup_hash == NULL)
+    hide_setup_hash = newSetupFileHash();
 
   /* global setup */
   si = setup;
