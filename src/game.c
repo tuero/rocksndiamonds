@@ -11226,9 +11226,9 @@ void GameActionsExt()
 
       fps_frames = 0;
       fps_counter = Counter();
-    }
 
-    redraw_mask |= REDRAW_FPS;
+      redraw_mask |= REDRAW_FPS;
+    }
   }
 }
 
