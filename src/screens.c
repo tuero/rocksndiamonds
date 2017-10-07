@@ -2138,10 +2138,6 @@ static void drawMenuInfoList(int first_entry, int num_page_entries,
 	(value_ptr == &scaling_type_text  && !video.window_scaling_available))
       si->type |= TYPE_GHOSTED;
 
-    /* set some entries to "unchangeable" that should be hidden */
-    if (hideSetupEntry(value_ptr))
-      si->type |= TYPE_GHOSTED;
-
     if (si->type & (TYPE_ENTER_MENU|TYPE_ENTER_LIST))
       initCursor(i, IMG_MENU_BUTTON_ENTER_MENU);
     else if (si->type & (TYPE_LEAVE_MENU|TYPE_LEAVE_LIST))
@@ -5815,6 +5811,28 @@ static void changeSetupValue(int screen_pos, int setup_info_pos_raw, int dx)
     ToggleFullscreenOrChangeWindowScalingIfNeeded();
 }
 
+static struct TokenInfo *getSetupInfoFinal(struct TokenInfo *setup_info_orig)
+{
+  static struct TokenInfo *setup_info_hide = NULL;
+  int list_size = 0;
+  int list_pos = 0;
+  int i;
+
+  /* determine maximum list size of target list */
+  while (setup_info_orig[list_size++].type != 0);
+
+  /* free, allocate and clear memory for target list */
+  checked_free(setup_info_hide);
+  setup_info_hide = checked_calloc(list_size * sizeof(struct TokenInfo));
+
+  /* copy setup info list without setup entries marked as hidden */
+  for (i = 0; setup_info_orig[i].type != 0; i++)
+    if (!hideSetupEntry(setup_info_orig[i].value))
+      setup_info_hide[list_pos++] = setup_info_orig[i];
+
+  return setup_info_hide;
+}
+
 static void DrawSetupScreen_Generic()
 {
   int fade_mask = REDRAW_FIELD;
@@ -5913,6 +5931,9 @@ static void DrawSetupScreen_Generic()
     setup_info = setup_info_shortcuts_5;
     title_string = "Setup Shortcuts";
   }
+
+  /* use modified setup info without setup entries marked as hidden */
+  setup_info = getSetupInfoFinal(setup_info);
 
   DrawTextSCentered(mSY - SY + 16, FONT_TITLE_1, title_string);
 
