@@ -5055,6 +5055,9 @@ static void InitSetup()
 
   if (setup.options.verbose)
     options.verbose = TRUE;
+
+  if (setup.debug.show_frames_per_second)
+    global.show_frames_per_second = TRUE;
 }
 
 static void InitGameInfo()

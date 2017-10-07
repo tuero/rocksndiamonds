@@ -8103,8 +8103,9 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_DEBUG_FRAME_DELAY_KEY_9	19
 #define SETUP_TOKEN_DEBUG_FRAME_DELAY_USE_MOD_KEY 20
 #define SETUP_TOKEN_DEBUG_FRAME_DELAY_GAME_ONLY	21
+#define SETUP_TOKEN_DEBUG_SHOW_FRAMES_PER_SECOND 22
 
-#define NUM_DEBUG_SETUP_TOKENS			22
+#define NUM_DEBUG_SETUP_TOKENS			23
 
 /* options setup */
 #define SETUP_TOKEN_OPTIONS_VERBOSE		0
@@ -8296,6 +8297,7 @@ static struct TokenInfo debug_setup_tokens[] =
   { TYPE_KEY_X11, &sdi.frame_delay_key[9],	"debug.key.frame_delay_9" },
   { TYPE_BOOLEAN, &sdi.frame_delay_use_mod_key,"debug.frame_delay.use_mod_key"},
   { TYPE_BOOLEAN, &sdi.frame_delay_game_only,  "debug.frame_delay.game_only" },
+  { TYPE_BOOLEAN, &sdi.show_frames_per_second, "debug.show_frames_per_second" },
 };
 
 static struct TokenInfo options_setup_tokens[] =
@@ -8492,6 +8494,8 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
 
   si->debug.frame_delay_use_mod_key = DEFAULT_FRAME_DELAY_USE_MOD_KEY;
   si->debug.frame_delay_game_only   = DEFAULT_FRAME_DELAY_GAME_ONLY;
+
+  si->debug.show_frames_per_second = FALSE;
 
   si->options.verbose = FALSE;
 

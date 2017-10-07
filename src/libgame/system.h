@@ -1095,6 +1095,7 @@ struct SetupDebugInfo
   Key frame_delay_key[10];
   boolean frame_delay_use_mod_key;
   boolean frame_delay_game_only;
+  boolean show_frames_per_second;
 };
 
 struct SetupInfo
