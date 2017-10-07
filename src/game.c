@@ -11227,8 +11227,13 @@ void GameActionsExt()
       fps_frames = 0;
       fps_counter = Counter();
 
+      /* always draw FPS to screen after FPS value was updated */
       redraw_mask |= REDRAW_FPS;
     }
+
+    /* only draw FPS if no screen areas are deactivated (invisible warp mode) */
+    if (GetDrawDeactivationMask() == REDRAW_NONE)
+      redraw_mask |= REDRAW_FPS;
   }
 }
 

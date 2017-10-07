@@ -622,11 +622,24 @@ void DrawFramesPerSecond()
   char text[100];
   int font_nr = FONT_TEXT_2;
   int font_width = getFontWidth(font_nr);
+  int draw_deactivation_mask = GetDrawDeactivationMask();
+  boolean draw_masked = (draw_deactivation_mask == REDRAW_NONE);
 
-  sprintf(text, "%04.1f fps", global.frames_per_second);
+  /* draw FPS with leading space (needed if field buffer deactivated) */
+  sprintf(text, " %04.1f fps", global.frames_per_second);
 
-  DrawTextExt(backbuffer, WIN_XSIZE - font_width * strlen(text), 0, text,
-	      font_nr, BLIT_OPAQUE);
+  /* override draw deactivation mask (required for invisible warp mode) */
+  SetDrawDeactivationMask(REDRAW_NONE);
+
+  /* draw opaque FPS if field buffer deactivated, else draw masked FPS */
+  DrawTextExt(backbuffer, SX + SXSIZE - font_width * strlen(text), SY, text,
+	      font_nr, (draw_masked ? BLIT_MASKED : BLIT_OPAQUE));
+
+  /* set draw deactivation mask to previous value */
+  SetDrawDeactivationMask(draw_deactivation_mask);
+
+  /* force full-screen redraw in this frame */
+  redraw_mask = REDRAW_ALL;
 }
 
 #if DEBUG_FRAME_TIME
