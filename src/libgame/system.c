@@ -329,6 +329,11 @@ void SetDrawDeactivationMask(int draw_deactivation_mask)
   gfx.draw_deactivation_mask = draw_deactivation_mask;
 }
 
+int GetDrawDeactivationMask()
+{
+  return gfx.draw_deactivation_mask;
+}
+
 void SetDrawBackgroundMask(int draw_background_mask)
 {
   gfx.draw_background_mask = draw_background_mask;

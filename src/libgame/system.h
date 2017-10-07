@@ -1476,6 +1476,7 @@ void SetOverlayEnabled(boolean);
 void SetOverlayActive(boolean);
 boolean GetOverlayActive();
 void SetDrawDeactivationMask(int);
+int GetDrawDeactivationMask(void);
 void SetDrawBackgroundMask(int);
 void SetWindowBackgroundBitmap(Bitmap *);
 void SetMainBackgroundBitmap(Bitmap *);
