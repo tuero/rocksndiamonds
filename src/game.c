@@ -11212,7 +11212,7 @@ void GameActionsExt()
 
   AdvanceFrameAndPlayerCounters(-1);	/* advance counters for all players */
 
-  if (options.debug)			/* calculate frames per second */
+  if (global.show_frames_per_second)
   {
     static unsigned int fps_counter = 0;
     static int fps_frames = 0;
@@ -11220,7 +11220,7 @@ void GameActionsExt()
 
     fps_frames++;
 
-    if (fps_delay_ms >= 500)	/* calculate fps every 0.5 seconds */
+    if (fps_delay_ms >= 500)	/* calculate FPS every 0.5 seconds */
     {
       global.frames_per_second = 1000 * (float)fps_frames / fps_delay_ms;
 

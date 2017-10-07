@@ -2649,6 +2649,7 @@ struct GlobalInfo
   int num_toons;
 
   float frames_per_second;
+  boolean show_frames_per_second;
 
   /* global values for fading screens and masking borders */
   int border_status;

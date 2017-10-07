@@ -4835,6 +4835,7 @@ static void InitGlobal()
   global.create_images_dir = NULL;
 
   global.frames_per_second = 0;
+  global.show_frames_per_second = FALSE;
 
   global.border_status = GAME_MODE_LOADING;
   global.anim_status = global.anim_status_next = GAME_MODE_LOADING;

@@ -1441,6 +1441,11 @@ static void HandleKeysSpecial(Key key)
     {
       SaveNativeLevel(&level);
     }
+    else if (is_string_suffix(cheat_input, ":frames-per-second") ||
+	     is_string_suffix(cheat_input, ":fps"))
+    {
+      global.show_frames_per_second = !global.show_frames_per_second;
+    }
   }
   else if (game_status == GAME_MODE_PLAYING)
   {
