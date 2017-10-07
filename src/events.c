@@ -1470,7 +1470,7 @@ void HandleKeysDebug(Key key)
 
   if (game_status == GAME_MODE_PLAYING || !setup.debug.frame_delay_game_only)
   {
-    boolean mod_key_pressed = (GetKeyModState() != KMOD_None);
+    boolean mod_key_pressed = ((GetKeyModState() & KMOD_Valid) != KMOD_None);
 
     for (i = 0; i < NUM_DEBUG_FRAME_DELAY_KEYS; i++)
     {

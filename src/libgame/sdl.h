@@ -430,6 +430,12 @@ struct MouseCursorInfo
 #define KMOD_Meta		(KMOD_Meta_L    | KMOD_Meta_R)
 #define KMOD_Alt		(KMOD_Alt_L     | KMOD_Alt_R)
 
+/* this only contains "valid" key modifiers (and ignores keys like "NumLock") */
+#define KMOD_Valid		(KMOD_Shift   |	\
+				 KMOD_Control |	\
+				 KMOD_Meta    |	\
+				 KMOD_Alt)
+
 #if defined(TARGET_SDL2)
 #define KMOD_TextInput		(KMOD_Shift | KMOD_Alt_R)
 #endif
