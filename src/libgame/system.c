@@ -1583,9 +1583,9 @@ KeyMod GetKeyModStateFromEvents()
 void StartTextInput(int x, int y, int width, int height)
 {
 #if defined(TARGET_SDL2)
+#if defined(HAS_SCREEN_KEYBOARD)
   SDL_StartTextInput();
 
-#if defined(HAS_SCREEN_KEYBOARD)
   if (y + height > SCREEN_KEYBOARD_POS(video.height))
   {
     video.shifted_up_pos = y + height - SCREEN_KEYBOARD_POS(video.height);
@@ -1599,9 +1599,9 @@ void StartTextInput(int x, int y, int width, int height)
 void StopTextInput()
 {
 #if defined(TARGET_SDL2)
+#if defined(HAS_SCREEN_KEYBOARD)
   SDL_StopTextInput();
 
-#if defined(HAS_SCREEN_KEYBOARD)
   if (video.shifted_up)
   {
     video.shifted_up_pos = 0;
