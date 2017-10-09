@@ -1005,6 +1005,12 @@ void GetOptions(int argc, char *argv[],
 #endif
 #endif
 
+#if DEBUG
+#if defined(PLATFORM_ANDROID)
+  options.debug = TRUE;
+#endif
+#endif
+
   while (*options_left)
   {
     char option_str[MAX_OPTION_LEN];
