@@ -206,6 +206,7 @@ static unsigned int anim_sync_frame = 0;
 static int game_mode_anim_classes[NUM_GAME_MODES];
 static int anim_class_game_modes[NUM_ANIM_CLASSES];
 
+static int anim_status_last_before_fading = GAME_MODE_DEFAULT;
 static int anim_status_last = GAME_MODE_DEFAULT;
 static int anim_classes_last = ANIM_CLASS_NONE;
 
@@ -560,6 +561,7 @@ void InitGlobalAnimControls()
     anim_class_game_modes[anim_class_game_modes_list[i].class_bit] =
       anim_class_game_modes_list[i].game_mode;
 
+  anim_status_last_before_fading = GAME_MODE_LOADING;
   anim_status_last = GAME_MODE_LOADING;
   anim_classes_last = ANIM_CLASS_NONE;
 }
@@ -602,11 +604,14 @@ void DrawGlobalAnimationsExt(int drawing_target, int drawing_stage)
     // start or stop global animations by change of game mode
     // (special handling of animations for "current screen" and "all screens")
 
-    // stop animations for last screen
-    game_mode_anim_action[anim_status_last] = ANIM_STOP;
+    if (global.anim_status_next != anim_status_last_before_fading)
+    {
+      // stop animations for last screen before fading to new screen
+      game_mode_anim_action[anim_status_last] = ANIM_STOP;
 
-    // start animations for current screen
-    game_mode_anim_action[global.anim_status] = ANIM_START;
+      // start animations for current screen after fading to new screen
+      game_mode_anim_action[global.anim_status] = ANIM_START;
+    }
 
     // start animations for all screens after loading new artwork set
     if (anim_status_last == GAME_MODE_LOADING)
@@ -635,7 +640,10 @@ void DrawGlobalAnimationsExt(int drawing_target, int drawing_stage)
     if (drawing_target == DRAW_TO_SCREEN)
     {
       if (after_fading)
+      {
 	anim_classes_last = anim_classes_next;
+	anim_status_last_before_fading = global.anim_status;
+      }
 
       anim_status_last = global.anim_status;
 
