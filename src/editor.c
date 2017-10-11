@@ -5462,6 +5462,7 @@ static void ReinitializeElementList_EnableSections()
     setup_editor_el_more		= FALSE;
     setup_editor_el_sokoban		= FALSE;
     setup_editor_el_supaplex		= FALSE;
+    setup_editor_el_diamond_caves	= FALSE;
     setup_editor_el_dx_boulderdash	= FALSE;
     setup_editor_el_mirror_magic	= FALSE;
     setup_editor_el_deflektor		= FALSE;
