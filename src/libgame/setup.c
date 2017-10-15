@@ -3519,6 +3519,8 @@ static void SaveUserLevelInfo()
   setString(&level_info->author, getRealName());
   level_info->levels = 100;
   level_info->first_level = 1;
+  level_info->sort_priority = LEVELCLASS_PRIVATE_START;
+  level_info->readonly = FALSE;
 
   token_value_position = TOKEN_VALUE_POSITION_SHORT;
 
@@ -3530,7 +3532,9 @@ static void SaveUserLevelInfo()
     if (i == LEVELINFO_TOKEN_NAME ||
 	i == LEVELINFO_TOKEN_AUTHOR ||
 	i == LEVELINFO_TOKEN_LEVELS ||
-	i == LEVELINFO_TOKEN_FIRST_LEVEL)
+	i == LEVELINFO_TOKEN_FIRST_LEVEL ||
+	i == LEVELINFO_TOKEN_SORT_PRIORITY ||
+	i == LEVELINFO_TOKEN_READONLY)
       fprintf(file, "%s\n", getSetupLine(levelinfo_tokens, "", i));
 
     /* just to make things nicer :) */
