@@ -7508,37 +7508,7 @@ static void ModifyLevelInfoForSavingIntoPersonalLevelSet(char *former_name)
   }
 
   if (level_nr > leveldir_current->last_level)
-  {
-    static char *temp_levelinfo = NULL;
-    FILE *temp_file = NULL;
-    char line[MAX_LINE_LEN];
-
-    setString(&temp_levelinfo,
-	      getPath2(getCurrentLevelDir(),
-		       getStringCat2(LEVELINFO_FILENAME, ".new")));
-
-    if ((file = fopen(filename_levelinfo, MODE_READ)) &&
-	(temp_file = fopen(temp_levelinfo, MODE_WRITE)))
-    {
-      while (fgets(line, MAX_LINE_LEN, file))
-      {
-	if (!strPrefix(line, "levels:"))
-	  fputs(line, temp_file);
-	else
-	  fprintf(temp_file, "%-32s%d\n", "levels:", level_nr + 9);
-      }
-    }
-
-    if (temp_file)
-      fclose(temp_file);
-
-    if (file)
-      fclose(file);
-
-    // needs error handling; also, ok on dos/win?
-    unlink(filename_levelinfo);
-    rename(temp_levelinfo, filename_levelinfo);
-  }
+    UpdateUserLevelSet(getLoginName(), NULL, NULL, level_nr + 9, -1);
 
   // else: allow the save even if annotation failed
 
