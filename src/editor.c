@@ -8660,6 +8660,24 @@ static void DrawPropertiesTabulatorGadgets()
 		  getTabulatorBarWidth(), getTabulatorBarHeight(), tab_color);
 }
 
+static void PrintInfoText(char *text, int font_nr, int xpos, int ypos)
+{
+  DrawText(SX + xpos, SY + ypos, text, font_nr);
+}
+
+static int PrintElementDescriptionFromFile(char *filename, int font_nr,
+					   int xpos, int ypos)
+{
+  int font_width = getFontWidth(font_nr);
+  int font_height = getFontHeight(font_nr);
+  int max_chars_per_line = (SXSIZE - 2 * xpos) / font_width;
+  int max_lines_drawable = (SYSIZE - ypos) / font_height - 1;
+
+  return DrawTextFile(SX + xpos, SY + ypos, filename, font_nr,
+		      max_chars_per_line, -1, max_lines_drawable, 0, -1,
+		      TRUE, FALSE, FALSE);
+}
+
 static void DrawLevelInfoLevel()
 {
   int i;
@@ -8945,24 +8963,6 @@ static void DrawEnvelopeTextArea(int envelope_nr)
 	       GDI_END);
 
   MapTextAreaGadget(ED_TEXTAREA_ID_ENVELOPE_INFO);
-}
-
-static void PrintInfoText(char *text, int font_nr, int xpos, int ypos)
-{
-  DrawText(SX + xpos, SY + ypos, text, font_nr);
-}
-
-static int PrintElementDescriptionFromFile(char *filename, int font_nr,
-					   int xpos, int ypos)
-{
-  int font_width = getFontWidth(font_nr);
-  int font_height = getFontHeight(font_nr);
-  int max_chars_per_line = (SXSIZE - 2 * xpos) / font_width;
-  int max_lines_drawable = (SYSIZE - ypos) / font_height - 1;
-
-  return DrawTextFile(SX + xpos, SY + ypos, filename, font_nr,
-		      max_chars_per_line, -1, max_lines_drawable, 0, -1,
-		      TRUE, FALSE, FALSE);
 }
 
 static void DrawPropertiesInfo()
