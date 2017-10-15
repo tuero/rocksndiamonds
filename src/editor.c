@@ -2605,13 +2605,13 @@ static struct
   {
     ED_LEVEL_TABS_XPOS(0),		ED_LEVEL_TABS_YPOS(0),
     GADGET_ID_LEVELINFO_LEVEL,		GADGET_ID_NONE,
-    8,					"Level",			
+    8,					"Level",
     NULL, NULL, NULL,			"Configure level properties"
   },
   {
     -1,					-1,
     GADGET_ID_LEVELINFO_EDITOR,		GADGET_ID_LEVELINFO_LEVEL,
-    8,					"Editor",			
+    8,					"Editor",
     NULL, NULL, NULL,			"Configure editor properties"
   },
 
@@ -2620,7 +2620,7 @@ static struct
   {
     ED_ELEMENT_TABS_XPOS(0),		ED_ELEMENT_TABS_YPOS(0),
     GADGET_ID_PROPERTIES_INFO,		GADGET_ID_NONE,
-    8,					"Info",			
+    8,					"Info",
     NULL, NULL, NULL,			"Show information about element"
   },
   {
