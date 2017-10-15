@@ -2333,7 +2333,7 @@ static struct
   int size;	/* char size of selectbox or '-1' (dynamically determined) */
   struct ValueTextInfo *options;
   int *value;
-  char *text_left, *text_right, *infotext;
+  char *text_above, *text_left, *text_right, *infotext;
 } selectbox_info[ED_NUM_SELECTBOX] =
 {
   /* ---------- level and editor settings ---------------------------------- */
@@ -2344,7 +2344,7 @@ static struct
     -1,
     options_time_or_steps,
     &level.use_step_counter,
-    NULL, "(0 => no limit)",		"time or step limit"
+    NULL, NULL, "(0 => no limit)",	"time or step limit"
   },
   {
     ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(11),
@@ -2352,7 +2352,7 @@ static struct
     -1,
     options_game_engine_type,
     &level.game_engine_type,
-    "game engine:", NULL,		"game engine"
+    NULL, "game engine:", NULL,		"game engine"
   },
 
   /* ---------- element settings: configure (several elements) ------------- */
@@ -2363,7 +2363,7 @@ static struct
     -1,
     options_wind_direction,
     &level.wind_direction_initial,
-    "initial wind direction:", NULL,	"initial wind direction"
+    NULL, "initial wind direction:", NULL,	"initial wind direction"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(7),
@@ -2371,7 +2371,7 @@ static struct
     -1,
     options_player_speed,
     &level.initial_player_stepsize[0],
-    "initial player speed:", NULL,	"initial player speed"
+    NULL, "initial player speed:", NULL,	"initial player speed"
   },
 
   /* ---------- element settings: configure 1 (custom elements) ------------ */
@@ -2382,7 +2382,7 @@ static struct
     -1,
     options_access_type,
     &custom_element.access_type,
-    NULL, NULL,				"type of access to this field"
+    NULL, NULL, NULL,			"type of access to this field"
   },
   {
     -1,					ED_ELEMENT_SETTINGS_YPOS(2),
@@ -2390,7 +2390,7 @@ static struct
     -1,
     options_access_layer,
     &custom_element.access_layer,
-    NULL, NULL,				"layer of access for this field"
+    NULL, NULL, NULL,			"layer of access for this field"
   },
   {
     -1,					ED_ELEMENT_SETTINGS_YPOS(2),
@@ -2398,7 +2398,7 @@ static struct
     -1,
     options_access_protected,
     &custom_element.access_protected,
-    NULL, NULL,				"protected access for this field"
+    NULL, NULL, NULL,			"protected access for this field"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(3),
@@ -2406,7 +2406,7 @@ static struct
     -1,
     options_access_direction,
     &custom_element.access_direction,
-    "from", NULL,			"access direction for this field"
+    NULL, "from", NULL,			"access direction for this field"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(4),
@@ -2414,7 +2414,7 @@ static struct
     -1,
     options_walk_to_action,
     &custom_element.walk_to_action,
-    NULL, NULL,				"diggable/collectible/pushable"
+    NULL, NULL, NULL,			"diggable/collectible/pushable"
   },
 
   /* ---------- element settings: configure 2 (custom elements) ------------ */
@@ -2425,7 +2425,7 @@ static struct
     -1,
     options_move_pattern,
     &custom_element.move_pattern,
-    "can move", NULL,			"element move pattern"
+    NULL, "can move", NULL,		"element move pattern"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(2),
@@ -2433,7 +2433,7 @@ static struct
     -1,
     options_move_direction,
     &custom_element.move_direction_initial,
-    "starts moving", NULL,		"initial element move direction"
+    NULL, "starts moving", NULL,	"initial element move direction"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(4),
@@ -2441,7 +2441,7 @@ static struct
     -1,
     options_move_stepsize,
     &custom_element.move_stepsize,
-    "move/fall speed", NULL,		"speed of element movement"
+    NULL, "move/fall speed", NULL,	"speed of element movement"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(3),
@@ -2451,8 +2451,8 @@ static struct
     &custom_element.move_leave_type,
     // left text with leading spaces to place gadget next to "can dig" gadget
     // (needed because drawing area gadgets created after selectbox gadgets)
-    // "can dig:    can", ":",		"leave behind or change element"
-    "            can", ":",		"leave behind or change element"
+    // NULL, "can dig:    can", ":",	"leave behind or change element"
+    NULL, "            can", ":",	"leave behind or change element"
   },
   {
     -1,					ED_ELEMENT_SETTINGS_YPOS(7),
@@ -2460,7 +2460,7 @@ static struct
     -1,
     options_smash_targets,
     &custom_element.smash_targets,
-    "can smash", NULL,			"elements that can be smashed"
+    NULL, "can smash", NULL,		"elements that can be smashed"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(8),
@@ -2468,7 +2468,7 @@ static struct
     -1,
     options_slippery_type,
     &custom_element.slippery_type,
-    "slippery", NULL,			"where other elements fall down"
+    NULL, "slippery", NULL,		"where other elements fall down"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(9),
@@ -2476,7 +2476,7 @@ static struct
     -1,
     options_deadliness,
     &custom_element.deadliness,
-    "deadly when", NULL,		"deadliness of element"
+    NULL, "deadly when", NULL,		"deadliness of element"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(10),
@@ -2484,7 +2484,7 @@ static struct
     -1,
     options_explosion_type,
     &custom_element.explosion_type,
-    "can explode", NULL,		"explosion type"
+    NULL, "can explode", NULL,		"explosion type"
   },
 
   /* ---------- element settings: advanced (custom elements) --------------- */
@@ -2495,7 +2495,7 @@ static struct
     -1,
     options_time_units,
     &custom_element_change.delay_frames,
-    "delay time given in", NULL,	"delay time units for change"
+    NULL, "delay time given in", NULL,	"delay time units for change"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(2),	ED_ELEMENT_SETTINGS_YPOS(4),
@@ -2503,7 +2503,7 @@ static struct
     -1,
     options_change_direct_action,
     &custom_element_change.direct_action,
-    NULL, NULL,				"type of direct action"
+    NULL, NULL, NULL,			"type of direct action"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(2),	ED_ELEMENT_SETTINGS_YPOS(5),
@@ -2511,7 +2511,7 @@ static struct
     -1,
     options_change_other_action,
     &custom_element_change.other_action,
-    NULL, "element:",			"type of other element action"
+    NULL, NULL, "element:",		"type of other element action"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(2),	ED_ELEMENT_SETTINGS_YPOS(6),
@@ -2519,7 +2519,7 @@ static struct
     -1,
     options_change_trigger_side,
     &custom_element_change.trigger_side,
-    "at", "side",			"element side triggering change"
+    NULL, "at", "side",			"element side triggering change"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(2),	ED_ELEMENT_SETTINGS_YPOS(7),
@@ -2527,7 +2527,7 @@ static struct
     -1,
     options_change_trigger_player,
     &custom_element_change.trigger_player,
-    "player:", " ",			"player that causes change"
+    NULL, "player:", " ",		"player that causes change"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(2),	ED_ELEMENT_SETTINGS_YPOS(7),
@@ -2535,7 +2535,7 @@ static struct
     -1,
     options_change_trigger_page,
     &custom_element_change.trigger_page,
-    "page:", NULL,			"change page that causes change"
+    NULL, "page:", NULL,		"change page that causes change"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(2),	ED_ELEMENT_SETTINGS_YPOS(10),
@@ -2543,7 +2543,7 @@ static struct
     -1,
     options_change_replace_when,
     &custom_element_change.replace_when,
-    "replace when", NULL,		"which elements can be replaced"
+    NULL, "replace when", NULL,		"which elements can be replaced"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(13),
@@ -2551,7 +2551,7 @@ static struct
     -1,
     options_action_type,
     &custom_element_change.action_type,
-    NULL, NULL,				"action on specified condition"
+    NULL, NULL, NULL,			"action on specified condition"
   },
   {
     -1,					ED_ELEMENT_SETTINGS_YPOS(13),
@@ -2559,7 +2559,7 @@ static struct
     -1,
     options_action_mode_none,
     &custom_element_change.action_mode,
-    NULL, NULL,				"action operator"
+    NULL, NULL, NULL,			"action operator"
   },
   {
     -1,					ED_ELEMENT_SETTINGS_YPOS(13),
@@ -2567,7 +2567,7 @@ static struct
     -1,
     options_action_arg_none,
     &custom_element_change.action_arg,
-    NULL, NULL,				"action parameter"
+    NULL, NULL, NULL,			"action parameter"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(14),
@@ -2575,7 +2575,7 @@ static struct
     3,
     options_change_page,
     &custom_element.current_change_page,
-    NULL, NULL,				"element change page"
+    NULL, NULL, NULL,			"element change page"
   },
 
   /* ---------- element settings: configure (group elements) --------------- */
@@ -2586,7 +2586,7 @@ static struct
     -1,
     options_group_choice_mode,
     &group_element_info.choice_mode,
-    "choice type:", NULL,		"type of group element choice"
+    NULL, "choice type:", NULL,		"type of group element choice"
   },
 };
 
@@ -7114,10 +7114,16 @@ static void MapSelectboxGadget(int id)
   struct GadgetInfo *gi = level_editor_gadget[selectbox_info[id].gadget_id];
   int xoffset_left = getTextWidthForGadget(selectbox_info[id].text_left);
   int xoffset_right = ED_GADGET_TEXT_DISTANCE;
+  int yoffset_above = font_height + ED_GADGET_LINE_DISTANCE;
   int yoffset = (gi->height - font_height) / 2;
   int x_left = gi->x - xoffset_left;
   int x_right = gi->x + gi->width + xoffset_right;
+  int y_above = gi->y - yoffset_above;
+  int x = gi->x;
   int y = gi->y + yoffset;
+
+  if (selectbox_info[id].text_above)
+    DrawText(x, y_above, selectbox_info[id].text_above, font_nr);
 
   if (selectbox_info[id].text_left)
     DrawText(x_left, y, selectbox_info[id].text_left, font_nr);
