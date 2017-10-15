@@ -271,6 +271,7 @@ char *getPersonalDataDir(void);
 char *getUserGameDataDir(void);
 char *getSetupDir(void);
 char *getCurrentLevelDir(void);
+char *getNewUserLevelSubdir(void);
 
 void createDirectory(char *, char *, int);
 void InitUserDataDirectory(void);

@@ -202,6 +202,28 @@ char *getCurrentLevelDir()
   return getLevelDirFromTreeInfo(leveldir_current);
 }
 
+char *getNewUserLevelSubdir()
+{
+  static char *new_level_subdir = NULL;
+  char *subdir_prefix = getLoginName();
+  char subdir_suffix[10];
+  int max_suffix_number = 1000;
+  int i = 0;
+
+  while (++i < max_suffix_number)
+  {
+    sprintf(subdir_suffix, "_%d", i);
+
+    checked_free(new_level_subdir);
+    new_level_subdir = getStringCat2(subdir_prefix, subdir_suffix);
+
+    if (!directoryExists(getUserLevelDir(new_level_subdir)))
+      break;
+  }
+
+  return new_level_subdir;
+}
+
 static char *getTapeDir(char *level_subdir)
 {
   static char *tape_dir = NULL;
