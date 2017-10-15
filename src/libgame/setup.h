@@ -310,6 +310,9 @@ void LoadLevelInfo(void);
 void LoadArtworkInfo(void);
 void LoadLevelArtworkInfo(void);
 
+boolean UpdateUserLevelSet(char *, char *, char *, int, int);
+boolean CreateUserLevelSet(char *, char *, char *, int, int);
+
 void LoadLevelSetup_LastSeries(void);
 void SaveLevelSetup_LastSeries(void);
 void SaveLevelSetup_LastSeries_Deactivate();

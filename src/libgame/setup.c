@@ -3494,20 +3494,76 @@ void LoadLevelArtworkInfo()
   print_timestamp_done("LoadLevelArtworkInfo");
 }
 
-static void SaveUserLevelInfo()
+boolean UpdateUserLevelSet(char *level_subdir,
+			   char *level_name, char *level_author,
+			   int num_levels, int first_level_nr)
+{
+  char *filename = getPath2(getUserLevelDir(level_subdir), LEVELINFO_FILENAME);
+  char *filename_tmp = getStringCat2(filename, ".tmp");
+  FILE *file = NULL;
+  FILE *file_tmp = NULL;
+  char line[MAX_LINE_LEN];
+  boolean update_num_levels_only = FALSE;
+  boolean success = FALSE;
+
+  if (level_name == NULL || level_author == NULL || first_level_nr == -1)
+    update_num_levels_only = TRUE;
+
+  if ((file     = fopen(filename,     MODE_READ)) &&
+      (file_tmp = fopen(filename_tmp, MODE_WRITE)))
+  {
+    while (fgets(line, MAX_LINE_LEN, file))
+    {
+      if (strPrefix(line, "name:") && !update_num_levels_only)
+	fprintf(file_tmp, "%-32s%s\n", "name:", level_name);
+      else if (strPrefix(line, "author:") && !update_num_levels_only)
+	fprintf(file_tmp, "%-32s%s\n", "author:", level_author);
+      else if (strPrefix(line, "levels:"))
+	fprintf(file_tmp, "%-32s%d\n", "levels:", num_levels);
+      else if (strPrefix(line, "first_level:") && !update_num_levels_only)
+	fprintf(file_tmp, "%-32s%d\n", "first_level:", first_level_nr);
+      else
+	fputs(line, file_tmp);
+    }
+
+    success = TRUE;
+  }
+
+  if (file)
+    fclose(file);
+
+  if (file_tmp)
+    fclose(file_tmp);
+
+  if (success)
+    success = (rename(filename_tmp, filename) == 0);
+
+  free(filename);
+  free(filename_tmp);
+
+  return success;
+}
+
+boolean CreateUserLevelSet(char *level_subdir,
+			   char *level_name, char *level_author,
+			   int num_levels, int first_level_nr)
 {
   LevelDirTree *level_info;
   char *filename;
   FILE *file;
   int i;
 
-  filename = getPath2(getUserLevelDir(getLoginName()), LEVELINFO_FILENAME);
+  // create user level sub-directory, if needed
+  createDirectory(getUserLevelDir(level_subdir), "user level", PERMS_PRIVATE);
+
+  filename = getPath2(getUserLevelDir(level_subdir), LEVELINFO_FILENAME);
 
   if (!(file = fopen(filename, MODE_WRITE)))
   {
     Error(ERR_WARN, "cannot write level info file '%s'", filename);
     free(filename);
-    return;
+
+    return FALSE;
   }
 
   level_info = newTreeInfo();
@@ -3515,10 +3571,10 @@ static void SaveUserLevelInfo()
   /* always start with reliable default values */
   setTreeInfoToDefaults(level_info, TREE_TYPE_LEVEL_DIR);
 
-  setString(&level_info->name, getLoginName());
-  setString(&level_info->author, getRealName());
-  level_info->levels = 100;
-  level_info->first_level = 1;
+  setString(&level_info->name, level_name);
+  setString(&level_info->author, level_author);
+  level_info->levels = num_levels;
+  level_info->first_level = first_level_nr;
   level_info->sort_priority = LEVELCLASS_PRIVATE_START;
   level_info->readonly = FALSE;
 
@@ -3550,6 +3606,13 @@ static void SaveUserLevelInfo()
 
   freeTreeInfo(level_info);
   free(filename);
+
+  return TRUE;
+}
+
+static void SaveUserLevelInfo()
+{
+  CreateUserLevelSet(getLoginName(), getLoginName(), getRealName(), 100, 1);
 }
 
 char *getSetupValue(int type, void *value)
