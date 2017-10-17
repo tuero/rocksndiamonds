@@ -3526,6 +3526,30 @@ boolean UpdateUserLevelSet(char *level_subdir,
   FILE *file_tmp = NULL;
   char line[MAX_LINE_LEN];
   boolean success = FALSE;
+  LevelDirTree *leveldir = getTreeInfoFromIdentifier(leveldir_first,
+						     level_subdir);
+  // update values in level directory tree
+
+  if (level_name != NULL)
+    setString(&leveldir->name, level_name);
+
+  if (level_author != NULL)
+    setString(&leveldir->author, level_author);
+
+  if (num_levels != -1)
+    leveldir->levels = num_levels;
+
+  if (first_level_nr != -1)
+    leveldir->first_level = first_level_nr;
+
+  // update values that depend on other values
+
+  setString(&leveldir->name_sorting, leveldir->name);
+
+  leveldir->last_level = leveldir->first_level + leveldir->levels - 1;
+
+  // sort order of level sets may have changed
+  sortTreeInfo(&leveldir_first);
 
   if ((file     = fopen(filename,     MODE_READ)) &&
       (file_tmp = fopen(filename_tmp, MODE_WRITE)))
