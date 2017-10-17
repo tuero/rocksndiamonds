@@ -3612,7 +3612,8 @@ boolean CreateUserLevelSet(char *level_subdir,
       fprintf(file, "%s\n", getSetupLine(levelinfo_tokens, "", i));
 
     /* just to make things nicer :) */
-    if (i == LEVELINFO_TOKEN_AUTHOR)
+    if (i == LEVELINFO_TOKEN_AUTHOR ||
+	i == LEVELINFO_TOKEN_FIRST_LEVEL)
       fprintf(file, "\n");	
   }
 
