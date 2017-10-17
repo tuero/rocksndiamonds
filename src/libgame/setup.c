@@ -3559,9 +3559,8 @@ void AddUserLevelSetToLevelInfo(char *level_subdir_new)
     Error(ERR_EXIT, "internal level set structure corrupted -- aborting");
 }
 
-boolean UpdateUserLevelSet(char *level_subdir,
-			   char *level_name, char *level_author,
-			   int num_levels, int first_level_nr)
+boolean UpdateUserLevelSet(char *level_subdir, char *level_name,
+			   char *level_author, int num_levels)
 {
   char *filename = getPath2(getUserLevelDir(level_subdir), LEVELINFO_FILENAME);
   char *filename_tmp = getStringCat2(filename, ".tmp");
@@ -3581,9 +3580,6 @@ boolean UpdateUserLevelSet(char *level_subdir,
 
   if (num_levels != -1)
     leveldir->levels = num_levels;
-
-  if (first_level_nr != -1)
-    leveldir->first_level = first_level_nr;
 
   // update values that depend on other values
 
@@ -3605,8 +3601,6 @@ boolean UpdateUserLevelSet(char *level_subdir,
 	fprintf(file_tmp, "%-32s%s\n", "author:", level_author);
       else if (strPrefix(line, "levels:") && num_levels != -1)
 	fprintf(file_tmp, "%-32s%d\n", "levels:", num_levels);
-      else if (strPrefix(line, "first_level:") && first_level_nr != -1)
-	fprintf(file_tmp, "%-32s%d\n", "first_level:", first_level_nr);
       else
 	fputs(line, file_tmp);
     }
@@ -3629,9 +3623,8 @@ boolean UpdateUserLevelSet(char *level_subdir,
   return success;
 }
 
-boolean CreateUserLevelSet(char *level_subdir,
-			   char *level_name, char *level_author,
-			   int num_levels, int first_level_nr)
+boolean CreateUserLevelSet(char *level_subdir, char *level_name,
+			   char *level_author, int num_levels)
 {
   LevelDirTree *level_info;
   char *filename;
@@ -3659,7 +3652,7 @@ boolean CreateUserLevelSet(char *level_subdir,
   setString(&level_info->name, level_name);
   setString(&level_info->author, level_author);
   level_info->levels = num_levels;
-  level_info->first_level = first_level_nr;
+  level_info->first_level = 1;
   level_info->sort_priority = LEVELCLASS_PRIVATE_START;
   level_info->readonly = FALSE;
 
@@ -3698,7 +3691,7 @@ boolean CreateUserLevelSet(char *level_subdir,
 
 static void SaveUserLevelInfo()
 {
-  CreateUserLevelSet(getLoginName(), getLoginName(), getRealName(), 100, 1);
+  CreateUserLevelSet(getLoginName(), getLoginName(), getRealName(), 100);
 }
 
 char *getSetupValue(int type, void *value)

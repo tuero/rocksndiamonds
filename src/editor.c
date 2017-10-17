@@ -1297,7 +1297,6 @@ static struct ElementInfo custom_element;
 static char levelset_name[MAX_LEVEL_NAME_LEN + 1];
 static char levelset_author[MAX_LEVEL_AUTHOR_LEN + 1];
 static int levelset_num_levels = 100;
-static int levelset_first_level_nr = 1;
 static int levelset_save_mode = LEVELSET_SAVE_MODE_UPDATE;
 
 static struct
@@ -7591,7 +7590,7 @@ static void ModifyLevelInfoForSavingIntoPersonalLevelSet(char *former_name)
   }
 
   if (level_nr > leveldir_current->last_level)
-    UpdateUserLevelSet(getLoginName(), NULL, NULL, level_nr + 9, -1);
+    UpdateUserLevelSet(getLoginName(), NULL, NULL, level_nr + 9);
 
   // else: allow the save even if annotation failed
 
@@ -8230,8 +8229,7 @@ static void InitLevelSetInfo()
   snprintf(levelset_author, MAX_LEVEL_AUTHOR_LEN + 1,
 	   "%s", leveldir_current->author);
 
-  levelset_num_levels     = leveldir_current->levels;
-  levelset_first_level_nr = leveldir_current->first_level;
+  levelset_num_levels = leveldir_current->levels;
 
   levelset_save_mode = LEVELSET_SAVE_MODE_UPDATE;
 }
@@ -12640,8 +12638,7 @@ static void HandleTextbuttonGadgets(struct GadgetInfo *gi)
       if (UpdateUserLevelSet(levelset_subdir,
 			     levelset_name,
 			     levelset_author,
-			     levelset_num_levels,
-			     levelset_first_level_nr))
+			     levelset_num_levels))
       {
 	Request("Level set updated!", REQ_CONFIRM);
       }
@@ -12655,8 +12652,7 @@ static void HandleTextbuttonGadgets(struct GadgetInfo *gi)
       if (CreateUserLevelSet(levelset_subdir,
 			     levelset_name,
 			     levelset_author,
-			     levelset_num_levels,
-			     1))
+			     levelset_num_levels))
       {
 	Request("New level set created!", REQ_CONFIRM);
 
