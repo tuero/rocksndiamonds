@@ -8236,6 +8236,26 @@ static void InitLevelSetInfo()
   levelset_save_mode = LEVELSET_SAVE_MODE_UPDATE;
 }
 
+static void ChangeEditorToLevelSet(char *levelset_subdir)
+{
+  leveldir_current = getTreeInfoFromIdentifier(leveldir_first, levelset_subdir);
+
+  // the previous level set might have used custom artwork
+  ReloadCustomArtwork(0);
+
+  LoadLevelSetup_SeriesInfo();
+
+  SaveLevelSetup_LastSeries();
+  SaveLevelSetup_SeriesInfo();
+
+  TapeErase();
+
+  LoadLevel(level_nr);
+  LoadScore(level_nr);
+
+  DrawLevelEd();
+}
+
 void DrawLevelEd()
 {
   int fade_mask = REDRAW_FIELD;
@@ -12639,13 +12659,14 @@ static void HandleTextbuttonGadgets(struct GadgetInfo *gi)
 			     levelset_first_level_nr))
       {
 	Request("New level set created!", REQ_CONFIRM);
+
+	AddUserLevelSetToLevelInfo(levelset_subdir);
+	ChangeEditorToLevelSet(levelset_subdir);
       }
       else
       {
 	Request("Creating new level set failed!", REQ_CONFIRM);
       }
-
-      DrawLevelInfoWindow();	// update (increment) level set directory name
     }
   }
   else if (type_id == ED_TEXTBUTTON_ID_ADD_CHANGE_PAGE &&
