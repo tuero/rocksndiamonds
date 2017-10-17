@@ -3525,24 +3525,20 @@ boolean UpdateUserLevelSet(char *level_subdir,
   FILE *file = NULL;
   FILE *file_tmp = NULL;
   char line[MAX_LINE_LEN];
-  boolean update_num_levels_only = FALSE;
   boolean success = FALSE;
-
-  if (level_name == NULL || level_author == NULL || first_level_nr == -1)
-    update_num_levels_only = TRUE;
 
   if ((file     = fopen(filename,     MODE_READ)) &&
       (file_tmp = fopen(filename_tmp, MODE_WRITE)))
   {
     while (fgets(line, MAX_LINE_LEN, file))
     {
-      if (strPrefix(line, "name:") && !update_num_levels_only)
+      if (strPrefix(line, "name:") && level_name != NULL)
 	fprintf(file_tmp, "%-32s%s\n", "name:", level_name);
-      else if (strPrefix(line, "author:") && !update_num_levels_only)
+      else if (strPrefix(line, "author:") && level_author != NULL)
 	fprintf(file_tmp, "%-32s%s\n", "author:", level_author);
-      else if (strPrefix(line, "levels:"))
+      else if (strPrefix(line, "levels:") && num_levels != -1)
 	fprintf(file_tmp, "%-32s%d\n", "levels:", num_levels);
-      else if (strPrefix(line, "first_level:") && !update_num_levels_only)
+      else if (strPrefix(line, "first_level:") && first_level_nr != -1)
 	fprintf(file_tmp, "%-32s%d\n", "first_level:", first_level_nr);
       else
 	fputs(line, file_tmp);
