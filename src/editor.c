@@ -12656,7 +12656,7 @@ static void HandleTextbuttonGadgets(struct GadgetInfo *gi)
 			     levelset_name,
 			     levelset_author,
 			     levelset_num_levels,
-			     levelset_first_level_nr))
+			     1))
       {
 	Request("New level set created!", REQ_CONFIRM);
 
