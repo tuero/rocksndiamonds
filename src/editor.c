@@ -8766,19 +8766,24 @@ static void DrawLevelInfoLevel()
     MapTextInputGadget(i);
 }
 
+static char *getLevelSubdirFromSaveMode(int save_mode)
+{
+  if (save_mode == LEVELSET_SAVE_MODE_CREATE)
+    return getNewUserLevelSubdir();
+
+  return leveldir_current->subdir;
+}
+
 static void DrawLevelInfoLevelSet_DirectoryInfo()
 {
   char *directory_text = "Level set directory:";
-  char *directory_name = leveldir_current->subdir;
+  char *directory_name = getLevelSubdirFromSaveMode(levelset_save_mode);
   int font1_nr = FONT_TEXT_1;
   int font2_nr = FONT_TEXT_2;
   int font1_height = getFontHeight(font1_nr);
   int yoffset_above = font1_height + ED_GADGET_LINE_DISTANCE;
   int x = ED_LEVEL_SETTINGS_X(0);
   int y = ED_LEVEL_SETTINGS_Y(6);
-
-  if (levelset_save_mode == LEVELSET_SAVE_MODE_CREATE)
-    directory_name = getNewUserLevelSubdir();
 
   PrintInfoText(directory_text, font1_nr, x, y - yoffset_above);
   PrintInfoText(directory_name, font2_nr, x, y);
@@ -12586,6 +12591,8 @@ static void HandleTextbuttonGadgets(struct GadgetInfo *gi)
   }
   else if (type_id == ED_TEXTBUTTON_ID_SAVE_LEVELSET)
   {
+    char *levelset_subdir = getLevelSubdirFromSaveMode(levelset_save_mode);
+
     if (levelset_save_mode == LEVELSET_SAVE_MODE_UPDATE &&
 	leveldir_current->readonly)
     {
@@ -12610,7 +12617,7 @@ static void HandleTextbuttonGadgets(struct GadgetInfo *gi)
 
     if (levelset_save_mode == LEVELSET_SAVE_MODE_UPDATE)
     {
-      if (UpdateUserLevelSet(leveldir_current->subdir,
+      if (UpdateUserLevelSet(levelset_subdir,
 			     levelset_name,
 			     levelset_author,
 			     levelset_num_levels,
@@ -12625,7 +12632,7 @@ static void HandleTextbuttonGadgets(struct GadgetInfo *gi)
     }
     else
     {
-      if (CreateUserLevelSet(getNewUserLevelSubdir(),
+      if (CreateUserLevelSet(levelset_subdir,
 			     levelset_name,
 			     levelset_author,
 			     levelset_num_levels,
