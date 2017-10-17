@@ -2649,7 +2649,7 @@ static TreeInfo *createTopTreeInfoNode(TreeInfo *node_first)
   setString(&ti_new->name_sorting, ti_new->name);
 
   setString(&ti_new->subdir, STRING_TOP_DIRECTORY);
-  setString(&ti_new->fullpath, node_first->fullpath);
+  setString(&ti_new->fullpath, ".");
 
   ti_new->sort_priority = node_first->sort_priority;;
   ti_new->latest_engine = node_first->latest_engine;
