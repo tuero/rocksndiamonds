@@ -871,8 +871,8 @@ struct FontBitmapInfo
 {
   Bitmap *bitmap;
 
-  int src_x, src_y;		/* start position of animation frames */
-  int width, height;		/* width/height of each animation frame */
+  int src_x, src_y;		/* start position of font characters */
+  int width, height;		/* width / height of font characters */
 
   int draw_xoffset;		/* offset for drawing font characters */
   int draw_yoffset;		/* offset for drawing font characters */
