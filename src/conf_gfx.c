@@ -7760,6 +7760,14 @@ struct ConfigInfo image_config[] =
   { "menu.list_size.INFO[ELEMENTS]",		"-1"			},
   { "menu.list_size.SETUP",			"-1"			},
 
+  { "menu.text.paragraph.large_spacing",	"-3"			},
+  { "menu.text.paragraph.normal_spacing",	"-2"			},
+  { "menu.text.headline.large_spacing",		"-2"			},
+  { "menu.text.headline.normal_spacing",	"-1"			},
+  { "menu.text.line.large_spacing",		"-1"			},
+  { "menu.text.line.normal_spacing",		"0"			},
+  { "menu.text.all.extra_spacing",		"2"			},
+
   { "main.button.name.x",			"0"			},
   { "main.button.name.y",			"64"			},
   { "main.button.levels.x",			"0"			},
