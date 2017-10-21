@@ -3276,8 +3276,8 @@ void HandleInfoScreen_Program(int button)
 
 void DrawInfoScreen_Version()
 {
-  int font_header = FONT_TEXT_3;
-  int font_text = FONT_TEXT_2;
+  int font_header = FONT_TEXT_2;
+  int font_text = FONT_TEXT_3;
   int xstep = getFontWidth(font_text);
   int ystep = getFontHeight(font_text);
   int ystart1 = mSY - SY + 100;
