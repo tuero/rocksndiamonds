@@ -874,6 +874,9 @@ struct FontBitmapInfo
   int src_x, src_y;		/* start position of font characters */
   int width, height;		/* width / height of font characters */
 
+  int offset_x;			/* offset to next font character */
+  int offset_y;			/* offset to next font character */
+
   int draw_xoffset;		/* offset for drawing font characters */
   int draw_yoffset;		/* offset for drawing font characters */
 

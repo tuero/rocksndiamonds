@@ -103,8 +103,8 @@ void getFontCharSource(int font_nr, char c, Bitmap **bitmap, int *x, int *y)
   int font_pos = getFontCharPosition(font_nr, c);
 
   *bitmap = font->bitmap;
-  *x = font->src_x + (font_pos % font->num_chars_per_line) * font->width;
-  *y = font->src_y + (font_pos / font->num_chars_per_line) * font->height;
+  *x = font->src_x + (font_pos % font->num_chars_per_line) * font->offset_x;
+  *y = font->src_y + (font_pos / font->num_chars_per_line) * font->offset_y;
 }
 
 
