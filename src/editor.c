@@ -5688,6 +5688,10 @@ static void ReinitializeElementList()
 
     num_editor_elements += num_editor_el_empty;
   }
+  else
+  {
+    num_editor_el_empty = 0;
+  }
 
   editor_elements = checked_malloc(num_editor_elements * sizeof(int));
 
