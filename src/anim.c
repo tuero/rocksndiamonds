@@ -1460,6 +1460,7 @@ static void InitGlobalAnim_Clickable()
 
 static boolean InitGlobalAnim_Clicked(int mx, int my, boolean clicked)
 {
+  boolean anything_clicked = FALSE;
   boolean any_part_clicked = FALSE;
   int mode_nr;
 
@@ -1468,12 +1469,14 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, boolean clicked)
     struct GlobalAnimControlInfo *ctrl = &global_anim_ctrl[mode_nr];
     int anim_nr;
 
-    for (anim_nr = 0; anim_nr < ctrl->num_anims; anim_nr++)
+    // check animations in reverse draw order (to stop when clicked)
+    for (anim_nr = ctrl->num_anims - 1; anim_nr >= 0; anim_nr--)
     {
       struct GlobalAnimMainControlInfo *anim = &ctrl->anim[anim_nr];
       int part_nr;
 
-      for (part_nr = 0; part_nr < anim->num_parts_all; part_nr++)
+      // check animation parts in reverse draw order (to stop when clicked)
+      for (part_nr = anim->num_parts_all - 1; part_nr >= 0; part_nr--)
       {
 	struct GlobalAnimPartControlInfo *part = &anim->part[part_nr];
 
@@ -1487,8 +1490,13 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, boolean clicked)
 	if (!part->clickable)
 	  continue;
 
+	// always handle "any" click events (clicking anywhere on screen) ...
 	if (isClickablePart(part, ANIM_EVENT_ANY))
-	  any_part_clicked = part->clicked = TRUE;
+	  anything_clicked = part->clicked = TRUE;
+
+	// ... but only handle the first (topmost) clickable animation
+	if (any_part_clicked)
+	  continue;
 
 	if (isClickedPart(part, mx, my, clicked))
 	{
@@ -1496,8 +1504,10 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, boolean clicked)
 	  printf("::: %d.%d CLICKED\n", anim_nr, part_nr);
 #endif
 
+	  any_part_clicked = TRUE;
+
 	  if (isClickablePart(part, ANIM_EVENT_SELF))
-	    any_part_clicked = part->clicked = TRUE;
+	    anything_clicked = part->clicked = TRUE;
 
 	  // check if this click is defined to trigger other animations
 	  int gic_anim_nr = part->old_anim_nr + 1;	// X as in "anim_X"
@@ -1519,7 +1529,7 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, boolean clicked)
 	      struct GlobalAnimPartControlInfo *part2 = &anim2->part[part2_nr];
 
 	      if (isClickablePart(part2, mask))
-		any_part_clicked = part2->clicked = TRUE;
+		anything_clicked = part2->clicked = TRUE;
 
 #if 0
 	      struct GraphicInfo *c = &part2->control_info;
@@ -1540,7 +1550,7 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, boolean clicked)
     }
   }
 
-  return any_part_clicked;
+  return anything_clicked;
 }
 
 static void ResetGlobalAnim_Clickable()
