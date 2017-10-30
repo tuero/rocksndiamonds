@@ -421,7 +421,7 @@ static struct
 				 GAME_MODE_MAIN : GAME_MODE_DEFAULT)
 
 /* (there are no draw offset definitions needed for INFO_MODE_TITLE) */
-#define DRAW_MODE_INFO(i)	((i) >= INFO_MODE_ELEMENTS &&		\
+#define DRAW_MODE_INFO(i)	((i) >= INFO_MODE_TITLE &&		\
 				 (i) <= INFO_MODE_LEVELSET ? (i) :	\
 				 INFO_MODE_MAIN)
 

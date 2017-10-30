@@ -7705,6 +7705,8 @@ struct ConfigInfo image_config[] =
   { "menu.draw_yoffset.EDITOR",			"0"			},
   { "menu.draw_xoffset.INFO",			"0"			},
   { "menu.draw_yoffset.INFO",			"0"			},
+  { "menu.draw_xoffset.INFO[TITLE]",		"0"			},
+  { "menu.draw_yoffset.INFO[TITLE]",		"0"			},
   { "menu.draw_xoffset.INFO[ELEMENTS]",		"0"			},
   { "menu.draw_yoffset.INFO[ELEMENTS]",		"0"			},
   { "menu.draw_xoffset.INFO[MUSIC]",		"0"			},
