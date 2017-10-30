@@ -2706,23 +2706,6 @@ struct InitInfo
   struct MenuPosInfo busy;
 };
 
-struct TextTypeInfo
-{
-  int large_spacing;
-  int normal_spacing;
-
-  int extra_spacing;
-};
-
-struct MenuTextInfo
-{
-  struct TextTypeInfo paragraph;
-  struct TextTypeInfo headline;
-  struct TextTypeInfo line;
-
-  struct TextTypeInfo all;
-};
-
 struct MenuInfo
 {
   int draw_xoffset[NUM_SPECIAL_GFX_ARGS];
@@ -2737,7 +2720,19 @@ struct MenuInfo
   int list_size[NUM_SPECIAL_GFX_ARGS];
   int list_size_info[NUM_SPECIAL_GFX_INFO_ARGS];
 
-  struct MenuTextInfo text;
+  int paragraph_spacing[NUM_SPECIAL_GFX_INFO_ARGS];
+  int paragraph_spacing_info[NUM_SPECIAL_GFX_INFO_ARGS];
+  int paragraph_spacing_setup[NUM_SPECIAL_GFX_INFO_ARGS];
+  int headline1_spacing[NUM_SPECIAL_GFX_INFO_ARGS];
+  int headline1_spacing_info[NUM_SPECIAL_GFX_INFO_ARGS];
+  int headline1_spacing_setup[NUM_SPECIAL_GFX_INFO_ARGS];
+  int headline2_spacing[NUM_SPECIAL_GFX_INFO_ARGS];
+  int headline2_spacing_info[NUM_SPECIAL_GFX_INFO_ARGS];
+  int headline2_spacing_setup[NUM_SPECIAL_GFX_INFO_ARGS];
+  int line_spacing[NUM_SPECIAL_GFX_INFO_ARGS];
+  int line_spacing_info[NUM_SPECIAL_GFX_INFO_ARGS];
+  int line_spacing_setup[NUM_SPECIAL_GFX_INFO_ARGS];
+  int extra_spacing;
 
   struct TitleFadingInfo enter_menu;
   struct TitleFadingInfo leave_menu;

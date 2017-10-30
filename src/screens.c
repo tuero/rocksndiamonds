@@ -88,6 +88,9 @@
 #define SETUPINPUT_SCREEN_POS_EMPTY1	(SETUPINPUT_SCREEN_POS_START + 3)
 #define SETUPINPUT_SCREEN_POS_EMPTY2	(SETUPINPUT_SCREEN_POS_END - 1)
 
+#define MENU_SETUP_FONT_TITLE		FONT_TEXT_1
+#define MENU_SETUP_FONT_TEXT		FONT_REQUEST
+
 /* for various menu stuff  */
 #define MENU_SCREEN_START_XPOS		1
 #define MENU_SCREEN_START_YPOS		2
@@ -95,13 +98,16 @@
 #define MENU_SCREEN_MAX_XPOS		(SCR_FIELDX - 1)
 #define MENU_TITLE1_YPOS		8
 #define MENU_TITLE2_YPOS		46
-#define MENU_TITLE_FONT_INFO		FONT_TEXT_1
-#define MENU_SPACING_TITLE		(menu.text.headline.normal_spacing)
+#define MENU_INFO_FONT_TITLE		FONT_TEXT_1
+#define MENU_INFO_FONT_HEAD		FONT_TEXT_2
+#define MENU_INFO_FONT_TEXT		FONT_TEXT_3
+#define MENU_INFO_FONT_FOOT		FONT_TEXT_4
+#define MENU_INFO_SPACE_HEAD		(menu.headline2_spacing_info[info_mode])
 #define MENU_SCREEN_INFO_XSTART		16
 #define MENU_SCREEN_INFO_YSTART1	100
-#define MENU_SCREEN_INFO_YSTART2	(MENU_SCREEN_INFO_YSTART1 +	      \
-					 getMenuTextStep(MENU_SPACING_TITLE,  \
-							 MENU_TITLE_FONT_INFO))
+#define MENU_SCREEN_INFO_YSTART2	(MENU_SCREEN_INFO_YSTART1 +	       \
+					 getMenuTextStep(MENU_INFO_SPACE_HEAD, \
+							 MENU_INFO_FONT_TITLE))
 #define MENU_SCREEN_INFO_YSTEP		(TILEY + 4)
 #define MENU_SCREEN_INFO_YBOTTOM	(SYSIZE - 20)
 #define MENU_SCREEN_INFO_YSIZE		(MENU_SCREEN_INFO_YBOTTOM -	\
@@ -2526,15 +2532,15 @@ void HandleInfoScreen_Main(int mx, int my, int dx, int dy, int button)
 
 static int getMenuFontSpacing(int spacing_height, int font_nr)
 {
-  return (spacing_height < 0 ? ABS(spacing_height) * getFontHeight(font_nr) :
+  int font_spacing = getFontHeight(font_nr) + menu.extra_spacing;
+
+  return (spacing_height < 0 ? ABS(spacing_height) * font_spacing :
 	  spacing_height);
 }
 
 static int getMenuTextSpacing(int spacing_height, int font_nr)
 {
-  int extra_spacing = menu.text.all.extra_spacing;
-
-  return getMenuFontSpacing(spacing_height, font_nr) + extra_spacing;
+  return getMenuFontSpacing(spacing_height, font_nr) + menu.extra_spacing;
 }
 
 static int getMenuTextStep(int spacing_height, int font_nr)
@@ -2544,10 +2550,10 @@ static int getMenuTextStep(int spacing_height, int font_nr)
 
 void DrawInfoScreen_NotAvailable(char *text_title, char *text_error)
 {
-  int font_title = FONT_TEXT_1;
+  int font_title = MENU_INFO_FONT_TITLE;
   int font_error = FONT_TEXT_2;
-  int font_foot  = FONT_TEXT_4;
-  int spacing_title = menu.text.headline.large_spacing;
+  int font_foot  = MENU_INFO_FONT_FOOT;
+  int spacing_title = menu.headline1_spacing_info[info_mode];
   int ystep_title = getMenuTextStep(spacing_title, font_title);
   int ystart1 = mSY - SY + 100;
   int ystart2 = ystart1 + ystep_title;
@@ -2573,8 +2579,8 @@ void DrawInfoScreen_HelpAnim(int start, int max_anims, boolean init)
 {
   static int infoscreen_step[MAX_INFO_ELEMENTS_ON_SCREEN];
   static int infoscreen_frame[MAX_INFO_ELEMENTS_ON_SCREEN];
-  int font_title = FONT_TEXT_1;
-  int font_foot  = FONT_TEXT_4;
+  int font_title = MENU_INFO_FONT_TITLE;
+  int font_foot  = MENU_INFO_FONT_FOOT;
   int xstart = mSX + MENU_SCREEN_INFO_XSTART;
   int ystart1 = mSY - SY + MENU_SCREEN_INFO_YSTART1;
   int ystart2 = mSY + MENU_SCREEN_INFO_YSTART2;
@@ -2860,16 +2866,14 @@ void DrawInfoScreen_Music()
 void HandleInfoScreen_Music(int button)
 {
   static struct MusicFileInfo *list = NULL;
-  int font_title = FONT_TEXT_1;
-  int font_head  = FONT_TEXT_2;
-  int font_text  = FONT_TEXT_3;
-  int font_foot  = FONT_TEXT_4;
-  int spacing_title = menu.text.headline.large_spacing;
-  int spacing_head  = menu.text.headline.normal_spacing;
-  int spacing_line  = menu.text.line.large_spacing;
+  int font_title = MENU_INFO_FONT_TITLE;
+  int font_head  = MENU_INFO_FONT_HEAD;
+  int font_text  = MENU_INFO_FONT_TEXT;
+  int font_foot  = MENU_INFO_FONT_FOOT;
+  int spacing_title = menu.headline1_spacing_info[info_mode];
+  int spacing_head  = menu.headline2_spacing_info[info_mode];
   int ystep_title = getMenuTextStep(spacing_title, font_title);
   int ystep_head  = getMenuTextStep(spacing_head,  font_head);
-  int ystep_line  = getMenuTextStep(spacing_line,  font_text);
   int ystart = mSY - SY + 100;
   int ybottom = mSY - SY + SYSIZE - 20;
 
@@ -2965,7 +2969,7 @@ void HandleInfoScreen_Music(int button)
       }
 
       DrawTextFCentered(ystart, font_text, "\"%s\"", list->title);
-      ystart += ystep_line;
+      ystart += ystep_head;
     }
 
     if (!strEqual(list->artist, UNKNOWN_NAME))
@@ -2978,7 +2982,7 @@ void HandleInfoScreen_Music(int button)
       ystart += ystep_head;
 
       DrawTextFCentered(ystart, font_text, "%s", list->artist);
-      ystart += ystep_line;
+      ystart += ystep_head;
     }
 
     if (!strEqual(list->album, UNKNOWN_NAME))
@@ -2991,7 +2995,7 @@ void HandleInfoScreen_Music(int button)
       ystart += ystep_head;
 
       DrawTextFCentered(ystart, font_text, "\"%s\"", list->album);
-      ystart += ystep_line;
+      ystart += ystep_head;
     }
 
     if (!strEqual(list->year, UNKNOWN_NAME))
@@ -3004,7 +3008,7 @@ void HandleInfoScreen_Music(int button)
       ystart += ystep_head;
 
       DrawTextFCentered(ystart, font_text, "%s", list->year);
-      ystart += ystep_line;
+      ystart += ystep_head;
     }
 
     DrawTextSCentered(ybottom, FONT_TEXT_4,
@@ -3020,20 +3024,18 @@ void HandleInfoScreen_Music(int button)
 
 static void DrawInfoScreen_CreditsScreen(int screen_nr)
 {
-  int font_title = FONT_TEXT_1;
-  int font_head  = FONT_TEXT_2;
-  int font_text  = FONT_TEXT_3;
-  int font_foot  = FONT_TEXT_4;
-  int spacing_title = menu.text.headline.large_spacing;
-  int spacing_head  = menu.text.headline.normal_spacing;
-  int spacing_para  = menu.text.paragraph.large_spacing;
-  int spacing_line  = menu.text.line.large_spacing;
-  int spacing_line1 = menu.text.line.normal_spacing;
+  int font_title = MENU_INFO_FONT_TITLE;
+  int font_head  = MENU_INFO_FONT_HEAD;
+  int font_text  = MENU_INFO_FONT_TEXT;
+  int font_foot  = MENU_INFO_FONT_FOOT;
+  int spacing_title = menu.headline1_spacing_info[info_mode];
+  int spacing_head  = menu.headline2_spacing_info[info_mode];
+  int spacing_para  = menu.paragraph_spacing_info[info_mode];
+  int spacing_line  = menu.line_spacing_info[info_mode];
   int ystep_title = getMenuTextStep(spacing_title, font_title);
   int ystep_head  = getMenuTextStep(spacing_head,  font_head);
   int ystep_para  = getMenuTextStep(spacing_para,  font_text);
   int ystep_line  = getMenuTextStep(spacing_line,  font_text);
-  int ystep_line1 = getMenuTextStep(spacing_line1, font_text);
   int ystart = mSY - SY + 100;
   int ybottom = mSY - SY + SYSIZE - 20;
 
@@ -3050,19 +3052,19 @@ static void DrawInfoScreen_CreditsScreen(int screen_nr)
     ystart += ystep_head;
     DrawTextSCentered(ystart, font_text,
 		      "Peter Liepa");
-    ystart += ystep_line;
+    ystart += ystep_head;
     DrawTextSCentered(ystart, font_head,
 		      "for creating");
     ystart += ystep_head;
     DrawTextSCentered(ystart, font_text,
 		      "\"Boulder Dash\"");
-    ystart += ystep_line;
+    ystart += ystep_head;
     DrawTextSCentered(ystart, font_head,
 		      "in the year");
     ystart += ystep_head;
     DrawTextSCentered(ystart, font_text,
 		      "1984");
-    ystart += ystep_line;
+    ystart += ystep_head;
     DrawTextSCentered(ystart, font_head,
 		      "published by");
     ystart += ystep_head;
@@ -3076,19 +3078,19 @@ static void DrawInfoScreen_CreditsScreen(int screen_nr)
     ystart += ystep_head;
     DrawTextSCentered(ystart, font_text,
 		      "Klaus Heinz & Volker Wertich");
-    ystart += ystep_line;
+    ystart += ystep_head;
     DrawTextSCentered(ystart, font_head,
 		      "for creating");
     ystart += ystep_head;
     DrawTextSCentered(ystart, font_text,
 		      "\"Emerald Mine\"");
-    ystart += ystep_line;
+    ystart += ystep_head;
     DrawTextSCentered(ystart, font_head,
 		      "in the year");
     ystart += ystep_head;
     DrawTextSCentered(ystart, font_text,
 		      "1987");
-    ystart += ystep_line;
+    ystart += ystep_head;
     DrawTextSCentered(ystart, font_head,
 		      "published by");
     ystart += ystep_head;
@@ -3102,19 +3104,19 @@ static void DrawInfoScreen_CreditsScreen(int screen_nr)
     ystart += ystep_head;
     DrawTextSCentered(ystart, font_text,
 		      "Michael Stopp & Philip Jespersen");
-    ystart += ystep_line;
+    ystart += ystep_head;
     DrawTextSCentered(ystart, font_head,
 		      "for creating");
     ystart += ystep_head;
     DrawTextSCentered(ystart, font_text,
 		      "\"Supaplex\"");
-    ystart += ystep_line;
+    ystart += ystep_head;
     DrawTextSCentered(ystart, font_head,
 		      "in the year");
     ystart += ystep_head;
     DrawTextSCentered(ystart, font_text,
 		      "1991");
-    ystart += ystep_line;
+    ystart += ystep_head;
     DrawTextSCentered(ystart, font_head,
 		      "published by");
     ystart += ystep_head;
@@ -3128,19 +3130,19 @@ static void DrawInfoScreen_CreditsScreen(int screen_nr)
     ystart += ystep_head;
     DrawTextSCentered(ystart, font_text,
 		      "Hiroyuki Imabayashi");
-    ystart += ystep_line;
+    ystart += ystep_head;
     DrawTextSCentered(ystart, font_head,
 		      "for creating");
     ystart += ystep_head;
     DrawTextSCentered(ystart, font_text,
 		      "\"Sokoban\"");
-    ystart += ystep_line;
+    ystart += ystep_head;
     DrawTextSCentered(ystart, font_head,
 		      "in the year");
     ystart += ystep_head;
     DrawTextSCentered(ystart, font_text,
 		      "1982");
-    ystart += ystep_line;
+    ystart += ystep_head;
     DrawTextSCentered(ystart, font_head,
 		      "published by");
     ystart += ystep_head;
@@ -3154,16 +3156,16 @@ static void DrawInfoScreen_CreditsScreen(int screen_nr)
     ystart += ystep_head;
     DrawTextSCentered(ystart, font_text,
 		      "Alan Bond");
-    ystart += ystep_line;
+    ystart += ystep_head;
     DrawTextSCentered(ystart, font_head,
 		      "and");
     ystart += ystep_head;
     DrawTextSCentered(ystart, font_text,
 		      "J\xfcrgen Bonhagen");
-    ystart += ystep_line;
+    ystart += ystep_head;
     DrawTextSCentered(ystart, font_head,
 		      "for the continuous creation");
-    ystart += ystep_line1;
+    ystart += ystep_line;
     DrawTextSCentered(ystart, font_head,
 		      "of outstanding level sets");
   }
@@ -3174,7 +3176,7 @@ static void DrawInfoScreen_CreditsScreen(int screen_nr)
     ystart += ystep_head;
     DrawTextSCentered(ystart, font_text,
 		      "Peter Elzner");
-    ystart += ystep_line;
+    ystart += ystep_head;
     DrawTextSCentered(ystart, font_head,
 		      "for ideas and inspiration by");
     ystart += ystep_head;
@@ -3187,7 +3189,7 @@ static void DrawInfoScreen_CreditsScreen(int screen_nr)
     ystart += ystep_head;
     DrawTextSCentered(ystart, font_text,
 		      "Steffest");
-    ystart += ystep_line;
+    ystart += ystep_head;
     DrawTextSCentered(ystart, font_head,
 		      "for ideas and inspiration by");
     ystart += ystep_head;
@@ -3201,10 +3203,10 @@ static void DrawInfoScreen_CreditsScreen(int screen_nr)
     ystart += ystep_head;
     DrawTextSCentered(ystart, font_text,
 		      "David Tritscher");
-    ystart += ystep_line;
+    ystart += ystep_head;
     DrawTextSCentered(ystart, font_head,
 		      "for the code base used for the");
-    ystart += ystep_line1;
+    ystart += ystep_line;
     DrawTextSCentered(ystart, font_head,
 		      "native Emerald Mine engine");
   }
@@ -3215,7 +3217,7 @@ static void DrawInfoScreen_CreditsScreen(int screen_nr)
     ystart += ystep_head;
     DrawTextSCentered(ystart, font_text,
 		      "Guido Schulz");
-    ystart += ystep_line;
+    ystart += ystep_head;
     DrawTextSCentered(ystart, font_head,
 		      "for the initial DOS port");
     ystart += ystep_para;
@@ -3225,7 +3227,7 @@ static void DrawInfoScreen_CreditsScreen(int screen_nr)
     ystart += ystep_head;
     DrawTextSCentered(ystart, font_text,
 		      "Karl H\xf6rnell");
-    ystart += ystep_line;
+    ystart += ystep_head;
     DrawTextSCentered(ystart, font_head,
 		      "for some additional toons");
   }
@@ -3233,16 +3235,16 @@ static void DrawInfoScreen_CreditsScreen(int screen_nr)
   {
     DrawTextSCentered(ystart, font_head,
 		      "And not to forget:");
-    ystart += ystep_line;
+    ystart += ystep_head;
     DrawTextSCentered(ystart, font_head,
 		      "Many thanks to");
     ystart += ystep_head;
     DrawTextSCentered(ystart, font_text,
 		      "All those who contributed");
-    ystart += ystep_line1;
+    ystart += ystep_line;
     DrawTextSCentered(ystart, font_text,
 		      "levels to this game");
-    ystart += ystep_line1;
+    ystart += ystep_line;
     DrawTextSCentered(ystart, font_text,
 		      "since 1995");
   }
@@ -3323,20 +3325,18 @@ void HandleInfoScreen_Credits(int button)
 
 void DrawInfoScreen_Program()
 {
-  int font_title = FONT_TEXT_1;
-  int font_head  = FONT_TEXT_2;
-  int font_text  = FONT_TEXT_3;
-  int font_foot  = FONT_TEXT_4;
-  int spacing_title = menu.text.headline.large_spacing;
-  int spacing_head  = menu.text.headline.normal_spacing;
-  int spacing_para  = menu.text.paragraph.large_spacing;
-  int spacing_line  = menu.text.line.large_spacing;
-  int spacing_line1 = menu.text.line.normal_spacing;
+  int font_title = MENU_INFO_FONT_TITLE;
+  int font_head  = MENU_INFO_FONT_HEAD;
+  int font_text  = MENU_INFO_FONT_TEXT;
+  int font_foot  = MENU_INFO_FONT_FOOT;
+  int spacing_title = menu.headline1_spacing_info[info_mode];
+  int spacing_head  = menu.headline2_spacing_info[info_mode];
+  int spacing_para  = menu.paragraph_spacing_info[info_mode];
+  int spacing_line  = menu.line_spacing_info[info_mode];
   int ystep_title = getMenuTextStep(spacing_title, font_title);
   int ystep_head  = getMenuTextStep(spacing_head,  font_head);
   int ystep_para  = getMenuTextStep(spacing_para,  font_text);
   int ystep_line  = getMenuTextStep(spacing_line,  font_text);
-  int ystep_line1 = getMenuTextStep(spacing_line1, font_text);
   int ystart = mSY - SY + 100;
   int ybottom = mSY - SY + SYSIZE - 20;
 
@@ -3352,7 +3352,7 @@ void DrawInfoScreen_Program()
 
   DrawTextSCentered(ystart, font_head,
 		    "This game is Freeware!");
-  ystart += ystep_line;
+  ystart += ystep_head;
   DrawTextSCentered(ystart, font_head,
 		    "If you like it, send e-mail to:");
   ystart += ystep_head;
@@ -3369,10 +3369,10 @@ void DrawInfoScreen_Program()
 
   DrawTextSCentered(ystart, font_head,
 		    "If you have created new levels,");
-  ystart += ystep_line1;
+  ystart += ystep_line;
   DrawTextSCentered(ystart, font_head,
 		    "send them to me to include them!");
-  ystart += ystep_line;
+  ystart += ystep_head;
   DrawTextSCentered(ystart, font_head,
 		    ":-)");
 
@@ -3410,14 +3410,14 @@ void HandleInfoScreen_Program(int button)
 
 void DrawInfoScreen_Version()
 {
-  int font_title = FONT_TEXT_1;
-  int font_head  = FONT_TEXT_2;
-  int font_text  = FONT_TEXT_3;
-  int font_foot  = FONT_TEXT_4;
-  int spacing_title = menu.text.headline.large_spacing;
-  int spacing_head  = menu.text.headline.normal_spacing;
-  int spacing_para  = menu.text.paragraph.normal_spacing;
-  int spacing_line  = menu.text.line.normal_spacing;
+  int font_title = MENU_INFO_FONT_TITLE;
+  int font_head  = MENU_INFO_FONT_HEAD;
+  int font_text  = MENU_INFO_FONT_TEXT;
+  int font_foot  = MENU_INFO_FONT_FOOT;
+  int spacing_title = menu.headline1_spacing_info[info_mode];
+  int spacing_head  = menu.headline2_spacing_info[info_mode];
+  int spacing_para  = menu.paragraph_spacing_info[info_mode];
+  int spacing_line  = menu.line_spacing_info[info_mode];
   int xstep = getFontWidth(font_text);
   int ystep_title = getMenuTextStep(spacing_title, font_title);
   int ystep_head  = getMenuTextStep(spacing_head,  font_head);
@@ -6542,16 +6542,14 @@ static boolean ConfigureJoystickMapButtonsAndAxes(SDL_Joystick *joystick)
   int alpha = 200, alpha_step = -1;
   int alpha_ticks = 0;
   char mapping[4096], temp[4096];
-  int font_name = FONT_TEXT_1;
-  int font_info = FONT_REQUEST;
-  int spacing_name  = menu.text.line.normal_spacing;
-  int spacing_line  = menu.text.line.normal_spacing;
-  int spacing_line2 = menu.text.line.large_spacing;
-  int ystep_name  = getMenuTextStep(spacing_name,  font_name);
-  int ystep_line  = getMenuTextStep(spacing_line,  font_info);
-  int ystep_line2 = getMenuTextStep(spacing_line2, font_info);
-  // int ystep1 = getFontHeight(font_name) + 2;
-  // int ystep2 = getFontHeight(font_info) + 2;
+  int font_name = MENU_SETUP_FONT_TITLE;
+  int font_info = MENU_SETUP_FONT_TEXT;
+  int spacing_name = menu.line_spacing_setup[SETUP_MODE_INPUT];
+  int spacing_line = menu.line_spacing_setup[SETUP_MODE_INPUT];
+  int spacing_para = menu.paragraph_spacing_setup[SETUP_MODE_INPUT];
+  int ystep_name = getMenuTextStep(spacing_name, font_name);
+  int ystep_line = getMenuTextStep(spacing_line, font_info);
+  int ystep_para = getMenuTextStep(spacing_para, font_info);
   int i, j;
 
   struct
@@ -6674,7 +6672,7 @@ static boolean ConfigureJoystickMapButtonsAndAxes(SDL_Joystick *joystick)
       ystart2 += ystep_line;
       DrawTextSCentered(ystart2, font_info,
 			"(Your controller may look different.)");
-      ystart2 += ystep_line2;
+      ystart2 += ystep_para;
 
 #if defined(PLATFORM_ANDROID)
       DrawTextSCentered(ystart2, font_info,

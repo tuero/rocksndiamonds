@@ -9749,6 +9749,25 @@ static void LoadMenuDesignSettingsFromFilename(char *filename)
   }
 
   /* special case: initialize with default values that may be overwritten */
+  /* (eg, init "menu.line_spacing.INFO[XXX]" from "menu.line_spacing.INFO") */
+  for (i = 0; i < NUM_SPECIAL_GFX_INFO_ARGS; i++)
+  {
+    char *value_1 = getHashEntry(setup_file_hash,"menu.paragraph_spacing.INFO");
+    char *value_2 = getHashEntry(setup_file_hash,"menu.headline1_spacing.INFO");
+    char *value_3 = getHashEntry(setup_file_hash,"menu.headline2_spacing.INFO");
+    char *value_4 = getHashEntry(setup_file_hash,"menu.line_spacing.INFO");
+
+    if (value_1 != NULL)
+      menu.paragraph_spacing_info[i] = get_integer_from_string(value_1);
+    if (value_2 != NULL)
+      menu.headline1_spacing_info[i] = get_integer_from_string(value_2);
+    if (value_3 != NULL)
+      menu.headline2_spacing_info[i] = get_integer_from_string(value_3);
+    if (value_4 != NULL)
+      menu.line_spacing_info[i] = get_integer_from_string(value_4);
+  }
+
+  /* special case: initialize with default values that may be overwritten */
   /* (eg, init "menu.enter_screen.SCORES.xyz" from "menu.enter_screen.xyz") */
   for (i = 0; i < NUM_SPECIAL_GFX_ARGS; i++)
   {
