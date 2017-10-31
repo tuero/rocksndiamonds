@@ -7802,7 +7802,15 @@ struct ConfigInfo image_config[] =
   { "menu.line_spacing.INFO[LEVELSET]",		"0"			},
   { "menu.line_spacing.SETUP[INPUT]",		"0"			},
 
-  { "menu.extra_spacing",			"2"			},
+  { "menu.extra_spacing.INFO",			"2"			},
+  { "menu.extra_spacing.INFO[TITLE]",		"2"			},
+  { "menu.extra_spacing.INFO[ELEMENTS]",	"2"			},
+  { "menu.extra_spacing.INFO[MUSIC]",		"2"			},
+  { "menu.extra_spacing.INFO[CREDITS]",		"2"			},
+  { "menu.extra_spacing.INFO[PROGRAM]",		"2"			},
+  { "menu.extra_spacing.INFO[VERSION]",		"2"			},
+  { "menu.extra_spacing.INFO[LEVELSET]",	"2"			},
+  { "menu.extra_spacing.SETUP[INPUT]",		"2"			},
 
   { "main.button.name.x",			"0"			},
   { "main.button.name.y",			"64"			},

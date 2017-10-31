@@ -9756,6 +9756,7 @@ static void LoadMenuDesignSettingsFromFilename(char *filename)
     char *value_2 = getHashEntry(setup_file_hash,"menu.headline1_spacing.INFO");
     char *value_3 = getHashEntry(setup_file_hash,"menu.headline2_spacing.INFO");
     char *value_4 = getHashEntry(setup_file_hash,"menu.line_spacing.INFO");
+    char *value_5 = getHashEntry(setup_file_hash,"menu.extra_spacing.INFO");
 
     if (value_1 != NULL)
       menu.paragraph_spacing_info[i] = get_integer_from_string(value_1);
@@ -9765,6 +9766,8 @@ static void LoadMenuDesignSettingsFromFilename(char *filename)
       menu.headline2_spacing_info[i] = get_integer_from_string(value_3);
     if (value_4 != NULL)
       menu.line_spacing_info[i] = get_integer_from_string(value_4);
+    if (value_5 != NULL)
+      menu.extra_spacing_info[i] = get_integer_from_string(value_5);
   }
 
   /* special case: initialize with default values that may be overwritten */

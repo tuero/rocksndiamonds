@@ -444,6 +444,9 @@ static struct
 #define DRAW_YOFFSET_INFO(i)	(DRAW_MODE_INFO(i) == INFO_MODE_MAIN ?	\
 				 menu.draw_yoffset[GAME_MODE_INFO] :	\
 				 menu.draw_yoffset_info[DRAW_MODE_INFO(i)])
+#define EXTRA_SPACING_INFO(i)	(DRAW_MODE_INFO(i) == INFO_MODE_MAIN ? \
+				 menu.extra_spacing[GAME_MODE_INFO] :	\
+				 menu.extra_spacing_info[DRAW_MODE_INFO(i)])
 
 #define DRAW_XOFFSET_SETUP(i)	(DRAW_MODE_SETUP(i) == SETUP_MODE_MAIN ? \
 				 menu.draw_xoffset[GAME_MODE_SETUP] :	\
@@ -451,6 +454,9 @@ static struct
 #define DRAW_YOFFSET_SETUP(i)	(DRAW_MODE_SETUP(i) == SETUP_MODE_MAIN ? \
 				 menu.draw_yoffset[GAME_MODE_SETUP] :	\
 				 menu.draw_yoffset_setup[DRAW_MODE_SETUP(i)])
+#define EXTRA_SPACING_SETUP(i)	(DRAW_MODE_SETUP(i) == SETUP_MODE_MAIN ? \
+				 menu.extra_spacing[GAME_MODE_SETUP] :	\
+				 menu.extra_spacing_setup[DRAW_MODE_SETUP(i)])
 
 #define DRAW_XOFFSET(s)		((s) == GAME_MODE_INFO ?		\
 				 DRAW_XOFFSET_INFO(info_mode) :		\
@@ -462,6 +468,11 @@ static struct
 				 (s) == GAME_MODE_SETUP ?		\
 				 DRAW_YOFFSET_SETUP(setup_mode) :	\
 				 menu.draw_yoffset[DRAW_MODE(s)])
+#define EXTRA_SPACING(s)	((s) == GAME_MODE_INFO ?		\
+				 EXTRA_SPACING_INFO(info_mode) :	\
+				 (s) == GAME_MODE_SETUP ?		\
+				 EXTRA_SPACING_SETUP(setup_mode) :	\
+				 menu.extra_spacing[DRAW_MODE(s)])
 
 #define mSX			(SX + DRAW_XOFFSET(game_status))
 #define mSY			(SY + DRAW_YOFFSET(game_status))
@@ -2532,7 +2543,7 @@ void HandleInfoScreen_Main(int mx, int my, int dx, int dy, int button)
 
 static int getMenuFontSpacing(int spacing_height, int font_nr)
 {
-  int font_spacing = getFontHeight(font_nr) + menu.extra_spacing;
+  int font_spacing = getFontHeight(font_nr) + EXTRA_SPACING(game_status);
 
   return (spacing_height < 0 ? ABS(spacing_height) * font_spacing :
 	  spacing_height);
@@ -2540,7 +2551,8 @@ static int getMenuFontSpacing(int spacing_height, int font_nr)
 
 static int getMenuTextSpacing(int spacing_height, int font_nr)
 {
-  return getMenuFontSpacing(spacing_height, font_nr) + menu.extra_spacing;
+  return (getMenuFontSpacing(spacing_height, font_nr) +
+	  EXTRA_SPACING(game_status));
 }
 
 static int getMenuTextStep(int spacing_height, int font_nr)

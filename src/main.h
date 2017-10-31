@@ -2732,7 +2732,9 @@ struct MenuInfo
   int line_spacing[NUM_SPECIAL_GFX_INFO_ARGS];
   int line_spacing_info[NUM_SPECIAL_GFX_INFO_ARGS];
   int line_spacing_setup[NUM_SPECIAL_GFX_INFO_ARGS];
-  int extra_spacing;
+  int extra_spacing[NUM_SPECIAL_GFX_INFO_ARGS];
+  int extra_spacing_info[NUM_SPECIAL_GFX_INFO_ARGS];
+  int extra_spacing_setup[NUM_SPECIAL_GFX_INFO_ARGS];
 
   struct TitleFadingInfo enter_menu;
   struct TitleFadingInfo leave_menu;
