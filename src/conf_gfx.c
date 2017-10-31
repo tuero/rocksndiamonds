@@ -6381,7 +6381,7 @@ struct ConfigInfo image_config[] =
   { "font.title_2.width",			"14"			},
   { "font.title_2.height",			"14"			},
   { "font.title_2.SETUP",			UNDEFINED_FILENAME	},
-  { "font.title_2.SETUP.clone_from",		"font.text_4"		},
+  { "font.title_2.SETUP.clone_from",		"font.text_2"		},
 
   { "font.menu_1",				"RocksFontBig.png"	},
   { "font.menu_1.x",				"0"			},
