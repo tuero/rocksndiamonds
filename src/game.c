@@ -15787,7 +15787,8 @@ static void HandleGameButtonsExt(int id, int button)
 
 	SetAudioMode(setup.sound);
 
-	PlayLevelMusic();
+	if (game_status == GAME_MODE_PLAYING)
+	  PlayLevelMusic();
       }
 
       RedrawSoundButtonGadget(id);
