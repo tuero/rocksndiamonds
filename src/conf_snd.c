@@ -297,6 +297,10 @@ struct ConfigInfo sound_config[] =
   /* sounds for other non-game actions */
   { "door.opening",			"door.wav"			},
   { "door.closing",			"door.wav"			},
+  { "door_1.opening",			UNDEFINED_FILENAME		},
+  { "door_1.closing",			UNDEFINED_FILENAME		},
+  { "door_2.opening",			UNDEFINED_FILENAME		},
+  { "door_2.closing",			UNDEFINED_FILENAME		},
 
   { "request.opening",			UNDEFINED_FILENAME		},
   { "request.closing",			UNDEFINED_FILENAME		},

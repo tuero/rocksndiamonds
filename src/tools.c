@@ -4862,9 +4862,23 @@ unsigned int MoveDoor(unsigned int door_state)
     {
       /* opening door sound has priority over simultaneously closing door */
       if (door_state & (DOOR_OPEN_1 | DOOR_OPEN_2))
+      {
         PlayMenuSoundStereo(SND_DOOR_OPENING, SOUND_MIDDLE);
+
+	if (door_state & DOOR_OPEN_1)
+	  PlayMenuSoundStereo(SND_DOOR_1_OPENING, SOUND_MIDDLE);
+	if (door_state & DOOR_OPEN_2)
+	  PlayMenuSoundStereo(SND_DOOR_2_OPENING, SOUND_MIDDLE);
+      }
       else if (door_state & (DOOR_CLOSE_1 | DOOR_CLOSE_2))
+      {
         PlayMenuSoundStereo(SND_DOOR_CLOSING, SOUND_MIDDLE);
+
+	if (door_state & DOOR_CLOSE_1)
+	  PlayMenuSoundStereo(SND_DOOR_1_CLOSING, SOUND_MIDDLE);
+	if (door_state & DOOR_CLOSE_2)
+	  PlayMenuSoundStereo(SND_DOOR_2_CLOSING, SOUND_MIDDLE);
+      }
     }
 
     for (k = start; k < num_move_steps; k++)
