@@ -1481,7 +1481,7 @@ static boolean insideSelectboxArea(struct GadgetInfo *gi, int mx, int my)
 
 void ClickOnGadget(struct GadgetInfo *gi, int button)
 {
-  if (!gi->mapped)
+  if (gi == NULL || gi->deactivated || !gi->mapped)
     return;
 
   /* simulate releasing mouse button over last gadget, if still pressed */
