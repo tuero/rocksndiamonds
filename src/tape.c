@@ -1356,7 +1356,7 @@ void MapTapeButtons()
     MapTapeWarpButton();
 
   if (tape.show_game_buttons)
-    MapGameButtons();
+    MapGameButtonsOnTape();
 }
 
 void UnmapTapeButtons()
@@ -1367,7 +1367,7 @@ void UnmapTapeButtons()
     UnmapGadget(tape_gadget[i]);
 
   if (tape.show_game_buttons)
-    UnmapGameButtons();
+    UnmapGameButtonsOnTape();
 }
 
 void RedrawTapeButtons()
@@ -1378,7 +1378,7 @@ void RedrawTapeButtons()
     RedrawGadget(tape_gadget[i]);
 
   if (tape.show_game_buttons)
-    RedrawGameButtons();
+    RedrawGameButtonsOnTape();
 
   // RedrawGadget() may have set REDRAW_ALL if buttons are defined off-area
   redraw_mask &= ~REDRAW_ALL;

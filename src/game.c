@@ -1013,11 +1013,17 @@ static struct GamePanelControlInfo game_panel_controls[] =
 #define GAME_CTRL_ID_SAVE		5
 #define GAME_CTRL_ID_PAUSE2		6
 #define GAME_CTRL_ID_LOAD		7
-#define SOUND_CTRL_ID_MUSIC		8
-#define SOUND_CTRL_ID_LOOPS		9
-#define SOUND_CTRL_ID_SIMPLE		10
+#define GAME_CTRL_ID_PANEL_STOP		8
+#define GAME_CTRL_ID_PANEL_PAUSE	9
+#define GAME_CTRL_ID_PANEL_PLAY		10
+#define SOUND_CTRL_ID_MUSIC		11
+#define SOUND_CTRL_ID_LOOPS		12
+#define SOUND_CTRL_ID_SIMPLE		13
+#define SOUND_CTRL_ID_PANEL_MUSIC	14
+#define SOUND_CTRL_ID_PANEL_LOOPS	15
+#define SOUND_CTRL_ID_PANEL_SIMPLE	16
 
-#define NUM_GAME_BUTTONS		11
+#define NUM_GAME_BUTTONS		17
 
 
 /* forward declaration for internal use */
@@ -4168,10 +4174,6 @@ void InitGame()
 
     FreeGameButtons();
     CreateGameButtons();
-
-    game_gadget[SOUND_CTRL_ID_MUSIC]->checked = setup.sound_music;
-    game_gadget[SOUND_CTRL_ID_LOOPS]->checked = setup.sound_loops;
-    game_gadget[SOUND_CTRL_ID_SIMPLE]->checked = setup.sound_simple;
 
     MapGameButtons();
     MapTapeButtons();
@@ -15308,52 +15310,95 @@ static struct
   int graphic;
   struct XY *pos;
   int gadget_id;
+  boolean *setup_value;
+  boolean allowed_on_tape;
   char *infotext;
 } gamebutton_info[NUM_GAME_BUTTONS] =
 {
   {
-    IMG_GFX_GAME_BUTTON_STOP,		&game.button.stop,
-    GAME_CTRL_ID_STOP,			"stop game"
+    IMG_GFX_GAME_BUTTON_STOP,			&game.button.stop,
+    GAME_CTRL_ID_STOP,				NULL,
+    TRUE,					"stop game"
   },
   {
-    IMG_GFX_GAME_BUTTON_PAUSE,		&game.button.pause,
-    GAME_CTRL_ID_PAUSE,			"pause game"
+    IMG_GFX_GAME_BUTTON_PAUSE,			&game.button.pause,
+    GAME_CTRL_ID_PAUSE,				NULL,
+    TRUE,					"pause game"
   },
   {
-    IMG_GFX_GAME_BUTTON_PLAY,		&game.button.play,
-    GAME_CTRL_ID_PLAY,			"play game"
+    IMG_GFX_GAME_BUTTON_PLAY,			&game.button.play,
+    GAME_CTRL_ID_PLAY,				NULL,
+    TRUE,					"play game"
   },
   {
-    IMG_GFX_GAME_BUTTON_UNDO,		&game.button.undo,
-    GAME_CTRL_ID_UNDO,			"undo step"
+    IMG_GFX_GAME_BUTTON_UNDO,			&game.button.undo,
+    GAME_CTRL_ID_UNDO,				NULL,
+    TRUE,					"undo step"
   },
   {
-    IMG_GFX_GAME_BUTTON_REDO,		&game.button.redo,
-    GAME_CTRL_ID_REDO,			"redo step"
+    IMG_GFX_GAME_BUTTON_REDO,			&game.button.redo,
+    GAME_CTRL_ID_REDO,				NULL,
+    TRUE,					"redo step"
   },
   {
-    IMG_GFX_GAME_BUTTON_SAVE,		&game.button.save,
-    GAME_CTRL_ID_SAVE,			"save game"
+    IMG_GFX_GAME_BUTTON_SAVE,			&game.button.save,
+    GAME_CTRL_ID_SAVE,				NULL,
+    TRUE,					"save game"
   },
   {
-    IMG_GFX_GAME_BUTTON_PAUSE2,		&game.button.pause2,
-    GAME_CTRL_ID_PAUSE2,		"pause game"
+    IMG_GFX_GAME_BUTTON_PAUSE2,			&game.button.pause2,
+    GAME_CTRL_ID_PAUSE2,			NULL,
+    TRUE,					"pause game"
   },
   {
-    IMG_GFX_GAME_BUTTON_LOAD,		&game.button.load,
-    GAME_CTRL_ID_LOAD,			"load game"
+    IMG_GFX_GAME_BUTTON_LOAD,			&game.button.load,
+    GAME_CTRL_ID_LOAD,				NULL,
+    TRUE,					"load game"
   },
   {
-    IMG_GFX_GAME_BUTTON_SOUND_MUSIC,	&game.button.sound_music,
-    SOUND_CTRL_ID_MUSIC,		"background music on/off"
+    IMG_GFX_GAME_BUTTON_PANEL_STOP,		&game.button.panel_stop,
+    GAME_CTRL_ID_PANEL_STOP,			NULL,
+    FALSE,					"stop game"
   },
   {
-    IMG_GFX_GAME_BUTTON_SOUND_LOOPS,	&game.button.sound_loops,
-    SOUND_CTRL_ID_LOOPS,		"sound loops on/off"
+    IMG_GFX_GAME_BUTTON_PANEL_PAUSE,		&game.button.panel_pause,
+    GAME_CTRL_ID_PANEL_PAUSE,			NULL,
+    FALSE,					"pause game"
   },
   {
-    IMG_GFX_GAME_BUTTON_SOUND_SIMPLE,	&game.button.sound_simple,
-    SOUND_CTRL_ID_SIMPLE,		"normal sounds on/off"
+    IMG_GFX_GAME_BUTTON_PANEL_PLAY,		&game.button.panel_play,
+    GAME_CTRL_ID_PANEL_PLAY,			NULL,
+    FALSE,					"play game"
+  },
+  {
+    IMG_GFX_GAME_BUTTON_SOUND_MUSIC,		&game.button.sound_music,
+    SOUND_CTRL_ID_MUSIC,			&setup.sound_music,
+    TRUE,					"background music on/off"
+  },
+  {
+    IMG_GFX_GAME_BUTTON_SOUND_LOOPS,		&game.button.sound_loops,
+    SOUND_CTRL_ID_LOOPS,			&setup.sound_loops,
+    TRUE,					"sound loops on/off"
+  },
+  {
+    IMG_GFX_GAME_BUTTON_SOUND_SIMPLE,		&game.button.sound_simple,
+    SOUND_CTRL_ID_SIMPLE,			&setup.sound_simple,
+    TRUE,					"normal sounds on/off"
+  },
+  {
+    IMG_GFX_GAME_BUTTON_PANEL_SOUND_MUSIC,	&game.button.panel_sound_music,
+    SOUND_CTRL_ID_PANEL_MUSIC,			&setup.sound_music,
+    FALSE,					"background music on/off"
+  },
+  {
+    IMG_GFX_GAME_BUTTON_PANEL_SOUND_LOOPS,	&game.button.panel_sound_loops,
+    SOUND_CTRL_ID_PANEL_LOOPS,			&setup.sound_loops,
+    FALSE,					"sound loops on/off"
+  },
+  {
+    IMG_GFX_GAME_BUTTON_PANEL_SOUND_SIMPLE,	&game.button.panel_sound_simple,
+    SOUND_CTRL_ID_PANEL_SIMPLE,			&setup.sound_simple,
+    FALSE,					"normal sounds on/off"
   }
 };
 
@@ -15369,8 +15414,10 @@ void CreateGameButtons()
     int button_type;
     boolean checked;
     unsigned int event_mask;
-    int base_x = (tape.show_game_buttons ? VX : DX);
-    int base_y = (tape.show_game_buttons ? VY : DY);
+    boolean allowed_on_tape = gamebutton_info[i].allowed_on_tape;
+    boolean on_tape = (tape.show_game_buttons && allowed_on_tape);
+    int base_x = (on_tape ? VX : DX);
+    int base_y = (on_tape ? VY : DY);
     int gd_x   = gfx->src_x;
     int gd_y   = gfx->src_y;
     int gd_xp  = gfx->src_x + gfx->pressed_xoffset;
@@ -15389,7 +15436,9 @@ void CreateGameButtons()
     }
 
     if (id == GAME_CTRL_ID_STOP ||
+	id == GAME_CTRL_ID_PANEL_STOP ||
 	id == GAME_CTRL_ID_PLAY ||
+	id == GAME_CTRL_ID_PANEL_PLAY ||
 	id == GAME_CTRL_ID_SAVE ||
 	id == GAME_CTRL_ID_LOAD)
     {
@@ -15407,10 +15456,8 @@ void CreateGameButtons()
     else
     {
       button_type = GD_TYPE_CHECK_BUTTON;
-      checked =
-	((id == SOUND_CTRL_ID_MUSIC && setup.sound_music) ||
-	 (id == SOUND_CTRL_ID_LOOPS && setup.sound_loops) ||
-	 (id == SOUND_CTRL_ID_SIMPLE && setup.sound_simple) ? TRUE : FALSE);
+      checked = (gamebutton_info[i].setup_value != NULL ?
+		 *gamebutton_info[i].setup_value : FALSE);
       event_mask = GD_EVENT_PRESSED;
     }
 
@@ -15471,6 +15518,10 @@ static void UnmapGameButtonsAtSamePosition_All()
     UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_STOP);
     UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_PAUSE);
     UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_PLAY);
+
+    UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_PANEL_STOP);
+    UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_PANEL_PAUSE);
+    UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_PANEL_PLAY);
   }
 }
 
@@ -15509,12 +15560,13 @@ void UnmapUndoRedoButtons()
   ModifyGadget(game_gadget[GAME_CTRL_ID_PAUSE2], GDI_CHECKED, FALSE, GDI_END);
 }
 
-void MapGameButtons()
+void MapGameButtonsExt(boolean on_tape)
 {
   int i;
 
   for (i = 0; i < NUM_GAME_BUTTONS; i++)
-    if (i != GAME_CTRL_ID_UNDO &&
+    if ((!on_tape || gamebutton_info[i].allowed_on_tape) &&
+	i != GAME_CTRL_ID_UNDO &&
 	i != GAME_CTRL_ID_REDO)
       MapGadget(game_gadget[i]);
 
@@ -15523,23 +15575,77 @@ void MapGameButtons()
   RedrawGameButtons();
 }
 
-void UnmapGameButtons()
+void UnmapGameButtonsExt(boolean on_tape)
 {
   int i;
 
   for (i = 0; i < NUM_GAME_BUTTONS; i++)
-    UnmapGadget(game_gadget[i]);
+    if (!on_tape || gamebutton_info[i].allowed_on_tape)
+      UnmapGadget(game_gadget[i]);
+}
+
+void RedrawGameButtonsExt(boolean on_tape)
+{
+  int i;
+
+  for (i = 0; i < NUM_GAME_BUTTONS; i++)
+    if (!on_tape || gamebutton_info[i].allowed_on_tape)
+      RedrawGadget(game_gadget[i]);
+
+  // RedrawGadget() may have set REDRAW_ALL if buttons are defined off-area
+  redraw_mask &= ~REDRAW_ALL;
+}
+
+void SetGadgetState(struct GadgetInfo *gi, boolean state)
+{
+  if (gi == NULL)
+    return;
+
+  gi->checked = state;
+}
+
+void RedrawSoundButtonGadget(int id)
+{
+  int id2 = (id == SOUND_CTRL_ID_MUSIC        ? SOUND_CTRL_ID_PANEL_MUSIC :
+	     id == SOUND_CTRL_ID_LOOPS        ? SOUND_CTRL_ID_PANEL_LOOPS :
+	     id == SOUND_CTRL_ID_SIMPLE       ? SOUND_CTRL_ID_PANEL_SIMPLE :
+	     id == SOUND_CTRL_ID_PANEL_MUSIC  ? SOUND_CTRL_ID_MUSIC :
+	     id == SOUND_CTRL_ID_PANEL_LOOPS  ? SOUND_CTRL_ID_LOOPS :
+	     id == SOUND_CTRL_ID_PANEL_SIMPLE ? SOUND_CTRL_ID_SIMPLE :
+	     id);
+
+  SetGadgetState(game_gadget[id2], *gamebutton_info[id2].setup_value);
+  RedrawGadget(game_gadget[id2]);
+}
+
+void MapGameButtons()
+{
+  MapGameButtonsExt(FALSE);
+}
+
+void UnmapGameButtons()
+{
+  UnmapGameButtonsExt(FALSE);
 }
 
 void RedrawGameButtons()
 {
-  int i;
+  RedrawGameButtonsExt(FALSE);
+}
 
-  for (i = 0; i < NUM_GAME_BUTTONS; i++)
-    RedrawGadget(game_gadget[i]);
+void MapGameButtonsOnTape()
+{
+  MapGameButtonsExt(TRUE);
+}
 
-  // RedrawGadget() may have set REDRAW_ALL if buttons are defined off-area
-  redraw_mask &= ~REDRAW_ALL;
+void UnmapGameButtonsOnTape()
+{
+  UnmapGameButtonsExt(TRUE);
+}
+
+void RedrawGameButtonsOnTape()
+{
+  RedrawGameButtonsExt(TRUE);
 }
 
 void GameUndoRedoExt()
@@ -15593,6 +15699,7 @@ static void HandleGameButtonsExt(int id, int button)
   switch (id)
   {
     case GAME_CTRL_ID_STOP:
+    case GAME_CTRL_ID_PANEL_STOP:
       if (game_status == GAME_MODE_MAIN)
 	break;
 
@@ -15605,6 +15712,7 @@ static void HandleGameButtonsExt(int id, int button)
 
     case GAME_CTRL_ID_PAUSE:
     case GAME_CTRL_ID_PAUSE2:
+    case GAME_CTRL_ID_PANEL_PAUSE:
       if (options.network && game_status == GAME_MODE_PLAYING)
       {
 #if defined(NETWORK_AVALIABLE)
@@ -15622,6 +15730,7 @@ static void HandleGameButtonsExt(int id, int button)
       break;
 
     case GAME_CTRL_ID_PLAY:
+    case GAME_CTRL_ID_PANEL_PLAY:
       if (game_status == GAME_MODE_MAIN)
       {
         StartGameActions(options.network, setup.autorecord, level.random_seed);
@@ -15665,6 +15774,7 @@ static void HandleGameButtonsExt(int id, int button)
       break;
 
     case SOUND_CTRL_ID_MUSIC:
+    case SOUND_CTRL_ID_PANEL_MUSIC:
       if (setup.sound_music)
       { 
 	setup.sound_music = FALSE;
@@ -15679,9 +15789,13 @@ static void HandleGameButtonsExt(int id, int button)
 
 	PlayLevelMusic();
       }
+
+      RedrawSoundButtonGadget(id);
+
       break;
 
     case SOUND_CTRL_ID_LOOPS:
+    case SOUND_CTRL_ID_PANEL_LOOPS:
       if (setup.sound_loops)
 	setup.sound_loops = FALSE;
       else if (audio.loops_available)
@@ -15690,9 +15804,13 @@ static void HandleGameButtonsExt(int id, int button)
 
 	SetAudioMode(setup.sound);
       }
+
+      RedrawSoundButtonGadget(id);
+
       break;
 
     case SOUND_CTRL_ID_SIMPLE:
+    case SOUND_CTRL_ID_PANEL_SIMPLE:
       if (setup.sound_simple)
 	setup.sound_simple = FALSE;
       else if (audio.sound_available)
@@ -15701,6 +15819,9 @@ static void HandleGameButtonsExt(int id, int button)
 
 	SetAudioMode(setup.sound);
       }
+
+      RedrawSoundButtonGadget(id);
+
       break;
 
     default:
@@ -15715,7 +15836,6 @@ static void HandleGameButtons(struct GadgetInfo *gi)
 
 void HandleSoundButtonKeys(Key key)
 {
-
   if (key == setup.shortcut.sound_simple)
     ClickOnGadget(game_gadget[SOUND_CTRL_ID_SIMPLE], MB_LEFTBUTTON);
   else if (key == setup.shortcut.sound_loops)

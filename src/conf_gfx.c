@@ -6188,6 +6188,14 @@ struct ConfigInfo image_config[] =
   { "gfx.game.button.sound_simple.pressed_xoffset", "-100"		},
   { "gfx.game.button.sound_simple.active_yoffset", "-30"		},
 
+  { "gfx.game.button.panel_stop",		UNDEFINED_FILENAME	},
+  { "gfx.game.button.panel_pause",		UNDEFINED_FILENAME	},
+  { "gfx.game.button.panel_play",		UNDEFINED_FILENAME	},
+
+  { "gfx.game.button.panel_sound_music",	UNDEFINED_FILENAME	},
+  { "gfx.game.button.panel_sound_loops",	UNDEFINED_FILENAME	},
+  { "gfx.game.button.panel_sound_simple",	UNDEFINED_FILENAME	},
+
   { "gfx.tape.button.eject",			"RocksDoor.png"		},
   { "gfx.tape.button.eject.x",			"305"			},
   { "gfx.tape.button.eject.y",			"357"			},
@@ -8990,6 +8998,19 @@ struct ConfigInfo image_config[] =
   { "game.button.sound_loops.y",		"245"			},
   { "game.button.sound_simple.x",		"65"			},
   { "game.button.sound_simple.y",		"245"			},
+
+  { "game.button.panel_stop.x",			"-1"			},
+  { "game.button.panel_stop.y",			"-1"			},
+  { "game.button.panel_pause.x",		"-1"			},
+  { "game.button.panel_pause.y",		"-1"			},
+  { "game.button.panel_play.x",			"-1"			},
+  { "game.button.panel_play.y",			"-1"			},
+  { "game.button.panel_sound_music.x",		"-1"			},
+  { "game.button.panel_sound_music.y",		"-1"			},
+  { "game.button.panel_sound_loops.x",		"-1"			},
+  { "game.button.panel_sound_loops.y",		"-1"			},
+  { "game.button.panel_sound_simple.x",		"-1"			},
+  { "game.button.panel_sound_simple.y",		"-1"			},
 
   { "tape.button.eject.x",			"5"			},
   { "tape.button.eject.y",			"77"			},

@@ -118,6 +118,14 @@ struct GameButtonInfo
   struct XY sound_music;
   struct XY sound_loops;
   struct XY sound_simple;
+
+  struct XY panel_stop;
+  struct XY panel_pause;
+  struct XY panel_play;
+
+  struct XY panel_sound_music;
+  struct XY panel_sound_loops;
+  struct XY panel_sound_simple;
 };
 
 struct GameSnapshotInfo
@@ -423,6 +431,9 @@ void UnmapUndoRedoButtons();
 void MapGameButtons();
 void UnmapGameButtons();
 void RedrawGameButtons();
+void MapGameButtonsOnTape();
+void UnmapGameButtonsOnTape();
+void RedrawGameButtonsOnTape();
 
 void HandleSoundButtonKeys(Key);
 
