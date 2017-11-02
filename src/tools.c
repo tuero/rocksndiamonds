@@ -5055,6 +5055,17 @@ unsigned int MoveDoor(unsigned int door_state)
       if (door_part_done_all)
 	break;
     }
+
+    if (!(door_state & DOOR_NO_DELAY))
+    {
+      /* wait for specified door action post delay */
+      if (door_state & DOOR_ACTION_1 && door_state & DOOR_ACTION_2)
+	Delay(MAX(door_1.post_delay, door_2.post_delay));
+      else if (door_state & DOOR_ACTION_1)
+	Delay(door_1.post_delay);
+      else if (door_state & DOOR_ACTION_2)
+	Delay(door_2.post_delay);
+    }
   }
 
   if (door_state & DOOR_ACTION_1)
