@@ -276,4 +276,7 @@ void ResetFontStatus();
 void ToggleFullscreenOrChangeWindowScalingIfNeeded();
 void ChangeViewportPropertiesIfNeeded();
 
+boolean CheckIfPlayfieldViewportHasChanged();
+boolean CheckIfGlobalBorderOrPlayfieldViewportHasChanged();
+
 #endif	/* TOOLS_H */

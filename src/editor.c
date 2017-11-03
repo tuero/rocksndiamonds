@@ -8264,7 +8264,7 @@ void DrawLevelEd()
 
   FadeSoundsAndMusic();
 
-  if (CheckIfGlobalBorderHasChanged())
+  if (CheckIfGlobalBorderOrPlayfieldViewportHasChanged())
     fade_mask = REDRAW_ALL;
 
   FadeOut(fade_mask);

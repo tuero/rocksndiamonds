@@ -3298,7 +3298,7 @@ void InitGame()
   else
     FadeSetEnterScreen();
 
-  if (CheckIfGlobalBorderHasChanged())
+  if (CheckIfGlobalBorderOrPlayfieldViewportHasChanged())
     fade_mask = REDRAW_ALL;
 
   FadeLevelSoundsAndMusic();

@@ -8973,6 +8973,31 @@ void ResetFontStatus()
   SetFontStatus(-1);
 }
 
+boolean CheckIfPlayfieldViewportHasChanged()
+{
+  // if game status has not changed, playfield viewport has not changed either
+  if (game_status == game_status_last)
+    return FALSE;
+
+  // check if playfield viewport has changed with current game status
+  struct RectWithBorder *vp_playfield = &viewport.playfield[game_status];
+  int new_real_sx	= vp_playfield->x;
+  int new_real_sy	= vp_playfield->y;
+  int new_full_sxsize	= vp_playfield->width;
+  int new_full_sysize	= vp_playfield->height;
+
+  return (new_real_sx != REAL_SX ||
+	  new_real_sy != REAL_SY ||
+	  new_full_sxsize != FULL_SXSIZE ||
+	  new_full_sysize != FULL_SYSIZE);
+}
+
+boolean CheckIfGlobalBorderOrPlayfieldViewportHasChanged()
+{
+  return (CheckIfGlobalBorderHasChanged() ||
+	  CheckIfPlayfieldViewportHasChanged());
+}
+
 void ChangeViewportPropertiesIfNeeded()
 {
   boolean use_mini_tilesize = (level.game_engine_type == GAME_ENGINE_TYPE_MM ?
