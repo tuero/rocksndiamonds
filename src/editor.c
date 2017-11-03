@@ -8277,7 +8277,7 @@ void DrawLevelEd()
   InitZoomLevelSettings(-1);
   InitLevelSetInfo();
 
-  OpenDoor(DOOR_OPEN_1 | DOOR_OPEN_2 | DOOR_NO_DELAY);
+  SetDoorState(DOOR_OPEN_1 | DOOR_OPEN_2);
 
 #if DEBUG
   CheckElementDescriptions();
