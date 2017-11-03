@@ -346,8 +346,12 @@
 #define INFOTEXT_XSIZE		SXSIZE
 #define INFOTEXT_YSIZE		getFontHeight(INFOTEXT_FONT)
 #define INFOTEXT_YSIZE_FULL	(INFOTEXT_YSIZE + ED_GADGET_SMALL_DISTANCE)
-#define INFOTEXT_XPOS		SX
-#define INFOTEXT_YPOS		(SY + SYSIZE - INFOTEXT_YSIZE)
+#define INFOTEXT_X		(editor.settings.tooltip.x)
+#define INFOTEXT_Y		(editor.settings.tooltip.y)
+#define INFOTEXT_XY_REDEFINED	(INFOTEXT_X != -1 || INFOTEXT_Y != -1)
+#define INFOTEXT_XPOS		SX + (INFOTEXT_XY_REDEFINED ? INFOTEXT_X : 0)
+#define INFOTEXT_YPOS		SY + (INFOTEXT_XY_REDEFINED ? INFOTEXT_Y : \
+				      SYSIZE - INFOTEXT_YSIZE)
 
 
 /*
@@ -8204,7 +8208,8 @@ static int getMaxEdFieldX(boolean has_scrollbar)
 
 static int getMaxEdFieldY(boolean has_scrollbar)
 {
-  int infotext_height = INFOTEXT_YSIZE_FULL;
+  int infotext_height = (IN_PIX_FIELD(INFOTEXT_XPOS - SX, INFOTEXT_YPOS - SY) ?
+			 INFOTEXT_YSIZE_FULL : 0);
   int scrollbar_height = (has_scrollbar ? ED_SCROLLBUTTON_YSIZE : 0);
   int sysize = SYSIZE - scrollbar_height - infotext_height;
   int max_ed_fieldy = sysize / ed_tilesize;

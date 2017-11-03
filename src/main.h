@@ -75,6 +75,7 @@
 					((x) >= (xmin) && (x) <= (xmax) && \
 					 (y) >= (ymin) && (y) <= (ymax))
 
+#define IN_PIX_FIELD(x, y)		IN_FIELD(x, y, SXSIZE, SYSIZE)
 #define IN_VIS_FIELD(x, y)		IN_FIELD(x, y, SCR_FIELDX, SCR_FIELDY)
 #define IN_LEV_FIELD(x, y)		IN_FIELD(x, y, lev_fieldx, lev_fieldy)
 #define IN_SCR_FIELD(x, y)		IN_FIELD_MINMAX(x,y, BX1,BY1, BX2,BY2)
@@ -2817,6 +2818,8 @@ struct EditorSettingsInfo
   struct XY element_name;
 
   struct EditorTabsInfo tabs;
+
+  struct XY tooltip;
 };
 
 struct EditorGadgetInfo
