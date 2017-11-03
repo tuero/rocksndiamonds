@@ -3745,6 +3745,9 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *);
 static void PrintEditorGadgetInfoText(struct GadgetInfo *);
 static boolean AskToCopyAndModifyLevelTemplate();
 static boolean getDrawModeHiRes();
+static int getTabulatorBarWidth();
+static int getTabulatorBarHeight();
+static Pixel getTabulatorBarColor();
 
 static int num_editor_gadgets = 0;	/* dynamically determined */
 
@@ -5434,6 +5437,13 @@ char *getElementDescriptionFilename(int element)
   return NULL;
 }
 
+static boolean suppressBorderElement()
+{
+  return (level.game_engine_type == GAME_ENGINE_TYPE_MM &&
+	  lev_fieldx <= MAX_ED_FIELDX &&
+	  lev_fieldy <= MAX_ED_FIELDY);
+}
+
 static void InitDynamicEditorElementList(int **elements, int *num_elements)
 {
   boolean element_found[NUM_FILE_ELEMENTS];
@@ -5876,6 +5886,45 @@ static void DrawElementBorder(int dest_x, int dest_y, int width, int height,
   ClearRectangle(drawto, dest_x - 1, dest_y - 1, width + 2, height + 2);
 }
 
+static void DrawEditorLevelBorderLine(int x, int y, int xsize, int ysize)
+{
+  int xsize_tile = MAX(ed_tilesize, xsize);
+  int ysize_tile = MAX(ed_tilesize, ysize);
+  int xsize_full = xsize + 1;
+  int ysize_full = ysize + 1;
+  int xsize_thin = (xsize < ed_tilesize ? 1 : xsize);
+  int ysize_thin = (ysize < ed_tilesize ? 1 : ysize);
+  Pixel line_color = getTabulatorBarColor();
+
+  if (line_color == BLACK_PIXEL)		/* black => transparent */
+    return;
+
+  FillRectangle(drawto, SX + x, SY + y, xsize_tile, ysize_tile, BLACK_PIXEL);
+  FillRectangle(drawto, SX + x, SY + y, xsize_full, ysize_full, line_color);
+  FillRectangle(drawto, SX + x, SY + y, xsize_thin, ysize_thin, BLACK_PIXEL);
+}
+
+static void DrawEditorLevelBorderLinesIfNeeded()
+{
+  int xsize = lev_fieldx * ed_tilesize;
+  int ysize = lev_fieldy * ed_tilesize;
+  int line_size = getTabulatorBarHeight();
+
+  if (!suppressBorderElement())
+    return;
+
+  /* draw little border line around editable level playfield */
+
+  if (xsize < SXSIZE)
+    DrawEditorLevelBorderLine(xsize, 0, line_size, ysize);
+
+  if (ysize < SYSIZE)
+    DrawEditorLevelBorderLine(0, ysize, xsize, line_size);
+
+  if (xsize < SXSIZE && ysize < SYSIZE)
+    DrawEditorLevelBorderLine(xsize, ysize, line_size, line_size);
+}
+
 static void DrawEditorElement(int x, int y, int element)
 {
   DrawSizedElement(x, y, element, ed_tilesize);
@@ -5894,6 +5943,7 @@ static void DrawEditorElementOrWall(int x, int y, int scroll_x, int scroll_y)
 static void DrawEditorLevel(int size_x, int size_y, int scroll_x, int scroll_y)
 {
   DrawSizedLevel(size_x, size_y, scroll_x, scroll_y, ed_tilesize);
+  DrawEditorLevelBorderLinesIfNeeded();
 }
 
 static void DrawDrawingArea(int id)
@@ -7346,6 +7396,12 @@ static void MapMainDrawingArea()
   boolean no_vertical_scrollbar = (lev_fieldy + 2 <= ed_fieldy);
   int i;
 
+  if (suppressBorderElement())
+  {
+    no_horizontal_scrollbar = (lev_fieldx <= ed_fieldx);
+    no_vertical_scrollbar   = (lev_fieldy <= ed_fieldy);
+  }
+
   for (i=ED_SCROLLBUTTON_ID_AREA_FIRST; i <= ED_SCROLLBUTTON_ID_AREA_LAST; i++)
   {
     if (((i == ED_SCROLLBUTTON_ID_AREA_LEFT ||
@@ -8362,6 +8418,12 @@ static void AdjustDrawingAreaGadgets()
   boolean vertical_scrollbar_needed;
   int x, y, width, height;
 
+  if (suppressBorderElement())
+  {
+    ed_xsize = max_ed_fieldx;
+    ed_ysize = max_ed_fieldy;
+  }
+
   /* check if we need any scrollbars */
   horizontal_scrollbar_needed = (ed_xsize > max_ed_fieldx);
   vertical_scrollbar_needed   = (ed_ysize > max_ed_fieldy);
@@ -8437,6 +8499,12 @@ static void AdjustLevelScrollPosition()
     level_ypos = lev_fieldy - ed_fieldy + 1;
   if (lev_fieldy < ed_fieldy - 2)
     level_ypos = -1;
+
+  if (suppressBorderElement())
+  {
+    level_xpos = 0;
+    level_ypos = 0;
+  }
 }
 
 static void AdjustEditorScrollbar(int id)
@@ -8668,13 +8736,20 @@ static int getTabulatorBarHeight()
   return ED_TAB_BAR_HEIGHT;
 }
 
-static void DrawLevelInfoTabulatorGadgets()
+static Pixel getTabulatorBarColor()
 {
   struct GadgetInfo *gd_gi1 = level_editor_gadget[GADGET_ID_LEVELINFO_LEVEL];
   struct GadgetDesign *gd = &gd_gi1->alt_design[GD_BUTTON_UNPRESSED];
   int gd_x = gd->x + gd_gi1->border.width / 2;
   int gd_y = gd->y + gd_gi1->height - 1;
-  Pixel tab_color = GetPixel(gd->bitmap, gd_x, gd_y);
+
+  return GetPixel(gd->bitmap, gd_x, gd_y);
+}
+
+static void DrawLevelInfoTabulatorGadgets()
+{
+  struct GadgetInfo *gd_gi1 = level_editor_gadget[GADGET_ID_LEVELINFO_LEVEL];
+  Pixel tab_color = getTabulatorBarColor();
   int id_first = ED_TAB_BUTTON_ID_LEVELINFO_FIRST;
   int id_last  = ED_TAB_BUTTON_ID_LEVELINFO_LAST;
   int i;
