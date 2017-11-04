@@ -2308,7 +2308,7 @@ void UpdateGameControlValues()
   game_panel_controls[GAME_PANEL_TIME_MM].value = (time / 60) % 60;
   game_panel_controls[GAME_PANEL_TIME_SS].value = time % 60;
 
-  if (game.no_time_limit)
+  if (level.time == 0)
     game_panel_controls[GAME_PANEL_TIME_ANIM].value = 100;
   else
     game_panel_controls[GAME_PANEL_TIME_ANIM].value = time * 100 / level.time;
