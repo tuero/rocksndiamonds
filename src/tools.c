@@ -4770,7 +4770,7 @@ unsigned int MoveDoor(unsigned int door_state)
     door_state &= ~DOOR_CLOSE_ALL;
   }
 
-  if (game_status == GAME_MODE_EDITOR)
+  if (game_status == GAME_MODE_EDITOR && !(door_state & DOOR_FORCE_ANIM))
     door_state |= DOOR_NO_DELAY;
 
   if (door_state & DOOR_ACTION)

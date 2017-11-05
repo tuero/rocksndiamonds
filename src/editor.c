@@ -3722,7 +3722,9 @@ static void ModifyEditorDrawingArea(int, int, int);
 static void ModifyEditorElementList();
 static void AdjustElementListScrollbar();
 static void RedrawDrawingElements();
+static void DrawDrawingWindowExt(boolean);
 static void DrawDrawingWindow();
+static void DrawDrawingWindow_PlayfieldOnly();
 static void DrawLevelInfoWindow();
 static void DrawPropertiesWindow();
 static void DrawPaletteWindow();
@@ -8319,6 +8321,58 @@ static void ChangeEditorToLevelSet(char *levelset_subdir)
   DrawLevelEd();
 }
 
+static boolean useEditorDoorAnimation()
+{
+  struct RectWithBorder *vp_door_1 = &viewport.door_1[GAME_MODE_MAIN];
+  boolean door_1_viewport_unchanged =
+    (vp_door_1->x      == DX     &&
+     vp_door_1->y      == DY     &&
+     vp_door_1->width  == DXSIZE &&
+     vp_door_1->height == DYSIZE);
+  boolean door_1_contains_toolbox =
+    (EX >= DX &&
+     EY >= DY &&
+     EX + EXSIZE <= DX + DXSIZE &&
+     EY + EYSIZE <= DY + DYSIZE);
+
+  return (door_1_viewport_unchanged && door_1_contains_toolbox);
+}
+
+void DrawEditorDoorContent()
+{
+  /* needed for gadgets drawn on background (like palette scrollbar) */
+  SetDoorBackgroundImage(IMG_UNDEFINED);
+
+  /* copy default editor door content to main double buffer */
+  BlitBitmap(graphic_info[IMG_BACKGROUND_PALETTE].bitmap, drawto,
+	     graphic_info[IMG_BACKGROUND_PALETTE].src_x,
+	     graphic_info[IMG_BACKGROUND_PALETTE].src_y,
+	     MIN(DXSIZE, graphic_info[IMG_BACKGROUND_PALETTE].width),
+	     MIN(DYSIZE, graphic_info[IMG_BACKGROUND_PALETTE].height),
+	     DX, DY);
+
+  /* draw bigger door */
+  DrawSpecialEditorDoor();
+
+  /* draw new control window */
+  BlitBitmap(graphic_info[IMG_BACKGROUND_TOOLBOX].bitmap, drawto,
+	     graphic_info[IMG_BACKGROUND_TOOLBOX].src_x,
+	     graphic_info[IMG_BACKGROUND_TOOLBOX].src_y,
+	     MIN(EXSIZE, graphic_info[IMG_BACKGROUND_TOOLBOX].width),
+	     MIN(EYSIZE, graphic_info[IMG_BACKGROUND_TOOLBOX].height),
+	     EX, EY);
+
+  /* draw all toolbox gadgets to editor doors */
+  MapControlButtons();
+
+  /* draw all palette gadgets to editor doors */
+  ModifyEditorElementList();
+  RedrawDrawingElements();
+
+  /* copy actual editor door content to door double buffer for OpenDoor() */
+  BlitBitmap(drawto, bitmap_db_door_1, DX, DY, DXSIZE, DYSIZE, 0, 0);
+}
+
 void DrawLevelEd()
 {
   int fade_mask = REDRAW_FIELD;
@@ -8337,8 +8391,6 @@ void DrawLevelEd()
 
   InitZoomLevelSettings(-1);
   InitLevelSetInfo();
-
-  SetDoorState(DOOR_OPEN_1 | DOOR_OPEN_2);
 
 #if DEBUG
   CheckElementDescriptions();
@@ -8363,28 +8415,6 @@ void DrawLevelEd()
     level_ypos = -1;
   }
 
-  /* needed for gadgets drawn on background (like palette scrollbar) */
-  SetDoorBackgroundImage(IMG_UNDEFINED);
-
-  /* copy default editor door content to main double buffer */
-  BlitBitmap(graphic_info[IMG_BACKGROUND_PALETTE].bitmap, drawto,
-	     graphic_info[IMG_BACKGROUND_PALETTE].src_x,
-	     graphic_info[IMG_BACKGROUND_PALETTE].src_y,
-	     MIN(DXSIZE, graphic_info[IMG_BACKGROUND_PALETTE].width),
-	     MIN(DYSIZE, graphic_info[IMG_BACKGROUND_PALETTE].height),
-	     DX, DY);
-
-  /* draw bigger door */
-  DrawSpecialEditorDoor();
-
-  /* draw new control window */
-  BlitBitmap(graphic_info[IMG_BACKGROUND_TOOLBOX].bitmap, drawto,
-	     graphic_info[IMG_BACKGROUND_TOOLBOX].src_x,
-	     graphic_info[IMG_BACKGROUND_TOOLBOX].src_y,
-	     MIN(EXSIZE, graphic_info[IMG_BACKGROUND_TOOLBOX].width),
-	     MIN(EYSIZE, graphic_info[IMG_BACKGROUND_TOOLBOX].height),
-	     EX, EY);
-
   // redraw_mask |= REDRAW_ALL;
 
   FreeLevelEditorGadgets();
@@ -8396,16 +8426,28 @@ void DrawLevelEd()
   InitElementPropertiesGfxElement();
 
   UnmapAllGadgets();
-  MapControlButtons();
 
-  DrawEditModeWindow();
+  DrawDrawingWindow_PlayfieldOnly();
 
   DrawMaskedBorder(fade_mask);
 
-  FadeIn(fade_mask);
+  // use door animation if door 1 viewport is unchanged and contains toolbox
+  if (useEditorDoorAnimation())
+  {
+    FadeIn(fade_mask);
 
-  /* copy actual editor door content to door double buffer for OpenDoor() */
-  BlitBitmap(drawto, bitmap_db_door_1, DX, DY, DXSIZE, DYSIZE, 0, 0);
+    DrawEditorDoorContent();
+
+    OpenDoor(DOOR_OPEN_1 | DOOR_FORCE_ANIM);
+  }
+  else
+  {
+    DrawEditorDoorContent();
+
+    FadeIn(fade_mask);
+  }
+
+  SetDoorState(DOOR_OPEN_1 | DOOR_OPEN_2);
 }
 
 static void AdjustDrawingAreaGadgets()
@@ -8702,7 +8744,7 @@ static void RedrawDrawingElements()
   PickDrawingElement(3, new_element3);
 }
 
-static void DrawDrawingWindow()
+static void DrawDrawingWindowExt(boolean remap_toolbox_gadgets)
 {
   stick_element_properties_window = FALSE;
 
@@ -8710,7 +8752,6 @@ static void DrawDrawingWindow()
   ClearField();
 
   UnmapLevelEditorFieldGadgets();
-  UnmapLevelEditorToolboxCustomGadgets();
 
   AdjustDrawingAreaGadgets();
   AdjustLevelScrollPosition();
@@ -8720,7 +8761,22 @@ static void DrawDrawingWindow()
   DrawEditorLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
 
   MapMainDrawingArea();
-  MapLevelEditorToolboxDrawingGadgets();
+
+  if (remap_toolbox_gadgets)
+  {
+    UnmapLevelEditorToolboxCustomGadgets();
+    MapLevelEditorToolboxDrawingGadgets();
+  }
+}
+
+static void DrawDrawingWindow()
+{
+  DrawDrawingWindowExt(TRUE);
+}
+
+static void DrawDrawingWindow_PlayfieldOnly()
+{
+  DrawDrawingWindowExt(FALSE);
 }
 
 static int getTabulatorBarWidth()
@@ -13915,6 +13971,10 @@ void RequestExitLevelEditor(boolean ask_if_level_has_changed,
 
     /* draw normal door */
     UndrawSpecialEditorDoor();
+
+    // use door animation if door 1 viewport is unchanged and contains toolbox
+    if (useEditorDoorAnimation())
+      CloseDoor(DOOR_CLOSE_1 | DOOR_FORCE_ANIM);
 
     // close editor doors if viewport definition is the same as in main menu
     if (vp_door_1->x      == DX     &&

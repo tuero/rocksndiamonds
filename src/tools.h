@@ -40,9 +40,10 @@
 #define DOOR_COPY_BACK		(1 << 4)
 #define DOOR_NO_COPY_BACK	(1 << 5)
 #define DOOR_NO_DELAY		(1 << 6)
-#define DOOR_FORCE_REDRAW	(1 << 7)
-#define DOOR_GET_STATE		(1 << 8)
-#define DOOR_SET_STATE		(1 << 9)
+#define DOOR_FORCE_ANIM		(1 << 7)
+#define DOOR_FORCE_REDRAW	(1 << 8)
+#define DOOR_GET_STATE		(1 << 9)
+#define DOOR_SET_STATE		(1 << 10)
 
 #define DOOR_1			(DOOR_ACTION_1)
 #define DOOR_2			(DOOR_ACTION_2)
