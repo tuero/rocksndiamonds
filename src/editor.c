@@ -1093,6 +1093,7 @@
 
 /* default value for element tile size in drawing area */
 #define DEFAULT_EDITOR_TILESIZE		MINI_TILESIZE
+#define DEFAULT_EDITOR_TILESIZE_MM	TILESIZE
 
 
 /*
@@ -8278,12 +8279,19 @@ static int getMaxEdFieldY(boolean has_scrollbar)
 void InitZoomLevelSettings(int zoom_tilesize)
 {
   if (zoom_tilesize == -1)
-    zoom_tilesize = setup.auto_setup.editor_zoom_tilesize;
+  {
+    ed_tilesize = setup.auto_setup.editor_zoom_tilesize;
+
+    if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
+      ed_tilesize = DEFAULT_EDITOR_TILESIZE_MM;
+  }
 
   // limit zoom tilesize by upper and lower bound
-  zoom_tilesize = MIN(MAX(MICRO_TILESIZE, zoom_tilesize), TILESIZE);
+  ed_tilesize = MIN(MAX(MICRO_TILESIZE, ed_tilesize), TILESIZE);
 
-  ed_tilesize = setup.auto_setup.editor_zoom_tilesize = zoom_tilesize;
+  // store zoom tilesize in auto setup file only if it was manually changed
+  if (zoom_tilesize != -1)
+    setup.auto_setup.editor_zoom_tilesize = ed_tilesize;
 
   MAX_ED_FIELDX = getMaxEdFieldX(FALSE);
   MAX_ED_FIELDY = getMaxEdFieldY(FALSE);
