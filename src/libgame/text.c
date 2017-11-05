@@ -101,10 +101,12 @@ void getFontCharSource(int font_nr, char c, Bitmap **bitmap, int *x, int *y)
   int font_bitmap_id = gfx.select_font_function(font_nr);
   struct FontBitmapInfo *font = &gfx.font_bitmap_info[font_bitmap_id];
   int font_pos = getFontCharPosition(font_nr, c);
+  int offset_x = (font->offset_x != 0 ? font->offset_x : font->width);
+  int offset_y = (font->offset_y != 0 ? font->offset_y : font->height);
 
   *bitmap = font->bitmap;
-  *x = font->src_x + (font_pos % font->num_chars_per_line) * font->offset_x;
-  *y = font->src_y + (font_pos / font->num_chars_per_line) * font->offset_y;
+  *x = font->src_x + (font_pos % font->num_chars_per_line) * offset_x;
+  *y = font->src_y + (font_pos / font->num_chars_per_line) * offset_y;
 }
 
 

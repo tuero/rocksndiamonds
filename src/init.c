@@ -552,13 +552,9 @@ void InitFontGraphicInfo()
       font_bitmap_info[font_bitmap_id].height = graphic_info[graphic].height;
 
       font_bitmap_info[font_bitmap_id].offset_x =
-	(graphic_info[graphic].offset_x != 0 ?
-	 graphic_info[graphic].offset_x :
-	 graphic_info[graphic].width);
+	graphic_info[graphic].offset_x;
       font_bitmap_info[font_bitmap_id].offset_y =
-	(graphic_info[graphic].offset_y != 0 ?
-	 graphic_info[graphic].offset_y :
-	 graphic_info[graphic].height);
+	graphic_info[graphic].offset_y;
 
       font_bitmap_info[font_bitmap_id].draw_xoffset =
 	graphic_info[graphic].draw_xoffset;
