@@ -3692,6 +3692,7 @@ static int level_xpos = -1, level_ypos = -1;
 
 /* actual tile size used to display playfield drawing area */
 static int ed_tilesize = DEFAULT_EDITOR_TILESIZE;
+static int ed_tilesize_default = DEFAULT_EDITOR_TILESIZE;
 
 #define IN_ED_FIELD(x,y)	IN_FIELD(x, y, ed_fieldx, ed_fieldy)
 
@@ -8281,9 +8282,13 @@ void InitZoomLevelSettings(int zoom_tilesize)
   if (zoom_tilesize == -1)
   {
     ed_tilesize = setup.auto_setup.editor_zoom_tilesize;
+    ed_tilesize_default = DEFAULT_EDITOR_TILESIZE;
 
     if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
+    {
       ed_tilesize = DEFAULT_EDITOR_TILESIZE_MM;
+      ed_tilesize_default = DEFAULT_EDITOR_TILESIZE_MM;
+    }
   }
 
   // limit zoom tilesize by upper and lower bound
@@ -13271,7 +13276,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
     case GADGET_ID_ZOOM:
       // zoom level editor tile size in or out (or reset to default size)
       ed_tilesize = (button == 1 ? ed_tilesize * 2 :
-		     button == 2 ? DEFAULT_EDITOR_TILESIZE :
+		     button == 2 ? ed_tilesize_default :
 		     button == 3 ? ed_tilesize / 2 : ed_tilesize);
 
       // limit zoom level by upper and lower bound
