@@ -8302,6 +8302,35 @@ void InitZoomLevelSettings(int zoom_tilesize)
   MAX_ED_FIELDY = getMaxEdFieldY(FALSE);
 }
 
+static void InitDrawingElements()
+{
+  static int game_engine_type_last = GAME_ENGINE_TYPE_UNKNOWN;
+
+  if (level.game_engine_type == game_engine_type_last)
+    return;
+
+  if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
+  {
+    new_element1 = EL_SP_CHIP_SINGLE;
+    new_element2 = EL_EMPTY;
+    new_element3 = EL_SP_BASE;
+  }
+  else if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
+  {
+    new_element1 = EL_MM_MIRROR_START;
+    new_element2 = EL_EMPTY;
+    new_element3 = EL_MM_WOODEN_WALL;
+  }
+  else
+  {
+    new_element1 = EL_WALL;
+    new_element2 = EL_EMPTY;
+    new_element3 = EL_SAND;
+  }
+
+  game_engine_type_last = level.game_engine_type;
+}
+
 static void InitLevelSetInfo()
 {
   snprintf(levelset_name,   MAX_LEVEL_NAME_LEN + 1,
@@ -8403,6 +8432,7 @@ void DrawLevelEd()
   ClearField();
 
   InitZoomLevelSettings(-1);
+  InitDrawingElements();
   InitLevelSetInfo();
 
 #if DEBUG
