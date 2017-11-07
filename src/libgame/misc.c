@@ -682,10 +682,16 @@ char *getBasePath(char *filename)
   char *basepath = getStringCopy(filename);
   char *last_separator = getLastPathSeparatorPtr(basepath);
 
-  if (last_separator != NULL)
-    *last_separator = '\0';	/* separator found: strip basename */
-  else
-    basepath = ".";		/* no separator found: use current path */
+  /* if no separator was found, use current directory */
+  if (last_separator == NULL)
+  {
+    free(basepath);
+
+    return getStringCopy(".");
+  }
+
+  /* separator found: strip basename */
+  *last_separator = '\0';
 
   return basepath;
 }
