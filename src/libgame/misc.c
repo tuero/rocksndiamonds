@@ -696,9 +696,9 @@ char *getBasePath(char *filename)
   return basepath;
 }
 
-static char *getProgramMainDataPath()
+static char *getProgramMainDataPath(char *command_filename)
 {
-  char *main_data_path = getStringCopy(program.command_basepath);
+  char *main_data_path = getBasePath(command_filename);
 
 #if defined(PLATFORM_MACOSX)
   if (strSuffix(main_data_path, MAC_APP_BINARY_SUBDIR))
@@ -955,9 +955,9 @@ void GetOptions(int argc, char *argv[],
      set the current working directory to the program package directory) */
 
   if (strEqual(ro_base_path, "."))
-    ro_base_path = getProgramMainDataPath();
+    ro_base_path = getProgramMainDataPath(argv[0]);
   if (strEqual(rw_base_path, "."))
-    rw_base_path = getProgramMainDataPath();
+    rw_base_path = getProgramMainDataPath(argv[0]);
 
   /* initialize global program options */
   options.server_host = NULL;
