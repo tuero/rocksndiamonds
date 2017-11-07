@@ -701,36 +701,13 @@ static char *getProgramMainDataPath()
   char *main_data_path = getStringCopy(program.command_basepath);
 
 #if defined(PLATFORM_MACOSX)
-  static char *main_data_binary_subdir = NULL;
-  static char *main_data_files_subdir = NULL;
-
-  if (main_data_binary_subdir == NULL)
-  {
-    main_data_binary_subdir = checked_malloc(strlen(program.program_title) + 1 +
-					     strlen("app") + 1 +
-					     strlen(MAC_APP_BINARY_SUBDIR) + 1);
-
-    sprintf(main_data_binary_subdir, "%s.app/%s",
-	    program.program_title, MAC_APP_BINARY_SUBDIR);
-  }
-
-  if (main_data_files_subdir == NULL)
-  {
-    main_data_files_subdir = checked_malloc(strlen(program.program_title) + 1 +
-					    strlen("app") + 1 +
-					    strlen(MAC_APP_FILES_SUBDIR) + 1);
-
-    sprintf(main_data_files_subdir, "%s.app/%s",
-	    program.program_title, MAC_APP_FILES_SUBDIR);
-  }
-
-  if (strSuffix(main_data_path, main_data_binary_subdir))
+  if (strSuffix(main_data_path, MAC_APP_BINARY_SUBDIR))
   {
     char *main_data_path_old = main_data_path;
 
     // cut relative path to Mac OS X application binary directory from path
     main_data_path[strlen(main_data_path) -
-		   strlen(main_data_binary_subdir)] = '\0';
+		   strlen(MAC_APP_BINARY_SUBDIR)] = '\0';
 
     // cut trailing path separator from path (but not if path is root directory)
     if (strSuffix(main_data_path, "/") && !strEqual(main_data_path, "/"))
@@ -741,7 +718,7 @@ static char *getProgramMainDataPath()
       main_data_path = ".";
 
     // add relative path to Mac OS X application resources directory to path
-    main_data_path = getPath2(main_data_path, main_data_files_subdir);
+    main_data_path = getPath2(main_data_path, MAC_APP_FILES_SUBDIR);
 
     free(main_data_path_old);
   }
