@@ -696,8 +696,16 @@ char *getBasePath(char *filename)
   return basepath;
 }
 
-static char *getProgramMainDataPath(char *command_filename)
+static char *getProgramMainDataPath(char *command_filename, char *base_path)
 {
+  /* check if the program's main data base directory is configured */
+  if (!strEqual(base_path, "."))
+    return base_path;
+
+  /* if the program is configured to start from current directory (default),
+     determine program package directory from program binary (some versions
+     of KDE/Konqueror and Mac OS X (especially "Mavericks") apparently do not
+     set the current working directory to the program package directory) */
   char *main_data_path = getBasePath(command_filename);
 
 #if defined(PLATFORM_MACOSX)
@@ -940,24 +948,14 @@ void GetOptions(int argc, char *argv[],
 		void (*print_usage_function)(void),
 		void (*print_version_function)(void))
 {
-  char *ro_base_path = RO_BASE_PATH;
-  char *rw_base_path = RW_BASE_PATH;
+  char *ro_base_path = getProgramMainDataPath(argv[0], RO_BASE_PATH);
+  char *rw_base_path = getProgramMainDataPath(argv[0], RW_BASE_PATH);
   char **argvplus = checked_calloc((argc + 1) * sizeof(char **));
   char **options_left = &argvplus[1];
 
   /* replace original "argv" with null-terminated array of string pointers */
   while (argc--)
     argvplus[argc] = argv[argc];
-
-  /* if the program is configured to start from current directory (default),
-     determine program package directory from program binary (some versions
-     of KDE/Konqueror and Mac OS X (especially "Mavericks") apparently do not
-     set the current working directory to the program package directory) */
-
-  if (strEqual(ro_base_path, "."))
-    ro_base_path = getProgramMainDataPath(argv[0]);
-  if (strEqual(rw_base_path, "."))
-    rw_base_path = getProgramMainDataPath(argv[0]);
 
   /* initialize global program options */
   options.server_host = NULL;
