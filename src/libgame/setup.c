@@ -472,19 +472,27 @@ char *getProgramConfigFilename(char *command_filename)
   if (strSuffix(command_filename_1, ".exe"))
     command_filename_1[strlen(command_filename_1) - 4] = '\0';
 
+  char *ro_base_path = getProgramMainDataPath(command_filename, RO_BASE_PATH);
+  char *conf_directory = getPath2(ro_base_path, CONF_DIRECTORY);
+
   char *command_basepath = getBasePath(command_filename);
   char *command_basename = getBaseNameNoSuffix(command_filename);
   char *command_filename_2 = getPath2(command_basepath, command_basename);
 
   char *config_filename_1 = getStringCat2(command_filename_1, ".conf");
   char *config_filename_2 = getStringCat2(command_filename_2, ".conf");
+  char *config_filename_3 = getPath2(conf_directory, SETUP_FILENAME);
 
   // 1st try: look for config file that exactly matches the binary filename
   if (fileExists(config_filename_1))
     return config_filename_1;
 
-  // 2nd try: return config filename that matches binary filename without suffix
-  return config_filename_2;
+  // 2nd try: look for config file that matches binary filename without suffix
+  if (fileExists(config_filename_2))
+    return config_filename_2;
+
+  // 3rd try: return setup config filename in global program config directory
+  return config_filename_3;
 }
 
 char *getTapeFilename(int nr)
