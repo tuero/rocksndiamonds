@@ -464,16 +464,16 @@ char *getProgramMainDataPath(char *command_filename, char *base_path)
   return main_data_path;
 }
 
-char *getProgramConfigFilename(char *command_filename_ptr)
+char *getProgramConfigFilename(char *command_filename)
 {
-  char *command_filename_1 = getStringCopy(command_filename_ptr);
+  char *command_filename_1 = getStringCopy(command_filename);
 
   // strip trailing executable suffix from command filename
   if (strSuffix(command_filename_1, ".exe"))
     command_filename_1[strlen(command_filename_1) - 4] = '\0';
 
-  char *command_basepath = getBasePath(command_filename_ptr);
-  char *command_basename = getBaseNameNoSuffix(command_filename_ptr);
+  char *command_basepath = getBasePath(command_filename);
+  char *command_basename = getBaseNameNoSuffix(command_filename);
   char *command_filename_2 = getPath2(command_basepath, command_basename);
 
   char *config_filename_1 = getStringCat2(command_filename_1, ".conf");
