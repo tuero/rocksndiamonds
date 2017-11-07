@@ -425,6 +425,45 @@ inline static char *getLevelArtworkDir(int type)
   return LEVELDIR_ARTWORK_PATH(leveldir_current, type);
 }
 
+char *getProgramMainDataPath(char *command_filename, char *base_path)
+{
+  /* check if the program's main data base directory is configured */
+  if (!strEqual(base_path, "."))
+    return base_path;
+
+  /* if the program is configured to start from current directory (default),
+     determine program package directory from program binary (some versions
+     of KDE/Konqueror and Mac OS X (especially "Mavericks") apparently do not
+     set the current working directory to the program package directory) */
+  char *main_data_path = getBasePath(command_filename);
+
+#if defined(PLATFORM_MACOSX)
+  if (strSuffix(main_data_path, MAC_APP_BINARY_SUBDIR))
+  {
+    char *main_data_path_old = main_data_path;
+
+    // cut relative path to Mac OS X application binary directory from path
+    main_data_path[strlen(main_data_path) -
+		   strlen(MAC_APP_BINARY_SUBDIR)] = '\0';
+
+    // cut trailing path separator from path (but not if path is root directory)
+    if (strSuffix(main_data_path, "/") && !strEqual(main_data_path, "/"))
+      main_data_path[strlen(main_data_path) - 1] = '\0';
+
+    // replace empty path with current directory
+    if (strEqual(main_data_path, ""))
+      main_data_path = ".";
+
+    // add relative path to Mac OS X application resources directory to path
+    main_data_path = getPath2(main_data_path, MAC_APP_FILES_SUBDIR);
+
+    free(main_data_path_old);
+  }
+#endif
+
+  return main_data_path;
+}
+
 char *getProgramConfigFilename(char *command_filename_ptr)
 {
   char *command_filename_1 = getStringCopy(command_filename_ptr);
