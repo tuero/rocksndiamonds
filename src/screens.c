@@ -82,6 +82,32 @@
 
 #define MAX_MENU_MODES			MAX(MAX_INFO_MODES, MAX_SETUP_MODES)
 
+/* setup screen titles */
+#define STR_SETUP_MAIN			"Setup"
+#define STR_SETUP_GAME			"Game & Menu"
+#define STR_SETUP_EDITOR		"Editor"
+#define STR_SETUP_GRAPHICS		"Graphics"
+#define STR_SETUP_SOUND			"Sound & Music"
+#define STR_SETUP_ARTWORK		"Custom Artwork"
+#define STR_SETUP_INPUT			"Input Devices"
+#define STR_SETUP_TOUCH			"Touch Controls"
+#define STR_SETUP_SHORTCUTS		"Key Shortcuts"
+#define STR_SETUP_EXIT			"Exit"
+#define STR_SETUP_SAVE_AND_EXIT		"Save and Exit"
+
+#define STR_SETUP_CHOOSE_GAME_SPEED	"Game Speed"
+#define STR_SETUP_CHOOSE_SCROLL_DELAY	"Scroll Delay"
+#define STR_SETUP_CHOOSE_SNAPSHOT_MODE	"Snapshot Mode"
+#define STR_SETUP_CHOOSE_WINDOW_SIZE	"Window Scaling"
+#define STR_SETUP_CHOOSE_SCALING_TYPE	"Anti-Aliasing"
+#define STR_SETUP_CHOOSE_RENDERING	"Rendering Mode"
+#define STR_SETUP_CHOOSE_VOLUME_SIMPLE	"Sound Volume"
+#define STR_SETUP_CHOOSE_VOLUME_LOOPS	"Loops Volume"
+#define STR_SETUP_CHOOSE_VOLUME_MUSIC	"Music Volume"
+#define STR_SETUP_CHOOSE_TOUCH_CONTROL	"Control Type"
+#define STR_SETUP_CHOOSE_MOVE_DISTANCE	"Move Distance"
+#define STR_SETUP_CHOOSE_DROP_DISTANCE	"Drop Distance"
+
 /* for input setup functions */
 #define SETUPINPUT_SCREEN_POS_START	0
 #define SETUPINPUT_SCREEN_POS_END	(SCR_FIELDY - 4)
@@ -4553,7 +4579,7 @@ static void execSetupGame_setGameSpeeds()
       setString(&ti->identifier, identifier);
       setString(&ti->name, name);
       setString(&ti->name_sorting, name);
-      setString(&ti->infotext, "Game Speed");
+      setString(&ti->infotext, STR_SETUP_CHOOSE_GAME_SPEED);
 
       pushTreeInfo(&game_speeds, ti);
     }
@@ -4603,7 +4629,7 @@ static void execSetupGame_setScrollDelays()
       setString(&ti->identifier, identifier);
       setString(&ti->name, name);
       setString(&ti->name_sorting, name);
-      setString(&ti->infotext, "Scroll Delay");
+      setString(&ti->infotext, STR_SETUP_CHOOSE_SCROLL_DELAY);
 
       pushTreeInfo(&scroll_delays, ti);
     }
@@ -4653,7 +4679,7 @@ static void execSetupGame_setSnapshotModes()
       setString(&ti->identifier, identifier);
       setString(&ti->name, name);
       setString(&ti->name_sorting, name);
-      setString(&ti->infotext, "Snapshot Mode");
+      setString(&ti->infotext, STR_SETUP_CHOOSE_SNAPSHOT_MODE);
 
       pushTreeInfo(&snapshot_modes, ti);
     }
@@ -4750,7 +4776,7 @@ static void execSetupGraphics_setWindowSizes(boolean update_list)
       setString(&ti->identifier, identifier);
       setString(&ti->name, name);
       setString(&ti->name_sorting, name);
-      setString(&ti->infotext, "Window Scaling");
+      setString(&ti->infotext, STR_SETUP_CHOOSE_WINDOW_SIZE);
 
       pushTreeInfo(&window_sizes, ti);
 
@@ -4775,7 +4801,7 @@ static void execSetupGraphics_setWindowSizes(boolean update_list)
       setString(&ti->identifier, identifier);
       setString(&ti->name, name);
       setString(&ti->name_sorting, name);
-      setString(&ti->infotext, "Window Scaling");
+      setString(&ti->infotext, STR_SETUP_CHOOSE_WINDOW_SIZE);
 
       pushTreeInfo(&window_sizes, ti);
     }
@@ -4827,7 +4853,7 @@ static void execSetupGraphics_setScalingTypes()
       setString(&ti->identifier, identifier);
       setString(&ti->name, name);
       setString(&ti->name_sorting, name);
-      setString(&ti->infotext, "Anti-Aliasing");
+      setString(&ti->infotext, STR_SETUP_CHOOSE_SCALING_TYPE);
 
       pushTreeInfo(&scaling_types, ti);
     }
@@ -4877,7 +4903,7 @@ static void execSetupGraphics_setRenderingModes()
       setString(&ti->identifier, identifier);
       setString(&ti->name, name);
       setString(&ti->name_sorting, name);
-      setString(&ti->infotext, "Special Rendering");
+      setString(&ti->infotext, STR_SETUP_CHOOSE_RENDERING);
 
       pushTreeInfo(&rendering_modes, ti);
     }
@@ -5004,7 +5030,7 @@ static void execSetupSound()
       setString(&ti->identifier, identifier);
       setString(&ti->name, name);
       setString(&ti->name_sorting, name);
-      setString(&ti->infotext, "Sound Volume");
+      setString(&ti->infotext, STR_SETUP_CHOOSE_VOLUME_SIMPLE);
 
       pushTreeInfo(&volumes_simple, ti);
 
@@ -5029,7 +5055,7 @@ static void execSetupSound()
       setString(&ti->identifier, identifier);
       setString(&ti->name, name);
       setString(&ti->name_sorting, name);
-      setString(&ti->infotext, "Sound Volume");
+      setString(&ti->infotext, STR_SETUP_CHOOSE_VOLUME_SIMPLE);
 
       pushTreeInfo(&volumes_simple, ti);
     }
@@ -5072,7 +5098,7 @@ static void execSetupSound()
       setString(&ti->identifier, identifier);
       setString(&ti->name, name);
       setString(&ti->name_sorting, name);
-      setString(&ti->infotext, "Loops Volume");
+      setString(&ti->infotext, STR_SETUP_CHOOSE_VOLUME_LOOPS);
 
       pushTreeInfo(&volumes_loops, ti);
 
@@ -5097,7 +5123,7 @@ static void execSetupSound()
       setString(&ti->identifier, identifier);
       setString(&ti->name, name);
       setString(&ti->name_sorting, name);
-      setString(&ti->infotext, "Loops Volume");
+      setString(&ti->infotext, STR_SETUP_CHOOSE_VOLUME_LOOPS);
 
       pushTreeInfo(&volumes_loops, ti);
     }
@@ -5140,7 +5166,7 @@ static void execSetupSound()
       setString(&ti->identifier, identifier);
       setString(&ti->name, name);
       setString(&ti->name_sorting, name);
-      setString(&ti->infotext, "Music Volume");
+      setString(&ti->infotext, STR_SETUP_CHOOSE_VOLUME_MUSIC);
 
       pushTreeInfo(&volumes_music, ti);
 
@@ -5165,7 +5191,7 @@ static void execSetupSound()
       setString(&ti->identifier, identifier);
       setString(&ti->name, name);
       setString(&ti->name_sorting, name);
-      setString(&ti->infotext, "Music Volume");
+      setString(&ti->infotext, STR_SETUP_CHOOSE_VOLUME_MUSIC);
 
       pushTreeInfo(&volumes_music, ti);
     }
@@ -5244,7 +5270,7 @@ static void execSetupTouch()
       setString(&ti->identifier, identifier);
       setString(&ti->name, name);
       setString(&ti->name_sorting, name);
-      setString(&ti->infotext, "Control Type");
+      setString(&ti->infotext, STR_SETUP_CHOOSE_TOUCH_CONTROL);
 
       pushTreeInfo(&touch_controls, ti);
     }
@@ -5286,7 +5312,7 @@ static void execSetupTouch()
       setString(&ti->identifier, identifier);
       setString(&ti->name, name);
       setString(&ti->name_sorting, name);
-      setString(&ti->infotext, "Move Distance");
+      setString(&ti->infotext, STR_SETUP_CHOOSE_MOVE_DISTANCE);
 
       pushTreeInfo(&move_distances, ti);
     }
@@ -5329,7 +5355,7 @@ static void execSetupTouch()
       setString(&ti->identifier, identifier);
       setString(&ti->name, name);
       setString(&ti->name_sorting, name);
-      setString(&ti->infotext, "Drop Distance");
+      setString(&ti->infotext, STR_SETUP_CHOOSE_DROP_DISTANCE);
 
       pushTreeInfo(&drop_distances, ti);
     }
@@ -5477,17 +5503,17 @@ static void execSaveAndExitSetup()
 
 static struct TokenInfo setup_info_main[] =
 {
-  { TYPE_ENTER_MENU,	execSetupGame,		"Game & Menu"		},
-  { TYPE_ENTER_MENU,	execSetupEditor,	"Editor"		},
-  { TYPE_ENTER_MENU,	execSetupGraphics,	"Graphics"		},
-  { TYPE_ENTER_MENU,	execSetupSound,		"Sound & Music"		},
-  { TYPE_ENTER_MENU,	execSetupArtwork,	"Custom Artwork"	},
-  { TYPE_ENTER_MENU,	execSetupInput,		"Input Devices"		},
-  { TYPE_ENTER_MENU,	execSetupTouch,		"Touch Controls"	},
-  { TYPE_ENTER_MENU,	execSetupShortcuts,	"Key Shortcuts"		},
+  { TYPE_ENTER_MENU,	execSetupGame,		STR_SETUP_GAME		},
+  { TYPE_ENTER_MENU,	execSetupEditor,	STR_SETUP_EDITOR	},
+  { TYPE_ENTER_MENU,	execSetupGraphics,	STR_SETUP_GRAPHICS	},
+  { TYPE_ENTER_MENU,	execSetupSound,		STR_SETUP_SOUND		},
+  { TYPE_ENTER_MENU,	execSetupArtwork,	STR_SETUP_ARTWORK	},
+  { TYPE_ENTER_MENU,	execSetupInput,		STR_SETUP_INPUT		},
+  { TYPE_ENTER_MENU,	execSetupTouch,		STR_SETUP_TOUCH		},
+  { TYPE_ENTER_MENU,	execSetupShortcuts,	STR_SETUP_SHORTCUTS	},
   { TYPE_EMPTY,		NULL,			""			},
-  { TYPE_LEAVE_MENU,	execExitSetup, 		"Exit"			},
-  { TYPE_LEAVE_MENU,	execSaveAndExitSetup,	"Save and Exit"		},
+  { TYPE_LEAVE_MENU,	execExitSetup, 		STR_SETUP_EXIT		},
+  { TYPE_LEAVE_MENU,	execSaveAndExitSetup,	STR_SETUP_SAVE_AND_EXIT	},
 
   { 0,			NULL,			NULL			}
 };
@@ -6036,37 +6062,37 @@ static void DrawSetupScreen_Generic()
   if (setup_mode == SETUP_MODE_MAIN)
   {
     setup_info = setup_info_main;
-    title_string = "Setup";
+    title_string = STR_SETUP_MAIN;
   }
   else if (setup_mode == SETUP_MODE_GAME)
   {
     setup_info = setup_info_game;
-    title_string = "Setup Game";
+    title_string = STR_SETUP_GAME;
   }
   else if (setup_mode == SETUP_MODE_EDITOR)
   {
     setup_info = setup_info_editor;
-    title_string = "Setup Editor";
+    title_string = STR_SETUP_EDITOR;
   }
   else if (setup_mode == SETUP_MODE_GRAPHICS)
   {
     setup_info = setup_info_graphics;
-    title_string = "Setup Graphics";
+    title_string = STR_SETUP_GRAPHICS;
   }
   else if (setup_mode == SETUP_MODE_SOUND)
   {
     setup_info = setup_info_sound;
-    title_string = "Setup Sound";
+    title_string = STR_SETUP_SOUND;
   }
   else if (setup_mode == SETUP_MODE_ARTWORK)
   {
     setup_info = setup_info_artwork;
-    title_string = "Custom Artwork";
+    title_string = STR_SETUP_ARTWORK;
   }
   else if (setup_mode == SETUP_MODE_TOUCH)
   {
     setup_info = setup_info_touch;
-    title_string = "Setup Touch Ctrls";
+    title_string = STR_SETUP_TOUCH;
 
     if (strEqual(setup.touch.control_type, TOUCH_CONTROL_WIPE_GESTURES))
       setup_info = setup_info_touch_wipe_gestures;
@@ -6074,32 +6100,32 @@ static void DrawSetupScreen_Generic()
   else if (setup_mode == SETUP_MODE_SHORTCUTS)
   {
     setup_info = setup_info_shortcuts;
-    title_string = "Setup Shortcuts";
+    title_string = STR_SETUP_SHORTCUTS;
   }
   else if (setup_mode == SETUP_MODE_SHORTCUTS_1)
   {
     setup_info = setup_info_shortcuts_1;
-    title_string = "Setup Shortcuts";
+    title_string = STR_SETUP_SHORTCUTS;
   }
   else if (setup_mode == SETUP_MODE_SHORTCUTS_2)
   {
     setup_info = setup_info_shortcuts_2;
-    title_string = "Setup Shortcuts";
+    title_string = STR_SETUP_SHORTCUTS;
   }
   else if (setup_mode == SETUP_MODE_SHORTCUTS_3)
   {
     setup_info = setup_info_shortcuts_3;
-    title_string = "Setup Shortcuts";
+    title_string = STR_SETUP_SHORTCUTS;
   }
   else if (setup_mode == SETUP_MODE_SHORTCUTS_4)
   {
     setup_info = setup_info_shortcuts_4;
-    title_string = "Setup Shortcuts";
+    title_string = STR_SETUP_SHORTCUTS;
   }
   else if (setup_mode == SETUP_MODE_SHORTCUTS_5)
   {
     setup_info = setup_info_shortcuts_5;
-    title_string = "Setup Shortcuts";
+    title_string = STR_SETUP_SHORTCUTS;
   }
 
   /* use modified setup info without setup entries marked as hidden */
@@ -6147,7 +6173,7 @@ void DrawSetupScreen_Input()
 
   setup_info = setup_info_input;
 
-  DrawTextSCentered(mSY - SY + 16, FONT_TITLE_1, "Setup Input");
+  DrawTextSCentered(mSY - SY + 16, FONT_TITLE_1, STR_SETUP_INPUT);
 
   for (i = 0; setup_info[i].type != 0 && i < MAX_MENU_ENTRIES_ON_SCREEN; i++)
   {
