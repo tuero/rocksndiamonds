@@ -313,9 +313,11 @@ void LoadLevelInfo(void);
 void LoadArtworkInfo(void);
 void LoadLevelArtworkInfo(void);
 
+char *getArtworkIdentifierForUserLevelSet(int);
+boolean checkIfCustomArtworkExistsForCurrentLevelSet();
 void AddUserLevelSetToLevelInfo(char *);
 boolean UpdateUserLevelSet(char *, char *, char *, int);
-boolean CreateUserLevelSet(char *, char *, char *, int);
+boolean CreateUserLevelSet(char *, char *, char *, int, boolean);
 
 void LoadLevelSetup_LastSeries(void);
 void SaveLevelSetup_LastSeries(void);

@@ -3606,6 +3606,43 @@ void AddUserLevelSetToLevelInfo(char *level_subdir_new)
     Error(ERR_EXIT, "internal level set structure corrupted -- aborting");
 }
 
+char *getArtworkIdentifierForUserLevelSet(int type)
+{
+  char *classic_artwork_set = getClassicArtworkSet(type);
+
+  /* check for custom artwork configured in "levelinfo.conf" */
+  char *leveldir_artwork_set =
+    *LEVELDIR_ARTWORK_SET_PTR(leveldir_current, type);
+  boolean has_leveldir_artwork_set =
+    (leveldir_artwork_set != NULL && !strEqual(leveldir_artwork_set,
+					       classic_artwork_set));
+
+  /* check for custom artwork in sub-directory "graphics" etc. */
+  TreeInfo *artwork_first_node = ARTWORK_FIRST_NODE(artwork, type);
+  char *leveldir_identifier = leveldir_current->identifier;
+  boolean has_artwork_subdir =
+    (getTreeInfoFromIdentifier(artwork_first_node,
+			       leveldir_identifier) != NULL);
+
+  return (has_leveldir_artwork_set ? leveldir_artwork_set :
+	  has_artwork_subdir       ? leveldir_identifier :
+	  classic_artwork_set);
+}
+
+boolean checkIfCustomArtworkExistsForCurrentLevelSet()
+{
+  char *graphics_set =
+    getArtworkIdentifierForUserLevelSet(ARTWORK_TYPE_GRAPHICS);
+  char *sounds_set =
+    getArtworkIdentifierForUserLevelSet(ARTWORK_TYPE_SOUNDS);
+  char *music_set =
+    getArtworkIdentifierForUserLevelSet(ARTWORK_TYPE_MUSIC);
+
+  return (!strEqual(graphics_set, GFX_CLASSIC_SUBDIR) ||
+	  !strEqual(sounds_set,   SND_CLASSIC_SUBDIR) ||
+	  !strEqual(music_set,    MUS_CLASSIC_SUBDIR));
+}
+
 boolean UpdateUserLevelSet(char *level_subdir, char *level_name,
 			   char *level_author, int num_levels)
 {
@@ -3671,7 +3708,8 @@ boolean UpdateUserLevelSet(char *level_subdir, char *level_name,
 }
 
 boolean CreateUserLevelSet(char *level_subdir, char *level_name,
-			   char *level_author, int num_levels)
+			   char *level_author, int num_levels,
+			   boolean use_artwork_set)
 {
   LevelDirTree *level_info;
   char *filename;
@@ -3703,6 +3741,16 @@ boolean CreateUserLevelSet(char *level_subdir, char *level_name,
   level_info->sort_priority = LEVELCLASS_PRIVATE_START;
   level_info->readonly = FALSE;
 
+  if (use_artwork_set)
+  {
+    level_info->graphics_set =
+      getStringCopy(getArtworkIdentifierForUserLevelSet(ARTWORK_TYPE_GRAPHICS));
+    level_info->sounds_set =
+      getStringCopy(getArtworkIdentifierForUserLevelSet(ARTWORK_TYPE_SOUNDS));
+    level_info->music_set =
+      getStringCopy(getArtworkIdentifierForUserLevelSet(ARTWORK_TYPE_MUSIC));
+  }
+
   token_value_position = TOKEN_VALUE_POSITION_SHORT;
 
   fprintFileHeader(file, LEVELINFO_FILENAME);
@@ -3715,12 +3763,16 @@ boolean CreateUserLevelSet(char *level_subdir, char *level_name,
 	i == LEVELINFO_TOKEN_LEVELS ||
 	i == LEVELINFO_TOKEN_FIRST_LEVEL ||
 	i == LEVELINFO_TOKEN_SORT_PRIORITY ||
-	i == LEVELINFO_TOKEN_READONLY)
+	i == LEVELINFO_TOKEN_READONLY ||
+	(use_artwork_set && (i == LEVELINFO_TOKEN_GRAPHICS_SET ||
+			     i == LEVELINFO_TOKEN_SOUNDS_SET ||
+			     i == LEVELINFO_TOKEN_MUSIC_SET)))
       fprintf(file, "%s\n", getSetupLine(levelinfo_tokens, "", i));
 
     /* just to make things nicer :) */
     if (i == LEVELINFO_TOKEN_AUTHOR ||
-	i == LEVELINFO_TOKEN_FIRST_LEVEL)
+	i == LEVELINFO_TOKEN_FIRST_LEVEL ||
+	(use_artwork_set && i == LEVELINFO_TOKEN_READONLY))
       fprintf(file, "\n");	
   }
 
@@ -3738,7 +3790,7 @@ boolean CreateUserLevelSet(char *level_subdir, char *level_name,
 
 static void SaveUserLevelInfo()
 {
-  CreateUserLevelSet(getLoginName(), getLoginName(), getRealName(), 100);
+  CreateUserLevelSet(getLoginName(), getLoginName(), getRealName(), 100, FALSE);
 }
 
 char *getSetupValue(int type, void *value)
