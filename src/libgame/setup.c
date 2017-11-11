@@ -114,22 +114,6 @@ static char *getLevelClassDescription(TreeInfo *ti)
     return "Unknown Level Class";
 }
 
-static char *getUserLevelDir(char *level_subdir)
-{
-  static char *userlevel_dir = NULL;
-  char *data_dir = getUserGameDataDir();
-  char *userlevel_subdir = LEVELS_DIRECTORY;
-
-  checked_free(userlevel_dir);
-
-  if (level_subdir != NULL)
-    userlevel_dir = getPath3(data_dir, userlevel_subdir, level_subdir);
-  else
-    userlevel_dir = getPath2(data_dir, userlevel_subdir);
-
-  return userlevel_dir;
-}
-
 static char *getScoreDir(char *level_subdir)
 {
   static char *score_dir = NULL;
@@ -195,6 +179,22 @@ static char *getLevelDirFromTreeInfo(TreeInfo *node)
 			options.level_directory), node->fullpath);
 
   return level_dir;
+}
+
+char *getUserLevelDir(char *level_subdir)
+{
+  static char *userlevel_dir = NULL;
+  char *data_dir = getUserGameDataDir();
+  char *userlevel_subdir = LEVELS_DIRECTORY;
+
+  checked_free(userlevel_dir);
+
+  if (level_subdir != NULL)
+    userlevel_dir = getPath3(data_dir, userlevel_subdir, level_subdir);
+  else
+    userlevel_dir = getPath2(data_dir, userlevel_subdir);
+
+  return userlevel_dir;
 }
 
 char *getCurrentLevelDir()
