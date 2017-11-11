@@ -3874,12 +3874,12 @@ static int editor_el_emerald_mine[] =
   EL_NUT,
   EL_BOMB,
 
-  EL_WALL_EMERALD,
-  EL_WALL_DIAMOND,
-  EL_DYNAMITE,
-  EL_DYNAMITE_ACTIVE,
+  EL_EM_DYNAMITE,
+  EL_EM_DYNAMITE_ACTIVE,
+  EL_EM_EXIT_CLOSED,
+  EL_EM_EXIT_OPEN,
 
-  EL_YAMYAM,
+  EL_YAMYAM_UP,
   EL_BUG_UP,
   EL_SPACESHIP_UP,
   EL_ROBOT,
@@ -3918,11 +3918,6 @@ static int editor_el_emerald_mine[] =
   EL_EM_GATE_2_GRAY,
   EL_EM_GATE_3_GRAY,
   EL_EM_GATE_4_GRAY,
-
-  EL_EM_EXIT_CLOSED,
-  EL_EM_EXIT_OPEN,
-  EL_EM_STEEL_EXIT_CLOSED,
-  EL_EM_STEEL_EXIT_OPEN,
 };
 static int *editor_hl_emerald_mine_ptr = editor_hl_emerald_mine;
 static int *editor_el_emerald_mine_ptr = editor_el_emerald_mine;
@@ -3996,8 +3991,8 @@ static int editor_el_emerald_mine_club[] =
 
   EL_EMC_LENSES,
   EL_EMC_MAGNIFIER,
-  EL_EM_DYNAMITE,
-  EL_EM_DYNAMITE_ACTIVE,
+  EL_EMPTY,
+  EL_EMPTY,
 
   EL_BALLOON,
   EL_YAMYAM_UP,
@@ -4029,6 +4024,11 @@ static int editor_hl_rnd[] =
 
 static int editor_el_rnd[] =
 {
+  EL_DYNAMITE,			/* RND */
+  EL_DYNAMITE_ACTIVE,		/* RND */
+  EL_EMPTY,
+  EL_EMPTY,
+
   EL_KEY_1,
   EL_KEY_2,
   EL_KEY_3,
@@ -4072,7 +4072,7 @@ static int editor_el_rnd[] =
   EL_PACMAN_LEFT,
   EL_DARK_YAMYAM,
   EL_PACMAN_RIGHT,
-  EL_EMPTY,
+  EL_YAMYAM,			/* RND */
 
   EL_BLACK_ORB,
   EL_PACMAN_DOWN,
@@ -4219,6 +4219,11 @@ static int editor_hl_diamond_caves[] =
 
 static int editor_el_diamond_caves[] =
 {
+  EL_EM_STEEL_EXIT_CLOSED,	/* DC2 */
+  EL_EM_STEEL_EXIT_OPEN,	/* DC2 */
+  EL_WALL_EMERALD,		/* DC2 */
+  EL_WALL_DIAMOND,		/* DC2 */
+
   EL_PEARL,
   EL_CRYSTAL,
   EL_WALL_PEARL,
