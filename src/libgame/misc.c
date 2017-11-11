@@ -2135,6 +2135,8 @@ void dumpList(ListNode *node_first)
 /* functions for file handling                                               */
 /* ------------------------------------------------------------------------- */
 
+#define MAX_BUFFER_SIZE			4096
+
 File *openFile(char *filename, char *mode)
 {
   File *file = checked_calloc(sizeof(File));
@@ -2217,6 +2219,11 @@ size_t readFile(File *file, void *buffer, size_t item_size, size_t num_items)
   return fread(buffer, item_size, num_items, file->file);
 }
 
+size_t writeFile(File *file, void *buffer, size_t item_size, size_t num_items)
+{
+  return fwrite(buffer, item_size, num_items, file->file);
+}
+
 int seekFile(File *file, long offset, int whence)
 {
 #if defined(PLATFORM_ANDROID)
@@ -2284,6 +2291,36 @@ char *getStringFromFile(File *file, char *line, int size)
 #endif
 
   return fgets(line, size, file->file);
+}
+
+int copyFile(char *filename_from, char *filename_to)
+{
+  File *file_from, *file_to;
+
+  if ((file_from = openFile(filename_from, MODE_READ)) == NULL)
+  {
+    return -1;
+  }
+
+  if ((file_to = openFile(filename_to, MODE_WRITE)) == NULL)
+  {
+    closeFile(file_from);
+
+    return -1;
+  }
+
+  while (!checkEndOfFile(file_from))
+  {
+    byte buffer[MAX_BUFFER_SIZE];
+    size_t bytes_read = readFile(file_from, buffer, 1, MAX_BUFFER_SIZE);
+
+    writeFile(file_to, buffer, 1, bytes_read);
+  }
+
+  closeFile(file_from);
+  closeFile(file_to);
+
+  return 0;
 }
 
 

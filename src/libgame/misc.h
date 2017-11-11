@@ -246,9 +246,11 @@ File *openFile(char *, char *);
 int closeFile(File *);
 int checkEndOfFile(File *);
 size_t readFile(File *, void *, size_t, size_t);
+size_t writeFile(File *, void *, size_t, size_t);
 int seekFile(File *, long, int);
 int getByteFromFile(File *);
 char *getStringFromFile(File *, char *, int);
+int copyFile(char *, char *);
 
 Directory *openDirectory(char *);
 int closeDirectory(Directory *);
