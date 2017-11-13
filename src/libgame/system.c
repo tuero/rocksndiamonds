@@ -525,6 +525,18 @@ Bitmap *CreateBitmap(int width, int height, int depth)
 
 void ReCreateBitmap(Bitmap **bitmap, int width, int height)
 {
+  if (*bitmap != NULL)
+  {
+    /* if new bitmap size fits into old one, no need to re-create it */
+    if (width  <= (*bitmap)->width &&
+        height <= (*bitmap)->height)
+      return;
+
+    /* else adjust size so that old and new bitmap size fit into it */
+    width  = MAX(width,  (*bitmap)->width);
+    height = MAX(height, (*bitmap)->height);
+  }
+
   Bitmap *new_bitmap = CreateBitmap(width, height, DEFAULT_DEPTH);
 
   if (*bitmap == NULL)
