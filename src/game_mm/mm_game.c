@@ -3145,7 +3145,9 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
       }
 
       StopSound_MM(SND_MM_GAME_HEALTH_CHARGING);
+#if 0
       FadeMusic();
+#endif
 
       DrawLaser(0, DL_LASER_DISABLED);
       game_mm.game_over = TRUE;
