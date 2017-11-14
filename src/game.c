@@ -4692,14 +4692,16 @@ void GameEnd()
 
   local_player->LevelSolved_GameEnd = TRUE;
 
-  if (!global.use_envelope_request)
-    CloseDoor(DOOR_CLOSE_1);
-
   if (local_player->LevelSolved_SaveTape)
   {
+    /* make sure that request dialog to save tape does not open door again */
+    if (!global.use_envelope_request)
+      CloseDoor(DOOR_CLOSE_1);
+
     SaveTapeChecked(tape.level_nr);	/* ask to save tape */
   }
 
+  /* if no tape is to be saved, close both doors simultaneously */
   CloseDoor(DOOR_CLOSE_ALL);
 
   if (level_editor_test_game)
