@@ -4866,6 +4866,9 @@ unsigned int MoveDoor(unsigned int door_state)
 	SkipUntilDelayReached(&door_delay, door_delay_value, &k, last_frame);
 
 	current_move_delay += max_step_delay;
+
+	/* prevent OS (Windows) from complaining about program not responding */
+	CheckQuitEvent();
       }
 
       if (door_part_done_all)

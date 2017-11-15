@@ -1546,6 +1546,7 @@ void SetAudioMode(boolean);
 boolean PendingEvent(void);
 void NextEvent(Event *event);
 void PeekEvent(Event *event);
+void CheckQuitEvent(void);
 Key GetEventKey(KeyEvent *, boolean);
 KeyMod HandleKeyModState(Key, int);
 KeyMod GetKeyModState();

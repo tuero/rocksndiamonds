@@ -1507,6 +1507,12 @@ void PeekEvent(Event *event)
 #endif
 }
 
+void CheckQuitEvent(void)
+{
+  if (SDL_QuitRequested())
+    program.exit_function(0);
+}
+
 Key GetEventKey(KeyEvent *event, boolean with_modifiers)
 {
 #if defined(TARGET_SDL2)

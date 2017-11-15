@@ -97,6 +97,9 @@ void DrawInitAnim()
   int sync_frame = FrameCounter;
   int x, y;
 
+  /* prevent OS (Windows) from complaining about program not responding */
+  CheckQuitEvent();
+
   if (game_status != GAME_MODE_LOADING)
     return;
 
