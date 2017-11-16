@@ -8307,7 +8307,9 @@ static int getMaxEdFieldY(boolean has_scrollbar)
 
 void InitZoomLevelSettings(int zoom_tilesize)
 {
-  if (zoom_tilesize == -1)
+  static int last_game_engine_type = GAME_ENGINE_TYPE_UNKNOWN;
+
+  if (zoom_tilesize == -1 && level.game_engine_type != last_game_engine_type)
   {
     ed_tilesize = setup.auto_setup.editor_zoom_tilesize;
     ed_tilesize_default = DEFAULT_EDITOR_TILESIZE;
@@ -8318,6 +8320,8 @@ void InitZoomLevelSettings(int zoom_tilesize)
       ed_tilesize_default = DEFAULT_EDITOR_TILESIZE_MM;
     }
   }
+
+  last_game_engine_type = level.game_engine_type;
 
   // limit zoom tilesize by upper and lower bound
   ed_tilesize = MIN(MAX(MICRO_TILESIZE, ed_tilesize), TILESIZE);
