@@ -243,22 +243,3 @@ void mm_open_all()
 void mm_close_all()
 {
 }
-
-
-/* ------------------------------------------------------------------------- */
-/* Mirror Magic game engine snapshot handling functions                      */
-/* ------------------------------------------------------------------------- */
-
-void SaveEngineSnapshotValues_MM(ListNode **buffers)
-{
-  engine_snapshot_mm.game_mm = game_mm;
-}
-
-void LoadEngineSnapshotValues_MM()
-{
-  /* stored engine snapshot buffers already restored at this point */
-
-  game_mm = engine_snapshot_mm.game_mm;
-
-  RedrawPlayfield_MM(TRUE);
-}

@@ -185,6 +185,26 @@ struct GraphicInfo_MM
 struct EngineSnapshotInfo_MM
 {
   struct GameInfo_MM game_mm;
+
+  struct LaserInfo laser;
+
+  short Ur[MAX_PLAYFIELD_WIDTH][MAX_PLAYFIELD_HEIGHT];
+  short Hit[MAX_PLAYFIELD_WIDTH][MAX_PLAYFIELD_HEIGHT];
+  short Box[MAX_PLAYFIELD_WIDTH][MAX_PLAYFIELD_HEIGHT];
+  short Angle[MAX_PLAYFIELD_WIDTH][MAX_PLAYFIELD_HEIGHT];
+  short Frame[MAX_PLAYFIELD_WIDTH][MAX_PLAYFIELD_HEIGHT];
+
+  short LX,LY, XS,YS, ELX,ELY;
+  short CT,Ct;
+
+  int last_LX, last_LY, last_hit_mask;
+  int hold_x, hold_y;
+  int pacman_nr;
+
+  unsigned int rotate_delay;
+  unsigned int pacman_delay;
+  unsigned int energy_delay;
+  unsigned int overload_delay;
 };
 
 

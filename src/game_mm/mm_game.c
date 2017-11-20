@@ -4192,3 +4192,94 @@ void RaiseScoreElement_MM(int element)
       break;
   }
 }
+
+
+/* ------------------------------------------------------------------------- */
+/* Mirror Magic game engine snapshot handling functions                      */
+/* ------------------------------------------------------------------------- */
+
+void SaveEngineSnapshotValues_MM(ListNode **buffers)
+{
+  int x, y;
+
+  engine_snapshot_mm.game_mm = game_mm;
+  engine_snapshot_mm.laser = laser;
+
+  for (x = 0; x < MAX_PLAYFIELD_WIDTH; x++)
+  {
+    for (y = 0; y < MAX_PLAYFIELD_HEIGHT; y++)
+    {
+      engine_snapshot_mm.Ur[x][y]    = Ur[x][y];
+      engine_snapshot_mm.Hit[x][y]   = Hit[x][y];
+      engine_snapshot_mm.Box[x][y]   = Box[x][y];
+      engine_snapshot_mm.Angle[x][y] = Angle[x][y];
+      engine_snapshot_mm.Frame[x][y] = Frame[x][y];
+    }
+  }
+
+  engine_snapshot_mm.LX = LX;
+  engine_snapshot_mm.LY = LY;
+  engine_snapshot_mm.XS = XS;
+  engine_snapshot_mm.YS = YS;
+  engine_snapshot_mm.ELX = ELX;
+  engine_snapshot_mm.ELY = ELY;
+  engine_snapshot_mm.CT = CT;
+  engine_snapshot_mm.Ct = Ct;
+
+  engine_snapshot_mm.last_LX = last_LX;
+  engine_snapshot_mm.last_LY = last_LY;
+  engine_snapshot_mm.last_hit_mask = last_hit_mask;
+  engine_snapshot_mm.hold_x = hold_x;
+  engine_snapshot_mm.hold_y = hold_y;
+  engine_snapshot_mm.pacman_nr = pacman_nr;
+
+  engine_snapshot_mm.rotate_delay = rotate_delay;
+  engine_snapshot_mm.pacman_delay = pacman_delay;
+  engine_snapshot_mm.energy_delay = energy_delay;
+  engine_snapshot_mm.overload_delay = overload_delay;
+}
+
+void LoadEngineSnapshotValues_MM()
+{
+  int x, y;
+
+  /* stored engine snapshot buffers already restored at this point */
+
+  game_mm = engine_snapshot_mm.game_mm;
+  laser   = engine_snapshot_mm.laser;
+
+  for (x = 0; x < MAX_PLAYFIELD_WIDTH; x++)
+  {
+    for (y = 0; y < MAX_PLAYFIELD_HEIGHT; y++)
+    {
+      Ur[x][y]    = engine_snapshot_mm.Ur[x][y];
+      Hit[x][y]   = engine_snapshot_mm.Hit[x][y];
+      Box[x][y]   = engine_snapshot_mm.Box[x][y];
+      Angle[x][y] = engine_snapshot_mm.Angle[x][y];
+      Frame[x][y] = engine_snapshot_mm.Frame[x][y];
+    }
+  }
+
+  LX  = engine_snapshot_mm.LX;
+  LY  = engine_snapshot_mm.LY;
+  XS  = engine_snapshot_mm.XS;
+  YS  = engine_snapshot_mm.YS;
+  ELX = engine_snapshot_mm.ELX;
+  ELY = engine_snapshot_mm.ELY;
+  CT  = engine_snapshot_mm.CT;
+  Ct  = engine_snapshot_mm.Ct;
+
+  last_LX       = engine_snapshot_mm.last_LX;
+  last_LY       = engine_snapshot_mm.last_LY;
+  last_hit_mask = engine_snapshot_mm.last_hit_mask;
+  hold_x        = engine_snapshot_mm.hold_x;
+  hold_y        = engine_snapshot_mm.hold_y;
+  pacman_nr     = engine_snapshot_mm.pacman_nr;
+
+  rotate_delay   = engine_snapshot_mm.rotate_delay;
+  pacman_delay   = engine_snapshot_mm.pacman_delay;
+  energy_delay   = engine_snapshot_mm.energy_delay;
+  overload_delay = engine_snapshot_mm.overload_delay;
+
+  RedrawPlayfield_MM(TRUE);
+}
