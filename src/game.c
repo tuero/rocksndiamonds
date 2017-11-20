@@ -15268,7 +15268,7 @@ void LoadEngineSnapshotValues()
     LoadEngineSnapshotValues_EM();
   if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
     LoadEngineSnapshotValues_SP();
-  if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
+  if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
     LoadEngineSnapshotValues_MM();
 }
 
