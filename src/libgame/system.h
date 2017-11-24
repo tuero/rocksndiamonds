@@ -1200,6 +1200,11 @@ struct TreeInfo
   char *name_sorting;	/* optional sorting name for correct name sorting */
   char *author;		/* level or artwork author name */
   char *year;		/* optional year of creation for levels or artwork */
+
+  char *program_title;	   /* optional alternative text for program title */
+  char *program_copyright; /* optional alternative text for program copyright */
+  char *program_company;   /* optional alternative text for program company */
+
   char *imported_from;	/* optional comment for imported levels or artwork */
   char *imported_by;	/* optional comment for imported levels or artwork */
   char *tested_by;	/* optional comment to name people who tested a set */

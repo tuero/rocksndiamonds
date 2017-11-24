@@ -2236,27 +2236,30 @@ SetupFileHash *loadSetupFileHash(char *filename)
 #define LEVELINFO_TOKEN_NAME_SORTING		2
 #define LEVELINFO_TOKEN_AUTHOR			3
 #define LEVELINFO_TOKEN_YEAR			4
-#define LEVELINFO_TOKEN_IMPORTED_FROM		5
-#define LEVELINFO_TOKEN_IMPORTED_BY		6
-#define LEVELINFO_TOKEN_TESTED_BY		7
-#define LEVELINFO_TOKEN_LEVELS			8
-#define LEVELINFO_TOKEN_FIRST_LEVEL		9
-#define LEVELINFO_TOKEN_SORT_PRIORITY		10
-#define LEVELINFO_TOKEN_LATEST_ENGINE		11
-#define LEVELINFO_TOKEN_LEVEL_GROUP		12
-#define LEVELINFO_TOKEN_READONLY		13
-#define LEVELINFO_TOKEN_GRAPHICS_SET_ECS	14
-#define LEVELINFO_TOKEN_GRAPHICS_SET_AGA	15
-#define LEVELINFO_TOKEN_GRAPHICS_SET		16
-#define LEVELINFO_TOKEN_SOUNDS_SET		17
-#define LEVELINFO_TOKEN_MUSIC_SET		18
-#define LEVELINFO_TOKEN_FILENAME		19
-#define LEVELINFO_TOKEN_FILETYPE		20
-#define LEVELINFO_TOKEN_SPECIAL_FLAGS		21
-#define LEVELINFO_TOKEN_HANDICAP		22
-#define LEVELINFO_TOKEN_SKIP_LEVELS		23
+#define LEVELINFO_TOKEN_PROGRAM_TITLE		5
+#define LEVELINFO_TOKEN_PROGRAM_COPYRIGHT	6
+#define LEVELINFO_TOKEN_PROGRAM_COMPANY		7
+#define LEVELINFO_TOKEN_IMPORTED_FROM		8
+#define LEVELINFO_TOKEN_IMPORTED_BY		9
+#define LEVELINFO_TOKEN_TESTED_BY		10
+#define LEVELINFO_TOKEN_LEVELS			11
+#define LEVELINFO_TOKEN_FIRST_LEVEL		12
+#define LEVELINFO_TOKEN_SORT_PRIORITY		13
+#define LEVELINFO_TOKEN_LATEST_ENGINE		14
+#define LEVELINFO_TOKEN_LEVEL_GROUP		15
+#define LEVELINFO_TOKEN_READONLY		16
+#define LEVELINFO_TOKEN_GRAPHICS_SET_ECS	17
+#define LEVELINFO_TOKEN_GRAPHICS_SET_AGA	18
+#define LEVELINFO_TOKEN_GRAPHICS_SET		19
+#define LEVELINFO_TOKEN_SOUNDS_SET		20
+#define LEVELINFO_TOKEN_MUSIC_SET		21
+#define LEVELINFO_TOKEN_FILENAME		22
+#define LEVELINFO_TOKEN_FILETYPE		23
+#define LEVELINFO_TOKEN_SPECIAL_FLAGS		24
+#define LEVELINFO_TOKEN_HANDICAP		25
+#define LEVELINFO_TOKEN_SKIP_LEVELS		26
 
-#define NUM_LEVELINFO_TOKENS			24
+#define NUM_LEVELINFO_TOKENS			27
 
 static LevelDirTree ldi;
 
@@ -2268,6 +2271,9 @@ static struct TokenInfo levelinfo_tokens[] =
   { TYPE_STRING,	&ldi.name_sorting,	"name_sorting"		},
   { TYPE_STRING,	&ldi.author,		"author"		},
   { TYPE_STRING,	&ldi.year,		"year"			},
+  { TYPE_STRING,	&ldi.program_title,	"program_title"		},
+  { TYPE_STRING,	&ldi.program_copyright,	"program_copyright"	},
+  { TYPE_STRING,	&ldi.program_company,	"program_company"	},
   { TYPE_STRING,	&ldi.imported_from,	"imported_from"		},
   { TYPE_STRING,	&ldi.imported_by,	"imported_by"		},
   { TYPE_STRING,	&ldi.tested_by,		"tested_by"		},
@@ -2297,6 +2303,9 @@ static struct TokenInfo artworkinfo_tokens[] =
   { TYPE_STRING,	&ldi.name,		"name"			},
   { TYPE_STRING,	&ldi.name_sorting,	"name_sorting"		},
   { TYPE_STRING,	&ldi.author,		"author"		},
+  { TYPE_STRING,	&ldi.program_title,	"program_title"		},
+  { TYPE_STRING,	&ldi.program_copyright,	"program_copyright"	},
+  { TYPE_STRING,	&ldi.program_company,	"program_company"	},
   { TYPE_INTEGER,	&ldi.sort_priority,	"sort_priority"		},
   { TYPE_STRING,	&ldi.basepath,		"basepath"		},
   { TYPE_STRING,	&ldi.fullpath,		"fullpath"		},
@@ -2332,6 +2341,10 @@ static void setTreeInfoToDefaults(TreeInfo *ti, int type)
   ti->name_sorting = NULL;
   ti->author = getStringCopy(ANONYMOUS_NAME);
   ti->year = NULL;
+
+  ti->program_title = NULL;
+  ti->program_copyright = NULL;
+  ti->program_company = NULL;
 
   ti->sort_priority = LEVELCLASS_UNDEFINED;	/* default: least priority */
   ti->latest_engine = FALSE;			/* default: get from level */
@@ -2406,6 +2419,10 @@ static void setTreeInfoToDefaultsFromParent(TreeInfo *ti, TreeInfo *parent)
   ti->author = getStringCopy(parent->author);
   ti->year = getStringCopy(parent->year);
 
+  ti->program_title = getStringCopy(parent->program_title);
+  ti->program_copyright = getStringCopy(parent->program_copyright);
+  ti->program_company = getStringCopy(parent->program_company);
+
   ti->sort_priority = parent->sort_priority;
   ti->latest_engine = parent->latest_engine;
   ti->parent_link = FALSE;
@@ -2471,6 +2488,11 @@ static TreeInfo *getTreeInfoCopy(TreeInfo *ti)
   ti_copy->name_sorting		= getStringCopy(ti->name_sorting);
   ti_copy->author		= getStringCopy(ti->author);
   ti_copy->year			= getStringCopy(ti->year);
+
+  ti_copy->program_title	= getStringCopy(ti->program_title);
+  ti_copy->program_copyright	= getStringCopy(ti->program_copyright);
+  ti_copy->program_company	= getStringCopy(ti->program_company);
+
   ti_copy->imported_from	= getStringCopy(ti->imported_from);
   ti_copy->imported_by		= getStringCopy(ti->imported_by);
   ti_copy->tested_by		= getStringCopy(ti->tested_by);
@@ -2527,6 +2549,10 @@ void freeTreeInfo(TreeInfo *ti)
   checked_free(ti->name_sorting);
   checked_free(ti->author);
   checked_free(ti->year);
+
+  checked_free(ti->program_title);
+  checked_free(ti->program_copyright);
+  checked_free(ti->program_company);
 
   checked_free(ti->class_desc);
 
@@ -3618,6 +3644,14 @@ char *getArtworkIdentifierForUserLevelSet(int type)
   return (has_leveldir_artwork_set ? leveldir_artwork_set :
 	  has_artwork_subdir       ? leveldir_identifier :
 	  classic_artwork_set);
+}
+
+TreeInfo *getArtworkTreeInfoForUserLevelSet(int type)
+{
+  char *artwork_set = getArtworkIdentifierForUserLevelSet(type);
+  TreeInfo *artwork_first_node = ARTWORK_FIRST_NODE(artwork, type);
+
+  return getTreeInfoFromIdentifier(artwork_first_node, artwork_set);
 }
 
 boolean checkIfCustomArtworkExistsForCurrentLevelSet()

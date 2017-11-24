@@ -5123,6 +5123,10 @@ static void InitArtworkConfig()
   {
     "name",
     "sort_priority",
+    "program_title",
+    "program_copyright",
+    "program_company",
+
     NULL
   };
   static char **ignore_image_tokens;
