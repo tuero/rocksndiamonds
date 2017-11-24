@@ -2820,22 +2820,13 @@ static TreeInfo *getArtworkInfoCacheEntry(LevelDirTree *level_node, int type)
       char *token = getCacheToken(token_prefix, artworkinfo_tokens[i].text);
       char *value = getHashEntry(artworkinfo_cache_old, token);
 
-      setSetupInfo(artworkinfo_tokens, i, value);
-
-      /* check if cache entry for this item is invalid or incomplete */
-      if (value == NULL)
-      {
-	Error(ERR_WARN, "cache entry '%s' invalid", token);
-
-	cached = FALSE;
-      }
+      /* if defined, use value from cache, else keep default value */
+      if (value != NULL)
+	setSetupInfo(artworkinfo_tokens, i, value);
     }
 
     *artwork_info = ldi;
-  }
 
-  if (cached)
-  {
     char *filename_levelinfo = getPath2(getLevelDirFromTreeInfo(level_node),
 					LEVELINFO_FILENAME);
     char *filename_artworkinfo = getPath2(getSetupArtworkDir(artwork_info),
