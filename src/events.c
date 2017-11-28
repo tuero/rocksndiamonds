@@ -676,6 +676,9 @@ void HandleFingerEvent(FingerEvent *event)
   if (game_status != GAME_MODE_PLAYING)
     return;
 
+  if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
+    return;
+
   if (strEqual(setup.touch.control_type, TOUCH_CONTROL_OFF))
     return;
 
@@ -962,24 +965,131 @@ void HandleFingerEvent(FingerEvent *event)
   }
 }
 
-static void HandleFollowFinger(int mx, int my, int button)
+#endif
+
+static void HandleButtonOrFinger_MM(int mx, int my, int button)
+{
+  static int old_mx = 0, old_my = 0;
+  static int last_button = MB_LEFTBUTTON;
+  static boolean touched = FALSE;
+  static boolean tapped = FALSE;
+
+  if (strEqual(setup.touch.control_type, TOUCH_CONTROL_WIPE_GESTURES))
+  {
+    // screen tile was tapped (but finger not touching the screen anymore)
+    // (this point will also be reached without receiving a touch event)
+    if (tapped && !touched)
+    {
+      SetPlayerMouseAction(old_mx, old_my, MB_RELEASED);
+
+      tapped = FALSE;
+    }
+
+    // stop here if this function was not triggered by a touch event
+    if (button == -1)
+      return;
+
+    if (button == MB_PRESSED && IN_GFX_FIELD_PLAY(mx, my))
+    {
+      // finger started touching the screen
+
+      touched = TRUE;
+      tapped = TRUE;
+
+      if (!motion_status)
+      {
+	old_mx = mx;
+	old_my = my;
+
+	ClearPlayerMouseAction();
+
+	Error(ERR_DEBUG, "---------- TOUCH ACTION STARTED ----------");
+      }
+    }
+    else if (button == MB_RELEASED && touched)
+    {
+      // finger stopped touching the screen
+
+      touched = FALSE;
+
+      if (tapped)
+	SetPlayerMouseAction(old_mx, old_my, last_button);
+      else
+	SetPlayerMouseAction(old_mx, old_my, MB_RELEASED);
+
+      Error(ERR_DEBUG, "---------- TOUCH ACTION STOPPED ----------");
+    }
+
+    if (touched)
+    {
+      // finger moved while touching the screen
+
+      int old_x = getLevelFromScreenX(old_mx);
+      int old_y = getLevelFromScreenY(old_my);
+      int new_x = getLevelFromScreenX(mx);
+      int new_y = getLevelFromScreenY(my);
+
+      if (new_x != old_x || new_y != old_y)
+	tapped = FALSE;
+
+      if (new_x != old_x)
+      {
+	// finger moved left or right from (horizontal) starting position
+
+	int button_nr = (new_x < old_x ? MB_LEFTBUTTON : MB_RIGHTBUTTON);
+
+	SetPlayerMouseAction(old_mx, old_my, button_nr);
+
+	last_button = button_nr;
+
+	Error(ERR_DEBUG, "---------- TOUCH ACTION: ROTATING ----------");
+      }
+      else
+      {
+	// finger stays at or returned to (horizontal) starting position
+
+	SetPlayerMouseAction(old_mx, old_my, MB_RELEASED);
+
+	Error(ERR_DEBUG, "---------- TOUCH ACTION PAUSED ----------");
+      }
+    }
+  }
+  else if (strEqual(setup.touch.control_type, TOUCH_CONTROL_FOLLOW_FINGER))
+  {
+  }
+}
+
+static void HandleButtonOrFinger(int mx, int my, int button)
 {
   static int old_mx = 0, old_my = 0;
   static Key motion_key_x = KSYM_UNDEFINED;
   static Key motion_key_y = KSYM_UNDEFINED;
+  static boolean touched = FALSE;
   static boolean started_on_player = FALSE;
   static boolean player_is_dropping = FALSE;
   static int player_drop_count = 0;
   static int last_player_x = -1;
   static int last_player_y = -1;
 
+  if (game_status != GAME_MODE_PLAYING)
+    return;
+
+  if (strEqual(setup.touch.control_type, TOUCH_CONTROL_OFF))
+    return;
+
+  if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
+  {
+    HandleButtonOrFinger_MM(mx, my, button);
+
+    return;
+  }
+
   if (!strEqual(setup.touch.control_type, TOUCH_CONTROL_FOLLOW_FINGER))
     return;
 
   if (button == MB_PRESSED && IN_GFX_FIELD_PLAY(mx, my))
   {
-    touch_info[0].touched = TRUE;
-    touch_info[0].key = 0;
+    touched = TRUE;
 
     old_mx = mx;
     old_my = my;
@@ -998,10 +1108,9 @@ static void HandleFollowFinger(int mx, int my, int button)
       Error(ERR_DEBUG, "---------- TOUCH ACTION STARTED ----------");
     }
   }
-  else if (button == MB_RELEASED && touch_info[0].touched)
+  else if (button == MB_RELEASED && touched)
   {
-    touch_info[0].touched = FALSE;
-    touch_info[0].key = 0;
+    touched = FALSE;
 
     old_mx = 0;
     old_my = 0;
@@ -1033,7 +1142,7 @@ static void HandleFollowFinger(int mx, int my, int button)
     Error(ERR_DEBUG, "---------- TOUCH ACTION STOPPED ----------");
   }
 
-  if (touch_info[0].touched)
+  if (touched)
   {
     int src_x = local_player->jx;
     int src_y = local_player->jy;
@@ -1127,6 +1236,8 @@ static void HandleFollowFinger(int mx, int my, int button)
     motion_key_y = new_motion_key_y;
   }
 }
+
+#if defined(TARGET_SDL2)
 
 static boolean checkTextInputKeyModState()
 {
@@ -1294,8 +1405,10 @@ void HandleButton(int mx, int my, int button, int button_nr)
 
 #if defined(PLATFORM_ANDROID)
   // when playing, only handle gadgets when using "follow finger" controls
+  // or when using touch controls in combination with the MM game engine
   boolean handle_gadgets =
     (game_status != GAME_MODE_PLAYING ||
+     level.game_engine_type == GAME_ENGINE_TYPE_MM ||
      strEqual(setup.touch.control_type, TOUCH_CONTROL_FOLLOW_FINGER));
 
   if (handle_gadgets &&
@@ -1364,11 +1477,10 @@ void HandleButton(int mx, int my, int button, int button_nr)
       break;
 
     case GAME_MODE_PLAYING:
-      SetPlayerMouseAction(mx, my, button);
-
-#if defined(TARGET_SDL2)
-      HandleFollowFinger(mx, my, button);
-#endif
+      if (!strEqual(setup.touch.control_type, TOUCH_CONTROL_OFF))
+	HandleButtonOrFinger(mx, my, button);
+      else
+	SetPlayerMouseAction(mx, my, button);
 
 #ifdef DEBUG
       if (button == MB_PRESSED && !motion_status && !button_hold &&
@@ -1937,11 +2049,9 @@ void HandleNoEvent()
 
   switch (game_status)
   {
-#if defined(TARGET_SDL2)
     case GAME_MODE_PLAYING:
-      HandleFollowFinger(-1, -1, -1);
+      HandleButtonOrFinger(-1, -1, -1);
       break;
-#endif
   }
 }
 
