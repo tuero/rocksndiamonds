@@ -1931,6 +1931,15 @@ void HandleKey(Key key, int key_status)
 void HandleNoEvent()
 {
   HandleMouseCursor();
+
+  switch (game_status)
+  {
+#if defined(TARGET_SDL2)
+    case GAME_MODE_PLAYING:
+      HandleFollowFinger(-1, -1, -1);
+      break;
+#endif
+  }
 }
 
 void HandleEventActions()
@@ -1961,12 +1970,6 @@ void HandleEventActions()
     case GAME_MODE_EDITOR:
       HandleLevelEditorIdle();
       break;
-
-#if defined(TARGET_SDL2)
-    case GAME_MODE_PLAYING:
-      HandleFollowFinger(-1, -1, -1);
-      break;
-#endif
 
     default:
       break;
