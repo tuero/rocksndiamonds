@@ -303,7 +303,7 @@ static struct
   char *text;
 } scaling_types_list[] =
 {
-  {	SCALING_QUALITY_NEAREST, "None"		},
+  {	SCALING_QUALITY_NEAREST, "Off"		},
   {	SCALING_QUALITY_LINEAR,	 "Linear"	},
   {	SCALING_QUALITY_BEST,	 "Anisotropic"	},
 
