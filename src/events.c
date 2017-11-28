@@ -39,6 +39,12 @@ static int cursor_mode_last = CURSOR_DEFAULT;
 static unsigned int special_cursor_delay = 0;
 static unsigned int special_cursor_delay_value = 1000;
 
+
+/* forward declarations for internal use */
+static void HandleNoEvent(void);
+static void HandleEventActions(void);
+
+
 /* event filter especially needed for SDL event filtering due to
    delay problems with lots of mouse motion events when mouse button
    not pressed (X11 can handle this with 'PointerMotionHintMask') */
@@ -318,10 +324,10 @@ void EventLoop(void)
     if (PendingEvent())
       HandleEvents();
     else
-      HandleMouseCursor();
+      HandleNoEvent();
 
-    /* also execute after pending events have been processed before */
-    HandleNoEvent();
+    /* execute event related actions after pending events have been processed */
+    HandleEventActions();
 
     /* don't use all CPU time when idle; the main loop while playing
        has its own synchronization and is CPU friendly, too */
@@ -1923,6 +1929,11 @@ void HandleKey(Key key, int key_status)
 }
 
 void HandleNoEvent()
+{
+  HandleMouseCursor();
+}
+
+void HandleEventActions()
 {
   // if (button_status && game_status != GAME_MODE_PLAYING)
   if (button_status && (game_status != GAME_MODE_PLAYING ||

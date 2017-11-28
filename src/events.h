@@ -38,7 +38,6 @@ void HandleFocusEvent(FocusChangeEvent *);
 void HandleClientMessageEvent(ClientMessageEvent *);
 void HandleWindowManagerEvent(Event *);
 
-void HandleNoEvent(void);
 void HandleToonAnimations(void);
 
 void HandleButton(int, int, int, int);
