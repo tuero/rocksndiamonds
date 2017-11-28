@@ -421,6 +421,7 @@ static struct
   char *text;
 } touch_controls_list[] =
 {
+  {	TOUCH_CONTROL_OFF,		"Off"			},
   {	TOUCH_CONTROL_VIRTUAL_BUTTONS,	"Virtual Buttons"	},
   {	TOUCH_CONTROL_WIPE_GESTURES,	"Wipe Gestures"		},
   {	TOUCH_CONTROL_FOLLOW_FINGER,	"Follow Finger"		},

@@ -676,7 +676,7 @@ void HandleFingerEvent(FingerEvent *event)
   if (game_status != GAME_MODE_PLAYING)
     return;
 
-  if (strEqual(setup.touch.control_type, TOUCH_CONTROL_FOLLOW_FINGER))
+  if (strEqual(setup.touch.control_type, TOUCH_CONTROL_OFF))
     return;
 
   if (strEqual(setup.touch.control_type, TOUCH_CONTROL_VIRTUAL_BUTTONS))
@@ -823,6 +823,9 @@ void HandleFingerEvent(FingerEvent *event)
 
     return;
   }
+
+  if (!strEqual(setup.touch.control_type, TOUCH_CONTROL_WIPE_GESTURES))
+    return;
 
   // use touch direction control
 

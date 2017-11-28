@@ -83,11 +83,16 @@
 #endif
 
 /* values for touch control */
+#define TOUCH_CONTROL_OFF		"off"
 #define TOUCH_CONTROL_VIRTUAL_BUTTONS	"virtual_buttons"
 #define TOUCH_CONTROL_WIPE_GESTURES	"wipe_gestures"
 #define TOUCH_CONTROL_FOLLOW_FINGER	"follow_finger"
 
+#if defined(PLATFORM_ANDROID)
 #define TOUCH_CONTROL_DEFAULT		TOUCH_CONTROL_VIRTUAL_BUTTONS
+#else
+#define TOUCH_CONTROL_DEFAULT		TOUCH_CONTROL_OFF
+#endif
 
 #define TOUCH_MOVE_DISTANCE_DEFAULT	2
 #define TOUCH_DROP_DISTANCE_DEFAULT	5
