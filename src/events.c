@@ -1389,6 +1389,7 @@ void HandleButton(int mx, int my, int button, int button_nr)
 {
   static int old_mx = 0, old_my = 0;
   boolean button_hold = FALSE;
+  boolean handle_gadgets = TRUE;
 
   if (button_nr < 0)
   {
@@ -1406,24 +1407,17 @@ void HandleButton(int mx, int my, int button, int button_nr)
 #if defined(PLATFORM_ANDROID)
   // when playing, only handle gadgets when using "follow finger" controls
   // or when using touch controls in combination with the MM game engine
-  boolean handle_gadgets =
+  handle_gadgets =
     (game_status != GAME_MODE_PLAYING ||
      level.game_engine_type == GAME_ENGINE_TYPE_MM ||
      strEqual(setup.touch.control_type, TOUCH_CONTROL_FOLLOW_FINGER));
-
-  if (handle_gadgets &&
-      HandleGadgets(mx, my, button))
-  {
-    /* do not handle this button event anymore */
-    mx = my = -32;	/* force mouse event to be outside screen tiles */
-  }
-#else
-  if (HandleGadgets(mx, my, button))
-  {
-    /* do not handle this button event anymore */
-    mx = my = -32;	/* force mouse event to be outside screen tiles */
-  }
 #endif
+
+  if (handle_gadgets && HandleGadgets(mx, my, button))
+  {
+    /* do not handle this button event anymore */
+    mx = my = -32;	/* force mouse event to be outside screen tiles */
+  }
 
   if (HandleGlobalAnimClicks(mx, my, button))
   {
