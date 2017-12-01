@@ -646,7 +646,148 @@ static struct
   Key key;
 } touch_info[NUM_TOUCH_FINGERS];
 
-void HandleFingerEvent(FingerEvent *event)
+void HandleFingerEvent_VirtualButtons(FingerEvent *event)
+{
+  float ypos = 1.0 - 1.0 / 3.0 * video.display_width / video.display_height;
+  float event_x = (event->x);
+  float event_y = (event->y - ypos) / (1 - ypos);
+  Key key = (event_x > 0         && event_x < 1.0 / 6.0 &&
+	     event_y > 2.0 / 3.0 && event_y < 1 ?
+	     setup.input[0].key.snap :
+	     event_x > 1.0 / 6.0 && event_x < 1.0 / 3.0 &&
+	     event_y > 2.0 / 3.0 && event_y < 1 ?
+	     setup.input[0].key.drop :
+	     event_x > 7.0 / 9.0 && event_x < 8.0 / 9.0 &&
+	     event_y > 0         && event_y < 1.0 / 3.0 ?
+	     setup.input[0].key.up :
+	     event_x > 6.0 / 9.0 && event_x < 7.0 / 9.0 &&
+	     event_y > 1.0 / 3.0 && event_y < 2.0 / 3.0 ?
+	     setup.input[0].key.left :
+	     event_x > 8.0 / 9.0 && event_x < 1 &&
+	     event_y > 1.0 / 3.0 && event_y < 2.0 / 3.0 ?
+	     setup.input[0].key.right :
+	     event_x > 7.0 / 9.0 && event_x < 8.0 / 9.0 &&
+	     event_y > 2.0 / 3.0 && event_y < 1 ?
+	     setup.input[0].key.down :
+	     KSYM_UNDEFINED);
+  int key_status = (event->type == EVENT_FINGERRELEASE ? KEY_RELEASED :
+		    KEY_PRESSED);
+  char *key_status_name = (key_status == KEY_RELEASED ? "KEY_RELEASED" :
+			   "KEY_PRESSED");
+  int i;
+
+  // for any touch input event, enable overlay buttons (if activated)
+  SetOverlayEnabled(TRUE);
+
+  Error(ERR_DEBUG, "::: key '%s' was '%s' [fingerId: %lld]",
+	getKeyNameFromKey(key), key_status_name, event->fingerId);
+
+  // check if we already know this touch event's finger id
+  for (i = 0; i < NUM_TOUCH_FINGERS; i++)
+  {
+    if (touch_info[i].touched &&
+	touch_info[i].finger_id == event->fingerId)
+    {
+      // Error(ERR_DEBUG, "MARK 1: %d", i);
+
+      break;
+    }
+  }
+
+  if (i >= NUM_TOUCH_FINGERS)
+  {
+    if (key_status == KEY_PRESSED)
+    {
+      int oldest_pos = 0, oldest_counter = touch_info[0].counter;
+
+      // unknown finger id -- get new, empty slot, if available
+      for (i = 0; i < NUM_TOUCH_FINGERS; i++)
+      {
+	if (touch_info[i].counter < oldest_counter)
+	{
+	  oldest_pos = i;
+	  oldest_counter = touch_info[i].counter;
+
+	  // Error(ERR_DEBUG, "MARK 2: %d", i);
+	}
+
+	if (!touch_info[i].touched)
+	{
+	  // Error(ERR_DEBUG, "MARK 3: %d", i);
+
+	  break;
+	}
+      }
+
+      if (i >= NUM_TOUCH_FINGERS)
+      {
+	// all slots allocated -- use oldest slot
+	i = oldest_pos;
+
+	// Error(ERR_DEBUG, "MARK 4: %d", i);
+      }
+    }
+    else
+    {
+      // release of previously unknown key (should not happen)
+
+      if (key != KSYM_UNDEFINED)
+      {
+	HandleKey(key, KEY_RELEASED);
+
+	Error(ERR_DEBUG, "=> key == '%s', key_status == '%s' [slot %d] [1]",
+	      getKeyNameFromKey(key), "KEY_RELEASED", i);
+      }
+    }
+  }
+
+  if (i < NUM_TOUCH_FINGERS)
+  {
+    if (key_status == KEY_PRESSED)
+    {
+      if (touch_info[i].key != key)
+      {
+	if (touch_info[i].key != KSYM_UNDEFINED)
+	{
+	  HandleKey(touch_info[i].key, KEY_RELEASED);
+
+	  Error(ERR_DEBUG, "=> key == '%s', key_status == '%s' [slot %d] [2]",
+		getKeyNameFromKey(touch_info[i].key), "KEY_RELEASED", i);
+	}
+
+	if (key != KSYM_UNDEFINED)
+	{
+	  HandleKey(key, KEY_PRESSED);
+
+	  Error(ERR_DEBUG, "=> key == '%s', key_status == '%s' [slot %d] [3]",
+		getKeyNameFromKey(key), "KEY_PRESSED", i);
+	}
+      }
+
+      touch_info[i].touched = TRUE;
+      touch_info[i].finger_id = event->fingerId;
+      touch_info[i].counter = Counter();
+      touch_info[i].key = key;
+    }
+    else
+    {
+      if (touch_info[i].key != KSYM_UNDEFINED)
+      {
+	HandleKey(touch_info[i].key, KEY_RELEASED);
+
+	Error(ERR_DEBUG, "=> key == '%s', key_status == '%s' [slot %d] [4]",
+	      getKeyNameFromKey(touch_info[i].key), "KEY_RELEASED", i);
+      }
+
+      touch_info[i].touched = FALSE;
+      touch_info[i].finger_id = 0;
+      touch_info[i].counter = 0;
+      touch_info[i].key = 0;
+    }
+  }
+}
+
+void HandleFingerEvent_WipeGestures(FingerEvent *event)
 {
   static Key motion_key_x = KSYM_UNDEFINED;
   static Key motion_key_y = KSYM_UNDEFINED;
@@ -661,176 +802,6 @@ void HandleFingerEvent(FingerEvent *event)
   float drop_trigger_distance = (float)drop_trigger_distance_percent / 100;
   float event_x = event->x;
   float event_y = event->y;
-
-#if DEBUG_EVENTS_FINGER
-  Error(ERR_DEBUG, "FINGER EVENT: finger was %s, touch ID %lld, finger ID %lld, x/y %f/%f, dx/dy %f/%f, pressure %f",
-	event->type == EVENT_FINGERPRESS ? "pressed" :
-	event->type == EVENT_FINGERRELEASE ? "released" : "moved",
-	event->touchId,
-	event->fingerId,
-	event->x, event->y,
-	event->dx, event->dy,
-	event->pressure);
-#endif
-
-  if (game_status != GAME_MODE_PLAYING)
-    return;
-
-  if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
-    return;
-
-  if (strEqual(setup.touch.control_type, TOUCH_CONTROL_OFF))
-    return;
-
-  if (strEqual(setup.touch.control_type, TOUCH_CONTROL_VIRTUAL_BUTTONS))
-  {
-    int key_status = (event->type == EVENT_FINGERRELEASE ? KEY_RELEASED :
-		      KEY_PRESSED);
-    float ypos = 1.0 - 1.0 / 3.0 * video.display_width / video.display_height;
-
-    event_y = (event_y - ypos) / (1 - ypos);
-
-    Key key = (event_x > 0         && event_x < 1.0 / 6.0 &&
-	       event_y > 2.0 / 3.0 && event_y < 1 ?
-	       setup.input[0].key.snap :
-	       event_x > 1.0 / 6.0 && event_x < 1.0 / 3.0 &&
-	       event_y > 2.0 / 3.0 && event_y < 1 ?
-	       setup.input[0].key.drop :
-	       event_x > 7.0 / 9.0 && event_x < 8.0 / 9.0 &&
-	       event_y > 0         && event_y < 1.0 / 3.0 ?
-	       setup.input[0].key.up :
-	       event_x > 6.0 / 9.0 && event_x < 7.0 / 9.0 &&
-	       event_y > 1.0 / 3.0 && event_y < 2.0 / 3.0 ?
-	       setup.input[0].key.left :
-	       event_x > 8.0 / 9.0 && event_x < 1 &&
-	       event_y > 1.0 / 3.0 && event_y < 2.0 / 3.0 ?
-	       setup.input[0].key.right :
-	       event_x > 7.0 / 9.0 && event_x < 8.0 / 9.0 &&
-	       event_y > 2.0 / 3.0 && event_y < 1 ?
-	       setup.input[0].key.down :
-	       KSYM_UNDEFINED);
-
-    char *key_status_name = (key_status == KEY_RELEASED ? "KEY_RELEASED" :
-			     "KEY_PRESSED");
-    int i;
-
-    // for any touch input event, enable overlay buttons (if activated)
-    SetOverlayEnabled(TRUE);
-
-    Error(ERR_DEBUG, "::: key '%s' was '%s' [fingerId: %lld]",
-	  getKeyNameFromKey(key), key_status_name, event->fingerId);
-
-    // check if we already know this touch event's finger id
-    for (i = 0; i < NUM_TOUCH_FINGERS; i++)
-    {
-      if (touch_info[i].touched &&
-	  touch_info[i].finger_id == event->fingerId)
-      {
-	// Error(ERR_DEBUG, "MARK 1: %d", i);
-
-	break;
-      }
-    }
-
-    if (i >= NUM_TOUCH_FINGERS)
-    {
-      if (key_status == KEY_PRESSED)
-      {
-	int oldest_pos = 0, oldest_counter = touch_info[0].counter;
-
-	// unknown finger id -- get new, empty slot, if available
-	for (i = 0; i < NUM_TOUCH_FINGERS; i++)
-	{
-	  if (touch_info[i].counter < oldest_counter)
-	  {
-	    oldest_pos = i;
-	    oldest_counter = touch_info[i].counter;
-
-	    // Error(ERR_DEBUG, "MARK 2: %d", i);
-	  }
-
-	  if (!touch_info[i].touched)
-	  {
-	    // Error(ERR_DEBUG, "MARK 3: %d", i);
-
-	    break;
-	  }
-	}
-
-	if (i >= NUM_TOUCH_FINGERS)
-	{
-	  // all slots allocated -- use oldest slot
-	  i = oldest_pos;
-
-	  // Error(ERR_DEBUG, "MARK 4: %d", i);
-	}
-      }
-      else
-      {
-	// release of previously unknown key (should not happen)
-
-	if (key != KSYM_UNDEFINED)
-	{
-	  HandleKey(key, KEY_RELEASED);
-
-	  Error(ERR_DEBUG, "=> key == '%s', key_status == '%s' [slot %d] [1]",
-		getKeyNameFromKey(key), "KEY_RELEASED", i);
-	}
-      }
-    }
-
-    if (i < NUM_TOUCH_FINGERS)
-    {
-      if (key_status == KEY_PRESSED)
-      {
-	if (touch_info[i].key != key)
-	{
-	  if (touch_info[i].key != KSYM_UNDEFINED)
-	  {
-	    HandleKey(touch_info[i].key, KEY_RELEASED);
-
-	    Error(ERR_DEBUG, "=> key == '%s', key_status == '%s' [slot %d] [2]",
-		  getKeyNameFromKey(touch_info[i].key), "KEY_RELEASED", i);
-	  }
-
-	  if (key != KSYM_UNDEFINED)
-	  {
-	    HandleKey(key, KEY_PRESSED);
-
-	    Error(ERR_DEBUG, "=> key == '%s', key_status == '%s' [slot %d] [3]",
-		  getKeyNameFromKey(key), "KEY_PRESSED", i);
-	  }
-	}
-
-	touch_info[i].touched = TRUE;
-	touch_info[i].finger_id = event->fingerId;
-	touch_info[i].counter = Counter();
-	touch_info[i].key = key;
-      }
-      else
-      {
-	if (touch_info[i].key != KSYM_UNDEFINED)
-	{
-	  HandleKey(touch_info[i].key, KEY_RELEASED);
-
-	  Error(ERR_DEBUG, "=> key == '%s', key_status == '%s' [slot %d] [4]",
-		getKeyNameFromKey(touch_info[i].key), "KEY_RELEASED", i);
-	}
-
-	touch_info[i].touched = FALSE;
-	touch_info[i].finger_id = 0;
-	touch_info[i].counter = 0;
-	touch_info[i].key = 0;
-      }
-    }
-
-    return;
-  }
-
-  if (!strEqual(setup.touch.control_type, TOUCH_CONTROL_WIPE_GESTURES))
-    return;
-
-  // use touch direction control
 
   if (event->type == EVENT_FINGERPRESS)
   {
@@ -965,101 +936,125 @@ void HandleFingerEvent(FingerEvent *event)
   }
 }
 
+void HandleFingerEvent(FingerEvent *event)
+{
+#if DEBUG_EVENTS_FINGER
+  Error(ERR_DEBUG, "FINGER EVENT: finger was %s, touch ID %lld, finger ID %lld, x/y %f/%f, dx/dy %f/%f, pressure %f",
+	event->type == EVENT_FINGERPRESS ? "pressed" :
+	event->type == EVENT_FINGERRELEASE ? "released" : "moved",
+	event->touchId,
+	event->fingerId,
+	event->x, event->y,
+	event->dx, event->dy,
+	event->pressure);
 #endif
 
-static void HandleButtonOrFinger_MM(int mx, int my, int button)
+  if (game_status != GAME_MODE_PLAYING)
+    return;
+
+  if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
+    return;
+
+  if (strEqual(setup.touch.control_type, TOUCH_CONTROL_VIRTUAL_BUTTONS))
+    HandleFingerEvent_VirtualButtons(event);
+  else if (strEqual(setup.touch.control_type, TOUCH_CONTROL_WIPE_GESTURES))
+    HandleFingerEvent_WipeGestures(event);
+}
+
+#endif
+
+static void HandleButtonOrFinger_WipeGestures_MM(int mx, int my, int button)
 {
   static int old_mx = 0, old_my = 0;
   static int last_button = MB_LEFTBUTTON;
   static boolean touched = FALSE;
   static boolean tapped = FALSE;
 
-  if (strEqual(setup.touch.control_type, TOUCH_CONTROL_WIPE_GESTURES))
+  // screen tile was tapped (but finger not touching the screen anymore)
+  // (this point will also be reached without receiving a touch event)
+  if (tapped && !touched)
   {
-    // screen tile was tapped (but finger not touching the screen anymore)
-    // (this point will also be reached without receiving a touch event)
-    if (tapped && !touched)
+    SetPlayerMouseAction(old_mx, old_my, MB_RELEASED);
+
+    tapped = FALSE;
+  }
+
+  // stop here if this function was not triggered by a touch event
+  if (button == -1)
+    return;
+
+  if (button == MB_PRESSED && IN_GFX_FIELD_PLAY(mx, my))
+  {
+    // finger started touching the screen
+
+    touched = TRUE;
+    tapped = TRUE;
+
+    if (!motion_status)
     {
-      SetPlayerMouseAction(old_mx, old_my, MB_RELEASED);
+      old_mx = mx;
+      old_my = my;
 
-      tapped = FALSE;
-    }
+      ClearPlayerMouseAction();
 
-    // stop here if this function was not triggered by a touch event
-    if (button == -1)
-      return;
-
-    if (button == MB_PRESSED && IN_GFX_FIELD_PLAY(mx, my))
-    {
-      // finger started touching the screen
-
-      touched = TRUE;
-      tapped = TRUE;
-
-      if (!motion_status)
-      {
-	old_mx = mx;
-	old_my = my;
-
-	ClearPlayerMouseAction();
-
-	Error(ERR_DEBUG, "---------- TOUCH ACTION STARTED ----------");
-      }
-    }
-    else if (button == MB_RELEASED && touched)
-    {
-      // finger stopped touching the screen
-
-      touched = FALSE;
-
-      if (tapped)
-	SetPlayerMouseAction(old_mx, old_my, last_button);
-      else
-	SetPlayerMouseAction(old_mx, old_my, MB_RELEASED);
-
-      Error(ERR_DEBUG, "---------- TOUCH ACTION STOPPED ----------");
-    }
-
-    if (touched)
-    {
-      // finger moved while touching the screen
-
-      int old_x = getLevelFromScreenX(old_mx);
-      int old_y = getLevelFromScreenY(old_my);
-      int new_x = getLevelFromScreenX(mx);
-      int new_y = getLevelFromScreenY(my);
-
-      if (new_x != old_x || new_y != old_y)
-	tapped = FALSE;
-
-      if (new_x != old_x)
-      {
-	// finger moved left or right from (horizontal) starting position
-
-	int button_nr = (new_x < old_x ? MB_LEFTBUTTON : MB_RIGHTBUTTON);
-
-	SetPlayerMouseAction(old_mx, old_my, button_nr);
-
-	last_button = button_nr;
-
-	Error(ERR_DEBUG, "---------- TOUCH ACTION: ROTATING ----------");
-      }
-      else
-      {
-	// finger stays at or returned to (horizontal) starting position
-
-	SetPlayerMouseAction(old_mx, old_my, MB_RELEASED);
-
-	Error(ERR_DEBUG, "---------- TOUCH ACTION PAUSED ----------");
-      }
+      Error(ERR_DEBUG, "---------- TOUCH ACTION STARTED ----------");
     }
   }
-  else if (strEqual(setup.touch.control_type, TOUCH_CONTROL_FOLLOW_FINGER))
+  else if (button == MB_RELEASED && touched)
   {
+    // finger stopped touching the screen
+
+    touched = FALSE;
+
+    if (tapped)
+      SetPlayerMouseAction(old_mx, old_my, last_button);
+    else
+      SetPlayerMouseAction(old_mx, old_my, MB_RELEASED);
+
+    Error(ERR_DEBUG, "---------- TOUCH ACTION STOPPED ----------");
+  }
+
+  if (touched)
+  {
+    // finger moved while touching the screen
+
+    int old_x = getLevelFromScreenX(old_mx);
+    int old_y = getLevelFromScreenY(old_my);
+    int new_x = getLevelFromScreenX(mx);
+    int new_y = getLevelFromScreenY(my);
+
+    if (new_x != old_x || new_y != old_y)
+      tapped = FALSE;
+
+    if (new_x != old_x)
+    {
+      // finger moved left or right from (horizontal) starting position
+
+      int button_nr = (new_x < old_x ? MB_LEFTBUTTON : MB_RIGHTBUTTON);
+
+      SetPlayerMouseAction(old_mx, old_my, button_nr);
+
+      last_button = button_nr;
+
+      Error(ERR_DEBUG, "---------- TOUCH ACTION: ROTATING ----------");
+    }
+    else
+    {
+      // finger stays at or returned to (horizontal) starting position
+
+      SetPlayerMouseAction(old_mx, old_my, MB_RELEASED);
+
+      Error(ERR_DEBUG, "---------- TOUCH ACTION PAUSED ----------");
+    }
   }
 }
 
-static void HandleButtonOrFinger(int mx, int my, int button)
+static void HandleButtonOrFinger_FollowFinger_MM(int mx, int my, int button)
+{
+  // (not implemented yet)
+}
+
+static void HandleButtonOrFinger_FollowFinger(int mx, int my, int button)
 {
   static int old_mx = 0, old_my = 0;
   static Key motion_key_x = KSYM_UNDEFINED;
@@ -1070,22 +1065,6 @@ static void HandleButtonOrFinger(int mx, int my, int button)
   static int player_drop_count = 0;
   static int last_player_x = -1;
   static int last_player_y = -1;
-
-  if (game_status != GAME_MODE_PLAYING)
-    return;
-
-  if (strEqual(setup.touch.control_type, TOUCH_CONTROL_OFF))
-    return;
-
-  if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
-  {
-    HandleButtonOrFinger_MM(mx, my, button);
-
-    return;
-  }
-
-  if (!strEqual(setup.touch.control_type, TOUCH_CONTROL_FOLLOW_FINGER))
-    return;
 
   if (button == MB_PRESSED && IN_GFX_FIELD_PLAY(mx, my))
   {
@@ -1234,6 +1213,25 @@ static void HandleButtonOrFinger(int mx, int my, int button)
 
     motion_key_x = new_motion_key_x;
     motion_key_y = new_motion_key_y;
+  }
+}
+
+static void HandleButtonOrFinger(int mx, int my, int button)
+{
+  if (game_status != GAME_MODE_PLAYING)
+    return;
+
+  if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
+  {
+    if (strEqual(setup.touch.control_type, TOUCH_CONTROL_WIPE_GESTURES))
+      HandleButtonOrFinger_WipeGestures_MM(mx, my, button);
+    else if (strEqual(setup.touch.control_type, TOUCH_CONTROL_FOLLOW_FINGER))
+      HandleButtonOrFinger_FollowFinger_MM(mx, my, button);
+  }
+  else
+  {
+    if (strEqual(setup.touch.control_type, TOUCH_CONTROL_FOLLOW_FINGER))
+      HandleButtonOrFinger_FollowFinger(mx, my, button);
   }
 }
 
