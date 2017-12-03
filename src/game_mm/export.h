@@ -250,4 +250,6 @@ extern void RedrawPlayfield_MM();
 extern void LoadEngineSnapshotValues_MM();
 extern void SaveEngineSnapshotValues_MM(ListNode **);
 
+extern int getButtonFromTouchPosition(int, int, int, int);
+
 #endif	/* GAME_MM_EXPORT_H */

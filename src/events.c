@@ -1051,7 +1051,92 @@ static void HandleButtonOrFinger_WipeGestures_MM(int mx, int my, int button)
 
 static void HandleButtonOrFinger_FollowFinger_MM(int mx, int my, int button)
 {
-  // (not implemented yet)
+  static int old_mx = 0, old_my = 0;
+  static int last_button = MB_LEFTBUTTON;
+  static boolean touched = FALSE;
+  static boolean tapped = FALSE;
+
+  // screen tile was tapped (but finger not touching the screen anymore)
+  // (this point will also be reached without receiving a touch event)
+  if (tapped && !touched)
+  {
+    SetPlayerMouseAction(old_mx, old_my, MB_RELEASED);
+
+    tapped = FALSE;
+  }
+
+  // stop here if this function was not triggered by a touch event
+  if (button == -1)
+    return;
+
+  if (button == MB_PRESSED && IN_GFX_FIELD_PLAY(mx, my))
+  {
+    // finger started touching the screen
+
+    touched = TRUE;
+    tapped = TRUE;
+
+    if (!motion_status)
+    {
+      old_mx = mx;
+      old_my = my;
+
+      ClearPlayerMouseAction();
+
+      Error(ERR_DEBUG, "---------- TOUCH ACTION STARTED ----------");
+    }
+  }
+  else if (button == MB_RELEASED && touched)
+  {
+    // finger stopped touching the screen
+
+    touched = FALSE;
+
+    if (tapped)
+      SetPlayerMouseAction(old_mx, old_my, last_button);
+    else
+      SetPlayerMouseAction(old_mx, old_my, MB_RELEASED);
+
+    Error(ERR_DEBUG, "---------- TOUCH ACTION STOPPED ----------");
+  }
+
+  if (touched)
+  {
+    // finger moved while touching the screen
+
+    int old_x = getLevelFromScreenX(old_mx);
+    int old_y = getLevelFromScreenY(old_my);
+    int new_x = getLevelFromScreenX(mx);
+    int new_y = getLevelFromScreenY(my);
+
+    if (new_x != old_x || new_y != old_y)
+    {
+      // finger moved away from starting position
+
+      int button_nr = getButtonFromTouchPosition(old_x, old_y, mx, my);
+
+      // quickly alternate between clicking and releasing for maximum speed
+      if (FrameCounter % 2 == 0)
+	button_nr = MB_RELEASED;
+
+      SetPlayerMouseAction(old_mx, old_my, button_nr);
+
+      if (button_nr)
+	last_button = button_nr;
+
+      tapped = FALSE;
+
+      Error(ERR_DEBUG, "---------- TOUCH ACTION: ROTATING ----------");
+    }
+    else
+    {
+      // finger stays at or returned to starting position
+
+      SetPlayerMouseAction(old_mx, old_my, MB_RELEASED);
+
+      Error(ERR_DEBUG, "---------- TOUCH ACTION PAUSED ----------");
+    }
+  }
 }
 
 static void HandleButtonOrFinger_FollowFinger(int mx, int my, int button)

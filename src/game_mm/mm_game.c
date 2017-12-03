@@ -9,6 +9,8 @@
 // mm_game.c
 // ============================================================================
 
+#include <math.h>
+
 #include "main_mm.h"
 
 #include "mm_main.h"
@@ -4282,4 +4284,80 @@ void LoadEngineSnapshotValues_MM()
   overload_delay = engine_snapshot_mm.overload_delay;
 
   RedrawPlayfield_MM(TRUE);
+}
+
+static int getAngleFromTouchDelta(int dx, int dy)
+{
+  double pi = 3.141592653;
+  double rad = atan2((double)-dy, (double)dx);
+  double rad2 = (rad < 0 ? rad + 2 * pi : rad);
+  double deg = rad2 * 180.0 / pi;
+
+  return (int)(deg * 16.0 / 360.0 + 0.5) % 16;
+}
+
+int getButtonFromTouchPosition(int x, int y, int dst_mx, int dst_my)
+{
+  // calculate start (source) position to be at the middle of the tile
+  int src_mx = SX + x * TILESIZE_VAR + TILESIZE_VAR / 2;
+  int src_my = SY + y * TILESIZE_VAR + TILESIZE_VAR / 2;
+  int dx = dst_mx - src_mx;
+  int dy = dst_my - src_my;
+  int element;
+  int angle_old = -1;
+  int angle_new = -1;
+  int button = 0;
+  int i;
+
+  if (!IN_LEV_FIELD(x, y))
+    return 0;
+
+  element = Feld[x][y];
+
+  if (!IS_MCDUFFIN(element) &&
+      !IS_LASER(element) &&
+      !IS_MIRROR(element) &&
+      !IS_BEAMER(element) &&
+      !IS_POLAR(element) &&
+      !IS_POLAR_CROSS(element) &&
+      !IS_DF_MIRROR(element) &&
+      !IS_DF_MIRROR_AUTO(element))
+    return 0;
+
+  if (IS_MCDUFFIN(element) ||
+      IS_LASER(element))
+  {
+    angle_old = laser.start_angle;
+    angle_new = (dx > 0 && ABS(dy) < ABS(dx) ? ANG_RAY_RIGHT :
+		 dy < 0 && ABS(dx) < ABS(dy) ? ANG_RAY_UP :
+		 dx < 0 && ABS(dy) < ABS(dx) ? ANG_RAY_LEFT :
+		 dy > 0 && ABS(dx) < ABS(dy) ? ANG_RAY_DOWN :
+		 -1);
+  }
+  else
+  {
+    for (i = 0; i < laser.num_damages; i++)
+    {
+      if (laser.damage[i].x == x &&
+	  laser.damage[i].y == y &&
+	  ObjHit(x, y, HIT_POS_CENTER))
+      {
+	angle_old = laser.damage[i].angle;
+
+	break;
+      }
+    }
+
+    if (angle_old == -1)
+      return 0;
+
+    angle_old = get_mirrored_angle(angle_old, get_element_angle(element));
+    angle_new = getAngleFromTouchDelta(dx, dy);
+  }
+
+  button = (angle_new == angle_old ? 0 :
+	    (angle_new - angle_old + 16) % 16 < 8 ? MB_LEFTBUTTON :
+	    MB_RIGHTBUTTON);
+
+  return button;
 }
