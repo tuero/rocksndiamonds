@@ -4286,14 +4286,14 @@ void LoadEngineSnapshotValues_MM()
   RedrawPlayfield_MM(TRUE);
 }
 
-static int getAngleFromTouchDelta(int dx, int dy)
+static int getAngleFromTouchDelta(int dx, int dy,  int base)
 {
   double pi = 3.141592653;
   double rad = atan2((double)-dy, (double)dx);
   double rad2 = (rad < 0 ? rad + 2 * pi : rad);
   double deg = rad2 * 180.0 / pi;
 
-  return (int)(deg * 16.0 / 360.0 + 0.5) % 16;
+  return (int)(deg * base / 360.0 + 0.5) % base;
 }
 
 int getButtonFromTouchPosition(int x, int y, int dst_mx, int dst_my)
@@ -4304,6 +4304,8 @@ int getButtonFromTouchPosition(int x, int y, int dst_mx, int dst_my)
   int dx = dst_mx - src_mx;
   int dy = dst_my - src_my;
   int element;
+  int base = 16;
+  int phases = 16;
   int angle_old = -1;
   int angle_new = -1;
   int button = 0;
@@ -4315,26 +4317,25 @@ int getButtonFromTouchPosition(int x, int y, int dst_mx, int dst_my)
   element = Feld[x][y];
 
   if (!IS_MCDUFFIN(element) &&
-      !IS_LASER(element) &&
       !IS_MIRROR(element) &&
       !IS_BEAMER(element) &&
       !IS_POLAR(element) &&
       !IS_POLAR_CROSS(element) &&
-      !IS_DF_MIRROR(element) &&
-      !IS_DF_MIRROR_AUTO(element))
+      !IS_DF_MIRROR(element))
     return 0;
 
-  if (IS_MCDUFFIN(element) ||
-      IS_LASER(element))
+  angle_old = get_element_angle(element);
+
+  if (IS_MCDUFFIN(element))
   {
-    angle_old = laser.start_angle;
     angle_new = (dx > 0 && ABS(dy) < ABS(dx) ? ANG_RAY_RIGHT :
 		 dy < 0 && ABS(dx) < ABS(dy) ? ANG_RAY_UP :
 		 dx < 0 && ABS(dy) < ABS(dx) ? ANG_RAY_LEFT :
 		 dy > 0 && ABS(dx) < ABS(dy) ? ANG_RAY_DOWN :
 		 -1);
   }
-  else
+  else if (IS_MIRROR(element) ||
+	   IS_DF_MIRROR(element))
   {
     for (i = 0; i < laser.num_damages; i++)
     {
@@ -4342,22 +4343,30 @@ int getButtonFromTouchPosition(int x, int y, int dst_mx, int dst_my)
 	  laser.damage[i].y == y &&
 	  ObjHit(x, y, HIT_POS_CENTER))
       {
-	angle_old = laser.damage[i].angle;
+	angle_old = get_mirrored_angle(laser.damage[i].angle, angle_old);
+	angle_new = getAngleFromTouchDelta(dx, dy, base) % phases;
 
 	break;
       }
     }
+  }
 
-    if (angle_old == -1)
-      return 0;
+  if (angle_new == -1)
+  {
+    if (IS_MIRROR(element) ||
+	IS_DF_MIRROR(element) ||
+	IS_POLAR(element))
+      base = 32;
 
-    angle_old = get_mirrored_angle(angle_old, get_element_angle(element));
-    angle_new = getAngleFromTouchDelta(dx, dy);
+    if (IS_POLAR_CROSS(element))
+      phases = 4;
+
+    angle_new = getAngleFromTouchDelta(dx, dy, base) % phases;
   }
 
   button = (angle_new == angle_old ? 0 :
-	    (angle_new - angle_old + 16) % 16 < 8 ? MB_LEFTBUTTON :
-	    MB_RIGHTBUTTON);
+	    (angle_new - angle_old + phases) % phases < (phases / 2) ?
+	    MB_LEFTBUTTON : MB_RIGHTBUTTON);
 
   return button;
 }
