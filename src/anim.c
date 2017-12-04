@@ -600,6 +600,11 @@ void DrawGlobalAnimationsExt(int drawing_target, int drawing_stage)
     if (drawing_target == DRAW_TO_FADE_TARGET)
       after_fading = TRUE;
 
+    // special case: changing from/to this screen is done without fading
+    if (global.anim_status == GAME_MODE_PSEUDO_TYPENAME ||
+	anim_status_last   == GAME_MODE_PSEUDO_TYPENAME)
+      after_fading = TRUE;
+
     // ---------- part 1 ------------------------------------------------------
     // start or stop global animations by change of game mode
     // (special handling of animations for "current screen" and "all screens")
