@@ -1066,13 +1066,20 @@ void TapeQuickLoad()
 
 void InsertSolutionTape()
 {
-  if (!TAPE_IS_EMPTY(tape))
+  if (!fileExists(getSolutionTapeFilename(level_nr)))
+  {
+    Request("No solution tape for this level!", REQ_CONFIRM);
+
     return;
+  }
+
+  // if tape recorder already contains a tape, remove it without asking
+  TapeErase();
 
   LoadSolutionTape(level_nr);
 
   if (TAPE_IS_EMPTY(tape))
-    Request("No solution tape for this level!", REQ_CONFIRM);
+    Request("Loading solution tape for this level failed!", REQ_CONFIRM);
 
   DrawCompleteVideoDisplay();
 }
