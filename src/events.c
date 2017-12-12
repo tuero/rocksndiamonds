@@ -2227,6 +2227,7 @@ void HandleJoystick()
     case GAME_MODE_LEVELNR:
     case GAME_MODE_SETUP:
     case GAME_MODE_INFO:
+    case GAME_MODE_SCORES:
     {
       static unsigned int joystickmove_delay = 0;
       static unsigned int joystickmove_delay_value = GADGET_FRAME_DELAY;
@@ -2259,15 +2260,13 @@ void HandleJoystick()
 	HandleSetupScreen(0,0,dx,dy, newbutton ? MB_MENU_CHOICE : MB_MENU_MARK);
       else if (game_status == GAME_MODE_INFO)
 	HandleInfoScreen(0,0,dx,dy, newbutton ? MB_MENU_CHOICE : MB_MENU_MARK);
+      else if (game_status == GAME_MODE_SCORES)
+	HandleHallOfFame(0,0,dx,dy, newbutton ? MB_MENU_CHOICE : MB_MENU_MARK);
 
       joystick_last = joystick;
 
       break;
     }
-
-    case GAME_MODE_SCORES:
-      HandleHallOfFame(0, 0, dx, dy, !newbutton);
-      break;
 
     case GAME_MODE_PLAYING:
       if (tape.playing || keyboard)
