@@ -2315,8 +2315,11 @@ void HandleJoystick()
     }
 
     case GAME_MODE_PLAYING:
+#if 0
+      // !!! causes immediate GameEnd() when solving MM level with keyboard !!!
       if (tape.playing || keyboard)
 	newbutton = ((joy & JOY_BUTTON) != 0);
+#endif
 
       if (newbutton && AllPlayersGone)
       {
