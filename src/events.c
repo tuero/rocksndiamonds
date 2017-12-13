@@ -482,6 +482,9 @@ void HandleButtonEvent(ButtonEvent *event)
 	event->x, event->y);
 #endif
 
+  // for any mouse button event, disable playfield tile cursor
+  SetTileCursorEnabled(FALSE);
+
 #if defined(HAS_SCREEN_KEYBOARD)
   if (video.shifted_up)
     event->y += video.shifted_up_pos;
@@ -1858,6 +1861,10 @@ void HandleKey(Key key, int key_status)
 	if (key_status == KEY_PRESSED && key_action & KEY_ACTION)
 	  TapeTogglePause(TAPE_TOGGLE_MANUAL);
       }
+
+      // for MM style levels, handle in-game keyboard input in HandleJoystick()
+      if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
+	joy |= key_action;
     }
   }
   else
@@ -2166,6 +2173,37 @@ void HandleEventActions()
   }
 }
 
+static void HandleTileCursor(int dx, int dy, int button)
+{
+  if (!dx || !button)
+    ClearPlayerMouseAction();
+
+  if (!dx && !dy)
+    return;
+
+  if (button)
+  {
+    SetPlayerMouseAction(tile_cursor.x, tile_cursor.y,
+			 (dx < 0 ? MB_LEFTBUTTON :
+			  dx > 0 ? MB_RIGHTBUTTON : MB_RELEASED));
+  }
+  else
+  {
+    int old_xpos = tile_cursor.xpos;
+    int old_ypos = tile_cursor.ypos;
+    int new_xpos = old_xpos;
+    int new_ypos = old_ypos;
+
+    if (IN_LEV_FIELD(old_xpos + dx, old_ypos))
+      new_xpos = old_xpos + dx;
+
+    if (IN_LEV_FIELD(old_xpos, old_ypos + dy))
+      new_ypos = old_ypos + dy;
+
+    SetTileCursorTargetXY(new_xpos, new_ypos);
+  }
+}
+
 static int HandleJoystickForAllPlayers()
 {
   int i;
@@ -2201,9 +2239,13 @@ static int HandleJoystickForAllPlayers()
 
 void HandleJoystick()
 {
+  static unsigned int joytest_delay = 0;
+  static unsigned int joytest_delay_value = GADGET_FRAME_DELAY;
+  static int joytest_last = 0;
   int joystick	= HandleJoystickForAllPlayers();
   int keyboard	= key_joystick_mapping;
   int joy	= (joystick | keyboard);
+  int joytest   = joystick;
   int left	= joy & JOY_LEFT;
   int right	= joy & JOY_RIGHT;
   int up	= joy & JOY_UP;
@@ -2219,6 +2261,31 @@ void HandleJoystick()
     return;
   }
 
+  if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
+  {
+    // when playing MM style levels, also use delay for keyboard events
+    if (game_status == GAME_MODE_PLAYING)
+      joytest |= keyboard;
+
+    // for any joystick or keyboard event, enable playfield tile cursor
+    if (dx || dy || button)
+      SetTileCursorEnabled(TRUE);
+  }
+
+  if (joytest && !button && !DelayReached(&joytest_delay, joytest_delay_value))
+  {
+    /* delay joystick/keyboard actions if axes/keys continually pressed */
+    newbutton = dx = dy = 0;
+  }
+  else
+  {
+    /* first start with longer delay, then continue with shorter delay */
+    joytest_delay_value =
+      (joytest != joytest_last ? GADGET_FRAME_DELAY_FIRST : GADGET_FRAME_DELAY);
+  }
+
+  joytest_last = joytest;
+
   switch (game_status)
   {
     case GAME_MODE_TITLE:
@@ -2229,25 +2296,6 @@ void HandleJoystick()
     case GAME_MODE_INFO:
     case GAME_MODE_SCORES:
     {
-      static unsigned int joystickmove_delay = 0;
-      static unsigned int joystickmove_delay_value = GADGET_FRAME_DELAY;
-      static int joystick_last = 0;
-
-      if (joystick && !button &&
-	  !DelayReached(&joystickmove_delay, joystickmove_delay_value))
-      {
-	/* delay joystick actions if buttons/axes continually pressed */
-	newbutton = dx = dy = 0;
-      }
-      else
-      {
-	/* start with longer delay, then continue with shorter delay */
-	if (joystick != joystick_last)
-	  joystickmove_delay_value = GADGET_FRAME_DELAY_FIRST;
-	else
-	  joystickmove_delay_value = GADGET_FRAME_DELAY;
-      }
-
       if (game_status == GAME_MODE_TITLE)
 	HandleTitleScreen(0,0,dx,dy, newbutton ? MB_MENU_CHOICE : MB_MENU_MARK);
       else if (game_status == GAME_MODE_MAIN)
@@ -2262,8 +2310,6 @@ void HandleJoystick()
 	HandleInfoScreen(0,0,dx,dy, newbutton ? MB_MENU_CHOICE : MB_MENU_MARK);
       else if (game_status == GAME_MODE_SCORES)
 	HandleHallOfFame(0,0,dx,dy, newbutton ? MB_MENU_CHOICE : MB_MENU_MARK);
-
-      joystick_last = joystick;
 
       break;
     }
@@ -2284,6 +2330,9 @@ void HandleJoystick()
 	if (joystick & JOY_ACTION)
 	  TapeTogglePause(TAPE_TOGGLE_MANUAL);
       }
+
+      if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
+	HandleTileCursor(dx, dy, button);
 
       break;
 

@@ -7127,6 +7127,11 @@ struct ConfigInfo image_config[] =
   { "global.busy.frames_per_line",		"7"			},
   { "global.busy.delay",			"2"			},
 
+  { "global.tile_cursor",			"RocksMore.png"		},
+  { "global.tile_cursor.xpos",			"10"			},
+  { "global.tile_cursor.ypos",			"7"			},
+  { "global.tile_cursor.frames",		"1"			},
+
   { "background",				UNDEFINED_FILENAME	},
   { "background.TITLE_INITIAL",			UNDEFINED_FILENAME	},
   { "background.TITLE",				UNDEFINED_FILENAME	},

@@ -33,6 +33,7 @@ struct OptionInfo	options;
 struct VideoSystemInfo	video;
 struct AudioSystemInfo	audio;
 struct GfxInfo		gfx;
+struct TileCursorInfo	tile_cursor;
 struct OverlayInfo	overlay;
 struct ArtworkInfo	artwork;
 struct JoystickInfo	joystick;
@@ -286,6 +287,11 @@ void InitGfxDrawGlobalBorderFunction(void (*draw_global_border_function)(int))
   gfx.draw_global_border_function = draw_global_border_function;
 }
 
+void InitGfxDrawTileCursorFunction(void (*draw_tile_cursor_function)(int))
+{
+  gfx.draw_tile_cursor_function = draw_tile_cursor_function;
+}
+
 void InitGfxCustomArtworkInfo()
 {
   gfx.override_level_graphics = FALSE;
@@ -300,6 +306,19 @@ void InitGfxOtherSettings()
   gfx.cursor_mode = CURSOR_DEFAULT;
 }
 
+void InitTileCursorInfo()
+{
+  tile_cursor.enabled = FALSE;
+  tile_cursor.active = FALSE;
+
+  tile_cursor.xpos = 0;
+  tile_cursor.ypos = 0;
+  tile_cursor.x = 0;
+  tile_cursor.y = 0;
+  tile_cursor.target_x = 0;
+  tile_cursor.target_y = 0;
+}
+
 void InitOverlayInfo()
 {
   overlay.enabled = FALSE;
@@ -309,6 +328,37 @@ void InitOverlayInfo()
   if (strEqual(setup.touch.control_type, TOUCH_CONTROL_VIRTUAL_BUTTONS))
     overlay.enabled = TRUE;
 #endif
+}
+
+void SetTileCursorEnabled(boolean enabled)
+{
+  tile_cursor.enabled = enabled;
+}
+
+void SetTileCursorActive(boolean active)
+{
+  tile_cursor.active = active;
+}
+
+void SetTileCursorTargetXY(int x, int y)
+{
+  // delayed placement of tile selection cursor at target position
+  // (tile cursor will be moved to target position step by step)
+
+  tile_cursor.xpos = x;
+  tile_cursor.ypos = y;
+  tile_cursor.target_x = gfx.sx + x * gfx.game_tile_size;
+  tile_cursor.target_y = gfx.sy + y * gfx.game_tile_size;
+}
+
+void SetTileCursorXY(int x, int y)
+{
+  // immediate placement of tile selection cursor at target position
+
+  SetTileCursorTargetXY(x, y);
+
+  tile_cursor.x = tile_cursor.target_x;
+  tile_cursor.y = tile_cursor.target_y;
 }
 
 void SetOverlayEnabled(boolean enabled)

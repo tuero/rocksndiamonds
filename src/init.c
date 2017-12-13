@@ -5431,6 +5431,7 @@ void InitGfx()
   InitGfxDrawBusyAnimFunction(DrawInitAnim);
   InitGfxDrawGlobalAnimFunction(DrawGlobalAnimations);
   InitGfxDrawGlobalBorderFunction(DrawMaskedBorderToTarget);
+  InitGfxDrawTileCursorFunction(DrawTileCursor);
 
   gfx.fade_border_source_status = global.border_status;
   gfx.fade_border_target_status = global.border_status;
@@ -6008,6 +6009,7 @@ void OpenAll()
   InitVideoDisplay();
   InitVideoBuffer(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH, setup.fullscreen);
 
+  InitTileCursorInfo();
   InitOverlayInfo();
 
   print_timestamp_time("[init video stuff]");

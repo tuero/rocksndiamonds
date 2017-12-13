@@ -744,6 +744,9 @@ void InitGameActions_MM()
 
   if (game_mm.kettles_still_needed == 0)
     CheckExitMM();
+
+  SetTileCursorXY(laser.start_edge.x, laser.start_edge.y);
+  SetTileCursorActive(TRUE);
 }
 
 void AddLaserEdge(int lx, int ly)
@@ -1965,7 +1968,11 @@ boolean HitLaserDestination(int element, int hit_mask)
   AddDamagedField(ELX, ELY);
 
   if (game_mm.lights_still_needed == 0)
+  {
     game_mm.level_solved = TRUE;
+
+    SetTileCursorActive(FALSE);
+  }
 
   return TRUE;
 }
@@ -2473,6 +2480,8 @@ static void Explode_MM(int x, int y, int phase, int mode)
 
       game_mm.game_over = TRUE;
       game_mm.game_over_cause = GAME_OVER_BOMB;
+
+      SetTileCursorActive(FALSE);
 
       laser.overloaded = FALSE;
     }
@@ -3155,6 +3164,8 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
       game_mm.game_over = TRUE;
       game_mm.game_over_cause = GAME_OVER_NO_ENERGY;
 
+      SetTileCursorActive(FALSE);
+
 #if 0
       if (Request("Out of magic energy ! Play it again ?",
 		  REQ_ASK | REQ_STAY_CLOSED))
@@ -3284,6 +3295,8 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
 
       game_mm.game_over = TRUE;
       game_mm.game_over_cause = GAME_OVER_OVERLOADED;
+
+      SetTileCursorActive(FALSE);
 
 #if 0
       if (Request("Magic spell hit Mc Duffin ! Play it again ?",

@@ -949,8 +949,19 @@ struct GfxInfo
   void (*draw_busy_anim_function)(void);
   void (*draw_global_anim_function)(int, int);
   void (*draw_global_border_function)(int);
+  void (*draw_tile_cursor_function)(int);
 
   int cursor_mode;
+};
+
+struct TileCursorInfo
+{
+  boolean enabled;		/* tile cursor generally enabled or disabled */
+  boolean active;		/* tile cursor activated (depending on game) */
+
+  int xpos, ypos;		/* tile cursor level playfield position */
+  int x, y;			/* tile cursor current screen position */
+  int target_x, target_y;	/* tile cursor target screen position */
 };
 
 struct OverlayInfo
@@ -1457,6 +1468,7 @@ extern struct OptionInfo	options;
 extern struct VideoSystemInfo	video;
 extern struct AudioSystemInfo	audio;
 extern struct GfxInfo		gfx;
+extern struct TileCursorInfo	tile_cursor;
 extern struct OverlayInfo	overlay;
 extern struct AnimInfo		anim;
 extern struct ArtworkInfo	artwork;
@@ -1511,9 +1523,15 @@ void InitGfxClipRegion(boolean, int, int, int, int);
 void InitGfxDrawBusyAnimFunction(void (*draw_busy_anim_function)(void));
 void InitGfxDrawGlobalAnimFunction(void (*draw_global_anim_function)(int, int));
 void InitGfxDrawGlobalBorderFunction(void (*draw_global_border_function)(int));
+void InitGfxDrawTileCursorFunction(void (*draw_tile_cursor_function)(int));
 void InitGfxCustomArtworkInfo();
 void InitGfxOtherSettings();
+void InitTileCursorInfo();
 void InitOverlayInfo();
+void SetTileCursorEnabled(boolean);
+void SetTileCursorActive(boolean);
+void SetTileCursorTargetXY(int, int);
+void SetTileCursorXY(int, int);
 void SetOverlayEnabled(boolean);
 void SetOverlayActive(boolean);
 boolean GetOverlayActive();

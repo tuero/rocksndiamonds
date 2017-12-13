@@ -635,6 +635,61 @@ void DrawMaskedBorderToTarget(int draw_target)
   }
 }
 
+void DrawTileCursor(int draw_target)
+{
+  Bitmap *fade_bitmap;
+  Bitmap *src_bitmap;
+  int src_x, src_y;
+  int dst_x, dst_y;
+  int graphic = IMG_GLOBAL_TILE_CURSOR;
+  int frame = 0;
+  int tilesize = TILESIZE_VAR;
+  int width = tilesize;
+  int height = tilesize;
+
+  if (game_status != GAME_MODE_PLAYING)
+    return;
+
+  if (!tile_cursor.enabled ||
+      !tile_cursor.active)
+    return;
+
+  if (tile_cursor.x != tile_cursor.target_x ||
+      tile_cursor.y != tile_cursor.target_y)
+  {
+    int step = TILESIZE_VAR / (GADGET_FRAME_DELAY / video.frame_delay_value);
+    int dx = tile_cursor.target_x - tile_cursor.x;
+    int dy = tile_cursor.target_y - tile_cursor.y;
+
+    if (ABS(dx) < step)
+      tile_cursor.x = tile_cursor.target_x;
+    else
+      tile_cursor.x += SIGN(dx) * step;
+
+    if (ABS(dy) < step)
+      tile_cursor.y = tile_cursor.target_y;
+    else
+      tile_cursor.y += SIGN(dy) * step;
+  }
+
+  dst_x = tile_cursor.x;
+  dst_y = tile_cursor.y;
+
+  frame = getGraphicAnimationFrame(graphic, -1);
+
+  getSizedGraphicSource(graphic, frame, tilesize, &src_bitmap, &src_x, &src_y);
+
+  fade_bitmap =
+    (draw_target == DRAW_TO_FADE_SOURCE ? gfx.fade_bitmap_source :
+     draw_target == DRAW_TO_FADE_TARGET ? gfx.fade_bitmap_target : NULL);
+
+  if (draw_target == DRAW_TO_SCREEN)
+    BlitToScreenMasked(src_bitmap, src_x, src_y, width, height, dst_x, dst_y);
+  else
+    BlitBitmapMasked(src_bitmap, fade_bitmap, src_x, src_y, width, height,
+		     dst_x, dst_y);
+}
+
 void BlitScreenToBitmap_RND(Bitmap *target_bitmap)
 {
   int fx = getFieldbufferOffsetX_RND();
@@ -1005,6 +1060,7 @@ void FadeOut(int fade_mask)
 
   SetScreenStates_BeforeFadingOut();
 
+  SetTileCursorActive(FALSE);
   SetOverlayActive(FALSE);
 
 #if 0
