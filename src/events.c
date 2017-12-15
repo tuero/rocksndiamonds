@@ -417,6 +417,8 @@ void SetPlayerMouseAction(int mx, int my, int button)
     if (button && !motion_status)
       TapeTogglePause(TAPE_TOGGLE_MANUAL);
   }
+
+  SetTileCursorXY(lx, ly);
 }
 
 void SleepWhileUnmapped()
