@@ -654,10 +654,9 @@ void DrawTileCursor(int draw_target)
       !tile_cursor.active)
     return;
 
-  if (tile_cursor.x != tile_cursor.target_x ||
-      tile_cursor.y != tile_cursor.target_y)
+  if (tile_cursor.moving)
   {
-    int step = TILESIZE_VAR / (GADGET_FRAME_DELAY / video.frame_delay_value);
+    int step = TILESIZE_VAR / 4;
     int dx = tile_cursor.target_x - tile_cursor.x;
     int dy = tile_cursor.target_y - tile_cursor.y;
 
@@ -670,6 +669,10 @@ void DrawTileCursor(int draw_target)
       tile_cursor.y = tile_cursor.target_y;
     else
       tile_cursor.y += SIGN(dy) * step;
+
+    if (tile_cursor.x == tile_cursor.target_x &&
+	tile_cursor.y == tile_cursor.target_y)
+      tile_cursor.moving = FALSE;
   }
 
   dst_x = tile_cursor.x;

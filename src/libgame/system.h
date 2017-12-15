@@ -958,6 +958,7 @@ struct TileCursorInfo
 {
   boolean enabled;		/* tile cursor generally enabled or disabled */
   boolean active;		/* tile cursor activated (depending on game) */
+  boolean moving;		/* tile cursor moving to target position */
 
   int xpos, ypos;		/* tile cursor level playfield position */
   int x, y;			/* tile cursor current screen position */

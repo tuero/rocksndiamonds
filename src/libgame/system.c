@@ -310,6 +310,7 @@ void InitTileCursorInfo()
 {
   tile_cursor.enabled = FALSE;
   tile_cursor.active = FALSE;
+  tile_cursor.moving = FALSE;
 
   tile_cursor.xpos = 0;
   tile_cursor.ypos = 0;
@@ -349,6 +350,8 @@ void SetTileCursorTargetXY(int x, int y)
   tile_cursor.ypos = y;
   tile_cursor.target_x = gfx.sx + x * gfx.game_tile_size;
   tile_cursor.target_y = gfx.sy + y * gfx.game_tile_size;
+
+  tile_cursor.moving = TRUE;
 }
 
 void SetTileCursorXY(int x, int y)
@@ -359,6 +362,8 @@ void SetTileCursorXY(int x, int y)
 
   tile_cursor.x = tile_cursor.target_x;
   tile_cursor.y = tile_cursor.target_y;
+
+  tile_cursor.moving = FALSE;
 }
 
 void SetOverlayEnabled(boolean enabled)

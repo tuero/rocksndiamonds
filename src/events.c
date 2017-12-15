@@ -2187,7 +2187,7 @@ static void HandleTileCursor(int dx, int dy, int button)
 			 (dx < 0 ? MB_LEFTBUTTON :
 			  dx > 0 ? MB_RIGHTBUTTON : MB_RELEASED));
   }
-  else
+  else if (!tile_cursor.moving)
   {
     int old_xpos = tile_cursor.xpos;
     int old_ypos = tile_cursor.ypos;
