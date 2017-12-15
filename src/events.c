@@ -2242,6 +2242,8 @@ void HandleJoystick()
   static unsigned int joytest_delay = 0;
   static unsigned int joytest_delay_value = GADGET_FRAME_DELAY;
   static int joytest_last = 0;
+  int delay_value_first = GADGET_FRAME_DELAY_FIRST;
+  int delay_value       = GADGET_FRAME_DELAY;
   int joystick	= HandleJoystickForAllPlayers();
   int keyboard	= key_joystick_mapping;
   int joy	= (joystick | keyboard);
@@ -2254,6 +2256,7 @@ void HandleJoystick()
   int newbutton	= (AnyJoystickButton() == JOY_BUTTON_NEW_PRESSED);
   int dx	= (left ? -1	: right ? 1	: 0);
   int dy	= (up   ? -1	: down  ? 1	: 0);
+  boolean use_delay_value_first = (joytest != joytest_last);
 
   if (HandleGlobalAnimClicks(-1, -1, newbutton))
   {
@@ -2263,9 +2266,17 @@ void HandleJoystick()
 
   if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
   {
-    // when playing MM style levels, also use delay for keyboard events
     if (game_status == GAME_MODE_PLAYING)
+    {
+      // when playing MM style levels, also use delay for keyboard events
       joytest |= keyboard;
+
+      // only use first delay value for new events, but not for changed events
+      use_delay_value_first = (!joytest != !joytest_last);
+
+      // only use delay after the initial keyboard event
+      delay_value = 0;
+    }
 
     // for any joystick or keyboard event, enable playfield tile cursor
     if (dx || dy || button)
@@ -2281,7 +2292,7 @@ void HandleJoystick()
   {
     /* first start with longer delay, then continue with shorter delay */
     joytest_delay_value =
-      (joytest != joytest_last ? GADGET_FRAME_DELAY_FIRST : GADGET_FRAME_DELAY);
+      (use_delay_value_first ? delay_value_first : delay_value);
   }
 
   joytest_last = joytest;
