@@ -304,7 +304,8 @@ void HandleMouseCursor()
 	cursor_inside_playfield &&
 	DelayReached(&special_cursor_delay, special_cursor_delay_value))
     {
-      if (level.game_engine_type != GAME_ENGINE_TYPE_MM)
+      if (level.game_engine_type != GAME_ENGINE_TYPE_MM ||
+	  tile_cursor.enabled)
 	SetMouseCursor(CURSOR_PLAYFIELD);
     }
   }
