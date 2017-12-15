@@ -1824,7 +1824,7 @@ void HandleKey(Key key, int key_status)
       else
 	stored_player[pnr].action &= ~key_action;
 
-      if (tape.single_step && tape.recording && tape.pausing)
+      if (tape.single_step && tape.recording && tape.pausing && !tape.use_mouse)
       {
 	if (key_status == KEY_PRESSED && key_action & KEY_MOTION)
 	{
@@ -2328,7 +2328,7 @@ void HandleJoystick()
 	return;
       }
 
-      if (tape.recording && tape.pausing)
+      if (tape.recording && tape.pausing && !tape.use_mouse)
       {
 	if (joystick & JOY_ACTION)
 	  TapeTogglePause(TAPE_TOGGLE_MANUAL);
