@@ -8747,6 +8747,11 @@ void CheckSaveEngineSnapshot_SP(boolean murphy_is_waiting,
   }
 }
 
+void CheckSaveEngineSnapshot_MM(boolean button_released)
+{
+  CheckSaveEngineSnapshotToList();
+}
+
 void CheckSingleStepMode_EM(byte action[MAX_PLAYERS], int frame,
 			    boolean any_player_moving,
 			    boolean any_player_snapping,
@@ -8775,6 +8780,15 @@ void CheckSingleStepMode_SP(boolean murphy_is_waiting,
       TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
 
   CheckSaveEngineSnapshot_SP(murphy_is_waiting, murphy_is_dropping);
+}
+
+void CheckSingleStepMode_MM(boolean button_released)
+{
+  if (tape.single_step && tape.recording && !tape.pausing)
+    if (button_released)
+      TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
+
+  CheckSaveEngineSnapshot_MM(button_released);
 }
 
 void getGraphicSource_SP(struct GraphicInfo_SP *g_sp,

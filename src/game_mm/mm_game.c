@@ -3747,6 +3747,8 @@ void GameActions_MM(struct MouseActionInfo action, boolean warp_mode)
   ClickElement(action.lx, action.ly, action.button);
 
   GameActions_MM_Ext(action, warp_mode);
+
+  CheckSingleStepMode_MM(action.button == MB_RELEASED);
 }
 
 void MovePacMen()

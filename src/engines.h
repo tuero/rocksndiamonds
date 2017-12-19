@@ -60,6 +60,8 @@ void SetDrawtoField(int);
 
 int el2img_mm(int);
 
+void CheckSingleStepMode_MM(boolean);
+
 void getGraphicSource(int, int, Bitmap **, int *, int *);
 void getMiniGraphicSource(int, Bitmap **, int *, int *);
 void getSizedGraphicSource(int, int, int, Bitmap **, int *, int *);

@@ -401,6 +401,7 @@ void SetPlayerMouseAction(int mx, int my, int button)
 {
   int lx = getLevelFromScreenX(mx);
   int ly = getLevelFromScreenY(my);
+  int new_button = (!local_player->mouse_action.button && button);
 
   ClearPlayerMouseAction();
 
@@ -413,9 +414,9 @@ void SetPlayerMouseAction(int mx, int my, int button)
 
   if (tape.recording && tape.pausing && tape.use_mouse)
   {
-    /* prevent button release or motion events from un-pausing a paused game */
-    if (button && !motion_status)
-      TapeTogglePause(TAPE_TOGGLE_MANUAL);
+    /* un-pause a paused game only if mouse button was newly pressed down */
+    if (new_button)
+      TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
   }
 
   SetTileCursorXY(lx, ly);
