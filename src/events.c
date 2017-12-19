@@ -2343,7 +2343,12 @@ void HandleJoystick()
 	return;
       }
 
-      if (tape.recording && tape.pausing && !tape.use_mouse)
+      if (tape.single_step && tape.recording && tape.pausing && !tape.use_mouse)
+      {
+	if (joystick & JOY_ACTION)
+	  TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
+      }
+      else if (tape.recording && tape.pausing && !tape.use_mouse)
       {
 	if (joystick & JOY_ACTION)
 	  TapeTogglePause(TAPE_TOGGLE_MANUAL);
