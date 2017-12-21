@@ -1541,6 +1541,8 @@ boolean HitElement(int element, int hit_mask)
       if (game_mm.kettles_still_needed > 0)
 	game_mm.kettles_still_needed--;
 
+      game.snapshot.collected_item = TRUE;
+
       if (game_mm.kettles_still_needed == 0)
       {
 	CheckExitMM();
@@ -2731,11 +2733,12 @@ static void ContinueMoving_MM(int x, int y)
   laser.redraw = TRUE;
 }
 
-void ClickElement(int x, int y, int button)
+boolean ClickElement(int x, int y, int button)
 {
   static unsigned int click_delay = 0;
   static int click_delay_value = CLICK_DELAY;
   static boolean new_button = TRUE;
+  boolean element_clicked = FALSE;
   int element;
 
   if (button == -1)
@@ -2745,12 +2748,12 @@ void ClickElement(int x, int y, int button)
     click_delay_value = CLICK_DELAY;
     new_button = TRUE;
 
-    return;
+    return FALSE;
   }
 
   /* do not rotate objects hit by the laser after the game was solved */
   if (game_mm.level_solved && Hit[x][y])
-    return;
+    return FALSE;
 
   if (button == MB_RELEASED)
   {
@@ -2760,20 +2763,20 @@ void ClickElement(int x, int y, int button)
     /* release eventually hold auto-rotating mirror */
     RotateMirror(x, y, MB_RELEASED);
 
-    return;
+    return FALSE;
   }
 
   if (!FrameReached(&click_delay, click_delay_value) && !new_button)
-    return;
+    return FALSE;
 
   if (button == MB_MIDDLEBUTTON)	/* middle button has no function */
-    return;
+    return FALSE;
 
   if (!IN_LEV_FIELD(x, y))
-    return;
+    return FALSE;
 
   if (Feld[x][y] == EL_EMPTY)
-    return;
+    return FALSE;
 
   element = Feld[x][y];
 
@@ -2785,6 +2788,8 @@ void ClickElement(int x, int y, int button)
       IS_DF_MIRROR_AUTO(element))
   {
     RotateMirror(x, y, button);
+
+    element_clicked = TRUE;
   }
   else if (IS_MCDUFFIN(element))
   {
@@ -2811,17 +2816,21 @@ void ClickElement(int x, int y, int button)
 
     if (!laser.fuse_off)
       ScanLaser();
+
+    element_clicked = TRUE;
   }
   else if (element == EL_FUSE_ON && laser.fuse_off)
   {
     if (x != laser.fuse_x || y != laser.fuse_y)
-      return;
+      return FALSE;
 
     laser.fuse_off = FALSE;
     laser.fuse_x = laser.fuse_y = -1;
 
     DrawGraphic_MM(x, y, IMG_MM_FUSE_ACTIVE);
     ScanLaser();
+
+    element_clicked = TRUE;
   }
   else if (element == EL_FUSE_ON && !laser.fuse_off && new_button)
   {
@@ -2832,16 +2841,22 @@ void ClickElement(int x, int y, int button)
 
     DrawLaser(0, DL_LASER_DISABLED);
     DrawGraphic_MM(x, y, IMG_MM_FUSE);
+
+    element_clicked = TRUE;
   }
   else if (element == EL_LIGHTBALL)
   {
     Bang_MM(x, y);
     RaiseScoreElement_MM(element);
     DrawLaser(0, DL_LASER_ENABLED);
+
+    element_clicked = TRUE;
   }
 
   click_delay_value = (new_button ? CLICK_DELAY_FIRST : CLICK_DELAY);
   new_button = FALSE;
+
+  return element_clicked;
 }
 
 void RotateMirror(int x, int y, int button)
@@ -3744,11 +3759,12 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
 
 void GameActions_MM(struct MouseActionInfo action, boolean warp_mode)
 {
-  ClickElement(action.lx, action.ly, action.button);
+  boolean element_clicked = ClickElement(action.lx, action.ly, action.button);
+  boolean button_released = (action.button == MB_RELEASED);
 
   GameActions_MM_Ext(action, warp_mode);
 
-  CheckSingleStepMode_MM(action.button == MB_RELEASED);
+  CheckSingleStepMode_MM(element_clicked, button_released);
 }
 
 void MovePacMen()

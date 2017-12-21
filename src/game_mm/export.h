@@ -232,7 +232,7 @@ extern void GameActions_MM(struct MouseActionInfo, boolean);
 
 extern void DrawLaser_MM();
 
-extern void ClickElement(int, int, int);
+extern boolean ClickElement(int, int, int);
 
 extern unsigned int InitEngineRandom_MM(int);
 
