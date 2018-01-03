@@ -1066,7 +1066,10 @@ void TapeQuickLoad()
 
 void InsertSolutionTape()
 {
-  if (!fileExists(getSolutionTapeFilename(level_nr)))
+  boolean level_has_tape = (level.game_engine_type == GAME_ENGINE_TYPE_SP &&
+			    level.native_sp_level->demo.is_available);
+
+  if (!fileExists(getSolutionTapeFilename(level_nr)) && !level_has_tape)
   {
     Request("No solution tape for this level!", REQ_CONFIRM);
 
