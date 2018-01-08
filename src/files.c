@@ -3779,6 +3779,15 @@ static void CopyNativeTape_RND_to_SP(struct LevelInfo *level)
   {
     int demo_action = map_key_RND_to_SP(tape.pos[i].action[0]);
     int demo_repeat = tape.pos[i].delay;
+    int demo_entries = (demo_repeat + 15) / 16;
+
+    if (demo->length + demo_entries >= SP_MAX_TAPE_LEN)
+    {
+      Error(ERR_WARN, "tape truncated: size exceeds maximum SP demo size %d",
+	    SP_MAX_TAPE_LEN);
+
+      break;
+    }
 
     for (j = 0; j < demo_repeat / 16; j++)
       demo->data[demo->length++] = 0xf0 | demo_action;
@@ -3806,12 +3815,16 @@ static void CopyNativeTape_SP_to_RND(struct LevelInfo *level)
     return;
 
   tape.level_nr = demo->level_nr;	/* (currently not used) */
-  tape.length = demo->length;
+  tape.length = MIN(demo->length, MAX_TAPE_LEN);
   tape.random_seed = level_sp->header.DemoRandomSeed;
 
   TapeSetDateFromEpochSeconds(getFileTimestampEpochSeconds(filename));
 
-  for (i = 0; i < demo->length; i++)
+  if (tape.length < demo->length)
+    Error(ERR_WARN, "SP demo truncated: size %d exceeds maximum tape size %d",
+	  demo->length, MAX_TAPE_LEN);
+
+  for (i = 0; i < tape.length; i++)
   {
     int demo_action = demo->data[i] & 0x0f;
     int demo_repeat = (demo->data[i] & 0xf0) >> 4;
