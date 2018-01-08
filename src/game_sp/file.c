@@ -257,6 +257,10 @@ static void LoadNativeLevelFromFileStream_SP(File *file, int width, int height,
 	break;
     }
 
+    if (i >= SP_MAX_TAPE_LEN)
+      Error(ERR_WARN, "SP demo truncated: size exceeds maximum SP demo size %d",
+	    SP_MAX_TAPE_LEN);
+
     native_sp_level.demo.length = i;
     native_sp_level.demo.is_available = (native_sp_level.demo.length > 0);
   }
