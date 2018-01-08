@@ -3775,6 +3775,7 @@ static void CopyNativeTape_RND_to_SP(struct LevelInfo *level)
   level_sp->header.DemoRandomSeed = tape.random_seed;
 
   demo->length = 0;
+
   for (i = 0; i < tape.length; i++)
   {
     int demo_action = map_key_RND_to_SP(tape.pos[i].action[0]);
@@ -3815,23 +3816,51 @@ static void CopyNativeTape_SP_to_RND(struct LevelInfo *level)
     return;
 
   tape.level_nr = demo->level_nr;	/* (currently not used) */
-  tape.length = MIN(demo->length, MAX_TAPE_LEN);
   tape.random_seed = level_sp->header.DemoRandomSeed;
 
   TapeSetDateFromEpochSeconds(getFileTimestampEpochSeconds(filename));
 
-  if (tape.length < demo->length)
-    Error(ERR_WARN, "SP demo truncated: size %d exceeds maximum tape size %d",
-	  demo->length, MAX_TAPE_LEN);
+  tape.length = 0;
+  tape.pos[tape.length].delay = 0;
 
-  for (i = 0; i < tape.length; i++)
+  for (i = 0; i < demo->length; i++)
   {
     int demo_action = demo->data[i] & 0x0f;
     int demo_repeat = (demo->data[i] & 0xf0) >> 4;
+    int tape_action = map_key_SP_to_RND(demo_action);
+    int tape_repeat = demo_repeat + 1;
+    int tape_entries = 1;	// one new tape entry may be added
 
-    tape.pos[i].action[0] = map_key_SP_to_RND(demo_action);
-    tape.pos[i].delay = demo_repeat + 1;
+    if (tape.length + tape_entries >= MAX_TAPE_LEN)
+    {
+      Error(ERR_WARN, "SP demo truncated: size exceeds maximum tape size %d",
+	    MAX_TAPE_LEN);
+
+      break;
+    }
+
+    if (tape.pos[tape.length].delay > 0)	/* already stored action */
+    {
+      if (tape.pos[tape.length].action[0] != tape_action ||
+	  tape.pos[tape.length].delay + tape_repeat >= 256)
+      {
+	tape.length++;
+	tape.pos[tape.length].delay = 0;
+      }
+      else
+      {
+	tape.pos[tape.length].delay += tape_repeat;
+      }
+    }
+
+    if (tape.pos[tape.length].delay == 0)	/* store new action */
+    {
+      tape.pos[tape.length].action[0] = tape_action;
+      tape.pos[tape.length].delay = tape_repeat;
+    }
   }
+
+  tape.length++;
 
   tape.length_frames  = GetTapeLengthFrames();
   tape.length_seconds = GetTapeLengthSeconds();
