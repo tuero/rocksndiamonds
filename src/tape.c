@@ -1394,7 +1394,7 @@ static void HandleTapeButtonsExt(int id)
       else
       {
 	if (tape.changed)
-	  SaveTapeChecked(tape.level_nr);
+	  SaveTapeChecked(level_nr);
 
 	TapeErase();
       }
