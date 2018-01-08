@@ -254,11 +254,7 @@ static void LoadNativeLevelFromFileStream_SP(File *file, int width, int height,
       native_sp_level.demo.data[i] = getFile8Bit(file);
 
       if (native_sp_level.demo.data[i] == 0xff)	/* "end of demo" byte */
-      {
-	i++;
-
 	break;
-      }
     }
 
     native_sp_level.demo.length = i;
@@ -574,6 +570,8 @@ void SaveNativeLevel_SP(char *filename)
 
     for (i = 0; i < native_sp_level.demo.length; i++)
       putFile8Bit(file, native_sp_level.demo.data[i]);
+
+    putFile8Bit(file, 0xff);	/* "end of demo" byte */
   }
 
   fclose(file);

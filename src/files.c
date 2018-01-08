@@ -3787,8 +3787,6 @@ static void CopyNativeTape_RND_to_SP(struct LevelInfo *level)
       demo->data[demo->length++] = ((demo_repeat % 16 - 1) << 4) | demo_action;
   }
 
-  demo->data[demo->length++] = 0xff;
-
   demo->is_available = TRUE;
 }
 
@@ -3808,12 +3806,12 @@ static void CopyNativeTape_SP_to_RND(struct LevelInfo *level)
     return;
 
   tape.level_nr = demo->level_nr;	/* (currently not used) */
-  tape.length = demo->length - 1;	/* without "end of demo" byte */
+  tape.length = demo->length;
   tape.random_seed = level_sp->header.DemoRandomSeed;
 
   TapeSetDateFromEpochSeconds(getFileTimestampEpochSeconds(filename));
 
-  for (i = 0; i < demo->length - 1; i++)
+  for (i = 0; i < demo->length; i++)
   {
     int demo_action = demo->data[i] & 0x0f;
     int demo_repeat = (demo->data[i] & 0xf0) >> 4;
