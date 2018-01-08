@@ -27,6 +27,10 @@
 #define SP_STD_LEVEL_SIZE		(SP_HEADER_SIZE + SP_STD_PLAYFIELD_SIZE)
 
 #define SP_FRAMES_PER_SECOND		35
+
+// use a much higher value to be able to load ultra-long MPX demo files
+// (like for level collection 78, level 88 ("WAITING FOR GODOT AGAIN"))
+// #define SP_MAX_TAPE_LEN			500000
 #define SP_MAX_TAPE_LEN			64010	/* (see "spfix63.doc") */
 
 
