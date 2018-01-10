@@ -211,6 +211,7 @@ void TapeSetDateFromNow();
 void TapeStartRecording(int);
 void TapeHaltRecording(void);
 void TapeStopRecording(void);
+boolean TapeAddAction(byte *);
 void TapeRecordAction(byte *);
 void TapeTogglePause(boolean);
 void TapeStartPlaying(void);

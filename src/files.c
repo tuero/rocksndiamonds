@@ -3820,8 +3820,8 @@ static void CopyNativeTape_SP_to_RND(struct LevelInfo *level)
 
   TapeSetDateFromEpochSeconds(getFileTimestampEpochSeconds(filename));
 
-  tape.length = 0;
-  tape.pos[tape.length].delay = 0;
+  tape.counter = 0;
+  tape.pos[tape.counter].delay = 0;
 
   for (i = 0; i < demo->length; i++)
   {
@@ -3829,41 +3829,23 @@ static void CopyNativeTape_SP_to_RND(struct LevelInfo *level)
     int demo_repeat = (demo->data[i] & 0xf0) >> 4;
     int tape_action = map_key_SP_to_RND(demo_action);
     int tape_repeat = demo_repeat + 1;
-    int tape_entries = 1;	// one new tape entry may be added
+    byte action[MAX_PLAYERS] = { tape_action, 0, 0, 0 };
+    boolean success;
+    int j;
 
-    if (tape.length + tape_entries >= MAX_TAPE_LEN)
+    for (j = 0; j < tape_repeat; j++)
+      success = TapeAddAction(action);
+
+    if (!success)
     {
       Error(ERR_WARN, "SP demo truncated: size exceeds maximum tape size %d",
 	    MAX_TAPE_LEN);
 
       break;
     }
-
-    if (tape.pos[tape.length].delay > 0)	/* already stored action */
-    {
-      if (tape.pos[tape.length].action[0] != tape_action ||
-	  tape.pos[tape.length].delay + tape_repeat >= 256)
-      {
-	tape.length++;
-	tape.pos[tape.length].delay = 0;
-      }
-      else
-      {
-	tape.pos[tape.length].delay += tape_repeat;
-      }
-    }
-
-    if (tape.pos[tape.length].delay == 0)	/* store new action */
-    {
-      tape.pos[tape.length].action[0] = tape_action;
-      tape.pos[tape.length].delay = tape_repeat;
-    }
   }
 
-  tape.length++;
-
-  tape.length_frames  = GetTapeLengthFrames();
-  tape.length_seconds = GetTapeLengthSeconds();
+  TapeHaltRecording();
 }
 
 
