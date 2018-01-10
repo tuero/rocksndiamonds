@@ -7388,7 +7388,16 @@ static int LoadTape_BODY(File *file, int chunk_size, struct TapeInfo *tape)
   for (i = 0; i < tape->length; i++)
   {
     if (i >= MAX_TAPE_LEN)
+    {
+      Error(ERR_WARN, "tape truncated -- size exceeds maximum tape size %d",
+	    MAX_TAPE_LEN);
+
+      // tape too large; read and ignore remaining tape data from this chunk
+      for (;i < tape->length; i++)
+	ReadUnusedBytesFromFile(file, tape->num_participating_players + 1);
+
       break;
+    }
 
     for (j = 0; j < MAX_PLAYERS; j++)
     {
