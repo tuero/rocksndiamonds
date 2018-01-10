@@ -637,9 +637,6 @@ static void TapeAppendRecording()
 
 void TapeHaltRecording()
 {
-  if (!tape.recording)
-    return;
-
   tape.counter++;
 
   // initialize delay for next tape entry (to be able to continue recording)
@@ -653,7 +650,8 @@ void TapeHaltRecording()
 
 void TapeStopRecording()
 {
-  TapeHaltRecording();
+  if (tape.recording)
+    TapeHaltRecording();
 
   tape.recording = FALSE;
   tape.pausing = FALSE;
