@@ -641,7 +641,10 @@ void TapeHaltRecording()
     return;
 
   tape.counter++;
-  tape.pos[tape.counter].delay = 0;
+
+  // initialize delay for next tape entry (to be able to continue recording)
+  if (tape.counter < MAX_TAPE_LEN)
+    tape.pos[tape.counter].delay = 0;
 
   tape.length = tape.counter;
   tape.length_frames = GetTapeLengthFrames();
