@@ -662,6 +662,36 @@ void TapeStopRecording()
   MapTapeEjectButton();
 }
 
+void TapeAddAction(byte action[MAX_PLAYERS])
+{
+  int i;
+
+  if (tape.pos[tape.counter].delay > 0)		/* already stored action */
+  {
+    boolean changed_events = FALSE;
+
+    for (i = 0; i < MAX_PLAYERS; i++)
+      if (tape.pos[tape.counter].action[i] != action[i])
+	changed_events = TRUE;
+
+    if (changed_events || tape.pos[tape.counter].delay >= 255)
+    {
+      tape.counter++;
+      tape.pos[tape.counter].delay = 0;
+    }
+    else
+      tape.pos[tape.counter].delay++;
+  }
+
+  if (tape.pos[tape.counter].delay == 0)	/* store new action */
+  {
+    for (i = 0; i < MAX_PLAYERS; i++)
+      tape.pos[tape.counter].action[i] = action[i];
+
+    tape.pos[tape.counter].delay++;
+  }
+}
+
 void TapeRecordAction(byte action_raw[MAX_PLAYERS])
 {
   byte action[MAX_PLAYERS];
@@ -689,30 +719,7 @@ void TapeRecordAction(byte action_raw[MAX_PLAYERS])
     tape.set_centered_player = FALSE;
   }
 
-  if (tape.pos[tape.counter].delay > 0)		/* already stored action */
-  {
-    boolean changed_events = FALSE;
-
-    for (i = 0; i < MAX_PLAYERS; i++)
-      if (tape.pos[tape.counter].action[i] != action[i])
-	changed_events = TRUE;
-
-    if (changed_events || tape.pos[tape.counter].delay >= 255)
-    {
-      tape.counter++;
-      tape.pos[tape.counter].delay = 0;
-    }
-    else
-      tape.pos[tape.counter].delay++;
-  }
-
-  if (tape.pos[tape.counter].delay == 0)	/* store new action */
-  {
-    for (i = 0; i < MAX_PLAYERS; i++)
-      tape.pos[tape.counter].action[i] = action[i];
-
-    tape.pos[tape.counter].delay++;
-  }
+  TapeAddAction(action);
 }
 
 void TapeTogglePause(boolean toggle_mode)
