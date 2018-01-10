@@ -660,7 +660,7 @@ void TapeStopRecording()
   MapTapeEjectButton();
 }
 
-void TapeAddAction(byte action[MAX_PLAYERS])
+boolean TapeAddAction(byte action[MAX_PLAYERS])
 {
   int i;
 
@@ -674,6 +674,9 @@ void TapeAddAction(byte action[MAX_PLAYERS])
 
     if (changed_events || tape.pos[tape.counter].delay >= 255)
     {
+      if (tape.counter >= MAX_TAPE_LEN - 1)
+	return FALSE;
+
       tape.counter++;
       tape.pos[tape.counter].delay = 0;
     }
@@ -688,6 +691,8 @@ void TapeAddAction(byte action[MAX_PLAYERS])
 
     tape.pos[tape.counter].delay++;
   }
+
+  return TRUE;
 }
 
 void TapeRecordAction(byte action_raw[MAX_PLAYERS])
@@ -697,12 +702,6 @@ void TapeRecordAction(byte action_raw[MAX_PLAYERS])
 
   if (!tape.recording)		/* (record action even when tape is paused) */
     return;
-
-  if (tape.counter >= MAX_TAPE_LEN - 1)
-  {
-    TapeStopRecording();
-    return;
-  }
 
   for (i = 0; i < MAX_PLAYERS; i++)
     action[i] = action_raw[i];
@@ -717,7 +716,8 @@ void TapeRecordAction(byte action_raw[MAX_PLAYERS])
     tape.set_centered_player = FALSE;
   }
 
-  TapeAddAction(action);
+  if (!TapeAddAction(action))
+    TapeStopRecording();
 }
 
 void TapeTogglePause(boolean toggle_mode)
