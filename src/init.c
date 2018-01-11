@@ -6115,7 +6115,7 @@ void CloseAllAndExit(int exit_value)
   CloseVideoDisplay();
   ClosePlatformDependentStuff();
 
-  if (exit_value != 0)
+  if (exit_value != 0 && !options.execute_command)
   {
     /* fall back to default level set (current set may have caused an error) */
     SaveLevelSetup_LastSeries_Deactivate();
