@@ -225,6 +225,16 @@ static void Mixer_PlayMusicChannel()
     // (this may happen when switching on music while playing the game)
     Mix_VolumeMusic(mixer[audio.music_channel].volume);
     Mix_FadeInMusic(mixer[audio.music_channel].data_ptr, -1, 100);
+
+#if defined(PLATFORM_WIN32)
+    // playing MIDI music is broken since Windows Vista, as it sets the volume
+    // for MIDI music also for all other sounds and music, which cannot be set
+    // back to normal unless playing MIDI music again with that desired volume
+    // (more details: https://www.artsoft.org/forum/viewtopic.php?f=7&t=2253)
+    // => workaround: always play MIDI music with maximum volume
+    if (Mix_GetMusicType(NULL) == MUS_MID)
+      Mix_VolumeMusic(SOUND_MAX_VOLUME);
+#endif
   }
 }
 
@@ -263,6 +273,16 @@ static void Mixer_FadeMusicChannel()
   Mixer_FadeChannel(audio.music_channel);
 
   Mix_FadeOutMusic(SOUND_FADING_INTERVAL);
+
+#if defined(PLATFORM_WIN32)
+  // playing MIDI music is broken since Windows Vista, as it sets the volume
+  // for MIDI music also for all other sounds and music, which cannot be set
+  // back to normal unless playing MIDI music again with that desired volume
+  // (more details: https://www.artsoft.org/forum/viewtopic.php?f=7&t=2253)
+  // => workaround: never fade MIDI music to lower volume, but just stop it
+  if (Mix_GetMusicType(NULL) == MUS_MID)
+    Mixer_StopMusicChannel();
+#endif
 
   setString(&currently_playing_music_filename, NULL);
 }
