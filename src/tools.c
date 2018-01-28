@@ -3046,9 +3046,8 @@ static int getMaxTextLength(struct TextPosInfo *pos, int font_nr)
   return max_text_width / font_width;
 }
 
-static void DrawPreviewLevelLabel(int mode)
+static void DrawPreviewLevelLabelExt(int mode, struct TextPosInfo *pos)
 {
-  struct TextPosInfo *pos = &menu.main.text.level_info_2;
   char label_text[MAX_OUTPUT_LINESIZE + 1];
   int max_len_label_text;
   int font_nr = pos->font;
@@ -3091,6 +3090,19 @@ static void DrawPreviewLevelLabel(int mode)
   redraw_mask |= REDRAW_FIELD;
 }
 
+static void DrawPreviewLevelLabel(int mode)
+{
+  DrawPreviewLevelLabelExt(mode, &menu.main.text.level_info_2);
+}
+
+static void DrawPreviewLevelInfo(int mode)
+{
+  if (mode == MICROLABEL_LEVEL_NAME)
+    DrawPreviewLevelLabelExt(mode, &menu.main.text.level_name);
+  else if (mode == MICROLABEL_LEVEL_AUTHOR)
+    DrawPreviewLevelLabelExt(mode, &menu.main.text.level_author);
+}
+
 static void DrawPreviewLevelExt(boolean restart)
 {
   static unsigned int scroll_delay = 0;
@@ -3124,6 +3136,9 @@ static void DrawPreviewLevelExt(boolean restart)
 
     DrawPreviewLevelPlayfield(from_x, from_y);
     DrawPreviewLevelLabel(label_state);
+
+    DrawPreviewLevelInfo(MICROLABEL_LEVEL_NAME);
+    DrawPreviewLevelInfo(MICROLABEL_LEVEL_AUTHOR);
 
     /* initialize delay counters */
     DelayReached(&scroll_delay, 0);
