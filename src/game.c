@@ -1052,6 +1052,7 @@ static void PlayLevelSoundElementActionIfLoop(int, int, int, int);
 static void PlayLevelSoundActionIfLoop(int, int, int);
 static void StopLevelSoundActionIfLoop(int, int, int);
 static void PlayLevelMusic();
+static void FadeLevelSoundsAndMusic();
 
 static void HandleGameButtons(struct GadgetInfo *);
 
@@ -3118,7 +3119,7 @@ void InitGame()
   if (CheckIfGlobalBorderHasChanged())
     fade_mask = REDRAW_ALL;
 
-  FadeSoundsAndMusic();
+  FadeLevelSoundsAndMusic();
 
   ExpireSoundLoops(TRUE);
 
@@ -14232,12 +14233,43 @@ static void StopLevelSoundActionIfLoop(int x, int y, int action)
     StopSound(sound_effect);
 }
 
-static void PlayLevelMusic()
+static int getLevelMusicNr()
 {
   if (levelset.music[level_nr] != MUS_UNDEFINED)
-    PlayMusic(levelset.music[level_nr]);	/* from config file */
+    return levelset.music[level_nr];		/* from config file */
   else
-    PlayMusic(MAP_NOCONF_MUSIC(level_nr));	/* from music dir */
+    return MAP_NOCONF_MUSIC(level_nr);		/* from music dir */
+}
+
+static void FadeLevelSounds()
+{
+  FadeSounds();
+}
+
+static void FadeLevelMusic()
+{
+  int music_nr = getLevelMusicNr();
+  char *curr_music = getCurrentlyPlayingMusicFilename();
+  char *next_music = getMusicListEntry(music_nr)->filename;
+
+  if (!strEqual(curr_music, next_music))
+    FadeMusic();
+}
+
+void FadeLevelSoundsAndMusic()
+{
+  FadeLevelSounds();
+  FadeLevelMusic();
+}
+
+static void PlayLevelMusic()
+{
+  int music_nr = getLevelMusicNr();
+  char *curr_music = getCurrentlyPlayingMusicFilename();
+  char *next_music = getMusicListEntry(music_nr)->filename;
+
+  if (!strEqual(curr_music, next_music))
+    PlayMusic(music_nr);
 }
 
 void PlayLevelSound_EM(int xx, int yy, int element_em, int sample)
