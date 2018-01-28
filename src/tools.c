@@ -2981,7 +2981,7 @@ void DrawMiniLevel(int size_x, int size_y, int scroll_x, int scroll_y)
   redraw_mask |= REDRAW_FIELD;
 }
 
-static void DrawPreviewLevelPlayfieldExt(int from_x, int from_y)
+static void DrawPreviewLevelPlayfield(int from_x, int from_y)
 {
   boolean show_level_border = (BorderElement != EL_EMPTY);
   int level_xsize = lev_fieldx + (show_level_border ? 2 : 0);
@@ -3046,7 +3046,7 @@ static int getMaxTextLength(struct TextPosInfo *pos, int font_nr)
   return max_text_width / font_width;
 }
 
-static void DrawPreviewLevelLabelExt(int mode)
+static void DrawPreviewLevelLabel(int mode)
 {
   struct TextPosInfo *pos = &menu.main.text.level_info_2;
   char label_text[MAX_OUTPUT_LINESIZE + 1];
@@ -3122,8 +3122,8 @@ static void DrawPreviewLevelExt(boolean restart)
     label_state = 1;
     label_counter = 0;
 
-    DrawPreviewLevelPlayfieldExt(from_x, from_y);
-    DrawPreviewLevelLabelExt(label_state);
+    DrawPreviewLevelPlayfield(from_x, from_y);
+    DrawPreviewLevelLabel(label_state);
 
     /* initialize delay counters */
     DelayReached(&scroll_delay, 0);
@@ -3202,7 +3202,7 @@ static void DrawPreviewLevelExt(boolean restart)
 	break;
     }
 
-    DrawPreviewLevelPlayfieldExt(from_x, from_y);
+    DrawPreviewLevelPlayfield(from_x, from_y);
   }
 
   /* !!! THIS ALL SUCKS -- SHOULD BE CLEANLY REWRITTEN !!! */
@@ -3243,7 +3243,7 @@ static void DrawPreviewLevelExt(boolean restart)
       label_state = (label_state == MICROLABEL_IMPORTED_FROM_HEAD ?
 		     MICROLABEL_IMPORTED_BY_HEAD : MICROLABEL_IMPORTED_BY);
 
-    DrawPreviewLevelLabelExt(label_state);
+    DrawPreviewLevelLabel(label_state);
   }
 }
 
