@@ -3749,7 +3749,6 @@ static void AdjustElementListScrollbar();
 static void RedrawDrawingElements();
 static void DrawDrawingWindowExt(boolean);
 static void DrawDrawingWindow();
-static void DrawDrawingWindow_PlayfieldOnly();
 static void DrawLevelInfoWindow();
 static void DrawPropertiesWindow();
 static void DrawPaletteWindow();
@@ -7564,10 +7563,13 @@ static void ResetUndoBuffer()
   level.changed = FALSE;
 }
 
-static void DrawEditModeWindow()
+static void DrawEditModeWindowExt(boolean remap_toolbox_gadgets)
 {
-  ModifyEditorElementList();
-  RedrawDrawingElements();
+  if (remap_toolbox_gadgets)
+  {
+    ModifyEditorElementList();
+    RedrawDrawingElements();
+  }
 
   if (edit_mode == ED_MODE_INFO)
     DrawLevelInfoWindow();
@@ -7576,7 +7578,17 @@ static void DrawEditModeWindow()
   else if (edit_mode == ED_MODE_PALETTE)
     DrawPaletteWindow();
   else	/* edit_mode == ED_MODE_DRAWING */
-    DrawDrawingWindow();
+    DrawDrawingWindowExt(remap_toolbox_gadgets);
+}
+
+static void DrawEditModeWindow()
+{
+  DrawEditModeWindowExt(TRUE);
+}
+
+static void DrawEditModeWindow_PlayfieldOnly()
+{
+  DrawEditModeWindowExt(FALSE);
 }
 
 static void ChangeEditModeWindow(int new_edit_mode)
@@ -8505,7 +8517,7 @@ void DrawLevelEd()
 
   UnmapAllGadgets();
 
-  DrawDrawingWindow_PlayfieldOnly();
+  DrawEditModeWindow_PlayfieldOnly();
 
   DrawMaskedBorder(fade_mask);
 
@@ -8850,11 +8862,6 @@ static void DrawDrawingWindowExt(boolean remap_toolbox_gadgets)
 static void DrawDrawingWindow()
 {
   DrawDrawingWindowExt(TRUE);
-}
-
-static void DrawDrawingWindow_PlayfieldOnly()
-{
-  DrawDrawingWindowExt(FALSE);
 }
 
 static int getTabulatorBarWidth()
