@@ -5604,12 +5604,10 @@ static Key getSetupKey()
 
   while (!got_key_event)
   {
-    if (PendingEvent())		/* got event */
+    Event event;
+
+    if (NextValidEvent(&event))
     {
-      Event event;
-
-      WaitEvent(&event);
-
       switch (event.type)
       {
         case EVENT_KEYPRESS:
@@ -6290,12 +6288,10 @@ void CustomizeKeyboard(int player_nr)
 
   while (!finished)
   {
-    if (PendingEvent())		/* got event */
+    Event event;
+
+    if (NextValidEvent(&event))
     {
-      Event event;
-
-      WaitEvent(&event);
-
       switch (event.type)
       {
         case EVENT_KEYPRESS:

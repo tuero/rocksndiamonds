@@ -341,12 +341,10 @@ void EventLoop(void)
 
 void ClearEventQueue()
 {
-  while (PendingEvent())
+  Event event;
+
+  while (NextValidEvent(&event))
   {
-    Event event;
-
-    WaitEvent(&event);
-
     switch (event.type)
     {
       case EVENT_BUTTONRELEASE:
@@ -393,7 +391,8 @@ void SleepWhileUnmapped()
   {
     Event event;
 
-    WaitEvent(&event);
+    if (!WaitEventFiltered(&event))
+      continue;
 
     switch (event.type)
     {

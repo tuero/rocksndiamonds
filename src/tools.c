@@ -3777,12 +3777,10 @@ void WaitForEventToContinue()
 
   while (still_wait)
   {
-    if (PendingEvent())
+    Event event;
+
+    if (NextValidEvent(&event))
     {
-      Event event;
-
-      WaitEvent(&event);
-
       switch (event.type)
       {
 	case EVENT_BUTTONPRESS:
