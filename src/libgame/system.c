@@ -1493,9 +1493,9 @@ boolean PendingEvent(void)
   return (SDL_PollEvent(NULL) ? TRUE : FALSE);
 }
 
-void NextEvent(Event *event)
+void WaitEvent(Event *event)
 {
-  SDLNextEvent(event);
+  SDLWaitEvent(event);
 }
 
 void PeekEvent(Event *event)

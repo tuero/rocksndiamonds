@@ -490,7 +490,7 @@ void SDLSetMouseCursor(struct MouseCursorInfo *);
 void SDLOpenAudio(void);
 void SDLCloseAudio(void);
 
-void SDLNextEvent(Event *);
+void SDLWaitEvent(Event *);
 void SDLHandleWindowManagerEvent(Event *);
 
 void HandleJoystickEvent(Event *);

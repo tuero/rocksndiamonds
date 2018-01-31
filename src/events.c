@@ -142,7 +142,7 @@ boolean NextValidEvent(Event *event)
   {
     boolean handle_this_event = FALSE;
 
-    NextEvent(event);
+    WaitEvent(event);
 
     if (FilterEvents(event))
       handle_this_event = TRUE;
@@ -344,7 +344,7 @@ void ClearEventQueue()
   {
     Event event;
 
-    NextEvent(&event);
+    WaitEvent(&event);
 
     switch (event.type)
     {
@@ -392,7 +392,7 @@ void SleepWhileUnmapped()
   {
     Event event;
 
-    NextEvent(&event);
+    WaitEvent(&event);
 
     switch (event.type)
     {

@@ -3781,7 +3781,7 @@ void WaitForEventToContinue()
     {
       Event event;
 
-      NextEvent(&event);
+      WaitEvent(&event);
 
       switch (event.type)
       {

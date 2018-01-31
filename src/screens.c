@@ -5608,7 +5608,7 @@ static Key getSetupKey()
     {
       Event event;
 
-      NextEvent(&event);
+      WaitEvent(&event);
 
       switch (event.type)
       {
@@ -6294,7 +6294,7 @@ void CustomizeKeyboard(int player_nr)
     {
       Event event;
 
-      NextEvent(&event);
+      WaitEvent(&event);
 
       switch (event.type)
       {

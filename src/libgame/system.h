@@ -1544,7 +1544,7 @@ void CloseAudio(void);
 void SetAudioMode(boolean);
 
 boolean PendingEvent(void);
-void NextEvent(Event *event);
+void WaitEvent(Event *event);
 void PeekEvent(Event *event);
 void CheckQuitEvent(void);
 Key GetEventKey(KeyEvent *, boolean);

@@ -2536,7 +2536,7 @@ void SDLCloseAudio(void)
 /* event functions                                                           */
 /* ========================================================================= */
 
-void SDLNextEvent(Event *event)
+void SDLWaitEvent(Event *event)
 {
   SDL_WaitEvent(event);
 }
