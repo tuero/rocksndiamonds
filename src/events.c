@@ -128,7 +128,7 @@ static boolean SkipPressedMouseMotionEvent(const Event *event)
   return FALSE;
 }
 
-static boolean WaitEventFiltered(Event *event)
+static boolean WaitValidEvent(Event *event)
 {
   WaitEvent(event);
 
@@ -152,7 +152,7 @@ static boolean WaitEventFiltered(Event *event)
 boolean NextValidEvent(Event *event)
 {
   while (PendingEvent())
-    if (WaitEventFiltered(event))
+    if (WaitValidEvent(event))
       return TRUE;
 
   return FALSE;
@@ -391,7 +391,7 @@ void SleepWhileUnmapped()
   {
     Event event;
 
-    if (!WaitEventFiltered(&event))
+    if (!WaitValidEvent(&event))
       continue;
 
     switch (event.type)
