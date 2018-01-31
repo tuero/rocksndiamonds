@@ -128,6 +128,19 @@ static boolean SkipPressedMouseMotionEvent(const Event *event)
   return FALSE;
 }
 
+static boolean WaitEventFiltered(Event *event)
+{
+  WaitEvent(event);
+
+  if (!FilterEvents(event))
+    return FALSE;
+
+  if (SkipPressedMouseMotionEvent(event))
+    return FALSE;
+
+  return TRUE;
+}
+
 /* this is especially needed for event modifications for the Android target:
    if mouse coordinates should be modified in the event filter function,
    using a properly installed SDL event filter does not work, because in
@@ -139,20 +152,8 @@ static boolean SkipPressedMouseMotionEvent(const Event *event)
 boolean NextValidEvent(Event *event)
 {
   while (PendingEvent())
-  {
-    boolean handle_this_event = FALSE;
-
-    WaitEvent(event);
-
-    if (FilterEvents(event))
-      handle_this_event = TRUE;
-
-    if (SkipPressedMouseMotionEvent(event))
-      handle_this_event = FALSE;
-
-    if (handle_this_event)
+    if (WaitEventFiltered(event))
       return TRUE;
-  }
 
   return FALSE;
 }
