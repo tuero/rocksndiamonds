@@ -303,32 +303,11 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
 {
   SoundInfo *snd_info;
   int i, k;
-  int num_sounds = getSoundListSize();
-  int num_music  = getMusicListSize();
 
   if (IS_MUSIC(snd_ctrl))
-  {
-    if (snd_ctrl.nr >= num_music)	/* invalid music */
-      return;
-
-    if (snd_ctrl.nr < 0)		/* undefined music */
-    {
-      if (num_music_noconf == 0)	/* no fallback music available */
-	return;
-
-      snd_ctrl.nr = UNMAP_NOCONF_MUSIC(snd_ctrl.nr) % num_music_noconf;
-      snd_info = Music_NoConf[snd_ctrl.nr];
-    }
-    else
-      snd_info = getMusicInfoEntryFromMusicID(snd_ctrl.nr);
-  }
+    snd_info = getMusicInfoEntryFromMusicID(snd_ctrl.nr);
   else
-  {
-    if (snd_ctrl.nr < 0 || snd_ctrl.nr >= num_sounds)
-      return;
-
     snd_info = getSoundInfoEntryFromSoundID(snd_ctrl.nr);
-  }
 
   if (snd_info == NULL)
     return;
@@ -735,8 +714,18 @@ static MusicInfo *getMusicInfoEntryFromMusicID(int pos)
     (MusicInfo **)(pos < num_list_entries ? music_info->artwork_list :
 		   music_info->dynamic_artwork_list);
 
-  if (pos < 0 || pos >= num_music)	/* invalid music */
+  if (pos >= num_music)			/* invalid music */
     return NULL;
+
+  if (pos < 0)				/* undefined music */
+  {
+    if (num_music_noconf == 0)		/* no fallback music available */
+      return NULL;
+
+    pos = UNMAP_NOCONF_MUSIC(pos) % num_music_noconf;
+
+    return Music_NoConf[pos];
+  }
 
   return mus_info[list_pos];
 }
