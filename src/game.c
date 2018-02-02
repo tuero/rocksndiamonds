@@ -14250,7 +14250,7 @@ static void FadeLevelMusic()
 {
   int music_nr = getLevelMusicNr();
   char *curr_music = getCurrentlyPlayingMusicFilename();
-  char *next_music = getMusicListEntry(music_nr)->filename;
+  char *next_music = getMusicInfoEntryFilename(music_nr);
 
   if (!strEqual(curr_music, next_music))
     FadeMusic();
@@ -14266,7 +14266,7 @@ static void PlayLevelMusic()
 {
   int music_nr = getLevelMusicNr();
   char *curr_music = getCurrentlyPlayingMusicFilename();
-  char *next_music = getMusicListEntry(music_nr)->filename;
+  char *next_music = getMusicInfoEntryFilename(music_nr);
 
   if (!strEqual(curr_music, next_music))
     PlayMusic(music_nr);

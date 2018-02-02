@@ -8498,7 +8498,7 @@ void PlayMenuMusicExt(int music)
 void PlayMenuMusic()
 {
   char *curr_music = getCurrentlyPlayingMusicFilename();
-  char *next_music = getMusicListEntry(menu.music[game_status])->filename;
+  char *next_music = getMusicInfoEntryFilename(menu.music[game_status]);
 
   if (!strEqual(curr_music, next_music))
     PlayMenuMusicExt(menu.music[game_status]);
@@ -8518,7 +8518,7 @@ static void FadeMenuSounds()
 static void FadeMenuMusic()
 {
   char *curr_music = getCurrentlyPlayingMusicFilename();
-  char *next_music = getMusicListEntry(menu.music[game_status])->filename;
+  char *next_music = getMusicInfoEntryFilename(menu.music[game_status]);
 
   if (!strEqual(curr_music, next_music))
     FadeMusic();

@@ -121,6 +121,7 @@ int getSoundListSize();
 int getMusicListSize();
 struct FileInfo *getSoundListEntry(int);
 struct FileInfo *getMusicListEntry(int);
+char *getMusicInfoEntryFilename(int);
 char *getCurrentlyPlayingMusicFilename();
 int getSoundListPropertyMappingSize();
 int getMusicListPropertyMappingSize();

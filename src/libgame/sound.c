@@ -725,6 +725,16 @@ static MusicInfo *getMusicInfoEntryFromMusicID(int pos)
   return mus_info[list_pos];
 }
 
+char *getMusicInfoEntryFilename(int pos)
+{
+  MusicInfo *mus_info = getMusicInfoEntryFromMusicID(pos);
+
+  if (mus_info == NULL)
+    return NULL;
+
+  return getBaseNamePtr(mus_info->source_filename);
+}
+
 char *getCurrentlyPlayingMusicFilename()
 {
   return currently_playing_music_filename;
