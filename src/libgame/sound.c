@@ -687,8 +687,12 @@ int getMusicListSize()
 
 struct FileInfo *getSoundListEntry(int pos)
 {
+  int num_sounds = getSoundListSize();
   int num_list_entries = sound_info->num_file_list_entries;
   int list_pos = (pos < num_list_entries ? pos : pos - num_list_entries);
+
+  if (pos < 0 || pos >= num_sounds)	/* invalid sound */
+    return NULL;
 
   return (pos < num_list_entries ? &sound_info->file_list[list_pos] :
 	  &sound_info->dynamic_file_list[list_pos]);
@@ -696,8 +700,12 @@ struct FileInfo *getSoundListEntry(int pos)
 
 struct FileInfo *getMusicListEntry(int pos)
 {
+  int num_music = getMusicListSize();
   int num_list_entries = music_info->num_file_list_entries;
   int list_pos = (pos < num_list_entries ? pos : pos - num_list_entries);
+
+  if (pos < 0 || pos >= num_music)	/* invalid music */
+    return NULL;
 
   return (pos < num_list_entries ? &music_info->file_list[list_pos] :
 	  &music_info->dynamic_file_list[list_pos]);
@@ -705,22 +713,30 @@ struct FileInfo *getMusicListEntry(int pos)
 
 static SoundInfo *getSoundInfoEntryFromSoundID(int pos)
 {
+  int num_sounds = getSoundListSize();
   int num_list_entries = sound_info->num_file_list_entries;
   int list_pos = (pos < num_list_entries ? pos : pos - num_list_entries);
   SoundInfo **snd_info =
     (SoundInfo **)(pos < num_list_entries ? sound_info->artwork_list :
 		   sound_info->dynamic_artwork_list);
 
+  if (pos < 0 || pos >= num_sounds)	/* invalid sound */
+    return NULL;
+
   return snd_info[list_pos];
 }
 
 static MusicInfo *getMusicInfoEntryFromMusicID(int pos)
 {
+  int num_music = getMusicListSize();
   int num_list_entries = music_info->num_file_list_entries;
   int list_pos = (pos < num_list_entries ? pos : pos - num_list_entries);
   MusicInfo **mus_info =
     (MusicInfo **)(pos < num_list_entries ? music_info->artwork_list :
 		   music_info->dynamic_artwork_list);
+
+  if (pos < 0 || pos >= num_music)	/* invalid music */
+    return NULL;
 
   return mus_info[list_pos];
 }
