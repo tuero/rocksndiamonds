@@ -1107,10 +1107,13 @@ void prepare_em_level(void)
     ply[i].joy_stick = ply[i].joy_spin = 0;
   }
 
+  // the following engine variables are initialized to version-specific values
+  // in function InitGameEngine() (src/game.c):
+  //
+  // - game_em.use_single_button (default: TRUE)
+
   game_em.any_player_moving = FALSE;
   game_em.any_player_snapping = FALSE;
-
-  game_em.use_single_button = TRUE;
 
   game_em.last_moving_player = 0;	/* default: first player */
 
