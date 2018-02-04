@@ -13,7 +13,7 @@ void synchro_3(void)
   int x;
   int y;
   int count;
-  unsigned long random;
+  unsigned int random;
 
   /* update variables */
 
