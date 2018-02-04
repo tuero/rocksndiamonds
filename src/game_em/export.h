@@ -668,6 +668,7 @@ struct GameInfo_EM
   boolean any_player_snapping;
 
   boolean use_single_button;
+  boolean use_snap_key_bug;
 
   int last_moving_player;
   int last_player_direction[MAX_PLAYERS];

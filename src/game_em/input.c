@@ -161,6 +161,10 @@ void readjoy(byte action, struct PLAYER *ply)
       !ply->joy_s &&
       !ply->joy_w)
     ply->joy_snap = snap;
+
+  /* use bug with snap key (mainly TAS keys) sometimes moving the player */
+  if (game_em.use_snap_key_bug)
+    ply->joy_snap = snap;
 }
 
 void SaveEngineSnapshotValues_EM()

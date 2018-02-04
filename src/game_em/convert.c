@@ -1111,6 +1111,7 @@ void prepare_em_level(void)
   // in function InitGameEngine() (src/game.c):
   //
   // - game_em.use_single_button (default: TRUE)
+  // - game_em.use_snap_key_bug (default: FALSE)
 
   game_em.any_player_moving = FALSE;
   game_em.any_player_snapping = FALSE;
