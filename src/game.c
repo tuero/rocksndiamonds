@@ -4599,6 +4599,10 @@ void InitPlayerGfxAnimation(struct PlayerInfo *player, int action, int dir)
 
 static void ResetGfxFrame(int x, int y)
 {
+  // profiling showed that "autotest" spends 10~20% of its time in this function
+  if (DrawingDeactivatedField())
+    return;
+
   int element = Feld[x][y];
   int graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
 

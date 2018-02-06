@@ -54,6 +54,10 @@ void InitGameEngine_SP()
 
 void RedrawPlayfield_SP(boolean force_redraw)
 {
+  // skip redrawing playfield in warp mode or when testing tapes with "autotest"
+  if (DrawingDeactivatedField())
+    return;
+
   if (force_redraw)
     RestorePlayfield();
 

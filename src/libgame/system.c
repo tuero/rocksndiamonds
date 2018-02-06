@@ -600,6 +600,17 @@ inline static boolean CheckDrawingArea(int x, int y, int width, int height,
   return FALSE;
 }
 
+boolean DrawingDeactivatedField()
+{
+  if (program.headless)
+    return TRUE;
+
+  if (gfx.draw_deactivation_mask & REDRAW_FIELD)
+    return TRUE;
+
+  return FALSE;
+}
+
 boolean DrawingDeactivated(int x, int y, int width, int height)
 {
   return CheckDrawingArea(x, y, width, height, gfx.draw_deactivation_mask);

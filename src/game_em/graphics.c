@@ -544,6 +544,10 @@ static boolean checkIfAllPlayersAreVisible(int center_x, int center_y)
 
 void RedrawPlayfield_EM(boolean force_redraw)
 {
+  // skip redrawing playfield in warp mode or when testing tapes with "autotest"
+  if (DrawingDeactivatedField())
+    return;
+
   boolean draw_new_player_location = FALSE;
   boolean quick_relocation = setup.quick_switch;
   int max_center_distance_player_nr =
