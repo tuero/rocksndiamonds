@@ -457,18 +457,17 @@ static boolean getCheckedTokenValueFromString(char *string, char **token,
 
 static void DrawTextBuffer_Flush(int x, int y, char *buffer, int font_nr,
 				 int line_length, int cut_length,
-				 int line_spacing, int mask_mode,
-				 boolean centered, int current_line)
+				 int mask_mode, boolean centered,
+				 int current_ypos)
 {
   int buffer_len = strlen(buffer);
   int font_width = getFontWidth(font_nr);
-  int font_height = getFontHeight(font_nr);
   int offset_chars = (centered ? (line_length - buffer_len) / 2 : 0);
   int offset_xsize =
     (centered ? font_width * (line_length - buffer_len) / 2 : 0);
   int final_cut_length = MAX(0, cut_length - offset_chars);
   int xx = x + offset_xsize;
-  int yy = y + current_line * (font_height + line_spacing);
+  int yy = y + current_ypos;
 
   buffer[final_cut_length] = '\0';
 
@@ -485,7 +484,11 @@ int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
 {
   char buffer[line_length + 1];
   int buffer_len;
+  int font_height = getFontHeight(font_nr);
+  int line_height = font_height + line_spacing;
   int current_line = 0;
+  int current_ypos = 0;
+  int max_ysize = max_lines * line_height;
 
   if (text_buffer == NULL || *text_buffer == '\0')
     return 0;
@@ -499,7 +502,7 @@ int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
   buffer[0] = '\0';
   buffer_len = 0;
 
-  while (*text_buffer && current_line < max_lines)
+  while (*text_buffer && current_ypos < max_ysize)
   {
     char line[MAX_LINE_LEN + 1];
     char *line_ptr;
@@ -526,11 +529,11 @@ int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
       if (getCheckedTokenValueFromString(line + 1, &token, &value))
       {
 	/* if found, flush the current buffer, if non-empty */
-	if (buffer_len > 0 && current_line < max_lines)
+	if (buffer_len > 0 && current_ypos < max_ysize)
 	{
 	  DrawTextBuffer_Flush(x, y, buffer, font_nr, line_length, cut_length,
-			       line_spacing, mask_mode, centered, current_line);
-
+			       mask_mode, centered, current_ypos);
+	  current_ypos += line_height;
 	  current_line++;
 
 	  buffer[0] = '\0';
@@ -545,6 +548,10 @@ int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
 	  centered = get_boolean_from_string(value);
 	else if (strEqual(token, ".parse_comments"))
 	  parse_comments = get_boolean_from_string(value);
+
+	// if font has changed, depending values need to be updated as well
+	font_height = getFontHeight(font_nr);
+	line_height = font_height + line_spacing;
       }
 
       continue;
@@ -565,7 +572,7 @@ int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
 
     line_ptr = line;
 
-    while (*line_ptr && current_line < max_lines)
+    while (*line_ptr && current_ypos < max_ysize)
     {
       boolean buffer_filled;
 
@@ -596,7 +603,8 @@ int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
       if (buffer_filled)
       {
 	DrawTextBuffer_Flush(x, y, buffer, font_nr, line_length, cut_length,
-			     line_spacing, mask_mode, centered, current_line);
+			     mask_mode, centered, current_ypos);
+	current_ypos += line_height;
 	current_line++;
 
 	last_line_was_empty = (buffer_len == 0);
@@ -607,10 +615,11 @@ int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
     }
   }
 
-  if (buffer_len > 0 && current_line < max_lines)
+  if (buffer_len > 0 && current_ypos < max_ysize)
   {
     DrawTextBuffer_Flush(x, y, buffer, font_nr, line_length, cut_length,
-			 line_spacing, mask_mode, centered, current_line);
+			 mask_mode, centered, current_ypos);
+    current_ypos += line_height;
     current_line++;
   }
 
