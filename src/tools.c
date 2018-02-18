@@ -1444,13 +1444,6 @@ void getSizedGraphicSourceExt(int graphic, int frame, int tilesize,
   *y = *y * tilesize / g->tile_size;
 }
 
-void getFixedGraphicSourceExt(int graphic, int frame, Bitmap **bitmap,
-			      int *x, int *y, boolean get_backside)
-{
-  getSizedGraphicSourceExt(graphic, frame, TILESIZE, bitmap, x, y,
-			   get_backside);
-}
-
 void getSizedGraphicSource(int graphic, int frame, int tilesize,
 			   Bitmap **bitmap, int *x, int *y)
 {
