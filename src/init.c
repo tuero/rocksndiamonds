@@ -1717,10 +1717,10 @@ static void InitGraphicInfo()
 
   for (i = 0; i < num_images; i++)
   {
-    Bitmap *src_bitmap;
+    Bitmap *src_bitmap = graphic_info[i].bitmap;
     int src_x, src_y;
     int width, height;
-    int first_frame, last_frame;
+    int last_frame;
     int src_bitmap_width, src_bitmap_height;
 
     /* now check if no animation frames are outside of the loaded image */
@@ -1738,9 +1738,7 @@ static void InitGraphicInfo()
 
     /* check if first animation frame is inside specified bitmap */
 
-    first_frame = 0;
-    getFixedGraphicSource(i, first_frame, &src_bitmap, &src_x, &src_y);
-
+    /* do not use getGraphicSourceXY() here to get position of first frame; */
     /* this avoids calculating wrong start position for out-of-bounds frame */
     src_x = graphic_info[i].src_x;
     src_y = graphic_info[i].src_y;
@@ -1770,12 +1768,15 @@ static void InitGraphicInfo()
       Error(ERR_INFO_LINE, "-");
 
       graphic_info[i] = graphic_info[fallback_graphic];
+
+      /* if first frame out of bounds, do not check last frame anymore */
+      continue;
     }
 
     /* check if last animation frame is inside specified bitmap */
 
     last_frame = graphic_info[i].anim_frames - 1;
-    getFixedGraphicSource(i, last_frame, &src_bitmap, &src_x, &src_y);
+    getGraphicSourceXY(i, last_frame, &src_x, &src_y, FALSE);
 
     if (src_x < 0 || src_y < 0 ||
 	src_x + width  > src_bitmap_width ||
