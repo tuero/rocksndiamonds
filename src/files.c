@@ -3664,7 +3664,7 @@ void CopyNativeLevel_SP_to_RND(struct LevelInfo *level)
 {
   struct LevelInfo_SP *level_sp = level->native_sp_level;
   LevelInfoType *header = &level_sp->header;
-  int i, x, y;
+  int i, j, x, y;
 
   level->fieldx = level_sp->width;
   level->fieldy = level_sp->height;
@@ -3688,9 +3688,20 @@ void CopyNativeLevel_SP_to_RND(struct LevelInfo *level)
     level->initial_player_gravity[i] =
       (header->InitialGravity == 1 ? TRUE : FALSE);
 
+  /* skip leading spaces */
   for (i = 0; i < SP_LEVEL_NAME_LEN; i++)
-    level->name[i] = header->LevelTitle[i];
-  level->name[SP_LEVEL_NAME_LEN] = '\0';
+    if (header->LevelTitle[i] != ' ')
+      break;
+
+  /* copy level title */
+  for (j = 0; i < SP_LEVEL_NAME_LEN; i++, j++)
+    level->name[j] = header->LevelTitle[i];
+  level->name[j] = '\0';
+
+  /* cut trailing spaces */
+  for (; j > 0; j--)
+    if (level->name[j - 1] == ' ' && level->name[j] == '\0')
+      level->name[j - 1] = '\0';
 
   level->gems_needed = header->InfotronsNeeded;
 
