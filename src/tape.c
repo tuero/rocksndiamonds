@@ -37,6 +37,7 @@
 /* forward declaration for internal use */
 static void HandleTapeButtons(struct GadgetInfo *);
 static void TapeStopWarpForward();
+static float GetTapeLengthSecondsFloat();
 
 static struct GadgetInfo *tape_gadget[NUM_TAPE_BUTTONS];
 
@@ -484,11 +485,13 @@ void PrintTapeReplayProgress(boolean replay_finished)
   }
   else
   {
+    float tape_length_seconds = GetTapeLengthSecondsFloat();
+
     PrintNoLog("\r");
     Print("Level %03d [%02d:%02d]: (%02d:%02d.%03d / %.2f %%) - %s.\n",
 	  level_nr, tape.length_seconds / 60, tape.length_seconds % 60,
 	  counter_seconds / 60, counter_seconds % 60, counter % 1000,
-	  (float)counter / tape.length_seconds / 10,
+	  (float)counter / tape_length_seconds / 10,
 	  tape.auto_play_level_solved ? "solved" : "NOT SOLVED");
 
     counter_last = -1;
@@ -941,6 +944,11 @@ unsigned int GetTapeLengthFrames()
 unsigned int GetTapeLengthSeconds()
 {
   return (GetTapeLengthFrames() * GAME_FRAME_DELAY / 1000);
+}
+
+static float GetTapeLengthSecondsFloat()
+{
+  return ((float)GetTapeLengthFrames() * GAME_FRAME_DELAY / 1000);
 }
 
 static void TapeStartWarpForward(int mode)
