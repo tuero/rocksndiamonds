@@ -3664,6 +3664,7 @@ void CopyNativeLevel_SP_to_RND(struct LevelInfo *level)
 {
   struct LevelInfo_SP *level_sp = level->native_sp_level;
   LevelInfoType *header = &level_sp->header;
+  boolean num_invalid_elements = 0;
   int i, j, x, y;
 
   level->fieldx = level_sp->width;
@@ -3677,12 +3678,20 @@ void CopyNativeLevel_SP_to_RND(struct LevelInfo *level)
       int element_new = getMappedElement(map_element_SP_to_RND(element_old));
 
       if (element_new == EL_UNKNOWN)
-	Error(ERR_WARN, "invalid element %d at position %d, %d",
+      {
+	num_invalid_elements++;
+
+	Error(ERR_DEBUG, "invalid element %d at position %d, %d",
 	      element_old, x, y);
+      }
 
       level->field[x][y] = element_new;
     }
   }
+
+  if (num_invalid_elements > 0)
+    Error(ERR_WARN, "found %d invalid elements%s", num_invalid_elements,
+	  (!options.debug ? " (use '--debug' for more details)" : ""));
 
   for (i = 0; i < MAX_PLAYERS; i++)
     level->initial_player_gravity[i] =
