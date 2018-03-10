@@ -5064,6 +5064,7 @@ static void InitSetup()
 static void InitGameInfo()
 {
   game.restart_level = FALSE;
+  game.restart_game_message = NULL;
 }
 
 static void InitPlayerInfo()

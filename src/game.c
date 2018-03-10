@@ -4227,6 +4227,7 @@ void InitGame()
   }
 
   game.restart_level = FALSE;
+  game.restart_game_message = NULL;
 
   if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
     InitGameActions_MM();
@@ -14956,6 +14957,22 @@ void RequestQuitGame(boolean ask_if_really_quit)
 
   RequestQuitGameExt(skip_request, quick_quit,
 		     "Do you really want to quit the game?");
+}
+
+void RequestRestartGame(char *message)
+{
+  game.restart_game_message = NULL;
+
+  if (Request(message, REQ_ASK | REQ_STAY_CLOSED))
+  {
+    StartGameActions(options.network, setup.autorecord, level.random_seed);
+  }
+  else
+  {
+    SetGameStatus(GAME_MODE_MAIN);
+
+    DrawMainMenu();
+  }
 }
 
 

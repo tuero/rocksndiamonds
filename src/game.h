@@ -207,6 +207,9 @@ struct GameInfo
   /* values for special game initialization control */
   boolean restart_level;
 
+  /* trigger message to ask for restarting the game */
+  char *restart_game_message;
+
   /* values for special game control */
   int centered_player_nr;
   int centered_player_nr_next;
@@ -410,6 +413,7 @@ void RaiseScoreElement(int);
 
 void RequestQuitGameExt(boolean, boolean, char *);
 void RequestQuitGame(boolean);
+void RequestRestartGame(char *);
 
 unsigned int InitEngineRandom_RND(int);
 unsigned int RND(int);
