@@ -3305,7 +3305,8 @@ void InitGame()
 
   ExpireSoundLoops(TRUE);
 
-  FadeOut(fade_mask);
+  if (!level_editor_test_game)
+    FadeOut(fade_mask);
 
   /* needed if different viewport properties defined for playing */
   ChangeViewportPropertiesIfNeeded();
