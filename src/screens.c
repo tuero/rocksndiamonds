@@ -1000,8 +1000,6 @@ static boolean visibleTextPos(struct TextPosInfo *pos)
 
 static void InitializeMainControls()
 {
-  TreeInfo *graphics_current =
-    getArtworkTreeInfoForUserLevelSet(ARTWORK_TYPE_GRAPHICS);
   boolean local_team_mode = (!options.network && setup.team_mode);
   int i;
 
@@ -1020,21 +1018,9 @@ static void InitializeMainControls()
   main_text_level_imported_by	= leveldir_current->imported_by;
   main_text_level_tested_by	= leveldir_current->tested_by;
 
-  main_text_title_1 = (leveldir_current->program_title ?
-		       leveldir_current->program_title :
-		       graphics_current->program_title ?
-		       graphics_current->program_title :
-		       setup.internal.program_title);
-  main_text_title_2 = (leveldir_current->program_copyright ?
-		       leveldir_current->program_copyright :
-		       graphics_current->program_copyright ?
-		       graphics_current->program_copyright :
-		       setup.internal.program_copyright);
-  main_text_title_3 = (leveldir_current->program_company ?
-		       leveldir_current->program_company :
-		       graphics_current->program_company ?
-		       graphics_current->program_company :
-		       setup.internal.program_company);
+  main_text_title_1 = getConfigProgramTitleString();
+  main_text_title_2 = getConfigProgramCopyrightString();
+  main_text_title_3 = getConfigProgramCompanyString();
 
   /* set main control screen positions to dynamically determined values */
   for (i = 0; main_controls[i].nr != -1; i++)

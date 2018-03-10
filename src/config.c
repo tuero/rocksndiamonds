@@ -57,6 +57,42 @@ char *getProgramInitString()
   return program_init_string;
 }
 
+char *getConfigProgramTitleString()
+{
+  TreeInfo *graphics_current =
+    getArtworkTreeInfoForUserLevelSet(ARTWORK_TYPE_GRAPHICS);
+
+  return (leveldir_current->program_title ?
+	  leveldir_current->program_title :
+	  graphics_current->program_title ?
+	  graphics_current->program_title :
+	  setup.internal.program_title);
+}
+
+char *getConfigProgramCopyrightString()
+{
+  TreeInfo *graphics_current =
+    getArtworkTreeInfoForUserLevelSet(ARTWORK_TYPE_GRAPHICS);
+
+  return (leveldir_current->program_copyright ?
+	  leveldir_current->program_copyright :
+	  graphics_current->program_copyright ?
+	  graphics_current->program_copyright :
+	  setup.internal.program_copyright);
+}
+
+char *getConfigProgramCompanyString()
+{
+  TreeInfo *graphics_current =
+    getArtworkTreeInfoForUserLevelSet(ARTWORK_TYPE_GRAPHICS);
+
+  return (leveldir_current->program_company ?
+	  leveldir_current->program_company :
+	  graphics_current->program_company ?
+	  graphics_current->program_company :
+	  setup.internal.program_company);
+}
+
 char *getWindowTitleString()
 {
   static char *window_title_string = NULL;
