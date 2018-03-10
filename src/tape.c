@@ -598,18 +598,7 @@ void TapeStartRecording(int random_seed)
 
 static void TapeStartGameRecording()
 {
-  TapeStartRecording(level.random_seed);
-
-#if defined(NETWORK_AVALIABLE)
-  if (options.network)
-  {
-    SendToServer_StartPlaying();
-
-    return;
-  }
-#endif
-
-  InitGame();
+  StartGameActions(options.network, TRUE, level.random_seed);
 }
 
 static void TapeAppendRecording()
