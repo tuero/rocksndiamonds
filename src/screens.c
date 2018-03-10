@@ -1330,9 +1330,8 @@ static void drawChooseTreeCursor(int ypos, boolean active)
 
 void DrawHeadline()
 {
-  DrawTextSCentered(MENU_TITLE1_YPOS, FONT_TITLE_1, getProgramTitleString());
-  DrawTextSCentered(MENU_TITLE2_YPOS, FONT_TITLE_2,
-		    setup.internal.program_copyright);
+  DrawTextSCentered(MENU_TITLE1_YPOS, FONT_TITLE_1, main_text_title_1);
+  DrawTextSCentered(MENU_TITLE2_YPOS, FONT_TITLE_2, main_text_title_2);
 }
 
 void DrawTitleScreenImage(int nr, boolean initial)
