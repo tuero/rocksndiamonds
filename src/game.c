@@ -3313,9 +3313,9 @@ void InitGame()
 
   ClearField();
 
-  OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
-
   DrawCompleteVideoDisplay();
+
+  OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
 
   InitGameEngine();
   InitGameControlValues();
