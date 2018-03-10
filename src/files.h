@@ -52,6 +52,7 @@ void LoadSolutionTape(int);
 void SaveTape(int);
 void DumpTape(struct TapeInfo *);
 boolean SaveTapeChecked(int);
+boolean SaveTapeChecked_LevelSolved(int);
 
 void LoadScore(int);
 void SaveScore(int);

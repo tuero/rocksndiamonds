@@ -4699,7 +4699,7 @@ void GameEnd()
     if (!global.use_envelope_request)
       CloseDoor(DOOR_CLOSE_1);
 
-    SaveTapeChecked(tape.level_nr);	/* ask to save tape */
+    SaveTapeChecked_LevelSolved(tape.level_nr);		/* ask to save tape */
   }
 
   /* if no tape is to be saved, close both doors simultaneously */

@@ -8081,23 +8081,34 @@ void SaveTape(int nr)
   tape.changed = FALSE;
 }
 
-boolean SaveTapeChecked(int nr)
+static boolean SaveTapeCheckedExt(int nr, char *msg_replace, char *msg_saved)
 {
   char *filename = getTapeFilename(nr);
   boolean new_tape = !fileExists(filename);
   boolean tape_saved = FALSE;
 
-  if (new_tape || Request("Replace old tape?", REQ_ASK))
+  if (new_tape || Request(msg_replace, REQ_ASK))
   {
     SaveTape(nr);
 
     if (new_tape)
-      Request("Tape saved!", REQ_CONFIRM);
+      Request(msg_saved, REQ_CONFIRM);
 
     tape_saved = TRUE;
   }
 
   return tape_saved;
+}
+
+boolean SaveTapeChecked(int nr)
+{
+  return SaveTapeCheckedExt(nr, "Replace old tape?", "Tape saved!");
+}
+
+boolean SaveTapeChecked_LevelSolved(int nr)
+{
+  return SaveTapeCheckedExt(nr, "Level solved! Replace old tape?",
+			        "Level solved! Tape saved!");
 }
 
 void DumpTape(struct TapeInfo *tape)
