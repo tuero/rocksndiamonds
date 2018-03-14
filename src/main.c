@@ -7688,10 +7688,14 @@ static void InitProgramConfig(char *command_filename)
   if (fileExists(config_filename))
   {
     // if program config file exists, derive Unix user data directory from it
-    userdata_basename = getBaseName(config_filename);
+    // (but only if the program config file is not generic "setup.conf" file)
+    if (!strEqual(getBaseNamePtr(config_filename), SETUP_FILENAME))
+    {
+      userdata_basename = getBaseName(config_filename);
 
-    if (strSuffix(userdata_basename, ".conf"))
-      userdata_basename[strlen(userdata_basename) - 5] = '\0';
+      if (strSuffix(userdata_basename, ".conf"))
+	userdata_basename[strlen(userdata_basename) - 5] = '\0';
+    }
 
     LoadSetupFromFilename(config_filename);
   }
