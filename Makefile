@@ -49,7 +49,7 @@ CROSS_PATH_WIN32 = /usr/local/cross-tools/i386-mingw32msvc
 .EXPORT_ALL_VARIABLES:
 
 SRC_DIR = src
-ANDROID_DIR = android
+ANDROID_DIR ?= android
 
 MAKE_CMD = $(MAKE) -C $(SRC_DIR)
 MAKE_CMD_ANDROID = $(MAKE) -C $(ANDROID_DIR)
@@ -82,6 +82,9 @@ android-package:
 
 android-install:
 	@$(MAKE_CMD_ANDROID) install
+
+android-assets-toc:
+	@$(MAKE_CMD_ANDROID) assets-toc
 
 android-clean:
 	@$(MAKE_CMD_ANDROID) clean
