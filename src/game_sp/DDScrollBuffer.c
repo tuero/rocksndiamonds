@@ -168,6 +168,17 @@ void UpdatePlayfield(boolean force_redraw)
   int num_redrawn = 0;
 #endif
 
+  if (force_redraw)
+  {
+    // force re-initialization of graphics status variables
+    for (y = DisplayMinY; y <= DisplayMaxY; y++)
+      for (x = DisplayMinX; x <= DisplayMaxX; x++)
+	GfxGraphic[x][y] = -1;
+
+    // force complete playfield redraw
+    DisplayLevel();
+  }
+
   for (y = DisplayMinY; y <= DisplayMaxY; y++)
   {
     for (x = DisplayMinX; x <= DisplayMaxX; x++)
