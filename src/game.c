@@ -3060,6 +3060,11 @@ static void InitGameEngine()
      strEqual(setup.engine_snapshot_mode, STR_SNAPSHOT_MODE_EVERY_COLLECT) ?
      SNAPSHOT_MODE_EVERY_COLLECT : SNAPSHOT_MODE_OFF);
   game.snapshot.save_snapshot = FALSE;
+
+  /* ---------- initialize level time for Supaplex engine ------------------- */
+  /* Supaplex levels with time limit currently unsupported -- should be added */
+  if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
+    level.time = 0;
 }
 
 int get_num_special_action(int element, int action_first, int action_last)
