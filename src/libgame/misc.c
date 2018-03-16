@@ -571,7 +571,7 @@ char *getLoginName()
     if (GetUserName(login_name, &buffer_size) == 0)
       strcpy(login_name, ANONYMOUS_NAME);
   }
-#else
+#elif defined(PLATFORM_UNIX) && !defined(PLATFORM_ANDROID)
   if (login_name == NULL)
   {
     struct passwd *pwd;
@@ -581,6 +581,8 @@ char *getLoginName()
     else
       login_name = getStringCopy(pwd->pw_name);
   }
+#else
+  login_name = ANONYMOUS_NAME;
 #endif
 
   return login_name;
