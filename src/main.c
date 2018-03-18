@@ -5006,84 +5006,84 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "gray ball"
   },
   {
-    "mm_beamer_1",
-    "mm_beamer",
-    "beamer (0\xb0)"
+    "mm_teleporter_1",
+    "mm_teleporter",
+    "teleporter (0\xb0)"
   },
   {
-    "mm_beamer_2",
-    "mm_beamer",
-    "beamer (22.5\xb0)"
+    "mm_teleporter_2",
+    "mm_teleporter",
+    "teleporter (22.5\xb0)"
   },
   {
-    "mm_beamer_3",
-    "mm_beamer",
-    "beamer (45\xb0)"
+    "mm_teleporter_3",
+    "mm_teleporter",
+    "teleporter (45\xb0)"
   },
   {
-    "mm_beamer_4",
-    "mm_beamer",
-    "beamer (67.5\xb0)"
+    "mm_teleporter_4",
+    "mm_teleporter",
+    "teleporter (67.5\xb0)"
   },
   {
-    "mm_beamer_5",
-    "mm_beamer",
-    "beamer (90\xb0)"
+    "mm_teleporter_5",
+    "mm_teleporter",
+    "teleporter (90\xb0)"
   },
   {
-    "mm_beamer_6",
-    "mm_beamer",
-    "beamer (112.5\xb0)"
+    "mm_teleporter_6",
+    "mm_teleporter",
+    "teleporter (112.5\xb0)"
   },
   {
-    "mm_beamer_7",
-    "mm_beamer",
-    "beamer (135\xb0)"
+    "mm_teleporter_7",
+    "mm_teleporter",
+    "teleporter (135\xb0)"
   },
   {
-    "mm_beamer_8",
-    "mm_beamer",
-    "beamer (157.5\xb0)"
+    "mm_teleporter_8",
+    "mm_teleporter",
+    "teleporter (157.5\xb0)"
   },
   {
-    "mm_beamer_9",
-    "mm_beamer",
-    "beamer (180\xb0)"
+    "mm_teleporter_9",
+    "mm_teleporter",
+    "teleporter (180\xb0)"
   },
   {
-    "mm_beamer_10",
-    "mm_beamer",
-    "beamer (202.5\xb0)"
+    "mm_teleporter_10",
+    "mm_teleporter",
+    "teleporter (202.5\xb0)"
   },
   {
-    "mm_beamer_11",
-    "mm_beamer",
-    "beamer (225\xb0)"
+    "mm_teleporter_11",
+    "mm_teleporter",
+    "teleporter (225\xb0)"
   },
   {
-    "mm_beamer_12",
-    "mm_beamer",
-    "beamer (247.5\xb0)"
+    "mm_teleporter_12",
+    "mm_teleporter",
+    "teleporter (247.5\xb0)"
   },
   {
-    "mm_beamer_13",
-    "mm_beamer",
-    "beamer (270\xb0)"
+    "mm_teleporter_13",
+    "mm_teleporter",
+    "teleporter (270\xb0)"
   },
   {
-    "mm_beamer_14",
-    "mm_beamer",
-    "beamer (292.5\xb0)"
+    "mm_teleporter_14",
+    "mm_teleporter",
+    "teleporter (292.5\xb0)"
   },
   {
-    "mm_beamer_15",
-    "mm_beamer",
-    "beamer (315\xb0)"
+    "mm_teleporter_15",
+    "mm_teleporter",
+    "teleporter (315\xb0)"
   },
   {
-    "mm_beamer_16",
-    "mm_beamer",
-    "beamer (337.5\xb0)"
+    "mm_teleporter_16",
+    "mm_teleporter",
+    "teleporter (337.5\xb0)"
   },
   {
     "mm_fuse.active",
@@ -5248,7 +5248,7 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   {
     "mm_lightbulb.active",
     "mm_lightbulb",
-    "ligh bulb (on)"
+    "light bulb (on)"
   },
   {
     "mm_lightball",
@@ -5638,7 +5638,7 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   {
     "df_empty_space",
     "empty_space",
-    "empty_space"
+    "empty space"
   },
   {
     "df_cell",
@@ -5896,324 +5896,324 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "rotating steel polarizer (157.5\xb0)"
   },
   {
-    "mm_beamer_red_1",
-    "mm_beamer",
-    "red beamer (0\xb0)"
+    "mm_teleporter_red_1",
+    "mm_teleporter",
+    "red teleporter (0\xb0)"
   },
   {
-    "mm_beamer_red_2",
-    "mm_beamer",
-    "red beamer (22.5\xb0)"
+    "mm_teleporter_red_2",
+    "mm_teleporter",
+    "red teleporter (22.5\xb0)"
   },
   {
-    "mm_beamer_red_3",
-    "mm_beamer",
-    "red beamer (45\xb0)"
+    "mm_teleporter_red_3",
+    "mm_teleporter",
+    "red teleporter (45\xb0)"
   },
   {
-    "mm_beamer_red_4",
-    "mm_beamer",
-    "red beamer (67.5\xb0)"
+    "mm_teleporter_red_4",
+    "mm_teleporter",
+    "red teleporter (67.5\xb0)"
   },
   {
-    "mm_beamer_red_5",
-    "mm_beamer",
-    "red beamer (90\xb0)"
+    "mm_teleporter_red_5",
+    "mm_teleporter",
+    "red teleporter (90\xb0)"
   },
   {
-    "mm_beamer_red_6",
-    "mm_beamer",
-    "red beamer (112.5\xb0)"
+    "mm_teleporter_red_6",
+    "mm_teleporter",
+    "red teleporter (112.5\xb0)"
   },
   {
-    "mm_beamer_red_7",
-    "mm_beamer",
-    "red beamer (135\xb0)"
+    "mm_teleporter_red_7",
+    "mm_teleporter",
+    "red teleporter (135\xb0)"
   },
   {
-    "mm_beamer_red_8",
-    "mm_beamer",
-    "red beamer (157.5\xb0)"
+    "mm_teleporter_red_8",
+    "mm_teleporter",
+    "red teleporter (157.5\xb0)"
   },
   {
-    "mm_beamer_red_9",
-    "mm_beamer",
-    "red beamer (180\xb0)"
+    "mm_teleporter_red_9",
+    "mm_teleporter",
+    "red teleporter (180\xb0)"
   },
   {
-    "mm_beamer_red_10",
-    "mm_beamer",
-    "red beamer (202.5\xb0)"
+    "mm_teleporter_red_10",
+    "mm_teleporter",
+    "red teleporter (202.5\xb0)"
   },
   {
-    "mm_beamer_red_11",
-    "mm_beamer",
-    "red beamer (225\xb0)"
+    "mm_teleporter_red_11",
+    "mm_teleporter",
+    "red teleporter (225\xb0)"
   },
   {
-    "mm_beamer_red_12",
-    "mm_beamer",
-    "red beamer (247.5\xb0)"
+    "mm_teleporter_red_12",
+    "mm_teleporter",
+    "red teleporter (247.5\xb0)"
   },
   {
-    "mm_beamer_red_13",
-    "mm_beamer",
-    "red beamer (270\xb0)"
+    "mm_teleporter_red_13",
+    "mm_teleporter",
+    "red teleporter (270\xb0)"
   },
   {
-    "mm_beamer_red_14",
-    "mm_beamer",
-    "red beamer (292.5\xb0)"
+    "mm_teleporter_red_14",
+    "mm_teleporter",
+    "red teleporter (292.5\xb0)"
   },
   {
-    "mm_beamer_red_15",
-    "mm_beamer",
-    "red beamer (315\xb0)"
+    "mm_teleporter_red_15",
+    "mm_teleporter",
+    "red teleporter (315\xb0)"
   },
   {
-    "mm_beamer_red_16",
-    "mm_beamer",
-    "red beamer (337.5\xb0)"
+    "mm_teleporter_red_16",
+    "mm_teleporter",
+    "red teleporter (337.5\xb0)"
   },
   {
-    "mm_beamer_yellow_1",
-    "mm_beamer",
-    "yellow beamer (0\xb0)"
+    "mm_teleporter_yellow_1",
+    "mm_teleporter",
+    "yellow teleporter (0\xb0)"
   },
   {
-    "mm_beamer_yellow_2",
-    "mm_beamer",
-    "yellow beamer (22.5\xb0)"
+    "mm_teleporter_yellow_2",
+    "mm_teleporter",
+    "yellow teleporter (22.5\xb0)"
   },
   {
-    "mm_beamer_yellow_3",
-    "mm_beamer",
-    "yellow beamer (45\xb0)"
+    "mm_teleporter_yellow_3",
+    "mm_teleporter",
+    "yellow teleporter (45\xb0)"
   },
   {
-    "mm_beamer_yellow_4",
-    "mm_beamer",
-    "yellow beamer (67.5\xb0)"
+    "mm_teleporter_yellow_4",
+    "mm_teleporter",
+    "yellow teleporter (67.5\xb0)"
   },
   {
-    "mm_beamer_yellow_5",
-    "mm_beamer",
-    "yellow beamer (90\xb0)"
+    "mm_teleporter_yellow_5",
+    "mm_teleporter",
+    "yellow teleporter (90\xb0)"
   },
   {
-    "mm_beamer_yellow_6",
-    "mm_beamer",
-    "yellow beamer (112.5\xb0)"
+    "mm_teleporter_yellow_6",
+    "mm_teleporter",
+    "yellow teleporter (112.5\xb0)"
   },
   {
-    "mm_beamer_yellow_7",
-    "mm_beamer",
-    "yellow beamer (135\xb0)"
+    "mm_teleporter_yellow_7",
+    "mm_teleporter",
+    "yellow teleporter (135\xb0)"
   },
   {
-    "mm_beamer_yellow_8",
-    "mm_beamer",
-    "yellow beamer (157.5\xb0)"
+    "mm_teleporter_yellow_8",
+    "mm_teleporter",
+    "yellow teleporter (157.5\xb0)"
   },
   {
-    "mm_beamer_yellow_9",
-    "mm_beamer",
-    "yellow beamer (180\xb0)"
+    "mm_teleporter_yellow_9",
+    "mm_teleporter",
+    "yellow teleporter (180\xb0)"
   },
   {
-    "mm_beamer_yellow_10",
-    "mm_beamer",
-    "yellow beamer (202.5\xb0)"
+    "mm_teleporter_yellow_10",
+    "mm_teleporter",
+    "yellow teleporter (202.5\xb0)"
   },
   {
-    "mm_beamer_yellow_11",
-    "mm_beamer",
-    "yellow beamer (225\xb0)"
+    "mm_teleporter_yellow_11",
+    "mm_teleporter",
+    "yellow teleporter (225\xb0)"
   },
   {
-    "mm_beamer_yellow_12",
-    "mm_beamer",
-    "yellow beamer (247.5\xb0)"
+    "mm_teleporter_yellow_12",
+    "mm_teleporter",
+    "yellow teleporter (247.5\xb0)"
   },
   {
-    "mm_beamer_yellow_13",
-    "mm_beamer",
-    "yellow beamer (270\xb0)"
+    "mm_teleporter_yellow_13",
+    "mm_teleporter",
+    "yellow teleporter (270\xb0)"
   },
   {
-    "mm_beamer_yellow_14",
-    "mm_beamer",
-    "yellow beamer (292.5\xb0)"
+    "mm_teleporter_yellow_14",
+    "mm_teleporter",
+    "yellow teleporter (292.5\xb0)"
   },
   {
-    "mm_beamer_yellow_15",
-    "mm_beamer",
-    "yellow beamer (315\xb0)"
+    "mm_teleporter_yellow_15",
+    "mm_teleporter",
+    "yellow teleporter (315\xb0)"
   },
   {
-    "mm_beamer_yellow_16",
-    "mm_beamer",
-    "yellow beamer (337.5\xb0)"
+    "mm_teleporter_yellow_16",
+    "mm_teleporter",
+    "yellow teleporter (337.5\xb0)"
   },
   {
-    "mm_beamer_green_1",
-    "mm_beamer",
-    "green beamer (0\xb0)"
+    "mm_teleporter_green_1",
+    "mm_teleporter",
+    "green teleporter (0\xb0)"
   },
   {
-    "mm_beamer_green_2",
-    "mm_beamer",
-    "green beamer (22.5\xb0)"
+    "mm_teleporter_green_2",
+    "mm_teleporter",
+    "green teleporter (22.5\xb0)"
   },
   {
-    "mm_beamer_green_3",
-    "mm_beamer",
-    "green beamer (45\xb0)"
+    "mm_teleporter_green_3",
+    "mm_teleporter",
+    "green teleporter (45\xb0)"
   },
   {
-    "mm_beamer_green_4",
-    "mm_beamer",
-    "green beamer (67.5\xb0)"
+    "mm_teleporter_green_4",
+    "mm_teleporter",
+    "green teleporter (67.5\xb0)"
   },
   {
-    "mm_beamer_green_5",
-    "mm_beamer",
-    "green beamer (90\xb0)"
+    "mm_teleporter_green_5",
+    "mm_teleporter",
+    "green teleporter (90\xb0)"
   },
   {
-    "mm_beamer_green_6",
-    "mm_beamer",
-    "green beamer (112.5\xb0)"
+    "mm_teleporter_green_6",
+    "mm_teleporter",
+    "green teleporter (112.5\xb0)"
   },
   {
-    "mm_beamer_green_7",
-    "mm_beamer",
-    "green beamer (135\xb0)"
+    "mm_teleporter_green_7",
+    "mm_teleporter",
+    "green teleporter (135\xb0)"
   },
   {
-    "mm_beamer_green_8",
-    "mm_beamer",
-    "green beamer (157.5\xb0)"
+    "mm_teleporter_green_8",
+    "mm_teleporter",
+    "green teleporter (157.5\xb0)"
   },
   {
-    "mm_beamer_green_9",
-    "mm_beamer",
-    "green beamer (180\xb0)"
+    "mm_teleporter_green_9",
+    "mm_teleporter",
+    "green teleporter (180\xb0)"
   },
   {
-    "mm_beamer_green_10",
-    "mm_beamer",
-    "green beamer (202.5\xb0)"
+    "mm_teleporter_green_10",
+    "mm_teleporter",
+    "green teleporter (202.5\xb0)"
   },
   {
-    "mm_beamer_green_11",
-    "mm_beamer",
-    "green beamer (225\xb0)"
+    "mm_teleporter_green_11",
+    "mm_teleporter",
+    "green teleporter (225\xb0)"
   },
   {
-    "mm_beamer_green_12",
-    "mm_beamer",
-    "green beamer (247.5\xb0)"
+    "mm_teleporter_green_12",
+    "mm_teleporter",
+    "green teleporter (247.5\xb0)"
   },
   {
-    "mm_beamer_green_13",
-    "mm_beamer",
-    "green beamer (270\xb0)"
+    "mm_teleporter_green_13",
+    "mm_teleporter",
+    "green teleporter (270\xb0)"
   },
   {
-    "mm_beamer_green_14",
-    "mm_beamer",
-    "green beamer (292.5\xb0)"
+    "mm_teleporter_green_14",
+    "mm_teleporter",
+    "green teleporter (292.5\xb0)"
   },
   {
-    "mm_beamer_green_15",
-    "mm_beamer",
-    "green beamer (315\xb0)"
+    "mm_teleporter_green_15",
+    "mm_teleporter",
+    "green teleporter (315\xb0)"
   },
   {
-    "mm_beamer_green_16",
-    "mm_beamer",
-    "green beamer (337.5\xb0)"
+    "mm_teleporter_green_16",
+    "mm_teleporter",
+    "green teleporter (337.5\xb0)"
   },
   {
-    "mm_beamer_blue_1",
-    "mm_beamer",
-    "blue beamer (0\xb0)"
+    "mm_teleporter_blue_1",
+    "mm_teleporter",
+    "blue teleporter (0\xb0)"
   },
   {
-    "mm_beamer_blue_2",
-    "mm_beamer",
-    "blue beamer (22.5\xb0)"
+    "mm_teleporter_blue_2",
+    "mm_teleporter",
+    "blue teleporter (22.5\xb0)"
   },
   {
-    "mm_beamer_blue_3",
-    "mm_beamer",
-    "blue beamer (45\xb0)"
+    "mm_teleporter_blue_3",
+    "mm_teleporter",
+    "blue teleporter (45\xb0)"
   },
   {
-    "mm_beamer_blue_4",
-    "mm_beamer",
-    "blue beamer (67.5\xb0)"
+    "mm_teleporter_blue_4",
+    "mm_teleporter",
+    "blue teleporter (67.5\xb0)"
   },
   {
-    "mm_beamer_blue_5",
-    "mm_beamer",
-    "blue beamer (90\xb0)"
+    "mm_teleporter_blue_5",
+    "mm_teleporter",
+    "blue teleporter (90\xb0)"
   },
   {
-    "mm_beamer_blue_6",
-    "mm_beamer",
-    "blue beamer (112.5\xb0)"
+    "mm_teleporter_blue_6",
+    "mm_teleporter",
+    "blue teleporter (112.5\xb0)"
   },
   {
-    "mm_beamer_blue_7",
-    "mm_beamer",
-    "blue beamer (135\xb0)"
+    "mm_teleporter_blue_7",
+    "mm_teleporter",
+    "blue teleporter (135\xb0)"
   },
   {
-    "mm_beamer_blue_8",
-    "mm_beamer",
-    "blue beamer (157.5\xb0)"
+    "mm_teleporter_blue_8",
+    "mm_teleporter",
+    "blue teleporter (157.5\xb0)"
   },
   {
-    "mm_beamer_blue_9",
-    "mm_beamer",
-    "blue beamer (180\xb0)"
+    "mm_teleporter_blue_9",
+    "mm_teleporter",
+    "blue teleporter (180\xb0)"
   },
   {
-    "mm_beamer_blue_10",
-    "mm_beamer",
-    "blue beamer (202.5\xb0)"
+    "mm_teleporter_blue_10",
+    "mm_teleporter",
+    "blue teleporter (202.5\xb0)"
   },
   {
-    "mm_beamer_blue_11",
-    "mm_beamer",
-    "blue beamer (225\xb0)"
+    "mm_teleporter_blue_11",
+    "mm_teleporter",
+    "blue teleporter (225\xb0)"
   },
   {
-    "mm_beamer_blue_12",
-    "mm_beamer",
-    "blue beamer (247.5\xb0)"
+    "mm_teleporter_blue_12",
+    "mm_teleporter",
+    "blue teleporter (247.5\xb0)"
   },
   {
-    "mm_beamer_blue_13",
-    "mm_beamer",
-    "blue beamer (270\xb0)"
+    "mm_teleporter_blue_13",
+    "mm_teleporter",
+    "blue teleporter (270\xb0)"
   },
   {
-    "mm_beamer_blue_14",
-    "mm_beamer",
-    "blue beamer (292.5\xb0)"
+    "mm_teleporter_blue_14",
+    "mm_teleporter",
+    "blue teleporter (292.5\xb0)"
   },
   {
-    "mm_beamer_blue_15",
-    "mm_beamer",
-    "blue beamer (315\xb0)"
+    "mm_teleporter_blue_15",
+    "mm_teleporter",
+    "blue teleporter (315\xb0)"
   },
   {
-    "mm_beamer_blue_16",
-    "mm_beamer",
-    "blue beamer (337.5\xb0)"
+    "mm_teleporter_blue_16",
+    "mm_teleporter",
+    "blue teleporter (337.5\xb0)"
   },
   {
     "mm_mcduffin",
