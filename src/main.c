@@ -4518,7 +4518,7 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   {
     "mm_empty_space",
     "empty_space",
-    "empty_space"
+    "empty space"
   },
   {
     "mm_mirror_1",
@@ -4603,22 +4603,22 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   {
     "mm_steel_grid_fixed_1",
     "mm_steel_grid_fixed",
-    "fixed steel polarisator (0\xb0)"
+    "fixed steel polarizer (0\xb0)"
   },
   {
     "mm_steel_grid_fixed_2",
     "mm_steel_grid_fixed",
-    "fixed steel polarisator (90\xb0)"
+    "fixed steel polarizer (90\xb0)"
   },
   {
     "mm_steel_grid_fixed_3",
     "mm_steel_grid_fixed",
-    "fixed steel polarisator (45\xb0)"
+    "fixed steel polarizer (45\xb0)"
   },
   {
     "mm_steel_grid_fixed_4",
     "mm_steel_grid_fixed",
-    "fixed steel polarisator (135\xb0)"
+    "fixed steel polarizer (135\xb0)"
   },
   {
     "mm_mcduffin.right",
@@ -5111,104 +5111,104 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "pac man (starts moving down)"
   },
   {
-    "mm_polarisator_1",
-    "mm_polarisator",
-    "polarisator (0\xb0)"
+    "mm_polarizer_1",
+    "mm_polarizer",
+    "polarizer (0\xb0)"
   },
   {
-    "mm_polarisator_2",
-    "mm_polarisator",
-    "polarisator (11.25\xb0)"
+    "mm_polarizer_2",
+    "mm_polarizer",
+    "polarizer (11.25\xb0)"
   },
   {
-    "mm_polarisator_3",
-    "mm_polarisator",
-    "polarisator (22.5\xb0)"
+    "mm_polarizer_3",
+    "mm_polarizer",
+    "polarizer (22.5\xb0)"
   },
   {
-    "mm_polarisator_4",
-    "mm_polarisator",
-    "polarisator (33.75\xb0)"
+    "mm_polarizer_4",
+    "mm_polarizer",
+    "polarizer (33.75\xb0)"
   },
   {
-    "mm_polarisator_5",
-    "mm_polarisator",
-    "polarisator (45\xb0)"
+    "mm_polarizer_5",
+    "mm_polarizer",
+    "polarizer (45\xb0)"
   },
   {
-    "mm_polarisator_6",
-    "mm_polarisator",
-    "polarisator (56.25\xb0)"
+    "mm_polarizer_6",
+    "mm_polarizer",
+    "polarizer (56.25\xb0)"
   },
   {
-    "mm_polarisator_7",
-    "mm_polarisator",
-    "polarisator (67.5\xb0)"
+    "mm_polarizer_7",
+    "mm_polarizer",
+    "polarizer (67.5\xb0)"
   },
   {
-    "mm_polarisator_8",
-    "mm_polarisator",
-    "polarisator (78.75\xb0)"
+    "mm_polarizer_8",
+    "mm_polarizer",
+    "polarizer (78.75\xb0)"
   },
   {
-    "mm_polarisator_9",
-    "mm_polarisator",
-    "polarisator (90\xb0)"
+    "mm_polarizer_9",
+    "mm_polarizer",
+    "polarizer (90\xb0)"
   },
   {
-    "mm_polarisator_10",
-    "mm_polarisator",
-    "polarisator (101.25\xb0)"
+    "mm_polarizer_10",
+    "mm_polarizer",
+    "polarizer (101.25\xb0)"
   },
   {
-    "mm_polarisator_11",
-    "mm_polarisator",
-    "polarisator (112.5\xb0)"
+    "mm_polarizer_11",
+    "mm_polarizer",
+    "polarizer (112.5\xb0)"
   },
   {
-    "mm_polarisator_12",
-    "mm_polarisator",
-    "polarisator (123.75\xb0)"
+    "mm_polarizer_12",
+    "mm_polarizer",
+    "polarizer (123.75\xb0)"
   },
   {
-    "mm_polarisator_13",
-    "mm_polarisator",
-    "polarisator (135\xb0)"
+    "mm_polarizer_13",
+    "mm_polarizer",
+    "polarizer (135\xb0)"
   },
   {
-    "mm_polarisator_14",
-    "mm_polarisator",
-    "polarisator (146.25\xb0)"
+    "mm_polarizer_14",
+    "mm_polarizer",
+    "polarizer (146.25\xb0)"
   },
   {
-    "mm_polarisator_15",
-    "mm_polarisator",
-    "polarisator (157.5\xb0)"
+    "mm_polarizer_15",
+    "mm_polarizer",
+    "polarizer (157.5\xb0)"
   },
   {
-    "mm_polarisator_16",
-    "mm_polarisator",
-    "polarisator (168.75\xb0)"
+    "mm_polarizer_16",
+    "mm_polarizer",
+    "polarizer (168.75\xb0)"
   },
   {
-    "mm_polarisator_cross_1",
-    "mm_polarisator_cross",
-    "two-way polarisator (0\xb0)"
+    "mm_polarizer_cross_1",
+    "mm_polarizer_cross",
+    "two-way polarizer (0\xb0)"
   },
   {
-    "mm_polarisator_cross_2",
-    "mm_polarisator_cross",
-    "two-way polarisator (22.5\xb0)"
+    "mm_polarizer_cross_2",
+    "mm_polarizer_cross",
+    "two-way polarizer (22.5\xb0)"
   },
   {
-    "mm_polarisator_cross_3",
-    "mm_polarisator_cross",
-    "two-way polarisator (45\xb0)"
+    "mm_polarizer_cross_3",
+    "mm_polarizer_cross",
+    "two-way polarizer (45\xb0)"
   },
   {
-    "mm_polarisator_cross_4",
-    "mm_polarisator_cross",
-    "two-way polarisator (67.5\xb0)"
+    "mm_polarizer_cross_4",
+    "mm_polarizer_cross",
+    "two-way polarizer (67.5\xb0)"
   },
   {
     "mm_mirror_fixed_1",
@@ -5273,22 +5273,22 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   {
     "mm_wooden_grid_fixed_1",
     "mm_wooden_grid_fixed",
-    "fixed wooden polarisator (0\xb0)"
+    "fixed wooden polarizer (0\xb0)"
   },
   {
     "mm_wooden_grid_fixed_2",
     "mm_wooden_grid_fixed",
-    "fixed wooden polarisator (90\xb0)"
+    "fixed wooden polarizer (90\xb0)"
   },
   {
     "mm_wooden_grid_fixed_3",
     "mm_wooden_grid_fixed",
-    "fixed wooden polarisator (45\xb0)"
+    "fixed wooden polarizer (45\xb0)"
   },
   {
     "mm_wooden_grid_fixed_4",
     "mm_wooden_grid_fixed",
-    "fixed wooden polarisator (135\xb0)"
+    "fixed wooden polarizer (135\xb0)"
   },
   {
     "mm_fuel_empty",
@@ -5398,82 +5398,82 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   {
     "df_wooden_grid_fixed_1",
     "df_wooden_grid_fixed",
-    "fixed wooden polarisator (0\xb0)"
+    "fixed wooden polarizer (0\xb0)"
   },
   {
     "df_wooden_grid_fixed_2",
     "df_wooden_grid_fixed",
-    "fixed wooden polarisator (22.5\xb0)"
+    "fixed wooden polarizer (22.5\xb0)"
   },
   {
     "df_wooden_grid_fixed_3",
     "df_wooden_grid_fixed",
-    "fixed wooden polarisator (45\xb0)"
+    "fixed wooden polarizer (45\xb0)"
   },
   {
     "df_wooden_grid_fixed_4",
     "df_wooden_grid_fixed",
-    "fixed wooden polarisator (67.5\xb0)"
+    "fixed wooden polarizer (67.5\xb0)"
   },
   {
     "df_wooden_grid_fixed_5",
     "df_wooden_grid_fixed",
-    "fixed wooden polarisator (90\xb0)"
+    "fixed wooden polarizer (90\xb0)"
   },
   {
     "df_wooden_grid_fixed_6",
     "df_wooden_grid_fixed",
-    "fixed wooden polarisator (112.5\xb0)"
+    "fixed wooden polarizer (112.5\xb0)"
   },
   {
     "df_wooden_grid_fixed_7",
     "df_wooden_grid_fixed",
-    "fixed wooden polarisator (135\xb0)"
+    "fixed wooden polarizer (135\xb0)"
   },
   {
     "df_wooden_grid_fixed_8",
     "df_wooden_grid_fixed",
-    "fixed wooden polarisator (157.5\xb0)"
+    "fixed wooden polarizer (157.5\xb0)"
   },
   {
     "df_steel_grid_fixed_1",
     "df_steel_grid_fixed",
-    "fixed steel polarisator (0\xb0)"
+    "fixed steel polarizer (0\xb0)"
   },
   {
     "df_steel_grid_fixed_2",
     "df_steel_grid_fixed",
-    "fixed steel polarisator (22.5\xb0)"
+    "fixed steel polarizer (22.5\xb0)"
   },
   {
     "df_steel_grid_fixed_3",
     "df_steel_grid_fixed",
-    "fixed steel polarisator (45\xb0)"
+    "fixed steel polarizer (45\xb0)"
   },
   {
     "df_steel_grid_fixed_4",
     "df_steel_grid_fixed",
-    "fixed steel polarisator (67.5\xb0)"
+    "fixed steel polarizer (67.5\xb0)"
   },
   {
     "df_steel_grid_fixed_5",
     "df_steel_grid_fixed",
-    "fixed steel polarisator (90\xb0)"
+    "fixed steel polarizer (90\xb0)"
   },
   {
     "df_steel_grid_fixed_6",
     "df_steel_grid_fixed",
-    "fixed steel polarisator (112.5\xb0)"
+    "fixed steel polarizer (112.5\xb0)"
   },
   {
     "df_steel_grid_fixed_7",
     "df_steel_grid_fixed",
-    "fixed steel polarisator (135\xb0)"
+    "fixed steel polarizer (135\xb0)"
   },
   {
     "df_steel_grid_fixed_8",
     "df_steel_grid_fixed",
-    "fixed steel polarisator (157.5\xb0)"
+    "fixed steel polarizer (157.5\xb0)"
   },
   {
     "df_wooden_wall_1",
@@ -5818,82 +5818,82 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
   {
     "df_wooden_grid_rotating_1",
     "df_wooden_grid_rotating",
-    "rotating wooden polarisator (0\xb0)"
+    "rotating wooden polarizer (0\xb0)"
   },
   {
     "df_wooden_grid_rotating_2",
     "df_wooden_grid_rotating",
-    "rotating wooden polarisator (22.5\xb0)"
+    "rotating wooden polarizer (22.5\xb0)"
   },
   {
     "df_wooden_grid_rotating_3",
     "df_wooden_grid_rotating",
-    "rotating wooden polarisator (45\xb0)"
+    "rotating wooden polarizer (45\xb0)"
   },
   {
     "df_wooden_grid_rotating_4",
     "df_wooden_grid_rotating",
-    "rotating wooden polarisator (67.5\xb0)"
+    "rotating wooden polarizer (67.5\xb0)"
   },
   {
     "df_wooden_grid_rotating_5",
     "df_wooden_grid_rotating",
-    "rotating wooden polarisator (90\xb0)"
+    "rotating wooden polarizer (90\xb0)"
   },
   {
     "df_wooden_grid_rotating_6",
     "df_wooden_grid_rotating",
-    "rotating wooden polarisator (112.5\xb0)"
+    "rotating wooden polarizer (112.5\xb0)"
   },
   {
     "df_wooden_grid_rotating_7",
     "df_wooden_grid_rotating",
-    "rotating wooden polarisator (135\xb0)"
+    "rotating wooden polarizer (135\xb0)"
   },
   {
     "df_wooden_grid_rotating_8",
     "df_wooden_grid_rotating",
-    "rotating wooden polarisator (157.5\xb0)"
+    "rotating wooden polarizer (157.5\xb0)"
   },
   {
     "df_steel_grid_rotating_1",
     "df_steel_grid_rotating",
-    "rotating steel polarisator (0\xb0)"
+    "rotating steel polarizer (0\xb0)"
   },
   {
     "df_steel_grid_rotating_2",
     "df_steel_grid_rotating",
-    "rotating steel polarisator (22.5\xb0)"
+    "rotating steel polarizer (22.5\xb0)"
   },
   {
     "df_steel_grid_rotating_3",
     "df_steel_grid_rotating",
-    "rotating steel polarisator (45\xb0)"
+    "rotating steel polarizer (45\xb0)"
   },
   {
     "df_steel_grid_rotating_4",
     "df_steel_grid_rotating",
-    "rotating steel polarisator (67.5\xb0)"
+    "rotating steel polarizer (67.5\xb0)"
   },
   {
     "df_steel_grid_rotating_5",
     "df_steel_grid_rotating",
-    "rotating steel polarisator (90\xb0)"
+    "rotating steel polarizer (90\xb0)"
   },
   {
     "df_steel_grid_rotating_6",
     "df_steel_grid_rotating",
-    "rotating steel polarisator (112.5\xb0)"
+    "rotating steel polarizer (112.5\xb0)"
   },
   {
     "df_steel_grid_rotating_7",
     "df_steel_grid_rotating",
-    "rotating steel polarisator (135\xb0)"
+    "rotating steel polarizer (135\xb0)"
   },
   {
     "df_steel_grid_rotating_8",
     "df_steel_grid_rotating",
-    "rotating steel polarisator (157.5\xb0)"
+    "rotating steel polarizer (157.5\xb0)"
   },
   {
     "mm_beamer_red_1",
