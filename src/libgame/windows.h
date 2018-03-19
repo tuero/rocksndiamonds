@@ -12,6 +12,9 @@
 #ifndef WINDOWS_H
 #define WINDOWS_H
 
+/* prevent including lots of conflicting macros */
+#define WIN32_LEAN_AND_MEAN
+
 #include <shlobj.h>
 
 
