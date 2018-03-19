@@ -16,6 +16,9 @@
 
 
 /* some symbols are already defined on Windows */
+typedef int boolean_internal;
+#define boolean boolean_internal
+
 #define CreateBitmap CreateBitmap_internal
 #define GetPixel GetPixel_internal
 #define CloseWindow CloseWindow_internal

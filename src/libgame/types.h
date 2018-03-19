@@ -18,9 +18,9 @@
 #include <string.h>
 #include <sys/types.h>
 
-typedef int boolean;
 
 #if !defined(PLATFORM_WIN32)
+typedef int boolean;
 typedef unsigned char byte;
 #endif
 
