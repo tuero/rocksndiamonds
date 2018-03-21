@@ -2721,21 +2721,21 @@ struct MenuInfo
   int list_size[NUM_SPECIAL_GFX_ARGS];
   int list_size_info[NUM_SPECIAL_GFX_INFO_ARGS];
 
-  int paragraph_spacing[NUM_SPECIAL_GFX_INFO_ARGS];
+  int paragraph_spacing[NUM_SPECIAL_GFX_ARGS];
   int paragraph_spacing_info[NUM_SPECIAL_GFX_INFO_ARGS];
-  int paragraph_spacing_setup[NUM_SPECIAL_GFX_INFO_ARGS];
-  int headline1_spacing[NUM_SPECIAL_GFX_INFO_ARGS];
+  int paragraph_spacing_setup[NUM_SPECIAL_GFX_SETUP_ARGS];
+  int headline1_spacing[NUM_SPECIAL_GFX_ARGS];
   int headline1_spacing_info[NUM_SPECIAL_GFX_INFO_ARGS];
-  int headline1_spacing_setup[NUM_SPECIAL_GFX_INFO_ARGS];
-  int headline2_spacing[NUM_SPECIAL_GFX_INFO_ARGS];
+  int headline1_spacing_setup[NUM_SPECIAL_GFX_SETUP_ARGS];
+  int headline2_spacing[NUM_SPECIAL_GFX_ARGS];
   int headline2_spacing_info[NUM_SPECIAL_GFX_INFO_ARGS];
-  int headline2_spacing_setup[NUM_SPECIAL_GFX_INFO_ARGS];
-  int line_spacing[NUM_SPECIAL_GFX_INFO_ARGS];
+  int headline2_spacing_setup[NUM_SPECIAL_GFX_SETUP_ARGS];
+  int line_spacing[NUM_SPECIAL_GFX_ARGS];
   int line_spacing_info[NUM_SPECIAL_GFX_INFO_ARGS];
-  int line_spacing_setup[NUM_SPECIAL_GFX_INFO_ARGS];
-  int extra_spacing[NUM_SPECIAL_GFX_INFO_ARGS];
+  int line_spacing_setup[NUM_SPECIAL_GFX_SETUP_ARGS];
+  int extra_spacing[NUM_SPECIAL_GFX_ARGS];
   int extra_spacing_info[NUM_SPECIAL_GFX_INFO_ARGS];
-  int extra_spacing_setup[NUM_SPECIAL_GFX_INFO_ARGS];
+  int extra_spacing_setup[NUM_SPECIAL_GFX_SETUP_ARGS];
 
   struct TitleFadingInfo enter_menu;
   struct TitleFadingInfo leave_menu;
