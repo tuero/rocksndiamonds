@@ -2511,7 +2511,7 @@ void AnimateEnvelope(int envelope_nr, int anim_mode, int action)
   boolean no_delay = (tape.warp_forward);
   unsigned int anim_delay = 0;
   int frame_delay_value = (ffwd_delay ? FfwdFrameDelay : GameFrameDelay);
-  int anim_delay_value = (no_delay ? 0 : frame_delay_value) / 2;
+  int anim_delay_value = MAX(1, (no_delay ? 0 : frame_delay_value) / 2);
   int font_nr = FONT_ENVELOPE_1 + envelope_nr;
   int font_width = getFontWidth(font_nr);
   int font_height = getFontHeight(font_nr);
@@ -2768,7 +2768,7 @@ void AnimateEnvelopeRequest(int anim_mode, int action)
   boolean ffwd_delay = (tape.playing && tape.fast_forward);
   boolean no_delay = (tape.warp_forward);
   int delay_value = (ffwd_delay ? delay_value_fast : delay_value_normal);
-  int anim_delay_value = (no_delay ? 0 : delay_value + 500 * 0) / 2;
+  int anim_delay_value = MAX(1, (no_delay ? 0 : delay_value + 500 * 0) / 2);
   unsigned int anim_delay = 0;
 
   int tile_size = MAX(request.step_offset, 1);
