@@ -360,30 +360,26 @@ static int getLevelFromScreenY_SP(int sy)
 
 static int getLevelFromScreenX_MM(int sx)
 {
-#if 0
   int level_xsize = level.native_mm_level->fieldx;
   int full_xsize = level_xsize * TILESIZE_VAR;
 
   sx -= (full_xsize < SXSIZE ? (SXSIZE - full_xsize) / 2 : 0);
-#endif
 
   int px = sx - SX;
-  int lx = px / TILESIZE_VAR;
+  int lx = (px + TILESIZE_VAR) / TILESIZE_VAR - 1;
 
   return lx;
 }
 
 static int getLevelFromScreenY_MM(int sy)
 {
-#if 0
   int level_ysize = level.native_mm_level->fieldy;
   int full_ysize = level_ysize * TILESIZE_VAR;
 
   sy -= (full_ysize < SYSIZE ? (SYSIZE - full_ysize) / 2 : 0);
-#endif
 
   int py = sy - SY;
-  int ly = py / TILESIZE_VAR;
+  int ly = (py + TILESIZE_VAR) / TILESIZE_VAR - 1;
 
   return ly;
 }

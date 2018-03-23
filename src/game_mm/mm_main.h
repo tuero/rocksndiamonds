@@ -251,6 +251,11 @@ extern struct GlobalInfo	global;
 extern short 		LX, LY, XS, YS, ELX, ELY;
 extern short 		CT, Ct;
 
+extern int		dSX, dSY;
+extern int		cSX, cSY;
+extern int		cSX2, cSY2;
+extern int		cFX, cFY;
+
 extern Pixel		pen_fg, pen_bg, pen_ray, pen_magicolor[2];
 extern int		color_status;
 
@@ -264,10 +269,6 @@ extern char	       *element_info[];
 extern int		num_element_info;
 
 /* often used screen positions */
-#define SX			8
-#define SY			8
-#define REAL_SX			(SX - 2)
-#define REAL_SY			(SY - 2)
 #define DX			534
 #define DY			60
 #define EX			DX

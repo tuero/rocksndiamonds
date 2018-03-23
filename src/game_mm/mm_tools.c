@@ -17,11 +17,34 @@
 #include "mm_tools.h"
 
 
+void SetDrawtoField_MM(int mode)
+{
+  int full_xsize = lev_fieldx * TILESIZE_VAR;
+  int full_ysize = lev_fieldy * TILESIZE_VAR;
+
+  // distance (delta) from screen border (SX/SY) to centered level playfield
+  dSX = (full_xsize < SXSIZE ? (SXSIZE - full_xsize) / 2 : 0);
+  dSY = (full_ysize < SYSIZE ? (SYSIZE - full_ysize) / 2 : 0);
+
+  // for convenience, absolute screen position to centered level playfield
+  cSX = SX + dSX;
+  cSY = SY + dSY;
+  cSX2 = SX + dSX + 2;	// including playfield border
+  cSY2 = SY + dSY + 2;	// including playfield border
+
+  if (mode == DRAW_TO_BACKBUFFER)
+  {
+    cFX = FX + dSX;
+    cFY = FY + dSY;
+  }
+}
+
 void ClearWindow()
 {
   ClearRectangle(backbuffer, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
 
-  SetDrawtoField(DRAW_BACKBUFFER);
+  SetDrawtoField(DRAW_TO_BACKBUFFER);
+  SetDrawtoField_MM(DRAW_TO_BACKBUFFER);
 
   redraw_mask |= REDRAW_FIELD;
 }
@@ -34,7 +57,7 @@ void DrawGraphicAnimation_MM(int x, int y, int graphic, int frame)
   getGraphicSource(graphic, frame, &bitmap, &src_x, &src_y);
 
   BlitBitmap(bitmap, drawto_field, src_x, src_y, TILEX, TILEY,
-	     FX + x * TILEX, FY + y * TILEY);
+	     cFX + x * TILEX, cFY + y * TILEY);
 }
 
 void DrawGraphic_MM(int x, int y, int graphic)
@@ -48,7 +71,7 @@ void DrawGraphic_MM(int x, int y, int graphic)
   }
 #endif
 
-  DrawGraphicExt_MM(drawto_field, FX + x*TILEX, FY + y*TILEY, graphic);
+  DrawGraphicExt_MM(drawto_field, cFX + x * TILEX, cFY + y * TILEY, graphic);
 
   MarkTileDirty(x, y);
 }
@@ -74,7 +97,7 @@ void DrawGraphicThruMask_MM(int x, int y, int graphic)
   }
 #endif
 
-  DrawGraphicThruMaskExt_MM(drawto_field, FX + x * TILEX, FY + y * TILEY,
+  DrawGraphicThruMaskExt_MM(drawto_field, cFX + x * TILEX, cFY + y * TILEY,
 			    graphic);
 
   MarkTileDirty(x,y);
@@ -96,7 +119,7 @@ void DrawGraphicThruMaskExt_MM(DrawBuffer *d, int dest_x, int dest_y,
 
 void DrawMiniGraphic_MM(int x, int y, int graphic)
 {
-  DrawMiniGraphicExt_MM(drawto, SX + x * MINI_TILEX, SY + y * MINI_TILEY,
+  DrawMiniGraphicExt_MM(drawto, cSX + x * MINI_TILEX, cSY + y * MINI_TILEY,
 			graphic);
 
   MarkTileDirty(x / 2, y / 2);
@@ -205,8 +228,8 @@ void DrawGraphicShifted_MM(int x,int y, int dx,int dy, int graphic,
   src_x += cx;
   src_y += cy;
 
-  dest_x = FX + x * TILEX + dx;
-  dest_y = FY + y * TILEY + dy;
+  dest_x = cFX + x * TILEX + dx;
+  dest_y = cFY + y * TILEY + dy;
 
 #if DEBUG
   if (!IN_SCR_FIELD(x,y))
@@ -432,8 +455,8 @@ void DrawWallsExt_MM(int x, int y, int element, int draw_mask)
 
   for (i = 0; i < 4; i++)
   {
-    int dest_x = SX + x * TILEX + MINI_TILEX * (i % 2);
-    int dest_y = SY + y * TILEY + MINI_TILEY * (i / 2);
+    int dest_x = cSX + x * TILEX + MINI_TILEX * (i % 2);
+    int dest_y = cSY + y * TILEY + MINI_TILEY * (i / 2);
 
     if (!((1 << i) & draw_mask))
       continue;
@@ -472,8 +495,8 @@ void DrawWallsAnimation_MM(int x, int y, int element, int phase, int bit_mask)
       int frame;
       Bitmap *bitmap;
       int src_x, src_y;
-      int dst_x = SX + x * TILEX + (i % 2) * MINI_TILEX;
-      int dst_y = SY + y * TILEY + (i / 2) * MINI_TILEY;
+      int dst_x = cSX + x * TILEX + (i % 2) * MINI_TILEX;
+      int dst_y = cSY + y * TILEY + (i / 2) * MINI_TILEY;
 
       if (bit_mask & (1 << i))
       {

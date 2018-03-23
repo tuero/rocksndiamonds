@@ -16,10 +16,6 @@
 
 #include "main_mm.h"
 
-/* for SetDrawtoField */
-#define DRAW_DIRECT		0
-#define DRAW_BUFFERED		1
-#define DRAW_BACKBUFFER		2
 
 /* for DrawElementShifted */
 #define NO_CUTTING		0

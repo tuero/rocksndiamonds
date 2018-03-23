@@ -751,15 +751,18 @@ void InitGameActions_MM()
 
 void AddLaserEdge(int lx, int ly)
 {
-  if (lx < -2 || ly < -2 || lx >= SXSIZE + 2 || ly >= SYSIZE + 2)
+  int clx = dSX + lx;
+  int cly = dSY + ly;
+
+  if (clx < -2 || cly < -2 || clx >= SXSIZE + 2 || cly >= SYSIZE + 2)
   {
     Error(ERR_WARN, "AddLaserEdge: out of bounds: %d, %d", lx, ly);
 
     return;
   }
 
-  laser.edge[laser.num_edges].x = SX + 2 + lx;
-  laser.edge[laser.num_edges].y = SY + 2 + ly;
+  laser.edge[laser.num_edges].x = cSX2 + lx;
+  laser.edge[laser.num_edges].y = cSY2 + ly;
   laser.num_edges++;
 
   laser.redraw = TRUE;
@@ -781,8 +784,8 @@ boolean StepBehind()
   {
     int x = LX - XS;
     int y = LY - YS;
-    int last_x = laser.edge[laser.num_edges - 1].x - SX - 2;
-    int last_y = laser.edge[laser.num_edges - 1].y - SY - 2;
+    int last_x = laser.edge[laser.num_edges - 1].x - cSX2;
+    int last_y = laser.edge[laser.num_edges - 1].y - cSY2;
 
     return ((x - last_x) * XS < 0 || (y - last_y) * YS < 0);
   }
@@ -860,8 +863,8 @@ int ScanPixel()
       }
       else
       {
-	pixel = (SX + px < REAL_SX || SX + px >= REAL_SX + FULL_SXSIZE ||
-		 SY + py < REAL_SY || SY + py >= REAL_SY + FULL_SYSIZE);
+	pixel = (cSX + px < REAL_SX || cSX + px >= REAL_SX + FULL_SXSIZE ||
+		 cSY + py < REAL_SY || cSY + py >= REAL_SY + FULL_SYSIZE);
       }
 
       if ((Sign[laser.current_angle] & (1 << i)) && pixel)
@@ -1191,8 +1194,8 @@ void DrawLaserExt(int start_edge, int num_edges, int mode)
   if (start_edge == 0)
     laser.current_angle = laser.start_angle;
 
-  LX = laser.edge[start_edge].x - (SX + 2);
-  LY = laser.edge[start_edge].y - (SY + 2);
+  LX = laser.edge[start_edge].x - cSX2;
+  LY = laser.edge[start_edge].y - cSY2;
   XS = 2 * Step[laser.current_angle].x;
   YS = 2 * Step[laser.current_angle].y;
 
@@ -2329,7 +2332,7 @@ void OpenSurpriseBall(int x, int y)
       getGraphicSource(graphic, 0, &bitmap, &gx, &gy);
 
       BlitBitmap(bitmap, drawto, gx + dx, gy + dy, 6, 6,
-		 SX + x * TILEX + dx, SY + y * TILEY + dy);
+		 cSX + x * TILEX + dx, cSY + y * TILEY + dy);
 
       MarkTileDirty(x, y);
     }
@@ -2540,7 +2543,7 @@ static void Explode_MM(int x, int y, int phase, int mode)
     getGraphicSource(graphic, graphic_phase, &bitmap, &src_x, &src_y);
 
     BlitBitmap(bitmap, drawto_field, src_x, src_y, TILEX, TILEY,
-	       FX + x * TILEX, FY + y * TILEY);
+	       cFX + x * TILEX, cFY + y * TILEY);
 
     MarkTileDirty(x, y);
   }
@@ -2991,24 +2994,24 @@ boolean ObjHit(int obx, int oby, int bits)
 
   if (bits & HIT_POS_CENTER)
   {
-    if (CheckLaserPixel(SX + obx + 15,
-			SY + oby + 15))
+    if (CheckLaserPixel(cSX + obx + 15,
+			cSY + oby + 15))
       return TRUE;
   }
 
   if (bits & HIT_POS_EDGE)
   {
     for (i = 0; i < 4; i++)
-      if (CheckLaserPixel(SX + obx + 31 * (i % 2),
-			  SY + oby + 31 * (i / 2)))
+      if (CheckLaserPixel(cSX + obx + 31 * (i % 2),
+			  cSY + oby + 31 * (i / 2)))
 	return TRUE;
   }
 
   if (bits & HIT_POS_BETWEEN)
   {
     for (i = 0; i < 4; i++)
-      if (CheckLaserPixel(SX + 4 + obx + 22 * (i % 2),
-			  SY + 4 + oby + 22 * (i / 2)))
+      if (CheckLaserPixel(cSX + 4 + obx + 22 * (i % 2),
+			  cSY + 4 + oby + 22 * (i / 2)))
 	return TRUE;
   }
 
@@ -3542,8 +3545,8 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
 
 /*
     laser.num_edges--;
-    LX = laser.edge[laser.num_edges].x - (SX + 2);
-    LY = laser.edge[laser.num_edges].y - (SY + 2);
+    LX = laser.edge[laser.num_edges].x - cSX2;
+    LY = laser.edge[laser.num_edges].y - cSY2;
 */
 
     for (i = (laser.num_damages > 0 ? laser.num_damages - 1 : 0); i >= 0; i--)
@@ -3596,12 +3599,12 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
     {
       if (laser.wall_mask & (1 << i))
       {
-	if (CheckLaserPixel(SX + ELX * TILEX + 14 + (i % 2) * 2,
-			    SY + ELY * TILEY + 31 * (i / 2)))
+	if (CheckLaserPixel(cSX + ELX * TILEX + 14 + (i % 2) * 2,
+			    cSY + ELY * TILEY + 31 * (i / 2)))
 	  break;
 
-	if (CheckLaserPixel(SX + ELX * TILEX + 31 * (i % 2),
-			    SY + ELY * TILEY + 14 + (i / 2) * 2))
+	if (CheckLaserPixel(cSX + ELX * TILEX + 31 * (i % 2),
+			    cSY + ELY * TILEY + 14 + (i / 2) * 2))
 	  break;
       }
     }
@@ -3612,8 +3615,8 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
     {
       if (laser.wall_mask & (1 << i))
       {
-	if (CheckLaserPixel(SX + ELX * TILEX + 31 * (i % 2),
-			    SY + ELY * TILEY + 31 * (i / 2)))
+	if (CheckLaserPixel(cSX + ELX * TILEX + 31 * (i % 2),
+			    cSY + ELY * TILEY + 31 * (i / 2)))
 	  break;
       }
     }
@@ -3622,8 +3625,8 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
 
     if (laser.num_beamers > 0 ||
 	k1 < 1 || k2 < 4 || k3 < 4 ||
-	CheckLaserPixel(SX + ELX * TILEX + 14,
-			SY + ELY * TILEY + 14))
+	CheckLaserPixel(cSX + ELX * TILEX + 14,
+			cSY + ELY * TILEY + 14))
     {
       laser.num_edges = r;
       laser.num_damages = d;
@@ -3838,8 +3841,8 @@ void MovePacMen()
       getGraphicSource(graphic, 0, &bitmap, &src_x, &src_y);
 
       CT = FrameCounter;
-      ox = SX + ox * TILEX;
-      oy = SY + oy * TILEY;
+      ox = cSX + ox * TILEX;
+      oy = cSY + oy * TILEY;
 
       for (i = 1; i < 33; i += 2)
 	BlitBitmap(bitmap, window,
@@ -4336,8 +4339,8 @@ static int getAngleFromTouchDelta(int dx, int dy,  int base)
 int getButtonFromTouchPosition(int x, int y, int dst_mx, int dst_my)
 {
   // calculate start (source) position to be at the middle of the tile
-  int src_mx = SX + x * TILESIZE_VAR + TILESIZE_VAR / 2;
-  int src_my = SY + y * TILESIZE_VAR + TILESIZE_VAR / 2;
+  int src_mx = cSX + x * TILESIZE_VAR + TILESIZE_VAR / 2;
+  int src_my = cSY + y * TILESIZE_VAR + TILESIZE_VAR / 2;
   int dx = dst_mx - src_mx;
   int dy = dst_my - src_my;
   int element;

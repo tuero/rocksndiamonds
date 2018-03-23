@@ -31,6 +31,11 @@ struct LaserInfo	laser;
 short		LX,LY, XS,YS, ELX,ELY;
 short		CT,Ct;
 
+int		dSX, dSY;
+int		cSX, cSY;
+int		cSX2, cSY2;
+int		cFX, cFY;
+
 Pixel		pen_fg, pen_bg, pen_ray, pen_magicolor[2];
 int		color_status;
 
