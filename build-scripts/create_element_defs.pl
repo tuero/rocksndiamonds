@@ -1573,7 +1573,7 @@ sub print_element_to_graphic_list
 	{
 	    print_element_to_graphic_entry($element_without_action,
 					   $gfx_action,
-					   '-1',
+					   $gfx_direction,
 					   $gfx_crumbled,
 					   $graphic);
 	}
