@@ -9763,22 +9763,34 @@ static void LoadMenuDesignSettingsFromFilename(char *filename)
   /* (eg, init "menu.line_spacing.INFO[XXX]" from "menu.line_spacing.INFO") */
   for (i = 0; i < NUM_SPECIAL_GFX_INFO_ARGS; i++)
   {
-    char *value_1 = getHashEntry(setup_file_hash,"menu.paragraph_spacing.INFO");
-    char *value_2 = getHashEntry(setup_file_hash,"menu.headline1_spacing.INFO");
-    char *value_3 = getHashEntry(setup_file_hash,"menu.headline2_spacing.INFO");
-    char *value_4 = getHashEntry(setup_file_hash,"menu.line_spacing.INFO");
-    char *value_5 = getHashEntry(setup_file_hash,"menu.extra_spacing.INFO");
+    char *value_1 = getHashEntry(setup_file_hash,"menu.left_spacing.INFO");
+    char *value_2 = getHashEntry(setup_file_hash,"menu.right_spacing.INFO");
+    char *value_3 = getHashEntry(setup_file_hash,"menu.top_spacing.INFO");
+    char *value_4 = getHashEntry(setup_file_hash,"menu.bottom_spacing.INFO");
+    char *value_5 = getHashEntry(setup_file_hash,"menu.paragraph_spacing.INFO");
+    char *value_6 = getHashEntry(setup_file_hash,"menu.headline1_spacing.INFO");
+    char *value_7 = getHashEntry(setup_file_hash,"menu.headline2_spacing.INFO");
+    char *value_8 = getHashEntry(setup_file_hash,"menu.line_spacing.INFO");
+    char *value_9 = getHashEntry(setup_file_hash,"menu.extra_spacing.INFO");
 
     if (value_1 != NULL)
-      menu.paragraph_spacing_info[i] = get_integer_from_string(value_1);
+      menu.left_spacing_info[i]      = get_integer_from_string(value_1);
     if (value_2 != NULL)
-      menu.headline1_spacing_info[i] = get_integer_from_string(value_2);
+      menu.right_spacing_info[i]     = get_integer_from_string(value_2);
     if (value_3 != NULL)
-      menu.headline2_spacing_info[i] = get_integer_from_string(value_3);
+      menu.top_spacing_info[i]       = get_integer_from_string(value_3);
     if (value_4 != NULL)
-      menu.line_spacing_info[i] = get_integer_from_string(value_4);
+      menu.bottom_spacing_info[i]    = get_integer_from_string(value_4);
     if (value_5 != NULL)
-      menu.extra_spacing_info[i] = get_integer_from_string(value_5);
+      menu.paragraph_spacing_info[i] = get_integer_from_string(value_5);
+    if (value_6 != NULL)
+      menu.headline1_spacing_info[i] = get_integer_from_string(value_6);
+    if (value_7 != NULL)
+      menu.headline2_spacing_info[i] = get_integer_from_string(value_7);
+    if (value_8 != NULL)
+      menu.line_spacing_info[i]      = get_integer_from_string(value_8);
+    if (value_9 != NULL)
+      menu.extra_spacing_info[i]     = get_integer_from_string(value_9);
   }
 
   /* special case: initialize with default values that may be overwritten */

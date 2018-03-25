@@ -2721,6 +2721,19 @@ struct MenuInfo
   int list_size[NUM_SPECIAL_GFX_ARGS];
   int list_size_info[NUM_SPECIAL_GFX_INFO_ARGS];
 
+  int left_spacing[NUM_SPECIAL_GFX_ARGS];
+  int left_spacing_info[NUM_SPECIAL_GFX_INFO_ARGS];
+  int left_spacing_setup[NUM_SPECIAL_GFX_SETUP_ARGS];
+  int right_spacing[NUM_SPECIAL_GFX_ARGS];
+  int right_spacing_info[NUM_SPECIAL_GFX_INFO_ARGS];
+  int right_spacing_setup[NUM_SPECIAL_GFX_SETUP_ARGS];
+  int top_spacing[NUM_SPECIAL_GFX_ARGS];
+  int top_spacing_info[NUM_SPECIAL_GFX_INFO_ARGS];
+  int top_spacing_setup[NUM_SPECIAL_GFX_SETUP_ARGS];
+  int bottom_spacing[NUM_SPECIAL_GFX_ARGS];
+  int bottom_spacing_info[NUM_SPECIAL_GFX_INFO_ARGS];
+  int bottom_spacing_setup[NUM_SPECIAL_GFX_SETUP_ARGS];
+
   int paragraph_spacing[NUM_SPECIAL_GFX_ARGS];
   int paragraph_spacing_info[NUM_SPECIAL_GFX_INFO_ARGS];
   int paragraph_spacing_setup[NUM_SPECIAL_GFX_SETUP_ARGS];
