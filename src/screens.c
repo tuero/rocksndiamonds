@@ -129,13 +129,16 @@
 #define MENU_INFO_FONT_TEXT		FONT_TEXT_3
 #define MENU_INFO_FONT_FOOT		FONT_TEXT_4
 #define MENU_INFO_SPACE_HEAD		(menu.headline2_spacing_info[info_mode])
-#define MENU_SCREEN_INFO_XSTART		16
-#define MENU_SCREEN_INFO_YSTART1	100
+#define MENU_SCREEN_INFO_SPACE_LEFT	(menu.left_spacing_info[info_mode])
+#define MENU_SCREEN_INFO_SPACE_RIGHT	(menu.right_spacing_info[info_mode])
+#define MENU_SCREEN_INFO_SPACE_TOP	(menu.top_spacing_info[info_mode])
+#define MENU_SCREEN_INFO_SPACE_BOTTOM	(menu.bottom_spacing_info[info_mode])
+#define MENU_SCREEN_INFO_YSTART1	MENU_SCREEN_INFO_SPACE_TOP
 #define MENU_SCREEN_INFO_YSTART2	(MENU_SCREEN_INFO_YSTART1 +	       \
 					 getMenuTextStep(MENU_INFO_SPACE_HEAD, \
 							 MENU_INFO_FONT_TITLE))
 #define MENU_SCREEN_INFO_YSTEP		(TILEY + 4)
-#define MENU_SCREEN_INFO_YBOTTOM	(SYSIZE - 20)
+#define MENU_SCREEN_INFO_YBOTTOM	(SYSIZE - MENU_SCREEN_INFO_SPACE_BOTTOM)
 #define MENU_SCREEN_INFO_YSIZE		(MENU_SCREEN_INFO_YBOTTOM -	\
 					 MENU_SCREEN_INFO_YSTART2 -	\
 					 TILEY / 2)
@@ -2626,7 +2629,7 @@ void DrawInfoScreen_HelpAnim(int start, int max_anims, boolean init)
   static int infoscreen_frame[MAX_INFO_ELEMENTS_ON_SCREEN];
   int font_title = MENU_INFO_FONT_TITLE;
   int font_foot  = MENU_INFO_FONT_FOOT;
-  int xstart = mSX + MENU_SCREEN_INFO_XSTART;
+  int xstart  = mSX + MENU_SCREEN_INFO_SPACE_LEFT;
   int ystart1 = mSY - SY + MENU_SCREEN_INFO_YSTART1;
   int ystart2 = mSY + MENU_SCREEN_INFO_YSTART2;
   int ybottom = mSY - SY + MENU_SCREEN_INFO_YBOTTOM;
@@ -2756,11 +2759,12 @@ void DrawInfoScreen_HelpText(int element, int action, int direction, int ypos)
   int font_width = getFontWidth(font_nr);
   int font_height = getFontHeight(font_nr);
   int yoffset = (TILEX - 2 * font_height) / 2;
-  int xstart = mSX + MENU_SCREEN_INFO_XSTART + TILEX + MINI_TILEX;
+  int xstart = mSX + MENU_SCREEN_INFO_SPACE_LEFT + TILEX + MINI_TILEX;
   int ystart = mSY + MENU_SCREEN_INFO_YSTART2 + yoffset;
   int ystep = TILEY + 4;
-  int pad_x = xstart - SX;
-  int max_chars_per_line = (SXSIZE - pad_x - MINI_TILEX) / font_width;
+  int pad_left = xstart - SX;
+  int pad_right = MENU_SCREEN_INFO_SPACE_RIGHT;
+  int max_chars_per_line = (SXSIZE - pad_left - pad_right) / font_width;
   int max_lines_per_text = 2;    
   char *text = NULL;
 
