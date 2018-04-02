@@ -32,6 +32,8 @@ CONVERT_ICON_ARGS = -transparent black -background transparent
 PROGBASE = rocksndiamonds
 PROGNAME = ../$(PROGBASE)
 
+EDITION ?= default
+
 
 # -----------------------------------------------------------------------------
 # configuring platform
@@ -205,7 +207,7 @@ ICONBASE = windows_icon
 ICON_BASEPATH = ../Special/Icons/windows_icons
 
 ifeq ($(PLATFORM),cross-win32)
-ICON_PATH = $(ICON_BASEPATH)/default
+ICON_PATH = $(ICON_BASEPATH)/$(EDITION)
 ICON = $(ICONBASE).o
 endif
 
