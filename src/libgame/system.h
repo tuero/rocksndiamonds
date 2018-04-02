@@ -1451,6 +1451,7 @@ struct MouseActionInfo
 {
   int lx, ly;
   int button;
+  int button_hint;
 };
 
 struct LevelStats

@@ -403,6 +403,9 @@ void SetPlayerMouseAction(int mx, int my, int button)
   int ly = getLevelFromScreenY(my);
   int new_button = (!local_player->mouse_action.button && button);
 
+  if (local_player->mouse_action.button_hint)
+    button = local_player->mouse_action.button_hint;
+
   ClearPlayerMouseAction();
 
   if (!IN_GFX_FIELD_PLAY(mx, my) || !IN_LEV_FIELD(lx, ly))
@@ -960,7 +963,16 @@ void HandleFingerEvent(FingerEvent *event)
     return;
 
   if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
+  {
+    if (strEqual(setup.touch.control_type, TOUCH_CONTROL_OFF))
+      local_player->mouse_action.button_hint =
+	(event->type == EVENT_FINGERRELEASE ? MB_NOT_PRESSED :
+	 event->x < 0.5                     ? MB_LEFTBUTTON  :
+	 event->x > 0.5                     ? MB_RIGHTBUTTON :
+	 MB_NOT_PRESSED);
+
     return;
+  }
 
   if (strEqual(setup.touch.control_type, TOUCH_CONTROL_VIRTUAL_BUTTONS))
     HandleFingerEvent_VirtualButtons(event);

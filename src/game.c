@@ -3345,10 +3345,12 @@ void InitGame()
     player->mouse_action.lx = 0;
     player->mouse_action.ly = 0;
     player->mouse_action.button = 0;
+    player->mouse_action.button_hint = 0;
 
     player->effective_mouse_action.lx = 0;
     player->effective_mouse_action.ly = 0;
     player->effective_mouse_action.button = 0;
+    player->effective_mouse_action.button_hint = 0;
 
     player->score = 0;
     player->score_final = 0;
