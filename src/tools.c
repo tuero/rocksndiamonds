@@ -1327,16 +1327,22 @@ void RedrawGlobalBorder()
   redraw_mask = REDRAW_ALL;
 }
 
+#define ONLY_REDRAW_GLOBAL_BORDER_IF_NEEDED		0
+
 static void RedrawGlobalBorderIfNeeded()
 {
+#if ONLY_REDRAW_GLOBAL_BORDER_IF_NEEDED
   if (game_status == game_status_last)
     return;
+#endif
 
   // copy current draw buffer to later copy back areas that have not changed
   if (game_status_last != GAME_MODE_TITLE)
     BlitBitmap(backbuffer, bitmap_db_store_1, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
 
+#if ONLY_REDRAW_GLOBAL_BORDER_IF_NEEDED
   if (CheckIfGlobalBorderRedrawIsNeeded())
+#endif
   {
     // redraw global screen border (or clear, if defined to be empty)
     RedrawGlobalBorderFromBitmap(global_border_bitmap);
