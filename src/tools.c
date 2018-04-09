@@ -1265,6 +1265,8 @@ static int dx_last = -1, dy_last = -1;
 static int dxsize_last = -1, dysize_last = -1;
 static int vx_last = -1, vy_last = -1;
 static int vxsize_last = -1, vysize_last = -1;
+static int ex_last = -1, ey_last = -1;
+static int exsize_last = -1, eysize_last = -1;
 
 boolean CheckIfGlobalBorderHasChanged()
 {
@@ -1307,6 +1309,11 @@ boolean CheckIfGlobalBorderRedrawIsNeeded()
       vxsize_last != VXSIZE || vysize_last != VYSIZE)
     return TRUE;
 
+  // redraw if position or size of editor area has changed
+  if (ex_last != EX || ey_last != EY ||
+      exsize_last != EXSIZE || eysize_last != EYSIZE)
+    return TRUE;
+
   return FALSE;
 }
 
@@ -1347,6 +1354,9 @@ static void RedrawGlobalBorderIfNeeded()
     // redraw global screen border (or clear, if defined to be empty)
     RedrawGlobalBorderFromBitmap(global_border_bitmap);
 
+    if (game_status == GAME_MODE_EDITOR)
+      DrawSpecialEditorDoor();
+
     // copy previous playfield and door areas, if they are defined on both
     // previous and current screen and if they still have the same size
 
@@ -1363,11 +1373,22 @@ static void RedrawGlobalBorderIfNeeded()
       BlitBitmap(bitmap_db_store_1, backbuffer,
 		 dx_last, dy_last, DXSIZE, DYSIZE, DX, DY);
 
-    if (vx_last != -1 && vy_last != -1 &&
-	VX != -1 && VY != -1 &&
-	vxsize_last == VXSIZE && vysize_last == VYSIZE)
-      BlitBitmap(bitmap_db_store_1, backbuffer,
-		 vx_last, vy_last, VXSIZE, VYSIZE, VX, VY);
+    if (game_status != GAME_MODE_EDITOR)
+    {
+      if (vx_last != -1 && vy_last != -1 &&
+	  VX != -1 && VY != -1 &&
+	  vxsize_last == VXSIZE && vysize_last == VYSIZE)
+	BlitBitmap(bitmap_db_store_1, backbuffer,
+		   vx_last, vy_last, VXSIZE, VYSIZE, VX, VY);
+    }
+    else
+    {
+      if (ex_last != -1 && ey_last != -1 &&
+	  EX != -1 && EY != -1 &&
+	  exsize_last == EXSIZE && eysize_last == EYSIZE)
+	BlitBitmap(bitmap_db_store_1, backbuffer,
+		   ex_last, ey_last, EXSIZE, EYSIZE, EX, EY);
+    }
 
     redraw_mask = REDRAW_ALL;
   }
@@ -1388,6 +1409,10 @@ static void RedrawGlobalBorderIfNeeded()
   vy_last = VY;
   vxsize_last = VXSIZE;
   vysize_last = VYSIZE;
+  ex_last = EX;
+  ey_last = EY;
+  exsize_last = EXSIZE;
+  eysize_last = EYSIZE;
 }
 
 void ClearField()
