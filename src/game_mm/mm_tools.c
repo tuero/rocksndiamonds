@@ -37,6 +37,8 @@ void SetDrawtoField_MM(int mode)
     cFX = FX + dSX;
     cFY = FY + dSY;
   }
+
+  SetTileCursorSXSY(cSX, cSY);
 }
 
 void ClearWindow()

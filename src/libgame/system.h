@@ -963,6 +963,8 @@ struct TileCursorInfo
   int xpos, ypos;		/* tile cursor level playfield position */
   int x, y;			/* tile cursor current screen position */
   int target_x, target_y;	/* tile cursor target screen position */
+
+  int sx, sy;			/* tile cursor screen start position */
 };
 
 struct OverlayInfo
@@ -1534,6 +1536,7 @@ void SetTileCursorEnabled(boolean);
 void SetTileCursorActive(boolean);
 void SetTileCursorTargetXY(int, int);
 void SetTileCursorXY(int, int);
+void SetTileCursorSXSY(int, int);
 void SetOverlayEnabled(boolean);
 void SetOverlayActive(boolean);
 boolean GetOverlayActive();
