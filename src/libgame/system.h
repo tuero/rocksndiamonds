@@ -596,10 +596,15 @@
 
 
 /* macros for version handling */
-#define VERSION_MAJOR(x)	((x) / 1000000)
-#define VERSION_MINOR(x)	(((x) % 1000000) / 10000)
-#define VERSION_PATCH(x)	(((x) % 10000) / 100)
-#define VERSION_BUILD(x)	((x) % 100)
+#define VERSION_PART_1(x)	((x) / 1000000)
+#define VERSION_PART_2(x)	(((x) % 1000000) / 10000)
+#define VERSION_PART_3(x)	(((x) % 10000) / 100)
+#define VERSION_PART_4(x)	((x) % 100)
+
+#define VERSION_SUPER(x)	VERSION_PART_1(x)
+#define VERSION_MAJOR(x)	VERSION_PART_2(x)
+#define VERSION_MINOR(x)	VERSION_PART_3(x)
+#define VERSION_PATCH(x)	VERSION_PART_4(x)
 #define VERSION_IDENT(a,b,c,d)	((a) * 1000000 + (b) * 10000 + (c) * 100 + (d))
 
 
@@ -780,10 +785,10 @@ struct ProgramInfo
   FILE *log_file[NUM_LOGS];		/* log file handles for out/err files */
   FILE *log_file_default[NUM_LOGS];	/* default log file handles (out/err) */
 
+  int version_super;
   int version_major;
   int version_minor;
   int version_patch;
-  int version_build;
   int version_ident;
 
   char *version_string;

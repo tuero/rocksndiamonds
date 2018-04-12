@@ -87,10 +87,10 @@ void InitProgramInfo(char *argv0, char *config_filename, char *userdata_subdir,
 
   program.cookie_prefix = cookie_prefix;
 
+  program.version_super = VERSION_SUPER(program_version);
   program.version_major = VERSION_MAJOR(program_version);
   program.version_minor = VERSION_MINOR(program_version);
   program.version_patch = VERSION_PATCH(program_version);
-  program.version_build = VERSION_BUILD(program_version);
   program.version_ident = program_version;
 
   program.version_string = program_version_string;

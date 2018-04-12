@@ -1176,9 +1176,9 @@ extern int		num_element_info;
 
 /* functions for version handling */
 #define MM_VERSION_IDENT(x,y,z)	VERSION_IDENT(x,y,z,0)
-#define MM_VERSION_MAJOR(x)	VERSION_MAJOR(x)
-#define MM_VERSION_MINOR(x)	VERSION_MINOR(x)
-#define MM_VERSION_PATCH(x)	VERSION_PATCH(x)
+#define MM_VERSION_MAJOR(x)	VERSION_PART_1(x)
+#define MM_VERSION_MINOR(x)	VERSION_PART_2(x)
+#define MM_VERSION_PATCH(x)	VERSION_PART_3(x)
 
 /* file version numbers for resource files (levels, score, setup, etc.)
 ** currently supported/known file version numbers:

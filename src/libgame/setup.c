@@ -1575,7 +1575,7 @@ char *getCookie(char *file_type)
 
   sprintf(cookie, "%s_%s_FILE_VERSION_%d.%d",
 	  program.cookie_prefix, file_type,
-	  program.version_major, program.version_minor);
+	  program.version_super, program.version_major);
 
   return cookie;
 }
@@ -1600,7 +1600,7 @@ int getFileVersionFromCookieString(const char *cookie)
   const int len_pattern1 = strlen(pattern1);
   const int len_pattern2 = strlen(pattern2);
   const int len_pattern = len_pattern1 + len_pattern2;
-  int version_major, version_minor;
+  int version_super, version_major;
 
   if (len_cookie <= len_pattern)
     return -1;
@@ -1616,10 +1616,10 @@ int getFileVersionFromCookieString(const char *cookie)
       ptr_cookie2[2] < '0' || ptr_cookie2[2] > '9')
     return -1;
 
-  version_major = ptr_cookie2[0] - '0';
-  version_minor = ptr_cookie2[2] - '0';
+  version_super = ptr_cookie2[0] - '0';
+  version_major = ptr_cookie2[2] - '0';
 
-  return VERSION_IDENT(version_major, version_minor, 0, 0);
+  return VERSION_IDENT(version_super, version_major, 0, 0);
 }
 
 boolean checkCookieString(const char *cookie, const char *template)
