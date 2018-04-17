@@ -4186,11 +4186,6 @@ void InitGame()
 
     OpenDoor(DOOR_OPEN_ALL);
 
-    PlaySound(SND_GAME_STARTING);
-
-    if (setup.sound_music)
-      PlayLevelMusic();
-
     KeyboardAutoRepeatOffUnlessAutoplay();
 
 #if DEBUG_INIT_PLAYER
@@ -4236,6 +4231,14 @@ void InitGame()
     InitGameActions_MM();
 
   SaveEngineSnapshotToListInitial();
+
+  if (!game.restart_level)
+  {
+    PlaySound(SND_GAME_STARTING);
+
+    if (setup.sound_music)
+      PlayLevelMusic();
+  }
 }
 
 void UpdateEngineValues(int actual_scroll_x, int actual_scroll_y,
