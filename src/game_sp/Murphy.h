@@ -7,6 +7,8 @@
 
 #include "global.h"
 
+void SaveEngineSnapshotValues_SP_Murphy(ListNode **);
+
 extern void subAdjustZonksInfotronsAboveMurphy(int);
 extern void subAnimateMurphy(int *);
 extern void subCopyFieldToScreen(int, int);

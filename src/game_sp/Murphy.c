@@ -11,6 +11,32 @@ static boolean subMoveKillsMurphy(int si, int ax, int bl);
 #define LocalStretch 			(2)
 #define MurphyZoomFactor		(ZoomFactor)
 
+
+// Variables that hold information about the animation sequence
+static int dx1 = 0; // image/animation token
+static int dx2 = 0; // an additional image position of a second sprite, for instance: yellow disk if pushed
+static int MurphyDX = 0, MurphyDY = 0; // murphys move steps
+static int SeqPos = 0; // index into dx()
+static int ClearPos = 0; // Position to clear before blitting sprites, none=-1
+static int dxPos = 0; // field-position  to draw dx(SeqPos)
+static int dx2Step = 0; // position of dx2 relative to dx-position
+static int dx1SequenceLength = 0;
+
+
+void SaveEngineSnapshotValues_SP_Murphy(ListNode **buffers)
+{
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(dx1));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(dx2));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(MurphyDX));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(MurphyDY));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(SeqPos));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(ClearPos));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(dxPos));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(dx2Step));
+  SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(dx1SequenceLength));
+}
+
+
 // ==========================================================================
 //                              SUBROUTINE
 // Move Murphy in any direction
@@ -21,16 +47,6 @@ void subAnimateMurphy(int *si)
   int ax, al, bl, i, X, Y;
   int time1, time2;
   int tDeltaX, tDeltaY, tPos, Tmp;
-
-  // Variables that hold information about the animation sequence
-  static int dx1 = 0; // image/animation token
-  static int dx2 = 0; // an additional image position of a second sprite, for instance: yellow disk if pushed
-  static int MurphyDX = 0, MurphyDY = 0; // murphys move steps
-  static int SeqPos = 0; // index into dx()
-  static int ClearPos = 0; // Position to clear before blitting sprites, none=-1
-  static int dxPos = 0; // field-position  to draw dx(SeqPos)
-  static int dx2Step = 0; // position of dx2 relative to dx-position
-  static int dx1SequenceLength = 0;
 
   ax = PlayField16[*si];
   al = LowByte(ax);

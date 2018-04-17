@@ -188,6 +188,8 @@ void SaveEngineSnapshotValues_SP(ListNode **buffers)
 
   SaveSnapshotBuffer(buffers, &PlayField16[-game_sp.preceding_buffer_size],
 		     game_sp.preceding_buffer_size * sizeof(int));
+
+  SaveEngineSnapshotValues_SP_Murphy(buffers);
 }
 
 void LoadEngineSnapshotValues_SP()
