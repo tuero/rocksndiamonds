@@ -6497,11 +6497,13 @@ static boolean CustomizeKeyboardMain(int player_nr)
 	  {
 	    Key key = GetEventKey((KeyEvent *)&event, FALSE);
 
+	    /* press 'Escape' to abort and keep the old key bindings */
 	    if (key == KSYM_Escape)
 	    {
 	      FadeSkipNextFadeIn();
 
 	      finished = TRUE;
+
 	      break;
 	    }
 
@@ -6563,8 +6565,9 @@ static boolean CustomizeKeyboardMain(int player_nr)
     BackToFront();
   }
 
-  /* write new key bindings back to player setup */
-  setup.input[player_nr].key = custom_key;
+  /* write new key bindings back to player setup, if successfully finished */
+  if (success)
+    setup.input[player_nr].key = custom_key;
 
   return success;
 }
