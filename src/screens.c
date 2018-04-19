@@ -6578,8 +6578,10 @@ void CustomizeKeyboard(int player_nr)
 
   if (success)
   {
-    int xpos = mSX - SX;
-    int ypos = mSY - SY;
+    int font_nr = FONT_TITLE_1;
+    int font_height = getFontHeight(font_nr);
+    int ypos1 = SYSIZE / 2 - font_height * 2;
+    int ypos2 = SYSIZE / 2 - font_height * 1;
     unsigned int wait_frame_delay = 0;
     unsigned int wait_frame_delay_value = 2000;
 
@@ -6587,8 +6589,8 @@ void CustomizeKeyboard(int player_nr)
 
     ClearField();
 
-    DrawTextS(xpos + 16, ypos + 6 * 32, FONT_TITLE_1, "    KEYBOARD    ");
-    DrawTextS(xpos + 16, ypos + 7 * 32, FONT_TITLE_1, " IS CONFIGURED! ");
+    DrawTextSCentered(ypos1, font_nr, "Keyboard");
+    DrawTextSCentered(ypos2, font_nr, "configured!");
 
     while (!DelayReached(&wait_frame_delay, wait_frame_delay_value))
       BackToFront();
@@ -7006,11 +7008,14 @@ void ConfigureJoystick(int player_nr)
   if (state != JOYSTICK_NOT_CONFIGURED)
   {
     boolean success = (state == JOYSTICK_CONFIGURED);
-    char *message = (success ? " IS CONFIGURED! " : " NOT AVAILABLE! ");
+    char message1[MAX_OUTPUT_LINESIZE + 1];
+    char *message2 = (success ? "configured!" : "not available!");
     char *device_name = setup.input[player_nr].joy.device_name;
     int nr = getJoystickNrFromDeviceName(device_name) + 1;
-    int xpos = mSX - SX;
-    int ypos = mSY - SY;
+    int font_nr = FONT_TITLE_1;
+    int font_height = getFontHeight(font_nr);
+    int ypos1 = SYSIZE / 2 - font_height * 2;
+    int ypos2 = SYSIZE / 2 - font_height * 1;
     unsigned int wait_frame_delay = 0;
     unsigned int wait_frame_delay_value = 2000;
 
@@ -7018,8 +7023,10 @@ void ConfigureJoystick(int player_nr)
 
     ClearField();
 
-    DrawTextF(xpos + 16, ypos + 6 * 32, FONT_TITLE_1, "   JOYSTICK %d   ", nr);
-    DrawTextF(xpos + 16, ypos + 7 * 32, FONT_TITLE_1, message);
+    sprintf(message1, "Joystick %d", nr);
+
+    DrawTextSCentered(ypos1, font_nr, message1);
+    DrawTextSCentered(ypos2, font_nr, message2);
 
     while (!DelayReached(&wait_frame_delay, wait_frame_delay_value))
       BackToFront();
