@@ -6444,7 +6444,7 @@ void HandleSetupScreen_Input(int mx, int my, int dx, int dy, int button)
   }
 }
 
-void CustomizeKeyboard(int player_nr)
+static boolean CustomizeKeyboardMain(int player_nr)
 {
   int i;
   int step_nr;
@@ -6463,6 +6463,7 @@ void CustomizeKeyboard(int player_nr)
     { &custom_key.snap,  "Snap Field"	},
     { &custom_key.drop,  "Drop Element"	}
   };
+  int success = FALSE;
 
   /* read existing key bindings from player setup */
   custom_key = setup.input[player_nr].key;
@@ -6496,18 +6497,13 @@ void CustomizeKeyboard(int player_nr)
 	  {
 	    Key key = GetEventKey((KeyEvent *)&event, FALSE);
 
-	    if (key == KSYM_Escape || (key == KSYM_Return && step_nr == 6))
+	    if (key == KSYM_Escape)
 	    {
-	      if (key == KSYM_Escape)
-		FadeSkipNextFadeIn();
+	      FadeSkipNextFadeIn();
 
 	      finished = TRUE;
 	      break;
 	    }
-
-	    /* all keys configured -- wait for "Escape" or "Return" key */
-	    if (step_nr == 6)
-	      break;
 
 	    /* press 'Enter' to keep the existing key binding */
 	    if (key == KSYM_Return)
@@ -6534,11 +6530,12 @@ void CustomizeKeyboard(int player_nr)
 	    DrawText(mSX, mSY + (2 + 2 * (step_nr - 1) + 1) * 32,
 		     "Key:", FONT_MENU_1);
 
-	    /* press 'Enter' to leave */
+	    /* all keys configured */
 	    if (step_nr == 6)
 	    {
-	      DrawText(mSX + 16, mSY + 15 * 32 + 16,
-		       "Press Enter", FONT_TITLE_1);
+	      finished = TRUE;
+	      success = TRUE;
+
 	      break;
 	    }
 
@@ -6568,6 +6565,33 @@ void CustomizeKeyboard(int player_nr)
 
   /* write new key bindings back to player setup */
   setup.input[player_nr].key = custom_key;
+
+  return success;
+}
+
+void CustomizeKeyboard(int player_nr)
+{
+  boolean success = CustomizeKeyboardMain(player_nr);
+
+  if (success)
+  {
+    int xpos = mSX - SX;
+    int ypos = mSY - SY;
+    unsigned int wait_frame_delay = 0;
+    unsigned int wait_frame_delay_value = 2000;
+
+    ResetDelayCounter(&wait_frame_delay);
+
+    ClearField();
+
+    DrawTextS(xpos + 16, ypos + 6 * 32, FONT_TITLE_1, "    KEYBOARD    ");
+    DrawTextS(xpos + 16, ypos + 7 * 32, FONT_TITLE_1, " IS CONFIGURED! ");
+
+    while (!DelayReached(&wait_frame_delay, wait_frame_delay_value))
+      BackToFront();
+
+    ClearEventQueue();
+  }
 
   DrawSetupScreen_Input();
 }
