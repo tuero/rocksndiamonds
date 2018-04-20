@@ -6020,7 +6020,7 @@ static void changeSetupValue(int screen_pos, int setup_info_pos_raw, int dx)
 
 static struct TokenInfo *getSetupInfoFinal(struct TokenInfo *setup_info_orig)
 {
-  static struct TokenInfo *setup_info_hide = NULL;
+  static struct TokenInfo *setup_info_final = NULL;
   int list_size = 0;
   int list_pos = 0;
   int i;
@@ -6029,8 +6029,8 @@ static struct TokenInfo *getSetupInfoFinal(struct TokenInfo *setup_info_orig)
   while (setup_info_orig[list_size++].type != 0);
 
   /* free, allocate and clear memory for target list */
-  checked_free(setup_info_hide);
-  setup_info_hide = checked_calloc(list_size * sizeof(struct TokenInfo));
+  checked_free(setup_info_final);
+  setup_info_final = checked_calloc(list_size * sizeof(struct TokenInfo));
 
   /* copy setup info list without setup entries marked as hidden */
   for (i = 0; setup_info_orig[i].type != 0; i++)
@@ -6044,10 +6044,10 @@ static struct TokenInfo *getSetupInfoFinal(struct TokenInfo *setup_info_orig)
 	setup_info_orig[i].type == TYPE_SKIPPABLE)
       continue;
 
-    setup_info_hide[list_pos++] = setup_info_orig[i];
+    setup_info_final[list_pos++] = setup_info_orig[i];
   }
 
-  return setup_info_hide;
+  return setup_info_final;
 }
 
 static void DrawSetupScreen_Generic()
