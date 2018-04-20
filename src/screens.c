@@ -110,9 +110,9 @@
 
 /* for input setup functions */
 #define SETUPINPUT_SCREEN_POS_START	0
-#define SETUPINPUT_SCREEN_POS_END	(SCR_FIELDY - 4)
-#define SETUPINPUT_SCREEN_POS_EMPTY1	(SETUPINPUT_SCREEN_POS_START + 3)
-#define SETUPINPUT_SCREEN_POS_EMPTY2	(SETUPINPUT_SCREEN_POS_END - 1)
+#define SETUPINPUT_SCREEN_POS_EMPTY1	3
+#define SETUPINPUT_SCREEN_POS_EMPTY2	12
+#define SETUPINPUT_SCREEN_POS_END	13
 
 #define MENU_SETUP_FONT_TITLE		FONT_TEXT_1
 #define MENU_SETUP_FONT_TEXT		FONT_TITLE_2
@@ -2145,7 +2145,7 @@ static void DrawCursorAndText_Menu_Ext(struct TokenInfo *token_info,
   int ypos = MENU_SCREEN_START_YPOS + screen_pos;
   int font_nr = getMenuTextFont(ti->type);
 
-  if (token_info == setup_info_input)
+  if (setup_mode == SETUP_MODE_INPUT)
     font_nr = FONT_MENU_1;
 
   if (active)
@@ -5657,6 +5657,7 @@ static struct TokenInfo setup_info_input[] =
   { TYPE_SWITCH,	NULL,			"Player:"		},
   { TYPE_SWITCH,	NULL,			"Device:"		},
   { TYPE_SWITCH,	NULL,			""			},
+  { TYPE_SKIPPABLE,	NULL,			""			},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_EMPTY,		NULL,			""			},
@@ -5665,8 +5666,7 @@ static struct TokenInfo setup_info_input[] =
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_EMPTY,		NULL,			""			},
-  { TYPE_EMPTY,		NULL,			""			},
-  { TYPE_EMPTY,		NULL,			""			},
+  { TYPE_SKIPPABLE,	NULL,			""			},
   { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
 
   { 0,			NULL,			NULL			}
@@ -6034,8 +6034,18 @@ static struct TokenInfo *getSetupInfoFinal(struct TokenInfo *setup_info_orig)
 
   /* copy setup info list without setup entries marked as hidden */
   for (i = 0; setup_info_orig[i].type != 0; i++)
-    if (!hideSetupEntry(setup_info_orig[i].value))
-      setup_info_hide[list_pos++] = setup_info_orig[i];
+  {
+    /* skip setup entries configured to be hidden */
+    if (hideSetupEntry(setup_info_orig[i].value))
+      continue;
+
+    /* skip skippable setup entries if screen is lower than usual */
+    if (SCR_FIELDY < SCR_FIELDY_DEFAULT &&
+	setup_info_orig[i].type == TYPE_SKIPPABLE)
+      continue;
+
+    setup_info_hide[list_pos++] = setup_info_orig[i];
+  }
 
   return setup_info_hide;
 }
@@ -6182,11 +6192,11 @@ void DrawSetupScreen_Input()
 
   ClearField();
 
-  setup_info = setup_info_input;
+  setup_info = getSetupInfoFinal(setup_info_input);
 
   DrawTextSCentered(mSY - SY + 16, FONT_TITLE_1, STR_SETUP_INPUT);
 
-  for (i = 0; setup_info[i].type != 0 && i < MAX_MENU_ENTRIES_ON_SCREEN; i++)
+  for (i = 0; setup_info[i].type != 0; i++)
   {
     if (setup_info[i].type & (TYPE_ENTER_MENU|TYPE_ENTER_LIST))
       initCursor(i, IMG_MENU_BUTTON_ENTER_MENU);
@@ -6296,7 +6306,10 @@ static void drawPlayerSetupInputInfo(int player_nr, boolean active)
     DrawText(mSX + 1 * 32, mSY + 4 * 32, "Customize", font_nr_menu);
   }
 
-  DrawText(mSX + 32, mSY + 5 * 32, "Actual Settings:", font_nr_info);
+  if (SCR_FIELDY >= SCR_FIELDY_DEFAULT)
+    DrawText(mSX + 32, mSY + 5 * 32, "Actual Settings:", font_nr_info);
+  else
+    pos = 3;
 
   drawCursorXY(1, pos + 0, IMG_MENU_BUTTON_LEFT);
   drawCursorXY(1, pos + 1, IMG_MENU_BUTTON_RIGHT);
@@ -6354,8 +6367,27 @@ void HandleSetupScreen_Input(int mx, int my, int dx, int dy, int button)
   int pos_empty2 = SETUPINPUT_SCREEN_POS_EMPTY2;
   int pos_end    = SETUPINPUT_SCREEN_POS_END;
 
+  if (SCR_FIELDY < SCR_FIELDY_DEFAULT)
+  {
+    int i;
+
+    for (i = 0; setup_info_input[i].type != 0; i++)
+    {
+      /* adjust menu structure according to skipped setup entries */
+      if (setup_info_input[i].type == TYPE_SKIPPABLE)
+      {
+	pos_empty2--;
+	pos_end--;
+      }
+    }
+  }
+
   if (button == MB_MENU_INITIALIZE)
   {
+    /* input setup menu may have changed size due to graphics configuration */
+    if (choice >= pos_empty1)
+      choice = pos_end;
+
     drawPlayerSetupInputInfo(input_player_nr, (choice == 2));
 
     DrawCursorAndText_Setup(choice, -1, TRUE);
