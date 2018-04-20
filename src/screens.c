@@ -6255,7 +6255,11 @@ static void drawPlayerSetupInputInfo(int player_nr, boolean active)
     "Joystick3",
     "Joystick4"
   };
-  int text_font_nr = (active ? FONT_MENU_1_ACTIVE : FONT_MENU_1);
+  int font_nr_menu = (active ? FONT_MENU_1_ACTIVE : FONT_MENU_1);
+  int font_nr_info = FONT_MENU_1;
+  int font_nr_name = FONT_VALUE_OLD;
+  int font_nr_on   = FONT_VALUE_1;
+  int font_nr_off  = FONT_VALUE_OLD;
 
   custom_key = setup.input[player_nr].key;
 
@@ -6273,41 +6277,41 @@ static void drawPlayerSetupInputInfo(int player_nr, boolean active)
     int joystick_nr = getJoystickNrFromDeviceName(device_name);
     boolean joystick_active = CheckJoystickOpened(joystick_nr);
     char *text = joystick_name[joystick_nr];
-    int font_nr = (joystick_active ? FONT_VALUE_1 : FONT_VALUE_OLD);
+    int font_nr = (joystick_active ? font_nr_on : font_nr_off);
 
     DrawText(mSX + 8 * 32, mSY + 3 * 32, text, font_nr);
-    DrawText(mSX + 32, mSY + 4 * 32, "Configure", text_font_nr);
+    DrawText(mSX + 32, mSY + 4 * 32, "Configure", font_nr_menu);
   }
   else
   {
-    DrawText(mSX + 8 * 32, mSY + 3 * 32, "Keyboard ", FONT_VALUE_1);
-    DrawText(mSX + 1 * 32, mSY + 4 * 32, "Customize", text_font_nr);
+    DrawText(mSX + 8 * 32, mSY + 3 * 32, "Keyboard ", font_nr_on);
+    DrawText(mSX + 1 * 32, mSY + 4 * 32, "Customize", font_nr_menu);
   }
 
-  DrawText(mSX + 32, mSY + 5 * 32, "Actual Settings:", FONT_MENU_1);
+  DrawText(mSX + 32, mSY + 5 * 32, "Actual Settings:", font_nr_info);
 
   drawCursorXY(1, 4, IMG_MENU_BUTTON_LEFT);
   drawCursorXY(1, 5, IMG_MENU_BUTTON_RIGHT);
   drawCursorXY(1, 6, IMG_MENU_BUTTON_UP);
   drawCursorXY(1, 7, IMG_MENU_BUTTON_DOWN);
 
-  DrawText(mSX + 2 * 32, mSY +  6 * 32, ":", FONT_VALUE_OLD);
-  DrawText(mSX + 2 * 32, mSY +  7 * 32, ":", FONT_VALUE_OLD);
-  DrawText(mSX + 2 * 32, mSY +  8 * 32, ":", FONT_VALUE_OLD);
-  DrawText(mSX + 2 * 32, mSY +  9 * 32, ":", FONT_VALUE_OLD);
-  DrawText(mSX + 1 * 32, mSY + 10 * 32, "Snap Field:", FONT_VALUE_OLD);
-  DrawText(mSX + 1 * 32, mSY + 12 * 32, "Drop Element:", FONT_VALUE_OLD);
+  DrawText(mSX + 2 * 32, mSY +  6 * 32, ":", font_nr_name);
+  DrawText(mSX + 2 * 32, mSY +  7 * 32, ":", font_nr_name);
+  DrawText(mSX + 2 * 32, mSY +  8 * 32, ":", font_nr_name);
+  DrawText(mSX + 2 * 32, mSY +  9 * 32, ":", font_nr_name);
+  DrawText(mSX + 1 * 32, mSY + 10 * 32, "Snap Field:", font_nr_name);
+  DrawText(mSX + 1 * 32, mSY + 12 * 32, "Drop Element:", font_nr_name);
 
   for (i = 0; i < 6; i++)
   {
     int ypos = 6 + i + (i > 3 ? i-3 : 0);
 
     DrawText(mSX + 3 * 32, mSY + ypos * 32,
-	     "              ", FONT_VALUE_1);
+	     "              ", font_nr_on);
     DrawText(mSX + 3 * 32, mSY + ypos * 32,
 	     (setup.input[player_nr].use_joystick ?
 	      custom[i].text :
-	      getKeyNameFromKey(*custom[i].key)), FONT_VALUE_1);
+	      getKeyNameFromKey(*custom[i].key)), font_nr_on);
   }
 }
 
@@ -6463,6 +6467,8 @@ static boolean CustomizeKeyboardMain(int player_nr)
     { &custom_key.snap,  "Snap Field"	},
     { &custom_key.drop,  "Drop Element"	}
   };
+  int font_nr_old = FONT_VALUE_OLD;
+  int font_nr_new = FONT_VALUE_1;
   int success = FALSE;
 
   /* read existing key bindings from player setup */
@@ -6481,7 +6487,7 @@ static boolean CustomizeKeyboardMain(int player_nr)
   DrawText(mSX, mSY + (2 + 2 * step_nr + 1) * 32,
 	   "Key:", FONT_INPUT_1_ACTIVE);
   DrawText(mSX + 4 * 32, mSY + (2 + 2 * step_nr + 1) * 32,
-	   getKeyNameFromKey(*customize_step[step_nr].key), FONT_VALUE_OLD);
+	   getKeyNameFromKey(*customize_step[step_nr].key), font_nr_old);
 
   FadeIn(REDRAW_FIELD);
 
@@ -6521,9 +6527,9 @@ static boolean CustomizeKeyboardMain(int player_nr)
 	    /* got new key binding */
 	    *customize_step[step_nr].key = key;
 	    DrawText(mSX + 4 * 32, mSY + (2 + 2 * step_nr + 1) * 32,
-		     "             ", FONT_VALUE_1);
+		     "             ", font_nr_new);
 	    DrawText(mSX + 4 * 32, mSY + (2 + 2 * step_nr + 1) * 32,
-		     getKeyNameFromKey(key), FONT_VALUE_1);
+		     getKeyNameFromKey(key), font_nr_new);
 	    step_nr++;
 
 	    /* un-highlight last query */
@@ -6548,7 +6554,7 @@ static boolean CustomizeKeyboardMain(int player_nr)
 		     "Key:", FONT_INPUT_1_ACTIVE);
 	    DrawText(mSX + 4 * 32, mSY + (2 + 2 * step_nr + 1) * 32,
 		     getKeyNameFromKey(*customize_step[step_nr].key),
-		     FONT_VALUE_OLD);
+		     font_nr_old);
 	  }
 	  break;
 
