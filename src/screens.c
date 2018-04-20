@@ -6260,6 +6260,7 @@ static void drawPlayerSetupInputInfo(int player_nr, boolean active)
   int font_nr_name = FONT_VALUE_OLD;
   int font_nr_on   = FONT_VALUE_1;
   int font_nr_off  = FONT_VALUE_OLD;
+  int pos = 4;
 
   custom_key = setup.input[player_nr].key;
 
@@ -6290,21 +6291,21 @@ static void drawPlayerSetupInputInfo(int player_nr, boolean active)
 
   DrawText(mSX + 32, mSY + 5 * 32, "Actual Settings:", font_nr_info);
 
-  drawCursorXY(1, 4, IMG_MENU_BUTTON_LEFT);
-  drawCursorXY(1, 5, IMG_MENU_BUTTON_RIGHT);
-  drawCursorXY(1, 6, IMG_MENU_BUTTON_UP);
-  drawCursorXY(1, 7, IMG_MENU_BUTTON_DOWN);
+  drawCursorXY(1, pos + 0, IMG_MENU_BUTTON_LEFT);
+  drawCursorXY(1, pos + 1, IMG_MENU_BUTTON_RIGHT);
+  drawCursorXY(1, pos + 2, IMG_MENU_BUTTON_UP);
+  drawCursorXY(1, pos + 3, IMG_MENU_BUTTON_DOWN);
 
-  DrawText(mSX + 2 * 32, mSY +  6 * 32, ":", font_nr_name);
-  DrawText(mSX + 2 * 32, mSY +  7 * 32, ":", font_nr_name);
-  DrawText(mSX + 2 * 32, mSY +  8 * 32, ":", font_nr_name);
-  DrawText(mSX + 2 * 32, mSY +  9 * 32, ":", font_nr_name);
-  DrawText(mSX + 1 * 32, mSY + 10 * 32, "Snap Field:", font_nr_name);
-  DrawText(mSX + 1 * 32, mSY + 12 * 32, "Drop Element:", font_nr_name);
+  DrawText(mSX + 2 * 32, mSY + (pos + 2) * 32, ":", font_nr_name);
+  DrawText(mSX + 2 * 32, mSY + (pos + 3) * 32, ":", font_nr_name);
+  DrawText(mSX + 2 * 32, mSY + (pos + 4) * 32, ":", font_nr_name);
+  DrawText(mSX + 2 * 32, mSY + (pos + 5) * 32, ":", font_nr_name);
+  DrawText(mSX + 1 * 32, mSY + (pos + 6) * 32, "Snap Field:", font_nr_name);
+  DrawText(mSX + 1 * 32, mSY + (pos + 8) * 32, "Drop Element:", font_nr_name);
 
   for (i = 0; i < 6; i++)
   {
-    int ypos = 6 + i + (i > 3 ? i-3 : 0);
+    int ypos = (pos + 2) + i + (i > 3 ? i - 3 : 0);
 
     DrawText(mSX + 3 * 32, mSY + ypos * 32,
 	     "              ", font_nr_on);
