@@ -6262,6 +6262,13 @@ static void drawPlayerSetupInputInfo(int player_nr, boolean active)
   int font_nr_off  = FONT_VALUE_OLD;
   int pos = 4;
 
+  if (SCR_FIELDX < SCR_FIELDX_DEFAULT)
+  {
+    font_nr_info = FONT_MENU_2;
+    font_nr_on   = FONT_VALUE_NARROW;
+    font_nr_off  = FONT_VALUE_OLD_NARROW;
+  }
+
   custom_key = setup.input[player_nr].key;
 
   DrawText(mSX + 11 * 32, mSY + 2 * 32, int2str(player_nr + 1, 1),
@@ -6471,6 +6478,12 @@ static boolean CustomizeKeyboardMain(int player_nr)
   int font_nr_old = FONT_VALUE_OLD;
   int font_nr_new = FONT_VALUE_1;
   int success = FALSE;
+
+  if (SCR_FIELDX < SCR_FIELDX_DEFAULT)
+  {
+    font_nr_old = FONT_VALUE_OLD_NARROW;
+    font_nr_new = FONT_VALUE_NARROW;
+  }
 
   /* read existing key bindings from player setup */
   custom_key = setup.input[player_nr].key;
