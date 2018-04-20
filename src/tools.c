@@ -4181,6 +4181,8 @@ static int RequestHandleEvents(unsigned int req_state)
 		break;
 
 	      case KSYM_Return:
+	      case KSYM_y:
+	      case KSYM_Y:
 #if defined(TARGET_SDL2)
 	      case KSYM_Select:
 	      case KSYM_Menu:
@@ -4192,6 +4194,8 @@ static int RequestHandleEvents(unsigned int req_state)
 		break;
 
 	      case KSYM_Escape:
+	      case KSYM_n:
+	      case KSYM_N:
 #if defined(TARGET_SDL2)
 	      case KSYM_Back:
 #if defined(KSYM_FastForward)
