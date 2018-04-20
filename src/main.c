@@ -7483,6 +7483,7 @@ struct FontInfo font_info[NUM_FONTS + 1] =
   { "font.option_on"		},
   { "font.value_1"		},
   { "font.value_2"		},
+  { "font.value_old_narrow"	},
   { "font.value_old"		},
   { "font.value_narrow"		},
   { "font.level_number.active"	},

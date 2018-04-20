@@ -6627,6 +6627,8 @@ struct ConfigInfo image_config[] =
   { "font.value_old.y",				"160"			},
   { "font.value_old.width",			"32"			},
   { "font.value_old.height",			"32"			},
+  { "font.value_old_narrow",			UNDEFINED_FILENAME	},
+  { "font.value_old_narrow.clone_from",		"font.text_2.LEVELS"	},
   { "font.value_narrow",			UNDEFINED_FILENAME	},
   { "font.value_narrow.clone_from",		"font.text_4.LEVELS"	},
 

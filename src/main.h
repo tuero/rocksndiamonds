@@ -2429,16 +2429,17 @@
 #define FONT_OPTION_ON			30
 #define FONT_VALUE_1			31
 #define FONT_VALUE_2			32
-#define FONT_VALUE_OLD			33
-#define FONT_VALUE_NARROW		34
-#define FONT_LEVEL_NUMBER_ACTIVE	35
-#define FONT_LEVEL_NUMBER		36
-#define FONT_TAPE_RECORDER		37
-#define FONT_GAME_INFO			38
-#define FONT_INFO_ELEMENTS		39
-#define FONT_INFO_LEVELSET		40
+#define FONT_VALUE_OLD_NARROW		33
+#define FONT_VALUE_OLD			34
+#define FONT_VALUE_NARROW		35
+#define FONT_LEVEL_NUMBER_ACTIVE	36
+#define FONT_LEVEL_NUMBER		37
+#define FONT_TAPE_RECORDER		38
+#define FONT_GAME_INFO			39
+#define FONT_INFO_ELEMENTS		40
+#define FONT_INFO_LEVELSET		41
 
-#define NUM_FONTS			41
+#define NUM_FONTS			42
 #define NUM_INITIAL_FONTS		4
 
 /* values for toon animation configuration */
