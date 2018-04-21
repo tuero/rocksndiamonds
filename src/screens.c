@@ -6570,7 +6570,7 @@ static boolean CustomizeKeyboardMain(int player_nr)
   };
   int font_nr_old = FONT_VALUE_OLD;
   int font_nr_new = FONT_VALUE_1;
-  int success = FALSE;
+  boolean success = FALSE;
 
   if (SCR_FIELDX < SCR_FIELDX_DEFAULT)
   {
