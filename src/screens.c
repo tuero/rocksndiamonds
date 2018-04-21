@@ -207,6 +207,7 @@ static void HandleSetupScreen_Generic(int, int, int, int, int);
 static void HandleSetupScreen_Input(int, int, int, int, int);
 static void CustomizeKeyboard(int);
 static void ConfigureJoystick(int);
+static void ConfigureVirtualButtons();
 static void execSetupGame(void);
 static void execSetupGraphics(void);
 static void execSetupSound(void);
@@ -5257,6 +5258,13 @@ static void execSetupChooseDropDistance()
   DrawSetupScreen();
 }
 
+static void execSetupConfigureVirtualButtons()
+{
+  ConfigureVirtualButtons();
+
+  DrawSetupScreen();
+}
+
 static void execSetupTouch()
 {
   if (touch_controls == NULL)
@@ -5743,6 +5751,18 @@ static struct TokenInfo setup_info_touch[] =
   { 0,			NULL,			NULL			}
 };
 
+static struct TokenInfo setup_info_touch_virtual_buttons[] =
+{
+  { TYPE_ENTER_LIST,	execSetupChooseTouchControls, "Touch Control Type:" },
+  { TYPE_STRING,	&touch_controls_text,	""			},
+  { TYPE_EMPTY,		NULL,			""			},
+  { TYPE_ENTER_LIST,	execSetupConfigureVirtualButtons, "Configure Virtual Buttons" },
+  { TYPE_EMPTY,		NULL,			""			},
+  { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
+
+  { 0,			NULL,			NULL			}
+};
+
 static struct TokenInfo setup_info_touch_wipe_gestures[] =
 {
   { TYPE_ENTER_LIST,	execSetupChooseTouchControls, "Touch Control Type:" },
@@ -6176,7 +6196,9 @@ static void DrawSetupScreen_Generic()
     setup_info = setup_info_touch;
     title_string = STR_SETUP_TOUCH;
 
-    if (strEqual(setup.touch.control_type, TOUCH_CONTROL_WIPE_GESTURES))
+    if (strEqual(setup.touch.control_type, TOUCH_CONTROL_VIRTUAL_BUTTONS))
+      setup_info = setup_info_touch_virtual_buttons;
+    else if (strEqual(setup.touch.control_type, TOUCH_CONTROL_WIPE_GESTURES))
       setup_info = setup_info_touch_wipe_gestures;
   }
   else if (setup_mode == SETUP_MODE_SHORTCUTS)
@@ -7151,6 +7173,146 @@ void ConfigureJoystick(int player_nr)
   }
 
   DrawSetupScreen_Input();
+}
+
+boolean ConfigureVirtualButtonsMain()
+{
+  static char *customize_step_text[] =
+  {
+    "Move Left",
+    "Move Right",
+    "Move Up",
+    "Move Down",
+    "Snap Field",
+    "Drop Element"
+  };
+  int font_nr = FONT_INPUT_1_ACTIVE;
+  int font_height = getFontHeight(font_nr);
+  int ypos1 = SYSIZE / 2 - font_height * 2;
+  int ypos2 = SYSIZE / 2 - font_height * 1;
+  boolean success = FALSE;
+  boolean finished = FALSE;
+  int step_nr = 0;
+
+  FadeSetEnterMenu();
+  FadeOut(REDRAW_FIELD);
+
+  ClearField();
+
+  DrawTextSCentered(mSY - SY + 16, FONT_TITLE_1, "Virtual Buttons");
+  DrawTextSCentered(ypos1, font_nr, "Select tiles to");
+  DrawTextSCentered(ypos2, font_nr, customize_step_text[step_nr]);
+
+  FadeIn(REDRAW_FIELD);
+
+  while (!finished)
+  {
+    Event event;
+
+    if (NextValidEvent(&event))
+    {
+      switch (event.type)
+      {
+        case EVENT_KEYPRESS:
+	  {
+	    Key key = GetEventKey((KeyEvent *)&event, FALSE);
+
+	    /* press 'Escape' to abort and keep the old key bindings */
+	    if (key == KSYM_Escape)
+	    {
+	      FadeSkipNextFadeIn();
+
+	      finished = TRUE;
+
+	      break;
+	    }
+
+	    /* press 'Enter' to keep the existing key binding */
+	    if (key == KSYM_Return ||
+		key == KSYM_Menu ||
+		key == KSYM_space)
+	    {
+	      step_nr++;
+	    }
+	    else if (key == KSYM_BackSpace ||
+		     key == KSYM_Back)
+	    {
+	      if (step_nr == 0)
+	      {
+		FadeSkipNextFadeIn();
+
+		finished = TRUE;
+
+		break;
+	      }
+
+	      step_nr--;
+	    }
+	    else
+	    {
+	      break;
+	    }
+
+	    /* all virtual buttons configured */
+	    if (step_nr == 6)
+	    {
+	      finished = TRUE;
+	      success = TRUE;
+
+	      break;
+	    }
+
+	    /* query next virtual button */
+
+	    ClearField();
+
+	    DrawTextSCentered(mSY - SY + 16, FONT_TITLE_1, "Virtual Buttons");
+	    DrawTextSCentered(ypos1, font_nr, "Select tiles to");
+	    DrawTextSCentered(ypos2, font_nr, customize_step_text[step_nr]);
+	  }
+	  break;
+
+        case EVENT_KEYRELEASE:
+	  key_joystick_mapping = 0;
+	  break;
+
+        default:
+	  HandleOtherEvents(&event);
+	  break;
+      }
+    }
+
+    BackToFront();
+  }
+
+  return success;
+}
+
+void ConfigureVirtualButtons()
+{
+  boolean success = ConfigureVirtualButtonsMain();
+
+  if (success)
+  {
+    int font_nr = FONT_TITLE_1;
+    int font_height = getFontHeight(font_nr);
+    int ypos1 = SYSIZE / 2 - font_height * 2;
+    int ypos2 = SYSIZE / 2 - font_height * 1;
+    unsigned int wait_frame_delay = 0;
+    unsigned int wait_frame_delay_value = 2000;
+
+    ResetDelayCounter(&wait_frame_delay);
+
+    ClearField();
+
+    DrawTextSCentered(ypos1, font_nr, "Virtual buttons");
+    DrawTextSCentered(ypos2, font_nr, "configured!");
+
+    while (!DelayReached(&wait_frame_delay, wait_frame_delay_value))
+      BackToFront();
+
+    ClearEventQueue();
+  }
 }
 
 void DrawSetupScreen()
