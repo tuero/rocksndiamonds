@@ -69,6 +69,7 @@ void SaveSetup_EditorCascade();
 
 void SaveSetup_AddGameControllerMapping(char *);
 
+void setHideSetupEntry(void *);
 boolean hideSetupEntry(void *);
 
 void LoadCustomElementDescriptions();

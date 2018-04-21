@@ -4974,7 +4974,6 @@ static void execSetupGraphics()
 #endif
 }
 
-#if defined(TARGET_SDL2) && !defined(PLATFORM_ANDROID)
 static void execSetupChooseWindowSize()
 {
   setup_mode = SETUP_MODE_CHOOSE_WINDOW_SIZE;
@@ -4995,7 +4994,6 @@ static void execSetupChooseRenderingMode()
 
   DrawSetupScreen();
 }
-#endif
 
 static void execSetupChooseVolumeSimple()
 {
@@ -5510,6 +5508,69 @@ static void execSaveAndExitSetup()
 {
   SaveSetup();
   execExitSetup();
+}
+
+static struct
+{
+  void *value;
+  void *related_value;
+} hide_related_entry_list[] =
+{
+  { &setup.game_frame_delay,		execSetupChooseGameSpeed	},
+  { &setup.game_frame_delay,		&game_speed_text		},
+
+  { &setup.scroll_delay_value,		execSetupChooseScrollDelay	},
+  { &setup.scroll_delay_value,		&scroll_delay_text		},
+
+  { &setup.engine_snapshot_mode,	execSetupChooseSnapshotMode	},
+  { &setup.engine_snapshot_mode,	&snapshot_mode_text		},
+
+  { &setup.window_scaling_percent,	execSetupChooseWindowSize	},
+  { &setup.window_scaling_percent,	&window_size_text		},
+
+  { &setup.window_scaling_quality,	execSetupChooseScalingType	},
+  { &setup.window_scaling_quality,	&scaling_type_text		},
+
+  { &setup.screen_rendering_mode,	execSetupChooseRenderingMode	},
+  { &setup.screen_rendering_mode,	&rendering_mode_text		},
+
+  { &setup.graphics_set,		execSetupChooseGraphics		},
+  { &setup.graphics_set,		&graphics_set_name		},
+
+  { &setup.sounds_set,			execSetupChooseSounds		},
+  { &setup.sounds_set,			&sounds_set_name		},
+
+  { &setup.music_set,			execSetupChooseMusic		},
+  { &setup.music_set,			&music_set_name			},
+
+  { &setup.volume_simple,		execSetupChooseVolumeSimple	},
+  { &setup.volume_simple,		&volume_simple_text		},
+
+  { &setup.volume_loops,		execSetupChooseVolumeLoops	},
+  { &setup.volume_loops,		&volume_loops_text		},
+
+  { &setup.volume_music,		execSetupChooseVolumeMusic	},
+  { &setup.volume_music,		&volume_music_text		},
+
+  { &setup.touch.control_type,		execSetupChooseTouchControls	},
+  { &setup.touch.control_type,		&touch_controls_text		},
+
+  { &setup.touch.move_distance,		execSetupChooseMoveDistance	},
+  { &setup.touch.move_distance,		&move_distance_text		},
+
+  { &setup.touch.drop_distance,		execSetupChooseDropDistance	},
+  { &setup.touch.drop_distance,		&drop_distance_text		},
+
+  { NULL,				NULL				}
+};
+
+void setHideRelatedSetupEntries()
+{
+  int i;
+
+  for (i = 0; hide_related_entry_list[i].value != NULL; i++)
+    if (hideSetupEntry(hide_related_entry_list[i].value))
+      setHideSetupEntry(hide_related_entry_list[i].related_value);
 }
 
 static struct TokenInfo setup_info_main[] =

@@ -39,4 +39,6 @@ void HandleGameActions(void);
 void CreateScreenGadgets();
 void FreeScreenGadgets();
 
+void setHideRelatedSetupEntries();
+
 #endif	/* SCREENS_H */

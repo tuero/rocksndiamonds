@@ -18,6 +18,7 @@
 
 #include "files.h"
 #include "init.h"
+#include "screens.h"
 #include "tools.h"
 #include "tape.h"
 #include "config.h"
@@ -8896,15 +8897,20 @@ static char *getHideSetupToken(void *setup_value)
   return hide_setup_token;
 }
 
-static void setHideSetupEntry(void *setup_value_raw)
+void setHideSetupEntry(void *setup_value)
 {
-  /* !!! DIRTY WORKAROUND; TO BE FIXED AFTER THE MM ENGINE RELEASE !!! */
-  void *setup_value = setup_value_raw - (void *)&si + (void *)&setup;
-
   char *hide_setup_token = getHideSetupToken(setup_value);
 
   if (setup_value != NULL)
     setHashEntry(hide_setup_hash, hide_setup_token, "");
+}
+
+static void setHideSetupEntryRaw(char *token_text, void *setup_value_raw)
+{
+  /* !!! DIRTY WORKAROUND; TO BE FIXED AFTER THE MM ENGINE RELEASE !!! */
+  void *setup_value = setup_value_raw - (void *)&si + (void *)&setup;
+
+  setHideSetupEntry(setup_value);
 }
 
 boolean hideSetupEntry(void *setup_value)
@@ -8927,7 +8933,7 @@ static void setSetupInfoFromTokenText(SetupFileHash *setup_file_hash,
 
   /* check if this setup option should be hidden in the setup menu */
   if (token_hide_value != NULL && get_boolean_from_string(token_hide_value))
-    setHideSetupEntry(token_info[token_nr].value);
+    setHideSetupEntryRaw(token_text, token_info[token_nr].value);
 }
 
 static void setSetupInfoFromTokenInfo(SetupFileHash *setup_file_hash,
@@ -9008,6 +9014,8 @@ static void decodeSetupFileHash(SetupFileHash *setup_file_hash)
   for (i = 0; i < NUM_OPTIONS_SETUP_TOKENS; i++)
     setSetupInfoFromTokenInfo(setup_file_hash, options_setup_tokens, i);
   setup.options = soi;
+
+  setHideRelatedSetupEntries();
 }
 
 static void decodeSetupFileHash_AutoSetup(SetupFileHash *setup_file_hash)
