@@ -7002,6 +7002,8 @@ static boolean ConfigureJoystickMapButtonsAndAxes(SDL_Joystick *joystick)
 		/* leave screen */
 		success = FALSE;
 		done = TRUE;
+
+		break;
 	      }
 
 	      /* undo this step */
