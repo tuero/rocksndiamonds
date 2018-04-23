@@ -6898,6 +6898,7 @@ static boolean ConfigureJoystickMapButtonsAndAxes(SDL_Joystick *joystick)
 		       controller->width, controller->height,
 		       controller_x, controller_y);
 
+      SDL_SetSurfaceBlendMode(marker->surface_masked, SDL_BLENDMODE_BLEND);
       SDL_SetSurfaceAlphaMod(marker->surface_masked, alpha);
 
       BlitBitmapMasked(marker, drawto, 0, 0,
