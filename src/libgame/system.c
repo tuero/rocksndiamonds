@@ -328,6 +328,8 @@ void InitOverlayInfo()
   overlay.enabled = FALSE;
   overlay.active = FALSE;
 
+  overlay.show_grid = FALSE;
+
 #if defined(PLATFORM_ANDROID)
   if (strEqual(setup.touch.control_type, TOUCH_CONTROL_VIRTUAL_BUTTONS))
     overlay.enabled = TRUE;
@@ -383,6 +385,16 @@ void SetOverlayEnabled(boolean enabled)
 void SetOverlayActive(boolean active)
 {
   overlay.active = active;
+}
+
+void SetOverlayShowGrid(boolean show_grid)
+{
+  overlay.show_grid = show_grid;
+
+  SetOverlayActive(show_grid);
+
+  if (show_grid)
+    SetOverlayEnabled(TRUE);
 }
 
 boolean GetOverlayActive()

@@ -976,6 +976,8 @@ struct OverlayInfo
 {
   boolean enabled;		/* overlay generally enabled or disabled */
   boolean active;		/* overlay activated (depending on game mode) */
+
+  boolean show_grid;
 };
 
 struct JoystickInfo
@@ -1544,6 +1546,7 @@ void SetTileCursorXY(int, int);
 void SetTileCursorSXSY(int, int);
 void SetOverlayEnabled(boolean);
 void SetOverlayActive(boolean);
+void SetOverlayShowGrid(boolean);
 boolean GetOverlayActive();
 void SetDrawDeactivationMask(int);
 int GetDrawDeactivationMask(void);

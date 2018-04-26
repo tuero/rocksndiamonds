@@ -2984,11 +2984,39 @@ boolean SDLReadJoystick(int nr, int *x, int *y, boolean *b1, boolean *b2)
 /* ========================================================================= */
 
 #if defined(USE_TOUCH_INPUT_OVERLAY)
+static void DrawTouchInputOverlay_ShowGrid(int alpha)
+{
+  SDL_Rect rect;
+  int grid_xsize = 18;
+  int grid_ysize = 11;
+  int x, y;
+
+  SDL_SetRenderDrawColor(sdl_renderer, 255, 255, 255, alpha);
+  SDL_SetRenderDrawBlendMode(sdl_renderer, SDL_BLENDMODE_BLEND);
+
+  for (x = 0; x < grid_xsize; x++)
+  {
+    rect.x = (x + 0) * video.screen_width / grid_xsize;
+    rect.w = (x + 1) * video.screen_width / grid_xsize - rect.x;
+
+    for (y = 0; y < grid_ysize; y++)
+    {
+      rect.y = (y + 0) * video.screen_height / grid_ysize;
+      rect.h = (y + 1) * video.screen_height / grid_ysize - rect.y;
+
+      SDL_RenderDrawRect(sdl_renderer, &rect);
+    }
+  }
+
+  SDL_SetRenderDrawColor(sdl_renderer, 0, 0, 0, 255);
+}
+
 static void DrawTouchInputOverlay()
 {
   static SDL_Texture *texture = NULL;
   static boolean initialized = FALSE;
   static boolean deactivated = TRUE;
+  static boolean show_grid = FALSE;
   static int width = 0, height = 0;
   static int alpha_max = SDL_ALPHA_OPAQUE / 2;
   static int alpha_step = 5;
@@ -3012,6 +3040,18 @@ static void DrawTouchInputOverlay()
 
     if (alpha == 0)
       deactivated = TRUE;
+  }
+
+  if (overlay.show_grid)
+    show_grid = TRUE;
+  else if (deactivated)
+    show_grid = FALSE;
+
+  if (show_grid)
+  {
+    DrawTouchInputOverlay_ShowGrid(alpha);
+
+    return;
   }
 
   if (!initialized)

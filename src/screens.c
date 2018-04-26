@@ -7205,6 +7205,8 @@ boolean ConfigureVirtualButtonsMain()
 
   FadeIn(REDRAW_FIELD);
 
+  SetOverlayShowGrid(TRUE);
+
   while (!finished)
   {
     Event event;
@@ -7284,6 +7286,8 @@ boolean ConfigureVirtualButtonsMain()
 
     BackToFront();
   }
+
+  SetOverlayShowGrid(FALSE);
 
   return success;
 }
