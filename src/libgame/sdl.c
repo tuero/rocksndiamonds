@@ -2992,7 +2992,7 @@ static void DrawTouchInputOverlay()
   static int width = 0, height = 0;
   static int alpha_max = SDL_ALPHA_OPAQUE / 2;
   static int alpha_step = 5;
-  static int alpha_last = 0;
+  static int alpha_last = -1;
   static int alpha = 0;
   boolean active = (overlay.enabled && overlay.active);
 
@@ -3042,7 +3042,6 @@ static void DrawTouchInputOverlay()
     SDL_FreeSurface(surface);
 
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-    SDL_SetTextureAlphaMod(texture, alpha_max);
 
     initialized = TRUE;
   }
