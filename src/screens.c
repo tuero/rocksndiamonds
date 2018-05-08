@@ -7211,7 +7211,7 @@ boolean ConfigureVirtualButtonsMain()
   {
     Event event;
 
-    if (NextValidEvent(&event))
+    while (NextValidEvent(&event))
     {
       switch (event.type)
       {
