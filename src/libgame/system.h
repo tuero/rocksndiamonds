@@ -106,7 +106,6 @@
 #define SCREEN_KEYBOARD_POS(h)		((h) / 2)
 #endif
 
-
 /* default input keys */
 #define DEFAULT_KEY_LEFT		KSYM_Left
 #define DEFAULT_KEY_RIGHT		KSYM_Right
@@ -451,6 +450,27 @@
 /* maximum number of global animation and parts */
 #define MAX_GLOBAL_ANIMS		32
 #define MAX_GLOBAL_ANIM_PARTS		32
+
+/* minimum/maximum/default x/y grid size for virtual buttons */
+#define MIN_GRID_XSIZE			3
+#define MIN_GRID_YSIZE			3
+#define MAX_GRID_XSIZE			32
+#define MAX_GRID_YSIZE			32
+#define DEFAULT_GRID_XSIZE		18
+#define DEFAULT_GRID_YSIZE		MIN(MAX(MIN_GRID_YSIZE,		\
+						DEFAULT_GRID_XSIZE *	\
+						video.screen_height /	\
+						video.screen_width),	\
+					    MAX_GRID_YSIZE)
+
+/* values for grid button characters for virtual buttons */
+#define CHAR_GRID_BUTTON_NONE		' '
+#define CHAR_GRID_BUTTON_LEFT		'<'
+#define CHAR_GRID_BUTTON_RIGHT		'>'
+#define CHAR_GRID_BUTTON_UP		'^'
+#define CHAR_GRID_BUTTON_DOWN		'v'
+#define CHAR_GRID_BUTTON_SNAP		'1'
+#define CHAR_GRID_BUTTON_DROP		'2'
 
 /* default name for empty highscore entry */
 #define EMPTY_PLAYER_NAME	"no name"
@@ -978,6 +998,13 @@ struct OverlayInfo
   boolean active;		/* overlay activated (depending on game mode) */
 
   boolean show_grid;
+  boolean show_grid_buttons;
+
+  int grid_xsize;
+  int grid_ysize;
+
+  char grid_button[MAX_GRID_XSIZE][MAX_GRID_YSIZE];
+  char grid_button_highlight;
 };
 
 struct JoystickInfo

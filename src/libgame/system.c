@@ -325,10 +325,49 @@ void InitTileCursorInfo()
 
 void InitOverlayInfo()
 {
+  static char *default_grid_button[6][2] =
+  {
+    { "      ",	"  ^^  " },
+    { "      ",	"  ^^  " },
+    { "      ",	"<<  >>" },
+    { "      ",	"<<  >>" },
+    { "111222",	"  vv  " },
+    { "111222",	"  vv  " }
+  };
+  int min_xsize, min_ysize;
+  int startx, starty;
+  int x, y;
+
+  min_xsize = MIN(6, DEFAULT_GRID_XSIZE);
+  min_ysize = MIN(6, DEFAULT_GRID_YSIZE);
+
+  startx = DEFAULT_GRID_XSIZE - min_xsize;
+  starty = DEFAULT_GRID_YSIZE - min_ysize;
+
   overlay.enabled = FALSE;
   overlay.active = FALSE;
 
   overlay.show_grid = FALSE;
+  overlay.show_grid_buttons = FALSE;
+
+  overlay.grid_xsize = DEFAULT_GRID_XSIZE;
+  overlay.grid_ysize = DEFAULT_GRID_YSIZE;
+
+  for (x = 0; x < MAX_GRID_XSIZE; x++)
+    for (y = 0; y < MAX_GRID_YSIZE; y++)
+      overlay.grid_button[x][y] = CHAR_GRID_BUTTON_NONE;
+
+  for (x = 0; x < min_xsize; x++)
+    for (y = 0; y < min_ysize; y++)
+      overlay.grid_button[x][starty + y] =
+	default_grid_button[y][0][x];
+
+  for (x = 0; x < min_xsize; x++)
+    for (y = 0; y < min_ysize; y++)
+      overlay.grid_button[startx + x][starty + y] =
+	default_grid_button[y][1][x];
+
+  overlay.grid_button_highlight = CHAR_GRID_BUTTON_NONE;
 
 #if defined(PLATFORM_ANDROID)
   if (strEqual(setup.touch.control_type, TOUCH_CONTROL_VIRTUAL_BUTTONS))
@@ -390,6 +429,7 @@ void SetOverlayActive(boolean active)
 void SetOverlayShowGrid(boolean show_grid)
 {
   overlay.show_grid = show_grid;
+  overlay.show_grid_buttons = show_grid;
 
   SetOverlayActive(show_grid);
 

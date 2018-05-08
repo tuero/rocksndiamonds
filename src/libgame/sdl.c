@@ -2987,8 +2987,8 @@ boolean SDLReadJoystick(int nr, int *x, int *y, boolean *b1, boolean *b2)
 static void DrawTouchInputOverlay_ShowGrid(int alpha)
 {
   SDL_Rect rect;
-  int grid_xsize = 18;
-  int grid_ysize = 11;
+  int grid_xsize = overlay.grid_xsize;
+  int grid_ysize = overlay.grid_ysize;
   int x, y;
 
   SDL_SetRenderDrawColor(sdl_renderer, 255, 255, 255, alpha);
@@ -3004,7 +3004,67 @@ static void DrawTouchInputOverlay_ShowGrid(int alpha)
       rect.y = (y + 0) * video.screen_height / grid_ysize;
       rect.h = (y + 1) * video.screen_height / grid_ysize - rect.y;
 
-      SDL_RenderDrawRect(sdl_renderer, &rect);
+      if (overlay.grid_button[x][y] == CHAR_GRID_BUTTON_NONE)
+	SDL_RenderDrawRect(sdl_renderer, &rect);
+    }
+  }
+
+  SDL_SetRenderDrawColor(sdl_renderer, 0, 0, 0, 255);
+}
+
+static void DrawTouchInputOverlay_ShowGridButtons(int alpha)
+{
+  static int alpha_max = SDL_ALPHA_OPAQUE / 2;
+  static int alpha_step = 5;
+  static int alpha_direction = 0;
+  static int alpha_highlight = 0;
+  SDL_Rect rect;
+  int grid_xsize = overlay.grid_xsize;
+  int grid_ysize = overlay.grid_ysize;
+  int x, y;
+
+  if (alpha == alpha_max)
+  {
+    if (alpha_direction < 0)
+    {
+      alpha_highlight = MAX(0, alpha_highlight - alpha_step);
+
+      if (alpha_highlight == 0)
+	alpha_direction = 1;
+    }
+    else
+    {
+      alpha_highlight = MIN(alpha_highlight + alpha_step, alpha_max);
+
+      if (alpha_highlight == alpha_max)
+	alpha_direction = -1;
+    }
+  }
+  else
+  {
+    alpha_direction = 1;
+    alpha_highlight = alpha;
+  }
+
+  SDL_SetRenderDrawBlendMode(sdl_renderer, SDL_BLENDMODE_BLEND);
+
+  for (x = 0; x < grid_xsize; x++)
+  {
+    rect.x = (x + 0) * video.screen_width / grid_xsize;
+    rect.w = (x + 1) * video.screen_width / grid_xsize - rect.x;
+
+    for (y = 0; y < grid_ysize; y++)
+    {
+      rect.y = (y + 0) * video.screen_height / grid_ysize;
+      rect.h = (y + 1) * video.screen_height / grid_ysize - rect.y;
+
+      if (overlay.grid_button[x][y] == overlay.grid_button_highlight)
+	SDL_SetRenderDrawColor(sdl_renderer, 255, 255, 255, alpha_highlight);
+      else
+	SDL_SetRenderDrawColor(sdl_renderer, 255, 255, 255, alpha);
+
+      if (overlay.grid_button[x][y] != CHAR_GRID_BUTTON_NONE)
+	SDL_RenderFillRect(sdl_renderer, &rect);
     }
   }
 
@@ -3017,6 +3077,7 @@ static void DrawTouchInputOverlay()
   static boolean initialized = FALSE;
   static boolean deactivated = TRUE;
   static boolean show_grid = FALSE;
+  static boolean show_grid_buttons = FALSE;
   static int width = 0, height = 0;
   static int alpha_max = SDL_ALPHA_OPAQUE / 2;
   static int alpha_step = 5;
@@ -3047,12 +3108,19 @@ static void DrawTouchInputOverlay()
   else if (deactivated)
     show_grid = FALSE;
 
+  if (overlay.show_grid_buttons)
+    show_grid_buttons = TRUE;
+  else if (deactivated)
+    show_grid_buttons = FALSE;
+
   if (show_grid)
-  {
     DrawTouchInputOverlay_ShowGrid(alpha);
 
+  if (show_grid_buttons)
+    DrawTouchInputOverlay_ShowGridButtons(alpha);
+
+  if (show_grid || show_grid_buttons)
     return;
-  }
 
   if (!initialized)
   {

@@ -7186,6 +7186,15 @@ boolean ConfigureVirtualButtonsMain()
     "Snap Field",
     "Drop Element"
   };
+  char grid_button[] =
+  {
+    CHAR_GRID_BUTTON_LEFT,
+    CHAR_GRID_BUTTON_RIGHT,
+    CHAR_GRID_BUTTON_UP,
+    CHAR_GRID_BUTTON_DOWN,
+    CHAR_GRID_BUTTON_SNAP,
+    CHAR_GRID_BUTTON_DROP
+  };
   int font_nr = FONT_INPUT_1_ACTIVE;
   int font_height = getFontHeight(font_nr);
   int ypos1 = SYSIZE / 2 - font_height * 2;
@@ -7193,6 +7202,17 @@ boolean ConfigureVirtualButtonsMain()
   boolean success = FALSE;
   boolean finished = FALSE;
   int step_nr = 0;
+  char grid_button_draw = CHAR_GRID_BUTTON_NONE;
+  char grid_button_old[MAX_GRID_XSIZE][MAX_GRID_YSIZE];
+  char grid_button_tmp[MAX_GRID_XSIZE][MAX_GRID_YSIZE];
+  boolean set_grid_button = FALSE;
+  int x, y;
+
+  for (x = 0; x < MAX_GRID_XSIZE; x++)
+    for (y = 0; y < MAX_GRID_YSIZE; y++)
+      grid_button_old[x][y] = grid_button_tmp[x][y] = overlay.grid_button[x][y];
+
+  overlay.grid_button_highlight = grid_button[step_nr];
 
   FadeSetEnterMenu();
   FadeOut(REDRAW_FIELD);
@@ -7222,6 +7242,10 @@ boolean ConfigureVirtualButtonsMain()
 	    /* press 'Escape' to abort and keep the old key bindings */
 	    if (key == KSYM_Escape)
 	    {
+	      for (x = 0; x < MAX_GRID_XSIZE; x++)
+		for (y = 0; y < MAX_GRID_YSIZE; y++)
+		  overlay.grid_button[x][y] = grid_button_old[x][y];
+
 	      FadeSkipNextFadeIn();
 
 	      finished = TRUE;
@@ -7264,6 +7288,12 @@ boolean ConfigureVirtualButtonsMain()
 	      break;
 	    }
 
+	    for (x = 0; x < MAX_GRID_XSIZE; x++)
+	      for (y = 0; y < MAX_GRID_YSIZE; y++)
+		grid_button_tmp[x][y] = overlay.grid_button[x][y];
+
+	    overlay.grid_button_highlight = grid_button[step_nr];
+
 	    /* query next virtual button */
 
 	    ClearField();
@@ -7278,14 +7308,68 @@ boolean ConfigureVirtualButtonsMain()
 	  key_joystick_mapping = 0;
 	  break;
 
+	case EVENT_BUTTONPRESS:
+	case EVENT_BUTTONRELEASE:
+	  {
+	    ButtonEvent *button = (ButtonEvent *)&event;
+
+	    button->x += video.screen_xoffset;
+	    button->y += video.screen_yoffset;
+
+	    x = button->x * overlay.grid_xsize / video.screen_width;
+	    y = button->y * overlay.grid_ysize / video.screen_height;
+
+	    if (button->type == EVENT_BUTTONPRESS)
+	    {
+	      button_status = button->button;
+
+	      grid_button_draw =
+		(overlay.grid_button[x][y] != grid_button[step_nr] ?
+		 grid_button[step_nr] : CHAR_GRID_BUTTON_NONE);
+
+	      set_grid_button = TRUE;
+	    }
+	    else
+	    {
+	      button_status = MB_RELEASED;
+	    }
+	  }
+	  break;
+
+	case EVENT_MOTIONNOTIFY:
+	  {
+	    MotionEvent *motion = (MotionEvent *)&event;
+
+	    motion->x += video.screen_xoffset;
+	    motion->y += video.screen_yoffset;
+
+	    x = motion->x * overlay.grid_xsize / video.screen_width;
+	    y = motion->y * overlay.grid_ysize / video.screen_height;
+
+	    set_grid_button = TRUE;
+	  }
+	  break;
+
         default:
 	  HandleOtherEvents(&event);
 	  break;
+      }
+
+      if (set_grid_button)
+      {
+	overlay.grid_button[x][y] =
+	  (grid_button_draw != CHAR_GRID_BUTTON_NONE ? grid_button_draw :
+	   grid_button_tmp[x][y] == grid_button[step_nr] ? CHAR_GRID_BUTTON_NONE :
+	   grid_button_tmp[x][y]);
+
+	set_grid_button = FALSE;
       }
     }
 
     BackToFront();
   }
+
+  overlay.grid_button_highlight = CHAR_GRID_BUTTON_NONE;
 
   SetOverlayShowGrid(FALSE);
 
