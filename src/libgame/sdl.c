@@ -3050,13 +3050,38 @@ static void DrawTouchInputOverlay_ShowGridButtons(int alpha)
 
   for (x = 0; x < grid_xsize; x++)
   {
-    rect.x = (x + 0) * video.screen_width / grid_xsize;
-    rect.w = (x + 1) * video.screen_width / grid_xsize - rect.x;
-
     for (y = 0; y < grid_ysize; y++)
     {
+      rect.x = (x + 0) * video.screen_width  / grid_xsize;
       rect.y = (y + 0) * video.screen_height / grid_ysize;
+      rect.w = (x + 1) * video.screen_width  / grid_xsize - rect.x;
       rect.h = (y + 1) * video.screen_height / grid_ysize - rect.y;
+
+      if (x == 0 ||
+	  overlay.grid_button[x - 1][y] != overlay.grid_button[x][y])
+      {
+	rect.x += 2;
+	rect.w -= 2;
+      }
+
+      if (x == grid_xsize - 1 ||
+	  overlay.grid_button[x + 1][y] != overlay.grid_button[x][y])
+      {
+	rect.w -= 2;
+      }
+
+      if (y == 0 ||
+	  overlay.grid_button[x][y - 1] != overlay.grid_button[x][y])
+      {
+	rect.y += 2;
+	rect.h -= 2;
+      }
+
+      if (y == grid_ysize - 1 ||
+	  overlay.grid_button[x][y + 1] != overlay.grid_button[x][y])
+      {
+	rect.h -= 2;
+      }
 
       if (overlay.grid_button[x][y] == overlay.grid_button_highlight)
 	SDL_SetRenderDrawColor(sdl_renderer, 255, 255, 255, alpha_highlight);
