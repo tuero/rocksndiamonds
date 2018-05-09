@@ -334,15 +334,8 @@ void InitOverlayInfo()
     { "111222",	"  vv  " },
     { "111222",	"  vv  " }
   };
-  int min_xsize, min_ysize;
-  int startx, starty;
-  int x, y;
-
-  min_xsize = MIN(6, DEFAULT_GRID_XSIZE);
-  min_ysize = MIN(6, DEFAULT_GRID_YSIZE);
-
-  startx = DEFAULT_GRID_XSIZE - min_xsize;
-  starty = DEFAULT_GRID_YSIZE - min_ysize;
+  int nr = GRID_ACTIVE_NR();
+  int i, x, y;
 
   overlay.enabled = FALSE;
   overlay.active = FALSE;
@@ -350,22 +343,39 @@ void InitOverlayInfo()
   overlay.show_grid = FALSE;
   overlay.show_grid_buttons = FALSE;
 
-  overlay.grid_xsize = DEFAULT_GRID_XSIZE;
-  overlay.grid_ysize = DEFAULT_GRID_YSIZE;
+  for (i = 0; i < 2; i++)
+  {
+    int grid_xsize = DEFAULT_GRID_XSIZE(i);
+    int grid_ysize = DEFAULT_GRID_YSIZE(i);
+    int min_xsize = MIN(6, grid_xsize);
+    int min_ysize = MIN(6, grid_ysize);
+    int startx = grid_xsize - min_xsize;
+    int starty = grid_ysize - min_ysize;
+
+    overlay.grid_xsize_all[i] = grid_xsize;
+    overlay.grid_ysize_all[i] = grid_ysize;
+
+    for (x = 0; x < MAX_GRID_XSIZE; x++)
+      for (y = 0; y < MAX_GRID_YSIZE; y++)
+	overlay.grid_button_all[i][x][y] = CHAR_GRID_BUTTON_NONE;
+
+    for (x = 0; x < min_xsize; x++)
+      for (y = 0; y < min_ysize; y++)
+	overlay.grid_button_all[i][x][starty + y] =
+	  default_grid_button[y][0][x];
+
+    for (x = 0; x < min_xsize; x++)
+      for (y = 0; y < min_ysize; y++)
+	overlay.grid_button_all[i][startx + x][starty + y] =
+	  default_grid_button[y][1][x];
+  }
+
+  overlay.grid_xsize = overlay.grid_xsize_all[nr];
+  overlay.grid_ysize = overlay.grid_ysize_all[nr];
 
   for (x = 0; x < MAX_GRID_XSIZE; x++)
     for (y = 0; y < MAX_GRID_YSIZE; y++)
-      overlay.grid_button[x][y] = CHAR_GRID_BUTTON_NONE;
-
-  for (x = 0; x < min_xsize; x++)
-    for (y = 0; y < min_ysize; y++)
-      overlay.grid_button[x][starty + y] =
-	default_grid_button[y][0][x];
-
-  for (x = 0; x < min_xsize; x++)
-    for (y = 0; y < min_ysize; y++)
-      overlay.grid_button[startx + x][starty + y] =
-	default_grid_button[y][1][x];
+      overlay.grid_button[x][y] = overlay.grid_button_all[nr][x][y];
 
   overlay.grid_button_highlight = CHAR_GRID_BUTTON_NONE;
 

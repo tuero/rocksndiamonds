@@ -7206,6 +7206,7 @@ boolean ConfigureVirtualButtonsMain()
   char grid_button_old[MAX_GRID_XSIZE][MAX_GRID_YSIZE];
   char grid_button_tmp[MAX_GRID_XSIZE][MAX_GRID_YSIZE];
   boolean set_grid_button = FALSE;
+  int nr = GRID_ACTIVE_NR();
   int x, y;
 
   for (x = 0; x < MAX_GRID_XSIZE; x++)
@@ -7368,6 +7369,10 @@ boolean ConfigureVirtualButtonsMain()
 
     BackToFront();
   }
+
+  for (x = 0; x < MAX_GRID_XSIZE; x++)
+    for (y = 0; y < MAX_GRID_YSIZE; y++)
+      overlay.grid_button_all[nr][x][y] = overlay.grid_button[x][y];
 
   overlay.grid_button_highlight = CHAR_GRID_BUTTON_NONE;
 

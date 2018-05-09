@@ -456,12 +456,30 @@
 #define MIN_GRID_YSIZE			3
 #define MAX_GRID_XSIZE			32
 #define MAX_GRID_YSIZE			32
-#define DEFAULT_GRID_XSIZE		18
-#define DEFAULT_GRID_YSIZE		MIN(MAX(MIN_GRID_YSIZE,		\
-						DEFAULT_GRID_XSIZE *	\
-						video.screen_height /	\
-						video.screen_width),	\
+#define GRID_REAL_WIDTH			MAX(video.screen_width,	\
+					    video.screen_height)
+#define GRID_REAL_HEIGHT		MIN(video.screen_width,	\
+					    video.screen_height)
+#define DEFAULT_GRID_XSIZE_0		18
+#define DEFAULT_GRID_YSIZE_0		MIN(MAX(MIN_GRID_YSIZE,		\
+						DEFAULT_GRID_XSIZE_0 *	\
+						GRID_REAL_HEIGHT /	\
+						GRID_REAL_WIDTH),	\
 					    MAX_GRID_YSIZE)
+#define DEFAULT_GRID_XSIZE_1		13
+#define DEFAULT_GRID_YSIZE_1		MIN(MAX(MIN_GRID_YSIZE,		\
+						DEFAULT_GRID_XSIZE_1 *	\
+						GRID_REAL_WIDTH /	\
+						GRID_REAL_HEIGHT),	\
+					    MAX_GRID_YSIZE)
+
+#define DEFAULT_GRID_XSIZE(n)		(n == 0 ? DEFAULT_GRID_XSIZE_0 : \
+					 DEFAULT_GRID_XSIZE_1)
+#define DEFAULT_GRID_YSIZE(n)		(n == 0 ? DEFAULT_GRID_YSIZE_0 : \
+					 DEFAULT_GRID_YSIZE_1)
+
+#define GRID_ACTIVE_NR()		(video.screen_width >	\
+					 video.screen_height ? 0 : 1)
 
 /* values for grid button characters for virtual buttons */
 #define CHAR_GRID_BUTTON_NONE		' '
@@ -1000,9 +1018,12 @@ struct OverlayInfo
   boolean show_grid;
   boolean show_grid_buttons;
 
+  int grid_xsize_all[2];
+  int grid_ysize_all[2];
   int grid_xsize;
   int grid_ysize;
 
+  char grid_button_all[2][MAX_GRID_XSIZE][MAX_GRID_YSIZE];
   char grid_button[MAX_GRID_XSIZE][MAX_GRID_YSIZE];
   char grid_button_highlight;
 };
