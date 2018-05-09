@@ -683,6 +683,18 @@ static struct
 
 void HandleFingerEvent_VirtualButtons(FingerEvent *event)
 {
+#if 1
+  int x = event->x * overlay.grid_xsize;
+  int y = event->y * overlay.grid_ysize;
+  int grid_button = overlay.grid_button[x][y];
+  Key key = (grid_button == CHAR_GRID_BUTTON_LEFT  ? setup.input[0].key.left :
+	     grid_button == CHAR_GRID_BUTTON_RIGHT ? setup.input[0].key.right :
+	     grid_button == CHAR_GRID_BUTTON_UP    ? setup.input[0].key.up :
+	     grid_button == CHAR_GRID_BUTTON_DOWN  ? setup.input[0].key.down :
+	     grid_button == CHAR_GRID_BUTTON_SNAP  ? setup.input[0].key.snap :
+	     grid_button == CHAR_GRID_BUTTON_DROP  ? setup.input[0].key.drop :
+	     KSYM_UNDEFINED);
+#else
   float ypos = 1.0 - 1.0 / 3.0 * video.display_width / video.display_height;
   float event_x = (event->x);
   float event_y = (event->y - ypos) / (1 - ypos);
@@ -705,6 +717,7 @@ void HandleFingerEvent_VirtualButtons(FingerEvent *event)
 	     event_y > 2.0 / 3.0 && event_y < 1 ?
 	     setup.input[0].key.down :
 	     KSYM_UNDEFINED);
+#endif
   int key_status = (event->type == EVENT_FINGERRELEASE ? KEY_RELEASED :
 		    KEY_PRESSED);
   char *key_status_name = (key_status == KEY_RELEASED ? "KEY_RELEASED" :

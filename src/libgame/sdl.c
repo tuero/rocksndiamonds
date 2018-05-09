@@ -3077,7 +3077,6 @@ static void DrawTouchInputOverlay()
   static boolean initialized = FALSE;
   static boolean deactivated = TRUE;
   static boolean show_grid = FALSE;
-  static boolean show_grid_buttons = FALSE;
   static int width = 0, height = 0;
   static int alpha_max = SDL_ALPHA_OPAQUE / 2;
   static int alpha_step = 5;
@@ -3108,19 +3107,15 @@ static void DrawTouchInputOverlay()
   else if (deactivated)
     show_grid = FALSE;
 
-  if (overlay.show_grid_buttons)
-    show_grid_buttons = TRUE;
-  else if (deactivated)
-    show_grid_buttons = FALSE;
-
   if (show_grid)
     DrawTouchInputOverlay_ShowGrid(alpha);
 
-  if (show_grid_buttons)
-    DrawTouchInputOverlay_ShowGridButtons(alpha);
+  DrawTouchInputOverlay_ShowGridButtons(alpha);
 
-  if (show_grid || show_grid_buttons)
-    return;
+  return;
+
+
+  // !!! VIRTUAL BUTTONS FROM IMAGE FILE NOT USED ANYMORE !!!
 
   if (!initialized)
   {

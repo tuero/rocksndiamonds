@@ -341,7 +341,6 @@ void InitOverlayInfo()
   overlay.active = FALSE;
 
   overlay.show_grid = FALSE;
-  overlay.show_grid_buttons = FALSE;
 
   for (i = 0; i < 2; i++)
   {
@@ -439,7 +438,6 @@ void SetOverlayActive(boolean active)
 void SetOverlayShowGrid(boolean show_grid)
 {
   overlay.show_grid = show_grid;
-  overlay.show_grid_buttons = show_grid;
 
   SetOverlayActive(show_grid);
 

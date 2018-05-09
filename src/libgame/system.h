@@ -1016,7 +1016,6 @@ struct OverlayInfo
   boolean active;		/* overlay activated (depending on game mode) */
 
   boolean show_grid;
-  boolean show_grid_buttons;
 
   int grid_xsize_all[2];
   int grid_ysize_all[2];
