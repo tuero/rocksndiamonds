@@ -636,10 +636,35 @@ void HandleWindowEvent(WindowEvent *event)
       if (new_display_width  != video.display_width ||
 	  new_display_height != video.display_height)
       {
+	int nr = GRID_ACTIVE_NR();	// previous screen orientation
+
 	video.display_width  = new_display_width;
 	video.display_height = new_display_height;
 
 	SDLSetScreenProperties();
+
+	// check if screen orientation has changed (should always be true here)
+	if (nr != GRID_ACTIVE_NR())
+	{
+	  int x, y;
+
+	  if (game_status == GAME_MODE_SETUP)
+	  {
+	    // save active virtual buttons (in case of just configuring them)
+	    for (x = 0; x < MAX_GRID_XSIZE; x++)
+	      for (y = 0; y < MAX_GRID_YSIZE; y++)
+		overlay.grid_button_all[nr][x][y] = overlay.grid_button[x][y];
+	  }
+
+	  nr = GRID_ACTIVE_NR();
+
+	  overlay.grid_xsize = overlay.grid_xsize_all[nr];
+	  overlay.grid_ysize = overlay.grid_ysize_all[nr];
+
+	  for (x = 0; x < MAX_GRID_XSIZE; x++)
+	    for (y = 0; y < MAX_GRID_YSIZE; y++)
+	      overlay.grid_button[x][y] = overlay.grid_button_all[nr][x][y];
+	}
       }
     }
 #endif

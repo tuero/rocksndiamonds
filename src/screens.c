@@ -7351,6 +7351,31 @@ boolean ConfigureVirtualButtonsMain()
 	  }
 	  break;
 
+#if defined(TARGET_SDL2)
+	case SDL_WINDOWEVENT:
+	  HandleWindowEvent((WindowEvent *) &event);
+
+	  // check if device has been rotated
+	  if (nr != GRID_ACTIVE_NR())
+	  {
+	    nr = GRID_ACTIVE_NR();
+
+	    for (x = 0; x < MAX_GRID_XSIZE; x++)
+	      for (y = 0; y < MAX_GRID_YSIZE; y++)
+		grid_button_old[x][y] = grid_button_tmp[x][y] =
+		  overlay.grid_button[x][y];
+	  }
+
+	  break;
+
+	case SDL_APP_WILLENTERBACKGROUND:
+	case SDL_APP_DIDENTERBACKGROUND:
+	case SDL_APP_WILLENTERFOREGROUND:
+	case SDL_APP_DIDENTERFOREGROUND:
+	  HandlePauseResumeEvent((PauseResumeEvent *) &event);
+	  break;
+#endif
+
         default:
 	  HandleOtherEvents(&event);
 	  break;
