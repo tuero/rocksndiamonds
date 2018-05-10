@@ -5237,6 +5237,17 @@ static void InitMixer()
   StartMixer();
 }
 
+static void InitVideoOverlay()
+{
+  // if virtual buttons are not loaded from setup file, repeat initializing
+  // virtual buttons grid with default values now that video is initialized
+  if (!setup.touch.grid_initialized)
+    InitSetup();
+
+  InitTileCursorInfo();
+  InitOverlayInfo();
+}
+
 void InitGfxBuffers()
 {
   static int win_xsize_last = -1;
@@ -6013,9 +6024,7 @@ void OpenAll()
   InitVideoDefaults();
   InitVideoDisplay();
   InitVideoBuffer(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH, setup.fullscreen);
-
-  InitTileCursorInfo();
-  InitOverlayInfo();
+  InitVideoOverlay();
 
   print_timestamp_time("[init video stuff]");
 

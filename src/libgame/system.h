@@ -456,10 +456,10 @@
 #define MIN_GRID_YSIZE			3
 #define MAX_GRID_XSIZE			32
 #define MAX_GRID_YSIZE			32
-#define GRID_REAL_WIDTH			MAX(video.screen_width,	\
-					    video.screen_height)
-#define GRID_REAL_HEIGHT		MIN(video.screen_width,	\
-					    video.screen_height)
+#define GRID_REAL_WIDTH			MAX(1, MAX(video.screen_width,	\
+						   video.screen_height))
+#define GRID_REAL_HEIGHT		MAX(1, MIN(video.screen_width,	\
+						   video.screen_height))
 #define DEFAULT_GRID_XSIZE_0		18
 #define DEFAULT_GRID_YSIZE_0		MIN(MAX(MIN_GRID_YSIZE,		\
 						DEFAULT_GRID_XSIZE_0 *	\
@@ -1017,12 +1017,9 @@ struct OverlayInfo
 
   boolean show_grid;
 
-  int grid_xsize_all[2];
-  int grid_ysize_all[2];
   int grid_xsize;
   int grid_ysize;
 
-  char grid_button_all[2][MAX_GRID_XSIZE][MAX_GRID_YSIZE];
   char grid_button[MAX_GRID_XSIZE][MAX_GRID_YSIZE];
   char grid_button_highlight;
 };
@@ -1053,6 +1050,13 @@ struct SetupTouchInfo
   char *control_type;
   int move_distance;
   int drop_distance;
+
+  int grid_xsize[2];
+  int grid_ysize[2];
+
+  char grid_button[2][MAX_GRID_XSIZE][MAX_GRID_YSIZE];
+
+  boolean grid_initialized;
 };
 
 struct SetupInputInfo

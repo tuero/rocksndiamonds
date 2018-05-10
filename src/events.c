@@ -653,17 +653,17 @@ void HandleWindowEvent(WindowEvent *event)
 	    // save active virtual buttons (in case of just configuring them)
 	    for (x = 0; x < MAX_GRID_XSIZE; x++)
 	      for (y = 0; y < MAX_GRID_YSIZE; y++)
-		overlay.grid_button_all[nr][x][y] = overlay.grid_button[x][y];
+		setup.touch.grid_button[nr][x][y] = overlay.grid_button[x][y];
 	  }
 
 	  nr = GRID_ACTIVE_NR();
 
-	  overlay.grid_xsize = overlay.grid_xsize_all[nr];
-	  overlay.grid_ysize = overlay.grid_ysize_all[nr];
+	  overlay.grid_xsize = setup.touch.grid_xsize[nr];
+	  overlay.grid_ysize = setup.touch.grid_ysize[nr];
 
 	  for (x = 0; x < MAX_GRID_XSIZE; x++)
 	    for (y = 0; y < MAX_GRID_YSIZE; y++)
-	      overlay.grid_button[x][y] = overlay.grid_button_all[nr][x][y];
+	      overlay.grid_button[x][y] = setup.touch.grid_button[nr][x][y];
 	}
       }
     }

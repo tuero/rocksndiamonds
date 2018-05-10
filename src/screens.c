@@ -7397,7 +7397,7 @@ boolean ConfigureVirtualButtonsMain()
 
   for (x = 0; x < MAX_GRID_XSIZE; x++)
     for (y = 0; y < MAX_GRID_YSIZE; y++)
-      overlay.grid_button_all[nr][x][y] = overlay.grid_button[x][y];
+      setup.touch.grid_button[nr][x][y] = overlay.grid_button[x][y];
 
   overlay.grid_button_highlight = CHAR_GRID_BUTTON_NONE;
 

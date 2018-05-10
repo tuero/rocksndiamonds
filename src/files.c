@@ -8721,6 +8721,55 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->touch.move_distance = TOUCH_MOVE_DISTANCE_DEFAULT;	/* percent */
   si->touch.drop_distance = TOUCH_DROP_DISTANCE_DEFAULT;	/* percent */
 
+  for (i = 0; i < 2; i++)
+  {
+    char *default_grid_button[6][2] =
+    {
+      { "      ", "  ^^  " },
+      { "      ", "  ^^  " },
+      { "      ", "<<  >>" },
+      { "      ", "<<  >>" },
+      { "111222", "  vv  " },
+      { "111222", "  vv  " }
+    };
+    int grid_xsize = DEFAULT_GRID_XSIZE(i);
+    int grid_ysize = DEFAULT_GRID_YSIZE(i);
+    int min_xsize = MIN(6, grid_xsize);
+    int min_ysize = MIN(6, grid_ysize);
+    int startx = grid_xsize - min_xsize;
+    int starty = grid_ysize - min_ysize;
+    int x, y;
+
+    // virtual buttons grid can only be set to defaults if video is initialized
+    // (this will be repeated if virtual buttons are not loaded from setup file)
+    if (video.initialized)
+    {
+      si->touch.grid_xsize[i] = grid_xsize;
+      si->touch.grid_ysize[i] = grid_ysize;
+    }
+    else
+    {
+      si->touch.grid_xsize[i] = -1;
+      si->touch.grid_ysize[i] = -1;
+    }
+
+    for (x = 0; x < MAX_GRID_XSIZE; x++)
+      for (y = 0; y < MAX_GRID_YSIZE; y++)
+	si->touch.grid_button[i][x][y] = CHAR_GRID_BUTTON_NONE;
+
+    for (x = 0; x < min_xsize; x++)
+      for (y = 0; y < min_ysize; y++)
+	si->touch.grid_button[i][x][starty + y] =
+	  default_grid_button[y][0][x];
+
+    for (x = 0; x < min_xsize; x++)
+      for (y = 0; y < min_ysize; y++)
+	si->touch.grid_button[i][startx + x][starty + y] =
+	  default_grid_button[y][1][x];
+  }
+
+  si->touch.grid_initialized		= video.initialized;
+
   si->editor.el_boulderdash		= TRUE;
   si->editor.el_emerald_mine		= TRUE;
   si->editor.el_emerald_mine_club	= TRUE;
