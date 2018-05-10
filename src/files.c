@@ -8305,8 +8305,12 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_TOUCH_CONTROL_TYPE		41
 #define SETUP_TOKEN_TOUCH_MOVE_DISTANCE		42
 #define SETUP_TOKEN_TOUCH_DROP_DISTANCE		43
+#define SETUP_TOKEN_TOUCH_GRID_XSIZE_0		44
+#define SETUP_TOKEN_TOUCH_GRID_YSIZE_0		45
+#define SETUP_TOKEN_TOUCH_GRID_XSIZE_1		46
+#define SETUP_TOKEN_TOUCH_GRID_YSIZE_1		47
 
-#define NUM_GLOBAL_SETUP_TOKENS			44
+#define NUM_GLOBAL_SETUP_TOKENS			48
 
 /* auto setup */
 #define SETUP_TOKEN_AUTO_EDITOR_ZOOM_TILESIZE	0
@@ -8507,6 +8511,10 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_STRING, &si.touch.control_type,      "touch.control_type"	},
   { TYPE_INTEGER,&si.touch.move_distance,     "touch.move_distance"	},
   { TYPE_INTEGER,&si.touch.drop_distance,     "touch.drop_distance"	},
+  { TYPE_INTEGER,&si.touch.grid_xsize[0],     "touch.virtual_buttons.0.xsize" },
+  { TYPE_INTEGER,&si.touch.grid_ysize[0],     "touch.virtual_buttons.0.ysize" },
+  { TYPE_INTEGER,&si.touch.grid_xsize[1],     "touch.virtual_buttons.1.xsize" },
+  { TYPE_INTEGER,&si.touch.grid_ysize[1],     "touch.virtual_buttons.1.ysize" },
 };
 
 static struct TokenInfo auto_setup_tokens[] =
@@ -9009,6 +9017,45 @@ static void decodeSetupFileHash(SetupFileHash *setup_file_hash)
     setSetupInfoFromTokenInfo(setup_file_hash, global_setup_tokens, i);
   setup = si;
 
+  /* virtual buttons setup */
+  setup.touch.grid_initialized = TRUE;
+  for (i = 0; i < 2; i++)
+  {
+    int grid_xsize = setup.touch.grid_xsize[i];
+    int grid_ysize = setup.touch.grid_ysize[i];
+    int x, y;
+
+    // if virtual buttons are not loaded from setup file, repeat initializing
+    // virtual buttons grid with default values later when video is initialized
+    if (grid_xsize == -1 ||
+	grid_ysize == -1)
+    {
+      setup.touch.grid_initialized = FALSE;
+
+      continue;
+    }
+
+    for (y = 0; y < grid_ysize; y++)
+    {
+      char token_string[MAX_LINE_LEN];
+
+      sprintf(token_string, "touch.virtual_buttons.%d.%02d", i, y);
+
+      char *value_string = getHashEntry(setup_file_hash, token_string);
+
+      if (value_string == NULL)
+	continue;
+
+      for (x = 0; x < grid_xsize; x++)
+      {
+	char c = value_string[x];
+
+	setup.touch.grid_button[i][x][y] =
+	  (c == '.' ? CHAR_GRID_BUTTON_NONE : c);
+      }
+    }
+  }
+
   /* editor setup */
   sei = setup.editor;
   for (i = 0; i < NUM_EDITOR_SETUP_TOKENS; i++)
@@ -9270,10 +9317,41 @@ void SaveSetup()
     if (i == SETUP_TOKEN_PLAYER_NAME + 1 ||
 	i == SETUP_TOKEN_GRAPHICS_SET ||
 	i == SETUP_TOKEN_VOLUME_SIMPLE ||
-	i == SETUP_TOKEN_TOUCH_CONTROL_TYPE)
+	i == SETUP_TOKEN_TOUCH_CONTROL_TYPE ||
+	i == SETUP_TOKEN_TOUCH_GRID_XSIZE_0 ||
+	i == SETUP_TOKEN_TOUCH_GRID_XSIZE_1)
       fprintf(file, "\n");
 
     fprintf(file, "%s\n", getSetupLine(global_setup_tokens, "", i));
+  }
+
+  /* virtual buttons setup */
+  for (i = 0; i < 2; i++)
+  {
+    int grid_xsize = setup.touch.grid_xsize[i];
+    int grid_ysize = setup.touch.grid_ysize[i];
+    int x, y;
+
+    fprintf(file, "\n");
+
+    for (y = 0; y < grid_ysize; y++)
+    {
+      char token_string[MAX_LINE_LEN];
+      char value_string[MAX_LINE_LEN];
+
+      sprintf(token_string, "touch.virtual_buttons.%d.%02d", i, y);
+
+      for (x = 0; x < grid_xsize; x++)
+      {
+	char c = setup.touch.grid_button[i][x][y];
+
+	value_string[x] = (c == CHAR_GRID_BUTTON_NONE ? '.' : c);
+      }
+
+      value_string[grid_xsize] = '\0';
+
+      fprintf(file, "%s\n", getFormattedSetupEntry(token_string, value_string));
+    }
   }
 
   /* editor setup */
