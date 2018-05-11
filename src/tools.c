@@ -5150,11 +5150,14 @@ unsigned int MoveDoor(unsigned int door_state)
     {
       /* wait for specified door action post delay */
       if (door_state & DOOR_ACTION_1 && door_state & DOOR_ACTION_2)
-	Delay(MAX(door_1.post_delay, door_2.post_delay));
+	door_delay_value = MAX(door_1.post_delay, door_2.post_delay);
       else if (door_state & DOOR_ACTION_1)
-	Delay(door_1.post_delay);
+	door_delay_value = door_1.post_delay;
       else if (door_state & DOOR_ACTION_2)
-	Delay(door_2.post_delay);
+	door_delay_value = door_2.post_delay;
+
+      while (!DelayReached(&door_delay, door_delay_value))
+	BackToFront();
     }
   }
 
