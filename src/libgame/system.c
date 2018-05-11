@@ -342,7 +342,7 @@ void InitOverlayInfo()
 
   overlay.grid_button_highlight = CHAR_GRID_BUTTON_NONE;
 
-#if defined(PLATFORM_ANDROID)
+#if defined(USE_TOUCH_INPUT_OVERLAY)
   if (strEqual(setup.touch.control_type, TOUCH_CONTROL_VIRTUAL_BUTTONS))
     overlay.enabled = TRUE;
 #endif
