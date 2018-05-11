@@ -78,8 +78,12 @@
 #define SETUP_MODE_CHOOSE_MOVE_DISTANCE	29
 #define SETUP_MODE_CHOOSE_DROP_DISTANCE	30
 #define SETUP_MODE_CHOOSE_TRANSPARENCY	31
+#define SETUP_MODE_CHOOSE_GRID_XSIZE_0	32
+#define SETUP_MODE_CHOOSE_GRID_YSIZE_0	33
+#define SETUP_MODE_CHOOSE_GRID_XSIZE_1	34
+#define SETUP_MODE_CHOOSE_GRID_YSIZE_1	35
 
-#define MAX_SETUP_MODES			32
+#define MAX_SETUP_MODES			36
 
 #define MAX_MENU_MODES			MAX(MAX_INFO_MODES, MAX_SETUP_MODES)
 
@@ -109,6 +113,10 @@
 #define STR_SETUP_CHOOSE_MOVE_DISTANCE	"Move Distance"
 #define STR_SETUP_CHOOSE_DROP_DISTANCE	"Drop Distance"
 #define STR_SETUP_CHOOSE_TRANSPARENCY	"Transparency"
+#define STR_SETUP_CHOOSE_GRID_XSIZE_0	"Horiz. Buttons"
+#define STR_SETUP_CHOOSE_GRID_YSIZE_0	"Vert. Buttons"
+#define STR_SETUP_CHOOSE_GRID_XSIZE_1	"Horiz. Buttons"
+#define STR_SETUP_CHOOSE_GRID_YSIZE_1	"Vert. Buttons"
 
 /* for input setup functions */
 #define SETUPINPUT_SCREEN_POS_START	0
@@ -280,6 +288,9 @@ static TreeInfo *drop_distance_current = NULL;
 
 static TreeInfo *transparencies = NULL;
 static TreeInfo *transparency_current = NULL;
+
+static TreeInfo *grid_sizes[2][2] = { { NULL, NULL }, { NULL, NULL } };
+static TreeInfo *grid_size_current[2][2] = { { NULL, NULL }, { NULL, NULL } };
 
 static TreeInfo *level_number = NULL;
 static TreeInfo *level_number_current = NULL;
@@ -474,6 +485,46 @@ static struct
   {	80,	"80 %"				},
   {	90,	"90 %"				},
   {	100,	"100 % (Invisible)"		},
+
+  {	-1,	NULL				},
+};
+
+static struct
+{
+  int value;
+  char *text;
+} grid_sizes_list[] =
+{
+  {	3,	"3"				},
+  {	4,	"4"				},
+  {	5,	"5"				},
+  {	6,	"6"				},
+  {	7,	"7"				},
+  {	8,	"8"				},
+  {	9,	"9"				},
+  {	10,	"10"				},
+  {	11,	"11"				},
+  {	12,	"12"				},
+  {	13,	"13"				},
+  {	14,	"14"				},
+  {	15,	"15"				},
+  {	16,	"16"				},
+  {	17,	"17"				},
+  {	18,	"18"				},
+  {	19,	"19"				},
+  {	20,	"20"				},
+  {	21,	"21"				},
+  {	22,	"22"				},
+  {	23,	"23"				},
+  {	24,	"24"				},
+  {	25,	"25"				},
+  {	26,	"26"				},
+  {	27,	"27"				},
+  {	28,	"28"				},
+  {	29,	"29"				},
+  {	30,	"30"				},
+  {	31,	"31"				},
+  {	32,	"32"				},
 
   {	-1,	NULL				},
 };
@@ -4103,7 +4154,11 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
       else if (setup_mode == SETUP_MODE_CHOOSE_TOUCH_CONTROL ||
 	       setup_mode == SETUP_MODE_CHOOSE_MOVE_DISTANCE ||
 	       setup_mode == SETUP_MODE_CHOOSE_DROP_DISTANCE ||
-	       setup_mode == SETUP_MODE_CHOOSE_TRANSPARENCY)
+	       setup_mode == SETUP_MODE_CHOOSE_TRANSPARENCY ||
+	       setup_mode == SETUP_MODE_CHOOSE_GRID_XSIZE_0 ||
+	       setup_mode == SETUP_MODE_CHOOSE_GRID_YSIZE_0 ||
+	       setup_mode == SETUP_MODE_CHOOSE_GRID_XSIZE_1 ||
+	       setup_mode == SETUP_MODE_CHOOSE_GRID_YSIZE_1)
 	execSetupTouch();
       else
 	execSetupArtwork();
@@ -4256,7 +4311,11 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 	  else if (setup_mode == SETUP_MODE_CHOOSE_TOUCH_CONTROL ||
 		   setup_mode == SETUP_MODE_CHOOSE_MOVE_DISTANCE ||
 		   setup_mode == SETUP_MODE_CHOOSE_DROP_DISTANCE ||
-		   setup_mode == SETUP_MODE_CHOOSE_TRANSPARENCY)
+		   setup_mode == SETUP_MODE_CHOOSE_TRANSPARENCY ||
+		   setup_mode == SETUP_MODE_CHOOSE_GRID_XSIZE_0 ||
+		   setup_mode == SETUP_MODE_CHOOSE_GRID_YSIZE_0 ||
+		   setup_mode == SETUP_MODE_CHOOSE_GRID_XSIZE_1 ||
+		   setup_mode == SETUP_MODE_CHOOSE_GRID_YSIZE_1)
 	    execSetupTouch();
 	  else
 	    execSetupArtwork();
@@ -4323,7 +4382,11 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 	  else if (setup_mode == SETUP_MODE_CHOOSE_TOUCH_CONTROL ||
 		   setup_mode == SETUP_MODE_CHOOSE_MOVE_DISTANCE ||
 		   setup_mode == SETUP_MODE_CHOOSE_DROP_DISTANCE ||
-		   setup_mode == SETUP_MODE_CHOOSE_TRANSPARENCY)
+		   setup_mode == SETUP_MODE_CHOOSE_TRANSPARENCY ||
+		   setup_mode == SETUP_MODE_CHOOSE_GRID_XSIZE_0 ||
+		   setup_mode == SETUP_MODE_CHOOSE_GRID_YSIZE_0 ||
+		   setup_mode == SETUP_MODE_CHOOSE_GRID_XSIZE_1 ||
+		   setup_mode == SETUP_MODE_CHOOSE_GRID_YSIZE_1)
 	    execSetupTouch();
 	  else
 	    execSetupArtwork();
@@ -4591,6 +4654,7 @@ static char *touch_controls_text;
 static char *move_distance_text;
 static char *drop_distance_text;
 static char *transparency_text;
+static char *grid_size_text[2][2];
 
 static void execSetupMain()
 {
@@ -5295,6 +5359,34 @@ static void execSetupChooseTransparency()
   DrawSetupScreen();
 }
 
+static void execSetupChooseGridXSize_0()
+{
+  setup_mode = SETUP_MODE_CHOOSE_GRID_XSIZE_0;
+
+  DrawSetupScreen();
+}
+
+static void execSetupChooseGridYSize_0()
+{
+  setup_mode = SETUP_MODE_CHOOSE_GRID_YSIZE_0;
+
+  DrawSetupScreen();
+}
+
+static void execSetupChooseGridXSize_1()
+{
+  setup_mode = SETUP_MODE_CHOOSE_GRID_XSIZE_1;
+
+  DrawSetupScreen();
+}
+
+static void execSetupChooseGridYSize_1()
+{
+  setup_mode = SETUP_MODE_CHOOSE_GRID_YSIZE_1;
+
+  DrawSetupScreen();
+}
+
 static void execSetupConfigureVirtualButtons()
 {
   ConfigureVirtualButtons();
@@ -5304,10 +5396,10 @@ static void execSetupConfigureVirtualButtons()
 
 static void execSetupTouch()
 {
+  int i, j, k;
+
   if (touch_controls == NULL)
   {
-    int i;
-
     for (i = 0; touch_controls_list[i].value != NULL; i++)
     {
       TreeInfo *ti = newTreeInfo_setDefaults(TREE_TYPE_UNDEFINED);
@@ -5348,8 +5440,6 @@ static void execSetupTouch()
 
   if (move_distances == NULL)
   {
-    int i;
-
     for (i = 0; distances_list[i].value != -1; i++)
     {
       TreeInfo *ti = newTreeInfo_setDefaults(TREE_TYPE_UNDEFINED);
@@ -5392,8 +5482,6 @@ static void execSetupTouch()
 
   if (drop_distances == NULL)
   {
-    int i;
-
     for (i = 0; distances_list[i].value != -1; i++)
     {
       TreeInfo *ti = newTreeInfo_setDefaults(TREE_TYPE_UNDEFINED);
@@ -5436,8 +5524,6 @@ static void execSetupTouch()
 
   if (transparencies == NULL)
   {
-    int i;
-
     for (i = 0; transparencies_list[i].value != -1; i++)
     {
       TreeInfo *ti = newTreeInfo_setDefaults(TREE_TYPE_UNDEFINED);
@@ -5478,16 +5564,91 @@ static void execSetupTouch()
       transparency_current = transparencies;
   }
 
+  for (i = 0; i < 2; i++)
+  {
+    for (j = 0; j < 2; j++)
+    {
+      if (grid_sizes[i][j] == NULL)
+      {
+	for (k = 0; grid_sizes_list[k].value != -1; k++)
+	{
+	  TreeInfo *ti = newTreeInfo_setDefaults(TREE_TYPE_UNDEFINED);
+	  char identifier[32], name[32];
+	  int value = grid_sizes_list[k].value;
+	  char *text = grid_sizes_list[k].text;
+
+	  ti->node_top = &grid_sizes[i][j];
+	  ti->sort_priority = value;
+
+	  sprintf(identifier, "%d", value);
+	  sprintf(name, "%s", text);
+
+	  setString(&ti->identifier, identifier);
+	  setString(&ti->name, name);
+	  setString(&ti->name_sorting, name);
+	  setString(&ti->infotext,
+		    (i == 0 ?
+		     (j == 0 ?
+		      STR_SETUP_CHOOSE_GRID_XSIZE_0 :
+		      STR_SETUP_CHOOSE_GRID_YSIZE_0) :
+		     (j == 0 ?
+		      STR_SETUP_CHOOSE_GRID_XSIZE_1 :
+		      STR_SETUP_CHOOSE_GRID_YSIZE_1)));
+
+	  pushTreeInfo(&grid_sizes[i][j], ti);
+	}
+
+	/* sort grid size values to start with lowest grid size value */
+	sortTreeInfo(&grid_sizes[i][j]);
+
+	/* set current grid size value to configured grid size value */
+	grid_size_current[i][j] =
+	  getTreeInfoFromIdentifier(grid_sizes[i][j],
+				    i_to_a(j == 0 ?
+					   setup.touch.grid_xsize[i] :
+					   setup.touch.grid_ysize[i]));
+
+	/* if that fails, set current grid size to reliable default value */
+	if (grid_size_current[i][j] == NULL)
+	  grid_size_current[i][j] =
+	    getTreeInfoFromIdentifier(grid_sizes[i][j],
+				      i_to_a(j == 0 ?
+					     DEFAULT_GRID_XSIZE(i) :
+					     DEFAULT_GRID_YSIZE(i)));
+
+	/* if that also fails, set current grid size to first available value */
+	if (grid_size_current[i][j] == NULL)
+	  grid_size_current[i][j] = grid_sizes[i][j];
+      }
+    }
+  }
+
   setup.touch.control_type = touch_control_current->identifier;
   setup.touch.move_distance = atoi(move_distance_current->identifier);
   setup.touch.drop_distance = atoi(drop_distance_current->identifier);
   setup.touch.transparency = atoi(transparency_current->identifier);
 
-  /* needed for displaying volume text instead of identifier */
+  for (i = 0; i < 2; i++)
+  {
+    setup.touch.grid_xsize[i] = atoi(grid_size_current[i][0]->identifier);
+    setup.touch.grid_ysize[i] = atoi(grid_size_current[i][1]->identifier);
+
+    if (i == GRID_ACTIVE_NR())
+    {
+      overlay.grid_xsize = setup.touch.grid_xsize[i];
+      overlay.grid_ysize = setup.touch.grid_ysize[i];
+    }
+  }
+
+  /* needed for displaying value text instead of identifier */
   touch_controls_text = touch_control_current->name;
   move_distance_text = move_distance_current->name;
   drop_distance_text = drop_distance_current->name;
   transparency_text = transparency_current->name;
+
+  for (i = 0; i < 2; i++)
+    for (j = 0; j < 2; j++)
+      grid_size_text[i][j] = grid_size_current[i][j]->name;
 
   setup_mode = SETUP_MODE_TOUCH;
 
@@ -5656,6 +5817,18 @@ static struct
 
   { &setup.touch.transparency,		execSetupChooseTransparency	},
   { &setup.touch.transparency,		&transparency_text		},
+
+  { &setup.touch.grid_xsize[0],		execSetupChooseGridXSize_0	},
+  { &setup.touch.grid_xsize[0],		&grid_size_text[0][0]		},
+
+  { &setup.touch.grid_ysize[0],		execSetupChooseGridYSize_0	},
+  { &setup.touch.grid_ysize[0],		&grid_size_text[0][1]		},
+
+  { &setup.touch.grid_xsize[1],		execSetupChooseGridXSize_1	},
+  { &setup.touch.grid_xsize[1],		&grid_size_text[1][0]		},
+
+  { &setup.touch.grid_ysize[1],		execSetupChooseGridYSize_1	},
+  { &setup.touch.grid_ysize[1],		&grid_size_text[1][1]		},
 
   { NULL,				NULL				}
 };
@@ -5844,6 +6017,10 @@ static struct TokenInfo setup_info_touch_virtual_buttons[] =
   { TYPE_ENTER_LIST,	execSetupChooseTouchControls, "Touch Control Type:" },
   { TYPE_STRING,	&touch_controls_text,	""			},
   { TYPE_EMPTY,		NULL,			""			},
+  { TYPE_ENTER_LIST,	execSetupChooseGridXSize_0, "Horizontal Buttons (Landscape):"	},
+  { TYPE_STRING,	&grid_size_text[0][0],	""			},
+  { TYPE_ENTER_LIST,	execSetupChooseGridYSize_0, "Vertical Buttons (Landscape):"	},
+  { TYPE_STRING,	&grid_size_text[0][1],	""			},
   { TYPE_ENTER_LIST,	execSetupChooseTransparency, "Transparency:"	},
   { TYPE_STRING,	&transparency_text,	""			},
   { TYPE_EMPTY,		NULL,			""			},
@@ -7560,6 +7737,14 @@ void DrawSetupScreen()
     DrawChooseTree(&drop_distance_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_TRANSPARENCY)
     DrawChooseTree(&transparency_current);
+  else if (setup_mode == SETUP_MODE_CHOOSE_GRID_XSIZE_0)
+    DrawChooseTree(&grid_size_current[0][0]);
+  else if (setup_mode == SETUP_MODE_CHOOSE_GRID_YSIZE_0)
+    DrawChooseTree(&grid_size_current[0][1]);
+  else if (setup_mode == SETUP_MODE_CHOOSE_GRID_XSIZE_1)
+    DrawChooseTree(&grid_size_current[1][0]);
+  else if (setup_mode == SETUP_MODE_CHOOSE_GRID_YSIZE_1)
+    DrawChooseTree(&grid_size_current[1][1]);
   else
     DrawSetupScreen_Generic();
 
@@ -7614,6 +7799,14 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
     HandleChooseTree(mx, my, dx, dy, button, &drop_distance_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_TRANSPARENCY)
     HandleChooseTree(mx, my, dx, dy, button, &transparency_current);
+  else if (setup_mode == SETUP_MODE_CHOOSE_GRID_XSIZE_0)
+    HandleChooseTree(mx, my, dx, dy, button, &grid_size_current[0][0]);
+  else if (setup_mode == SETUP_MODE_CHOOSE_GRID_YSIZE_0)
+    HandleChooseTree(mx, my, dx, dy, button, &grid_size_current[0][1]);
+  else if (setup_mode == SETUP_MODE_CHOOSE_GRID_XSIZE_1)
+    HandleChooseTree(mx, my, dx, dy, button, &grid_size_current[1][0]);
+  else if (setup_mode == SETUP_MODE_CHOOSE_GRID_YSIZE_1)
+    HandleChooseTree(mx, my, dx, dy, button, &grid_size_current[1][1]);
   else
     HandleSetupScreen_Generic(mx, my, dx, dy, button);
 }
