@@ -96,7 +96,10 @@
 
 #define TOUCH_MOVE_DISTANCE_DEFAULT	2
 #define TOUCH_DROP_DISTANCE_DEFAULT	5
+#define TOUCH_TRANSPARENCY_DEFAULT	50
 
+#define ALPHA_FROM_TRANSPARENCY(x)	((100 - x) * SDL_ALPHA_OPAQUE / 100)
+#define ALPHA_FADING_STEPSIZE(x)	((x) / 25)
 
 /* values for special settings for mobile devices */
 #if defined(PLATFORM_ANDROID)
@@ -1055,6 +1058,8 @@ struct SetupTouchInfo
   int grid_ysize[2];
 
   char grid_button[2][MAX_GRID_XSIZE][MAX_GRID_YSIZE];
+
+  int transparency;		/* in percent (0 == opaque, 100 == invisible) */
 
   boolean grid_initialized;
 };

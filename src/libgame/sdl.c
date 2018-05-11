@@ -3014,10 +3014,10 @@ static void DrawTouchInputOverlay_ShowGrid(int alpha)
 
 static void DrawTouchInputOverlay_ShowGridButtons(int alpha)
 {
-  static int alpha_max = SDL_ALPHA_OPAQUE / 2;
-  static int alpha_step = 5;
   static int alpha_direction = 0;
   static int alpha_highlight = 0;
+  int alpha_max = ALPHA_FROM_TRANSPARENCY(setup.touch.transparency);
+  int alpha_step = ALPHA_FADING_STEPSIZE(alpha_max);
   SDL_Rect rect;
   int grid_xsize = overlay.grid_xsize;
   int grid_ysize = overlay.grid_ysize;
@@ -3103,10 +3103,10 @@ static void DrawTouchInputOverlay()
   static boolean deactivated = TRUE;
   static boolean show_grid = FALSE;
   static int width = 0, height = 0;
-  static int alpha_max = SDL_ALPHA_OPAQUE / 2;
-  static int alpha_step = 5;
   static int alpha_last = -1;
   static int alpha = 0;
+  int alpha_max = ALPHA_FROM_TRANSPARENCY(setup.touch.transparency);
+  int alpha_step = ALPHA_FADING_STEPSIZE(alpha_max);
   boolean active = (overlay.enabled && overlay.active);
 
   if (!active && deactivated)

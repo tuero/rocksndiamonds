@@ -77,8 +77,9 @@
 #define SETUP_MODE_CHOOSE_TOUCH_CONTROL	28
 #define SETUP_MODE_CHOOSE_MOVE_DISTANCE	29
 #define SETUP_MODE_CHOOSE_DROP_DISTANCE	30
+#define SETUP_MODE_CHOOSE_TRANSPARENCY	31
 
-#define MAX_SETUP_MODES			31
+#define MAX_SETUP_MODES			32
 
 #define MAX_MENU_MODES			MAX(MAX_INFO_MODES, MAX_SETUP_MODES)
 
@@ -107,6 +108,7 @@
 #define STR_SETUP_CHOOSE_TOUCH_CONTROL	"Control Type"
 #define STR_SETUP_CHOOSE_MOVE_DISTANCE	"Move Distance"
 #define STR_SETUP_CHOOSE_DROP_DISTANCE	"Drop Distance"
+#define STR_SETUP_CHOOSE_TRANSPARENCY	"Transparency"
 
 /* for input setup functions */
 #define SETUPINPUT_SCREEN_POS_START	0
@@ -275,6 +277,9 @@ static TreeInfo *move_distance_current = NULL;
 
 static TreeInfo *drop_distances = NULL;
 static TreeInfo *drop_distance_current = NULL;
+
+static TreeInfo *transparencies = NULL;
+static TreeInfo *transparency_current = NULL;
 
 static TreeInfo *level_number = NULL;
 static TreeInfo *level_number_current = NULL;
@@ -448,6 +453,27 @@ static struct
   {	15,	"15 %"				},
   {	20,	"20 %"				},
   {	25,	"25 %"				},
+
+  {	-1,	NULL				},
+};
+
+static struct
+{
+  int value;
+  char *text;
+} transparencies_list[] =
+{
+  {	0,	"0 % (Opaque)"			},
+  {	10,	"10 %"				},
+  {	20,	"20 %"				},
+  {	30,	"30 %"				},
+  {	40,	"40 %"				},
+  {	50,	"50 %"				},
+  {	60,	"60 %"				},
+  {	70,	"70 %"				},
+  {	80,	"80 %"				},
+  {	90,	"90 %"				},
+  {	100,	"100 % (Invisible)"		},
 
   {	-1,	NULL				},
 };
@@ -4076,7 +4102,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 	execSetupSound();
       else if (setup_mode == SETUP_MODE_CHOOSE_TOUCH_CONTROL ||
 	       setup_mode == SETUP_MODE_CHOOSE_MOVE_DISTANCE ||
-	       setup_mode == SETUP_MODE_CHOOSE_DROP_DISTANCE)
+	       setup_mode == SETUP_MODE_CHOOSE_DROP_DISTANCE ||
+	       setup_mode == SETUP_MODE_CHOOSE_TRANSPARENCY)
 	execSetupTouch();
       else
 	execSetupArtwork();
@@ -4228,7 +4255,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 	    execSetupSound();
 	  else if (setup_mode == SETUP_MODE_CHOOSE_TOUCH_CONTROL ||
 		   setup_mode == SETUP_MODE_CHOOSE_MOVE_DISTANCE ||
-		   setup_mode == SETUP_MODE_CHOOSE_DROP_DISTANCE)
+		   setup_mode == SETUP_MODE_CHOOSE_DROP_DISTANCE ||
+		   setup_mode == SETUP_MODE_CHOOSE_TRANSPARENCY)
 	    execSetupTouch();
 	  else
 	    execSetupArtwork();
@@ -4294,7 +4322,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 	    execSetupSound();
 	  else if (setup_mode == SETUP_MODE_CHOOSE_TOUCH_CONTROL ||
 		   setup_mode == SETUP_MODE_CHOOSE_MOVE_DISTANCE ||
-		   setup_mode == SETUP_MODE_CHOOSE_DROP_DISTANCE)
+		   setup_mode == SETUP_MODE_CHOOSE_DROP_DISTANCE ||
+		   setup_mode == SETUP_MODE_CHOOSE_TRANSPARENCY)
 	    execSetupTouch();
 	  else
 	    execSetupArtwork();
@@ -4561,6 +4590,7 @@ static char *volume_music_text;
 static char *touch_controls_text;
 static char *move_distance_text;
 static char *drop_distance_text;
+static char *transparency_text;
 
 static void execSetupMain()
 {
@@ -5258,6 +5288,13 @@ static void execSetupChooseDropDistance()
   DrawSetupScreen();
 }
 
+static void execSetupChooseTransparency()
+{
+  setup_mode = SETUP_MODE_CHOOSE_TRANSPARENCY;
+
+  DrawSetupScreen();
+}
+
 static void execSetupConfigureVirtualButtons()
 {
   ConfigureVirtualButtons();
@@ -5395,14 +5432,60 @@ static void execSetupTouch()
       drop_distance_current = drop_distances;
   }
 
+  if (transparencies == NULL)
+  {
+    int i;
+
+    for (i = 0; transparencies_list[i].value != -1; i++)
+    {
+      TreeInfo *ti = newTreeInfo_setDefaults(TREE_TYPE_UNDEFINED);
+      char identifier[32], name[32];
+      int value = transparencies_list[i].value;
+      char *text = transparencies_list[i].text;
+
+      ti->node_top = &transparencies;
+      ti->sort_priority = value;
+
+      sprintf(identifier, "%d", value);
+      sprintf(name, "%s", text);
+
+      setString(&ti->identifier, identifier);
+      setString(&ti->name, name);
+      setString(&ti->name_sorting, name);
+      setString(&ti->infotext, STR_SETUP_CHOOSE_TRANSPARENCY);
+
+      pushTreeInfo(&transparencies, ti);
+    }
+
+    /* sort transparency values to start with lowest transparency value */
+    sortTreeInfo(&transparencies);
+
+    /* set current transparency value to configured transparency value */
+    transparency_current =
+      getTreeInfoFromIdentifier(transparencies,
+				i_to_a(setup.touch.transparency));
+
+    /* if that fails, set current transparency to reliable default value */
+    if (transparency_current == NULL)
+      transparency_current =
+	getTreeInfoFromIdentifier(transparencies,
+				  i_to_a(TOUCH_TRANSPARENCY_DEFAULT));
+
+    /* if that also fails, set current transparency to first available value */
+    if (transparency_current == NULL)
+      transparency_current = transparencies;
+  }
+
   setup.touch.control_type = touch_control_current->identifier;
   setup.touch.move_distance = atoi(move_distance_current->identifier);
   setup.touch.drop_distance = atoi(drop_distance_current->identifier);
+  setup.touch.transparency = atoi(transparency_current->identifier);
 
   /* needed for displaying volume text instead of identifier */
   touch_controls_text = touch_control_current->name;
   move_distance_text = move_distance_current->name;
   drop_distance_text = drop_distance_current->name;
+  transparency_text = transparency_current->name;
 
   setup_mode = SETUP_MODE_TOUCH;
 
@@ -5568,6 +5651,9 @@ static struct
 
   { &setup.touch.drop_distance,		execSetupChooseDropDistance	},
   { &setup.touch.drop_distance,		&drop_distance_text		},
+
+  { &setup.touch.transparency,		execSetupChooseTransparency	},
+  { &setup.touch.transparency,		&transparency_text		},
 
   { NULL,				NULL				}
 };
@@ -5755,6 +5841,9 @@ static struct TokenInfo setup_info_touch_virtual_buttons[] =
 {
   { TYPE_ENTER_LIST,	execSetupChooseTouchControls, "Touch Control Type:" },
   { TYPE_STRING,	&touch_controls_text,	""			},
+  { TYPE_EMPTY,		NULL,			""			},
+  { TYPE_ENTER_LIST,	execSetupChooseTransparency, "Transparency:"	},
+  { TYPE_STRING,	&transparency_text,	""			},
   { TYPE_EMPTY,		NULL,			""			},
   { TYPE_ENTER_LIST,	execSetupConfigureVirtualButtons, "Configure Virtual Buttons" },
   { TYPE_EMPTY,		NULL,			""			},
@@ -7467,6 +7556,8 @@ void DrawSetupScreen()
     DrawChooseTree(&move_distance_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_DROP_DISTANCE)
     DrawChooseTree(&drop_distance_current);
+  else if (setup_mode == SETUP_MODE_CHOOSE_TRANSPARENCY)
+    DrawChooseTree(&transparency_current);
   else
     DrawSetupScreen_Generic();
 
@@ -7519,6 +7610,8 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
     HandleChooseTree(mx, my, dx, dy, button, &move_distance_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_DROP_DISTANCE)
     HandleChooseTree(mx, my, dx, dy, button, &drop_distance_current);
+  else if (setup_mode == SETUP_MODE_CHOOSE_TRANSPARENCY)
+    HandleChooseTree(mx, my, dx, dy, button, &transparency_current);
   else
     HandleSetupScreen_Generic(mx, my, dx, dy, button);
 }
