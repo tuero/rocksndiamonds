@@ -5382,7 +5382,8 @@ static void execSetupTouch()
     /* if that fails, set current distance to reliable default value */
     if (move_distance_current == NULL)
       move_distance_current =
-	getTreeInfoFromIdentifier(move_distances, i_to_a(1));
+	getTreeInfoFromIdentifier(move_distances,
+				  i_to_a(TOUCH_MOVE_DISTANCE_DEFAULT));
 
     /* if that also fails, set current distance to first available value */
     if (move_distance_current == NULL)
@@ -5425,7 +5426,8 @@ static void execSetupTouch()
     /* if that fails, set current distance to reliable default value */
     if (drop_distance_current == NULL)
       drop_distance_current =
-	getTreeInfoFromIdentifier(drop_distances, i_to_a(1));
+	getTreeInfoFromIdentifier(drop_distances,
+				  i_to_a(TOUCH_DROP_DISTANCE_DEFAULT));
 
     /* if that also fails, set current distance to first available value */
     if (drop_distance_current == NULL)
