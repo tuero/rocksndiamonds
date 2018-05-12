@@ -476,9 +476,9 @@
 						GRID_REAL_HEIGHT),	\
 					    MAX_GRID_YSIZE)
 
-#define DEFAULT_GRID_XSIZE(n)		(n == 0 ? DEFAULT_GRID_XSIZE_0 : \
+#define DEFAULT_GRID_XSIZE(n)		((n) == 0 ? DEFAULT_GRID_XSIZE_0 : \
 					 DEFAULT_GRID_XSIZE_1)
-#define DEFAULT_GRID_YSIZE(n)		(n == 0 ? DEFAULT_GRID_YSIZE_0 : \
+#define DEFAULT_GRID_YSIZE(n)		((n) == 0 ? DEFAULT_GRID_YSIZE_0 : \
 					 DEFAULT_GRID_YSIZE_1)
 
 #define GRID_ACTIVE_NR()		(video.screen_width >	\
