@@ -3052,44 +3052,45 @@ static void DrawTouchInputOverlay_ShowGridButtons(int alpha)
   {
     for (y = 0; y < grid_ysize; y++)
     {
+      int grid_button = overlay.grid_button[x][y];
+      int alpha_draw = alpha;
+
+      if (grid_button == CHAR_GRID_BUTTON_NONE)
+	continue;
+
+      if (grid_button == overlay.grid_button_highlight)
+	alpha_draw = alpha_highlight;
+
+      SDL_SetRenderDrawColor(sdl_renderer, 255, 255, 255, alpha_draw);
+
       rect.x = (x + 0) * video.screen_width  / grid_xsize;
       rect.y = (y + 0) * video.screen_height / grid_ysize;
       rect.w = (x + 1) * video.screen_width  / grid_xsize - rect.x;
       rect.h = (y + 1) * video.screen_height / grid_ysize - rect.y;
 
-      if (x == 0 ||
-	  overlay.grid_button[x - 1][y] != overlay.grid_button[x][y])
+      if (x == 0 || overlay.grid_button[x - 1][y] != grid_button)
       {
 	rect.x += 2;
 	rect.w -= 2;
       }
 
-      if (x == grid_xsize - 1 ||
-	  overlay.grid_button[x + 1][y] != overlay.grid_button[x][y])
+      if (x == grid_xsize - 1 || overlay.grid_button[x + 1][y] != grid_button)
       {
 	rect.w -= 2;
       }
 
-      if (y == 0 ||
-	  overlay.grid_button[x][y - 1] != overlay.grid_button[x][y])
+      if (y == 0 || overlay.grid_button[x][y - 1] != grid_button)
       {
 	rect.y += 2;
 	rect.h -= 2;
       }
 
-      if (y == grid_ysize - 1 ||
-	  overlay.grid_button[x][y + 1] != overlay.grid_button[x][y])
+      if (y == grid_ysize - 1 || overlay.grid_button[x][y + 1] != grid_button)
       {
 	rect.h -= 2;
       }
 
-      if (overlay.grid_button[x][y] == overlay.grid_button_highlight)
-	SDL_SetRenderDrawColor(sdl_renderer, 255, 255, 255, alpha_highlight);
-      else
-	SDL_SetRenderDrawColor(sdl_renderer, 255, 255, 255, alpha);
-
-      if (overlay.grid_button[x][y] != CHAR_GRID_BUTTON_NONE)
-	SDL_RenderFillRect(sdl_renderer, &rect);
+      SDL_RenderFillRect(sdl_renderer, &rect);
     }
   }
 
