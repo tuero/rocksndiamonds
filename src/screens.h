@@ -25,6 +25,7 @@ void DrawMainMenu(void);
 void DrawHallOfFame(int);
 
 void RedrawSetupScreenAfterFullscreenToggle();
+void RedrawSetupScreenAfterScreenRotation(int);
 
 void HandleTitleScreen(int, int, int, int, int);
 void HandleMainMenu(int, int, int, int, int);

@@ -82,8 +82,9 @@
 #define SETUP_MODE_CHOOSE_GRID_YSIZE_0	33
 #define SETUP_MODE_CHOOSE_GRID_XSIZE_1	34
 #define SETUP_MODE_CHOOSE_GRID_YSIZE_1	35
+#define SETUP_MODE_CONFIG_VIRT_BUTTONS	36
 
-#define MAX_SETUP_MODES			36
+#define MAX_SETUP_MODES			37
 
 #define MAX_MENU_MODES			MAX(MAX_INFO_MODES, MAX_SETUP_MODES)
 
@@ -5389,7 +5390,11 @@ static void execSetupChooseGridYSize_1()
 
 static void execSetupConfigureVirtualButtons()
 {
+  setup_mode = SETUP_MODE_CONFIG_VIRT_BUTTONS;
+
   ConfigureVirtualButtons();
+
+  setup_mode = SETUP_MODE_TOUCH;
 
   DrawSetupScreen();
 }
@@ -6012,7 +6017,7 @@ static struct TokenInfo setup_info_touch[] =
   { 0,			NULL,			NULL			}
 };
 
-static struct TokenInfo setup_info_touch_virtual_buttons[] =
+static struct TokenInfo setup_info_touch_virtual_buttons_0[] =
 {
   { TYPE_ENTER_LIST,	execSetupChooseTouchControls, "Touch Control Type:" },
   { TYPE_STRING,	&touch_controls_text,	""			},
@@ -6029,6 +6034,31 @@ static struct TokenInfo setup_info_touch_virtual_buttons[] =
   { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
 
   { 0,			NULL,			NULL			}
+};
+
+static struct TokenInfo setup_info_touch_virtual_buttons_1[] =
+{
+  { TYPE_ENTER_LIST,	execSetupChooseTouchControls, "Touch Control Type:" },
+  { TYPE_STRING,	&touch_controls_text,	""			},
+  { TYPE_EMPTY,		NULL,			""			},
+  { TYPE_ENTER_LIST,	execSetupChooseGridXSize_1, "Horizontal Buttons (Portrait):"	},
+  { TYPE_STRING,	&grid_size_text[1][0],	""			},
+  { TYPE_ENTER_LIST,	execSetupChooseGridYSize_1, "Vertical Buttons (Portrait):"	},
+  { TYPE_STRING,	&grid_size_text[1][1],	""			},
+  { TYPE_ENTER_LIST,	execSetupChooseTransparency, "Transparency:"	},
+  { TYPE_STRING,	&transparency_text,	""			},
+  { TYPE_EMPTY,		NULL,			""			},
+  { TYPE_ENTER_LIST,	execSetupConfigureVirtualButtons, "Configure Virtual Buttons" },
+  { TYPE_EMPTY,		NULL,			""			},
+  { TYPE_LEAVE_MENU,	execSetupMain, 		"Back"			},
+
+  { 0,			NULL,			NULL			}
+};
+
+static struct TokenInfo *setup_info_touch_virtual_buttons[] =
+{
+  setup_info_touch_virtual_buttons_0,
+  setup_info_touch_virtual_buttons_1
 };
 
 static struct TokenInfo setup_info_touch_wipe_gestures[] =
@@ -6465,7 +6495,7 @@ static void DrawSetupScreen_Generic()
     title_string = STR_SETUP_TOUCH;
 
     if (strEqual(setup.touch.control_type, TOUCH_CONTROL_VIRTUAL_BUTTONS))
-      setup_info = setup_info_touch_virtual_buttons;
+      setup_info = setup_info_touch_virtual_buttons[GRID_ACTIVE_NR()];
     else if (strEqual(setup.touch.control_type, TOUCH_CONTROL_WIPE_GESTURES))
       setup_info = setup_info_touch_wipe_gestures;
   }
@@ -7760,6 +7790,24 @@ void RedrawSetupScreenAfterFullscreenToggle()
     execSetupGraphics_setWindowSizes(TRUE);
 
     DrawSetupScreen();
+  }
+}
+
+void RedrawSetupScreenAfterScreenRotation(int nr)
+{
+  int x, y;
+
+  if (setup_mode == SETUP_MODE_TOUCH)
+  {
+    // update virtual button settings (depending on screen orientation)
+    DrawSetupScreen();
+  }
+  else if (setup_mode == SETUP_MODE_CONFIG_VIRT_BUTTONS)
+  {
+    // save already configured virtual buttons
+    for (x = 0; x < MAX_GRID_XSIZE; x++)
+      for (y = 0; y < MAX_GRID_YSIZE; y++)
+	setup.touch.grid_button[nr][x][y] = overlay.grid_button[x][y];
   }
 }
 

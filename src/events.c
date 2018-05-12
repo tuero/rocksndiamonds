@@ -649,12 +649,7 @@ void HandleWindowEvent(WindowEvent *event)
 	  int x, y;
 
 	  if (game_status == GAME_MODE_SETUP)
-	  {
-	    // save active virtual buttons (in case of just configuring them)
-	    for (x = 0; x < MAX_GRID_XSIZE; x++)
-	      for (y = 0; y < MAX_GRID_YSIZE; y++)
-		setup.touch.grid_button[nr][x][y] = overlay.grid_button[x][y];
-	  }
+	    RedrawSetupScreenAfterScreenRotation(nr);
 
 	  nr = GRID_ACTIVE_NR();
 
