@@ -682,6 +682,7 @@ void HandleFingerEvent_VirtualButtons(FingerEvent *event)
   int x = event->x * overlay.grid_xsize;
   int y = event->y * overlay.grid_ysize;
   int grid_button = overlay.grid_button[x][y];
+  int grid_button_action = GET_ACTION_FROM_GRID_BUTTON(grid_button);
   Key key = (grid_button == CHAR_GRID_BUTTON_LEFT  ? setup.input[0].key.left :
 	     grid_button == CHAR_GRID_BUTTON_RIGHT ? setup.input[0].key.right :
 	     grid_button == CHAR_GRID_BUTTON_UP    ? setup.input[0].key.up :
@@ -724,6 +725,11 @@ void HandleFingerEvent_VirtualButtons(FingerEvent *event)
 
   Error(ERR_DEBUG, "::: key '%s' was '%s' [fingerId: %lld]",
 	getKeyNameFromKey(key), key_status_name, event->fingerId);
+
+  if (key_status == KEY_PRESSED)
+    overlay.grid_button_action |= grid_button_action;
+  else
+    overlay.grid_button_action &= ~grid_button_action;
 
   // check if we already know this touch event's finger id
   for (i = 0; i < NUM_TOUCH_FINGERS; i++)

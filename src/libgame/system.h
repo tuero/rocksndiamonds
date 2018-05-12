@@ -493,6 +493,20 @@
 #define CHAR_GRID_BUTTON_SNAP		'1'
 #define CHAR_GRID_BUTTON_DROP		'2'
 
+#define GET_ACTION_FROM_GRID_BUTTON(c)	((c) == CHAR_GRID_BUTTON_LEFT ?  \
+					 JOY_LEFT :			 \
+					 (c) == CHAR_GRID_BUTTON_RIGHT ? \
+					 JOY_RIGHT :			 \
+					 (c) == CHAR_GRID_BUTTON_UP ?    \
+					 JOY_UP :			 \
+					 (c) == CHAR_GRID_BUTTON_DOWN ?  \
+					 JOY_DOWN :			 \
+					 (c) == CHAR_GRID_BUTTON_SNAP ?  \
+					 JOY_BUTTON_1 :			 \
+					 (c) == CHAR_GRID_BUTTON_DROP ?  \
+					 JOY_BUTTON_2 :			 \
+					 JOY_NO_ACTION)
+
 /* default name for empty highscore entry */
 #define EMPTY_PLAYER_NAME	"no name"
 
@@ -1024,8 +1038,9 @@ struct OverlayInfo
   int grid_ysize;
 
   char grid_button[MAX_GRID_XSIZE][MAX_GRID_YSIZE];
-
   char grid_button_highlight;
+
+  int grid_button_action;
 };
 
 struct JoystickInfo
@@ -1062,6 +1077,7 @@ struct SetupTouchInfo
 
   int transparency;		/* in percent (0 == opaque, 100 == invisible) */
   boolean draw_outlined;
+  boolean draw_pressed;
 
   boolean grid_initialized;
 };

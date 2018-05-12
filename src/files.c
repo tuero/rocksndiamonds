@@ -8307,12 +8307,13 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_TOUCH_DROP_DISTANCE		43
 #define SETUP_TOKEN_TOUCH_TRANSPARENCY		44
 #define SETUP_TOKEN_TOUCH_DRAW_OUTLINED		45
-#define SETUP_TOKEN_TOUCH_GRID_XSIZE_0		46
-#define SETUP_TOKEN_TOUCH_GRID_YSIZE_0		47
-#define SETUP_TOKEN_TOUCH_GRID_XSIZE_1		48
-#define SETUP_TOKEN_TOUCH_GRID_YSIZE_1		49
+#define SETUP_TOKEN_TOUCH_DRAW_PRESSED		46
+#define SETUP_TOKEN_TOUCH_GRID_XSIZE_0		47
+#define SETUP_TOKEN_TOUCH_GRID_YSIZE_0		48
+#define SETUP_TOKEN_TOUCH_GRID_XSIZE_1		49
+#define SETUP_TOKEN_TOUCH_GRID_YSIZE_1		50
 
-#define NUM_GLOBAL_SETUP_TOKENS			50
+#define NUM_GLOBAL_SETUP_TOKENS			51
 
 /* auto setup */
 #define SETUP_TOKEN_AUTO_EDITOR_ZOOM_TILESIZE	0
@@ -8515,6 +8516,7 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_INTEGER,&si.touch.drop_distance,     "touch.drop_distance"	},
   { TYPE_INTEGER,&si.touch.transparency,      "touch.transparency"	},
   { TYPE_INTEGER,&si.touch.draw_outlined,     "touch.draw_outlined"	},
+  { TYPE_INTEGER,&si.touch.draw_pressed,      "touch.draw_pressed"	},
   { TYPE_INTEGER,&si.touch.grid_xsize[0],     "touch.virtual_buttons.0.xsize" },
   { TYPE_INTEGER,&si.touch.grid_ysize[0],     "touch.virtual_buttons.0.ysize" },
   { TYPE_INTEGER,&si.touch.grid_xsize[1],     "touch.virtual_buttons.1.xsize" },
@@ -8734,6 +8736,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->touch.drop_distance = TOUCH_DROP_DISTANCE_DEFAULT;	/* percent */
   si->touch.transparency = TOUCH_TRANSPARENCY_DEFAULT;		/* percent */
   si->touch.draw_outlined = TRUE;
+  si->touch.draw_pressed = TRUE;
 
   for (i = 0; i < 2; i++)
   {
