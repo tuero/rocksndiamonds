@@ -3012,6 +3012,13 @@ static void DrawTouchInputOverlay_ShowGrid(int alpha)
   SDL_SetRenderDrawColor(sdl_renderer, 0, 0, 0, 255);
 }
 
+static void RenderFillRectangle(int x, int y, int width, int height)
+{
+  SDL_Rect rect = { x, y, width, height };
+
+  SDL_RenderFillRect(sdl_renderer, &rect);
+}
+
 static void DrawTouchInputOverlay_ShowGridButtons(int alpha)
 {
   static int alpha_direction = 0;
@@ -3054,6 +3061,9 @@ static void DrawTouchInputOverlay_ShowGridButtons(int alpha)
     {
       int grid_button = overlay.grid_button[x][y];
       int alpha_draw = alpha;
+      int outline_border = MV_NONE;
+      int border_size = 2;
+      boolean draw_outlined = setup.touch.draw_outlined;
 
       if (grid_button == CHAR_GRID_BUTTON_NONE)
 	continue;
@@ -3070,27 +3080,60 @@ static void DrawTouchInputOverlay_ShowGridButtons(int alpha)
 
       if (x == 0 || overlay.grid_button[x - 1][y] != grid_button)
       {
-	rect.x += 2;
-	rect.w -= 2;
+	rect.x += border_size;
+	rect.w -= border_size;
+
+	outline_border |= MV_LEFT;
       }
 
       if (x == grid_xsize - 1 || overlay.grid_button[x + 1][y] != grid_button)
       {
-	rect.w -= 2;
+	rect.w -= border_size;
+
+	outline_border |= MV_RIGHT;
       }
 
       if (y == 0 || overlay.grid_button[x][y - 1] != grid_button)
       {
-	rect.y += 2;
-	rect.h -= 2;
+	rect.y += border_size;
+	rect.h -= border_size;
+
+	outline_border |= MV_UP;
       }
 
       if (y == grid_ysize - 1 || overlay.grid_button[x][y + 1] != grid_button)
       {
-	rect.h -= 2;
+	rect.h -= border_size;
+
+	outline_border |= MV_DOWN;
       }
 
-      SDL_RenderFillRect(sdl_renderer, &rect);
+      if (draw_outlined)
+      {
+	int rect_x = rect.x +
+	  (outline_border & MV_LEFT  ? border_size : 0);
+	int rect_w = rect.w -
+	  (outline_border & MV_LEFT  ? border_size : 0) -
+	  (outline_border & MV_RIGHT ? border_size : 0);
+
+	if (outline_border & MV_LEFT)
+	  RenderFillRectangle(rect.x, rect.y, border_size, rect.h);
+
+	if (outline_border & MV_RIGHT)
+	  RenderFillRectangle(rect.x + rect.w - border_size, rect.y,
+			      border_size, rect.h);
+
+	if (outline_border & MV_UP)
+	  RenderFillRectangle(rect_x, rect.y, rect_w, border_size);
+
+	if (outline_border & MV_DOWN)
+	  RenderFillRectangle(rect_x, rect.y + rect.h - border_size,
+			      rect_w, border_size);
+      }
+      else
+      {
+	SDL_RenderFillRect(sdl_renderer, &rect);
+      }
     }
   }
 

@@ -1024,6 +1024,7 @@ struct OverlayInfo
   int grid_ysize;
 
   char grid_button[MAX_GRID_XSIZE][MAX_GRID_YSIZE];
+
   char grid_button_highlight;
 };
 
@@ -1060,6 +1061,7 @@ struct SetupTouchInfo
   char grid_button[2][MAX_GRID_XSIZE][MAX_GRID_YSIZE];
 
   int transparency;		/* in percent (0 == opaque, 100 == invisible) */
+  boolean draw_outlined;
 
   boolean grid_initialized;
 };
