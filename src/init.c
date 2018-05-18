@@ -5075,9 +5075,13 @@ static void InitPlayerInfo()
   local_player = &stored_player[0];
 
   for (i = 0; i < MAX_PLAYERS; i++)
-    stored_player[i].connected = FALSE;
+  {
+    stored_player[i].connected_locally = FALSE;
+    stored_player[i].connected_network = FALSE;
+  }
 
-  local_player->connected = TRUE;
+  local_player->connected_locally = TRUE;
+  local_player->connected_network = TRUE;
 }
 
 static void InitArtworkInfo()

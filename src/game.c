@@ -1731,7 +1731,7 @@ static void InitPlayerField(int x, int y, int element, boolean init_game)
     if (game.use_block_last_field_bug)
       player->block_delay_adjustment = (player->block_last_field ? -1 : 1);
 
-    if (!options.network || player->connected)
+    if (!options.network || player->connected_network)
     {
       player->active = TRUE;
 
@@ -3684,22 +3684,33 @@ void InitGame()
       game.belt_dir_nr[i] = 3;		/* not moving, next moving left */
 
 #if USE_NEW_PLAYER_ASSIGNMENTS
-  /* !!! SAME AS init.c:InitPlayerInfo() -- FIX THIS !!! */
-  /* choose default local player */
-  local_player = &stored_player[0];
-
   for (i = 0; i < MAX_PLAYERS; i++)
+  {
     stored_player[i].connected = FALSE;
 
-  local_player->connected = TRUE;
-  /* !!! SAME AS init.c:InitPlayerInfo() -- FIX THIS !!! */
+    /* in network game mode, the local player might not be the first player */
+    if (stored_player[i].connected_locally)
+      local_player = &stored_player[i];
+  }
+
+  if (!options.network)
+    local_player->connected = TRUE;
 
   if (tape.playing)
   {
     for (i = 0; i < MAX_PLAYERS; i++)
       stored_player[i].connected = tape.player_participates[i];
   }
-  else if (game.team_mode && !options.network)
+  else if (options.network)
+  {
+    /* add team mode players connected over the network (needed for correct
+       assignment of player figures from level to locally playing players) */
+
+    for (i = 0; i < MAX_PLAYERS; i++)
+      if (stored_player[i].connected_network)
+	stored_player[i].connected = TRUE;
+  }
+  else if (game.team_mode)
   {
     /* try to guess locally connected team mode players (needed for correct
        assignment of player figures from level to locally playing players) */

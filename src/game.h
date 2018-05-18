@@ -225,6 +225,8 @@ struct GameInfo
 struct PlayerInfo
 {
   boolean present;		/* player present in level playfield */
+  boolean connected_locally;	/* player connected (locally) */
+  boolean connected_network;	/* player connected (network) */
   boolean connected;		/* player connected (locally or via network) */
   boolean active;		/* player present and connected */
   boolean mapped;		/* player already mapped to input device */

@@ -275,11 +275,15 @@ static void Handle_OP_YOUR_NUMBER()
 
   if (old_local_player != new_local_player)
   {
-    /* copy existing player settings and change to new player */
+    /* set relevant player settings and change to new player */
 
-    *new_local_player = *old_local_player;
-    old_local_player->connected = FALSE;
     local_player = new_local_player;
+
+    old_local_player->connected_locally = FALSE;
+    new_local_player->connected_locally = TRUE;
+
+    old_local_player->connected_network = FALSE;
+    new_local_player->connected_network = TRUE;
   }
 
   if (first_player.nr > MAX_PLAYERS)
@@ -313,17 +317,22 @@ static void Handle_OP_NUMBER_WANTED()
 
     if (old_client_nr != new_client_nr)
     {
-      /* copy existing player settings and change to new player */
+      /* set relevant player settings and change to new player */
 
-      *new_player = *old_player;
-      old_player->connected = FALSE;
+      old_player->connected_network = FALSE;
+      new_player->connected_network = TRUE;
     }
 
     player = getNetworkPlayer(old_client_nr);
     player->nr = new_client_nr;
 
     if (old_player == local_player)		/* local player switched */
+    {
       local_player = new_player;
+
+      old_player->connected_locally = FALSE;
+      new_player->connected_locally = TRUE;
+    }
   }
   else if (old_client_nr == first_player.nr)	/* failed -- local player? */
   {
@@ -375,13 +384,14 @@ static void Handle_OP_PLAYER_CONNECTED()
   player->name[0] = '\0';
   player->next = NULL;
 
-  stored_player[new_index_nr].connected = TRUE;
+  stored_player[new_index_nr].connected_network = TRUE;
 }
 
 static void Handle_OP_PLAYER_DISCONNECTED()
 {
   struct NetworkClientPlayerInfo *player, *player_disconnected;
   int player_nr = (int)buffer[0];
+  int index_nr = player_nr - 1;
 
   printf("OP_PLAYER_DISCONNECTED: %d\n", player_nr);
   player_disconnected = getNetworkPlayer(player_nr);
@@ -392,6 +402,9 @@ static void Handle_OP_PLAYER_DISCONNECTED()
     if (player->next == player_disconnected)
       player->next = player_disconnected->next;
   free(player_disconnected);
+
+  stored_player[index_nr].connected_locally = FALSE;
+  stored_player[index_nr].connected_network = FALSE;
 }
 
 static void Handle_OP_START_PLAYING()
