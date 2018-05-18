@@ -508,7 +508,7 @@ static void Handle_OP_MOVE_PLAYER(unsigned int len)
   /* copy valid player actions */
   for (i = 0; i < MAX_PLAYERS; i++)
     stored_player[i].effective_action =
-      (i < len - 6 && stored_player[i].active ? buffer[6 + i] : 0);
+      (i < len - 6 ? buffer[6 + i] : 0);
 
   network_player_action_received = TRUE;
 }
