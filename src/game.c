@@ -3558,6 +3558,24 @@ void InitGame()
   if (options.debug)
   {
     printf("Player status at level initialization:\n");
+
+    for (i = 0; i < MAX_PLAYERS; i++)
+    {
+      struct PlayerInfo *player = &stored_player[i];
+
+      printf("- player %d: present == %d, connected == %d [%d/%d], active == %d",
+	     i + 1,
+	     player->present,
+	     player->connected,
+	     player->connected_locally,
+	     player->connected_network,
+	     player->active);
+
+      if (local_player == player)
+	printf(" (local player)");
+
+      printf("\n");
+    }
   }
 #endif
 
@@ -3718,10 +3736,12 @@ void InitGame()
     {
       struct PlayerInfo *player = &stored_player[i];
 
-      printf("- player %d: present == %d, connected == %d, active == %d",
+      printf("- player %d: present == %d, connected == %d [%d/%d], active == %d",
 	     i + 1,
 	     player->present,
 	     player->connected,
+	     player->connected_locally,
+	     player->connected_network,
 	     player->active);
 
       if (local_player == player)
@@ -3824,10 +3844,12 @@ void InitGame()
     {
       struct PlayerInfo *player = &stored_player[i];
 
-      printf("- player %d: present == %d, connected == %d, active == %d",
+      printf("- player %d: present == %d, connected == %d [%d/%d], active == %d",
 	     i + 1,
 	     player->present,
 	     player->connected,
+	     player->connected_locally,
+	     player->connected_network,
 	     player->active);
 
       if (local_player == player)
@@ -3989,10 +4011,12 @@ void InitGame()
     {
       struct PlayerInfo *player = &stored_player[i];
 
-      printf("- player %d: present == %d, connected == %d, active == %d",
+      printf("- player %d: present == %d, connected == %d [%d/%d], active == %d",
 	     i + 1,
 	     player->present,
 	     player->connected,
+	     player->connected_locally,
+	     player->connected_network,
 	     player->active);
 
       if (local_player == player)
@@ -4208,10 +4232,12 @@ void InitGame()
       {
 	struct PlayerInfo *player = &stored_player[i];
 
-	printf("- player %d: present == %d, connected == %d, active == %d",
+	printf("- player %d: present == %d, connected == %d [%d/%d], active == %d",
 	       i + 1,
 	       player->present,
 	       player->connected,
+	       player->connected_locally,
+	       player->connected_network,
 	       player->active);
 
 	if (local_player == player)
