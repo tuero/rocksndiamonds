@@ -3545,18 +3545,6 @@ void InitGame()
 
   game.envelope_active = FALSE;
 
-  /* set focus to local player for network games, else to all players */
-  game.centered_player_nr = (network_playing ? local_player->index_nr : -1);
-  game.centered_player_nr_next = game.centered_player_nr;
-  game.set_centered_player = FALSE;
-
-  if (network_playing && tape.recording)
-  {
-    /* store client dependent player focus when recording network games */
-    tape.centered_player_nr_next = game.centered_player_nr_next;
-    tape.set_centered_player = TRUE;
-  }
-
   for (i = 0; i < NUM_BELTS; i++)
   {
     game.belt_dir[i] = MV_NONE;
@@ -3894,6 +3882,18 @@ void InitGame()
 #if 0
   printf("::: local_player->present == %d\n", local_player->present);
 #endif
+
+  /* set focus to local player for network games, else to all players */
+  game.centered_player_nr = (network_playing ? local_player->index_nr : -1);
+  game.centered_player_nr_next = game.centered_player_nr;
+  game.set_centered_player = FALSE;
+
+  if (network_playing && tape.recording)
+  {
+    /* store client dependent player focus when recording network games */
+    tape.centered_player_nr_next = game.centered_player_nr_next;
+    tape.set_centered_player = TRUE;
+  }
 
   if (tape.playing)
   {
