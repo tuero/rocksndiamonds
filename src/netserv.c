@@ -452,7 +452,6 @@ int NetworkServerThread(void *ptr)
 
 void NetworkServer(int port, int serveronly)
 {
-  int sl;
   struct NetworkServerPlayerInfo *player;
   int r; 
   unsigned int len;
@@ -507,17 +506,8 @@ void NetworkServer(int port, int serveronly)
     for (player = first_player; player; player = player->next)
       flushuser(player);
 
-    if ((sl = SDLNet_CheckSockets(fds, 500000)) < 1)
-    {
-      Error(ERR_NETWORK_SERVER, "SDLNet_CheckSockets failed: %s",
-	    SDLNet_GetError());
-      perror("SDLNet_CheckSockets");
-    }
-
-    if (sl < 0)
-      continue;
-    
-    if (sl == 0)
+    // wait for 100 ms for activity on open network sockets
+    if (SDLNet_CheckSockets(fds, 100) < 1)
       continue;
 
     /* accept incoming connections */
