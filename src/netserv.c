@@ -433,6 +433,13 @@ static void Handle_OP_MOVE_PLAYER(struct NetworkServerPlayerInfo *player)
   ServerFrameCounter++;
 }
 
+void ExitNetworkServer(int exit_value)
+{
+  Error(ERR_NETWORK_SERVER, "exiting network server");
+
+  exit(exit_value);
+}
+
 /* the following is not used for a standalone server;
    the pointer points to an integer containing the port-number */
 int NetworkServerThread(void *ptr)
@@ -457,6 +464,10 @@ void NetworkServer(int port, int serveronly)
 
   if (port == 0)
     port = DEFAULT_SERVER_PORT;
+
+  // if only running the network server, exit on Ctrl-C
+  if (serveronly)
+    signal(SIGINT, ExitNetworkServer);
 
   if (!serveronly)
     onceonly = 1;
