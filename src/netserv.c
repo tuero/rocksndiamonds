@@ -483,14 +483,20 @@ void NetworkServer(int port, int serveronly)
 #endif
 
   if (SDLNet_ResolveHost(&ip, NULL, port) == -1)
-    Error(ERR_EXIT_NETWORK_SERVER, "SDLNet_ResolveHost() failed");
+    Error(ERR_EXIT_NETWORK_SERVER, "SDLNet_ResolveHost() failed: %s",
+          SDLNet_GetError());
 
-  lfd = SDLNet_TCP_Open(&ip);
-  if (!lfd)
-    Error(ERR_EXIT_NETWORK_SERVER, "SDLNet_TCP_Open() failed");
+  if ((fds = SDLNet_AllocSocketSet(MAX_PLAYERS + 1)) == NULL)
+    Error(ERR_EXIT_NETWORK_SERVER, "SDLNet_AllocSocketSet() failed: %s"),
+      SDLNet_GetError();
 
-  fds = SDLNet_AllocSocketSet(MAX_PLAYERS+1);
-  SDLNet_TCP_AddSocket(fds, lfd);
+  if ((lfd = SDLNet_TCP_Open(&ip)) == NULL)
+    Error(ERR_EXIT_NETWORK_SERVER, "SDLNet_TCP_Open() failed: %s"),
+      SDLNet_GetError();
+
+  if (SDLNet_TCP_AddSocket(fds, lfd) == -1)
+    Error(ERR_EXIT_NETWORK_SERVER, "SDLNet_TCP_AddSocket() failed: %s"),
+      SDLNet_GetError();
 
   if (options.verbose)
   {
