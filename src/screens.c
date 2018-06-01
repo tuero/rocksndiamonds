@@ -5879,6 +5879,7 @@ static struct TokenInfo setup_info_main[] =
 static struct TokenInfo setup_info_game[] =
 {
   { TYPE_SWITCH,	&setup.team_mode,	"Team-Mode (Multi-Player):" },
+  { TYPE_SWITCH,	&setup.network_mode,	"Network Multi-Player Mode:" },
   { TYPE_YES_NO,	&setup.input_on_focus,	"Only Move Focussed Player:" },
   { TYPE_SWITCH,	&setup.time_limit,	"Time Limit:"		},
   { TYPE_SWITCH,	&setup.handicap,	"Handicap:"		},
@@ -6411,6 +6412,11 @@ static void changeSetupValue(int screen_pos, int setup_info_pos_raw, int dx)
   // fullscreen state may have changed at this point
   if (si->value == &setup.fullscreen)
     ToggleFullscreenOrChangeWindowScalingIfNeeded();
+
+  if (si->value == &setup.network_mode &&
+      setup.network_mode &&
+      !options.network)
+    Request("Please restart game to enable network games!", REQ_CONFIRM);
 }
 
 static struct TokenInfo *getSetupInfoFinal(struct TokenInfo *setup_info_orig)

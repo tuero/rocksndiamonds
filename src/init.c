@@ -5611,6 +5611,9 @@ void InitNetworkServer()
   int nr_wanted;
 #endif
 
+  if (setup.network_mode)
+    options.network = TRUE;
+
   if (!options.network)
     return;
 

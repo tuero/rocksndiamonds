@@ -1272,6 +1272,8 @@ struct SetupInfo
   int volume_loops;
   int volume_music;
 
+  boolean network_mode;
+
   struct SetupAutoSetupInfo auto_setup;
   struct SetupEditorInfo editor;
   struct SetupEditorCascadeInfo editor_cascade;

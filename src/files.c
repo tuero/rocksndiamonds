@@ -8312,8 +8312,9 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_TOUCH_GRID_YSIZE_0		48
 #define SETUP_TOKEN_TOUCH_GRID_XSIZE_1		49
 #define SETUP_TOKEN_TOUCH_GRID_YSIZE_1		50
+#define SETUP_TOKEN_NETWORK_MODE		51
 
-#define NUM_GLOBAL_SETUP_TOKENS			51
+#define NUM_GLOBAL_SETUP_TOKENS			52
 
 /* auto setup */
 #define SETUP_TOKEN_AUTO_EDITOR_ZOOM_TILESIZE	0
@@ -8521,6 +8522,7 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_INTEGER,&si.touch.grid_ysize[0],     "touch.virtual_buttons.0.ysize" },
   { TYPE_INTEGER,&si.touch.grid_xsize[1],     "touch.virtual_buttons.1.xsize" },
   { TYPE_INTEGER,&si.touch.grid_ysize[1],     "touch.virtual_buttons.1.ysize" },
+  { TYPE_SWITCH, &si.network_mode,            "network_mode"		},
 };
 
 static struct TokenInfo auto_setup_tokens[] =
@@ -8786,6 +8788,8 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   }
 
   si->touch.grid_initialized		= video.initialized;
+
+  si->network_mode = FALSE;
 
   si->editor.el_boulderdash		= TRUE;
   si->editor.el_emerald_mine		= TRUE;
