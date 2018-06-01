@@ -47,7 +47,8 @@ static struct NetworkServerPlayerInfo *first_player = NULL;
 #define NEXT(player) ((player)->next ? (player)->next : first_player)
 
 /* TODO: peer address */
-static TCPsocket lfd;		/* listening socket */
+static TCPsocket lfd;		/* listening TCP socket */
+static UDPsocket udp;		/* listening UDP socket */
 static SDLNet_SocketSet fds;	/* socket set */
 
 static unsigned char realbuffer[512], *buffer = realbuffer + 4;
@@ -486,7 +487,7 @@ void NetworkServer(int port, int serveronly)
     Error(ERR_EXIT_NETWORK_SERVER, "SDLNet_ResolveHost() failed: %s",
           SDLNet_GetError());
 
-  if ((fds = SDLNet_AllocSocketSet(MAX_PLAYERS + 1)) == NULL)
+  if ((fds = SDLNet_AllocSocketSet(MAX_PLAYERS + 1 + 1)) == NULL)
     Error(ERR_EXIT_NETWORK_SERVER, "SDLNet_AllocSocketSet() failed: %s"),
       SDLNet_GetError();
 
@@ -495,6 +496,14 @@ void NetworkServer(int port, int serveronly)
       SDLNet_GetError();
 
   if (SDLNet_TCP_AddSocket(fds, lfd) == -1)
+    Error(ERR_EXIT_NETWORK_SERVER, "SDLNet_TCP_AddSocket() failed: %s"),
+      SDLNet_GetError();
+
+  if ((udp = SDLNet_UDP_Open(port)) == NULL)
+    Error(ERR_EXIT_NETWORK_SERVER, "SDLNet_UDP_Open() failed: %s",
+          SDLNet_GetError());
+
+  if (SDLNet_UDP_AddSocket(fds, udp) == -1)
     Error(ERR_EXIT_NETWORK_SERVER, "SDLNet_TCP_AddSocket() failed: %s"),
       SDLNet_GetError();
 
@@ -516,9 +525,11 @@ void NetworkServer(int port, int serveronly)
     if (SDLNet_CheckSockets(fds, 100) < 1)
       continue;
 
-    /* accept incoming connections */
+    /* accept incoming TCP connections */
     if (SDLNet_SocketReady(lfd))
     {
+      Error(ERR_DEBUG, "got TCP packet");
+
       TCPsocket newsock;
 
       newsock = SDLNet_TCP_Accept(lfd);
@@ -527,9 +538,25 @@ void NetworkServer(int port, int serveronly)
 	AddPlayer(newsock);
     }
 
+    /* accept incoming UDP packets */
+    if (SDLNet_SocketReady(udp))
+    {
+      Error(ERR_DEBUG, "got UDP packet");
+
+      static UDPpacket packet;
+
+      int num_packets = SDLNet_UDP_Recv(udp, &packet);
+
+      if (num_packets == 1)
+      {
+        // bounce packet
+        SDLNet_UDP_Send(udp, -1, &packet);
+      }
+    }
+
     player = first_player;
 
-    do
+    while (player && !interrupt)
     {
       if (SDLNet_SocketReady(player->fd))
       {
@@ -628,7 +655,6 @@ void NetworkServer(int port, int serveronly)
       if (player && !interrupt)
 	player = player->next;
     }
-    while (player && !interrupt);
   }
 }
 

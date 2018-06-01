@@ -44,7 +44,8 @@ static struct NetworkClientPlayerInfo first_player =
 
 /* server stuff */
 
-static TCPsocket sfd;		/* server socket */
+static TCPsocket sfd;		/* TCP server socket */
+static UDPsocket udp;		/* UDP server socket */
 static SDLNet_SocketSet rfds;	/* socket set */
 
 static byte realbuffer[512];
@@ -121,24 +122,98 @@ static void StartNetworkServer(int port)
 boolean ConnectToServer(char *hostname, int port)
 {
   IPaddress ip;
+  int server_host = 0;
   int i;
 
   if (port == 0)
     port = DEFAULT_SERVER_PORT;
+
+  if (hostname == NULL)
+  {
+    // if no hostname given, try to auto-detect network server in local network
+    // by doing a UDP broadcast on the network server port and wait for answer
+
+    SDLNet_SocketSet udp_socket_set = SDLNet_AllocSocketSet(1);
+    if (!udp_socket_set)
+      Error(ERR_EXIT, "SDLNet_AllocSocketSet() failed: %s"), SDLNet_GetError();
+
+    udp = SDLNet_UDP_Open(0);
+    if(!udp)
+      Error(ERR_EXIT, "SDLNet_UDP_Open() failed: %s", SDLNet_GetError());
+
+    if (SDLNet_UDP_AddSocket(udp_socket_set, udp) == -1)
+      Error(ERR_EXIT_NETWORK_SERVER, "SDLNet_TCP_AddSocket() failed: %s"),
+        SDLNet_GetError();
+
+    char *data_ptr = "network server UDB broadcast";
+    int data_len = strlen(data_ptr) + 1;
+    IPaddress ip_address;
+
+    SDLNet_Write32(0xffffffff, &ip_address.host);	/* 255.255.255.255 */
+    SDLNet_Write16(port,       &ip_address.port);
+
+    UDPpacket packet =
+    {
+      -1,
+      (Uint8 *)data_ptr,
+      data_len,
+      data_len,
+      0,
+      ip_address
+    };
+
+    SDLNet_UDP_Send(udp, -1, &packet);
+
+    Error(ERR_DEBUG, "doing UDP broadcast for local network server ...");
+
+    if (SDLNet_CheckSockets(udp_socket_set, 1000) == 1)
+    {
+      int num_packets = SDLNet_UDP_Recv(udp, &packet);
+
+      if (num_packets == 1)
+      {
+        Error(ERR_DEBUG, "network server found");
+
+        server_host = SDLNet_Read32(&packet.address.host);
+      }
+      else
+      {
+	Error(ERR_DEBUG, "no answer from network server");
+      }
+    }
+    else
+    {
+      Error(ERR_DEBUG, "no network server found");
+    }
+  }
 
   rfds = SDLNet_AllocSocketSet(1);
 
   if (hostname)
   {
     SDLNet_ResolveHost(&ip, hostname, port);
+
     if (ip.host == INADDR_NONE)
       Error(ERR_EXIT, "cannot locate host '%s'", hostname);
+    else
+      server_host = SDLNet_Read32(&ip.host);
   }
   else
   {
-    SDLNet_Write32(0x7f000001, &ip.host);	/* 127.0.0.1 */
-    SDLNet_Write16(port, &ip.port);
+    // if no hostname was given and no network server was auto-detected in the
+    // local network, try to connect to a network server at the local host
+    if (server_host == 0)
+      server_host = 0x7f000001;			/* 127.0.0.1 */
+
+    SDLNet_Write32(server_host, &ip.host);
+    SDLNet_Write16(port,        &ip.port);
   }
+
+  Error(ERR_DEBUG, "trying to connect to network server at %d.%d.%d.%d ...",
+        (server_host >> 24) & 0xff,
+        (server_host >> 16) & 0xff,
+        (server_host >>  8) & 0xff,
+        (server_host >>  0) & 0xff);
 
   sfd = SDLNet_TCP_Open(&ip);
 
