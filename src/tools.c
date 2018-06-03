@@ -5309,10 +5309,48 @@ void CreateToolButtons()
     int gd_y = gfx->src_y;
     int gd_xp = gfx->src_x + gfx->pressed_xoffset;
     int gd_yp = gfx->src_y + gfx->pressed_yoffset;
+    int x = pos->x;
+    int y = pos->y;
     int id = i;
 
     if (global.use_envelope_request)
+    {
       setRequestPosition(&dx, &dy, TRUE);
+
+      // check if request buttons are outside of envelope and fix, if needed
+      if (x < 0 || x + gfx->width  > request.width ||
+	  y < 0 || y + gfx->height > request.height)
+      {
+	// use left padding of "yes" button as default border padding
+	int padding = toolbutton_info[TOOL_CTRL_ID_YES].pos->x;
+
+	if (id == TOOL_CTRL_ID_YES)
+	{
+	  x = padding;
+	  y = request.height - 2 * request.border_size - gfx->height - padding;
+	}
+	else if (id == TOOL_CTRL_ID_NO)
+	{
+	  x = request.width  - 2 * request.border_size - gfx->width  - padding;
+	  y = request.height - 2 * request.border_size - gfx->height - padding;
+	}
+	else if (id == TOOL_CTRL_ID_CONFIRM)
+	{
+	  x = (request.width - 2 * request.border_size - gfx->width) / 2;
+	  y = request.height - 2 * request.border_size - gfx->height - padding;
+	}
+	else if (id >= TOOL_CTRL_ID_PLAYER_1 && id <= TOOL_CTRL_ID_PLAYER_4)
+	{
+	  int player_nr = id - TOOL_CTRL_ID_PLAYER_1;
+
+	  x = (request.width - 2 * request.border_size - gfx->width) / 2;
+	  y = request.height - 2 * request.border_size - gfx->height - padding;
+
+	  x += (player_nr % 2 ? +1 : -1) * gfx->width / 2;
+	  y += (player_nr / 2 ?  0 : -1) * gfx->height;
+	}
+      }
+    }
 
     if (id >= TOOL_CTRL_ID_PLAYER_1 && id <= TOOL_CTRL_ID_PLAYER_4)
     {
@@ -5326,8 +5364,8 @@ void CreateToolButtons()
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_INFO_TEXT, toolbutton_info[i].infotext,
-		      GDI_X, dx + pos->x,
-		      GDI_Y, dy + pos->y,
+		      GDI_X, dx + x,
+		      GDI_Y, dy + y,
 		      GDI_WIDTH, gfx->width,
 		      GDI_HEIGHT, gfx->height,
 		      GDI_TYPE, GD_TYPE_NORMAL_BUTTON,
