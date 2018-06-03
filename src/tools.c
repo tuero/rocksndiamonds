@@ -5326,8 +5326,8 @@ void CreateToolButtons()
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_INFO_TEXT, toolbutton_info[i].infotext,
-		      GDI_X, dx + GDI_ACTIVE_POS(pos->x),
-		      GDI_Y, dy + GDI_ACTIVE_POS(pos->y),
+		      GDI_X, dx + pos->x,
+		      GDI_Y, dy + pos->y,
 		      GDI_WIDTH, gfx->width,
 		      GDI_HEIGHT, gfx->height,
 		      GDI_TYPE, GD_TYPE_NORMAL_BUTTON,
