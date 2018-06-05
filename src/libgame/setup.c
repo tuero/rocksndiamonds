@@ -2629,6 +2629,10 @@ void setSetupInfo(struct TokenInfo *token_info,
       *(char **)setup_value = getStringCopy(token_value);
       break;
 
+    case TYPE_PLAYER:
+      *(int *)setup_value = get_player_nr_from_string(token_value);
+      break;
+
     default:
       break;
   }
@@ -3870,6 +3874,10 @@ char *getSetupValue(int type, void *value)
 	return NULL;
 
       strcpy(value_string, *(char **)value);
+      break;
+
+    case TYPE_PLAYER:
+      sprintf(value_string, "player_%d", *(int *)value + 1);
       break;
 
     default:

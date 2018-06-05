@@ -27,28 +27,29 @@
 #define TYPE_KEY_X11			(1 << 7)
 #define TYPE_INTEGER			(1 << 8)
 #define TYPE_STRING			(1 << 9)
-#define TYPE_ELEMENT			(1 << 10)
-#define TYPE_GRAPHIC			(1 << 11)
+#define TYPE_PLAYER			(1 << 10)
+#define TYPE_ELEMENT			(1 << 11)
+#define TYPE_GRAPHIC			(1 << 12)
 
 /* additional values for setup screen */
-#define TYPE_ENTER_SCREEN		(1 << 12)
-#define TYPE_LEAVE_SCREEN		(1 << 13)
-#define TYPE_ENTER_MENU			(1 << 14)
-#define TYPE_LEAVE_MENU			(1 << 15)
-#define TYPE_ENTER_LIST			(1 << 16)
-#define TYPE_LEAVE_LIST			(1 << 17)
-#define TYPE_EMPTY			(1 << 18)
-#define TYPE_SKIPPABLE			(1 << 19)
-#define TYPE_KEYTEXT			(1 << 20)
+#define TYPE_ENTER_SCREEN		(1 << 13)
+#define TYPE_LEAVE_SCREEN		(1 << 14)
+#define TYPE_ENTER_MENU			(1 << 15)
+#define TYPE_LEAVE_MENU			(1 << 16)
+#define TYPE_ENTER_LIST			(1 << 17)
+#define TYPE_LEAVE_LIST			(1 << 18)
+#define TYPE_EMPTY			(1 << 19)
+#define TYPE_SKIPPABLE			(1 << 20)
+#define TYPE_KEYTEXT			(1 << 21)
 
-#define TYPE_GHOSTED			(1 << 21)
-#define TYPE_QUERY			(1 << 22)
+#define TYPE_GHOSTED			(1 << 22)
+#define TYPE_QUERY			(1 << 23)
 
 /* additional values for internal purposes */
-#define TYPE_BITFIELD			(1 << 23)
-#define TYPE_CONTENT			(1 << 24)
-#define TYPE_ELEMENT_LIST		(1 << 25)
-#define TYPE_CONTENT_LIST		(1 << 26)
+#define TYPE_BITFIELD			(1 << 24)
+#define TYPE_CONTENT			(1 << 25)
+#define TYPE_ELEMENT_LIST		(1 << 26)
+#define TYPE_CONTENT_LIST		(1 << 27)
 
 /* derived values for setup file handling */
 #define TYPE_BOOLEAN_STYLE		(TYPE_BOOLEAN | \
@@ -64,6 +65,7 @@
 					 TYPE_KEY_X11		| \
 					 TYPE_INTEGER		| \
 					 TYPE_STRING		| \
+					 TYPE_PLAYER		| \
 					 TYPE_ELEMENT		| \
 					 TYPE_GRAPHIC)
 

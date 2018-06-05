@@ -5607,10 +5607,6 @@ static void InitArtworkDone()
 
 void InitNetworkServer()
 {
-#if defined(NETWORK_AVALIABLE)
-  int nr_wanted;
-#endif
-
   if (setup.network_mode)
     options.network = TRUE;
 
@@ -5618,16 +5614,12 @@ void InitNetworkServer()
     return;
 
 #if defined(NETWORK_AVALIABLE)
-  nr_wanted = Request("Choose player", REQ_PLAYER | REQ_STAY_CLOSED);
-
   if (!ConnectToServer(options.server_host, options.server_port))
     Error(ERR_EXIT, "cannot connect to network game server");
 
   SendToServer_PlayerName(setup.player_name);
   SendToServer_ProtocolVersion();
-
-  if (nr_wanted)
-    SendToServer_NrWanted(nr_wanted);
+  SendToServer_NrWanted(setup.network_player_nr + 1);
 #endif
 }
 

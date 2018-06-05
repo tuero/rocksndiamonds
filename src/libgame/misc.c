@@ -2043,6 +2043,31 @@ int get_switch3_from_string(char *s)
   return result;
 }
 
+int get_player_nr_from_string(char *s)
+{
+  static char *player_text[] =
+  {
+    "player_1",
+    "player_2",
+    "player_3",
+    "player_4",
+
+    NULL
+  };
+
+  char *s_lower = getStringToLower(s);
+  int result = 0;
+  int i;
+
+  for (i = 0; player_text[i] != NULL; i++)
+    if (strEqual(s_lower, player_text[i]))
+      result = i;
+
+  free(s_lower);
+
+  return result;
+}
+
 
 /* ------------------------------------------------------------------------- */
 /* functions for generic lists                                               */

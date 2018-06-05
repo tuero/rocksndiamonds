@@ -1273,6 +1273,7 @@ struct SetupInfo
   int volume_music;
 
   boolean network_mode;
+  int network_player_nr;
 
   struct SetupAutoSetupInfo auto_setup;
   struct SetupEditorInfo editor;

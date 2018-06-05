@@ -8302,19 +8302,20 @@ void SaveScore(int nr)
 #define SETUP_TOKEN_VOLUME_SIMPLE		38
 #define SETUP_TOKEN_VOLUME_LOOPS		39
 #define SETUP_TOKEN_VOLUME_MUSIC		40
-#define SETUP_TOKEN_TOUCH_CONTROL_TYPE		41
-#define SETUP_TOKEN_TOUCH_MOVE_DISTANCE		42
-#define SETUP_TOKEN_TOUCH_DROP_DISTANCE		43
-#define SETUP_TOKEN_TOUCH_TRANSPARENCY		44
-#define SETUP_TOKEN_TOUCH_DRAW_OUTLINED		45
-#define SETUP_TOKEN_TOUCH_DRAW_PRESSED		46
-#define SETUP_TOKEN_TOUCH_GRID_XSIZE_0		47
-#define SETUP_TOKEN_TOUCH_GRID_YSIZE_0		48
-#define SETUP_TOKEN_TOUCH_GRID_XSIZE_1		49
-#define SETUP_TOKEN_TOUCH_GRID_YSIZE_1		50
-#define SETUP_TOKEN_NETWORK_MODE		51
+#define SETUP_TOKEN_NETWORK_MODE		41
+#define SETUP_TOKEN_NETWORK_PLAYER_NR		42
+#define SETUP_TOKEN_TOUCH_CONTROL_TYPE		43
+#define SETUP_TOKEN_TOUCH_MOVE_DISTANCE		44
+#define SETUP_TOKEN_TOUCH_DROP_DISTANCE		45
+#define SETUP_TOKEN_TOUCH_TRANSPARENCY		46
+#define SETUP_TOKEN_TOUCH_DRAW_OUTLINED		47
+#define SETUP_TOKEN_TOUCH_DRAW_PRESSED		48
+#define SETUP_TOKEN_TOUCH_GRID_XSIZE_0		49
+#define SETUP_TOKEN_TOUCH_GRID_YSIZE_0		50
+#define SETUP_TOKEN_TOUCH_GRID_XSIZE_1		51
+#define SETUP_TOKEN_TOUCH_GRID_YSIZE_1		52
 
-#define NUM_GLOBAL_SETUP_TOKENS			52
+#define NUM_GLOBAL_SETUP_TOKENS			53
 
 /* auto setup */
 #define SETUP_TOKEN_AUTO_EDITOR_ZOOM_TILESIZE	0
@@ -8512,6 +8513,8 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_INTEGER,&si.volume_simple,           "volume_simple"		},
   { TYPE_INTEGER,&si.volume_loops,            "volume_loops"		},
   { TYPE_INTEGER,&si.volume_music,            "volume_music"		},
+  { TYPE_SWITCH, &si.network_mode,            "network_mode"		},
+  { TYPE_PLAYER, &si.network_player_nr,       "network_player"		},
   { TYPE_STRING, &si.touch.control_type,      "touch.control_type"	},
   { TYPE_INTEGER,&si.touch.move_distance,     "touch.move_distance"	},
   { TYPE_INTEGER,&si.touch.drop_distance,     "touch.drop_distance"	},
@@ -8522,7 +8525,6 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_INTEGER,&si.touch.grid_ysize[0],     "touch.virtual_buttons.0.ysize" },
   { TYPE_INTEGER,&si.touch.grid_xsize[1],     "touch.virtual_buttons.1.xsize" },
   { TYPE_INTEGER,&si.touch.grid_ysize[1],     "touch.virtual_buttons.1.ysize" },
-  { TYPE_SWITCH, &si.network_mode,            "network_mode"		},
 };
 
 static struct TokenInfo auto_setup_tokens[] =
@@ -8733,6 +8735,9 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->volume_loops = 100;		/* percent */
   si->volume_music = 100;		/* percent */
 
+  si->network_mode = FALSE;
+  si->network_player_nr = 0;		/* first player */
+
   si->touch.control_type = getStringCopy(TOUCH_CONTROL_DEFAULT);
   si->touch.move_distance = TOUCH_MOVE_DISTANCE_DEFAULT;	/* percent */
   si->touch.drop_distance = TOUCH_DROP_DISTANCE_DEFAULT;	/* percent */
@@ -8788,8 +8793,6 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   }
 
   si->touch.grid_initialized		= video.initialized;
-
-  si->network_mode = FALSE;
 
   si->editor.el_boulderdash		= TRUE;
   si->editor.el_emerald_mine		= TRUE;
@@ -9330,6 +9333,7 @@ void SaveSetup()
     if (i == SETUP_TOKEN_PLAYER_NAME + 1 ||
 	i == SETUP_TOKEN_GRAPHICS_SET ||
 	i == SETUP_TOKEN_VOLUME_SIMPLE ||
+	i == SETUP_TOKEN_NETWORK_MODE ||
 	i == SETUP_TOKEN_TOUCH_CONTROL_TYPE ||
 	i == SETUP_TOKEN_TOUCH_GRID_XSIZE_0 ||
 	i == SETUP_TOKEN_TOUCH_GRID_XSIZE_1)

@@ -2213,6 +2213,7 @@ static int getMenuTextFont(int type)
 	      TYPE_YES_NO	|
 	      TYPE_YES_NO_AUTO	|
 	      TYPE_STRING	|
+	      TYPE_PLAYER	|
 	      TYPE_ECS_AGA	|
 	      TYPE_KEYTEXT	|
 	      TYPE_ENTER_LIST))
@@ -2544,7 +2545,8 @@ void HandleMenuScreen(int mx, int my, int dx, int dy, int button,
 
       if (menu_info[choice].type & menu_navigation_type ||
 	  menu_info[choice].type & TYPE_BOOLEAN_STYLE ||
-	  menu_info[choice].type & TYPE_YES_NO_AUTO)
+	  menu_info[choice].type & TYPE_YES_NO_AUTO ||
+	  menu_info[choice].type & TYPE_PLAYER)
 	button = MB_MENU_CHOICE;
     }
     else if (dy)
@@ -5880,6 +5882,7 @@ static struct TokenInfo setup_info_game[] =
 {
   { TYPE_SWITCH,	&setup.team_mode,	"Team-Mode (Multi-Player):" },
   { TYPE_SWITCH,	&setup.network_mode,	"Network Multi-Player Mode:" },
+  { TYPE_PLAYER,	&setup.network_player_nr,"Preferred Network Player:" },
   { TYPE_YES_NO,	&setup.input_on_focus,	"Only Move Focussed Player:" },
   { TYPE_SWITCH,	&setup.time_limit,	"Time Limit:"		},
   { TYPE_SWITCH,	&setup.handicap,	"Handicap:"		},
@@ -6247,6 +6250,8 @@ static int getSetupValueFont(int type, void *value)
   else if (type & TYPE_YES_NO_AUTO)
     return (*(int *)value == AUTO  ? FONT_OPTION_ON :
 	    *(int *)value == FALSE ? FONT_OPTION_OFF : FONT_OPTION_ON);
+  else if (type & TYPE_PLAYER)
+    return FONT_VALUE_1;
   else
     return FONT_VALUE_1;
 }
@@ -6301,6 +6306,12 @@ static void drawSetupValue(int screen_pos, int setup_info_pos_raw)
   else if (type & TYPE_YES_NO_AUTO)
   {
     xpos = menu_screen_value_xpos - 1;
+  }
+  else if (type & TYPE_PLAYER)
+  {
+    int displayed_player_nr = *(int *)value + 1;
+
+    value_string = getSetupValue(TYPE_INTEGER, (void *)&displayed_player_nr);
   }
 
   startx = mSX + xpos * 32;
@@ -6372,6 +6383,15 @@ static void drawSetupValue(int screen_pos, int setup_info_pos_raw)
 
   DrawText(startx, starty, value_string, font_nr);
 
+  if (type & TYPE_PLAYER)
+  {
+    int player_nr = *(int *)value;
+    int xoff = getFontWidth(font_nr);
+
+    DrawFixedGraphicThruMaskExt(drawto, startx + xoff, starty,
+				PLAYER_NR_GFX(IMG_PLAYER_1, player_nr), 0);
+  }
+
   if (font_draw_xoffset_modified)
     getFontBitmapInfo(font_nr)->draw_xoffset = font_draw_xoffset_old;
 }
@@ -6405,6 +6425,17 @@ static void changeSetupValue(int screen_pos, int setup_info_pos_raw, int dx)
     key = getSetupKey();
     if (key != KSYM_UNDEFINED)
       *(Key *)si->value = key;
+  }
+  else if (si->type & TYPE_PLAYER)
+  {
+    int player_nr = *(int *)si->value;
+
+    if (dx)
+      player_nr += dx;
+    else
+      player_nr = Request("Choose player", REQ_PLAYER) - 1;
+
+    *(int *)si->value = MIN(MAX(0, player_nr), MAX_PLAYERS - 1);
   }
 
   drawSetupValue(screen_pos, setup_info_pos_raw);
