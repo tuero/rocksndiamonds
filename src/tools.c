@@ -4227,11 +4227,24 @@ static int RequestHandleEvents(unsigned int req_state)
 		  result = old_player_nr + 1;
 		  break;
 
+		case KSYM_Up:
 		case KSYM_1:
+		  result = 1;
+		  break;
+
+		case KSYM_Right:
 		case KSYM_2:
+		  result = 2;
+		  break;
+
+		case KSYM_Down:
 		case KSYM_3:
+		  result = 3;
+		  break;
+
+		case KSYM_Left:
 		case KSYM_4:
-		  result = key - KSYM_1 + 1;
+		  result = 4;
 		  break;
 
 		default:
@@ -4253,19 +4266,52 @@ static int RequestHandleEvents(unsigned int req_state)
 	      case SDL_CONTROLLER_BUTTON_A:
 	      case SDL_CONTROLLER_BUTTON_X:
 	      case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
+	      case SDL_CONTROLLER_BUTTON_LEFTSTICK:
 		result = 1;
 		break;
 
 	      case SDL_CONTROLLER_BUTTON_B:
 	      case SDL_CONTROLLER_BUTTON_Y:
 	      case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
+	      case SDL_CONTROLLER_BUTTON_RIGHTSTICK:
 	      case SDL_CONTROLLER_BUTTON_BACK:
 		result = 0;
 		break;
 	    }
 
 	    if (req_state & REQ_PLAYER)
-	      result = 0;
+	    {
+	      int old_player_nr = setup.network_player_nr;
+
+	      if (result != -1)
+		result = old_player_nr + 1;
+
+	      switch (event.cbutton.button)
+	      {
+		case SDL_CONTROLLER_BUTTON_DPAD_UP:
+		case SDL_CONTROLLER_BUTTON_Y:
+		  result = 1;
+		  break;
+
+		case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+		case SDL_CONTROLLER_BUTTON_B:
+		  result = 2;
+		  break;
+
+		case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+		case SDL_CONTROLLER_BUTTON_A:
+		  result = 3;
+		  break;
+
+		case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+		case SDL_CONTROLLER_BUTTON_X:
+		  result = 4;
+		  break;
+
+		default:
+		  break;
+	      }
+	    }
 
 	    break;
 
@@ -4289,6 +4335,22 @@ static int RequestHandleEvents(unsigned int req_state)
 	result = 1;
       else if (joy & JOY_BUTTON_2)
 	result = 0;
+    }
+    else if (AnyJoystick())
+    {
+      int joy = AnyJoystick();
+
+      if (req_state & REQ_PLAYER)
+      {
+	if (joy & JOY_UP)
+	  result = 1;
+	else if (joy & JOY_RIGHT)
+	  result = 2;
+	else if (joy & JOY_DOWN)
+	  result = 3;
+	else if (joy & JOY_LEFT)
+	  result = 4;
+      }
     }
 
     if (level_solved)
