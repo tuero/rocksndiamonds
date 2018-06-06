@@ -4215,7 +4215,29 @@ static int RequestHandleEvents(unsigned int req_state)
 	    }
 
 	    if (req_state & REQ_PLAYER)
-	      result = 0;
+	    {
+	      int old_player_nr = setup.network_player_nr;
+
+	      if (result != -1)
+		result = old_player_nr + 1;
+
+	      switch (key)
+	      {
+		case KSYM_space:
+		  result = old_player_nr + 1;
+		  break;
+
+		case KSYM_1:
+		case KSYM_2:
+		case KSYM_3:
+		case KSYM_4:
+		  result = key - KSYM_1 + 1;
+		  break;
+
+		default:
+		  break;
+	      }
+	    }
 
 	    break;
 	  }
