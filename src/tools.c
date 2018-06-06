@@ -5351,33 +5351,30 @@ void CreateToolButtons()
       if (x < 0 || x + gfx->width  > request.width ||
 	  y < 0 || y + gfx->height > request.height)
       {
-	// use left padding of "yes" button as default border padding
-	int padding = toolbutton_info[TOOL_CTRL_ID_YES].pos->x;
-
 	if (id == TOOL_CTRL_ID_YES)
 	{
-	  x = padding;
-	  y = request.height - 2 * request.border_size - gfx->height - padding;
+	  x = 0;
+	  y = request.height - 2 * request.border_size - gfx->height;
 	}
 	else if (id == TOOL_CTRL_ID_NO)
 	{
-	  x = request.width  - 2 * request.border_size - gfx->width  - padding;
-	  y = request.height - 2 * request.border_size - gfx->height - padding;
+	  x = request.width  - 2 * request.border_size - gfx->width;
+	  y = request.height - 2 * request.border_size - gfx->height;
 	}
 	else if (id == TOOL_CTRL_ID_CONFIRM)
 	{
 	  x = (request.width - 2 * request.border_size - gfx->width) / 2;
-	  y = request.height - 2 * request.border_size - gfx->height - padding;
+	  y = request.height - 2 * request.border_size - gfx->height;
 	}
 	else if (id >= TOOL_CTRL_ID_PLAYER_1 && id <= TOOL_CTRL_ID_PLAYER_4)
 	{
 	  int player_nr = id - TOOL_CTRL_ID_PLAYER_1;
 
 	  x = (request.width - 2 * request.border_size - gfx->width) / 2;
-	  y = request.height - 2 * request.border_size - gfx->height - padding;
+	  y = request.height - 2 * request.border_size - gfx->height * 2;
 
-	  x += (player_nr % 2 ? +1 : -1) * gfx->width / 2;
-	  y += (player_nr / 2 ?  0 : -1) * gfx->height;
+	  x += (player_nr == 3 ? -1 : player_nr == 1 ? +1 : 0) * gfx->width;
+	  y += (player_nr == 0 ? -1 : player_nr == 2 ? +1 : 0) * gfx->height;
 	}
       }
     }
