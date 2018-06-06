@@ -544,12 +544,13 @@ static void Handle_OP_STOP_PLAYING()
 
   if (game_status == GAME_MODE_PLAYING)
   {
-    if (buffer[2] == NETWORK_STOP_BY_PLAYER)
-      Request("Network game stopped by player!", REQ_CONFIRM);
-    else if (buffer[2] == NETWORK_STOP_BY_ERROR)
-      Request("Network game stopped due to internal error!", REQ_CONFIRM);
-    else
-      Request("Network game stopped!", REQ_CONFIRM);
+    char *message = (buffer[2] == NETWORK_STOP_BY_PLAYER ?
+		     "Network game stopped by player!" :
+		     buffer[2] == NETWORK_STOP_BY_ERROR ?
+		     "Network game stopped due to internal error!" :
+		     "Network game stopped!");
+
+    Request(message, REQ_CONFIRM | REQ_STAY_CLOSED);
   }
 
   SetGameStatus(GAME_MODE_MAIN);
