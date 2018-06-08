@@ -1311,7 +1311,8 @@ void CreateTapeButtons()
 
   for (i = 0; i < NUM_TAPE_BUTTONS; i++)
   {
-    struct GraphicInfo *gfx = &graphic_info[tapebutton_info[i].graphic];
+    int graphic = tapebutton_info[i].graphic;
+    struct GraphicInfo *gfx = &graphic_info[graphic];
     struct XY *pos = tapebutton_info[i].pos;
     struct GadgetInfo *gi;
     int gd_x = gfx->src_x;
@@ -1321,6 +1322,7 @@ void CreateTapeButtons()
     int id = i;
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
+		      GDI_IMAGE_ID, graphic,
 		      GDI_INFO_TEXT, tapebutton_info[i].infotext,
 		      GDI_X, VX + pos->x,
 		      GDI_Y, VY + pos->y,

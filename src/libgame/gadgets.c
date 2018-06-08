@@ -782,6 +782,10 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
   {
     switch(tag)
     {
+      case GDI_IMAGE_ID:
+	gi->image_id = va_arg(ap, int);
+	break;
+
       case GDI_CUSTOM_ID:
 	gi->custom_id = va_arg(ap, int);
 	break;
@@ -1281,6 +1285,7 @@ struct GadgetInfo *CreateGadget(int first_tag, ...)
 
   /* always start with reliable default values */
   new_gadget->id = getNewGadgetID();
+  new_gadget->image_id = -1;
   new_gadget->callback_info = default_callback_info;
   new_gadget->callback_action = default_callback_action;
   new_gadget->active = TRUE;

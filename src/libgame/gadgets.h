@@ -62,55 +62,56 @@
 
 /* gadget creation tags */
 #define GDI_END				0
-#define GDI_CUSTOM_ID			1
-#define GDI_CUSTOM_TYPE_ID		2
-#define GDI_X				3
-#define GDI_Y				4
-#define GDI_WIDTH			5
-#define GDI_HEIGHT			6
-#define GDI_TYPE			7
-#define GDI_STATE			8
-#define GDI_CHECKED			9
-#define GDI_RADIO_NR			10
-#define GDI_NUMBER_VALUE		11
-#define GDI_NUMBER_MIN			12
-#define GDI_NUMBER_MAX			13
-#define GDI_TEXT_VALUE			14
-#define GDI_TEXT_SIZE			15
-#define GDI_TEXT_FONT			16
-#define GDI_TEXT_FONT_ACTIVE		17
-#define GDI_TEXT_FONT_UNSELECTABLE	18
-#define GDI_SELECTBOX_OPTIONS		19
-#define GDI_SELECTBOX_INDEX		20
-#define GDI_SELECTBOX_CHAR_UNSELECTABLE	21
-#define GDI_DESIGN_UNPRESSED		22
-#define GDI_DESIGN_PRESSED		23
-#define GDI_ALT_DESIGN_UNPRESSED	24
-#define GDI_ALT_DESIGN_PRESSED		25
-#define GDI_BORDER_SIZE			26
-#define GDI_BORDER_SIZE_SELECTBUTTON	27
-#define GDI_DESIGN_WIDTH		28
-#define GDI_DECORATION_DESIGN		29
-#define GDI_DECORATION_POSITION		30
-#define GDI_DECORATION_SIZE		31
-#define GDI_DECORATION_SHIFTING		32
-#define GDI_DECORATION_MASKED		33
-#define GDI_EVENT_MASK			34
-#define GDI_EVENT			35
-#define GDI_CALLBACK_INFO		36
-#define GDI_CALLBACK_ACTION		37
-#define GDI_AREA_SIZE			38
-#define GDI_ITEM_SIZE			39
-#define GDI_SCROLLBAR_ITEMS_MAX		40
-#define GDI_SCROLLBAR_ITEMS_VISIBLE	41
-#define GDI_SCROLLBAR_ITEM_POSITION	42
-#define GDI_WHEEL_AREA_X		43
-#define GDI_WHEEL_AREA_Y		44
-#define GDI_WHEEL_AREA_WIDTH		45
-#define GDI_WHEEL_AREA_HEIGHT		46
-#define GDI_INFO_TEXT			47
-#define GDI_ACTIVE			48
-#define GDI_DIRECT_DRAW			49
+#define GDI_IMAGE_ID			1
+#define GDI_CUSTOM_ID			2
+#define GDI_CUSTOM_TYPE_ID		3
+#define GDI_X				4
+#define GDI_Y				5
+#define GDI_WIDTH			6
+#define GDI_HEIGHT			7
+#define GDI_TYPE			8
+#define GDI_STATE			9
+#define GDI_CHECKED			10
+#define GDI_RADIO_NR			11
+#define GDI_NUMBER_VALUE		12
+#define GDI_NUMBER_MIN			13
+#define GDI_NUMBER_MAX			14
+#define GDI_TEXT_VALUE			15
+#define GDI_TEXT_SIZE			16
+#define GDI_TEXT_FONT			17
+#define GDI_TEXT_FONT_ACTIVE		18
+#define GDI_TEXT_FONT_UNSELECTABLE	19
+#define GDI_SELECTBOX_OPTIONS		20
+#define GDI_SELECTBOX_INDEX		21
+#define GDI_SELECTBOX_CHAR_UNSELECTABLE	22
+#define GDI_DESIGN_UNPRESSED		23
+#define GDI_DESIGN_PRESSED		24
+#define GDI_ALT_DESIGN_UNPRESSED	25
+#define GDI_ALT_DESIGN_PRESSED		26
+#define GDI_BORDER_SIZE			27
+#define GDI_BORDER_SIZE_SELECTBUTTON	28
+#define GDI_DESIGN_WIDTH		29
+#define GDI_DECORATION_DESIGN		30
+#define GDI_DECORATION_POSITION		31
+#define GDI_DECORATION_SIZE		32
+#define GDI_DECORATION_SHIFTING		33
+#define GDI_DECORATION_MASKED		34
+#define GDI_EVENT_MASK			35
+#define GDI_EVENT			36
+#define GDI_CALLBACK_INFO		37
+#define GDI_CALLBACK_ACTION		38
+#define GDI_AREA_SIZE			39
+#define GDI_ITEM_SIZE			40
+#define GDI_SCROLLBAR_ITEMS_MAX		41
+#define GDI_SCROLLBAR_ITEMS_VISIBLE	42
+#define GDI_SCROLLBAR_ITEM_POSITION	43
+#define GDI_WHEEL_AREA_X		44
+#define GDI_WHEEL_AREA_Y		45
+#define GDI_WHEEL_AREA_WIDTH		46
+#define GDI_WHEEL_AREA_HEIGHT		47
+#define GDI_INFO_TEXT			48
+#define GDI_ACTIVE			49
+#define GDI_DIRECT_DRAW			50
 
 /* gadget deactivation hack */
 #define GDI_ACTIVE_POS(a)		((a) < 0 ? POS_OFFSCREEN : (a))
@@ -230,6 +231,7 @@ struct GadgetInfo
   boolean deactivated;			/* flag to deactivate gadget */
 
   int id;				/* internal gadget identifier */
+  int image_id;				/* internal gadget image identifier */
   int custom_id;			/* custom gadget identifier */
   int custom_type_id;			/* custom gadget type identifier */
   char info_text[MAX_INFO_TEXTSIZE + 1];/* short popup info text */

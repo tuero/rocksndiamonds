@@ -8032,6 +8032,7 @@ static void CreateScreenMenubuttons()
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,
+		      GDI_IMAGE_ID, gfx_unpressed,
 		      GDI_INFO_TEXT, menubutton_info[i].infotext,
 		      GDI_X, x,
 		      GDI_Y, y,
@@ -8099,6 +8100,7 @@ static void CreateScreenScrollbuttons()
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,
+		      GDI_IMAGE_ID, gfx_unpressed,
 		      GDI_INFO_TEXT, scrollbutton_info[i].infotext,
 		      GDI_X, x,
 		      GDI_Y, y,
@@ -8171,6 +8173,7 @@ static void CreateScreenScrollbars()
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,
+		      GDI_IMAGE_ID, gfx_unpressed,
 		      GDI_INFO_TEXT, scrollbar_info[i].infotext,
 		      GDI_X, x,
 		      GDI_Y, y,

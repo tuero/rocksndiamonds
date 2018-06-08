@@ -6124,6 +6124,7 @@ static void CreateControlButtons()
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,
+		      GDI_IMAGE_ID, graphic,
 		      GDI_INFO_TEXT, controlbutton_info[i].infotext,
 		      GDI_X, x,
 		      GDI_Y, y,
@@ -6198,6 +6199,7 @@ static void CreateControlButtons()
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,
+		      GDI_IMAGE_ID, graphic,
 		      GDI_INFO_TEXT, scrollbutton_info[i].infotext,
 		      GDI_X, x,
 		      GDI_Y, y,
@@ -6246,6 +6248,7 @@ static void CreateControlButtons()
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,
+		      GDI_IMAGE_ID, graphic,
 		      GDI_INFO_TEXT, getElementInfoText(element),
 		      GDI_X, x,
 		      GDI_Y, y,
@@ -6343,6 +6346,7 @@ static void CreateCounterButtons()
 
       gi = CreateGadget(GDI_CUSTOM_ID, id,
 			GDI_CUSTOM_TYPE_ID, i,
+			GDI_IMAGE_ID, graphic,
 			GDI_INFO_TEXT, infotext,
 			GDI_X, x,
 			GDI_Y, y,
@@ -6399,6 +6403,7 @@ static void CreateCounterButtons()
 
 	gi = CreateGadget(GDI_CUSTOM_ID, id,
 			  GDI_CUSTOM_TYPE_ID, i,
+			  GDI_IMAGE_ID, graphic,
 			  GDI_INFO_TEXT, "enter counter value",
 			  GDI_X, x,
 			  GDI_Y, y,
@@ -6741,6 +6746,7 @@ static void CreateTextbuttonGadgets()
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,
+		      GDI_IMAGE_ID, graphic,
 		      GDI_INFO_TEXT, infotext,
 		      GDI_X, x,
 		      GDI_Y, y,
@@ -6781,7 +6787,8 @@ static void CreateGraphicbuttonGadgets()
     int id = graphicbutton_info[i].gadget_id;
     int x = SX + ED_SETTINGS_X(graphicbutton_info[i].x);
     int y = SY + ED_SETTINGS_Y(graphicbutton_info[i].y);
-    struct GraphicInfo *gd = &graphic_info[graphicbutton_info[i].graphic];
+    int graphic = graphicbutton_info[i].graphic;
+    struct GraphicInfo *gd = &graphic_info[graphic];
     int gd_x1 = gd->src_x;
     int gd_y1 = gd->src_y;
     int gd_x2 = gd->src_x + gd->pressed_xoffset;
@@ -6800,6 +6807,7 @@ static void CreateGraphicbuttonGadgets()
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,
+		      GDI_IMAGE_ID, graphic,
 		      GDI_INFO_TEXT, graphicbutton_info[i].infotext,
 		      GDI_X, x,
 		      GDI_Y, y,
@@ -6906,6 +6914,7 @@ static void CreateScrollbarGadgets()
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,
+		      GDI_IMAGE_ID, graphic,
 		      GDI_INFO_TEXT, scrollbar_info[i].infotext,
 		      GDI_X, scrollbar_pos[i].x,
 		      GDI_Y, scrollbar_pos[i].y,
@@ -6971,6 +6980,7 @@ static void CreateCheckbuttonGadgets()
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,
+		      GDI_IMAGE_ID, graphic,
 		      GDI_INFO_TEXT, checkbutton_info[i].infotext,
 		      GDI_X, x,
 		      GDI_Y, y,
@@ -6998,7 +7008,8 @@ static void CreateCheckbuttonGadgets()
 
 static void CreateRadiobuttonGadgets()
 {
-  struct GraphicInfo *gd = &graphic_info[IMG_EDITOR_RADIOBUTTON];
+  int graphic = IMG_EDITOR_RADIOBUTTON;
+  struct GraphicInfo *gd = &graphic_info[graphic];
   int gd_x1 = gd->src_x;
   int gd_y1 = gd->src_y;
   int gd_x2 = gd->src_x + gd->pressed_xoffset;
@@ -7033,6 +7044,7 @@ static void CreateRadiobuttonGadgets()
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,
+		      GDI_IMAGE_ID, graphic,
 		      GDI_INFO_TEXT, radiobutton_info[i].infotext,
 		      GDI_X, x,
 		      GDI_Y, y,

@@ -15470,7 +15470,8 @@ void CreateGameButtons()
 
   for (i = 0; i < NUM_GAME_BUTTONS; i++)
   {
-    struct GraphicInfo *gfx = &graphic_info[gamebutton_info[i].graphic];
+    int graphic = gamebutton_info[i].graphic;
+    struct GraphicInfo *gfx = &graphic_info[graphic];
     struct XY *pos = gamebutton_info[i].pos;
     struct GadgetInfo *gi;
     int button_type;
@@ -15524,6 +15525,7 @@ void CreateGameButtons()
     }
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
+		      GDI_IMAGE_ID, graphic,
 		      GDI_INFO_TEXT, gamebutton_info[i].infotext,
 		      GDI_X, base_x + GDI_ACTIVE_POS(pos->x),
 		      GDI_Y, base_y + GDI_ACTIVE_POS(pos->y),

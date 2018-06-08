@@ -5304,7 +5304,8 @@ void CreateToolButtons()
 
   for (i = 0; i < NUM_TOOL_BUTTONS; i++)
   {
-    struct GraphicInfo *gfx = &graphic_info[toolbutton_info[i].graphic];
+    int graphic = toolbutton_info[i].graphic;
+    struct GraphicInfo *gfx = &graphic_info[graphic];
     struct TextPosInfo *pos = toolbutton_info[i].pos;
     struct GadgetInfo *gi;
     Bitmap *deco_bitmap = None;
@@ -5370,6 +5371,7 @@ void CreateToolButtons()
     }
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
+		      GDI_IMAGE_ID, graphic,
 		      GDI_INFO_TEXT, toolbutton_info[i].infotext,
 		      GDI_X, dx + x,
 		      GDI_Y, dy + y,
