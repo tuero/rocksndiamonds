@@ -1353,6 +1353,11 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
 
   part = &anim->part[anim->active_part_nr];
 
+  // first set all animation parts to "inactive", ...
+  for (i = 0; i < num_parts; i++)
+    anim->part[i].state = ANIM_STATE_INACTIVE;
+
+  // ... then set current animation parts to "running"
   part->state = ANIM_STATE_RUNNING;
 
   anim->state = HandleGlobalAnim_Part(part, anim->state);
