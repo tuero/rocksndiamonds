@@ -2806,6 +2806,25 @@ int get_anim_parameter_value(char *s)
   return result;
 }
 
+int get_anim_action_parameter_value(char *token)
+{
+  int result = getImageIDFromToken(token);
+
+  if (result == -1)
+  {
+    char *gfx_token = getStringCat2("gfx.", token);
+
+    result = getImageIDFromToken(gfx_token);
+
+    checked_free(gfx_token);
+  }
+
+  if (result == -1)
+    result = ANIM_EVENT_ACTION_NONE;
+
+  return result;
+}
+
 int get_parameter_value(char *value_raw, char *suffix, int type)
 {
   char *value = getStringToLower(value_raw);
@@ -2886,6 +2905,11 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
 
     // add optional "click:anim_X" or "click:anim_X.part_X" parameter
     result |= get_anim_parameter_value(value);
+  }
+  else if (strEqual(suffix, ".init_event_action") ||
+	   strEqual(suffix, ".anim_event_action"))
+  {
+    result = get_anim_action_parameter_value(value);
   }
   else if (strEqual(suffix, ".class"))
   {

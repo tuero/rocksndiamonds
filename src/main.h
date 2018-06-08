@@ -2359,26 +2359,28 @@
 #define GFX_ARG_POST_DELAY_FIXED	39
 #define GFX_ARG_POST_DELAY_RANDOM	40
 #define GFX_ARG_INIT_EVENT		41
-#define GFX_ARG_ANIM_EVENT		42
-#define GFX_ARG_NAME			43
-#define GFX_ARG_SCALE_UP_FACTOR		44
-#define GFX_ARG_TILE_SIZE		45
-#define GFX_ARG_CLONE_FROM		46
-#define GFX_ARG_FADE_MODE		47
-#define GFX_ARG_FADE_DELAY		48
-#define GFX_ARG_POST_DELAY		49
-#define GFX_ARG_AUTO_DELAY		50
-#define GFX_ARG_ALIGN			51
-#define GFX_ARG_VALIGN			52
-#define GFX_ARG_SORT_PRIORITY		53
-#define GFX_ARG_CLASS			54
-#define GFX_ARG_STYLE			55
-#define GFX_ARG_ACTIVE_XOFFSET		56
-#define GFX_ARG_ACTIVE_YOFFSET		57
-#define GFX_ARG_PRESSED_XOFFSET		58
-#define GFX_ARG_PRESSED_YOFFSET		59
+#define GFX_ARG_INIT_EVENT_ACTION	42
+#define GFX_ARG_ANIM_EVENT		43
+#define GFX_ARG_ANIM_EVENT_ACTION	44
+#define GFX_ARG_NAME			45
+#define GFX_ARG_SCALE_UP_FACTOR		46
+#define GFX_ARG_TILE_SIZE		47
+#define GFX_ARG_CLONE_FROM		48
+#define GFX_ARG_FADE_MODE		49
+#define GFX_ARG_FADE_DELAY		50
+#define GFX_ARG_POST_DELAY		51
+#define GFX_ARG_AUTO_DELAY		52
+#define GFX_ARG_ALIGN			53
+#define GFX_ARG_VALIGN			54
+#define GFX_ARG_SORT_PRIORITY		55
+#define GFX_ARG_CLASS			56
+#define GFX_ARG_STYLE			57
+#define GFX_ARG_ACTIVE_XOFFSET		58
+#define GFX_ARG_ACTIVE_YOFFSET		59
+#define GFX_ARG_PRESSED_XOFFSET		60
+#define GFX_ARG_PRESSED_YOFFSET		61
 
-#define NUM_GFX_ARGS			60
+#define NUM_GFX_ARGS			62
 
 
 /* values for sound configuration suffixes */
@@ -3407,7 +3409,9 @@ struct GraphicInfo
   int post_delay_random;	/* animations (pause before next animation) */
 
   int init_event;		/* optional event triggering animation start */
+  int init_event_action;	/* optional action called on animation start */
   int anim_event;		/* optional event triggering animation end   */
+  int anim_event_action;	/* optional action called on animation end   */
 
   int step_offset;		/* optional step offset of toon animations */
   int step_xoffset;		/* optional step offset of toon animations */

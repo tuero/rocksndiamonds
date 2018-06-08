@@ -1289,6 +1289,8 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   g->post_delay_random = 0;
   g->init_event = ANIM_EVENT_DEFAULT;
   g->anim_event = ANIM_EVENT_DEFAULT;
+  g->init_event_action = -1;
+  g->anim_event_action = -1;
   g->draw_masked = FALSE;
   g->draw_order = 0;
   g->fade_mode = FADE_MODE_DEFAULT;
@@ -1511,6 +1513,10 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
     g->init_event = parameter[GFX_ARG_INIT_EVENT];
   if (parameter[GFX_ARG_ANIM_EVENT] != ARG_UNDEFINED_VALUE)
     g->anim_event = parameter[GFX_ARG_ANIM_EVENT];
+  if (parameter[GFX_ARG_INIT_EVENT_ACTION] != ARG_UNDEFINED_VALUE)
+    g->init_event_action = parameter[GFX_ARG_INIT_EVENT_ACTION];
+  if (parameter[GFX_ARG_ANIM_EVENT_ACTION] != ARG_UNDEFINED_VALUE)
+    g->anim_event_action = parameter[GFX_ARG_ANIM_EVENT_ACTION];
 
   /* used for toon animations and global animations */
   g->step_offset  = parameter[GFX_ARG_STEP_OFFSET];
