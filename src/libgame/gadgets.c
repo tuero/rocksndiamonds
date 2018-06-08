@@ -2286,3 +2286,20 @@ void DumpGadgetIdentifiers()
 
   printf("Done.\n");
 }
+
+boolean DoGadgetAction(int image_id)
+{
+  struct GadgetInfo *gi;
+
+  for (gi = gadget_list_first_entry; gi != NULL; gi = gi->next)
+  {
+    if (gi->mapped && gi->image_id == image_id)
+    {
+      gi->callback_action(gi);
+
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}

@@ -1438,6 +1438,16 @@ static void DoAnimationExt()
 #endif
 }
 
+static boolean DoGlobalAnim_EventAction(struct GlobalAnimPartControlInfo *part)
+{
+  int anim_event_action = part->control_info.anim_event_action;
+
+  if (anim_event_action == -1)
+    return FALSE;
+
+  return DoGadgetAction(anim_event_action);
+}
+
 static void InitGlobalAnim_Clickable()
 {
   int mode_nr;
@@ -1495,6 +1505,9 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, boolean clicked)
 	if (!part->clickable)
 	  continue;
 
+	if (part->state != ANIM_STATE_RUNNING)
+	  continue;
+
 	// always handle "any" click events (clicking anywhere on screen) ...
 	if (isClickablePart(part, ANIM_EVENT_ANY))
 	  anything_clicked = part->clicked = TRUE;
@@ -1506,8 +1519,13 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, boolean clicked)
 	if (isClickedPart(part, mx, my, clicked))
 	{
 #if 0
-	  printf("::: %d.%d CLICKED\n", anim_nr, part_nr);
+	  printf("::: %d.%d CLICKED [%d]\n", anim_nr, part_nr,
+		 part->control_info.anim_event_action);
 #endif
+
+	  // after executing event action, force click to be ignored
+	  if (DoGlobalAnim_EventAction(part))
+	    return TRUE;
 
 	  any_part_clicked = TRUE;
 
@@ -1533,8 +1551,22 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, boolean clicked)
 	    {
 	      struct GlobalAnimPartControlInfo *part2 = &anim2->part[part2_nr];
 
+	      if (part2->state != ANIM_STATE_RUNNING)
+		continue;
+
 	      if (isClickablePart(part2, mask))
+	      {
 		anything_clicked = part2->clicked = TRUE;
+
+#if 0
+		printf("::: %d.%d TRIGGER CLICKED [%d]\n", anim2_nr, part2_nr,
+		       part2->control_info.anim_event_action);
+#endif
+
+		// after executing event action, force click to be ignored
+		if (DoGlobalAnim_EventAction(part2))
+		  return TRUE;
+	      }
 
 #if 0
 	      struct GraphicInfo *c = &part2->control_info;

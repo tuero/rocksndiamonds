@@ -292,5 +292,6 @@ boolean HandleGadgets(int, int, int);
 boolean HandleGadgetsKeyInput(Key);
 
 void DumpGadgetIdentifiers(void);
+boolean DoGadgetAction(int);
 
 #endif	/* GADGETS_H */
