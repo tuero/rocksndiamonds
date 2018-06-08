@@ -1760,6 +1760,14 @@ static void HandleKeysSpecial(Key key)
       DumpBrush_Small();
     }
   }
+
+  /* special key shortcuts for all game modes */
+  if (is_string_suffix(cheat_input, ":dump-gadget-ids") ||
+      is_string_suffix(cheat_input, ":dgi") ||
+      is_string_suffix(cheat_input, ":DGI"))
+  {
+    DumpGadgetIdentifiers();
+  }
 }
 
 void HandleKeysDebug(Key key)

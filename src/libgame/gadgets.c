@@ -13,6 +13,7 @@
 #include <string.h>
 
 #include "gadgets.h"
+#include "image.h"
 #include "text.h"
 #include "misc.h"
 
@@ -2271,4 +2272,17 @@ boolean HandleGadgetsKeyInput(Key key)
   }
 
   return TRUE;
+}
+
+void DumpGadgetIdentifiers()
+{
+  struct GadgetInfo *gi;
+
+  printf("Gadgets on current screen (any prefix 'gfx.' can be omitted):\n");
+
+  for (gi = gadget_list_first_entry; gi != NULL; gi = gi->next)
+    if (gi->mapped && gi->image_id != -1)
+      printf("- '%s'\n", getTokenFromImageID(gi->image_id));
+
+  printf("Done.\n");
 }

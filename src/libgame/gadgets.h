@@ -291,4 +291,6 @@ void ClickOnGadget(struct GadgetInfo *, int);
 boolean HandleGadgets(int, int, int);
 boolean HandleGadgetsKeyInput(Key);
 
+void DumpGadgetIdentifiers(void);
+
 #endif	/* GADGETS_H */
