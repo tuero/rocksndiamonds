@@ -1248,7 +1248,9 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
 {
   struct GlobalAnimPartControlInfo *part;
   struct GraphicInfo *c = &anim->control_info;
+  int num_parts = anim->num_parts + (anim->has_base ? 1 : 0);
   int state, active_part_nr;
+  int i;
 
 #if 0
   printf("::: HandleGlobalAnim_Main: %d, %d => %d\n",
@@ -1289,13 +1291,8 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
     case ANIM_STOP:
       anim->state = ANIM_STATE_INACTIVE;
 
-      {
-	int num_parts = anim->num_parts + (anim->has_base ? 1 : 0);
-	int i;
-
-	for (i = 0; i < num_parts; i++)
-	  StopGlobalAnimSoundAndMusic(&anim->part[i]);
-      }
+      for (i = 0; i < num_parts; i++)
+	StopGlobalAnimSoundAndMusic(&anim->part[i]);
 
       return;
 
@@ -1305,9 +1302,6 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
 
   if (c->anim_mode & ANIM_ALL || anim->num_parts == 0)
   {
-    int num_parts = anim->num_parts + (anim->has_base ? 1 : 0);
-    int i;
-
 #if 0
     printf("::: HandleGlobalAnim_Main: %d, %d => %d\n",
 	   anim->mode_nr, anim->nr, num_parts);
