@@ -330,6 +330,9 @@
 #define STYLE_INNER_CORNERS	(1 << 1)
 #define STYLE_REVERSE		(1 << 2)
 
+/* values for special event handling style (used for global animation) */
+#define STYLE_PASSTHROUGH	(1 << 3)
+
 #define STYLE_DEFAULT		STYLE_NONE
 
 /* values for special global animation events */
