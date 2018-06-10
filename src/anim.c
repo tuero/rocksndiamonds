@@ -1483,6 +1483,7 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, boolean clicked)
 {
   boolean anything_clicked = FALSE;
   boolean any_part_clicked = FALSE;
+  boolean any_event_action = FALSE;
   int mode_nr;
 
   // check game modes in reverse draw order (to stop when clicked)
@@ -1530,9 +1531,9 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, boolean clicked)
 		 part->control_info.anim_event_action);
 #endif
 
-	  // after executing event action, force click to be ignored
-	  if (DoGlobalAnim_EventAction(part))
-	    return TRUE;
+	  // after executing event action, ignore any further actions
+	  if (!any_event_action && DoGlobalAnim_EventAction(part))
+	    any_event_action = TRUE;
 
 	  any_part_clicked = TRUE;
 
@@ -1570,9 +1571,9 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, boolean clicked)
 		       part2->control_info.anim_event_action);
 #endif
 
-		// after executing event action, force click to be ignored
-		if (DoGlobalAnim_EventAction(part2))
-		  return TRUE;
+		// after executing event action, ignore any further actions
+		if (!any_event_action && DoGlobalAnim_EventAction(part2))
+		  any_event_action = TRUE;
 	      }
 
 #if 0
