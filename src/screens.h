@@ -42,4 +42,7 @@ void FreeScreenGadgets();
 
 void setHideRelatedSetupEntries();
 
+void DumpScreenIdentifiers(void);
+boolean DoScreenAction(int);
+
 #endif	/* SCREENS_H */

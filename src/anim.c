@@ -1450,7 +1450,8 @@ static boolean DoGlobalAnim_EventAction(struct GlobalAnimPartControlInfo *part)
   if (anim_event_action == -1)
     return FALSE;
 
-  return DoGadgetAction(anim_event_action);
+  return (DoGadgetAction(anim_event_action) ||
+	  DoScreenAction(anim_event_action));
 }
 
 static void InitGlobalAnim_Clickable()

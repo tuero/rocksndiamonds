@@ -8308,3 +8308,50 @@ static void HandleScreenGadgets(struct GadgetInfo *gi)
       break;
   }
 }
+
+void DumpScreenIdentifiers()
+{
+  int i;
+
+  Print("Active screen elements on current screen:\n");
+
+  for (i = 0; main_controls[i].nr != -1; i++)
+  {
+    struct MainControlInfo *mci = &main_controls[i];
+
+    if (mci->button_graphic != -1)
+    {
+      char *token = getTokenFromImageID(mci->button_graphic);
+
+      Print("- '%s'\n", token);
+    }
+  }
+
+  Print("Done.\n");
+}
+
+boolean DoScreenAction(int image_id)
+{
+  int i;
+
+  if (game_status != GAME_MODE_MAIN)
+    return FALSE;
+
+  for (i = 0; main_controls[i].nr != -1; i++)
+  {
+    struct MainControlInfo *mci = &main_controls[i];
+    struct MenuPosInfo *pos = mci->pos_button;
+
+    if (mci->button_graphic == image_id)
+    {
+      int x = mSX + pos->x;
+      int y = mSY + pos->y;
+
+      HandleMainMenu(x, y, 0, 0, MB_MENU_CHOICE);
+
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}

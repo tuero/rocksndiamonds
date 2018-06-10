@@ -1762,11 +1762,12 @@ static void HandleKeysSpecial(Key key)
   }
 
   /* special key shortcuts for all game modes */
-  if (is_string_suffix(cheat_input, ":dump-gadget-ids") ||
-      is_string_suffix(cheat_input, ":dgi") ||
-      is_string_suffix(cheat_input, ":DGI"))
+  if (is_string_suffix(cheat_input, ":dump-event-actions") ||
+      is_string_suffix(cheat_input, ":dea") ||
+      is_string_suffix(cheat_input, ":DEA"))
   {
     DumpGadgetIdentifiers();
+    DumpScreenIdentifiers();
   }
 }
 
