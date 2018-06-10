@@ -2278,13 +2278,23 @@ void DumpGadgetIdentifiers()
 {
   struct GadgetInfo *gi;
 
-  printf("Gadgets on current screen (any prefix 'gfx.' can be omitted):\n");
+  Print("Gadgets on current screen:\n");
 
   for (gi = gadget_list_first_entry; gi != NULL; gi = gi->next)
+  {
     if (gi->mapped && gi->image_id != -1)
-      printf("- '%s'\n", getTokenFromImageID(gi->image_id));
+    {
+      char *token = getTokenFromImageID(gi->image_id);
+      char *prefix = "gfx.";
 
-  printf("Done.\n");
+      if (strPrefix(token, prefix))
+	token = &token[strlen(prefix)];
+
+      Print("- '%s'\n", token);
+    }
+  }
+
+  Print("Done.\n");
 }
 
 boolean DoGadgetAction(int image_id)
