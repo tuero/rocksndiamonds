@@ -1003,10 +1003,8 @@ static boolean isClickedPart(struct GlobalAnimPartControlInfo *part,
   return TRUE;
 }
 
-static boolean setPartClicked(struct GlobalAnimPartControlInfo *part)
+static boolean clickConsumed(struct GlobalAnimPartControlInfo *part)
 {
-  part->clicked = TRUE;
-
   return (part->control_info.style & STYLE_PASSTHROUGH ? FALSE : TRUE);
 }
 
@@ -1518,7 +1516,10 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, boolean clicked)
 
 	// always handle "any" click events (clicking anywhere on screen) ...
 	if (isClickablePart(part, ANIM_EVENT_ANY))
-	  anything_clicked = setPartClicked(part);
+	{
+	  part->clicked = TRUE;
+	  anything_clicked = clickConsumed(part);
+	}
 
 	// ... but only handle the first (topmost) clickable animation
 	if (any_part_clicked)
@@ -1538,7 +1539,10 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, boolean clicked)
 	  any_part_clicked = TRUE;
 
 	  if (isClickablePart(part, ANIM_EVENT_SELF))
-	    anything_clicked = setPartClicked(part);
+	  {
+	    part->clicked = TRUE;
+	    anything_clicked = clickConsumed(part);
+	  }
 
 	  // check if this click is defined to trigger other animations
 	  int gic_anim_nr = part->old_anim_nr + 1;	// X as in "anim_X"
@@ -1564,7 +1568,8 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, boolean clicked)
 
 	      if (isClickablePart(part2, mask))
 	      {
-		setPartClicked(part2);
+		part2->clicked = TRUE;
+		anything_clicked = clickConsumed(part);	// click was on "part"!
 
 #if 0
 		printf("::: %d.%d TRIGGER CLICKED [%d]\n", anim2_nr, part2_nr,
