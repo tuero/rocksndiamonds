@@ -1543,7 +1543,8 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, boolean clicked)
 	  if (!any_event_action && DoGlobalAnim_EventAction(part))
 	    any_event_action = TRUE;
 
-	  any_part_clicked = TRUE;
+	  // determine if mouse clicks should be blocked from other animations
+	  any_part_clicked = clickConsumed(part);
 
 	  if (isClickablePart(part, ANIM_EVENT_SELF))
 	  {
