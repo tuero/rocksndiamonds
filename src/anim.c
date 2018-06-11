@@ -14,6 +14,7 @@
 #include "anim.h"
 #include "main.h"
 #include "tools.h"
+#include "screens.h"
 
 
 /* values for global toon animation definition */
