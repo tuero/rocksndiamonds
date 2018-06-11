@@ -2931,6 +2931,9 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
 
     if (string_has_parameter(value, "passthrough_clicks"))
       result |= STYLE_PASSTHROUGH;
+
+    if (string_has_parameter(value, "multiple_actions"))
+      result |= STYLE_MULTIPLE_ACTIONS;
   }
   else if (strEqual(suffix, ".fade_mode"))
   {
