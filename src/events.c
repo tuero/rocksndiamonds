@@ -1675,6 +1675,11 @@ static void HandleKeysSpecial(Key key)
     {
       InsertSolutionTape();
     }
+    else if (is_string_suffix(cheat_input, ":play-solution-tape") ||
+	     is_string_suffix(cheat_input, ":pst"))
+    {
+      PlaySolutionTape();
+    }
     else if (is_string_suffix(cheat_input, ":reload-graphics") ||
 	     is_string_suffix(cheat_input, ":rg"))
     {

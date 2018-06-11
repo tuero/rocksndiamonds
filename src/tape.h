@@ -109,6 +109,8 @@ struct TapeButtonInfo
   struct XY pause;
   struct XY record;
   struct XY play;
+  struct XY insert_solution;
+  struct XY play_solution;
 };
 
 struct TapeSymbolInfo
@@ -231,7 +233,8 @@ unsigned int GetTapeLengthFrames(void);
 unsigned int GetTapeLengthSeconds(void);
 void TapeQuickSave(void);
 void TapeQuickLoad(void);
-void InsertSolutionTape(void);
+boolean InsertSolutionTape(void);
+boolean PlaySolutionTape(void);
 
 void AutoPlayTape(void);
 

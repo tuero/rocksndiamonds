@@ -6233,6 +6233,9 @@ struct ConfigInfo image_config[] =
   { "gfx.tape.button.play.height",		"18"			},
   { "gfx.tape.button.play.pressed_xoffset",	"-100"			},
 
+  { "gfx.tape.button.insert_solution",		UNDEFINED_FILENAME	},
+  { "gfx.tape.button.play_solution",		UNDEFINED_FILENAME	},
+
   { "gfx.tape.symbol.eject",			UNDEFINED_FILENAME	},
   { "gfx.tape.symbol.stop",			UNDEFINED_FILENAME	},
   { "gfx.tape.symbol.pause",			"RocksDoor.png"		},
@@ -9071,6 +9074,11 @@ struct ConfigInfo image_config[] =
   { "tape.button.record.y",			"77"			},
   { "tape.button.play.x",			"77"			},
   { "tape.button.play.y",			"77"			},
+
+  { "tape.button.insert_solution.x",		"-1"			},
+  { "tape.button.insert_solution.y",		"-1"			},
+  { "tape.button.play_solution.x",		"-1"			},
+  { "tape.button.play_solution.y",		"-1"			},
 
   { "tape.symbol.eject.x",			"-1"			},
   { "tape.symbol.eject.y",			"-1"			},

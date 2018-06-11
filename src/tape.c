@@ -28,8 +28,10 @@
 #define TAPE_CTRL_ID_PAUSE			3
 #define TAPE_CTRL_ID_RECORD			4
 #define TAPE_CTRL_ID_PLAY			5
+#define TAPE_CTRL_ID_INSERT_SOLUTION		6
+#define TAPE_CTRL_ID_PLAY_SOLUTION		7
 
-#define NUM_TAPE_BUTTONS			6
+#define NUM_TAPE_BUTTONS			8
 
 /* values for tape handling */
 #define TAPE_PAUSE_SECONDS_BEFORE_DEATH		5
@@ -1077,7 +1079,7 @@ void TapeQuickLoad()
   }
 }
 
-void InsertSolutionTape()
+boolean InsertSolutionTape()
 {
   boolean level_has_tape = (level.game_engine_type == GAME_ENGINE_TYPE_SP &&
 			    level.native_sp_level->demo.is_available);
@@ -1086,18 +1088,37 @@ void InsertSolutionTape()
   {
     Request("No solution tape for this level!", REQ_CONFIRM);
 
-    return;
+    return FALSE;
   }
+
+  if (!TAPE_IS_STOPPED(tape))
+    TapeStop();
 
   // if tape recorder already contains a tape, remove it without asking
   TapeErase();
 
   LoadSolutionTape(level_nr);
 
+  DrawCompleteVideoDisplay();
+
   if (TAPE_IS_EMPTY(tape))
+  {
     Request("Loading solution tape for this level failed!", REQ_CONFIRM);
 
-  DrawCompleteVideoDisplay();
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+boolean PlaySolutionTape()
+{
+  if (!InsertSolutionTape())
+    return FALSE;
+
+  TapeStartGamePlaying();
+
+  return TRUE;
 }
 
 
@@ -1273,6 +1294,14 @@ static struct
   {
     IMG_GFX_TAPE_BUTTON_PLAY,		&tape.button.play,
     TAPE_CTRL_ID_PLAY,			"play tape"
+  },
+  {
+    IMG_GFX_TAPE_BUTTON_INSERT_SOLUTION,&tape.button.insert_solution,
+    TAPE_CTRL_ID_INSERT_SOLUTION,	"insert solution tape"
+  },
+  {
+    IMG_GFX_TAPE_BUTTON_PLAY_SOLUTION,	&tape.button.play_solution,
+    TAPE_CTRL_ID_PLAY_SOLUTION,		"play solution tape"
   }
 };
 
@@ -1500,6 +1529,16 @@ static void HandleTapeButtonsExt(int id)
 
 	DrawVideoDisplayCurrentState();
       }
+
+      break;
+
+    case TAPE_CTRL_ID_INSERT_SOLUTION:
+      InsertSolutionTape();
+
+      break;
+
+    case TAPE_CTRL_ID_PLAY_SOLUTION:
+      PlaySolutionTape();
 
       break;
 
