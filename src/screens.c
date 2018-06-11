@@ -8251,7 +8251,9 @@ static void HandleScreenGadgets(struct GadgetInfo *gi)
 {
   int id = gi->custom_id;
   int button = gi->event.button;
-  int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
+  int step = (button == MB_LEFTBUTTON   ? 1 :
+	      button == MB_MIDDLEBUTTON ? 5 :
+	      button == MB_RIGHTBUTTON  ? 10 : 1);
 
   switch (id)
   {
