@@ -1601,7 +1601,7 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, boolean clicked)
     }
   }
 
-  return anything_clicked;
+  return (anything_clicked || any_event_action);
 }
 
 static void ResetGlobalAnim_Clickable()
