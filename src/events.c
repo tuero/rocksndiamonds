@@ -2423,24 +2423,38 @@ void HandleJoystick()
 void HandleSpecialGameControllerButtons(Event *event)
 {
 #if defined(TARGET_SDL2)
+  int key_status;
+  Key key;
+
   switch (event->type)
   {
     case SDL_CONTROLLERBUTTONDOWN:
-      if (event->cbutton.button == SDL_CONTROLLER_BUTTON_START)
-	HandleKey(KSYM_space, KEY_PRESSED);
-      else if (event->cbutton.button == SDL_CONTROLLER_BUTTON_BACK)
-	HandleKey(KSYM_Escape, KEY_PRESSED);
-
+      key_status = KEY_PRESSED;
       break;
 
     case SDL_CONTROLLERBUTTONUP:
-      if (event->cbutton.button == SDL_CONTROLLER_BUTTON_START)
-	HandleKey(KSYM_space, KEY_RELEASED);
-      else if (event->cbutton.button == SDL_CONTROLLER_BUTTON_BACK)
-	HandleKey(KSYM_Escape, KEY_RELEASED);
-
+      key_status = KEY_RELEASED;
       break;
+
+    default:
+      return;
   }
+
+  switch (event->cbutton.button)
+  {
+    case SDL_CONTROLLER_BUTTON_START:
+      key = KSYM_space;
+      break;
+
+    case SDL_CONTROLLER_BUTTON_BACK:
+      key = KSYM_Escape;
+      break;
+
+    default:
+      return;
+  }
+
+  HandleKey(key, key_status);
 #endif
 }
 
