@@ -2496,3 +2496,18 @@ void HandleSpecialGameControllerKeys(Key key, int key_status)
 #endif
 #endif
 }
+
+boolean DoKeysymAction(int keysym)
+{
+  if (keysym < 0)
+  {
+    Key key = (Key)(-keysym);
+
+    HandleKey(key, KEY_PRESSED);
+    HandleKey(key, KEY_RELEASED);
+
+    return TRUE;
+  }
+
+  return FALSE;
+}

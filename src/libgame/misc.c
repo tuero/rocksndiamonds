@@ -2820,6 +2820,14 @@ int get_anim_action_parameter_value(char *token)
   }
 
   if (result == -1)
+  {
+    Key key = getKeyFromX11KeyName(token);
+
+    if (key != KSYM_UNDEFINED)
+      result = -(int)key;
+  }
+
+  if (result == -1)
     result = ANIM_EVENT_ACTION_NONE;
 
   return result;
@@ -2909,7 +2917,7 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
   else if (strEqual(suffix, ".init_event_action") ||
 	   strEqual(suffix, ".anim_event_action"))
   {
-    result = get_anim_action_parameter_value(value);
+    result = get_anim_action_parameter_value(value_raw);
   }
   else if (strEqual(suffix, ".class"))
   {

@@ -14,6 +14,7 @@
 #include "anim.h"
 #include "main.h"
 #include "tools.h"
+#include "events.h"
 #include "screens.h"
 
 
@@ -1452,7 +1453,8 @@ static boolean DoGlobalAnim_EventAction(struct GlobalAnimPartControlInfo *part)
     return FALSE;
 
   boolean action_executed = (DoGadgetAction(anim_event_action) ||
-			     DoScreenAction(anim_event_action));
+			     DoScreenAction(anim_event_action) ||
+			     DoKeysymAction(anim_event_action));
 
   // check if further actions are allowed to be executed
   if (part->control_info.style & STYLE_MULTIPLE_ACTIONS)

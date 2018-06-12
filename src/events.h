@@ -46,4 +46,6 @@ void HandleJoystick();
 void HandleSpecialGameControllerButtons(Event *);
 void HandleSpecialGameControllerKeys(Key, int);
 
+boolean DoKeysymAction(int);
+
 #endif
