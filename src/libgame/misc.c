@@ -1516,6 +1516,10 @@ void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
     char *name;
   } translate_key[] =
   {
+    /* return and escape keys */
+    { KSYM_Return,	"XK_Return",		"return" },
+    { KSYM_Escape,	"XK_Escape",		"escape" },
+
     /* normal cursor keys */
     { KSYM_Left,	"XK_Left",		"cursor left" },
     { KSYM_Right,	"XK_Right",		"cursor right" },
