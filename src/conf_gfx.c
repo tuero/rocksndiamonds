@@ -6079,6 +6079,13 @@ struct ConfigInfo image_config[] =
   { "menu.button_quit.active",			UNDEFINED_FILENAME	},
   { "menu.button_quit.active.clone_from",	"menu.button.active"	},
 
+  { "menu.button_first_level",			UNDEFINED_FILENAME	},
+  { "menu.button_first_level.active",		UNDEFINED_FILENAME	},
+  { "menu.button_last_level",			UNDEFINED_FILENAME	},
+  { "menu.button_last_level.active",		UNDEFINED_FILENAME	},
+  { "menu.button_level_number",			UNDEFINED_FILENAME	},
+  { "menu.button_level_number.active",		UNDEFINED_FILENAME	},
+
   { "menu.scrollbar",				"RocksDC.png"		},
   { "menu.scrollbar.xpos",			"8"			},
   { "menu.scrollbar.ypos",			"10"			},
@@ -7886,6 +7893,13 @@ struct ConfigInfo image_config[] =
   { "main.button.setup.y",			"256"			},
   { "main.button.quit.x",			"0"			},
   { "main.button.quit.y",			"288"			},
+
+  { "main.button.first_level.x",		"-1"			},
+  { "main.button.first_level.y",		"-1"			},
+  { "main.button.last_level.x",			"-1"			},
+  { "main.button.last_level.y",			"-1"			},
+  { "main.button.level_number.x",		"-1"			},
+  { "main.button.level_number.y",		"-1"			},
 
   { "main.button.prev_level.x",			"320"			},
   { "main.button.prev_level.y",			"96"			},

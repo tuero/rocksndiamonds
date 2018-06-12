@@ -749,19 +749,19 @@ static struct MainControlInfo main_controls[] =
 #endif
   {
     MAIN_CONTROL_FIRST_LEVEL,
-    NULL,				-1,
+    &menu.main.button.first_level,	IMG_MENU_BUTTON_FIRST_LEVEL,
     &menu.main.text.first_level,	&main_text_first_level,
     NULL,				NULL,
   },
   {
     MAIN_CONTROL_LAST_LEVEL,
-    NULL,				-1,
+    &menu.main.button.last_level,	IMG_MENU_BUTTON_LAST_LEVEL,
     &menu.main.text.last_level,		&main_text_last_level,
     NULL,				NULL,
   },
   {
     MAIN_CONTROL_LEVEL_NUMBER,
-    NULL,				-1,
+    &menu.main.button.level_number,	IMG_MENU_BUTTON_LEVEL_NUMBER,
     &menu.main.text.level_number,	&main_text_level_number,
     NULL,				NULL,
   },
@@ -1148,8 +1148,8 @@ static void InitializeMainControls()
 
     if (pos_text != NULL)		/* (x/y may be -1/-1 here) */
     {
-      /* calculate size for non-clickable text -- needed for text alignment */
-      boolean calculate_text_size = (pos_button == NULL && text != NULL);
+      /* calculate text size -- needed for text alignment */
+      boolean calculate_text_size = (text != NULL);
 
       if (pos_text->width == -1 || calculate_text_size)
 	pos_text->width = text_width;

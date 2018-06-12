@@ -2636,6 +2636,10 @@ struct MenuMainButtonInfo
 
   struct MenuPosInfo prev_level;
   struct MenuPosInfo next_level;
+
+  struct MenuPosInfo first_level;
+  struct MenuPosInfo last_level;
+  struct MenuPosInfo level_number;
 };
 
 struct MenuMainTextInfo
