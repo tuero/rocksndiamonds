@@ -6088,6 +6088,11 @@ struct ConfigInfo image_config[] =
   { "menu.button_level_number",			UNDEFINED_FILENAME	},
   { "menu.button_level_number.active",		UNDEFINED_FILENAME	},
 
+  { "menu.button_insert_solution",		UNDEFINED_FILENAME	},
+  { "menu.button_insert_solution.active",	UNDEFINED_FILENAME	},
+  { "menu.button_play_solution",		UNDEFINED_FILENAME	},
+  { "menu.button_play_solution.active",		UNDEFINED_FILENAME	},
+
   { "menu.scrollbar",				"RocksDC.png"		},
   { "menu.scrollbar.xpos",			"8"			},
   { "menu.scrollbar.ypos",			"10"			},
@@ -7907,6 +7912,11 @@ struct ConfigInfo image_config[] =
   { "main.button.prev_level.y",			"96"			},
   { "main.button.next_level.x",			"448"			},
   { "main.button.next_level.y",			"96"			},
+
+  { "main.button.insert_solution.x",		"-1"			},
+  { "main.button.insert_solution.y",		"-1"			},
+  { "main.button.play_solution.x",		"-1"			},
+  { "main.button.play_solution.y",		"-1"			},
 
   { "main.text.name.x",				"-1"			},
   { "main.text.name.y",				"-1"			},

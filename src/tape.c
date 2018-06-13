@@ -1079,12 +1079,18 @@ void TapeQuickLoad()
   }
 }
 
-boolean InsertSolutionTape()
+boolean hasSolutionTape()
 {
+  boolean tape_file_exists = fileExists(getSolutionTapeFilename(level_nr));
   boolean level_has_tape = (level.game_engine_type == GAME_ENGINE_TYPE_SP &&
 			    level.native_sp_level->demo.is_available);
 
-  if (!fileExists(getSolutionTapeFilename(level_nr)) && !level_has_tape)
+  return (tape_file_exists || level_has_tape);
+}
+
+boolean InsertSolutionTape()
+{
+  if (!hasSolutionTape())
   {
     Request("No solution tape for this level!", REQ_CONFIRM);
 

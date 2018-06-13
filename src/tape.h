@@ -233,6 +233,8 @@ unsigned int GetTapeLengthFrames(void);
 unsigned int GetTapeLengthSeconds(void);
 void TapeQuickSave(void);
 void TapeQuickLoad(void);
+
+boolean hasSolutionTape();
 boolean InsertSolutionTape(void);
 boolean PlaySolutionTape(void);
 

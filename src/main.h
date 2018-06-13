@@ -2642,6 +2642,9 @@ struct MenuMainButtonInfo
   struct MenuPosInfo first_level;
   struct MenuPosInfo last_level;
   struct MenuPosInfo level_number;
+
+  struct MenuPosInfo insert_solution;
+  struct MenuPosInfo play_solution;
 };
 
 struct MenuMainTextInfo

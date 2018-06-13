@@ -172,18 +172,21 @@
 #define SCREEN_CTRL_ID_NEXT_LEVEL	1
 #define SCREEN_CTRL_ID_PREV_PLAYER	2
 #define SCREEN_CTRL_ID_NEXT_PLAYER	3
-#define SCREEN_CTRL_ID_SCROLL_UP	4
-#define SCREEN_CTRL_ID_SCROLL_DOWN	5
-#define SCREEN_CTRL_ID_SCROLL_VERTICAL	6
+#define SCREEN_CTRL_ID_INSERT_SOLUTION	4
+#define SCREEN_CTRL_ID_PLAY_SOLUTION	5
+#define SCREEN_CTRL_ID_SCROLL_UP	6
+#define SCREEN_CTRL_ID_SCROLL_DOWN	7
+#define SCREEN_CTRL_ID_SCROLL_VERTICAL	8
 
-#define NUM_SCREEN_GADGETS		7
+#define NUM_SCREEN_GADGETS		9
 
-#define NUM_SCREEN_MENUBUTTONS		4
+#define NUM_SCREEN_MENUBUTTONS		6
 #define NUM_SCREEN_SCROLLBUTTONS	2
 #define NUM_SCREEN_SCROLLBARS		1
 
 #define SCREEN_MASK_MAIN		(1 << 0)
-#define SCREEN_MASK_INPUT		(1 << 1)
+#define SCREEN_MASK_MAIN_HAS_SOLUTION	(1 << 1)
+#define SCREEN_MASK_INPUT		(1 << 2)
 
 /* graphic position and size values for buttons and scrollbars */
 #define SC_MENUBUTTON_XSIZE		TILEX
@@ -245,6 +248,8 @@ static void HandleInfoScreen_Version(int);
 static void MapScreenMenuGadgets(int);
 static void MapScreenGadgets(int);
 static void MapScreenTreeGadgets(TreeInfo *);
+
+static void UpdateScreenMenuGadgets(int, boolean);
 
 static struct GadgetInfo *screen_gadget[NUM_SCREEN_GADGETS];
 
@@ -1658,6 +1663,7 @@ void DrawMainMenu()
   /* map gadgets for main menu screen */
   MapTapeButtons();
   MapScreenMenuGadgets(SCREEN_MASK_MAIN);
+  UpdateScreenMenuGadgets(SCREEN_MASK_MAIN_HAS_SOLUTION, hasSolutionTape());
 
   /* copy actual game door content to door double buffer for OpenDoor() */
   BlitBitmap(drawto, bitmap_db_door_1, DX, DY, DXSIZE, DYSIZE, 0, 0);
@@ -1928,6 +1934,8 @@ void HandleMainMenu_SelectLevel(int step, int direction, int selected_level_nr)
     DrawCompleteVideoDisplay();
 
     SaveLevelSetup_SeriesInfo();
+
+    UpdateScreenMenuGadgets(SCREEN_MASK_MAIN_HAS_SOLUTION, hasSolutionTape());
 
     /* needed because DrawPreviewLevelInitial() takes some time */
     BackToFront();
@@ -7914,6 +7922,16 @@ static void getScreenMenuButtonPos(int *x, int *y, int gadget_id)
       *y = mSY + TILEY * MENU_SCREEN_START_YPOS;
       break;
 
+    case SCREEN_CTRL_ID_INSERT_SOLUTION:
+      *x = mSX + GDI_ACTIVE_POS(menu.main.button.insert_solution.x);
+      *y = mSY + GDI_ACTIVE_POS(menu.main.button.insert_solution.y);
+      break;
+
+    case SCREEN_CTRL_ID_PLAY_SOLUTION:
+      *x = mSX + GDI_ACTIVE_POS(menu.main.button.play_solution.x);
+      *y = mSY + GDI_ACTIVE_POS(menu.main.button.play_solution.y);
+      break;
+
     default:
       Error(ERR_EXIT, "unknown gadget ID %d", gadget_id);
   }
@@ -7955,6 +7973,20 @@ static struct
     SCREEN_CTRL_ID_NEXT_PLAYER,
     SCREEN_MASK_INPUT,
     "next player"
+  },
+  {
+    IMG_MENU_BUTTON_INSERT_SOLUTION, IMG_MENU_BUTTON_INSERT_SOLUTION_ACTIVE,
+    getScreenMenuButtonPos,
+    SCREEN_CTRL_ID_INSERT_SOLUTION,
+    SCREEN_MASK_MAIN_HAS_SOLUTION,
+    "insert solution tape"
+  },
+  {
+    IMG_MENU_BUTTON_PLAY_SOLUTION, IMG_MENU_BUTTON_PLAY_SOLUTION_ACTIVE,
+    getScreenMenuButtonPos,
+    SCREEN_CTRL_ID_PLAY_SOLUTION,
+    SCREEN_MASK_MAIN_HAS_SOLUTION,
+    "play solution tape"
   },
 };
 
@@ -8014,12 +8046,23 @@ static void CreateScreenMenubuttons()
     int gd_x1, gd_x2, gd_y1, gd_y2;
     int id = menubutton_info[i].gadget_id;
 
-    event_mask = GD_EVENT_PRESSED | GD_EVENT_REPEATED;
+    if (menubutton_info[i].screen_mask == SCREEN_MASK_MAIN_HAS_SOLUTION)
+      event_mask = GD_EVENT_RELEASED;
+    else
+      event_mask = GD_EVENT_PRESSED | GD_EVENT_REPEATED;
 
     menubutton_info[i].get_gadget_position(&x, &y, id);
 
-    width = SC_MENUBUTTON_XSIZE;
-    height = SC_MENUBUTTON_YSIZE;
+    if (menubutton_info[i].screen_mask == SCREEN_MASK_MAIN_HAS_SOLUTION)
+    {
+      width  = graphic_info[menubutton_info[i].gfx_pressed].width;
+      height = graphic_info[menubutton_info[i].gfx_pressed].height;
+    }
+    else
+    {
+      width = SC_MENUBUTTON_XSIZE;
+      height = SC_MENUBUTTON_YSIZE;
+    }
 
     gfx_unpressed = menubutton_info[i].gfx_unpressed;
     gfx_pressed   = menubutton_info[i].gfx_pressed;
@@ -8228,6 +8271,33 @@ void MapScreenMenuGadgets(int screen_mask)
       MapGadget(screen_gadget[menubutton_info[i].gadget_id]);
 }
 
+void UnmapScreenMenuGadgets(int screen_mask)
+{
+  int i;
+
+  for (i = 0; i < NUM_SCREEN_MENUBUTTONS; i++)
+  {
+    if (screen_mask & menubutton_info[i].screen_mask)
+    {
+      UnmapGadget(screen_gadget[menubutton_info[i].gadget_id]);
+
+      if (screen_mask & SCREEN_MASK_MAIN_HAS_SOLUTION)
+	DrawBackground(screen_gadget[menubutton_info[i].gadget_id]->x,
+		       screen_gadget[menubutton_info[i].gadget_id]->y,
+		       screen_gadget[menubutton_info[i].gadget_id]->width,
+		       screen_gadget[menubutton_info[i].gadget_id]->height);
+    }
+  }
+}
+
+void UpdateScreenMenuGadgets(int screen_mask, boolean map_gadgets)
+{
+  if (map_gadgets)
+    MapScreenMenuGadgets(screen_mask);
+  else
+    UnmapScreenMenuGadgets(screen_mask);
+}
+
 void MapScreenGadgets(int num_entries)
 {
   int i;
@@ -8271,6 +8341,14 @@ static void HandleScreenGadgets(struct GadgetInfo *gi)
 
     case SCREEN_CTRL_ID_NEXT_PLAYER:
       HandleSetupScreen_Input_Player(step, +1);
+      break;
+
+    case SCREEN_CTRL_ID_INSERT_SOLUTION:
+      InsertSolutionTape();
+      break;
+
+    case SCREEN_CTRL_ID_PLAY_SOLUTION:
+      PlaySolutionTape();
       break;
 
     case SCREEN_CTRL_ID_SCROLL_UP:
