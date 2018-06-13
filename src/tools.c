@@ -1574,6 +1574,10 @@ void getSizedGraphicSourceExt(int graphic, int frame, int tilesize,
 {
   struct GraphicInfo *g = &graphic_info[graphic];
 
+  // if no graphics defined at all, use fallback graphics
+  if (g->bitmaps == NULL)
+    *g = graphic_info[IMG_CHAR_EXCLAM];
+
   // if no in-game graphics defined, always use standard graphic size
   if (g->bitmaps[IMG_BITMAP_GAME] == NULL)
     tilesize = TILESIZE;
