@@ -7558,13 +7558,19 @@ boolean ConfigureVirtualButtonsMain()
 
 	    /* press 'Enter' to keep the existing key binding */
 	    if (key == KSYM_Return ||
+#if defined(TARGET_SDL2)
 		key == KSYM_Menu ||
+#endif
 		key == KSYM_space)
 	    {
 	      step_nr++;
 	    }
-	    else if (key == KSYM_BackSpace ||
-		     key == KSYM_Back)
+	    else if (key == KSYM_BackSpace
+#if defined(TARGET_SDL2)
+		     ||
+		     key == KSYM_Back
+#endif
+		     )
 	    {
 	      if (step_nr == 0)
 	      {
