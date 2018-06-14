@@ -664,31 +664,71 @@ static void HandleNetworkingMessages()
     SendToServer_StopPlaying(NETWORK_STOP_BY_ERROR);
 }
 
-/* TODO */
+static char *HandleNetworkingPackets()
+{
+  while (1)
+  {
+    /* ---------- check network server for activity ---------- */
+
+    int num_active_sockets = SDLNet_CheckSockets(rfds, 1);
+
+    if (num_active_sockets < 0)
+      return "Error checking network sockets!";
+
+    if (num_active_sockets == 0)
+      break;	// no active sockets, stop here
+
+    /* ---------- read packets from network server ---------- */
+
+    int num_bytes = SDLNet_TCP_Recv(sfd, readbuffer + nread, 1);
+
+    if (num_bytes < 0)
+      return "Error reading from network server!";
+
+    if (num_bytes == 0)
+      return "Connection to network server lost!";
+
+    nread += num_bytes;
+
+    HandleNetworkingMessages();
+  }
+
+  return NULL;
+}
+
+static void HandleNetworkingDisconnect()
+{
+  int i;
+
+  SDLNet_TCP_DelSocket(rfds, sfd);
+  SDLNet_TCP_Close(sfd);
+
+  network.enabled = FALSE;
+  network_playing = FALSE;
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+    stored_player[i].connected_network = FALSE;
+}
 
 void HandleNetworking()
 {
-  int r = 0;
+  char *error_message = HandleNetworkingPackets();
 
-  do
+  if (error_message != NULL)
   {
-    if ((r = SDLNet_CheckSockets(rfds, 1)) < 0)
-      Error(ERR_EXIT, "HandleNetworking(): SDLNet_CheckSockets() failed");
+    HandleNetworkingDisconnect();
 
-    if (r > 0)
+    if (game_status == GAME_MODE_PLAYING)
     {
-      r = SDLNet_TCP_Recv(sfd, readbuffer + nread, 1);
+      Request(error_message, REQ_CONFIRM | REQ_STAY_CLOSED);
 
-      if (r < 0)
-	Error(ERR_EXIT, "error reading from network server");
+      SetGameStatus(GAME_MODE_MAIN);
 
-      if (r == 0)
-	Error(ERR_EXIT, "connection to network server lost");
-
-      nread += r;
-
-      HandleNetworkingMessages();
+      DrawMainMenu();
+    }
+    else
+    {
+      Request(error_message, REQ_CONFIRM);
     }
   }
-  while (r > 0);
 }
