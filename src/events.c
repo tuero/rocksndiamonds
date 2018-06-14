@@ -2222,10 +2222,8 @@ void HandleEventActions()
     HandleJoystick();
   }
 
-#if defined(NETWORK_AVALIABLE)
   if (network.enabled)
     HandleNetworking();
-#endif
 
   switch (game_status)
   {

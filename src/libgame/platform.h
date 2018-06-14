@@ -165,12 +165,4 @@
 #endif
 
 
-/* ========================================================================= */
-/* this should better go into "system.h" or "features.h" (yet to be created) */
-/* ========================================================================= */
-
-#if defined(PLATFORM_UNIX) || defined(TARGET_SDL)
-#define NETWORK_AVALIABLE
-#endif
-
 #endif /* PLATFORM_H */

@@ -3503,11 +3503,9 @@ void InitGame()
 
   network_player_action_received = FALSE;
 
-#if defined(NETWORK_AVALIABLE)
   /* initial null action */
   if (network_playing)
     SendToServer_MovePlayer(MV_NONE);
-#endif
 
   ZX = ZY = -1;
   ExitX = ExitY = -1;
@@ -11290,14 +11288,12 @@ void StartGameActions(boolean init_network_game, boolean record_tape,
   if (record_tape)
     TapeStartRecording(new_random_seed);
 
-#if defined(NETWORK_AVALIABLE)
   if (init_network_game)
   {
     SendToServer_StartPlaying();
 
     return;
   }
-#endif
 
   InitGame();
 }
@@ -11420,10 +11416,8 @@ void GameActionsExt()
   {
     /* try to get network player actions in time */
 
-#if defined(NETWORK_AVALIABLE)
     /* last chance to get network player actions without main loop delay */
     HandleNetworking();
-#endif
 
     /* game was quit by network peer */
     if (game_status != GAME_MODE_PLAYING)
@@ -11469,10 +11463,8 @@ void GameActionsExt()
       stored_player[i].effective_action = stored_player[i].action;
   }
 
-#if defined(NETWORK_AVALIABLE)
   if (network_playing)
     SendToServer_MovePlayer(summarized_player_action);
-#endif
 
   // summarize all actions at local players mapped input device position
   // (this allows using different input devices in single player mode)
@@ -14967,11 +14959,9 @@ void RequestQuitGameExt(boolean skip_request, boolean quick_quit, char *message)
     if (!skip_request)
       CloseDoor(DOOR_CLOSE_1);
 
-#if defined(NETWORK_AVALIABLE)
     if (network.enabled)
       SendToServer_StopPlaying(NETWORK_STOP_BY_PLAYER);
     else
-#endif
     {
       if (quick_quit)
 	FadeSkipNextFadeIn();
@@ -15779,12 +15769,10 @@ static void HandleGameButtonsExt(int id, int button)
     case GAME_CTRL_ID_PANEL_PAUSE:
       if (network.enabled && game_status == GAME_MODE_PLAYING)
       {
-#if defined(NETWORK_AVALIABLE)
 	if (tape.pausing)
 	  SendToServer_ContinuePlaying();
 	else
 	  SendToServer_PausePlaying();
-#endif
       }
       else
 	TapeTogglePause(TAPE_TOGGLE_MANUAL);
@@ -15801,11 +15789,9 @@ static void HandleGameButtonsExt(int id, int button)
       }
       else if (tape.pausing)
       {
-#if defined(NETWORK_AVALIABLE)
 	if (network.enabled)
 	  SendToServer_ContinuePlaying();
 	else
-#endif
 	  TapeTogglePause(TAPE_TOGGLE_MANUAL | TAPE_TOGGLE_PLAY_PAUSE);
       }
       break;

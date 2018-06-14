@@ -9,19 +9,14 @@
 // network.c
 // ============================================================================
 
-#include "libgame/platform.h"
-
-#if defined(NETWORK_AVALIABLE)
-
 #include <signal.h>
 #include <sys/time.h>
-
-#include "main.h"
 
 #include "libgame/libgame.h"
 
 #include "network.h"
 #include "netserv.h"
+#include "main.h"
 #include "game.h"
 #include "tape.h"
 #include "files.h"
@@ -697,5 +692,3 @@ void HandleNetworking()
   }
   while (r > 0);
 }
-
-#endif /* NETWORK_AVALIABLE */

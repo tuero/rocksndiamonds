@@ -4392,13 +4392,11 @@ static boolean RequestDoor(char *text, unsigned int req_state)
 
   SetMouseCursor(CURSOR_DEFAULT);
 
-#if defined(NETWORK_AVALIABLE)
   /* pause network game while waiting for request to answer */
   if (network.enabled &&
       game_status == GAME_MODE_PLAYING &&
       req_state & REQUEST_WAIT_FOR_INPUT)
     SendToServer_PausePlaying();
-#endif
 
   old_door_state = GetDoorState();
 
@@ -4534,13 +4532,11 @@ static boolean RequestDoor(char *text, unsigned int req_state)
     SetDrawBackgroundMask(REDRAW_FIELD);
   }
 
-#if defined(NETWORK_AVALIABLE)
   /* continue network game after request */
   if (network.enabled &&
       game_status == GAME_MODE_PLAYING &&
       req_state & REQUEST_WAIT_FOR_INPUT)
     SendToServer_ContinuePlaying();
-#endif
 
   /* restore deactivated drawing when quick-loading level tape recording */
   if (tape.playing && tape.deactivate_display)
@@ -4562,13 +4558,11 @@ static boolean RequestEnvelope(char *text, unsigned int req_state)
 
   SetMouseCursor(CURSOR_DEFAULT);
 
-#if defined(NETWORK_AVALIABLE)
   /* pause network game while waiting for request to answer */
   if (network.enabled &&
       game_status == GAME_MODE_PLAYING &&
       req_state & REQUEST_WAIT_FOR_INPUT)
     SendToServer_PausePlaying();
-#endif
 
   /* simulate releasing mouse button over last gadget, if still pressed */
   if (button_status)
@@ -4621,13 +4615,11 @@ static boolean RequestEnvelope(char *text, unsigned int req_state)
     SetDrawBackgroundMask(REDRAW_FIELD);
   }
 
-#if defined(NETWORK_AVALIABLE)
   /* continue network game after request */
   if (network.enabled &&
       game_status == GAME_MODE_PLAYING &&
       req_state & REQUEST_WAIT_FOR_INPUT)
     SendToServer_ContinuePlaying();
-#endif
 
   /* restore deactivated drawing when quick-loading level tape recording */
   if (tape.playing && tape.deactivate_display)

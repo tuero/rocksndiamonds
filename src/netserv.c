@@ -9,20 +9,16 @@
 // netserv.c
 // ============================================================================
 
-#include "libgame/platform.h"
-
-#if defined(NETWORK_AVALIABLE)
-
 #include <fcntl.h>
 #include <sys/time.h>
 #include <signal.h>
 #include <errno.h>
 
-#include "main.h"
-
 #include "libgame/libgame.h"
 
 #include "netserv.h"
+#include "main.h"
+
 
 static int clients = 0;
 static int onceonly = 0;
@@ -657,5 +653,3 @@ void NetworkServer(int port, int serveronly)
     }
   }
 }
-
-#endif /* NETWORK_AVALIABLE */

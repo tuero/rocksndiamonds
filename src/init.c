@@ -5619,14 +5619,12 @@ void InitNetworkServer()
   if (!network.enabled)
     return;
 
-#if defined(NETWORK_AVALIABLE)
   if (!ConnectToServer(network.server_host, network.server_port))
     Error(ERR_EXIT, "cannot connect to network game server");
 
   SendToServer_PlayerName(setup.player_name);
   SendToServer_ProtocolVersion();
   SendToServer_NrWanted(setup.network_player_nr + 1);
-#endif
 }
 
 static boolean CheckArtworkConfigForCustomElements(char *filename)
