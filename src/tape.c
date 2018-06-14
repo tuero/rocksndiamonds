@@ -600,7 +600,7 @@ void TapeStartRecording(int random_seed)
 
 static void TapeStartGameRecording()
 {
-  StartGameActions(options.network, TRUE, level.random_seed);
+  StartGameActions(network.enabled, TRUE, level.random_seed);
 }
 
 static void TapeAppendRecording()
@@ -979,7 +979,7 @@ static void TapeStopWarpForward()
 
 static void TapeSingleStep()
 {
-  if (options.network)
+  if (network.enabled)
     return;
 
   if (!tape.pausing)

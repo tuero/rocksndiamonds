@@ -1731,7 +1731,7 @@ static void InitPlayerField(int x, int y, int element, boolean init_game)
     if (game.use_block_last_field_bug)
       player->block_delay_adjustment = (player->block_last_field ? -1 : 1);
 
-    if (!options.network || player->connected_network)
+    if (!network.enabled || player->connected_network)
     {
       player->active = TRUE;
 
@@ -3321,7 +3321,7 @@ void InitGame()
   InitGameControlValues();
 
   /* don't play tapes over network */
-  network_playing = (options.network && !tape.playing);
+  network_playing = (network.enabled && !tape.playing);
 
   for (i = 0; i < MAX_PLAYERS; i++)
   {
@@ -3699,7 +3699,7 @@ void InitGame()
       local_player = &stored_player[i];
   }
 
-  if (!options.network)
+  if (!network.enabled)
     local_player->connected = TRUE;
 
   if (tape.playing)
@@ -3707,7 +3707,7 @@ void InitGame()
     for (i = 0; i < MAX_PLAYERS; i++)
       stored_player[i].connected = tape.player_participates[i];
   }
-  else if (options.network)
+  else if (network.enabled)
   {
     /* add team mode players connected over the network (needed for correct
        assignment of player figures from level to locally playing players) */
@@ -3962,7 +3962,7 @@ void InitGame()
     }
 #endif
   }
-  else if (!options.network && !game.team_mode)		/* && !tape.playing */
+  else if (!network.enabled && !game.team_mode)		/* && !tape.playing */
   {
     /* when in single player mode, eliminate all but the first active player */
 
@@ -11333,7 +11333,7 @@ void GameActionsExt()
   }
 
   if (game.restart_level)
-    StartGameActions(options.network, setup.autorecord, level.random_seed);
+    StartGameActions(network.enabled, setup.autorecord, level.random_seed);
 
   /* !!! SAME CODE AS IN "CheckLevelTime()" -- FIX THIS !!! */
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
@@ -11476,7 +11476,7 @@ void GameActionsExt()
 
   // summarize all actions at local players mapped input device position
   // (this allows using different input devices in single player mode)
-  if (!options.network && !game.team_mode)
+  if (!network.enabled && !game.team_mode)
     stored_player[map_player_action[local_player->index_nr]].effective_action =
       summarized_player_action;
 
@@ -12386,7 +12386,7 @@ boolean MovePlayerOneStep(struct PlayerInfo *player,
     }
   }
 
-  if (!options.network && game.centered_player_nr == -1 &&
+  if (!network.enabled && game.centered_player_nr == -1 &&
       !AllPlayersInSight(player, new_jx, new_jy))
     return MP_NO_ACTION;
 
@@ -12573,7 +12573,7 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
 
     if (scroll_x != old_scroll_x || scroll_y != old_scroll_y)
     {
-      if (!options.network && game.centered_player_nr == -1 &&
+      if (!network.enabled && game.centered_player_nr == -1 &&
 	  !AllPlayersInVisibleScreen())
       {
 	scroll_x = old_scroll_x;
@@ -14968,7 +14968,7 @@ void RequestQuitGameExt(boolean skip_request, boolean quick_quit, char *message)
       CloseDoor(DOOR_CLOSE_1);
 
 #if defined(NETWORK_AVALIABLE)
-    if (options.network)
+    if (network.enabled)
       SendToServer_StopPlaying(NETWORK_STOP_BY_PLAYER);
     else
 #endif
@@ -15008,7 +15008,7 @@ void RequestRestartGame(char *message)
 
   if (Request(message, REQ_ASK | REQ_STAY_CLOSED))
   {
-    StartGameActions(options.network, setup.autorecord, level.random_seed);
+    StartGameActions(network.enabled, setup.autorecord, level.random_seed);
   }
   else
   {
@@ -15777,7 +15777,7 @@ static void HandleGameButtonsExt(int id, int button)
     case GAME_CTRL_ID_PAUSE:
     case GAME_CTRL_ID_PAUSE2:
     case GAME_CTRL_ID_PANEL_PAUSE:
-      if (options.network && game_status == GAME_MODE_PLAYING)
+      if (network.enabled && game_status == GAME_MODE_PLAYING)
       {
 #if defined(NETWORK_AVALIABLE)
 	if (tape.pausing)
@@ -15797,12 +15797,12 @@ static void HandleGameButtonsExt(int id, int button)
     case GAME_CTRL_ID_PANEL_PLAY:
       if (game_status == GAME_MODE_MAIN)
       {
-        StartGameActions(options.network, setup.autorecord, level.random_seed);
+        StartGameActions(network.enabled, setup.autorecord, level.random_seed);
       }
       else if (tape.pausing)
       {
 #if defined(NETWORK_AVALIABLE)
-	if (options.network)
+	if (network.enabled)
 	  SendToServer_ContinuePlaying();
 	else
 #endif

@@ -865,6 +865,17 @@ struct ProgramInfo
   boolean headless;
 };
 
+struct NetworkInfo
+{
+  boolean enabled;
+  boolean connected;
+  boolean serveronly;
+
+  char *server_host;
+  int server_port;
+
+};
+
 struct OptionInfo
 {
   char *server_host;
@@ -1559,6 +1570,7 @@ struct LevelStats
 /* ========================================================================= */
 
 extern struct ProgramInfo	program;
+extern struct NetworkInfo	network;
 extern struct OptionInfo	options;
 extern struct VideoSystemInfo	video;
 extern struct AudioSystemInfo	audio;
@@ -1597,6 +1609,7 @@ extern int			FrameCounter;
 
 void InitProgramInfo(char *, char *, char *, char *, char *, char *, char *,
 		     char *, int);
+void InitNetworkInfo(boolean, boolean, boolean, char *, int);
 
 void InitScoresInfo();
 void SetWindowTitle();

@@ -1087,7 +1087,7 @@ static boolean visibleTextPos(struct TextPosInfo *pos)
 
 static void InitializeMainControls()
 {
-  boolean local_team_mode = (!options.network && setup.team_mode);
+  boolean local_team_mode = (!network.enabled && setup.team_mode);
   int i;
 
   /* set main control text values to dynamically determined values */
@@ -2101,7 +2101,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       }
       else if (pos == MAIN_CONTROL_GAME)
       {
-	StartGameActions(options.network, setup.autorecord, level.random_seed);
+	StartGameActions(network.enabled, setup.autorecord, level.random_seed);
       }
       else if (pos == MAIN_CONTROL_SETUP)
       {
@@ -6446,7 +6446,7 @@ static void changeSetupValue(int screen_pos, int setup_info_pos_raw, int dx)
 
   if (si->value == &setup.network_mode &&
       setup.network_mode &&
-      !options.network)
+      !network.enabled)
     Request("Please restart game to enable network games!", REQ_CONFIRM);
 }
 

@@ -29,6 +29,7 @@
 /* ========================================================================= */
 
 struct ProgramInfo	program;
+struct NetworkInfo	network;
 struct OptionInfo	options;
 struct VideoSystemInfo	video;
 struct AudioSystemInfo	audio;
@@ -101,6 +102,17 @@ void InitProgramInfo(char *argv0, char *config_filename, char *userdata_subdir,
   program.log_file[LOG_ERR_ID] = program.log_file_default[LOG_ERR_ID] = stderr;
 
   program.headless = FALSE;
+}
+
+void InitNetworkInfo(boolean enabled, boolean connected, boolean serveronly,
+		     char *server_host, int server_port)
+{
+  network.enabled = enabled;
+  network.connected = connected;
+  network.serveronly = serveronly;
+
+  network.server_host = server_host;
+  network.server_port = server_port;
 }
 
 void InitScoresInfo()

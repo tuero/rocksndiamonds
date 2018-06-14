@@ -5605,16 +5605,22 @@ static void InitArtworkDone()
   InitGlobalAnimations();
 }
 
+void InitNetworkSettings()
+{
+  InitNetworkInfo(options.network || setup.network_mode,
+		  FALSE,
+		  options.serveronly,
+		  options.server_host,
+		  options.server_port);
+}
+
 void InitNetworkServer()
 {
-  if (setup.network_mode)
-    options.network = TRUE;
-
-  if (!options.network)
+  if (!network.enabled)
     return;
 
 #if defined(NETWORK_AVALIABLE)
-  if (!ConnectToServer(options.server_host, options.server_port))
+  if (!ConnectToServer(network.server_host, network.server_port))
     Error(ERR_EXIT, "cannot connect to network game server");
 
   SendToServer_PlayerName(setup.player_name);
@@ -5993,10 +5999,12 @@ void OpenAll()
   if (options.execute_command)
     Execute_Command(options.execute_command);
 
-  if (options.serveronly)
+  InitNetworkSettings();
+
+  if (network.serveronly)
   {
 #if defined(PLATFORM_UNIX)
-    NetworkServer(options.server_port, options.serveronly);
+    NetworkServer(network.server_port, TRUE);
 #else
     Error(ERR_WARN, "networking only supported in Unix version");
 #endif

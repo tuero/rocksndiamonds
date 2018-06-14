@@ -56,7 +56,7 @@ static boolean stop_network_game = FALSE;
 
 static void SendBufferToServer(int size)
 {
-  if (!options.network)
+  if (!network.enabled)
     return;
 
   realbuffer[0] = realbuffer[1] = realbuffer[2] = 0;
