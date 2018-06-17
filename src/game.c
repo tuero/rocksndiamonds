@@ -3962,26 +3962,21 @@ void InitGame()
   }
   else if (!network.enabled && !game.team_mode)		/* && !tape.playing */
   {
-    /* when in single player mode, eliminate all but the first active player */
+    /* when in single player mode, eliminate all but the local player */
 
     for (i = 0; i < MAX_PLAYERS; i++)
     {
-      if (stored_player[i].active)
+      struct PlayerInfo *player = &stored_player[i];
+
+      if (player->active && player != local_player)
       {
-	for (j = i + 1; j < MAX_PLAYERS; j++)
-	{
-	  if (stored_player[j].active)
-	  {
-	    struct PlayerInfo *player = &stored_player[j];
-	    int jx = player->jx, jy = player->jy;
+	int jx = player->jx, jy = player->jy;
 
-	    player->active = FALSE;
-	    player->present = FALSE;
+	player->active = FALSE;
+	player->present = FALSE;
 
-	    StorePlayer[jx][jy] = 0;
-	    Feld[jx][jy] = EL_EMPTY;
-	  }
-	}
+	StorePlayer[jx][jy] = 0;
+	Feld[jx][jy] = EL_EMPTY;
       }
     }
   }
