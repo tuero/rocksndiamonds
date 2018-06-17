@@ -1651,6 +1651,10 @@ void DrawMainMenu()
   FreeScreenGadgets();
   CreateScreenGadgets();
 
+  /* may be required if audio buttons shown on tape and changed in setup menu */
+  FreeGameButtons();
+  CreateGameButtons();
+
   /* map gadgets for main menu screen */
   MapTapeButtons();
   MapScreenMenuGadgets(SCREEN_MASK_MAIN);
