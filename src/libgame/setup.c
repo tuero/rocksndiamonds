@@ -31,6 +31,7 @@
 
 
 #define ENABLE_UNUSED_CODE	FALSE	/* for currently unused functions */
+#define DEBUG_NO_CONFIG_FILE	FALSE	/* for extra-verbose debug output */
 
 #define NUM_LEVELCLASS_DESC	8
 
@@ -2024,7 +2025,9 @@ static boolean loadSetupFileData(void *setup_file_data, char *filename,
 
   if (!(file = openFile(filename, MODE_READ)))
   {
+#if DEBUG_NO_CONFIG_FILE
     Error(ERR_DEBUG, "cannot open configuration file '%s'", filename);
+#endif
 
     return FALSE;
   }
@@ -2966,7 +2969,9 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
 
   if (setup_file_hash == NULL)
   {
+#if DEBUG_NO_CONFIG_FILE
     Error(ERR_WARN, "ignoring level directory '%s'", directory_path);
+#endif
 
     free(directory_path);
     free(filename);
@@ -3204,8 +3209,10 @@ static boolean LoadArtworkInfoFromArtworkConf(TreeInfo **node_first,
 
     if (!valid_file_found)
     {
+#if DEBUG_NO_CONFIG_FILE
       if (!strEqual(directory_name, "."))
 	Error(ERR_WARN, "ignoring artwork directory '%s'", directory_path);
+#endif
 
       free(directory_path);
       free(filename);

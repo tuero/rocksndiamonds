@@ -122,6 +122,7 @@ void InitScoresInfo()
   program.global_scores = directoryExists(global_scores_dir);
   program.many_scores_per_name = !program.global_scores;
 
+#if 0
   if (options.debug)
   {
     if (program.global_scores)
@@ -136,6 +137,7 @@ void InitScoresInfo()
       Error(ERR_DEBUG, "Using private, single-user scores directory.");
     }
   }
+#endif
 
   free(global_scores_dir);
 }
