@@ -3273,6 +3273,36 @@ int get_num_special_action(int element, int action_first, int action_last)
   =============================================================================
 */
 
+#if DEBUG_INIT_PLAYER
+static void DebugPrintPlayerStatus(char *message)
+{
+  int i;
+
+  if (!options.debug)
+    return;
+
+  printf("%s:\n", message);
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+  {
+    struct PlayerInfo *player = &stored_player[i];
+
+    printf("- player %d: present == %d, connected == %d [%d/%d], active == %d",
+	   i + 1,
+	   player->present,
+	   player->connected,
+	   player->connected_locally,
+	   player->connected_network,
+	   player->active);
+
+    if (local_player == player)
+      printf(" (local player)");
+
+    printf("\n");
+  }
+}
+#endif
+
 void InitGame()
 {
   int full_lev_fieldx = lev_fieldx + (BorderElement != EL_EMPTY ? 2 : 0);
@@ -3553,28 +3583,7 @@ void InitGame()
     AmoebaCnt[i] = AmoebaCnt2[i] = 0;
 
 #if DEBUG_INIT_PLAYER
-  if (options.debug)
-  {
-    printf("Player status at level initialization:\n");
-
-    for (i = 0; i < MAX_PLAYERS; i++)
-    {
-      struct PlayerInfo *player = &stored_player[i];
-
-      printf("- player %d: present == %d, connected == %d [%d/%d], active == %d",
-	     i + 1,
-	     player->present,
-	     player->connected,
-	     player->connected_locally,
-	     player->connected_network,
-	     player->active);
-
-      if (local_player == player)
-	printf(" (local player)");
-
-      printf("\n");
-    }
-  }
+  DebugPrintPlayerStatus("Player status at level initialization");
 #endif
 
   SCAN_PLAYFIELD(x, y)
@@ -3726,28 +3735,7 @@ void InitGame()
   }
 
 #if DEBUG_INIT_PLAYER
-  if (options.debug)
-  {
-    printf("Player status after level initialization:\n");
-
-    for (i = 0; i < MAX_PLAYERS; i++)
-    {
-      struct PlayerInfo *player = &stored_player[i];
-
-      printf("- player %d: present == %d, connected == %d [%d/%d], active == %d",
-	     i + 1,
-	     player->present,
-	     player->connected,
-	     player->connected_locally,
-	     player->connected_network,
-	     player->active);
-
-      if (local_player == player)
-	printf(" (local player)");
-
-      printf("\n");
-    }
-  }
+  DebugPrintPlayerStatus("Player status after level initialization");
 #endif
 
 #if DEBUG_INIT_PLAYER
@@ -3834,28 +3822,7 @@ void InitGame()
   }
 
 #if DEBUG_INIT_PLAYER
-  if (options.debug)
-  {
-    printf("Player status after player assignment (first stage):\n");
-
-    for (i = 0; i < MAX_PLAYERS; i++)
-    {
-      struct PlayerInfo *player = &stored_player[i];
-
-      printf("- player %d: present == %d, connected == %d [%d/%d], active == %d",
-	     i + 1,
-	     player->present,
-	     player->connected,
-	     player->connected_locally,
-	     player->connected_network,
-	     player->active);
-
-      if (local_player == player)
-	printf(" (local player)");
-
-      printf("\n");
-    }
-  }
+  DebugPrintPlayerStatus("Player status after player assignment (first stage)");
 #endif
 
 #else
@@ -3996,28 +3963,7 @@ void InitGame()
   }
 
 #if DEBUG_INIT_PLAYER
-  if (options.debug)
-  {
-    printf("Player status after player assignment (final stage):\n");
-
-    for (i = 0; i < MAX_PLAYERS; i++)
-    {
-      struct PlayerInfo *player = &stored_player[i];
-
-      printf("- player %d: present == %d, connected == %d [%d/%d], active == %d",
-	     i + 1,
-	     player->present,
-	     player->connected,
-	     player->connected_locally,
-	     player->connected_network,
-	     player->active);
-
-      if (local_player == player)
-	printf(" (local player)");
-
-      printf("\n");
-    }
-  }
+  DebugPrintPlayerStatus("Player status after player assignment (final stage)");
 #endif
 
   if (BorderElement == EL_EMPTY)
@@ -4217,28 +4163,7 @@ void InitGame()
     KeyboardAutoRepeatOffUnlessAutoplay();
 
 #if DEBUG_INIT_PLAYER
-    if (options.debug)
-    {
-      printf("Player status (final):\n");
-
-      for (i = 0; i < MAX_PLAYERS; i++)
-      {
-	struct PlayerInfo *player = &stored_player[i];
-
-	printf("- player %d: present == %d, connected == %d [%d/%d], active == %d",
-	       i + 1,
-	       player->present,
-	       player->connected,
-	       player->connected_locally,
-	       player->connected_network,
-	       player->active);
-
-	if (local_player == player)
-	  printf(" (local player)");
-
-	printf("\n");
-      }
-    }
+    DebugPrintPlayerStatus("Player status (final)");
 #endif
   }
 
