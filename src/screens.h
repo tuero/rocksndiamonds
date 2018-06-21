@@ -22,7 +22,7 @@
 void DrawMainMenuExt(int);
 void DrawAndFadeInMainMenu(int);
 void DrawMainMenu(void);
-void DrawHallOfFame(int);
+void DrawHallOfFame(int, int);
 
 void RedrawSetupScreenAfterFullscreenToggle();
 void RedrawSetupScreenAfterScreenRotation(int);

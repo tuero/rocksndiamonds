@@ -1096,7 +1096,7 @@ void ContinueMoving(int, int);
 void Bang(int, int);
 void InitMovDir(int, int);
 void InitAmoebaNr(int, int);
-int NewHiScore(void);
+int NewHiScore(int);
 
 void TestIfGoodThingHitsBadThing(int, int, int);
 void TestIfBadThingHitsGoodThing(int, int, int);
@@ -4695,11 +4695,11 @@ void GameEnd()
       level_nr < leveldir_current->last_level)
     raise_level = TRUE;			/* advance to next level */
 
-  if ((hi_pos = NewHiScore()) >= 0) 
+  if ((hi_pos = NewHiScore(level_nr)) >= 0)
   {
     SetGameStatus(GAME_MODE_SCORES);
 
-    DrawHallOfFame(hi_pos);
+    DrawHallOfFame(level_nr, hi_pos);
 
     if (raise_level)
     {
@@ -4721,7 +4721,7 @@ void GameEnd()
   }
 }
 
-int NewHiScore()
+int NewHiScore(int level_nr)
 {
   int k, l;
   int position = -1;
