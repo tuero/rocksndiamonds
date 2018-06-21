@@ -8282,6 +8282,7 @@ enum
   SETUP_TOKEN_SKIP_LEVELS,
   SETUP_TOKEN_INCREMENT_LEVELS,
   SETUP_TOKEN_AUTO_PLAY_NEXT_LEVEL,
+  SETUP_TOKEN_SKIP_SCORES_AFTER_GAME,
   SETUP_TOKEN_TIME_LIMIT,
   SETUP_TOKEN_FULLSCREEN,
   SETUP_TOKEN_WINDOW_SCALING_PERCENT,
@@ -8522,6 +8523,7 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_SWITCH, &si.skip_levels,             "skip_levels"		},
   { TYPE_SWITCH, &si.increment_levels,        "increment_levels"	},
   { TYPE_SWITCH, &si.auto_play_next_level,    "auto_play_next_level"	},
+  { TYPE_SWITCH, &si.skip_scores_after_game,  "skip_scores_after_game"	},
   { TYPE_SWITCH, &si.time_limit,              "time_limit"		},
   { TYPE_SWITCH, &si.fullscreen,              "fullscreen"		},
   { TYPE_INTEGER,&si.window_scaling_percent,  "window_scaling_percent"	},
@@ -8741,6 +8743,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->skip_levels = TRUE;
   si->increment_levels = TRUE;
   si->auto_play_next_level = TRUE;
+  si->skip_scores_after_game = FALSE;
   si->time_limit = TRUE;
   si->fullscreen = FALSE;
   si->window_scaling_percent = STD_WINDOW_SCALING_PERCENT;
