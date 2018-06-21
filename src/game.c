@@ -4650,7 +4650,7 @@ void GameWon()
 void GameEnd()
 {
   int hi_pos;
-  boolean raise_level = FALSE;
+  int last_level_nr = level_nr;
 
   local_player->LevelSolved_GameEnd = TRUE;
 
@@ -4693,29 +4693,22 @@ void GameEnd()
 
   if (setup.increment_levels &&
       level_nr < leveldir_current->last_level)
-    raise_level = TRUE;			/* advance to next level */
+  {
+    level_nr++;		/* advance to next level */
+    TapeErase();	/* start with empty tape */
+  }
 
-  if ((hi_pos = NewHiScore(level_nr)) >= 0)
+  hi_pos = NewHiScore(last_level_nr);
+
+  if (hi_pos >= 0)
   {
     SetGameStatus(GAME_MODE_SCORES);
 
-    DrawHallOfFame(level_nr, hi_pos);
-
-    if (raise_level)
-    {
-      level_nr++;
-      TapeErase();
-    }
+    DrawHallOfFame(last_level_nr, hi_pos);
   }
   else
   {
     SetGameStatus(GAME_MODE_MAIN);
-
-    if (raise_level)
-    {
-      level_nr++;
-      TapeErase();
-    }
 
     DrawMainMenu();
   }

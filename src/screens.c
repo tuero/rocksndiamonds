@@ -4619,17 +4619,7 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
       drawHallOfFameList(first_entry, highlight_position);
     }
   }
-  else if (button == MB_MENU_LEAVE)
-  {
-    PlaySound(SND_MENU_ITEM_SELECTING);
-
-    FadeSound(SND_BACKGROUND_SCORES);
-
-    SetGameStatus(GAME_MODE_MAIN);
-
-    DrawMainMenu();
-  }
-  else if (button == MB_MENU_CHOICE)
+  else if (button == MB_MENU_LEAVE || button == MB_MENU_CHOICE)
   {
     PlaySound(SND_MENU_ITEM_SELECTING);
 
