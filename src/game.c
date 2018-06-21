@@ -4696,6 +4696,13 @@ void GameEnd()
   {
     level_nr++;		/* advance to next level */
     TapeErase();	/* start with empty tape */
+
+    if (setup.auto_play_next_level)
+    {
+      LoadLevel(level_nr);
+
+      SaveLevelSetup_SeriesInfo();
+    }
   }
 
   hi_pos = NewHiScore(last_level_nr);
@@ -4706,11 +4713,15 @@ void GameEnd()
 
     DrawHallOfFame(last_level_nr, hi_pos);
   }
-  else
+  else if (!setup.auto_play_next_level || !setup.increment_levels)
   {
     SetGameStatus(GAME_MODE_MAIN);
 
     DrawMainMenu();
+  }
+  else
+  {
+    StartGameActions(network.enabled, setup.autorecord, level.random_seed);
   }
 }
 

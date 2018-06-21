@@ -1257,6 +1257,7 @@ struct SetupInfo
   boolean handicap;
   boolean skip_levels;
   boolean increment_levels;
+  boolean auto_play_next_level;
   boolean time_limit;
   boolean fullscreen;
   int window_scaling_percent;

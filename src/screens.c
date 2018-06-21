@@ -4625,9 +4625,17 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
 
     FadeSound(SND_BACKGROUND_SCORES);
 
-    SetGameStatus(GAME_MODE_MAIN);
+    if (game_status_last_screen != GAME_MODE_PLAYING ||
+	!setup.auto_play_next_level || !setup.increment_levels)
+    {
+      SetGameStatus(GAME_MODE_MAIN);
 
-    DrawMainMenu();
+      DrawMainMenu();
+    }
+    else
+    {
+      StartGameActions(network.enabled, setup.autorecord, level.random_seed);
+    }
   }
 
   if (game_status == GAME_MODE_SCORES)
@@ -5878,6 +5886,7 @@ static struct TokenInfo setup_info_game[] =
   { TYPE_SWITCH,	&setup.handicap,	"Handicap:"		},
   { TYPE_SWITCH,	&setup.skip_levels,	"Skip Unsolved Levels:"	},
   { TYPE_SWITCH,	&setup.increment_levels,"Increment Solved Levels:" },
+  { TYPE_SWITCH,	&setup.auto_play_next_level,"Auto-play Next Level:" },
   { TYPE_SWITCH,	&setup.autorecord,	"Auto-Record Tapes:"	},
   { TYPE_ENTER_LIST,	execSetupChooseGameSpeed, "Game Speed:"		},
   { TYPE_STRING,	&game_speed_text,	""			},
