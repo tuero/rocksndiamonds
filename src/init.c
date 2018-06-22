@@ -5620,7 +5620,13 @@ void InitNetworkServer()
     return;
 
   if (!ConnectToServer(network.server_host, network.server_port))
-    Error(ERR_EXIT, "cannot connect to network game server");
+  {
+    Request("Cannot connect to network server!", REQ_CONFIRM);
+
+    network.enabled = FALSE;
+
+    return;
+  }
 
   SendToServer_PlayerName(setup.player_name);
   SendToServer_ProtocolVersion();
