@@ -5616,7 +5616,7 @@ void InitNetworkSettings()
 
 void InitNetworkServer()
 {
-  if (!network.enabled)
+  if (!network.enabled || network.connected)
     return;
 
   if (!ConnectToServer(network.server_host, network.server_port))
@@ -5625,12 +5625,16 @@ void InitNetworkServer()
 
     network.enabled = FALSE;
 
+    setup.network_mode = FALSE;
+
     return;
   }
 
   SendToServer_PlayerName(setup.player_name);
   SendToServer_ProtocolVersion();
   SendToServer_NrWanted(setup.network_player_nr + 1);
+
+  network.connected = TRUE;
 }
 
 static boolean CheckArtworkConfigForCustomElements(char *filename)

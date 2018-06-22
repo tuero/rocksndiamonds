@@ -704,8 +704,12 @@ static void HandleNetworkingDisconnect()
   SDLNet_TCP_DelSocket(rfds, sfd);
   SDLNet_TCP_Close(sfd);
 
-  network.enabled = FALSE;
   network_playing = FALSE;
+
+  network.enabled = FALSE;
+  network.connected = FALSE;
+
+  setup.network_mode = FALSE;
 
   for (i = 0; i < MAX_PLAYERS; i++)
     stored_player[i].connected_network = FALSE;
