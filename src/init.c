@@ -5619,22 +5619,27 @@ void InitNetworkServer()
   if (!network.enabled || network.connected)
     return;
 
+  LimitScreenUpdates(FALSE);
+
+  ClearRectangle(drawto, 0, 0, WIN_XSIZE, WIN_YSIZE);
+
   if (!ConnectToServer(network.server_host, network.server_port))
   {
-    Request("Cannot connect to network server!", REQ_CONFIRM);
-
     network.enabled = FALSE;
 
     setup.network_mode = FALSE;
+  }
+  else
+  {
+    SendToServer_PlayerName(setup.player_name);
+    SendToServer_ProtocolVersion();
+    SendToServer_NrWanted(setup.network_player_nr + 1);
 
-    return;
+    network.connected = TRUE;
   }
 
-  SendToServer_PlayerName(setup.player_name);
-  SendToServer_ProtocolVersion();
-  SendToServer_NrWanted(setup.network_player_nr + 1);
-
-  network.connected = TRUE;
+  /* short time to recognize result of network initialization */
+  Delay(1000);
 }
 
 static boolean CheckArtworkConfigForCustomElements(char *filename)
@@ -6097,6 +6102,8 @@ void OpenAll()
     return;
   }
 
+  InitNetworkServer();
+
   SetGameStatus(GAME_MODE_MAIN);
 
   FadeSetEnterScreen();
@@ -6108,8 +6115,6 @@ void OpenAll()
   print_timestamp_done("OpenAll");
 
   DrawMainMenu();
-
-  InitNetworkServer();
 
 #if 0
   Error(ERR_DEBUG, "::: SDL_GetBasePath() == '%s'",

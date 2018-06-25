@@ -49,6 +49,62 @@ static byte *buffer = realbuffer + 4;
 static int nread = 0, nwrite = 0;
 static boolean stop_network_game = FALSE;
 
+static void DrawNetworkTextExt(char *message, int font_nr, boolean initialize)
+{
+  static int xpos = 0, ypos = 0;
+  int font_width = getFontWidth(font_nr);
+  int font_height = getFontHeight(font_nr);
+
+  if (initialize)
+  {
+    xpos = (WIN_XSIZE - getTextWidth(message, font_nr)) / 2;
+    ypos = 120;
+
+    DrawText(xpos, ypos, message, font_nr);
+
+    xpos = 0;
+    ypos = 150;
+
+    Error(ERR_DEBUG, "========== %s ==========", message);
+  }
+  else
+  {
+    int max_chars_per_line = WIN_XSIZE / font_width;
+    int max_lines_per_text = 10;
+    int num_lines_spacing = (font_nr == FC_YELLOW ? 1 : 3);
+    int num_lines_printed = DrawTextBuffer(xpos, ypos, message, font_nr,
+					   max_chars_per_line, -1,
+					   max_lines_per_text, 0, -1,
+					   TRUE, TRUE, FALSE);
+
+    ypos += (num_lines_printed + num_lines_spacing) * font_height;
+
+    Error(ERR_DEBUG, "%s", message);
+  }
+
+  BackToFront();
+}
+
+static void DrawNetworkText(char *message)
+{
+  DrawNetworkTextExt(message, FC_YELLOW, FALSE);
+}
+
+static void DrawNetworkText_Success(char *message)
+{
+  DrawNetworkTextExt(message, FC_GREEN, FALSE);
+}
+
+static void DrawNetworkText_Failed(char *message)
+{
+  DrawNetworkTextExt(message, FC_RED, FALSE);
+}
+
+static void DrawNetworkText_Title(char *message)
+{
+  DrawNetworkTextExt(message, FC_GREEN, TRUE);
+}
+
 static void SendBufferToServer(int size)
 {
   if (!network.enabled)
@@ -120,6 +176,8 @@ boolean ConnectToServer(char *hostname, int port)
   int server_host = 0;
   int i;
 
+  DrawNetworkText_Title("Initializing Network");
+
   if (port == 0)
     port = DEFAULT_SERVER_PORT;
 
@@ -159,7 +217,7 @@ boolean ConnectToServer(char *hostname, int port)
 
     SDLNet_UDP_Send(udp, -1, &packet);
 
-    Error(ERR_DEBUG, "doing UDP broadcast for local network server ...");
+    DrawNetworkText("Looking for local network server ...");
 
     if (SDLNet_CheckSockets(udp_socket_set, 1000) == 1)
     {
@@ -167,18 +225,18 @@ boolean ConnectToServer(char *hostname, int port)
 
       if (num_packets == 1)
       {
-        Error(ERR_DEBUG, "network server found");
+	DrawNetworkText_Success("Network server found!");
 
         server_host = SDLNet_Read32(&packet.address.host);
       }
       else
       {
-	Error(ERR_DEBUG, "no answer from network server");
+	DrawNetworkText_Failed("No answer from network server!");
       }
     }
     else
     {
-      Error(ERR_DEBUG, "no network server found");
+      DrawNetworkText_Failed("No network server found!");
     }
   }
 
@@ -192,6 +250,8 @@ boolean ConnectToServer(char *hostname, int port)
       Error(ERR_EXIT, "cannot locate host '%s'", hostname);
     else
       server_host = SDLNet_Read32(&ip.host);
+
+    DrawNetworkText("Connecting to remote host ...");
   }
   else
   {
@@ -202,6 +262,8 @@ boolean ConnectToServer(char *hostname, int port)
 
     SDLNet_Write32(server_host, &ip.host);
     SDLNet_Write16(port,        &ip.port);
+
+    DrawNetworkText("Connecting to local host ...");
   }
 
   Error(ERR_DEBUG, "trying to connect to network server at %d.%d.%d.%d ...",
@@ -215,17 +277,23 @@ boolean ConnectToServer(char *hostname, int port)
   if (sfd)
   {
     SDLNet_TCP_AddSocket(rfds, sfd);
+
+    DrawNetworkText_Success("Successfully connected!");
+
     return TRUE;
   }
   else
   {
+    DrawNetworkText_Failed("Failed to connect to network server!");
+
     printf("SDLNet_TCP_Open(): %s\n", SDLNet_GetError());
   }
 
   if (hostname)			/* connect to specified server failed */
     return FALSE;
 
-  printf("No rocksndiamonds server on localhost -- starting up one ...\n");
+  DrawNetworkText("Starting new local network server ...");
+
   StartNetworkServer(port);
 
   /* wait for server to start up and try connecting several times */
@@ -235,10 +303,14 @@ boolean ConnectToServer(char *hostname, int port)
 
     if ((sfd = SDLNet_TCP_Open(&ip)))		/* connected */
     {
+      DrawNetworkText_Success("Successfully connected!");
+
       SDLNet_TCP_AddSocket(rfds, sfd);
       return TRUE;
     }
   }
+
+  DrawNetworkText_Failed("Failed to connect to network server!");
 
   /* when reaching this point, connect to newly started server has failed */
   return FALSE;
