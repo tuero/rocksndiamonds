@@ -809,3 +809,16 @@ void HandleNetworking()
     }
   }
 }
+
+void DisconnectFromNetworkServer()
+{
+  DrawNetworkText_Title("Terminating Network");
+  DrawNetworkText("Disconnecting from network server ...");
+
+  HandleNetworkingDisconnect();
+
+  DrawNetworkText_Success("Successfully disconnected!");
+
+  /* short time to recognize result of network initialization */
+  Delay(1000);
+}

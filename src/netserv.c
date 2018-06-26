@@ -129,6 +129,7 @@ static void RemovePlayer(struct NetworkServerPlayerInfo *player)
   free(player);
   clients--;
 
+#if 0	/* do not terminate network server if last player disconnected */
   if (onceonly && clients == 0)
   {
     if (options.verbose)
@@ -138,6 +139,7 @@ static void RemovePlayer(struct NetworkServerPlayerInfo *player)
     }
     exit(0);
   }
+#endif
 }
 
 static void AddPlayer(TCPsocket fd)

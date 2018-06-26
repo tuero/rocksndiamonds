@@ -6445,10 +6445,9 @@ static void changeSetupValue(int screen_pos, int setup_info_pos_raw, int dx)
     ToggleFullscreenOrChangeWindowScalingIfNeeded();
 
   if (si->value == &setup.network_mode &&
-      setup.network_mode &&
-      !network.enabled)
+      setup.network_mode != network.enabled)
   {
-    network.enabled = TRUE;
+    network.enabled = setup.network_mode;
 
     SetGameStatus(GAME_MODE_LOADING);
     SetDrawBackgroundMask(REDRAW_NONE);
@@ -6459,7 +6458,10 @@ static void changeSetupValue(int screen_pos, int setup_info_pos_raw, int dx)
 
     FadeIn(REDRAW_ALL);
 
-    InitNetworkServer();
+    if (network.enabled)
+      InitNetworkServer();
+    else
+      DisconnectFromNetworkServer();
 
     SetGameStatus(GAME_MODE_SETUP);
     SetDrawBackgroundMask(REDRAW_FIELD);

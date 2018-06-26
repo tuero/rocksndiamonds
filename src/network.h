@@ -27,5 +27,6 @@ void SendToServer_ContinuePlaying(void);
 void SendToServer_StopPlaying(int);
 void SendToServer_MovePlayer(byte);
 void HandleNetworking(void);
+void DisconnectFromNetworkServer(void);
 
 #endif
