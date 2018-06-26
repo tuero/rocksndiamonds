@@ -6447,7 +6447,27 @@ static void changeSetupValue(int screen_pos, int setup_info_pos_raw, int dx)
   if (si->value == &setup.network_mode &&
       setup.network_mode &&
       !network.enabled)
-    Request("Please restart game to enable network games!", REQ_CONFIRM);
+  {
+    network.enabled = TRUE;
+
+    SetGameStatus(GAME_MODE_LOADING);
+    SetDrawBackgroundMask(REDRAW_NONE);
+
+    FadeOut(REDRAW_ALL);
+
+    ClearRectangle(drawto, 0, 0, WIN_XSIZE, WIN_YSIZE);
+
+    FadeIn(REDRAW_ALL);
+
+    InitNetworkServer();
+
+    SetGameStatus(GAME_MODE_SETUP);
+    SetDrawBackgroundMask(REDRAW_FIELD);
+
+    redraw_mask = REDRAW_ALL;
+
+    DrawSetupScreen();
+  }
 }
 
 static struct TokenInfo *getSetupInfoFinal(struct TokenInfo *setup_info_orig)

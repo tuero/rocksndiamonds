@@ -44,6 +44,8 @@ void InitGfxBuffers();
 void InitGadgets();
 void InitImageTextures();
 
+void InitNetworkServer();
+
 void DisplayExitMessage(char *, va_list);
 
 void OpenAll(void);
