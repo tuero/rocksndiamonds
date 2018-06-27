@@ -219,7 +219,7 @@ boolean ConnectToServer(char *hostname, int port)
 
     DrawNetworkText("Looking for local network server ...");
 
-    if (SDLNet_CheckSockets(udp_socket_set, 1000) == 1)
+    if (SDLNet_CheckSockets(udp_socket_set, 500) == 1)
     {
       int num_packets = SDLNet_UDP_Recv(udp, &packet);
 
