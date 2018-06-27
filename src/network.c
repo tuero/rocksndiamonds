@@ -297,10 +297,8 @@ boolean ConnectToServer(char *hostname, int port)
   StartNetworkServer(port);
 
   /* wait for server to start up and try connecting several times */
-  for (i = 0; i < 6; i++)
+  for (i = 0; i < 30; i++)
   {
-    Delay(500);			/* wait 500 ms == 0.5 seconds */
-
     if ((sfd = SDLNet_TCP_Open(&ip)))		/* connected */
     {
       DrawNetworkText_Success("Successfully connected!");
@@ -308,6 +306,8 @@ boolean ConnectToServer(char *hostname, int port)
       SDLNet_TCP_AddSocket(rfds, sfd);
       return TRUE;
     }
+
+    Delay(100);
   }
 
   DrawNetworkText_Failed("Failed to connect to network server!");
