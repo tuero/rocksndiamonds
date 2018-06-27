@@ -245,6 +245,20 @@ static void UpdateScreen_WithoutFrameDelay(SDL_Rect *rect)
   UpdateScreenExt(rect, FALSE);
 }
 
+void Delay_WithScreenUpdates(unsigned int delay)
+{
+  unsigned int time_current = SDL_GetTicks();
+  unsigned int time_delayed = time_current + delay;
+
+  while (time_current < time_delayed)
+  {
+    // updating the screen contains waiting for frame delay (non-busy)
+    UpdateScreen_WithFrameDelay(NULL);
+
+    time_current = SDL_GetTicks();
+  }
+}
+
 static void SDLSetWindowIcon(char *basename)
 {
   /* (setting the window icon on Mac OS X would replace the high-quality
@@ -1389,20 +1403,7 @@ void SDLFadeRectangle(int x, int y, int width, int height,
   }
 
   if (post_delay > 0)
-  {
-    unsigned int time_post_delay;
-
-    time_current = SDL_GetTicks();
-    time_post_delay = time_current + post_delay;
-
-    while (time_current < time_post_delay)
-    {
-      // updating the screen contains waiting for frame delay (non-busy)
-      UpdateScreen_WithFrameDelay(NULL);
-
-      time_current = SDL_GetTicks();
-    }
-  }
+    Delay_WithScreenUpdates(post_delay);
 
   // restore function for drawing global masked border
   gfx.draw_global_border_function = draw_global_border_function;

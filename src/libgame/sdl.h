@@ -503,4 +503,6 @@ void SDLCloseJoystick(int);
 
 void PrepareFadeBitmap(int);
 
+void Delay_WithScreenUpdates(unsigned int);
+
 #endif /* SDL_H */
