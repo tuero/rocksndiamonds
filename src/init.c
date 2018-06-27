@@ -5637,7 +5637,7 @@ void InitNetworkServer()
   }
 
   /* short time to recognize result of network initialization */
-  Delay(1000);
+  Delay_WithScreenUpdates(1000);
 }
 
 static boolean CheckArtworkConfigForCustomElements(char *filename)

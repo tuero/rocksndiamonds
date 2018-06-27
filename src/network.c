@@ -240,25 +240,34 @@ boolean ConnectToServer(char *hostname, int port)
 
     DrawNetworkText("Looking for local network server ...");
 
-    if (SDLNet_CheckSockets(udp_socket_set, 500) == 1)
+    /* wait for any local network server to answer UDP broadcast */
+    for (i = 0; i < 5; i++)
     {
-      int num_packets = SDLNet_UDP_Recv(udp, &packet);
-
-      if (num_packets == 1)
+      if (SDLNet_CheckSockets(udp_socket_set, 0) == 1)
       {
-	DrawNetworkText_Success("Network server found!");
+	int num_packets = SDLNet_UDP_Recv(udp, &packet);
 
-        server_host = SDLNet_Read32(&packet.address.host);
+	if (num_packets == 1)
+	{
+	  DrawNetworkText_Success("Network server found!");
+
+	  server_host = SDLNet_Read32(&packet.address.host);
+	}
+	else
+	{
+	  DrawNetworkText_Failed("No answer from network server!");
+	}
+
+	break;
       }
       else
       {
-	DrawNetworkText_Failed("No answer from network server!");
+	Delay_WithScreenUpdates(100);
       }
     }
-    else
-    {
+
+    if (server_host == 0)
       DrawNetworkText_Failed("No network server found!");
-    }
   }
 
   rfds = SDLNet_AllocSocketSet(1);
@@ -328,7 +337,7 @@ boolean ConnectToServer(char *hostname, int port)
       return TRUE;
     }
 
-    Delay(100);
+    Delay_WithScreenUpdates(100);
   }
 
   DrawNetworkText_Failed("Failed to connect to network server!");
@@ -841,5 +850,5 @@ void DisconnectFromNetworkServer()
   DrawNetworkText_Success("Successfully disconnected!");
 
   /* short time to recognize result of network initialization */
-  Delay(1000);
+  Delay_WithScreenUpdates(1000);
 }
