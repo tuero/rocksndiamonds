@@ -5621,8 +5621,6 @@ void InitNetworkServer()
 
   LimitScreenUpdates(FALSE);
 
-  ClearRectangle(drawto, 0, 0, WIN_XSIZE, WIN_YSIZE);
-
   if (!ConnectToServer(network.server_host, network.server_port))
   {
     network.enabled = FALSE;

@@ -52,24 +52,45 @@ static boolean stop_network_game = FALSE;
 static void DrawNetworkTextExt(char *message, int font_nr, boolean initialize)
 {
   static int xpos = 0, ypos = 0;
+  static int max_line_width = 0;
   int font_width = getFontWidth(font_nr);
   int font_height = getFontHeight(font_nr);
+  int ypos_1 = 120;
+  int ypos_2 = 150;
 
   if (initialize)
   {
-    xpos = (WIN_XSIZE - getTextWidth(message, font_nr)) / 2;
-    ypos = 120;
+    if (game_status == GAME_MODE_LOADING)
+    {
+      max_line_width = WIN_XSIZE;
 
-    DrawText(xpos, ypos, message, font_nr);
+      xpos = (max_line_width - getTextWidth(message, font_nr)) / 2;
+      ypos = ypos_1;
 
-    xpos = 0;
-    ypos = 150;
+      DrawText(xpos, ypos, message, font_nr);
+
+      xpos = 0;
+      ypos = ypos_2;
+    }
+    else
+    {
+      max_line_width = SXSIZE;
+
+      DrawTextSCentered(ypos_1, font_nr, message);
+
+      /* calculate offset to x position caused by rounding */
+      int max_chars_per_line = max_line_width / font_width;
+      int xoffset = (max_line_width - max_chars_per_line * font_width) / 2;
+
+      xpos = SX + xoffset;
+      ypos = SY + ypos_2;
+    }
 
     Error(ERR_DEBUG, "========== %s ==========", message);
   }
   else
   {
-    int max_chars_per_line = WIN_XSIZE / font_width;
+    int max_chars_per_line = max_line_width / font_width;
     int max_lines_per_text = 10;
     int num_lines_spacing = (font_nr == FC_YELLOW ? 1 : 3);
     int num_lines_printed = DrawTextBuffer(xpos, ypos, message, font_nr,
