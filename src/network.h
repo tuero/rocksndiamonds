@@ -17,6 +17,8 @@
 #define NETWORK_STOP_BY_PLAYER		0
 #define NETWORK_STOP_BY_ERROR		1
 
+char *getNetworkPlayerName(int);
+
 boolean ConnectToServer(char *, int);
 void SendToServer_PlayerName(char *);
 void SendToServer_ProtocolVersion(void);

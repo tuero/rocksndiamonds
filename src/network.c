@@ -518,6 +518,9 @@ static void Handle_OP_NUMBER_WANTED()
     Error(ERR_NETWORK_CLIENT, "cannot switch -- you keep client # %d",
 	  new_client_nr);
   }
+
+  if (game_status == GAME_MODE_MAIN)
+    DrawNetworkPlayers();
 }
 
 static void Handle_OP_PLAYER_NAME(unsigned int len)
@@ -590,6 +593,10 @@ static void Handle_OP_PLAYER_DISCONNECTED()
     SetGameStatus(GAME_MODE_MAIN);
 
     DrawMainMenu();
+  }
+  else if (game_status == GAME_MODE_MAIN)
+  {
+    DrawNetworkPlayers();
   }
 }
 

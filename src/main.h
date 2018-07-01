@@ -2440,8 +2440,9 @@
 #define FONT_GAME_INFO			39
 #define FONT_INFO_ELEMENTS		40
 #define FONT_INFO_LEVELSET		41
+#define FONT_MAIN_NETWORK_PLAYERS	42
 
-#define NUM_FONTS			42
+#define NUM_FONTS			43
 #define NUM_INITIAL_FONTS		4
 
 /* values for toon animation configuration */
@@ -2684,6 +2685,8 @@ struct MenuMainInfo
   struct MenuMainButtonInfo button;
   struct MenuMainTextInfo text;
   struct MenuMainInputInfo input;
+
+  struct TextPosInfo network_players;
 };
 
 struct TitleFadingInfo

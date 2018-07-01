@@ -3514,6 +3514,85 @@ void DrawPreviewLevelAnimation()
   DrawPreviewLevelExt(FALSE);
 }
 
+static void DrawNetworkPlayer(int x, int y, int player_nr, int tile_size,
+			      int border_size, int font_nr)
+{
+  int graphic = el2img(EL_PLAYER_1 + player_nr);
+  int font_height = getFontHeight(font_nr);
+  int player_height = MAX(tile_size, font_height);
+  int xoffset_text = tile_size + border_size;
+  int yoffset_text    = (player_height - font_height) / 2;
+  int yoffset_graphic = (player_height - tile_size) / 2;
+  char *player_name = getNetworkPlayerName(player_nr + 1);
+
+  DrawSizedGraphicThruMaskExt(drawto, x, y + yoffset_graphic, graphic, 0,
+			      tile_size);
+  DrawText(x + xoffset_text, y + yoffset_text, player_name, font_nr);
+}
+
+void DrawNetworkPlayers()
+{
+  if (!network.enabled || !network.connected)
+    return;
+
+  int num_players = 0;
+  int i;
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+    if (stored_player[i].connected_network)
+      num_players++;
+
+  struct TextPosInfo *pos = &menu.main.network_players;
+  int tile_size = pos->tile_size;
+  int border_size = 2;
+  int xoffset_text = tile_size + border_size;
+  int font_nr = pos->font;
+  int font_width = getFontWidth(font_nr);
+  int font_height = getFontHeight(font_nr);
+  int player_height = MAX(tile_size, font_height);
+  int player_yoffset = player_height + border_size;
+  int max_players_width = xoffset_text + MAX_PLAYER_NAME_LEN * font_width;
+  int max_players_height = MAX_PLAYERS * player_yoffset - border_size;
+  int all_players_height = num_players * player_yoffset - border_size;
+  int max_xpos = SX + ALIGNED_XPOS(pos->x, max_players_width,  pos->align);
+  int max_ypos = SY + ALIGNED_YPOS(pos->y, max_players_height, pos->valign);
+  int ypos = SY + ALIGNED_YPOS(pos->y, all_players_height, pos->valign);
+
+  ClearRectangleOnBackground(drawto, max_xpos, max_ypos,
+			     max_players_width, max_players_height);
+
+  /* first draw local network player ... */
+  for (i = 0; i < MAX_PLAYERS; i++)
+  {
+    if (stored_player[i].connected_locally)
+    {
+      char *player_name = getNetworkPlayerName(i + 1);
+      int player_width = xoffset_text + getTextWidth(player_name, font_nr);
+      int xpos = SX + ALIGNED_XPOS(pos->x, player_width,  pos->align);
+
+      DrawNetworkPlayer(xpos, ypos, i, tile_size, border_size, font_nr);
+
+      ypos += player_yoffset;
+    }
+  }
+
+  /* ... then draw all other network players */
+  for (i = 0; i < MAX_PLAYERS; i++)
+  {
+    if (stored_player[i].connected_network &&
+	!stored_player[i].connected_locally)
+    {
+      char *player_name = getNetworkPlayerName(i + 1);
+      int player_width = xoffset_text + getTextWidth(player_name, font_nr);
+      int xpos = SX + ALIGNED_XPOS(pos->x, player_width,  pos->align);
+
+      DrawNetworkPlayer(xpos, ypos, i, tile_size, border_size, font_nr);
+
+      ypos += player_yoffset;
+    }
+  }
+}
+
 inline static void DrawGraphicAnimationExt(DrawBuffer *dst_bitmap, int x, int y,
 					   int graphic, int sync_frame,
 					   int mask_mode)

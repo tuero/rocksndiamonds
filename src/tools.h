@@ -197,6 +197,8 @@ void DrawMiniLevel(int, int, int, int);
 void DrawPreviewLevelInitial(void);
 void DrawPreviewLevelAnimation(void);
 
+void DrawNetworkPlayers(void);
+
 void WaitForEventToContinue(void);
 boolean Request(char *, unsigned int);
 void InitGraphicCompatibilityInfo_Doors(void);

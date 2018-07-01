@@ -1551,6 +1551,8 @@ struct TextPosInfo
   int direction;		/* needed for panel time/health graphics */
   int class;			/* needed for panel time/health graphics */
   int style;			/* needed for panel time/health graphics */
+
+  int tile_size;		/* special case for list of network players */
 };
 
 struct MouseActionInfo

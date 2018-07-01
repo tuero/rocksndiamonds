@@ -6674,6 +6674,9 @@ struct ConfigInfo image_config[] =
   { "font.info.levelset",			UNDEFINED_FILENAME	},
   { "font.info.levelset.clone_from",		"font.level_number"	},
 
+  { "font.main.network_players",		UNDEFINED_FILENAME	},
+  { "font.main.network_players.clone_from",	"font.level_number"	},
+
   { "editor.element_border",			"RocksMore.png"		},
   { "editor.element_border.xpos",		"0"			},
   { "editor.element_border.ypos",		"2"			},
@@ -8063,6 +8066,13 @@ struct ConfigInfo image_config[] =
   { "main.input.name.align",			"left"			},
   { "main.input.name.valign",			"top"			},
   { "main.input.name.font",			"font.input_1"		},
+
+  { "main.network_players.x",			"68"			},
+  { "main.network_players.y",			"448"			},
+  { "main.network_players.align",		"center"		},
+  { "main.network_players.valign",		"middle"		},
+  { "main.network_players.font",		"font.main.network_players" },
+  { "main.network_players.tile_size",		"16"			},
 
   { "preview.x",				"272"			},
   { "preview.y",				"380"			},

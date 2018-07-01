@@ -1642,6 +1642,7 @@ void DrawMainMenu()
 
   DrawCursorAndText_Main(-1, FALSE, FALSE);
   DrawPreviewLevelInitial();
+  DrawNetworkPlayers();
 
   HandleMainMenu(0, 0, 0, 0, MB_MENU_INITIALIZE);
 
