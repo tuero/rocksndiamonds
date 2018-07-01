@@ -669,11 +669,11 @@ static void Handle_OP_STOP_PLAYING()
 
     if (buffer[2] != NETWORK_STOP_BY_PLAYER || stopped_by_remote_player)
       Request(message, REQ_CONFIRM | REQ_STAY_CLOSED);
+
+    SetGameStatus(GAME_MODE_MAIN);
+
+    DrawMainMenu();
   }
-
-  SetGameStatus(GAME_MODE_MAIN);
-
-  DrawMainMenu();
 }
 
 static void Handle_OP_MOVE_PLAYER(unsigned int len)
