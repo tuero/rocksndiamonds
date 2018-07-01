@@ -659,11 +659,13 @@ static void Handle_OP_STOP_PLAYING()
     int index_nr = client_nr - 1;
     struct PlayerInfo *client_player = &stored_player[index_nr];
     boolean stopped_by_remote_player = (!client_player->connected_locally);
-    char *message = (buffer[2] == NETWORK_STOP_BY_PLAYER ?
-		     "Network game stopped by player!" :
-		     buffer[2] == NETWORK_STOP_BY_ERROR ?
-		     "Network game stopped due to internal error!" :
-		     "Network game stopped!");
+    char message[100];
+
+    sprintf(message, (buffer[2] == NETWORK_STOP_BY_PLAYER ?
+		      "Network game stopped by player %d!" :
+		      buffer[2] == NETWORK_STOP_BY_ERROR ?
+		      "Network game stopped due to internal error!" :
+		      "Network game stopped!"), client_nr);
 
     if (buffer[2] != NETWORK_STOP_BY_PLAYER || stopped_by_remote_player)
       Request(message, REQ_CONFIRM | REQ_STAY_CLOSED);
