@@ -577,6 +577,20 @@ static void Handle_OP_PLAYER_DISCONNECTED()
 
   stored_player[index_nr].connected_locally = FALSE;
   stored_player[index_nr].connected_network = FALSE;
+
+  if (game_status == GAME_MODE_PLAYING)
+  {
+    char message[100];
+
+    sprintf(message, "Player %d left network server! Network game stopped!",
+	    player_nr);
+
+    Request(message, REQ_CONFIRM | REQ_STAY_CLOSED);
+
+    SetGameStatus(GAME_MODE_MAIN);
+
+    DrawMainMenu();
+  }
 }
 
 static void Handle_OP_START_PLAYING()
