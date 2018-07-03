@@ -198,6 +198,7 @@ void DrawPreviewLevelInitial(void);
 void DrawPreviewLevelAnimation(void);
 
 void DrawNetworkPlayers(void);
+void ClearNetworkPlayers(void);
 
 void WaitForEventToContinue(void);
 boolean Request(char *, unsigned int);

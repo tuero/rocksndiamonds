@@ -3530,9 +3530,12 @@ static void DrawNetworkPlayer(int x, int y, int player_nr, int tile_size,
   DrawText(x + xoffset_text, y + yoffset_text, player_name, font_nr);
 }
 
-void DrawNetworkPlayers()
+void DrawNetworkPlayersExt(boolean force)
 {
-  if (!network.enabled || !network.connected)
+  if (game_status != GAME_MODE_MAIN)
+    return;
+
+  if (!network.connected && !force)
     return;
 
   int num_players = 0;
@@ -3564,7 +3567,8 @@ void DrawNetworkPlayers()
   /* first draw local network player ... */
   for (i = 0; i < MAX_PLAYERS; i++)
   {
-    if (stored_player[i].connected_locally)
+    if (stored_player[i].connected_network &&
+	stored_player[i].connected_locally)
     {
       char *player_name = getNetworkPlayerName(i + 1);
       int player_width = xoffset_text + getTextWidth(player_name, font_nr);
@@ -3591,6 +3595,16 @@ void DrawNetworkPlayers()
       ypos += player_yoffset;
     }
   }
+}
+
+void DrawNetworkPlayers()
+{
+  DrawNetworkPlayersExt(FALSE);
+}
+
+void ClearNetworkPlayers()
+{
+  DrawNetworkPlayersExt(TRUE);
 }
 
 inline static void DrawGraphicAnimationExt(DrawBuffer *dst_bitmap, int x, int y,

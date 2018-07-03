@@ -859,6 +859,9 @@ void HandleNetworking()
     else
     {
       Request(error_message, REQ_CONFIRM);
+
+      if (game_status == GAME_MODE_MAIN)
+	ClearNetworkPlayers();
     }
   }
 }
