@@ -5087,7 +5087,6 @@ static void InitPlayerInfo()
   }
 
   local_player->connected_locally = TRUE;
-  local_player->connected_network = TRUE;
 }
 
 static void InitArtworkInfo()
