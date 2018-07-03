@@ -462,6 +462,8 @@ static void Handle_OP_YOUR_NUMBER()
     Error(ERR_EXIT, "sorry, more than %d players not allowed", MAX_PLAYERS);
 
   Error(ERR_NETWORK_CLIENT, "you get client # %d", new_client_nr);
+
+  stored_player[new_index_nr].connected_network = TRUE;
 }
 
 static void Handle_OP_NUMBER_WANTED()
@@ -822,6 +824,17 @@ static char *HandleNetworkingPackets()
   return NULL;
 }
 
+static void FreeNetworkClientPlayerInfo(struct NetworkClientPlayerInfo *player)
+{
+  if (player == NULL)
+    return;
+
+  if (player->next)
+    FreeNetworkClientPlayerInfo(player->next);
+
+  checked_free(player);
+}
+
 static void HandleNetworkingDisconnect()
 {
   int i;
@@ -838,6 +851,11 @@ static void HandleNetworkingDisconnect()
 
   for (i = 0; i < MAX_PLAYERS; i++)
     stored_player[i].connected_network = FALSE;
+
+  FreeNetworkClientPlayerInfo(first_player.next);
+
+  first_player.nr = 0;
+  first_player.next = NULL;
 }
 
 void HandleNetworking()
