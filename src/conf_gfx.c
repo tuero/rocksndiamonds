@@ -8073,6 +8073,7 @@ struct ConfigInfo image_config[] =
   { "main.network_players.valign",		"middle"		},
   { "main.network_players.font",		"font.main.network_players" },
   { "main.network_players.tile_size",		"16"			},
+  { "main.network_players.border_size",		"2"			},
 
   { "main.preview_players.x",			"474"			},
   { "main.preview_players.y",			"448"			},

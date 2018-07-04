@@ -3623,7 +3623,7 @@ void DrawNetworkPlayersExt(boolean force)
 
   struct TextPosInfo *pos = &menu.main.network_players;
   int tile_size = pos->tile_size;
-  int border_size = 2;
+  int border_size = pos->border_size;
   int xoffset_text = tile_size + border_size;
   int font_nr = pos->font;
   int font_width = getFontWidth(font_nr);
