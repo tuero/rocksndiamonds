@@ -1539,6 +1539,7 @@ struct TextPosInfo
   int x, y;
   int xoffset;			/* special case for tape date and time */
   int xoffset2;			/* special case for tape date */
+  int yoffset;			/* special case for list of preview players */
   int width, height;
   int align, valign;
   int size;			/* also used for suffix ".digits" */
@@ -1553,6 +1554,8 @@ struct TextPosInfo
   int style;			/* needed for panel time/health graphics */
 
   int tile_size;		/* special case for list of network players */
+  int border_size;		/* special case for list of preview players */
+  int vertical;			/* special case for list of preview players */
 };
 
 struct MouseActionInfo

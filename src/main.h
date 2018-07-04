@@ -2686,6 +2686,7 @@ struct MenuMainInfo
   struct MenuMainTextInfo text;
   struct MenuMainInputInfo input;
 
+  struct TextPosInfo preview_players;
   struct TextPosInfo network_players;
 };
 

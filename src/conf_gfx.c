@@ -8074,6 +8074,16 @@ struct ConfigInfo image_config[] =
   { "main.network_players.font",		"font.main.network_players" },
   { "main.network_players.tile_size",		"16"			},
 
+  { "main.preview_players.x",			"474"			},
+  { "main.preview_players.y",			"448"			},
+  { "main.preview_players.align",		"center"		},
+  { "main.preview_players.valign",		"middle"		},
+  { "main.preview_players.tile_size",		"32"			},
+  { "main.preview_players.border_size",		"2"			},
+  { "main.preview_players.vertical",		"false"			},
+  { "main.preview_players.xoffset",		"-1"			},
+  { "main.preview_players.yoffset",		"-1"			},
+
   { "preview.x",				"272"			},
   { "preview.y",				"380"			},
   { "preview.align",				"center"		},

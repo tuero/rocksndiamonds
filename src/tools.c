@@ -3504,9 +3504,85 @@ static void DrawPreviewLevelExt(boolean restart)
   }
 }
 
+void DrawPreviewPlayers()
+{
+  if (game_status != GAME_MODE_MAIN)
+    return;
+
+  if (!network.enabled && !setup.team_mode)
+    return;
+
+  boolean player_found[MAX_PLAYERS];
+  int num_players = 0;
+  int i, x, y;
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+    player_found[i] = FALSE;
+
+  /* check which players can be found in the level (simple approach) */
+  for (x = 0; x < lev_fieldx; x++)
+  {
+    for (y = 0; y < lev_fieldy; y++)
+    {
+      int element = level.field[x][y];
+
+      if (ELEM_IS_PLAYER(element))
+      {
+	int player_nr = GET_PLAYER_NR(element);
+
+	player_nr = MIN(MAX(0, player_nr), MAX_PLAYERS - 1);
+
+	if (!player_found[player_nr])
+	  num_players++;
+
+	player_found[player_nr] = TRUE;
+      }
+    }
+  }
+
+  struct TextPosInfo *pos = &menu.main.preview_players;
+  int tile_size = pos->tile_size;
+  int border_size = pos->border_size;
+  int player_xoffset_raw = (pos->vertical ? 0 : tile_size + border_size);
+  int player_yoffset_raw = (pos->vertical ? tile_size + border_size : 0);
+  int player_xoffset = (pos->xoffset != -1 ? pos->xoffset : player_xoffset_raw);
+  int player_yoffset = (pos->yoffset != -1 ? pos->yoffset : player_yoffset_raw);
+  int max_players_width  = (MAX_PLAYERS - 1) * player_xoffset + tile_size;
+  int max_players_height = (MAX_PLAYERS - 1) * player_yoffset + tile_size;
+  int all_players_width  = (num_players - 1) * player_xoffset + tile_size;
+  int all_players_height = (num_players - 1) * player_yoffset + tile_size;
+  int max_xpos = SX + ALIGNED_XPOS(pos->x, max_players_width,  pos->align);
+  int max_ypos = SY + ALIGNED_YPOS(pos->y, max_players_height, pos->valign);
+  int xpos = SX + ALIGNED_XPOS(pos->x, all_players_width,  pos->align);
+  int ypos = SY + ALIGNED_YPOS(pos->y, all_players_height, pos->valign);
+
+  /* clear area in which the players will be drawn */
+  ClearRectangleOnBackground(drawto, max_xpos, max_ypos,
+			     max_players_width, max_players_height);
+
+  /* only draw players if level is suited for team mode */
+  if (num_players < 2)
+    return;
+
+  /* draw all players that were found in the level */
+  for (i = 0; i < MAX_PLAYERS; i++)
+  {
+    if (player_found[i])
+    {
+      int graphic = el2img(EL_PLAYER_1 + i);
+
+      DrawSizedGraphicThruMaskExt(drawto, xpos, ypos, graphic, 0, tile_size);
+
+      xpos += player_xoffset;
+      ypos += player_yoffset;
+    }
+  }
+}
+
 void DrawPreviewLevelInitial()
 {
   DrawPreviewLevelExt(TRUE);
+  DrawPreviewPlayers();
 }
 
 void DrawPreviewLevelAnimation()
