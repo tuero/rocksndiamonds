@@ -620,8 +620,9 @@ static void Handle_OP_START_PLAYING()
   {
     Error(ERR_WARN, "no such level identifier: '%s'", new_leveldir_identifier);
 
-    new_leveldir = leveldir_first;
-    Error(ERR_WARN, "using default level set: '%s'", new_leveldir->identifier);
+    stop_network_game = TRUE;
+
+    return;
   }
 
   printf("OP_START_PLAYING: %d\n", buffer[0]);
