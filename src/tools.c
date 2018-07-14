@@ -981,6 +981,8 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
 		draw_border_function);
 
   redraw_mask &= ~fade_mask;
+
+  ClearEventQueue();
 }
 
 static void SetScreenStates_BeforeFadingIn()
@@ -2800,6 +2802,8 @@ void AnimateEnvelope(int envelope_nr, int anim_mode, int action)
 
     SkipUntilDelayReached(&anim_delay, anim_delay_value, &i, last_frame);
   }
+
+  ClearEventQueue();
 }
 
 void ShowEnvelope(int envelope_nr)
@@ -3083,6 +3087,8 @@ void AnimateEnvelopeRequest(int anim_mode, int action)
 
     SkipUntilDelayReached(&anim_delay, anim_delay_value, &i, last_frame);
   }
+
+  ClearEventQueue();
 }
 
 void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
@@ -5418,6 +5424,8 @@ unsigned int MoveDoor(unsigned int door_state)
   // draw masked border over door area
   DrawMaskedBorder(REDRAW_DOOR_1);
   DrawMaskedBorder(REDRAW_DOOR_2);
+
+  ClearEventQueue();
 
   return (door1 | door2);
 }
