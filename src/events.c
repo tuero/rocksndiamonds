@@ -1370,6 +1370,8 @@ static void HandleButtonOrFinger(int mx, int my, int button)
       HandleButtonOrFinger_WipeGestures_MM(mx, my, button);
     else if (strEqual(setup.touch.control_type, TOUCH_CONTROL_FOLLOW_FINGER))
       HandleButtonOrFinger_FollowFinger_MM(mx, my, button);
+    else if (strEqual(setup.touch.control_type, TOUCH_CONTROL_VIRTUAL_BUTTONS))
+      SetPlayerMouseAction(mx, my, button);	/* special case */
   }
   else
   {
