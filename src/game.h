@@ -349,6 +349,7 @@ struct PlayerInfo
   int gems_still_needed;
   int sokobanfields_still_needed;
   int lights_still_needed;
+  int players_still_needed;
   int friends_still_needed;
   int key[MAX_NUM_KEYS];
   int num_white_keys;

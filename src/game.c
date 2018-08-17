@@ -3392,6 +3392,7 @@ void InitGame()
     player->gems_still_needed = level.gems_needed;
     player->sokobanfields_still_needed = 0;
     player->lights_still_needed = 0;
+    player->players_still_needed = 0;
     player->friends_still_needed = 0;
 
     for (j = 0; j < MAX_NUM_KEYS; j++)
@@ -3948,6 +3949,10 @@ void InitGame()
       }
     }
   }
+
+  for (i = 0; i < MAX_PLAYERS; i++)
+    if (stored_player[i].active)
+      local_player->players_still_needed++;
 
   /* when recording the game, store which players take part in the game */
   if (tape.recording)
@@ -13410,6 +13415,8 @@ void ExitPlayer(struct PlayerInfo *player)
 {
   DrawPlayer(player);	/* needed here only to cleanup last field */
   RemovePlayer(player);
+
+  local_player->players_still_needed--;
 }
 
 static void setFieldForSnapping(int x, int y, int element, int direction)
@@ -13957,6 +13964,8 @@ static int DigField(struct PlayerInfo *player,
       if (local_player->sokobanfields_still_needed == 0 &&
 	  (game.emulation == EMU_SOKOBAN || level.auto_exit_sokoban))
       {
+	local_player->players_still_needed = 0;
+
 	PlayerWins(player);
 
 	PlayLevelSound(x, y, SND_GAME_SOKOBAN_SOLVING);
