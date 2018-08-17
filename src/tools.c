@@ -4570,6 +4570,7 @@ static boolean RequestDoor(char *text, unsigned int req_state)
   /* pause network game while waiting for request to answer */
   if (network.enabled &&
       game_status == GAME_MODE_PLAYING &&
+      !AllPlayersGone &&
       req_state & REQUEST_WAIT_FOR_INPUT)
     SendToServer_PausePlaying();
 
@@ -4710,6 +4711,7 @@ static boolean RequestDoor(char *text, unsigned int req_state)
   /* continue network game after request */
   if (network.enabled &&
       game_status == GAME_MODE_PLAYING &&
+      !AllPlayersGone &&
       req_state & REQUEST_WAIT_FOR_INPUT)
     SendToServer_ContinuePlaying();
 
@@ -4736,6 +4738,7 @@ static boolean RequestEnvelope(char *text, unsigned int req_state)
   /* pause network game while waiting for request to answer */
   if (network.enabled &&
       game_status == GAME_MODE_PLAYING &&
+      !AllPlayersGone &&
       req_state & REQUEST_WAIT_FOR_INPUT)
     SendToServer_PausePlaying();
 
@@ -4793,6 +4796,7 @@ static boolean RequestEnvelope(char *text, unsigned int req_state)
   /* continue network game after request */
   if (network.enabled &&
       game_status == GAME_MODE_PLAYING &&
+      !AllPlayersGone &&
       req_state & REQUEST_WAIT_FOR_INPUT)
     SendToServer_ContinuePlaying();
 
