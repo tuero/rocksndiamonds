@@ -4422,6 +4422,10 @@ void InitAmoebaNr(int x, int y)
 
 static void PlayerWins(struct PlayerInfo *player)
 {
+  if (level.game_engine_type == GAME_ENGINE_TYPE_RND &&
+      local_player->players_still_needed > 0)
+    return;
+
   player->LevelSolved = TRUE;
   player->GameOver = TRUE;
 
