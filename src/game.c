@@ -1112,6 +1112,7 @@ void TestIfGoodThingGetsHitByBadThing(int, int, int);
 void KillPlayer(struct PlayerInfo *);
 void BuryPlayer(struct PlayerInfo *);
 void RemovePlayer(struct PlayerInfo *);
+void RemovePlayerWithCleanup(struct PlayerInfo *);
 
 static int getInvisibleActiveFromInvisibleElement(int);
 static int getInvisibleFromInvisibleActiveElement(int);
@@ -12641,8 +12642,7 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
 	Feld[jx][jy] == EL_SP_EXIT_OPEN ||
 	Feld[jx][jy] == EL_SP_EXIT_OPENING)	/* <-- special case */
     {
-      DrawPlayer(player);	/* needed here only to cleanup last field */
-      RemovePlayer(player);
+      RemovePlayerWithCleanup(player);
 
       if (local_player->friends_still_needed == 0 ||
 	  IS_SP_ELEMENT(Feld[jx][jy]))
@@ -13400,6 +13400,12 @@ void RemovePlayer(struct PlayerInfo *player)
 
   ExitX = ZX = jx;
   ExitY = ZY = jy;
+}
+
+void RemovePlayerWithCleanup(struct PlayerInfo *player)
+{
+  DrawPlayer(player);	/* needed here only to cleanup last field */
+  RemovePlayer(player);
 }
 
 static void setFieldForSnapping(int x, int y, int element, int direction)
