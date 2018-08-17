@@ -9776,7 +9776,10 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
     {
       for (i = 0; i < MAX_PLAYERS; i++)
 	if (action_arg_player_bits & (1 << i))
-	  PlayerWins(&stored_player[i]);
+	  RemovePlayerWithCleanup(&stored_player[i]);
+
+      if (AllPlayersGone)
+	PlayerWins(local_player);
 
       break;
     }
