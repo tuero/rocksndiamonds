@@ -5051,6 +5051,9 @@ void Execute_Command(char *command)
   {
     Error(ERR_EXIT_HELP, "unrecognized command '%s'", command);
   }
+
+  /* disable networking if any valid command was recognized */
+  options.network = setup.network_mode = FALSE;
 }
 
 static void InitSetup()
