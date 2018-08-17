@@ -1112,7 +1112,7 @@ void TestIfGoodThingGetsHitByBadThing(int, int, int);
 void KillPlayer(struct PlayerInfo *);
 void BuryPlayer(struct PlayerInfo *);
 void RemovePlayer(struct PlayerInfo *);
-void RemovePlayerWithCleanup(struct PlayerInfo *);
+void ExitPlayer(struct PlayerInfo *);
 
 static int getInvisibleActiveFromInvisibleElement(int);
 static int getInvisibleFromInvisibleActiveElement(int);
@@ -9776,7 +9776,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
     {
       for (i = 0; i < MAX_PLAYERS; i++)
 	if (action_arg_player_bits & (1 << i))
-	  RemovePlayerWithCleanup(&stored_player[i]);
+	  ExitPlayer(&stored_player[i]);
 
       if (AllPlayersGone)
 	PlayerWins(local_player);
@@ -12645,7 +12645,7 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
 	Feld[jx][jy] == EL_SP_EXIT_OPEN ||
 	Feld[jx][jy] == EL_SP_EXIT_OPENING)	/* <-- special case */
     {
-      RemovePlayerWithCleanup(player);
+      ExitPlayer(player);
 
       if ((local_player->friends_still_needed == 0 ||
 	   IS_SP_ELEMENT(Feld[jx][jy])) &&
@@ -13406,7 +13406,7 @@ void RemovePlayer(struct PlayerInfo *player)
   ExitY = ZY = jy;
 }
 
-void RemovePlayerWithCleanup(struct PlayerInfo *player)
+void ExitPlayer(struct PlayerInfo *player)
 {
   DrawPlayer(player);	/* needed here only to cleanup last field */
   RemovePlayer(player);
