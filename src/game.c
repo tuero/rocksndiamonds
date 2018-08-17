@@ -12644,9 +12644,10 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
     {
       RemovePlayerWithCleanup(player);
 
-      if (local_player->friends_still_needed == 0 ||
-	  IS_SP_ELEMENT(Feld[jx][jy]))
-	PlayerWins(player);
+      if ((local_player->friends_still_needed == 0 ||
+	   IS_SP_ELEMENT(Feld[jx][jy])) &&
+	  AllPlayersGone)
+	PlayerWins(local_player);
     }
 
     /* this breaks one level: "machine", level 000 */
