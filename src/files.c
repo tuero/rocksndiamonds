@@ -6582,6 +6582,13 @@ void LoadLevelTemplate(int nr)
 {
   char *filename;
 
+  if (!fileExists(getGlobalLevelTemplateFilename()))
+  {
+    Error(ERR_WARN, "no level template found for this level");
+
+    return;
+  }
+
   setLevelFileInfo(&level_template.file_info, nr);
   filename = level_template.file_info.filename;
 
