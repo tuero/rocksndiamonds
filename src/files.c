@@ -6206,7 +6206,7 @@ void LoadLevelFromFilename(struct LevelInfo *level, char *filename)
   LoadLevelFromFileInfo(level, &level_file_info, FALSE);
 }
 
-static void LoadLevel_InitVersion(struct LevelInfo *level, char *filename)
+static void LoadLevel_InitVersion(struct LevelInfo *level)
 {
   int i, j;
 
@@ -6526,7 +6526,7 @@ static void LoadLevel_InitCustomElements(struct LevelInfo *level)
   }
 }
 
-static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
+static void LoadLevel_InitElements(struct LevelInfo *level)
 {
   LoadLevel_InitStandardElements(level);
 
@@ -6538,7 +6538,7 @@ static void LoadLevel_InitElements(struct LevelInfo *level, char *filename)
   InitElementPropertiesGfxElement();
 }
 
-static void LoadLevel_InitPlayfield(struct LevelInfo *level, char *filename)
+static void LoadLevel_InitPlayfield(struct LevelInfo *level)
 {
   int x, y;
 
@@ -6570,7 +6570,7 @@ static void LoadLevel_InitPlayfield(struct LevelInfo *level, char *filename)
     SetBorderElement();
 }
 
-static void LoadLevel_InitNativeEngines(struct LevelInfo *level,char *filename)
+static void LoadLevel_InitNativeEngines(struct LevelInfo *level)
 {
   struct LevelFileInfo *level_file_info = &level->file_info;
 
@@ -6580,8 +6580,6 @@ static void LoadLevel_InitNativeEngines(struct LevelInfo *level,char *filename)
 
 void LoadLevelTemplate(int nr)
 {
-  char *filename;
-
   if (!fileExists(getGlobalLevelTemplateFilename()))
   {
     Error(ERR_WARN, "no level template found for this level");
@@ -6590,33 +6588,29 @@ void LoadLevelTemplate(int nr)
   }
 
   setLevelFileInfo(&level_template.file_info, nr);
-  filename = level_template.file_info.filename;
 
   LoadLevelFromFileInfo(&level_template, &level_template.file_info, FALSE);
 
-  LoadLevel_InitVersion(&level_template, filename);
-  LoadLevel_InitElements(&level_template, filename);
+  LoadLevel_InitVersion(&level_template);
+  LoadLevel_InitElements(&level_template);
 
   ActivateLevelTemplate();
 }
 
 void LoadLevel(int nr)
 {
-  char *filename;
-
   setLevelFileInfo(&level.file_info, nr);
-  filename = level.file_info.filename;
 
   LoadLevelFromFileInfo(&level, &level.file_info, FALSE);
 
   if (level.use_custom_template)
     LoadLevelTemplate(-1);
 
-  LoadLevel_InitVersion(&level, filename);
-  LoadLevel_InitElements(&level, filename);
-  LoadLevel_InitPlayfield(&level, filename);
+  LoadLevel_InitVersion(&level);
+  LoadLevel_InitElements(&level);
+  LoadLevel_InitPlayfield(&level);
 
-  LoadLevel_InitNativeEngines(&level, filename);
+  LoadLevel_InitNativeEngines(&level);
 }
 
 void LoadLevelInfoOnly(int nr)
