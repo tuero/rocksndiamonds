@@ -645,8 +645,11 @@ static void Handle_OP_PAUSE_PLAYING()
   printf("OP_PAUSE_PLAYING: %d\n", buffer[0]);
   Error(ERR_NETWORK_CLIENT, "client %d pauses game", buffer[0]);
 
-  tape.pausing = TRUE;
-  DrawVideoDisplay(VIDEO_STATE_PAUSE_ON,0);
+  if (game_status == GAME_MODE_PLAYING)
+  {
+    tape.pausing = TRUE;
+    DrawVideoDisplay(VIDEO_STATE_PAUSE_ON,0);
+  }
 }
 
 static void Handle_OP_CONTINUE_PLAYING()
@@ -654,8 +657,11 @@ static void Handle_OP_CONTINUE_PLAYING()
   printf("OP_CONTINUE_PLAYING: %d\n", buffer[0]);
   Error(ERR_NETWORK_CLIENT, "client %d continues game", buffer[0]);
 
-  tape.pausing = FALSE;
-  DrawVideoDisplay(VIDEO_STATE_PAUSE_OFF,0);
+  if (game_status == GAME_MODE_PLAYING)
+  {
+    tape.pausing = FALSE;
+    DrawVideoDisplay(VIDEO_STATE_PAUSE_OFF,0);
+  }
 }
 
 static void Handle_OP_STOP_PLAYING()
