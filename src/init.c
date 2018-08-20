@@ -5631,8 +5631,8 @@ void InitNetworkServer()
   }
   else
   {
-    SendToServer_PlayerName(setup.player_name);
     SendToServer_ProtocolVersion();
+    SendToServer_PlayerName(setup.player_name);
     SendToServer_NrWanted(setup.network_player_nr + 1);
 
     network.connected = TRUE;
