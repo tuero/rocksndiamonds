@@ -589,10 +589,12 @@ void NetworkServer(int port, int serveronly)
 	  memmove(player->readbuffer, player->readbuffer + 4 + len, player->nread);
 
 	  buffer[0] = player->number;
-	  if (!player->introduced && buffer[1] != OP_PLAYER_NAME)
+	  if (!player->introduced &&
+	      buffer[1] != OP_PLAYER_NAME &&
+	      buffer[1] != OP_PROTOCOL_VERSION)
 	  {
 	    if (options.verbose)
-	      Error(ERR_NETWORK_SERVER, "!(client %d)->introduced && buffer[1]==%d (expected OP_PLAYER_NAME)", buffer[0], buffer[1]);
+	      Error(ERR_NETWORK_SERVER, "!(client %d)->introduced && buffer[1]==%d (expected OP_PLAYER_NAME or OP_PROTOCOL_VERSION)", buffer[0], buffer[1]);
 
 	    RemovePlayer(player);
 	    interrupt = 1;
