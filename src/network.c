@@ -48,6 +48,8 @@ static byte readbuffer[MAX_BUFFER_SIZE], writbuffer[MAX_BUFFER_SIZE];
 static byte *buffer = realbuffer + 4;
 static int nread = 0, nwrite = 0;
 static boolean stop_network_game = FALSE;
+static boolean stop_network_client = FALSE;
+static char stop_network_client_message[MAX_OUTPUT_LINESIZE + 1];
 
 static void DrawNetworkTextExt(char *message, int font_nr, boolean initialize)
 {
@@ -430,9 +432,15 @@ void SendToServer_MovePlayer(byte player_action)
 static void Handle_OP_BAD_PROTOCOL_VERSION()
 {
   Error(ERR_WARN, "protocol version mismatch");
-  Error(ERR_EXIT, "server expects %d.%d.x instead of %d.%d.%d",
+  Error(ERR_WARN, "server expects %d.%d.x instead of %d.%d.%d",
 	buffer[2], buffer[3],
 	PROTOCOL_VERSION_1, PROTOCOL_VERSION_2, PROTOCOL_VERSION_3);
+
+  sprintf(stop_network_client_message, "Network protocol version mismatch! Server expects version %d.%d.x instead of %d.%d.%d!",
+	  buffer[2], buffer[3],
+	  PROTOCOL_VERSION_1, PROTOCOL_VERSION_2, PROTOCOL_VERSION_3);
+
+  stop_network_client = TRUE;
 }
 
 static void Handle_OP_YOUR_NUMBER()
@@ -826,6 +834,9 @@ static char *HandleNetworkingPackets()
     nread += num_bytes;
 
     HandleNetworkingMessages();
+
+    if (stop_network_client)
+      return stop_network_client_message;
   }
 
   return NULL;
