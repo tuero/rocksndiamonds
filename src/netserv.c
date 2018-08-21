@@ -20,22 +20,20 @@
 #include "main.h"
 
 
-static int clients = 0;
-static int onceonly = 0;
+static int num_clients = 0;
+static boolean run_server_only_once = FALSE;
 
 struct NetworkServerPlayerInfo
 {
   TCPsocket fd;
-  char player_name[16];
-  unsigned char number;
-  struct NetworkServerPlayerInfo *next;
-  char active;
-  char introduced;
-  unsigned char readbuffer[MAX_BUFFER_SIZE];
-  unsigned char writbuffer[MAX_BUFFER_SIZE];
-  int nread, nwrite;
+  char player_name[MAX_PLAYER_NAME_LEN + 1];
+  int number;
+  boolean active;
+  boolean introduced;
   byte action;
   boolean action_received;
+
+  struct NetworkServerPlayerInfo *next;
 };
 
 static struct NetworkServerPlayerInfo *first_player = NULL;
@@ -47,96 +45,354 @@ static TCPsocket lfd;		/* listening TCP socket */
 static UDPsocket udp;		/* listening UDP socket */
 static SDLNet_SocketSet fds;	/* socket set */
 
-static unsigned char realbuffer[512], *buffer = realbuffer + 4;
-
-static int interrupt;
+static struct NetworkBuffer *read_buffer = NULL;
+static struct NetworkBuffer *write_buffer = NULL;
 
 static unsigned int ServerFrameCounter = 0;
 
-static void addtobuffer(struct NetworkServerPlayerInfo *player,
-			unsigned char *b, int len)
-{
-  if (player->nwrite + len >= MAX_BUFFER_SIZE)
-    Error(ERR_EXIT_NETWORK_SERVER,
-	  "internal error: network send buffer overflow");
 
-  memcpy(player->writbuffer + player->nwrite, b, len);
-  player->nwrite += len;
+int getNetwork8BitInteger(byte *ptr)
+{
+  return ptr[0];
 }
 
-static void flushuser(struct NetworkServerPlayerInfo *player)
+int putNetwork8BitInteger(byte *ptr, int value)
 {
-  if (player->nwrite)
-  {
-    SDLNet_TCP_Send(player->fd, player->writbuffer, player->nwrite);
+  ptr[0] = value;
 
-    player->nwrite = 0;
+  return 1;
+}
+
+int getNetwork16BitInteger(byte *ptr)
+{
+  return ((ptr[0] << 8) |
+	  (ptr[1] << 0));
+}
+
+int putNetwork16BitInteger(byte *ptr, int value)
+{
+  ptr[0] = (value >> 8) & 0xff;
+  ptr[1] = (value >> 0) & 0xff;
+
+  return 2;
+}
+
+int getNetwork32BitInteger(byte *ptr)
+{
+  return ((ptr[0] << 24) |
+	  (ptr[1] << 16) |
+	  (ptr[2] <<  8) |
+	  (ptr[3] <<  0));
+}
+
+int putNetwork32BitInteger(byte *ptr, int value)
+{
+  ptr[0] = (value >> 24) & 0xff;
+  ptr[1] = (value >> 16) & 0xff;
+  ptr[2] = (value >>  8) & 0xff;
+  ptr[3] = (value >>  0) & 0xff;
+
+  return 4;
+}
+
+char *getNetworkString(byte *ptr)
+{
+  return (char *)ptr;
+}
+
+int putNetworkString(byte *ptr, char *s)
+{
+  strcpy((char *)ptr, s);
+
+  return strlen(s) + 1;
+}
+
+struct NetworkBuffer *newNetworkBuffer()
+{
+  struct NetworkBuffer *new = checked_calloc(sizeof(struct NetworkBuffer));
+
+  new->max_size = MAX_BUFFER_SIZE;
+  new->size = 0;
+  new->pos = 0;
+
+  new->buffer = checked_calloc(new->max_size);
+
+  return new;
+}
+
+static void resetNetworkBufferForReading(struct NetworkBuffer *nb)
+{
+  nb->pos = 0;
+}
+
+static void resetNetworkBufferForWriting(struct NetworkBuffer *nb)
+{
+  nb->size = 0;
+  nb->pos = 0;
+}
+
+void initNetworkBufferForReceiving(struct NetworkBuffer *nb)
+{
+  resetNetworkBufferForWriting(nb);
+}
+
+void initNetworkBufferForReading(struct NetworkBuffer *nb)
+{
+  resetNetworkBufferForReading(nb);
+
+  /* skip message length header */
+  getNetworkBuffer32BitInteger(nb);
+}
+
+void initNetworkBufferForWriting(struct NetworkBuffer *nb, int message_type,
+				 int player_nr)
+{
+  resetNetworkBufferForWriting(nb);
+
+  /* will be replaced with message length before sending */
+  putNetworkBuffer32BitInteger(nb, 0);
+
+  putNetworkBuffer8BitInteger(nb, message_type);
+  putNetworkBuffer8BitInteger(nb, player_nr);
+}
+
+static void copyNetworkBufferForWriting(struct NetworkBuffer *nb_from,
+					struct NetworkBuffer *nb_to,
+					int player_nr)
+{
+  initNetworkBufferForReading(nb_from);
+
+  int message_type = getNetworkBuffer8BitInteger(nb_from);
+
+  /* skip player number */
+  getNetworkBuffer8BitInteger(nb_from);
+
+  initNetworkBufferForWriting(nb_to, message_type, player_nr);
+
+  while (nb_from->pos < nb_from->size)
+  {
+    int b = getNetworkBuffer8BitInteger(nb_from);
+
+    putNetworkBuffer8BitInteger(nb_to, b);
   }
 }
 
-static void broadcast(struct NetworkServerPlayerInfo *except,
-		      int len, int activeonly)
+static void increaseNetworkBuffer(struct NetworkBuffer *nb, int additional_size)
+{
+  /* add some more buffer size than is really required this time */
+  nb->max_size += additional_size + MAX_BUFFER_SIZE;
+  nb->buffer = checked_realloc(nb->buffer, nb->max_size);
+}
+
+int receiveNetworkBufferBytes(struct NetworkBuffer *nb, TCPsocket socket,
+			     int num_bytes)
+{
+  if (nb->pos + num_bytes > nb->max_size)
+    increaseNetworkBuffer(nb, num_bytes);
+
+  int result = SDLNet_TCP_Recv(socket, &nb->buffer[nb->pos], num_bytes);
+
+  if (result != num_bytes)
+    return result;
+
+  nb->pos += num_bytes;
+  nb->size = nb->pos;
+
+  return num_bytes;
+}
+
+int receiveNetworkBufferPacket(struct NetworkBuffer *nb, TCPsocket socket)
+{
+  int num_bytes, num_bytes_head, num_bytes_body;
+
+  num_bytes_head = 4;
+  num_bytes = receiveNetworkBufferBytes(nb, socket, num_bytes_head);
+
+  if (num_bytes != num_bytes_head)
+    return num_bytes;
+
+  num_bytes_body = getNetwork32BitInteger(nb->buffer);
+  num_bytes = receiveNetworkBufferBytes(nb, socket, num_bytes_body);
+
+  return num_bytes;
+}
+
+int getNetworkBuffer8BitInteger(struct NetworkBuffer *nb)
+{
+  int num_bytes = 1;
+
+  if (nb->pos + num_bytes > nb->size)
+    return 0;
+
+  int value = getNetwork8BitInteger(&nb->buffer[nb->pos]);
+
+  nb->pos += num_bytes;
+
+  return value;
+}
+
+void putNetworkBuffer8BitInteger(struct NetworkBuffer *nb, int value)
+{
+  int num_bytes = 1;
+
+  if (nb->pos + num_bytes > nb->max_size)
+    increaseNetworkBuffer(nb, num_bytes);
+
+  nb->pos += putNetwork8BitInteger(&nb->buffer[nb->pos], value);
+  nb->size = nb->pos;
+}
+
+int getNetworkBuffer16BitInteger(struct NetworkBuffer *nb)
+{
+  int num_bytes = 2;
+
+  if (nb->pos + num_bytes > nb->size)
+    return 0;
+
+  int value = getNetwork16BitInteger(&nb->buffer[nb->pos]);
+
+  nb->pos += num_bytes;
+
+  return value;
+}
+
+void putNetworkBuffer16BitInteger(struct NetworkBuffer *nb, int value)
+{
+  int num_bytes = 2;
+
+  if (nb->pos + num_bytes > nb->max_size)
+    increaseNetworkBuffer(nb, num_bytes);
+
+  nb->pos += putNetwork16BitInteger(&nb->buffer[nb->pos], value);
+  nb->size = nb->pos;
+}
+
+int getNetworkBuffer32BitInteger(struct NetworkBuffer *nb)
+{
+  int num_bytes = 4;
+
+  if (nb->pos + num_bytes > nb->size)
+    return 0;
+
+  int value = getNetwork32BitInteger(&nb->buffer[nb->pos]);
+
+  nb->pos += num_bytes;
+
+  return value;
+}
+
+void putNetworkBuffer32BitInteger(struct NetworkBuffer *nb, int value)
+{
+  int num_bytes = 4;
+
+  if (nb->pos + num_bytes > nb->max_size)
+    increaseNetworkBuffer(nb, num_bytes);
+
+  nb->pos += putNetwork32BitInteger(&nb->buffer[nb->pos], value);
+  nb->size = nb->pos;
+}
+
+char *getNetworkBufferString(struct NetworkBuffer *nb)
+{
+  char *s = getNetworkString(&nb->buffer[nb->pos]);
+
+  nb->pos += strlen(s) + 1;
+
+  return s;
+}
+
+void putNetworkBufferString(struct NetworkBuffer *nb, char *s)
+{
+  int num_bytes = strlen(s) + 1;
+
+  if (nb->pos + num_bytes > nb->max_size)
+    increaseNetworkBuffer(nb, num_bytes);
+
+  nb->pos += putNetworkString(&nb->buffer[nb->pos], s);
+  nb->size = nb->pos;
+}
+
+static void SendNetworkBufferToAllButOne(struct NetworkBuffer *nb,
+					 struct NetworkServerPlayerInfo *except)
 {
   struct NetworkServerPlayerInfo *player;
 
-  realbuffer[0] = realbuffer[1] = realbuffer[2] = 0;
-  realbuffer[3] = (unsigned char)len;
-  for (player = first_player; player; player = player->next)
-    if (player != except && player->introduced &&
-	(player->active || !activeonly))
-      addtobuffer(player, realbuffer, 4 + len);
+  /* set message length header */
+  putNetwork32BitInteger(nb->buffer, nb->size - 4);
+
+  for (player = first_player; player != NULL; player = player->next)
+  {
+    if (player != except && player->introduced)
+    {
+      /* directly send the buffer to the network client */
+      SDLNet_TCP_Send(player->fd, nb->buffer, nb->size);
+    }
+  }
 }
 
-static void sendtoone(struct NetworkServerPlayerInfo *to, int len)
+static void SendNetworkBufferToAll(struct NetworkBuffer *nb)
 {
-  realbuffer[0] = realbuffer[1] = realbuffer[2] = 0;
-  realbuffer[3] = (unsigned char)len;
-  addtobuffer(to, realbuffer, 4 + len);
+  SendNetworkBufferToAllButOne(nb, NULL);
+}
+
+static void SendNetworkBufferToClient(struct NetworkBuffer *nb,
+				      struct NetworkServerPlayerInfo *player)
+{
+  /* set message length header */
+  putNetwork32BitInteger(nb->buffer, nb->size - 4);
+
+  /* directly send the buffer to the network client */
+  SDLNet_TCP_Send(player->fd, nb->buffer, nb->size);
 }
 
 static void RemovePlayer(struct NetworkServerPlayerInfo *player)
 {
-  struct NetworkServerPlayerInfo *v;
-  
   if (options.verbose)
     Error(ERR_NETWORK_SERVER, "dropping client %d (%s)",
 	  player->number, player->player_name);
 
+  SDLNet_TCP_DelSocket(fds, player->fd);
+  SDLNet_TCP_Close(player->fd);
+
   if (player == first_player)
+  {
     first_player = player->next;
+  }
   else
   {
-    for (v = first_player; v; v = v->next)
+    struct NetworkServerPlayerInfo *p;
+
+    for (p = first_player; p != NULL; p = p->next)
     {
-      if (v->next && v->next == player)
+      if (p->next && p->next == player)
       {
-	v->next = player->next;
+	p->next = player->next;
+
 	break;
       }
     }
   }
 
-  SDLNet_TCP_DelSocket(fds, player->fd);
-  SDLNet_TCP_Close(player->fd);
-
   if (player->introduced)
   {
-    buffer[0] = player->number;
-    buffer[1] = OP_PLAYER_DISCONNECTED;
-    broadcast(player, 2, 0);
+    initNetworkBufferForWriting(write_buffer, OP_PLAYER_DISCONNECTED,
+				player->number);
+
+    SendNetworkBufferToAllButOne(write_buffer, player);
   }
 
   free(player);
-  clients--;
+  num_clients--;
 
 #if 0	/* do not terminate network server if last player disconnected */
-  if (onceonly && clients == 0)
+  if (run_server_only_once && num_clients == 0)
   {
     if (options.verbose)
     {
       Error(ERR_NETWORK_SERVER, "no clients left");
       Error(ERR_NETWORK_SERVER, "aborting");
     }
+
     exit(0);
   }
 #endif
@@ -144,103 +400,110 @@ static void RemovePlayer(struct NetworkServerPlayerInfo *player)
 
 static void AddPlayer(TCPsocket fd)
 {
-  struct NetworkServerPlayerInfo *player, *v;
-  unsigned char nxn;
+  struct NetworkServerPlayerInfo *player, *p;
+  int number = 1;
   boolean again = TRUE;
-
-  player = checked_malloc(sizeof (struct NetworkServerPlayerInfo));
-
-  player->fd = fd;
-  player->player_name[0] = 0;
-  player->next = first_player;
-  player->active = 0;
-  player->nread = 0;
-  player->nwrite = 0;
-  player->introduced = 0;
-  player->action = 0;
-  player->action_received = FALSE;
 
   SDLNet_TCP_AddSocket(fds, fd);
 
-  first_player = player;
+  player = checked_calloc(sizeof(struct NetworkServerPlayerInfo));
 
-  nxn = 1;
+  player->fd = fd;
+  player->player_name[0] = 0;
+  player->active = FALSE;
+  player->introduced = FALSE;
+  player->action = 0;
+  player->action_received = FALSE;
+  player->next = first_player;
+
+  first_player = player;
 
   while (again)
   {
     again = FALSE;
-    v = player->next;
+    p = player->next;
 
-    while (v)
+    while (p)
     {
-      if (v->number == nxn)
+      if (p->number == number)
       {
-	nxn++;
+	number++;
 
 	again = TRUE;
+
 	break;
       }
-      v = v->next;
+
+      p = p->next;
     }
   }
 
-  player->number = nxn;
-  clients++;
+  player->number = number;
+  num_clients++;
 
-  buffer[0] = 0;
-  buffer[1] = OP_YOUR_NUMBER;
-  buffer[2] = player->number;
-  sendtoone(player, 3);
+  initNetworkBufferForWriting(write_buffer, OP_YOUR_NUMBER, 0);
+
+  putNetworkBuffer8BitInteger(write_buffer, player->number);
+
+  SendNetworkBufferToClient(write_buffer, player);
 }
 
-static void Handle_OP_PROTOCOL_VERSION(struct NetworkServerPlayerInfo *player,
-				       unsigned int len)
+static void Handle_OP_PROTOCOL_VERSION(struct NetworkServerPlayerInfo *player)
 {
-  if (len != 5 ||
-      buffer[2] != PROTOCOL_VERSION_1 ||
-      buffer[3] != PROTOCOL_VERSION_2)
+  int protocol_version_major = getNetworkBuffer8BitInteger(read_buffer);
+  int protocol_version_minor = getNetworkBuffer8BitInteger(read_buffer);
+  int protocol_version_patch = getNetworkBuffer8BitInteger(read_buffer);
+
+  if (protocol_version_major != PROTOCOL_VERSION_MAJOR ||
+      protocol_version_minor != PROTOCOL_VERSION_MINOR)
   {
     if (options.verbose)
       Error(ERR_NETWORK_SERVER,
 	    "client %d (%s) has wrong protocol version %d.%d.%d",
-	    player->number, player->player_name, buffer[2], buffer[3], buffer[4]);
+	    player->number, player->player_name,
+	    protocol_version_major,
+	    protocol_version_minor,
+	    protocol_version_patch);
 
-    buffer[0] = 0;
-    buffer[1] = OP_BAD_PROTOCOL_VERSION;
-    buffer[2] = PROTOCOL_VERSION_1;
-    buffer[3] = PROTOCOL_VERSION_2;
-    buffer[4] = PROTOCOL_VERSION_3;
-    sendtoone(player, 5);
-    flushuser(player);
+    initNetworkBufferForWriting(write_buffer, OP_BAD_PROTOCOL_VERSION, 0);
+
+    putNetworkBuffer8BitInteger(write_buffer, PROTOCOL_VERSION_MAJOR);
+    putNetworkBuffer8BitInteger(write_buffer, PROTOCOL_VERSION_MINOR);
+    putNetworkBuffer8BitInteger(write_buffer, PROTOCOL_VERSION_PATCH);
+
+    SendNetworkBufferToClient(write_buffer, player);
 
     RemovePlayer(player);
-    interrupt = 1;
   }
   else
   {
     if (options.verbose)
       Error(ERR_NETWORK_SERVER,
 	    "client %d (%s) uses protocol version %d.%d.%d",
-	    player->number, player->player_name, buffer[2], buffer[3], buffer[4]);
+	    player->number, player->player_name,
+	    protocol_version_major,
+	    protocol_version_minor,
+	    protocol_version_patch);
   }
 }
 
 static void Handle_OP_NUMBER_WANTED(struct NetworkServerPlayerInfo *player)
 {
-  struct NetworkServerPlayerInfo *v;
+  int nr_wanted = getNetworkBuffer8BitInteger(read_buffer);
   int client_nr = player->number;
-  int nr_wanted = buffer[2];
-  int nr_is_free = 1;
+  boolean nr_is_free = TRUE;
+  struct NetworkServerPlayerInfo *p;
 
   if (options.verbose)
       Error(ERR_NETWORK_SERVER, "client %d (%s) wants to switch to # %d",
 	    player->number, player->player_name, nr_wanted);
 
-  for (v = first_player; v; v = v->next)
+  for (p = first_player; p != NULL; p = p->next)
   {
-    if (v->number == nr_wanted)
+    if (p->number == nr_wanted)
     {
-      nr_is_free = 0;
+      nr_is_free = FALSE;
+
       break;
     }
   }
@@ -262,86 +525,87 @@ static void Handle_OP_NUMBER_WANTED(struct NetworkServerPlayerInfo *player)
   if (nr_is_free)
     player->number = nr_wanted;
 
-  buffer[0] = client_nr;
-  buffer[1] = OP_NUMBER_WANTED;
-  buffer[2] = nr_wanted;
-  buffer[3] = player->number;
+  initNetworkBufferForWriting(write_buffer, OP_NUMBER_WANTED, client_nr);
 
-  /*
-  sendtoone(player, 4);
-  */
+  putNetworkBuffer8BitInteger(write_buffer, nr_wanted);
+  putNetworkBuffer8BitInteger(write_buffer, player->number);
 
-  broadcast(NULL, 4, 0);
+  SendNetworkBufferToAll(write_buffer);
 }
 
-static void Handle_OP_PLAYER_NAME(struct NetworkServerPlayerInfo *player,
-				  unsigned int len)
+static void Handle_OP_PLAYER_NAME(struct NetworkServerPlayerInfo *player)
 {
-  struct NetworkServerPlayerInfo *v;
+  char *player_name = getNetworkBufferString(read_buffer);
   int i;
 
-  if (len>16)
-    len=16;
-  memcpy(player->player_name, &buffer[2], len-2);
-  player->player_name[len-2] = 0;
-  for (i = 0; i < len - 2; i++)
+  strncpy(player->player_name, player_name, MAX_PLAYER_NAME_LEN);
+  player->player_name[MAX_PLAYER_NAME_LEN] = '\0';
+
+  for (i = 0; i < MAX_PLAYER_NAME_LEN; i++)
   {
-    if (player->player_name[i] < ' ' || 
+    if (player->player_name[i] < ' ' ||
 	((unsigned char)(player->player_name[i]) > 0x7e &&
 	 (unsigned char)(player->player_name[i]) <= 0xa0))
     {
       player->player_name[i] = 0;
+
       break;
     }
   }
 
   if (!player->introduced)
   {
-    buffer[0] = player->number;
-    buffer[1] = OP_PLAYER_CONNECTED;
-    broadcast(player, 2, 0);
+    initNetworkBufferForWriting(write_buffer, OP_PLAYER_CONNECTED,
+				player->number);
+
+    SendNetworkBufferToAllButOne(write_buffer, player);
   }
 	      
   if (options.verbose)
     Error(ERR_NETWORK_SERVER, "client %d calls itself \"%s\"",
 	  player->number, player->player_name);
-  buffer[1] = OP_PLAYER_NAME;
-  broadcast(player, len, 0);
+
+  copyNetworkBufferForWriting(read_buffer, write_buffer, player->number);
+
+  SendNetworkBufferToAllButOne(write_buffer, player);
 
   if (!player->introduced)
   {
-    for (v = first_player; v; v = v->next)
+    struct NetworkServerPlayerInfo *p;
+
+    for (p = first_player; p != NULL; p = p->next)
     {
-      if (v != player && v->introduced)
+      if (p != player && p->introduced)
       {
-	buffer[0] = v->number;
-	buffer[1] = OP_PLAYER_CONNECTED;
-	sendtoone(player, 2);
-	buffer[1] = OP_PLAYER_NAME;
-	memcpy(&buffer[2], v->player_name, 14);
-	sendtoone(player, 2+strlen(v->player_name));
+	initNetworkBufferForWriting(write_buffer, OP_PLAYER_CONNECTED,
+				    p->number);
+
+	SendNetworkBufferToClient(write_buffer, player);
+
+	initNetworkBufferForWriting(write_buffer, OP_PLAYER_NAME, p->number);
+
+	putNetworkBufferString(write_buffer, p->player_name);
+
+	SendNetworkBufferToClient(write_buffer, player);
       }
     }
   }
 
-  player->introduced = 1;
+  player->introduced = TRUE;
 }
 
 static void Handle_OP_START_PLAYING(struct NetworkServerPlayerInfo *player)
 {
-  struct NetworkServerPlayerInfo *v, *w;
+  char *new_leveldir_identifier = getNetworkBufferString(read_buffer);
+  int level_nr = getNetworkBuffer16BitInteger(read_buffer);
 
   if (options.verbose)
     Error(ERR_NETWORK_SERVER,
-	  "client %d (%s) starts game [level %d from leveldir %d (%s)]",
-	  player->number, player->player_name,
-	  (buffer[2] << 8) + buffer[3],
-	  (buffer[4] << 8) + buffer[5],
-	  &buffer[10]);
+	  "client %d (%s) starts game [level %d from level set '%s']",
+	  player->number, player->player_name, level_nr,
+	  new_leveldir_identifier);
 
-  for (w = first_player; w; w = w->next)
-    if (w->introduced)
-      w->active = 1;
+  struct NetworkServerPlayerInfo *p;
 
   /* reset frame counter */
   ServerFrameCounter = 0;
@@ -349,13 +613,18 @@ static void Handle_OP_START_PLAYING(struct NetworkServerPlayerInfo *player)
   Error(ERR_NETWORK_SERVER, "resetting ServerFrameCounter to 0");
 
   /* reset player actions */
-  for (v = first_player; v; v = v->next)
+  for (p = first_player; p != NULL; p = p->next)
   {
-    v->action = 0;
-    v->action_received = FALSE;
+    p->action = 0;
+    p->action_received = FALSE;
+
+    if (p->introduced)
+      p->active = TRUE;
   }
 
-  broadcast(NULL, 10 + strlen((char *)&buffer[10])+1, 0);
+  copyNetworkBufferForWriting(read_buffer, write_buffer, player->number);
+
+  SendNetworkBufferToAll(write_buffer);
 }
 
 static void Handle_OP_PAUSE_PLAYING(struct NetworkServerPlayerInfo *player)
@@ -363,7 +632,10 @@ static void Handle_OP_PAUSE_PLAYING(struct NetworkServerPlayerInfo *player)
   if (options.verbose)
     Error(ERR_NETWORK_SERVER, "client %d (%s) pauses game",
 	  player->number, player->player_name);
-  broadcast(NULL, 2, 0);
+
+  copyNetworkBufferForWriting(read_buffer, write_buffer, player->number);
+
+  SendNetworkBufferToAll(write_buffer);
 }
 
 static void Handle_OP_CONTINUE_PLAYING(struct NetworkServerPlayerInfo *player)
@@ -371,65 +643,90 @@ static void Handle_OP_CONTINUE_PLAYING(struct NetworkServerPlayerInfo *player)
   if (options.verbose)
     Error(ERR_NETWORK_SERVER, "client %d (%s) continues game",
 	  player->number, player->player_name);
-  broadcast(NULL, 2, 0);
+
+  copyNetworkBufferForWriting(read_buffer, write_buffer, player->number);
+
+  SendNetworkBufferToAll(write_buffer);
 }
 
 static void Handle_OP_STOP_PLAYING(struct NetworkServerPlayerInfo *player)
 {
-  int cause_for_stopping = buffer[2];
+  int cause_for_stopping = getNetworkBuffer8BitInteger(read_buffer);
 
   if (options.verbose)
     Error(ERR_NETWORK_SERVER, "client %d (%s) stops game [%d]",
 	  player->number, player->player_name, cause_for_stopping);
-  broadcast(NULL, 3, 0);
+
+  copyNetworkBufferForWriting(read_buffer, write_buffer, player->number);
+
+  SendNetworkBufferToAll(write_buffer);
 }
 
 static void Handle_OP_MOVE_PLAYER(struct NetworkServerPlayerInfo *player)
 {
-  struct NetworkServerPlayerInfo *v;
+  int player_action = getNetworkBuffer8BitInteger(read_buffer);
   int last_client_nr = 0;
+  struct NetworkServerPlayerInfo *p;
   int i;
 
   /* store player action */
-  for (v = first_player; v; v = v->next)
+  for (p = first_player; p != NULL; p = p->next)
   {
-    if (v->number == player->number)
+    if (p->number == player->number)
     {
-      v->action = buffer[2];
-      v->action_received = TRUE;
+      p->action = player_action;
+      p->action_received = TRUE;
     }
   }
 
   /* check if server received action from each player */
-  for (v = first_player; v; v = v->next)
+  for (p = first_player; p != NULL; p = p->next)
   {
-    if (!v->action_received)
+    if (!p->action_received)
       return;
 
-    if (v->number > last_client_nr)
-      last_client_nr = v->number;
+    if (p->number > last_client_nr)
+      last_client_nr = p->number;
   }
+
+  int player_action_all[last_client_nr];
 
   /* initialize all player actions to zero */
   for (i = 0; i < last_client_nr; i++)
-    buffer[6 + i] = 0;
+    player_action_all[i] = 0;
 
   /* broadcast actions of all players to all players */
-  for (v = first_player; v; v = v->next)
+  for (p = first_player; p != NULL; p = p->next)
   {
-    buffer[6 + v->number-1] = v->action;
-    v->action = 0;
-    v->action_received = FALSE;
+    player_action_all[p->number - 1] = p->action;
+
+    p->action = 0;
+    p->action_received = FALSE;
   }
 
-  buffer[2] = (unsigned char)((ServerFrameCounter >> 24) & 0xff);
-  buffer[3] = (unsigned char)((ServerFrameCounter >> 16) & 0xff);
-  buffer[4] = (unsigned char)((ServerFrameCounter >>  8) & 0xff);
-  buffer[5] = (unsigned char)((ServerFrameCounter >>  0) & 0xff);
+  initNetworkBufferForWriting(write_buffer, OP_MOVE_PLAYER, player->number);
 
-  broadcast(NULL, 6 + last_client_nr, 0);
+  putNetworkBuffer32BitInteger(write_buffer, ServerFrameCounter);
+
+  for (i = 0; i < last_client_nr; i++)
+    putNetworkBuffer8BitInteger(write_buffer, player_action_all[i]);
+
+  SendNetworkBufferToAll(write_buffer);
 
   ServerFrameCounter++;
+}
+
+static void Handle_OP_BROADCAST_MESSAGE(struct NetworkServerPlayerInfo *player)
+{
+  char *message = getNetworkBufferString(read_buffer);
+
+  if (options.verbose)
+    Error(ERR_NETWORK_SERVER, "client %d (%s) sends message: %s",
+	  player->number, player->player_name, message);
+
+  copyNetworkBufferForWriting(read_buffer, write_buffer, player->number);
+
+  SendNetworkBufferToAllButOne(write_buffer, player);
 }
 
 void ExitNetworkServer(int exit_value)
@@ -452,13 +749,17 @@ int NetworkServerThread(void *ptr)
 void NetworkServer(int port, int serveronly)
 {
   struct NetworkServerPlayerInfo *player;
-  int r; 
-  unsigned int len;
   IPaddress ip;
 
 #if defined(PLATFORM_UNIX) && !defined(PLATFORM_NEXT)
   struct sigaction sact;
 #endif
+
+  if (read_buffer == NULL)
+    read_buffer = newNetworkBuffer();
+
+  if (write_buffer == NULL)
+    write_buffer = newNetworkBuffer();
 
   if (port == 0)
     port = DEFAULT_SERVER_PORT;
@@ -468,7 +769,7 @@ void NetworkServer(int port, int serveronly)
     signal(SIGINT, ExitNetworkServer);
 
   if (!serveronly)
-    onceonly = 1;
+    run_server_only_once = TRUE;
 
 #if defined(PLATFORM_UNIX)
 #if defined(PLATFORM_NEXT)
@@ -509,16 +810,13 @@ void NetworkServer(int port, int serveronly)
   {
     Error(ERR_NETWORK_SERVER, "started up, listening on port %d", port);
     Error(ERR_NETWORK_SERVER, "using protocol version %d.%d.%d",
-	  PROTOCOL_VERSION_1, PROTOCOL_VERSION_2, PROTOCOL_VERSION_3);
+	  PROTOCOL_VERSION_MAJOR,
+	  PROTOCOL_VERSION_MINOR,
+	  PROTOCOL_VERSION_PATCH);
   }
 
   while (1)
   {
-    interrupt = 0;
-
-    for (player = first_player; player; player = player->next)
-      flushuser(player);
-
     // wait for 100 ms for activity on open network sockets
     if (SDLNet_CheckSockets(fds, 100) < 1)
       continue;
@@ -552,108 +850,89 @@ void NetworkServer(int port, int serveronly)
       }
     }
 
-    player = first_player;
-
-    while (player && !interrupt)
+    for (player = first_player; player != NULL; player = player->next)
     {
-      if (SDLNet_SocketReady(player->fd))
+      if (!SDLNet_SocketReady(player->fd))
+	continue;
+
+      initNetworkBufferForReceiving(read_buffer);
+
+      int num_bytes = receiveNetworkBufferPacket(read_buffer, player->fd);
+
+      if (num_bytes <= 0)
       {
-	/* read only 1 byte, because SDLNet blocks when we want more than is
-	   in the buffer */
-	r = SDLNet_TCP_Recv(player->fd, player->readbuffer + player->nread, 1);
+	if (options.verbose)
+	  Error(ERR_NETWORK_SERVER, "EOF from client %d (%s)",
+		player->number, player->player_name);
 
-	if (r <= 0)
-	{
-	  if (options.verbose)
-	    Error(ERR_NETWORK_SERVER, "EOF from client %d (%s)",
-		  player->number, player->player_name);
-	  RemovePlayer(player);
-	  interrupt = 1;
-	  break;
-	}
-	player->nread += r;
-	while (player->nread >= 4 && player->nread >= 4 + player->readbuffer[3])
-	{
-	  len = player->readbuffer[3];
-	  if (player->readbuffer[0] || player->readbuffer[1] || player->readbuffer[2])
-	  {
-	    if (options.verbose)
-	      Error(ERR_NETWORK_SERVER, "crap from client %d (%s)",
-		    player->number, player->player_name);
-	    RemovePlayer(player);
-	    interrupt = 1;
-	    break;
-	  }
-	  memcpy(buffer, &player->readbuffer[4], len);
-	  player->nread -= 4 + len;
-	  memmove(player->readbuffer, player->readbuffer + 4 + len, player->nread);
+	RemovePlayer(player);
 
-	  buffer[0] = player->number;
-	  if (!player->introduced &&
-	      buffer[1] != OP_PLAYER_NAME &&
-	      buffer[1] != OP_PROTOCOL_VERSION)
-	  {
-	    if (options.verbose)
-	      Error(ERR_NETWORK_SERVER, "!(client %d)->introduced && buffer[1]==%d (expected OP_PLAYER_NAME or OP_PROTOCOL_VERSION)", buffer[0], buffer[1]);
-
-	    RemovePlayer(player);
-	    interrupt = 1;
-	    break;
-	  }
-
-	  switch (buffer[1])
-	  {
-	    case OP_PLAYER_NAME:
-	      Handle_OP_PLAYER_NAME(player, len);
-	      break;
-
-	    case OP_PROTOCOL_VERSION:
-	      Handle_OP_PROTOCOL_VERSION(player, len);
-	      break;
-
-	    case OP_NUMBER_WANTED:
-	      Handle_OP_NUMBER_WANTED(player);
-	      break;
-
-	    case OP_START_PLAYING:
-	      Handle_OP_START_PLAYING(player);
-	      break;
-
-	    case OP_PAUSE_PLAYING:
-	      Handle_OP_PAUSE_PLAYING(player);
-	      break;
-
-	    case OP_CONTINUE_PLAYING:
-	      Handle_OP_CONTINUE_PLAYING(player);
-	      break;
-
-	    case OP_STOP_PLAYING:
-	      Handle_OP_STOP_PLAYING(player);
-	      break;
-
-	    case OP_MOVE_PLAYER:
-	      Handle_OP_MOVE_PLAYER(player);
-	      break;
-
-	    case OP_BROADCAST_MESSAGE:
-	      buffer[len] = '\0';
-	      if (options.verbose)
-		Error(ERR_NETWORK_SERVER, "client %d (%s) sends message: %s",
-		      player->number, player->player_name, &buffer[2]);
-	      broadcast(player, len, 0);
-	      break;
-	    
-	    default:
-	      if (options.verbose)
-		Error(ERR_NETWORK_SERVER,
-		      "unknown opcode %d from client %d (%s)",
-		      buffer[0], player->number, player->player_name);
-	  }
-	}
+	break;
       }
 
-      if (player && !interrupt)
-	player = player->next;
+      initNetworkBufferForReading(read_buffer);
+
+      int message_type = getNetworkBuffer8BitInteger(read_buffer);
+
+      /* skip player number */
+      getNetworkBuffer8BitInteger(read_buffer);
+
+      if (!player->introduced &&
+	  message_type != OP_PLAYER_NAME &&
+	  message_type != OP_PROTOCOL_VERSION)
+      {
+	if (options.verbose)
+	  Error(ERR_NETWORK_SERVER, "got opcode %d for client %d which is not introduced yet (expected OP_PLAYER_NAME or OP_PROTOCOL_VERSION)", message_type, player->number);
+
+	RemovePlayer(player);
+
+	break;
+      }
+
+      switch (message_type)
+      {
+	case OP_PROTOCOL_VERSION:
+	  Handle_OP_PROTOCOL_VERSION(player);
+	  break;
+
+	case OP_NUMBER_WANTED:
+	  Handle_OP_NUMBER_WANTED(player);
+	  break;
+
+	case OP_PLAYER_NAME:
+	  Handle_OP_PLAYER_NAME(player);
+	  break;
+
+	case OP_START_PLAYING:
+	  Handle_OP_START_PLAYING(player);
+	  break;
+
+	case OP_PAUSE_PLAYING:
+	  Handle_OP_PAUSE_PLAYING(player);
+	  break;
+
+	case OP_CONTINUE_PLAYING:
+	  Handle_OP_CONTINUE_PLAYING(player);
+	  break;
+
+	case OP_STOP_PLAYING:
+	  Handle_OP_STOP_PLAYING(player);
+	  break;
+
+	case OP_MOVE_PLAYER:
+	  Handle_OP_MOVE_PLAYER(player);
+	  break;
+
+	case OP_BROADCAST_MESSAGE:
+	  Handle_OP_BROADCAST_MESSAGE(player);
+	  break;
+
+	default:
+	  if (options.verbose)
+	    Error(ERR_NETWORK_SERVER,
+		  "unknown opcode %d from client %d (%s)",
+		  message_type, player->number, player->player_name);
+      }
     }
   }
 }

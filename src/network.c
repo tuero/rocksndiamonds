@@ -43,10 +43,9 @@ static TCPsocket sfd;		/* TCP server socket */
 static UDPsocket udp;		/* UDP server socket */
 static SDLNet_SocketSet rfds;	/* socket set */
 
-static byte realbuffer[512];
-static byte readbuffer[MAX_BUFFER_SIZE], writbuffer[MAX_BUFFER_SIZE];
-static byte *buffer = realbuffer + 4;
-static int nread = 0, nwrite = 0;
+static struct NetworkBuffer *read_buffer = NULL;
+static struct NetworkBuffer *write_buffer = NULL;
+
 static boolean stop_network_game = FALSE;
 static boolean stop_network_client = FALSE;
 static char stop_network_client_message[MAX_OUTPUT_LINESIZE + 1];
@@ -128,24 +127,16 @@ static void DrawNetworkText_Title(char *message)
   DrawNetworkTextExt(message, FC_GREEN, TRUE);
 }
 
-static void SendBufferToServer(int size)
+static void SendNetworkBufferToServer(struct NetworkBuffer *nb)
 {
   if (!network.enabled)
     return;
 
-  realbuffer[0] = realbuffer[1] = realbuffer[2] = 0;
-  realbuffer[3] = (byte)size;
-  buffer[0] = 0;
-
-  if (nwrite + 4 + size >= MAX_BUFFER_SIZE)
-    Error(ERR_EXIT, "internal error: network send buffer overflow");
-
-  memcpy(writbuffer + nwrite, realbuffer, 4 + size);
-  nwrite += 4 + size;
+  /* set message length header */
+  putNetwork32BitInteger(nb->buffer, nb->size - 4);
 
   /* directly send the buffer to the network server */
-  SDLNet_TCP_Send(sfd, writbuffer, nwrite);
-  nwrite = 0;
+  SDLNet_TCP_Send(sfd, nb->buffer, nb->size);
 }
 
 struct NetworkClientPlayerInfo *getNetworkPlayer(int player_nr)
@@ -198,6 +189,12 @@ boolean ConnectToServer(char *hostname, int port)
   IPaddress ip;
   int server_host = 0;
   int i;
+
+  if (read_buffer == NULL)
+    read_buffer = newNetworkBuffer();
+
+  if (write_buffer == NULL)
+    write_buffer = newNetworkBuffer();
 
   DrawNetworkText_Title("Initializing Network");
 
@@ -350,107 +347,112 @@ boolean ConnectToServer(char *hostname, int port)
 
 void SendToServer_PlayerName(char *player_name)
 {
-  int len_player_name = strlen(player_name);
+  initNetworkBufferForWriting(write_buffer, OP_PLAYER_NAME, 0);
 
-  buffer[1] = OP_PLAYER_NAME;
-  memcpy(&buffer[2], player_name, len_player_name);
-  SendBufferToServer(2 + len_player_name);
+  putNetworkBufferString(write_buffer, player_name);
+
+  SendNetworkBufferToServer(write_buffer);
+
   Error(ERR_NETWORK_CLIENT, "you set your player name to \"%s\"", player_name);
 }
 
 void SendToServer_ProtocolVersion()
 {
-  buffer[1] = OP_PROTOCOL_VERSION;
-  buffer[2] = PROTOCOL_VERSION_1;
-  buffer[3] = PROTOCOL_VERSION_2;
-  buffer[4] = PROTOCOL_VERSION_3;
+  initNetworkBufferForWriting(write_buffer, OP_PROTOCOL_VERSION, 0);
 
-  SendBufferToServer(5);
+  putNetworkBuffer8BitInteger(write_buffer, PROTOCOL_VERSION_MAJOR);
+  putNetworkBuffer8BitInteger(write_buffer, PROTOCOL_VERSION_MINOR);
+  putNetworkBuffer8BitInteger(write_buffer, PROTOCOL_VERSION_PATCH);
+
+  SendNetworkBufferToServer(write_buffer);
 }
 
 void SendToServer_NrWanted(int nr_wanted)
 {
-  buffer[1] = OP_NUMBER_WANTED;
-  buffer[2] = nr_wanted;
+  initNetworkBufferForWriting(write_buffer, OP_NUMBER_WANTED, 0);
 
-  SendBufferToServer(3);
+  putNetworkBuffer8BitInteger(write_buffer, nr_wanted);
+
+  SendNetworkBufferToServer(write_buffer);
 }
 
 void SendToServer_StartPlaying()
 {
   unsigned int new_random_seed = InitRND(level.random_seed);
 
-  int dummy = 0;		/* !!! HAS NO MEANING ANYMORE !!! */
-				/* the name of the level must be enough */
+  initNetworkBufferForWriting(write_buffer, OP_START_PLAYING, 0);
 
-  buffer[1] = OP_START_PLAYING;
-  buffer[2] = (byte)(level_nr >> 8);
-  buffer[3] = (byte)(level_nr & 0xff);
-  buffer[4] = (byte)(dummy >> 8);
-  buffer[5] = (byte)(dummy & 0xff);
+  putNetworkBufferString(      write_buffer, leveldir_current->identifier);
+  putNetworkBuffer16BitInteger(write_buffer, level_nr);
+  putNetworkBuffer32BitInteger(write_buffer, new_random_seed);
 
-  buffer[6] = (unsigned char)((new_random_seed >> 24) & 0xff);
-  buffer[7] = (unsigned char)((new_random_seed >> 16) & 0xff);
-  buffer[8] = (unsigned char)((new_random_seed >>  8) & 0xff);
-  buffer[9] = (unsigned char)((new_random_seed >>  0) & 0xff);
-
-  strcpy((char *)&buffer[10], leveldir_current->identifier);
-
-  SendBufferToServer(10 + strlen(leveldir_current->identifier) + 1);
+  SendNetworkBufferToServer(write_buffer);
 }
 
 void SendToServer_PausePlaying()
 {
-  buffer[1] = OP_PAUSE_PLAYING;
+  initNetworkBufferForWriting(write_buffer, OP_PAUSE_PLAYING, 0);
 
-  SendBufferToServer(2);
+  SendNetworkBufferToServer(write_buffer);
 }
 
 void SendToServer_ContinuePlaying()
 {
-  buffer[1] = OP_CONTINUE_PLAYING;
+  initNetworkBufferForWriting(write_buffer, OP_CONTINUE_PLAYING, 0);
 
-  SendBufferToServer(2);
+  SendNetworkBufferToServer(write_buffer);
 }
 
 void SendToServer_StopPlaying(int cause_for_stopping)
 {
-  buffer[1] = OP_STOP_PLAYING;
-  buffer[2] = cause_for_stopping;
+  initNetworkBufferForWriting(write_buffer, OP_STOP_PLAYING, 0);
 
-  SendBufferToServer(3);
+  putNetworkBuffer8BitInteger(write_buffer, cause_for_stopping);
+
+  SendNetworkBufferToServer(write_buffer);
 }
 
 void SendToServer_MovePlayer(byte player_action)
 {
-  buffer[1] = OP_MOVE_PLAYER;
-  buffer[2] = player_action;
+  initNetworkBufferForWriting(write_buffer, OP_MOVE_PLAYER, 0);
 
-  SendBufferToServer(3);
+  putNetworkBuffer8BitInteger(write_buffer, player_action);
+
+  SendNetworkBufferToServer(write_buffer);
 }
 
 static void Handle_OP_BAD_PROTOCOL_VERSION()
 {
+  int protocol_version_major = getNetworkBuffer8BitInteger(read_buffer);
+  int protocol_version_minor = getNetworkBuffer8BitInteger(read_buffer);
+
   Error(ERR_WARN, "protocol version mismatch");
   Error(ERR_WARN, "server expects %d.%d.x instead of %d.%d.%d",
-	buffer[2], buffer[3],
-	PROTOCOL_VERSION_1, PROTOCOL_VERSION_2, PROTOCOL_VERSION_3);
+	protocol_version_major,
+	protocol_version_minor,
+	PROTOCOL_VERSION_MAJOR,
+	PROTOCOL_VERSION_MINOR,
+	PROTOCOL_VERSION_PATCH);
 
   sprintf(stop_network_client_message, "Network protocol version mismatch! Server expects version %d.%d.x instead of %d.%d.%d!",
-	  buffer[2], buffer[3],
-	  PROTOCOL_VERSION_1, PROTOCOL_VERSION_2, PROTOCOL_VERSION_3);
+	  protocol_version_major,
+	  protocol_version_minor,
+	  PROTOCOL_VERSION_MAJOR,
+	  PROTOCOL_VERSION_MINOR,
+	  PROTOCOL_VERSION_PATCH);
 
   stop_network_client = TRUE;
 }
 
 static void Handle_OP_YOUR_NUMBER()
 {
-  int new_client_nr = buffer[2];
+  int old_client_nr = getNetworkBuffer8BitInteger(read_buffer);
+  int new_client_nr = getNetworkBuffer8BitInteger(read_buffer);
   int new_index_nr = new_client_nr - 1;
   struct PlayerInfo *old_local_player = local_player;
   struct PlayerInfo *new_local_player = &stored_player[new_index_nr];
 
-  printf("OP_YOUR_NUMBER: %d\n", buffer[0]);
+  printf("OP_YOUR_NUMBER: %d\n", old_client_nr);
   first_player.nr = new_client_nr;
 
   if (old_local_player != new_local_player)
@@ -476,16 +478,16 @@ static void Handle_OP_YOUR_NUMBER()
 
 static void Handle_OP_NUMBER_WANTED()
 {
-  int client_nr_wanted = buffer[2];
-  int old_client_nr = buffer[0];
-  int new_client_nr = buffer[3];
+  int old_client_nr    = getNetworkBuffer8BitInteger(read_buffer);
+  int client_nr_wanted = getNetworkBuffer8BitInteger(read_buffer);
+  int new_client_nr    = getNetworkBuffer8BitInteger(read_buffer);
   int old_index_nr = old_client_nr - 1;
   int new_index_nr = new_client_nr - 1;
   int index_nr_wanted = client_nr_wanted - 1;
   struct PlayerInfo *old_player = &stored_player[old_index_nr];
   struct PlayerInfo *new_player = &stored_player[new_index_nr];
 
-  printf("OP_NUMBER_WANTED: %d\n", buffer[0]);
+  printf("OP_NUMBER_WANTED: %d\n", old_client_nr);
 
   if (new_client_nr == client_nr_wanted)	/* switching succeeded */
   {
@@ -533,23 +535,25 @@ static void Handle_OP_NUMBER_WANTED()
     DrawNetworkPlayers();
 }
 
-static void Handle_OP_PLAYER_NAME(unsigned int len)
+static void Handle_OP_PLAYER_NAME()
 {
-  struct NetworkClientPlayerInfo *player;
-  int player_nr = (int)buffer[0];
+  int player_nr = getNetworkBuffer8BitInteger(read_buffer);
+  char *player_name = getNetworkBufferString(read_buffer);
+  struct NetworkClientPlayerInfo *player = getNetworkPlayer(player_nr);
 
   printf("OP_PLAYER_NAME: %d\n", player_nr);
-  player = getNetworkPlayer(player_nr);
-  buffer[len] = 0;
+
+  strncpy(player->name, player_name, MAX_PLAYER_NAME_LEN);
+  player->name[MAX_PLAYER_NAME_LEN] = '\0';
+
   Error(ERR_NETWORK_CLIENT, "client %d calls itself \"%s\"",
-	buffer[0], &buffer[2]);
-  strncpy(player->name, (char *)&buffer[2], MAX_PLAYER_NAME_LEN);
+	player_nr, player->name);
 }
 
 static void Handle_OP_PLAYER_CONNECTED()
 {
   struct NetworkClientPlayerInfo *player, *last_player = NULL;
-  int new_client_nr = (int)buffer[0];
+  int new_client_nr = getNetworkBuffer8BitInteger(read_buffer);
   int new_index_nr = new_client_nr - 1;
 
   printf("OP_PLAYER_CONNECTED: %d\n", new_client_nr);
@@ -575,13 +579,13 @@ static void Handle_OP_PLAYER_CONNECTED()
 static void Handle_OP_PLAYER_DISCONNECTED()
 {
   struct NetworkClientPlayerInfo *player, *player_disconnected;
-  int player_nr = (int)buffer[0];
+  int player_nr = getNetworkBuffer8BitInteger(read_buffer);
   int index_nr = player_nr - 1;
 
   printf("OP_PLAYER_DISCONNECTED: %d\n", player_nr);
   player_disconnected = getNetworkPlayer(player_nr);
   Error(ERR_NETWORK_CLIENT, "client %d (%s) disconnected",
-	player_nr, getNetworkPlayerName(buffer[0]));
+	player_nr, getNetworkPlayerName(player_nr));
 
   for (player = &first_player; player; player = player->next)
     if (player->next == player_disconnected)
@@ -612,18 +616,14 @@ static void Handle_OP_PLAYER_DISCONNECTED()
 
 static void Handle_OP_START_PLAYING()
 {
-  LevelDirTree *new_leveldir;
-  int new_level_nr;
-  unsigned int new_random_seed;
-  char *new_leveldir_identifier;
+  int player_nr = getNetworkBuffer8BitInteger(read_buffer);
+  char *new_leveldir_identifier = getNetworkBufferString(read_buffer);
+  int new_level_nr = getNetworkBuffer16BitInteger(read_buffer);
+  unsigned int new_random_seed = getNetworkBuffer32BitInteger(read_buffer);
 
-  new_level_nr = (buffer[2] << 8) + buffer[3];
-  new_random_seed =
-    (buffer[6] << 24) | (buffer[7] << 16) | (buffer[8] << 8) | (buffer[9]);
-  new_leveldir_identifier = (char *)&buffer[10];
+  LevelDirTree *new_leveldir =
+    getTreeInfoFromIdentifier(leveldir_first, new_leveldir_identifier);
 
-  new_leveldir = getTreeInfoFromIdentifier(leveldir_first,
-					   new_leveldir_identifier);
   if (new_leveldir == NULL)
   {
     Error(ERR_WARN, "no such level identifier: '%s'", new_leveldir_identifier);
@@ -633,10 +633,10 @@ static void Handle_OP_START_PLAYING()
     return;
   }
 
-  printf("OP_START_PLAYING: %d\n", buffer[0]);
+  printf("OP_START_PLAYING: %d\n", player_nr);
   Error(ERR_NETWORK_CLIENT,
 	"client %d starts game [level %d from level identifier '%s']\n",
-	buffer[0], new_level_nr, new_leveldir->identifier);
+	player_nr, new_level_nr, new_leveldir->identifier);
 
   leveldir_current = new_leveldir;
   level_nr = new_level_nr;
@@ -650,48 +650,56 @@ static void Handle_OP_START_PLAYING()
 
 static void Handle_OP_PAUSE_PLAYING()
 {
-  printf("OP_PAUSE_PLAYING: %d\n", buffer[0]);
-  Error(ERR_NETWORK_CLIENT, "client %d pauses game", buffer[0]);
+  int player_nr = getNetworkBuffer8BitInteger(read_buffer);
+
+  printf("OP_PAUSE_PLAYING: %d\n", player_nr);
+  Error(ERR_NETWORK_CLIENT, "client %d pauses game", player_nr);
 
   if (game_status == GAME_MODE_PLAYING)
   {
     tape.pausing = TRUE;
-    DrawVideoDisplay(VIDEO_STATE_PAUSE_ON,0);
+    DrawVideoDisplay(VIDEO_STATE_PAUSE_ON, 0);
   }
 }
 
 static void Handle_OP_CONTINUE_PLAYING()
 {
-  printf("OP_CONTINUE_PLAYING: %d\n", buffer[0]);
-  Error(ERR_NETWORK_CLIENT, "client %d continues game", buffer[0]);
+  int player_nr = getNetworkBuffer8BitInteger(read_buffer);
+
+  printf("OP_CONTINUE_PLAYING: %d\n", player_nr);
+  Error(ERR_NETWORK_CLIENT, "client %d continues game", player_nr);
 
   if (game_status == GAME_MODE_PLAYING)
   {
     tape.pausing = FALSE;
-    DrawVideoDisplay(VIDEO_STATE_PAUSE_OFF,0);
+    DrawVideoDisplay(VIDEO_STATE_PAUSE_OFF, 0);
   }
 }
 
 static void Handle_OP_STOP_PLAYING()
 {
-  printf("OP_STOP_PLAYING: %d [%d]\n", buffer[0], buffer[2]);
-  Error(ERR_NETWORK_CLIENT, "client %d stops game [%d]", buffer[0], buffer[2]);
+  int client_nr = getNetworkBuffer8BitInteger(read_buffer);
+  int cause_for_stopping = getNetworkBuffer8BitInteger(read_buffer);
+
+  printf("OP_STOP_PLAYING: %d [%d]\n", client_nr, cause_for_stopping);
+  Error(ERR_NETWORK_CLIENT, "client %d stops game [%d]",
+	client_nr, cause_for_stopping);
 
   if (game_status == GAME_MODE_PLAYING)
   {
-    int client_nr = buffer[0];
     int index_nr = client_nr - 1;
     struct PlayerInfo *client_player = &stored_player[index_nr];
     boolean stopped_by_remote_player = (!client_player->connected_locally);
     char message[100];
 
-    sprintf(message, (buffer[2] == NETWORK_STOP_BY_PLAYER ?
+    sprintf(message, (cause_for_stopping == NETWORK_STOP_BY_PLAYER ?
 		      "Network game stopped by player %d!" :
-		      buffer[2] == NETWORK_STOP_BY_ERROR ?
+		      cause_for_stopping == NETWORK_STOP_BY_ERROR ?
 		      "Network game stopped due to internal error!" :
 		      "Network game stopped!"), client_nr);
 
-    if (buffer[2] != NETWORK_STOP_BY_PLAYER || stopped_by_remote_player)
+    if (cause_for_stopping != NETWORK_STOP_BY_PLAYER ||
+	stopped_by_remote_player)
       Request(message, REQ_CONFIRM | REQ_STAY_CLOSED);
 
     SetGameStatus(GAME_MODE_MAIN);
@@ -700,20 +708,19 @@ static void Handle_OP_STOP_PLAYING()
   }
 }
 
-static void Handle_OP_MOVE_PLAYER(unsigned int len)
+static void Handle_OP_MOVE_PLAYER()
 {
-  int server_frame_counter;
+  int player_nr = getNetworkBuffer8BitInteger(read_buffer);
+  int server_frame_counter = getNetworkBuffer32BitInteger(read_buffer);
   int i;
 
   if (!network_playing)
     return;
 
-  server_frame_counter =
-    (buffer[2] << 24) | (buffer[3] << 16) | (buffer[4] << 8) | (buffer[5]);
-
   if (server_frame_counter != FrameCounter)
   {
-    Error(ERR_INFO, "client and servers frame counters out of sync");
+    Error(ERR_INFO, "frame counters of client %d and server out of sync",
+	  player_nr);
     Error(ERR_INFO, "frame counter of client is %d", FrameCounter);
     Error(ERR_INFO, "frame counter of server is %d", server_frame_counter);
     Error(ERR_INFO, "this should not happen -- please debug");
@@ -723,81 +730,84 @@ static void Handle_OP_MOVE_PLAYER(unsigned int len)
     return;
   }
 
-  /* copy valid player actions */
+  /* copy valid player actions (will be set to 0 for not connected players) */
   for (i = 0; i < MAX_PLAYERS; i++)
     stored_player[i].effective_action =
-      (i < len - 6 ? buffer[6 + i] : 0);
+      getNetworkBuffer8BitInteger(read_buffer);
 
   network_player_action_received = TRUE;
 }
 
-static void HandleNetworkingMessages()
+static void Handle_OP_BROADCAST_MESSAGE()
 {
-  unsigned int message_length;
+  int player_nr = getNetworkBuffer8BitInteger(read_buffer);
 
+  printf("OP_BROADCAST_MESSAGE: %d\n", player_nr);
+  Error(ERR_NETWORK_CLIENT, "client %d sends message", player_nr);
+}
+
+static void HandleNetworkingMessage()
+{
   stop_network_game = FALSE;
 
-  while (nread >= 4 && nread >= 4 + readbuffer[3])
+  initNetworkBufferForReading(read_buffer);
+
+  int message_type = getNetworkBuffer8BitInteger(read_buffer);
+
+  switch (message_type)
   {
-    message_length = readbuffer[3];
-    if (readbuffer[0] || readbuffer[1] || readbuffer[2])
-      Error(ERR_EXIT, "wrong network server line length");
+    case OP_BAD_PROTOCOL_VERSION:
+      Handle_OP_BAD_PROTOCOL_VERSION();
+      break;
 
-    memcpy(buffer, &readbuffer[4], message_length);
-    nread -= 4 + message_length;
-    memmove(readbuffer, readbuffer + 4 + message_length, nread);
+    case OP_YOUR_NUMBER:
+      Handle_OP_YOUR_NUMBER();
+      break;
 
-    switch (buffer[1])
-    {
-      case OP_BAD_PROTOCOL_VERSION:
-	Handle_OP_BAD_PROTOCOL_VERSION();
-	break;
+    case OP_NUMBER_WANTED:
+      Handle_OP_NUMBER_WANTED();
+      break;
 
-      case OP_YOUR_NUMBER:
-	Handle_OP_YOUR_NUMBER();
-	break;
+    case OP_PLAYER_NAME:
+      Handle_OP_PLAYER_NAME();
+      break;
 
-      case OP_NUMBER_WANTED:
-	Handle_OP_NUMBER_WANTED();
-	break;
+    case OP_PLAYER_CONNECTED:
+      Handle_OP_PLAYER_CONNECTED();
+      break;
 
-      case OP_PLAYER_NAME:
-	Handle_OP_PLAYER_NAME(message_length);
-	break;
+    case OP_PLAYER_DISCONNECTED:
+      Handle_OP_PLAYER_DISCONNECTED();
+      break;
 
-      case OP_PLAYER_CONNECTED:
-	Handle_OP_PLAYER_CONNECTED();
-	break;
-      
-      case OP_PLAYER_DISCONNECTED:
-	Handle_OP_PLAYER_DISCONNECTED();
-	break;
+    case OP_START_PLAYING:
+      Handle_OP_START_PLAYING();
+      break;
 
-      case OP_START_PLAYING:
-	Handle_OP_START_PLAYING();
-	break;
+    case OP_PAUSE_PLAYING:
+      Handle_OP_PAUSE_PLAYING();
+      break;
 
-      case OP_PAUSE_PLAYING:
-	Handle_OP_PAUSE_PLAYING();
-	break;
+    case OP_CONTINUE_PLAYING:
+      Handle_OP_CONTINUE_PLAYING();
+      break;
 
-      case OP_CONTINUE_PLAYING:
-	Handle_OP_CONTINUE_PLAYING();
-	break;
+    case OP_STOP_PLAYING:
+      Handle_OP_STOP_PLAYING();
+      break;
 
-      case OP_STOP_PLAYING:
-	Handle_OP_STOP_PLAYING();
-	break;
+    case OP_MOVE_PLAYER:
+      Handle_OP_MOVE_PLAYER();
+      break;
 
-      case OP_MOVE_PLAYER:
-	Handle_OP_MOVE_PLAYER(message_length);
-	break;
+    case OP_BROADCAST_MESSAGE:
+      Handle_OP_BROADCAST_MESSAGE();
+      break;
 
-      case OP_BROADCAST_MESSAGE:
-	printf("OP_BROADCAST_MESSAGE: %d\n", buffer[0]);
-	Error(ERR_NETWORK_CLIENT, "client %d sends message", buffer[0]);
-	break;
-    }
+    default:
+      if (options.verbose)
+	Error(ERR_NETWORK_CLIENT,
+	      "unknown opcode %d from server", message_type);
   }
 
   fflush(stdout);
@@ -813,7 +823,7 @@ static char *HandleNetworkingPackets()
   {
     /* ---------- check network server for activity ---------- */
 
-    int num_active_sockets = SDLNet_CheckSockets(rfds, 1);
+    int num_active_sockets = SDLNet_CheckSockets(rfds, 0);
 
     if (num_active_sockets < 0)
       return "Error checking network sockets!";
@@ -823,7 +833,9 @@ static char *HandleNetworkingPackets()
 
     /* ---------- read packets from network server ---------- */
 
-    int num_bytes = SDLNet_TCP_Recv(sfd, readbuffer + nread, 1);
+    initNetworkBufferForReceiving(read_buffer);
+
+    int num_bytes = receiveNetworkBufferPacket(read_buffer, sfd);
 
     if (num_bytes < 0)
       return "Error reading from network server!";
@@ -831,9 +843,7 @@ static char *HandleNetworkingPackets()
     if (num_bytes == 0)
       return "Connection to network server lost!";
 
-    nread += num_bytes;
-
-    HandleNetworkingMessages();
+    HandleNetworkingMessage();
 
     if (stop_network_client)
       return stop_network_client_message;
