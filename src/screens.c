@@ -4532,14 +4532,15 @@ void DrawHallOfFame(int level_nr, int highlight_position)
 
   OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
 
-  HandleHallOfFame(highlight_position, 0, 0, 0, MB_MENU_INITIALIZE);
+  HandleHallOfFame(level_nr, highlight_position, 0, 0, MB_MENU_INITIALIZE);
 
   DrawMaskedBorder(fade_mask);
 
   FadeIn(fade_mask);
 }
 
-static void drawHallOfFameList(int first_entry, int highlight_position)
+static void drawHallOfFameList(int level_nr, int first_entry,
+			       int highlight_position)
 {
   int i, j;
 
@@ -4582,15 +4583,18 @@ static void drawHallOfFameList(int first_entry, int highlight_position)
 
 void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
 {
+  static int level_nr = 0;
   static int first_entry = 0;
   static int highlight_position = 0;
   int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
 
   if (button == MB_MENU_INITIALIZE)
   {
+    level_nr = mx;
     first_entry = 0;
-    highlight_position = mx;
-    drawHallOfFameList(first_entry, highlight_position);
+    highlight_position = my;
+
+    drawHallOfFameList(level_nr, first_entry, highlight_position);
 
     return;
   }
@@ -4606,7 +4610,7 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
       if (first_entry < 0)
 	first_entry = 0;
 
-      drawHallOfFameList(first_entry, highlight_position);
+      drawHallOfFameList(level_nr, first_entry, highlight_position);
     }
   }
   else if (dy > 0)
@@ -4617,7 +4621,7 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
       if (first_entry + NUM_MENU_ENTRIES_ON_SCREEN > MAX_SCORE_ENTRIES)
 	first_entry = MAX(0, MAX_SCORE_ENTRIES - NUM_MENU_ENTRIES_ON_SCREEN);
 
-      drawHallOfFameList(first_entry, highlight_position);
+      drawHallOfFameList(level_nr, first_entry, highlight_position);
     }
   }
   else if (button == MB_MENU_LEAVE || button == MB_MENU_CHOICE)
