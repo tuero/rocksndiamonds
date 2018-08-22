@@ -312,6 +312,25 @@ void putNetworkBufferString(struct NetworkBuffer *nb, char *s)
   nb->size = nb->pos;
 }
 
+void dumpNetworkBuffer(struct NetworkBuffer *nb)
+{
+  int i;
+
+  printf("::: network buffer maximum size: %d\n", nb->max_size);
+  printf("::: network buffer size:         %d\n", nb->size);
+  printf("::: network buffer position    : %d\n", nb->pos);
+
+  for (i = 0; i < nb->size; i++)
+  {
+    if ((i % 16) == 0)
+      printf("\n::: ");
+
+    printf("%02x ", nb->buffer[i]);
+  }
+
+  printf("\n");
+}
+
 static void SendNetworkBufferToAllButOne(struct NetworkBuffer *nb,
 					 struct NetworkServerPlayerInfo *except)
 {

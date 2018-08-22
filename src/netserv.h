@@ -73,6 +73,8 @@ void putNetworkBuffer32BitInteger(struct NetworkBuffer *, int);
 char *getNetworkBufferString(struct NetworkBuffer *);
 void putNetworkBufferString(struct NetworkBuffer *, char *);
 
+void dumpNetworkBuffer(struct NetworkBuffer *);
+
 int NetworkServerThread(void *);
 void NetworkServer(int, int);
 
