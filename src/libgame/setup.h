@@ -250,6 +250,7 @@ char *getCustomMusicDirectory(void);
 void InitTapeDirectory(char *);
 void InitScoreDirectory(char *);
 void InitUserLevelDirectory(char *);
+void InitNetworkLevelDirectory(char *);
 void InitLevelSetupDirectory(char *);
 
 TreeInfo *newTreeInfo();
@@ -276,6 +277,7 @@ char *getPersonalDataDir(void);
 char *getUserGameDataDir(void);
 char *getSetupDir(void);
 char *getUserLevelDir(char *);
+char *getNetworkLevelDir(char *);
 char *getCurrentLevelDir(void);
 char *getNewUserLevelSubdir(void);
 

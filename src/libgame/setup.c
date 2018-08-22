@@ -167,6 +167,16 @@ static char *getCacheDir()
   return cache_dir;
 }
 
+static char *getNetworkDir()
+{
+  static char *network_dir = NULL;
+
+  if (network_dir == NULL)
+    network_dir = getPath2(getUserGameDataDir(), NETWORK_DIRECTORY);
+
+  return network_dir;
+}
+
 static char *getLevelDirFromTreeInfo(TreeInfo *node)
 {
   static char *level_dir = NULL;
@@ -196,6 +206,22 @@ char *getUserLevelDir(char *level_subdir)
     userlevel_dir = getPath2(data_dir, userlevel_subdir);
 
   return userlevel_dir;
+}
+
+char *getNetworkLevelDir(char *level_subdir)
+{
+  static char *network_level_dir = NULL;
+  char *data_dir = getNetworkDir();
+  char *networklevel_subdir = LEVELS_DIRECTORY;
+
+  checked_free(network_level_dir);
+
+  if (level_subdir != NULL)
+    network_level_dir = getPath3(data_dir, networklevel_subdir, level_subdir);
+  else
+    network_level_dir = getPath2(data_dir, networklevel_subdir);
+
+  return network_level_dir;
 }
 
 char *getCurrentLevelDir()
@@ -1046,6 +1072,17 @@ void InitUserLevelDirectory(char *level_subdir)
     createDirectory(getUserLevelDir(level_subdir), "user level", PERMS_PRIVATE);
 
     SaveUserLevelInfo();
+  }
+}
+
+void InitNetworkLevelDirectory(char *level_subdir)
+{
+  if (!directoryExists(getNetworkLevelDir(level_subdir)))
+  {
+    createDirectory(getUserGameDataDir(), "user data", PERMS_PRIVATE);
+    createDirectory(getNetworkDir(), "network data", PERMS_PRIVATE);
+    createDirectory(getNetworkLevelDir(NULL), "main network level", PERMS_PRIVATE);
+    createDirectory(getNetworkLevelDir(level_subdir), "network level", PERMS_PRIVATE);
   }
 }
 
