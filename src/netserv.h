@@ -72,6 +72,8 @@ int getNetworkBuffer32BitInteger(struct NetworkBuffer *);
 void putNetworkBuffer32BitInteger(struct NetworkBuffer *, int);
 char *getNetworkBufferString(struct NetworkBuffer *);
 void putNetworkBufferString(struct NetworkBuffer *, char *);
+int getNetworkBufferFile(struct NetworkBuffer *, char *);
+int putNetworkBufferFile(struct NetworkBuffer *, char *);
 
 void dumpNetworkBuffer(struct NetworkBuffer *);
 

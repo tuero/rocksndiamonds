@@ -312,6 +312,67 @@ void putNetworkBufferString(struct NetworkBuffer *nb, char *s)
   nb->size = nb->pos;
 }
 
+int getNetworkBufferFile(struct NetworkBuffer *nb, char *filename)
+{
+  FILE *file;
+  int num_bytes = getNetworkBuffer32BitInteger(nb);
+  int i;
+
+  if (!(file = fopen(filename, MODE_WRITE)))
+  {
+    Error(ERR_WARN, "cannot write file '%s' from network buffer", filename);
+
+    return 0;
+  }
+
+  for (i = 0; i < num_bytes; i++)
+  {
+    int b = getNetworkBuffer8BitInteger(nb);
+
+    putFile8Bit(file, b);
+  }
+
+  fclose(file);
+
+  return num_bytes;
+}
+
+int putNetworkBufferFile(struct NetworkBuffer *nb, char *filename)
+{
+  File *file;
+  int filesize_pos = nb->pos;
+  int num_bytes = 0;
+
+  /* will be replaced with file size */
+  putNetworkBuffer32BitInteger(nb, 0);
+
+  if (!(file = openFile(filename, MODE_READ)))
+  {
+    Error(ERR_WARN, "cannot read file '%s' to network buffer", filename);
+
+    return 0;
+  }
+
+  while (1)
+  {
+    int b = getFile8Bit(file);
+
+    if (checkEndOfFile(file))
+      break;
+
+    putNetworkBuffer8BitInteger(nb, b);
+
+    num_bytes++;
+  }
+
+  closeFile(file);
+
+  /* set file size */
+  putNetwork32BitInteger(&nb->buffer[filesize_pos], num_bytes);
+
+  return num_bytes;
+}
+
 void dumpNetworkBuffer(struct NetworkBuffer *nb)
 {
   int i;
