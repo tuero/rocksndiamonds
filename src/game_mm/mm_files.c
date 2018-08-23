@@ -97,12 +97,12 @@ void setLevelInfoToDefaults_MM()
 
   native_mm_level.encoding_16bit_field = FALSE;	/* default: only 8-bit elements */
 
-  lev_fieldx = native_mm_level.fieldx = STD_LEV_FIELDX;
-  lev_fieldy = native_mm_level.fieldy = STD_LEV_FIELDY;
+  native_mm_level.fieldx = STD_LEV_FIELDX;
+  native_mm_level.fieldy = STD_LEV_FIELDY;
 
   for (x = 0; x < MAX_LEV_FIELDX; x++)
     for (y = 0; y < MAX_LEV_FIELDY; y++)
-      native_mm_level.field[x][y] = Feld[x][y] = Ur[x][y] = EL_EMPTY;
+      native_mm_level.field[x][y] = Ur[x][y] = EL_EMPTY;
 
   native_mm_level.time = 100;
   native_mm_level.kettles_needed = 0;
@@ -127,9 +127,8 @@ void setLevelInfoToDefaults_MM()
   for (i = 0; i < LEVEL_SCORE_ELEMENTS; i++)
     native_mm_level.score[i] = 10;
 
-  native_mm_level.field[0][0] = Feld[0][0] = Ur[0][0] = EL_MCDUFFIN_RIGHT;
+  native_mm_level.field[0][0] = Ur[0][0] = EL_MCDUFFIN_RIGHT;
   native_mm_level.field[STD_LEV_FIELDX-1][STD_LEV_FIELDY-1] =
-    Feld[STD_LEV_FIELDX-1][STD_LEV_FIELDY-1] =
     Ur[STD_LEV_FIELDX-1][STD_LEV_FIELDY-1] = EL_EXIT_CLOSED;
 }
 
@@ -158,8 +157,8 @@ static int LoadLevel_MM_HEAD(File *file, int chunk_size,
   int i;
   int laser_color;
 
-  lev_fieldx = level->fieldx = getFile8Bit(file);
-  lev_fieldy = level->fieldy = getFile8Bit(file);
+  level->fieldx = getFile8Bit(file);
+  level->fieldy = getFile8Bit(file);
 
   level->time           = getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN);
   level->kettles_needed = getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN);
@@ -236,7 +235,7 @@ static int LoadLevel_MM_BODY(File *file, int chunk_size,
 
   for (y = 0; y < level->fieldy; y++)
     for (x = 0; x < level->fieldx; x++)
-      native_mm_level.field[x][y] = Feld[x][y] = Ur[x][y] =
+      native_mm_level.field[x][y] = Ur[x][y] =
 	checkLevelElement(level->encoding_16bit_field ?
 			  getFile16BitInteger(file, BYTE_ORDER_BIG_ENDIAN) :
 			  getFile8Bit(file));
