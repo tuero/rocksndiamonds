@@ -13147,7 +13147,8 @@ static void HandleCheckbuttons(struct GadgetInfo *gi)
   if ((type_id >= ED_CHECKBUTTON_ID_LEVELSET_FIRST &&
        type_id <= ED_CHECKBUTTON_ID_LEVELSET_LAST) ||
       (type_id >= ED_CHECKBUTTON_ID_EDITOR_FIRST &&
-       type_id <= ED_CHECKBUTTON_ID_EDITOR_LAST) ||
+       type_id <= ED_CHECKBUTTON_ID_EDITOR_LAST &&
+       type_id != ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE_2) ||
       type_id == ED_CHECKBUTTON_ID_STICK_ELEMENT)
     return;
 
