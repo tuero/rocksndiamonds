@@ -1855,8 +1855,9 @@ static void setFileInfoToDefaults(struct LevelFileInfo *level_file_info)
   level_file_info->nr = 0;
   level_file_info->type = LEVEL_FILE_TYPE_UNKNOWN;
   level_file_info->packed = FALSE;
-  level_file_info->basename = NULL;
-  level_file_info->filename = NULL;
+
+  setString(&level_file_info->basename, NULL);
+  setString(&level_file_info->filename, NULL);
 }
 
 int getMappedElement_SB(int, boolean);
@@ -2088,8 +2089,9 @@ static void setLevelFileInfo_SingleLevelFilename(struct LevelFileInfo *lfi,
 {
   lfi->type = type;
   lfi->packed = FALSE;
-  lfi->basename = getSingleLevelBasename(lfi->nr, lfi->type);
-  lfi->filename = getLevelFilenameFromBasename(lfi->basename);
+
+  setString(&lfi->basename, getSingleLevelBasename(lfi->nr, lfi->type));
+  setString(&lfi->filename, getLevelFilenameFromBasename(lfi->basename));
 }
 #endif
 
@@ -2105,8 +2107,9 @@ static void setLevelFileInfo_FormatLevelFilename(struct LevelFileInfo *lfi,
 
   lfi->type = type;
   lfi->packed = FALSE;
-  lfi->basename = basename;
-  lfi->filename = getLevelFilenameFromBasename(lfi->basename);
+
+  setString(&lfi->basename, basename);
+  setString(&lfi->filename, getLevelFilenameFromBasename(lfi->basename));
 }
 
 static void setLevelFileInfo_PackedLevelFilename(struct LevelFileInfo *lfi,
@@ -2114,8 +2117,9 @@ static void setLevelFileInfo_PackedLevelFilename(struct LevelFileInfo *lfi,
 {
   lfi->type = type;
   lfi->packed = TRUE;
-  lfi->basename = getPackedLevelBasename(lfi->type);
-  lfi->filename = getLevelFilenameFromBasename(lfi->basename);
+
+  setString(&lfi->basename, getPackedLevelBasename(lfi->type));
+  setString(&lfi->filename, getLevelFilenameFromBasename(lfi->basename));
 }
 
 static int getFiletypeFromID(char *filetype_id)
@@ -2187,7 +2191,7 @@ static void determineLevelFileInfo_Filename(struct LevelFileInfo *lfi)
 					 getSingleLevelBasename(-1));
 
     /* replace local level template filename with global template filename */
-    lfi->filename = getGlobalLevelTemplateFilename();
+    setString(&lfi->filename, getGlobalLevelTemplateFilename());
 
     /* no fallback if template file not existing */
     return;
@@ -6201,7 +6205,8 @@ void LoadLevelFromFilename(struct LevelInfo *level, char *filename)
 
   level_file_info.nr = 0;			/* unknown level number */
   level_file_info.type = LEVEL_FILE_TYPE_RND;	/* no others supported yet */
-  level_file_info.filename = filename;
+
+  setString(&level_file_info.filename, filename);
 
   LoadLevelFromFileInfo(level, &level_file_info, FALSE);
 }
