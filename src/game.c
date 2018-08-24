@@ -2224,7 +2224,8 @@ void UpdateGameControlValues()
 
   /* update game panel control values */
 
-  game_panel_controls[GAME_PANEL_LEVEL_NUMBER].value = level_nr;
+  /* use "level.file_info.nr" instead of "level_nr" (for network games) */
+  game_panel_controls[GAME_PANEL_LEVEL_NUMBER].value = level.file_info.nr;
   game_panel_controls[GAME_PANEL_GEMS].value = gems;
 
   game_panel_controls[GAME_PANEL_INVENTORY_COUNT].value = 0;
