@@ -1935,14 +1935,13 @@ static void ActivateLevelTemplate()
 
 static char *getLevelFilenameFromBasename(char *basename)
 {
-  static char *filename[2] = { NULL, NULL };
-  int pos = (strEqual(basename, LEVELTEMPLATE_FILENAME) ? 0 : 1);
+  static char *filename = NULL;
 
-  checked_free(filename[pos]);
+  checked_free(filename);
 
-  filename[pos] = getPath2(getCurrentLevelDir(), basename);
+  filename = getPath2(getCurrentLevelDir(), basename);
 
-  return filename[pos];
+  return filename;
 }
 
 static int getFileTypeFromBasename(char *basename)
