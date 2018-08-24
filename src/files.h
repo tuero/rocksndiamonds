@@ -37,6 +37,7 @@ void LoadLevelFromFilename(struct LevelInfo *, char *);
 void LoadLevel(int);
 void LoadLevelTemplate(int);
 void LoadLevelInfoOnly(int);
+void LoadLevelFromNetwork(struct LevelFileInfo *, struct LevelFileInfo *);
 void SaveLevel(int);
 void SaveLevelTemplate();
 void SaveNativeLevel(struct LevelInfo *);

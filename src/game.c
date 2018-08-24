@@ -11228,6 +11228,7 @@ void StartGameActions(boolean init_network_game, boolean record_tape,
 
   if (init_network_game)
   {
+    SendToServer_LevelFile();
     SendToServer_StartPlaying();
 
     return;

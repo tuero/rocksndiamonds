@@ -2287,6 +2287,17 @@ static void setLevelFileInfo(struct LevelFileInfo *level_file_info, int nr)
   determineLevelFileInfo_Filetype(level_file_info);
 }
 
+static void copyLevelFileInfo(struct LevelFileInfo *lfi_from,
+			      struct LevelFileInfo *lfi_to)
+{
+  lfi_to->nr     = lfi_from->nr;
+  lfi_to->type   = lfi_from->type;
+  lfi_to->packed = lfi_from->packed;
+
+  setString(&lfi_to->basename, lfi_from->basename);
+  setString(&lfi_to->filename, lfi_from->filename);
+}
+
 /* ------------------------------------------------------------------------- */
 /* functions for loading R'n'D level                                         */
 /* ------------------------------------------------------------------------- */
@@ -6582,6 +6593,16 @@ static void LoadLevel_InitNativeEngines(struct LevelInfo *level)
     CopyNativeLevel_RND_to_Native(level);
 }
 
+static void LoadLevelTemplate_LoadAndInit()
+{
+  LoadLevelFromFileInfo(&level_template, &level_template.file_info, FALSE);
+
+  LoadLevel_InitVersion(&level_template);
+  LoadLevel_InitElements(&level_template);
+
+  ActivateLevelTemplate();
+}
+
 void LoadLevelTemplate(int nr)
 {
   if (!fileExists(getGlobalLevelTemplateFilename()))
@@ -6593,22 +6614,27 @@ void LoadLevelTemplate(int nr)
 
   setLevelFileInfo(&level_template.file_info, nr);
 
-  LoadLevelFromFileInfo(&level_template, &level_template.file_info, FALSE);
-
-  LoadLevel_InitVersion(&level_template);
-  LoadLevel_InitElements(&level_template);
-
-  ActivateLevelTemplate();
+  LoadLevelTemplate_LoadAndInit();
 }
 
-void LoadLevel(int nr)
+static void LoadLevelTemplateFromNetwork(struct LevelFileInfo *lfi_network_template)
 {
-  setLevelFileInfo(&level.file_info, nr);
+  copyLevelFileInfo(lfi_network_template, &level_template.file_info);
 
+  LoadLevelTemplate_LoadAndInit();
+}
+
+static void LoadLevel_LoadAndInit(struct LevelFileInfo *lfi_network_template)
+{
   LoadLevelFromFileInfo(&level, &level.file_info, FALSE);
 
   if (level.use_custom_template)
-    LoadLevelTemplate(-1);
+  {
+    if (lfi_network_template != NULL)
+      LoadLevelTemplateFromNetwork(lfi_network_template);
+    else
+      LoadLevelTemplate(-1);
+  }
 
   LoadLevel_InitVersion(&level);
   LoadLevel_InitElements(&level);
@@ -6617,11 +6643,26 @@ void LoadLevel(int nr)
   LoadLevel_InitNativeEngines(&level);
 }
 
+void LoadLevel(int nr)
+{
+  setLevelFileInfo(&level.file_info, nr);
+
+  LoadLevel_LoadAndInit(NULL);
+}
+
 void LoadLevelInfoOnly(int nr)
 {
   setLevelFileInfo(&level.file_info, nr);
 
   LoadLevelFromFileInfo(&level, &level.file_info, TRUE);
+}
+
+void LoadLevelFromNetwork(struct LevelFileInfo *lfi_network_level,
+			  struct LevelFileInfo *lfi_network_template)
+{
+  copyLevelFileInfo(lfi_network_level, &level.file_info);
+
+  LoadLevel_LoadAndInit(lfi_network_template);
 }
 
 static int SaveLevel_VERS(FILE *file, struct LevelInfo *level)

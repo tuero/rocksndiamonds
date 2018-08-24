@@ -23,6 +23,7 @@ boolean ConnectToServer(char *, int);
 void SendToServer_PlayerName(char *);
 void SendToServer_ProtocolVersion(void);
 void SendToServer_NrWanted(int);
+void SendToServer_LevelFile(void);
 void SendToServer_StartPlaying(void);
 void SendToServer_PausePlaying(void);
 void SendToServer_ContinuePlaying(void);

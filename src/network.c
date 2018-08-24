@@ -37,6 +37,15 @@ static struct NetworkClientPlayerInfo first_player =
   NULL
 };
 
+struct NetworkLevelFileInfo
+{
+  char *leveldir_identifier;
+  struct LevelFileInfo file_info;
+  struct LevelFileInfo tmpl_info;
+  boolean use_network_level_files;
+  boolean use_custom_template;
+};
+
 /* server stuff */
 
 static TCPsocket sfd;		/* TCP server socket */
@@ -49,6 +58,8 @@ static struct NetworkBuffer *write_buffer = NULL;
 static boolean stop_network_game = FALSE;
 static boolean stop_network_client = FALSE;
 static char stop_network_client_message[MAX_OUTPUT_LINESIZE + 1];
+
+static struct NetworkLevelFileInfo network_level;
 
 static void DrawNetworkTextExt(char *message, int font_nr, boolean initialize)
 {
@@ -376,6 +387,44 @@ void SendToServer_NrWanted(int nr_wanted)
   SendNetworkBufferToServer(write_buffer);
 }
 
+void SendToServer_LevelFile()
+{
+  initNetworkBufferForWriting(write_buffer, OP_LEVEL_FILE, 0);
+
+  putNetworkBufferString(      write_buffer, leveldir_current->identifier);
+  putNetworkBuffer16BitInteger(write_buffer, level.file_info.nr);
+  putNetworkBuffer8BitInteger( write_buffer, level.file_info.type);
+  putNetworkBuffer8BitInteger( write_buffer, level.file_info.packed);
+  putNetworkBufferString(      write_buffer, level.file_info.basename);
+  putNetworkBufferFile(        write_buffer, level.file_info.filename);
+  putNetworkBuffer8BitInteger( write_buffer, level.use_custom_template);
+
+  if (level.use_custom_template)
+  {
+    putNetworkBufferString(write_buffer, level_template.file_info.basename);
+    putNetworkBufferFile(  write_buffer, level_template.file_info.filename);
+  }
+
+  SendNetworkBufferToServer(write_buffer);
+
+  setString(&network_level.leveldir_identifier, leveldir_current->identifier);
+
+  /* the sending client does not use network level files (but the real ones) */
+  network_level.use_network_level_files = FALSE;
+
+#if 0
+  printf("::: '%s'\n", leveldir_current->identifier);
+  printf("::: '%d'\n", level.file_info.nr);
+  printf("::: '%d'\n", level.file_info.type);
+  printf("::: '%d'\n", level.file_info.packed);
+  printf("::: '%s'\n", level.file_info.basename);
+  printf("::: '%s'\n", level.file_info.filename);
+
+  if (level.use_custom_template)
+    printf("::: '%s'\n", level_template.file_info.filename);
+#endif
+}
+
 void SendToServer_StartPlaying()
 {
   unsigned int new_random_seed = InitRND(level.random_seed);
@@ -621,10 +670,7 @@ static void Handle_OP_START_PLAYING()
   int new_level_nr = getNetworkBuffer16BitInteger(read_buffer);
   unsigned int new_random_seed = getNetworkBuffer32BitInteger(read_buffer);
 
-  LevelDirTree *new_leveldir =
-    getTreeInfoFromIdentifier(leveldir_first, new_leveldir_identifier);
-
-  if (new_leveldir == NULL)
+  if (!strEqual(new_leveldir_identifier, network_level.leveldir_identifier))
   {
     Error(ERR_WARN, "no such level identifier: '%s'", new_leveldir_identifier);
 
@@ -636,14 +682,24 @@ static void Handle_OP_START_PLAYING()
   printf("OP_START_PLAYING: %d\n", player_nr);
   Error(ERR_NETWORK_CLIENT,
 	"client %d starts game [level %d from level identifier '%s']\n",
-	player_nr, new_level_nr, new_leveldir->identifier);
+	player_nr, new_level_nr, new_leveldir_identifier);
 
-  leveldir_current = new_leveldir;
-  level_nr = new_level_nr;
+  LevelDirTree *new_leveldir =
+    getTreeInfoFromIdentifier(leveldir_first, new_leveldir_identifier);
+
+  if (new_leveldir != NULL)
+  {
+    leveldir_current = new_leveldir;
+    level_nr = new_level_nr;
+  }
 
   TapeErase();
-  LoadTape(level_nr);
-  LoadLevel(level_nr);
+
+  if (network_level.use_network_level_files)
+    LoadLevelFromNetwork(&network_level.file_info,
+			 &network_level.tmpl_info);
+  else
+    LoadLevel(level_nr);
 
   StartGameActions(FALSE, setup.autorecord, new_random_seed);
 }
@@ -746,6 +802,66 @@ static void Handle_OP_BROADCAST_MESSAGE()
   Error(ERR_NETWORK_CLIENT, "client %d sends message", player_nr);
 }
 
+static void Handle_OP_LEVEL_FILE()
+{
+  int player_nr = getNetworkBuffer8BitInteger(read_buffer);
+  char *leveldir_identifier;
+  char *network_level_dir;
+  struct LevelFileInfo *file_info = &network_level.file_info;
+  struct LevelFileInfo *tmpl_info = &network_level.tmpl_info;
+  boolean use_custom_template;
+
+  setString(&network_level.leveldir_identifier, NULL);
+  setString(&network_level.file_info.basename,  NULL);
+  setString(&network_level.file_info.filename,  NULL);
+  setString(&network_level.tmpl_info.basename,  NULL);
+  setString(&network_level.tmpl_info.filename,  NULL);
+
+  printf("OP_LEVEL_FILE: %d\n", player_nr);
+
+  leveldir_identifier = getStringCopy(getNetworkBufferString(read_buffer));
+  network_level_dir   = getNetworkLevelDir(leveldir_identifier);
+
+  file_info->nr       = getNetworkBuffer16BitInteger(read_buffer);
+  file_info->type     = getNetworkBuffer8BitInteger(read_buffer);
+  file_info->packed   = getNetworkBuffer8BitInteger(read_buffer);
+  file_info->basename = getStringCopy(getNetworkBufferString(read_buffer));
+  file_info->filename = getPath2(network_level_dir, file_info->basename);
+
+  InitNetworkLevelDirectory(leveldir_identifier);
+
+  getNetworkBufferFile(read_buffer, file_info->filename);
+
+  use_custom_template = getNetworkBuffer8BitInteger(read_buffer);
+  if (use_custom_template)
+  {
+    *tmpl_info = *file_info;
+
+    tmpl_info->basename = getStringCopy(getNetworkBufferString(read_buffer));
+    tmpl_info->filename = getPath2(network_level_dir, tmpl_info->basename);
+
+    getNetworkBufferFile(read_buffer, tmpl_info->filename);
+  }
+
+  network_level.leveldir_identifier = leveldir_identifier;
+  network_level.use_custom_template = use_custom_template;
+
+  /* the receiving client(s) use(s) the transferred network level files */
+  network_level.use_network_level_files = TRUE;
+
+#if 0
+  printf("::: '%s'\n", leveldir_identifier);
+  printf("::: '%d'\n", file_info->nr);
+  printf("::: '%d'\n", file_info->type);
+  printf("::: '%d'\n", file_info->packed);
+  printf("::: '%s'\n", file_info->basename);
+  printf("::: '%s'\n", file_info->filename);
+
+  if (use_custom_template)
+    printf("::: '%s'\n", tmpl_info->filename);
+#endif
+}
+
 static void HandleNetworkingMessage()
 {
   stop_network_game = FALSE;
@@ -802,6 +918,10 @@ static void HandleNetworkingMessage()
 
     case OP_BROADCAST_MESSAGE:
       Handle_OP_BROADCAST_MESSAGE();
+      break;
+
+    case OP_LEVEL_FILE:
+      Handle_OP_LEVEL_FILE();
       break;
 
     default:

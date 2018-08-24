@@ -33,6 +33,7 @@
 #define OP_STOP_PLAYING		11
 #define OP_MOVE_PLAYER		12
 #define OP_BROADCAST_MESSAGE	13
+#define OP_LEVEL_FILE		14
 
 #define MAX_BUFFER_SIZE		4096
 

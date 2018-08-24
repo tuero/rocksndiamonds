@@ -809,6 +809,13 @@ static void Handle_OP_BROADCAST_MESSAGE(struct NetworkServerPlayerInfo *player)
   SendNetworkBufferToAllButOne(write_buffer, player);
 }
 
+static void Handle_OP_LEVEL_FILE(struct NetworkServerPlayerInfo *player)
+{
+  copyNetworkBufferForWriting(read_buffer, write_buffer, player->number);
+
+  SendNetworkBufferToAllButOne(write_buffer, player);
+}
+
 void ExitNetworkServer(int exit_value)
 {
   Error(ERR_NETWORK_SERVER, "exiting network server");
@@ -1005,6 +1012,10 @@ void NetworkServer(int port, int serveronly)
 
 	case OP_BROADCAST_MESSAGE:
 	  Handle_OP_BROADCAST_MESSAGE(player);
+	  break;
+
+	case OP_LEVEL_FILE:
+	  Handle_OP_LEVEL_FILE(player);
 	  break;
 
 	default:
