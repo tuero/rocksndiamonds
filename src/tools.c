@@ -8115,7 +8115,7 @@ int getBeltSwitchElementFromBeltNrAndBeltDir(int belt_nr, int belt_dir)
 
 boolean getTeamMode_EM()
 {
-  return game.team_mode;
+  return game.team_mode || network_playing;
 }
 
 int getGameFrameDelay_EM(int native_em_game_frame_delay)
