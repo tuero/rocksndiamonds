@@ -4703,7 +4703,8 @@ void GameEnd()
   }
 
   if (setup.increment_levels &&
-      level_nr < leveldir_current->last_level)
+      level_nr < leveldir_current->last_level &&
+      !network_playing)
   {
     level_nr++;		/* advance to next level */
     TapeErase();	/* start with empty tape */
