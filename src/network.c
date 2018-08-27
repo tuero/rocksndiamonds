@@ -22,6 +22,7 @@
 #include "files.h"
 #include "tools.h"
 #include "screens.h"
+#include "init.h"
 
 struct NetworkClientPlayerInfo
 {
@@ -692,6 +693,9 @@ static void Handle_OP_START_PLAYING()
     leveldir_current = new_leveldir;
     level_nr = new_level_nr;
   }
+
+  /* needed if level set of network game changed graphics, sounds or music */
+  ReloadCustomArtwork(0);
 
   TapeErase();
 
