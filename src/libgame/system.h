@@ -1566,6 +1566,11 @@ struct MouseActionInfo
   int button_hint;
 };
 
+struct LevelSetInfo
+{
+  int music[MAX_LEVELS];
+};
+
 struct LevelStats
 {
   int played;
@@ -1595,6 +1600,7 @@ extern LevelDirTree	       *leveldir_first;
 extern LevelDirTree	       *leveldir_current;
 extern int			level_nr;
 
+extern struct LevelSetInfo	levelset;
 extern struct LevelStats	level_stats[];
 
 extern DrawWindow	       *window;

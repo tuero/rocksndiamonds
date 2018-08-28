@@ -133,7 +133,6 @@ int			TimeFrames, TimePlayed, TimeLeft, TapeTime;
 
 boolean			network_player_action_received = FALSE;
 
-struct LevelSetInfo	levelset;
 struct LevelInfo	level, level_template;
 struct PlayerInfo	stored_player[MAX_PLAYERS], *local_player = NULL;
 struct HiScore		highscore[MAX_SCORE_ENTRIES];

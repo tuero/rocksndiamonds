@@ -2966,11 +2966,6 @@ struct EnvelopeInfo
   char text[MAX_ENVELOPE_TEXT_LEN + 1];
 };
 
-struct LevelSetInfo
-{
-  int music[MAX_LEVELS];
-};
-
 struct LevelFileInfo
 {
   int nr;
@@ -3623,7 +3618,6 @@ extern boolean			network_player_action_received;
 
 extern int			graphics_action_mapping[];
 
-extern struct LevelSetInfo	levelset;
 extern struct LevelInfo		level, level_template;
 extern struct HiScore		highscore[];
 extern struct TapeInfo		tape;
