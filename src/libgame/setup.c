@@ -569,7 +569,9 @@ char *getScoreFilename(int nr)
   checked_free(filename);
 
   sprintf(basename, "%03d.%s", nr, SCOREFILE_EXTENSION);
-  filename = getPath2(getScoreDir(leveldir_current->subdir), basename);
+
+  /* used instead of "leveldir_current->subdir" (for network games) */
+  filename = getPath2(getScoreDir(levelset.identifier), basename);
 
   return filename;
 }

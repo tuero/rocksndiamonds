@@ -2224,8 +2224,8 @@ void UpdateGameControlValues()
 
   /* update game panel control values */
 
-  /* use "level.file_info.nr" instead of "level_nr" (for network games) */
-  game_panel_controls[GAME_PANEL_LEVEL_NUMBER].value = level.file_info.nr;
+  /* used instead of "level_nr" (for network games) */
+  game_panel_controls[GAME_PANEL_LEVEL_NUMBER].value = levelset.level_nr;
   game_panel_controls[GAME_PANEL_GEMS].value = gems;
 
   game_panel_controls[GAME_PANEL_INVENTORY_COUNT].value = 0;
@@ -4661,7 +4661,6 @@ void GameWon()
 void GameEnd()
 {
   int hi_pos;
-  int last_level_nr = level_nr;
 
   local_player->LevelSolved_GameEnd = TRUE;
 
@@ -4717,13 +4716,14 @@ void GameEnd()
     }
   }
 
-  hi_pos = NewHiScore(last_level_nr);
+  /* used instead of last "level_nr" (for network games) */
+  hi_pos = NewHiScore(levelset.level_nr);
 
   if (hi_pos >= 0 && !setup.skip_scores_after_game)
   {
     SetGameStatus(GAME_MODE_SCORES);
 
-    DrawHallOfFame(last_level_nr, hi_pos);
+    DrawHallOfFame(levelset.level_nr, hi_pos);
   }
   else if (setup.auto_play_next_level && setup.increment_levels &&
 	   !network_playing)

@@ -8281,7 +8281,8 @@ void SaveScore(int nr)
   char *filename = getScoreFilename(nr);
   FILE *file;
 
-  InitScoreDirectory(leveldir_current->subdir);
+  /* used instead of "leveldir_current->subdir" (for network games) */
+  InitScoreDirectory(levelset.identifier);
 
   if (!(file = fopen(filename, MODE_WRITE)))
   {
