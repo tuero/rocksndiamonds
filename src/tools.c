@@ -9391,6 +9391,13 @@ void ResetFontStatus()
   SetFontStatus(-1);
 }
 
+void SetLevelSetInfo(char *identifier, int level_nr)
+{
+  setString(&levelset.identifier, identifier);
+
+  levelset.level_nr = level_nr;
+}
+
 boolean CheckIfPlayfieldViewportHasChanged()
 {
   // if game status has not changed, playfield viewport has not changed either

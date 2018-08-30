@@ -1591,6 +1591,8 @@ void DrawMainMenu()
 
   init_last = init;			/* switch to new busy animation */
 
+  SetLevelSetInfo(leveldir_current->identifier, level_nr);
+
   /* needed if last screen (level choice) changed graphics, sounds or music */
   ReloadCustomArtwork(0);
 

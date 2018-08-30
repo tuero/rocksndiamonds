@@ -5489,6 +5489,8 @@ static void InitLevelInfo()
     if (leveldir_current == NULL)
       leveldir_current = getFirstValidTreeInfoEntry(leveldir_first);
   }
+
+  SetLevelSetInfo(leveldir_current->identifier, level_nr);
 }
 
 static void InitLevelArtworkInfo()

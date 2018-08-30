@@ -1569,6 +1569,9 @@ struct MouseActionInfo
 struct LevelSetInfo
 {
   int music[MAX_LEVELS];
+
+  char *identifier;
+  int level_nr;
 };
 
 struct LevelStats

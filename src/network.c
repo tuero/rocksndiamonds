@@ -694,6 +694,8 @@ static void Handle_OP_START_PLAYING()
     level_nr = new_level_nr;
   }
 
+  SetLevelSetInfo(new_leveldir_identifier, new_level_nr);
+
   /* needed if level set of network game changed graphics, sounds or music */
   ReloadCustomArtwork(0);
 

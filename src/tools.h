@@ -278,6 +278,8 @@ void SetGameStatus(int);
 void SetFontStatus(int);
 void ResetFontStatus();
 
+void SetLevelSetInfo(char *, int);
+
 void ToggleFullscreenOrChangeWindowScalingIfNeeded();
 void ChangeViewportPropertiesIfNeeded();
 
