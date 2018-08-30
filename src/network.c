@@ -824,6 +824,9 @@ static void Handle_OP_LEVEL_FILE()
   printf("OP_LEVEL_FILE: %d\n", player_nr);
 
   leveldir_identifier = getStringCopy(getNetworkBufferString(read_buffer));
+
+  InitNetworkLevelDirectory(leveldir_identifier);
+
   network_level_dir   = getNetworkLevelDir(leveldir_identifier);
 
   file_info->nr       = getNetworkBuffer16BitInteger(read_buffer);
@@ -831,8 +834,6 @@ static void Handle_OP_LEVEL_FILE()
   file_info->packed   = getNetworkBuffer8BitInteger(read_buffer);
   file_info->basename = getStringCopy(getNetworkBufferString(read_buffer));
   file_info->filename = getPath2(network_level_dir, file_info->basename);
-
-  InitNetworkLevelDirectory(leveldir_identifier);
 
   getNetworkBufferFile(read_buffer, file_info->filename);
 
