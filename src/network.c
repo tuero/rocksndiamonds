@@ -182,6 +182,11 @@ char *getNetworkPlayerName(int player_nr)
   return(EMPTY_PLAYER_NAME);
 }
 
+static boolean hasPathSeparator(char *s)
+{
+  return (strchr(s, '/') != NULL);
+}
+
 static void StartNetworkServer(int port)
 {
   static int p;
@@ -827,6 +832,9 @@ static void Handle_OP_LEVEL_FILE()
 
   leveldir_identifier = getStringCopy(getNetworkBufferString(read_buffer));
 
+  if (hasPathSeparator(leveldir_identifier))
+    Error(ERR_EXIT, "protocol error: invalid filename from network client");
+
   InitNetworkLevelDirectory(leveldir_identifier);
 
   network_level_dir   = getNetworkLevelDir(leveldir_identifier);
@@ -837,6 +845,9 @@ static void Handle_OP_LEVEL_FILE()
   file_info->basename = getStringCopy(getNetworkBufferString(read_buffer));
   file_info->filename = getPath2(network_level_dir, file_info->basename);
 
+  if (hasPathSeparator(file_info->basename))
+    Error(ERR_EXIT, "protocol error: invalid filename from network client");
+
   getNetworkBufferFile(read_buffer, file_info->filename);
 
   use_custom_template = getNetworkBuffer8BitInteger(read_buffer);
@@ -846,6 +857,9 @@ static void Handle_OP_LEVEL_FILE()
 
     tmpl_info->basename = getStringCopy(getNetworkBufferString(read_buffer));
     tmpl_info->filename = getPath2(network_level_dir, tmpl_info->basename);
+
+    if (hasPathSeparator(tmpl_info->basename))
+      Error(ERR_EXIT, "protocol error: invalid filename from network client");
 
     getNetworkBufferFile(read_buffer, tmpl_info->filename);
   }
