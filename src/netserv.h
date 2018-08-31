@@ -36,6 +36,7 @@
 #define OP_LEVEL_FILE		14
 
 #define MAX_BUFFER_SIZE		4096
+#define MAX_PACKET_SIZE		1048576
 
 
 struct NetworkBuffer

@@ -187,6 +187,14 @@ static void increaseNetworkBuffer(struct NetworkBuffer *nb, int additional_size)
 int receiveNetworkBufferBytes(struct NetworkBuffer *nb, TCPsocket socket,
 			     int num_bytes)
 {
+  if (num_bytes > MAX_PACKET_SIZE)
+  {
+    Error(ERR_NETWORK_SERVER, "protocol error: invalid packet size %d",
+	  num_bytes);
+
+    return -1;
+  }
+
   if (nb->pos + num_bytes > nb->max_size)
     increaseNetworkBuffer(nb, num_bytes);
 
