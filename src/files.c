@@ -1915,6 +1915,9 @@ static void ActivateLevelTemplate()
     /* overwrite all individual level settings from template level settings */
     level = level_template;
 
+    /* restore level file info */
+    level.file_info = level_backup.file_info;
+
     /* restore playfield size */
     level.fieldx = level_backup.fieldx;
     level.fieldy = level_backup.fieldy;
