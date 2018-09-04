@@ -3806,7 +3806,7 @@ static int editor_el_players[] =
   EL_PLAYER_4
 };
 static int *editor_el_players_ptr = editor_el_players;
-static int num_editor_el_players = SIZEOF_ARRAY_INT(editor_el_players);
+static int num_editor_el_players = ARRAY_SIZE(editor_el_players);
 
 static int editor_hl_boulderdash[] =
 {
@@ -3845,8 +3845,8 @@ static int editor_el_boulderdash[] =
 };
 static int *editor_hl_boulderdash_ptr = editor_hl_boulderdash;
 static int *editor_el_boulderdash_ptr = editor_el_boulderdash;
-static int num_editor_hl_boulderdash = SIZEOF_ARRAY_INT(editor_hl_boulderdash);
-static int num_editor_el_boulderdash = SIZEOF_ARRAY_INT(editor_el_boulderdash);
+static int num_editor_hl_boulderdash = ARRAY_SIZE(editor_hl_boulderdash);
+static int num_editor_el_boulderdash = ARRAY_SIZE(editor_el_boulderdash);
 
 static int editor_hl_emerald_mine[] =
 {
@@ -3920,8 +3920,8 @@ static int editor_el_emerald_mine[] =
 };
 static int *editor_hl_emerald_mine_ptr = editor_hl_emerald_mine;
 static int *editor_el_emerald_mine_ptr = editor_el_emerald_mine;
-static int num_editor_hl_emerald_mine=SIZEOF_ARRAY_INT(editor_hl_emerald_mine);
-static int num_editor_el_emerald_mine=SIZEOF_ARRAY_INT(editor_el_emerald_mine);
+static int num_editor_hl_emerald_mine = ARRAY_SIZE(editor_hl_emerald_mine);
+static int num_editor_el_emerald_mine = ARRAY_SIZE(editor_el_emerald_mine);
 
 static int editor_hl_emerald_mine_club[] =
 {
@@ -4010,8 +4010,8 @@ static int editor_el_emerald_mine_club[] =
 };
 static int *editor_hl_emerald_mine_club_ptr = editor_hl_emerald_mine_club;
 static int *editor_el_emerald_mine_club_ptr = editor_el_emerald_mine_club;
-static int num_editor_hl_emerald_mine_club=SIZEOF_ARRAY_INT(editor_hl_emerald_mine_club);
-static int num_editor_el_emerald_mine_club=SIZEOF_ARRAY_INT(editor_el_emerald_mine_club);
+static int num_editor_hl_emerald_mine_club = ARRAY_SIZE(editor_hl_emerald_mine_club);
+static int num_editor_el_emerald_mine_club = ARRAY_SIZE(editor_el_emerald_mine_club);
 
 static int editor_hl_rnd[] =
 {
@@ -4110,8 +4110,8 @@ static int editor_el_rnd[] =
 };
 static int *editor_hl_rnd_ptr = editor_hl_rnd;
 static int *editor_el_rnd_ptr = editor_el_rnd;
-static int num_editor_hl_rnd = SIZEOF_ARRAY_INT(editor_hl_rnd);
-static int num_editor_el_rnd = SIZEOF_ARRAY_INT(editor_el_rnd);
+static int num_editor_hl_rnd = ARRAY_SIZE(editor_hl_rnd);
+static int num_editor_el_rnd = ARRAY_SIZE(editor_el_rnd);
 
 static int editor_hl_sokoban[] =
 {
@@ -4130,8 +4130,8 @@ static int editor_el_sokoban[] =
 };
 static int *editor_hl_sokoban_ptr = editor_hl_sokoban;
 static int *editor_el_sokoban_ptr = editor_el_sokoban;
-static int num_editor_hl_sokoban = SIZEOF_ARRAY_INT(editor_hl_sokoban);
-static int num_editor_el_sokoban = SIZEOF_ARRAY_INT(editor_el_sokoban);
+static int num_editor_hl_sokoban = ARRAY_SIZE(editor_hl_sokoban);
+static int num_editor_el_sokoban = ARRAY_SIZE(editor_el_sokoban);
 
 static int editor_hl_supaplex[] =
 {
@@ -4205,8 +4205,8 @@ static int editor_el_supaplex[] =
 };
 static int *editor_hl_supaplex_ptr = editor_hl_supaplex;
 static int *editor_el_supaplex_ptr = editor_el_supaplex;
-static int num_editor_hl_supaplex = SIZEOF_ARRAY_INT(editor_hl_supaplex);
-static int num_editor_el_supaplex = SIZEOF_ARRAY_INT(editor_el_supaplex);
+static int num_editor_hl_supaplex = ARRAY_SIZE(editor_hl_supaplex);
+static int num_editor_el_supaplex = ARRAY_SIZE(editor_el_supaplex);
 
 static int editor_hl_diamond_caves[] =
 {
@@ -4367,8 +4367,8 @@ static int editor_el_diamond_caves[] =
 };
 static int *editor_hl_diamond_caves_ptr = editor_hl_diamond_caves;
 static int *editor_el_diamond_caves_ptr = editor_el_diamond_caves;
-static int num_editor_hl_diamond_caves = SIZEOF_ARRAY_INT(editor_hl_diamond_caves);
-static int num_editor_el_diamond_caves = SIZEOF_ARRAY_INT(editor_el_diamond_caves);
+static int num_editor_hl_diamond_caves = ARRAY_SIZE(editor_hl_diamond_caves);
+static int num_editor_el_diamond_caves = ARRAY_SIZE(editor_el_diamond_caves);
 
 static int editor_hl_dx_boulderdash[] =
 {
@@ -4402,8 +4402,8 @@ static int editor_el_dx_boulderdash[] =
 };
 static int *editor_hl_dx_boulderdash_ptr = editor_hl_dx_boulderdash;
 static int *editor_el_dx_boulderdash_ptr = editor_el_dx_boulderdash;
-static int num_editor_hl_dx_boulderdash = SIZEOF_ARRAY_INT(editor_hl_dx_boulderdash);
-static int num_editor_el_dx_boulderdash = SIZEOF_ARRAY_INT(editor_el_dx_boulderdash);
+static int num_editor_hl_dx_boulderdash = ARRAY_SIZE(editor_hl_dx_boulderdash);
+static int num_editor_el_dx_boulderdash = ARRAY_SIZE(editor_el_dx_boulderdash);
 
 static int editor_hl_mirror_magic[] =
 {
@@ -4467,8 +4467,8 @@ static int editor_el_mirror_magic[] =
 };
 static int *editor_hl_mirror_magic_ptr = editor_hl_mirror_magic;
 static int *editor_el_mirror_magic_ptr = editor_el_mirror_magic;
-static int num_editor_hl_mirror_magic = SIZEOF_ARRAY_INT(editor_hl_mirror_magic);
-static int num_editor_el_mirror_magic = SIZEOF_ARRAY_INT(editor_el_mirror_magic);
+static int num_editor_hl_mirror_magic = ARRAY_SIZE(editor_hl_mirror_magic);
+static int num_editor_el_mirror_magic = ARRAY_SIZE(editor_el_mirror_magic);
 
 static int editor_hl_deflektor[] =
 {
@@ -4512,8 +4512,8 @@ static int editor_el_deflektor[] =
 };
 static int *editor_hl_deflektor_ptr = editor_hl_deflektor;
 static int *editor_el_deflektor_ptr = editor_el_deflektor;
-static int num_editor_hl_deflektor = SIZEOF_ARRAY_INT(editor_hl_deflektor);
-static int num_editor_el_deflektor = SIZEOF_ARRAY_INT(editor_el_deflektor);
+static int num_editor_hl_deflektor = ARRAY_SIZE(editor_hl_deflektor);
+static int num_editor_el_deflektor = ARRAY_SIZE(editor_el_deflektor);
 
 static int editor_hl_chars[] =
 {
@@ -4622,8 +4622,8 @@ static int editor_el_chars[] =
 };
 static int *editor_hl_chars_ptr = editor_hl_chars;
 static int *editor_el_chars_ptr = editor_el_chars;
-static int num_editor_hl_chars = SIZEOF_ARRAY_INT(editor_hl_chars);
-static int num_editor_el_chars = SIZEOF_ARRAY_INT(editor_el_chars);
+static int num_editor_hl_chars = ARRAY_SIZE(editor_hl_chars);
+static int num_editor_el_chars = ARRAY_SIZE(editor_el_chars);
 
 static int editor_hl_steel_chars[] =
 {
@@ -4732,8 +4732,8 @@ static int editor_el_steel_chars[] =
 };
 static int *editor_hl_steel_chars_ptr = editor_hl_steel_chars;
 static int *editor_el_steel_chars_ptr = editor_el_steel_chars;
-static int num_editor_hl_steel_chars = SIZEOF_ARRAY_INT(editor_hl_steel_chars);
-static int num_editor_el_steel_chars = SIZEOF_ARRAY_INT(editor_el_steel_chars);
+static int num_editor_hl_steel_chars = ARRAY_SIZE(editor_hl_steel_chars);
+static int num_editor_el_steel_chars = ARRAY_SIZE(editor_el_steel_chars);
 
 static int editor_hl_custom[] =
 {
@@ -5067,8 +5067,8 @@ static int editor_el_custom[] =
 };
 static int *editor_hl_custom_ptr = editor_hl_custom;
 static int *editor_el_custom_ptr = editor_el_custom;
-static int num_editor_hl_custom = SIZEOF_ARRAY_INT(editor_hl_custom);
-static int num_editor_el_custom = SIZEOF_ARRAY_INT(editor_el_custom);
+static int num_editor_hl_custom = ARRAY_SIZE(editor_hl_custom);
+static int num_editor_el_custom = ARRAY_SIZE(editor_el_custom);
 
 static int editor_hl_group[] =
 {
@@ -5122,8 +5122,8 @@ static int editor_el_group[] =
 };
 static int *editor_hl_group_ptr = editor_hl_group;
 static int *editor_el_group_ptr = editor_el_group;
-static int num_editor_hl_group = SIZEOF_ARRAY_INT(editor_hl_group);
-static int num_editor_el_group = SIZEOF_ARRAY_INT(editor_el_group);
+static int num_editor_hl_group = ARRAY_SIZE(editor_hl_group);
+static int num_editor_el_group = ARRAY_SIZE(editor_el_group);
 
 static int editor_hl_reference[] =
 {
@@ -5167,8 +5167,8 @@ static int editor_el_reference[] =
 };
 static int *editor_hl_reference_ptr = editor_hl_reference;
 static int *editor_el_reference_ptr = editor_el_reference;
-static int num_editor_hl_reference = SIZEOF_ARRAY_INT(editor_hl_reference);
-static int num_editor_el_reference = SIZEOF_ARRAY_INT(editor_el_reference);
+static int num_editor_hl_reference = ARRAY_SIZE(editor_hl_reference);
+static int num_editor_el_reference = ARRAY_SIZE(editor_el_reference);
 
 static int editor_hl_user_defined[] =
 {
@@ -5180,7 +5180,7 @@ static int editor_hl_user_defined[] =
 
 static int *editor_hl_user_defined_ptr = editor_hl_user_defined;
 static int *editor_el_user_defined_ptr = NULL;
-static int num_editor_hl_user_defined=SIZEOF_ARRAY_INT(editor_hl_user_defined);
+static int num_editor_hl_user_defined = ARRAY_SIZE(editor_hl_user_defined);
 static int num_editor_el_user_defined = 0;
 
 static int editor_hl_dynamic[] =
@@ -5193,7 +5193,7 @@ static int editor_hl_dynamic[] =
 
 static int *editor_hl_dynamic_ptr = editor_hl_dynamic;
 static int *editor_el_dynamic_ptr = NULL;
-static int num_editor_hl_dynamic = SIZEOF_ARRAY_INT(editor_hl_dynamic);
+static int num_editor_hl_dynamic = ARRAY_SIZE(editor_hl_dynamic);
 static int num_editor_el_dynamic = 0;
 
 static int editor_hl_empty[] = { EL_EMPTY };
