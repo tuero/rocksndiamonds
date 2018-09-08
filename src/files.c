@@ -6648,6 +6648,8 @@ static void LoadLevel_LoadAndInit(struct LevelFileInfo *lfi_network_template)
 
 void LoadLevel(int nr)
 {
+  SetLevelSetInfo(leveldir_current->identifier, nr);
+
   setLevelFileInfo(&level.file_info, nr);
 
   LoadLevel_LoadAndInit(NULL);
