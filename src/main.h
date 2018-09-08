@@ -3125,6 +3125,17 @@ struct LevelInfo
   boolean use_action_after_change_bug;
 };
 
+struct NetworkLevelInfo
+{
+  char *leveldir_identifier;		/* network levelset identifier */
+
+  struct LevelFileInfo file_info;	/* file info for level file */
+  struct LevelFileInfo tmpl_info;	/* file info for level template */
+
+  boolean use_network_level_files;	/* use levels from network server */
+  boolean use_custom_template;		/* use CEs from level template */
+};
+
 struct GlobalInfo
 {
   char *autoplay_leveldir;

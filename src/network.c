@@ -38,15 +38,6 @@ static struct NetworkClientPlayerInfo first_player =
   NULL
 };
 
-struct NetworkLevelFileInfo
-{
-  char *leveldir_identifier;
-  struct LevelFileInfo file_info;
-  struct LevelFileInfo tmpl_info;
-  boolean use_network_level_files;
-  boolean use_custom_template;
-};
-
 /* server stuff */
 
 static TCPsocket sfd;		/* TCP server socket */
@@ -60,7 +51,7 @@ static boolean stop_network_game = FALSE;
 static boolean stop_network_client = FALSE;
 static char stop_network_client_message[MAX_OUTPUT_LINESIZE + 1];
 
-static struct NetworkLevelFileInfo network_level;
+static struct NetworkLevelInfo network_level;
 
 static void DrawNetworkTextExt(char *message, int font_nr, boolean initialize)
 {
@@ -699,16 +690,13 @@ static void Handle_OP_START_PLAYING()
     level_nr = new_level_nr;
   }
 
-  SetLevelSetInfo(new_leveldir_identifier, new_level_nr);
-
   /* needed if level set of network game changed graphics, sounds or music */
   ReloadCustomArtwork(0);
 
   TapeErase();
 
   if (network_level.use_network_level_files)
-    LoadLevelFromNetwork(&network_level.file_info,
-			 &network_level.tmpl_info);
+    LoadNetworkLevel(&network_level);
   else
     LoadLevel(level_nr);
 

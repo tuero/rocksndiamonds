@@ -6620,21 +6620,21 @@ void LoadLevelTemplate(int nr)
   LoadLevelTemplate_LoadAndInit();
 }
 
-static void LoadLevelTemplateFromNetwork(struct LevelFileInfo *lfi_network_template)
+static void LoadNetworkLevelTemplate(struct NetworkLevelInfo *network_level)
 {
-  copyLevelFileInfo(lfi_network_template, &level_template.file_info);
+  copyLevelFileInfo(&network_level->tmpl_info, &level_template.file_info);
 
   LoadLevelTemplate_LoadAndInit();
 }
 
-static void LoadLevel_LoadAndInit(struct LevelFileInfo *lfi_network_template)
+static void LoadLevel_LoadAndInit(struct NetworkLevelInfo *network_level)
 {
   LoadLevelFromFileInfo(&level, &level.file_info, FALSE);
 
   if (level.use_custom_template)
   {
-    if (lfi_network_template != NULL)
-      LoadLevelTemplateFromNetwork(lfi_network_template);
+    if (network_level != NULL)
+      LoadNetworkLevelTemplate(network_level);
     else
       LoadLevelTemplate(-1);
   }
@@ -6662,12 +6662,14 @@ void LoadLevelInfoOnly(int nr)
   LoadLevelFromFileInfo(&level, &level.file_info, TRUE);
 }
 
-void LoadLevelFromNetwork(struct LevelFileInfo *lfi_network_level,
-			  struct LevelFileInfo *lfi_network_template)
+void LoadNetworkLevel(struct NetworkLevelInfo *network_level)
 {
-  copyLevelFileInfo(lfi_network_level, &level.file_info);
+  SetLevelSetInfo(network_level->leveldir_identifier,
+		  network_level->file_info.nr);
 
-  LoadLevel_LoadAndInit(lfi_network_template);
+  copyLevelFileInfo(&network_level->file_info, &level.file_info);
+
+  LoadLevel_LoadAndInit(network_level);
 }
 
 static int SaveLevel_VERS(FILE *file, struct LevelInfo *level)
