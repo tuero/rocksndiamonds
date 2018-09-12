@@ -18,6 +18,7 @@ boolean NextValidEvent(Event *);
 
 void EventLoop(void);
 void HandleOtherEvents(Event *);
+void ClearAutoRepeatKeyEvents(void);
 void ClearEventQueue(void);
 void ClearPlayerAction(void);
 void SleepWhileUnmapped(void);

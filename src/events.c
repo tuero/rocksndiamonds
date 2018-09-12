@@ -347,6 +347,23 @@ void EventLoop(void)
   }
 }
 
+void ClearAutoRepeatKeyEvents()
+{
+  while (PendingEvent())
+  {
+    Event next_event;
+
+    PeekEvent(&next_event);
+
+    /* if event is repeated key press event, remove it from event queue */
+    if (next_event.type == EVENT_KEYPRESS &&
+	next_event.key.repeat)
+      WaitEvent(&next_event);
+    else
+      break;
+  }
+}
+
 void ClearEventQueue()
 {
   Event event;
