@@ -14594,7 +14594,7 @@ static void PlayLevelMusic()
   char *next_music = getMusicInfoEntryFilename(music_nr);
 
   if (!strEqual(curr_music, next_music))
-    PlayMusic(music_nr);
+    PlayMusicLoop(music_nr);
 }
 
 void PlayLevelSound_EM(int xx, int yy, int element_em, int sample)

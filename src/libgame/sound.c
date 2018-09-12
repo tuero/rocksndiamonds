@@ -59,9 +59,9 @@
 #define SOUND_VOLUME_LOOPS(v)  SOUND_VOLUME_FROM_PERCENT(v, setup.volume_loops)
 #define SOUND_VOLUME_MUSIC(v)  SOUND_VOLUME_FROM_PERCENT(v, setup.volume_music)
 
-#define SETUP_SOUND_VOLUME(v,s)		((s) == SND_CTRL_PLAY_MUSIC ?	\
+#define SETUP_SOUND_VOLUME(v,s)		((s) & SND_CTRL_MUSIC ?		\
 					 SOUND_VOLUME_MUSIC(v) :	\
-					 (s) == SND_CTRL_PLAY_LOOP ?	\
+					 (s) & SND_CTRL_LOOP ?		\
 					 SOUND_VOLUME_LOOPS(v) :	\
 					 SOUND_VOLUME_SIMPLE(v))
 
@@ -221,10 +221,12 @@ static void Mixer_PlayMusicChannel()
 
   if (mixer[audio.music_channel].type != MUS_TYPE_WAV)
   {
+    int loops = (IS_LOOP(mixer[audio.music_channel]) ? -1 : 1);
+
     // use short fade-in to prevent "plop" sound for certain music files
     // (this may happen when switching on music while playing the game)
     Mix_VolumeMusic(mixer[audio.music_channel].volume);
-    Mix_FadeInMusic(mixer[audio.music_channel].data_ptr, -1, 100);
+    Mix_FadeInMusic(mixer[audio.music_channel].data_ptr, loops, 100);
 
 #if defined(PLATFORM_WIN32)
     // playing MIDI music is broken since Windows Vista, as it sets the volume
@@ -923,6 +925,14 @@ void PlayMusic(int nr)
   PlaySoundMusic(nr);
 }
 
+void PlayMusicLoop(int nr)
+{
+  if (!audio.music_available)
+    return;
+
+  PlaySoundMusicLoop(nr);
+}
+
 void PlaySound(int nr)
 {
   if (!setup.sound_simple)
@@ -953,6 +963,14 @@ void PlaySoundMusic(int nr)
     return;
 
   PlaySoundExt(nr, SOUND_MAX_VOLUME, SOUND_MIDDLE, SND_CTRL_PLAY_MUSIC);
+}
+
+void PlaySoundMusicLoop(int nr)
+{
+  if (!setup.sound_music)
+    return;
+
+  PlaySoundExt(nr, SOUND_MAX_VOLUME, SOUND_MIDDLE, SND_CTRL_PLAY_MUSIC_LOOP);
 }
 
 void PlaySoundExt(int nr, int volume, int stereo_position, int state)

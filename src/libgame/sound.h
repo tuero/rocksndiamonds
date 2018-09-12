@@ -60,7 +60,8 @@
 
 #define SND_CTRL_PLAY_SOUND		(SND_CTRL_NONE)
 #define SND_CTRL_PLAY_LOOP		(SND_CTRL_LOOP)
-#define SND_CTRL_PLAY_MUSIC		(SND_CTRL_LOOP | SND_CTRL_MUSIC)
+#define SND_CTRL_PLAY_MUSIC		(SND_CTRL_MUSIC)
+#define SND_CTRL_PLAY_MUSIC_LOOP	(SND_CTRL_MUSIC | SND_CTRL_LOOP)
 
 #define SND_CTRL_FADE_SOUND		(SND_CTRL_FADE)
 #define SND_CTRL_FADE_MUSIC		(SND_CTRL_FADE | SND_CTRL_MUSIC)
@@ -102,10 +103,12 @@ void StartMixer(void);
 
 /* sound client functions */
 void PlayMusic(int);
+void PlayMusicLoop(int);
 void PlaySound(int);
 void PlaySoundStereo(int, int);
 void PlaySoundLoop(int);
 void PlaySoundMusic(int);
+void PlaySoundMusicLoop(int);
 void PlaySoundExt(int, int, int, int);
 void FadeMusic(void);
 void FadeSound(int);

@@ -3096,7 +3096,12 @@ void HandleInfoScreen_Music(int button)
     }
     else
     {
-      PlayMusic(list->music);
+      int music = list->music;
+
+      if (music_info[music].loop)
+	PlayMusicLoop(music);
+      else
+	PlayMusic(music);
 
       DrawTextSCentered(ystart, font_title, "The Game Background Music:");
     }

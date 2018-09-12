@@ -917,7 +917,10 @@ static void PlayGlobalAnimMusic(struct GlobalAnimPartControlInfo *part)
   if (!setup.sound_music)
     return;
 
-  PlayMusic(music);
+  if (IS_LOOP_MUSIC(music))
+    PlayMusicLoop(music);
+  else
+    PlayMusic(music);
 
 #if 0
   printf("::: PLAY MUSIC %d.%d.%d: %d\n",

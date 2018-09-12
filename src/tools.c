@@ -9215,7 +9215,10 @@ void PlayMenuMusicExt(int music)
   if (!setup.sound_music)
     return;
 
-  PlayMusic(music);
+  if (IS_LOOP_MUSIC(music))
+    PlayMusicLoop(music);
+  else
+    PlayMusic(music);
 }
 
 void PlayMenuMusic()

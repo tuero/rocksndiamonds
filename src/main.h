@@ -905,6 +905,7 @@
 #define IS_NEXT_FRAME(f, g)	(IS_NEW_FRAME(f, g) && (f) > 0)
 
 #define IS_LOOP_SOUND(s)	(sound_info[s].loop)
+#define IS_LOOP_MUSIC(s)	(music_info[s].loop)
 
 #define IS_SPECIAL_GFX_ARG(a)	((a) >= 0 && (a) < NUM_SPECIAL_GFX_ARGS)
 
