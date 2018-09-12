@@ -959,6 +959,28 @@ static void StopGlobalAnimSoundAndMusic(struct GlobalAnimPartControlInfo *part)
   StopGlobalAnimMusic(part);
 }
 
+static void PlayGlobalAnimSoundIfLoop(struct GlobalAnimPartControlInfo *part)
+{
+  // when drawing animations to fading buffer, do not play sounds
+  if (drawing_to_fading_buffer)
+    return;
+
+  // loop sounds only expire when playing
+  if (game_status != GAME_MODE_PLAYING)
+    return;
+
+  // check if any sound is defined for this animation part
+  if (part->sound == SND_UNDEFINED)
+    return;
+
+  // normal (non-loop) sounds do not expire when playing
+  if (!IS_LOOP_SOUND(part->sound))
+    return;
+
+  // prevent expiring loop sounds when playing
+  PlayGlobalAnimSound(part);
+}
+
 static boolean isClickablePart(struct GlobalAnimPartControlInfo *part, int mask)
 {
   struct GraphicInfo *c = &part->control_info;
@@ -1228,6 +1250,9 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
 
     return ANIM_STATE_WAITING;
   }
+
+  // special case to prevent expiring loop sounds when playing
+  PlayGlobalAnimSoundIfLoop(part);
 
   if (!DelayReachedExt(&part->step_delay, part->step_delay_value,
 		       anim_sync_frame))
