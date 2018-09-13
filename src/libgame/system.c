@@ -1388,7 +1388,13 @@ static void CreateScaledBitmaps(Bitmap **bitmaps, int zoom_factor,
 	free_old_bitmap = FALSE;
 
     if (free_old_bitmap)
+    {
+      /* copy image filename from old to new standard sized bitmap */
+      bitmaps[IMG_BITMAP_STANDARD]->source_filename =
+	getStringCopy(old_bitmap->source_filename);
+
       FreeBitmap(old_bitmap);
+    }
   }
   else
   {
