@@ -747,11 +747,12 @@ static void Handle_OP_STOP_PLAYING()
     boolean stopped_by_remote_player = (!client_player->connected_locally);
     char message[100];
 
-    sprintf(message, (cause_for_stopping == NETWORK_STOP_BY_PLAYER ?
-		      "Network game stopped by player %d!" :
-		      cause_for_stopping == NETWORK_STOP_BY_ERROR ?
-		      "Network game stopped due to internal error!" :
-		      "Network game stopped!"), client_nr);
+    if (cause_for_stopping == NETWORK_STOP_BY_PLAYER)
+      sprintf(message, "Network game stopped by player %d!", client_nr);
+    else
+      sprintf(message, (cause_for_stopping == NETWORK_STOP_BY_ERROR ?
+			"Network game stopped due to internal error!" :
+			"Network game stopped!"));
 
     if (cause_for_stopping != NETWORK_STOP_BY_PLAYER ||
 	stopped_by_remote_player)
