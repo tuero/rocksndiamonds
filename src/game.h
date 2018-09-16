@@ -154,10 +154,6 @@ struct GameInfo
   int scroll_delay_value;
   int tile_size;
 
-  /* values for engine initialization */
-  int default_push_delay_fixed;
-  int default_push_delay_random;
-
   /* constant within running game */
   int engine_version;
   int emulation;
@@ -187,7 +183,6 @@ struct GameInfo
   int belt_dir_nr[4];
   int switchgate_pos;
   int wind_direction;
-  boolean gravity;
   boolean explosions_delayed;
   boolean envelope_active;
   boolean no_time_limit;	/* (variable only in very special case) */
