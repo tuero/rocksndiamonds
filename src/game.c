@@ -3573,6 +3573,8 @@ void InitGame()
   game.ball_state = level.ball_state_initial;
   game.ball_content_nr = 0;
 
+  game.explosions_delayed = TRUE;
+
   game.envelope_active = FALSE;
 
   for (i = 0; i < NUM_BELTS; i++)
