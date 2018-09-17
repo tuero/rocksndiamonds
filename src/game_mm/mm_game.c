@@ -4323,7 +4323,7 @@ void LoadEngineSnapshotValues_MM()
   energy_delay   = engine_snapshot_mm.energy_delay;
   overload_delay = engine_snapshot_mm.overload_delay;
 
-  RedrawPlayfield_MM(TRUE);
+  RedrawPlayfield_MM();
 }
 
 static int getAngleFromTouchDelta(int dx, int dy,  int base)
