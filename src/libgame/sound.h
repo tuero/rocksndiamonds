@@ -120,16 +120,16 @@ void StopSounds(void);
 void StopSoundExt(int, int);
 void ExpireSoundLoops(boolean);
 
-int getSoundListSize();
-int getMusicListSize();
+int getSoundListSize(void);
+int getMusicListSize(void);
 struct FileInfo *getSoundListEntry(int);
 struct FileInfo *getMusicListEntry(int);
 char *getMusicInfoEntryFilename(int);
-char *getCurrentlyPlayingMusicFilename();
-int getSoundListPropertyMappingSize();
-int getMusicListPropertyMappingSize();
-struct PropertyMapping *getSoundListPropertyMapping();
-struct PropertyMapping *getMusicListPropertyMapping();
+char *getCurrentlyPlayingMusicFilename(void);
+int getSoundListPropertyMappingSize(void);
+int getMusicListPropertyMappingSize(void);
+struct PropertyMapping *getSoundListPropertyMapping(void);
+struct PropertyMapping *getMusicListPropertyMapping(void);
 void InitSoundList(struct ConfigInfo *, int, struct ConfigTypeInfo *,
 		   char **, char **, char **, char **, char **);
 void InitMusicList(struct ConfigInfo *, int, struct ConfigTypeInfo *,

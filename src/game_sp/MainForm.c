@@ -6,13 +6,13 @@
 
 
 static void DrawFrame(int Delta);
-static void ReStretch();
+static void ReStretch(void);
 
 void DrawField(int X, int Y);
 void DrawFieldAnimated(int X, int Y);
 void DrawFieldNoAnimated(int X, int Y);
 
-void DrawFrameIfNeeded()
+void DrawFrameIfNeeded(void)
 {
   DrawFrame(0);
 
@@ -21,7 +21,7 @@ void DrawFrameIfNeeded()
     DrawFrame(1);
 }
 
-void DisplayLevel()
+void DisplayLevel(void)
 {
   int X, Y;
 
@@ -53,7 +53,7 @@ void DisplayLevel()
   }
 }
 
-void Form_Load()
+void Form_Load(void)
 {
   InitGlobals();
 
@@ -93,7 +93,7 @@ static void DrawFrame(int Delta)
   }
 }
 
-static void RestoreFrame()
+static void RestoreFrame(void)
 {
   int i, LX, tY, RX, BY;
 
@@ -115,7 +115,7 @@ static void RestoreFrame()
   }
 }
 
-void SetDisplayRegion()
+void SetDisplayRegion(void)
 {
   if (! menBorder)
   {
@@ -139,7 +139,7 @@ void SetDisplayRegion()
   }
 }
 
-void menPlay_Click()
+void menPlay_Click(void)
 {
   bPlaying = True;
 
@@ -150,7 +150,7 @@ void menPlay_Click()
   subMainGameLoop_Init();
 }
 
-static void ReStretch()
+static void ReStretch(void)
 {
   if (LevelLoaded)
   {
@@ -168,7 +168,7 @@ static void ReStretch()
   ScrollTo(ScreenScrollXPos, ScreenScrollYPos);
 }
 
-void SetScrollEdges()
+void SetScrollEdges(void)
 {
   int border1_offset = (menBorder ? 1 : 2);
   int border2_offset = (menBorder ? 0 : TILESIZE / 2);

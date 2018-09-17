@@ -1404,7 +1404,7 @@ static boolean check_special_flags(char *flag)
   return FALSE;
 }
 
-static struct DateInfo getCurrentDate()
+static struct DateInfo getCurrentDate(void)
 {
   time_t epoch_seconds = time(NULL);
   struct tm *now = localtime(&epoch_seconds);
@@ -1427,7 +1427,7 @@ static void resetEventFlags(struct ElementChangeInfo *change)
     change->has_event[i] = FALSE;
 }
 
-static void resetEventBits()
+static void resetEventBits(void)
 {
   int i;
 
@@ -1868,7 +1868,7 @@ static void setFileInfoToDefaults(struct LevelFileInfo *level_file_info)
 
 int getMappedElement_SB(int, boolean);
 
-static void ActivateLevelTemplate()
+static void ActivateLevelTemplate(void)
 {
   int x, y;
 
@@ -2159,12 +2159,12 @@ static int getFiletypeFromID(char *filetype_id)
   return filetype;
 }
 
-char *getLocalLevelTemplateFilename()
+char *getLocalLevelTemplateFilename(void)
 {
   return getDefaultLevelFilename(-1);
 }
 
-char *getGlobalLevelTemplateFilename()
+char *getGlobalLevelTemplateFilename(void)
 {
   /* global variable "leveldir_current" must be modified in the loop below */
   LevelDirTree *leveldir_current_last = leveldir_current;
@@ -3957,7 +3957,7 @@ static void CopyNativeTape_RND_to_SP(struct LevelInfo *level)
   demo->is_available = TRUE;
 }
 
-static void setTapeInfoToDefaults();
+static void setTapeInfoToDefaults(void);
 
 static void CopyNativeTape_SP_to_RND(struct LevelInfo *level)
 {
@@ -6606,7 +6606,7 @@ static void LoadLevel_InitNativeEngines(struct LevelInfo *level)
     CopyNativeLevel_RND_to_Native(level);
 }
 
-static void LoadLevelTemplate_LoadAndInit()
+static void LoadLevelTemplate_LoadAndInit(void)
 {
   LoadLevelFromFileInfo(&level_template, &level_template.file_info, FALSE);
 
@@ -7514,7 +7514,7 @@ void SaveLevel(int nr)
   SaveLevelFromFilename(&level, filename, FALSE);
 }
 
-void SaveLevelTemplate()
+void SaveLevelTemplate(void)
 {
   char *filename = getLocalLevelTemplateFilename();
 
@@ -7584,7 +7584,7 @@ void DumpLevel(struct LevelInfo *level)
 /* tape file functions                                                       */
 /* ========================================================================= */
 
-static void setTapeInfoToDefaults()
+static void setTapeInfoToDefaults(void)
 {
   int i;
 
@@ -9278,7 +9278,7 @@ void LoadSetupFromFilename(char *filename)
   }
 }
 
-static void LoadSetup_SpecialPostProcessing()
+static void LoadSetup_SpecialPostProcessing(void)
 {
   char *player_name_new;
 
@@ -9299,7 +9299,7 @@ static void LoadSetup_SpecialPostProcessing()
     MIN(MAX(MIN_SCROLL_DELAY, setup.scroll_delay_value), MAX_SCROLL_DELAY);
 }
 
-void LoadSetup()
+void LoadSetup(void)
 {
   char *filename;
 
@@ -9320,7 +9320,7 @@ void LoadSetup()
   LoadSetup_SpecialPostProcessing();
 }
 
-void LoadSetup_AutoSetup()
+void LoadSetup_AutoSetup(void)
 {
   char *filename = getPath2(getSetupDir(), AUTOSETUP_FILENAME);
   SetupFileHash *setup_file_hash = NULL;
@@ -9340,7 +9340,7 @@ void LoadSetup_AutoSetup()
   free(filename);
 }
 
-void LoadSetup_EditorCascade()
+void LoadSetup_EditorCascade(void)
 {
   char *filename = getPath2(getSetupDir(), EDITORCASCADE_FILENAME);
   SetupFileHash *setup_file_hash = NULL;
@@ -9409,7 +9409,7 @@ static void LoadSetup_ReadGameControllerMappings(SetupFileHash *mappings_hash,
   fclose(file);
 }
 
-void SaveSetup()
+void SaveSetup(void)
 {
   char *filename = getSetupFilename();
   FILE *file;
@@ -9522,7 +9522,7 @@ void SaveSetup()
   SetFilePermissions(filename, PERMS_PRIVATE);
 }
 
-void SaveSetup_AutoSetup()
+void SaveSetup_AutoSetup(void)
 {
   char *filename = getPath2(getSetupDir(), AUTOSETUP_FILENAME);
   FILE *file;
@@ -9550,7 +9550,7 @@ void SaveSetup_AutoSetup()
   free(filename);
 }
 
-void SaveSetup_EditorCascade()
+void SaveSetup_EditorCascade(void)
 {
   char *filename = getPath2(getSetupDir(), EDITORCASCADE_FILENAME);
   FILE *file;
@@ -9619,7 +9619,7 @@ void SaveSetup_AddGameControllerMapping(char *mapping)
   free(filename);
 }
 
-void LoadCustomElementDescriptions()
+void LoadCustomElementDescriptions(void)
 {
   char *filename = getCustomArtworkConfigFilename(ARTWORK_TYPE_GRAPHICS);
   SetupFileHash *setup_file_hash;
@@ -9681,7 +9681,7 @@ static int get_token_parameter_value(char *token, char *value_raw)
   return get_parameter_value(value_raw, suffix, TYPE_INTEGER);
 }
 
-void InitMenuDesignSettings_Static()
+void InitMenuDesignSettings_Static(void)
 {
   int i;
 
@@ -9696,7 +9696,7 @@ void InitMenuDesignSettings_Static()
   }
 }
 
-static void InitMenuDesignSettings_SpecialPreProcessing()
+static void InitMenuDesignSettings_SpecialPreProcessing(void)
 {
   int i;
 
@@ -9788,7 +9788,7 @@ static void InitMenuDesignSettings_SpecialPreProcessing()
   }
 }
 
-static void InitMenuDesignSettings_SpecialPostProcessing()
+static void InitMenuDesignSettings_SpecialPostProcessing(void)
 {
   static struct
   {
@@ -9817,7 +9817,7 @@ static void InitMenuDesignSettings_SpecialPostProcessing()
       *game_buttons_xy[i].dst = *game_buttons_xy[i].src;
 }
 
-static void InitMenuDesignSettings_SpecialPostProcessing_AfterGraphics()
+static void InitMenuDesignSettings_SpecialPostProcessing_AfterGraphics(void)
 {
   static struct
   {
@@ -10251,7 +10251,7 @@ static void LoadMenuDesignSettingsFromFilename(char *filename)
   freeSetupFileHash(setup_file_hash);
 }
 
-void LoadMenuDesignSettings()
+void LoadMenuDesignSettings(void)
 {
   char *filename_base = UNDEFINED_FILENAME, *filename_local;
 
@@ -10275,7 +10275,7 @@ void LoadMenuDesignSettings()
   InitMenuDesignSettings_SpecialPostProcessing();
 }
 
-void LoadMenuDesignSettings_AfterGraphics()
+void LoadMenuDesignSettings_AfterGraphics(void)
 {
   InitMenuDesignSettings_SpecialPostProcessing_AfterGraphics();
 }
@@ -10477,7 +10477,7 @@ static boolean sound_info_listed(struct MusicFileInfo *list, char *basename)
   return music_info_listed_ext(list, basename, TRUE);
 }
 
-void LoadMusicInfo()
+void LoadMusicInfo(void)
 {
   char *music_directory = getCustomMusicDirectory();
   int num_music = getMusicListSize();
@@ -10639,7 +10639,7 @@ void print_unknown_token_end(int token_nr)
     Error(ERR_INFO_LINE, "-");
 }
 
-void LoadHelpAnimInfo()
+void LoadHelpAnimInfo(void)
 {
   char *filename = getHelpAnimFilename();
   SetupFileList *setup_file_list = NULL, *list;
@@ -10849,7 +10849,7 @@ void LoadHelpAnimInfo()
 #endif
 }
 
-void LoadHelpTextInfo()
+void LoadHelpTextInfo(void)
 {
   char *filename = getHelpTextFilename();
   int i;
@@ -10891,7 +10891,7 @@ void LoadHelpTextInfo()
 
 #define MAX_NUM_CONVERT_LEVELS		1000
 
-void ConvertLevels()
+void ConvertLevels(void)
 {
   static LevelDirTree *convert_leveldir = NULL;
   static int convert_level_nr = -1;
@@ -11003,7 +11003,7 @@ void ConvertLevels()
 /* create and save images for use in level sketches (raw BMP format)         */
 /* ------------------------------------------------------------------------- */
 
-void CreateLevelSketchImages()
+void CreateLevelSketchImages(void)
 {
 #if defined(TARGET_SDL)
   Bitmap *bitmap1;

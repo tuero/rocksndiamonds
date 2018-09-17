@@ -270,9 +270,9 @@ extern int GetStretchX(int si);
 extern int GetStretchY(int si);
 extern int GetX(int si);
 extern int GetY(int si);
-extern void InitGlobals();
+extern void InitGlobals(void);
 
-extern void PrepareLevel();
+extern void PrepareLevel(void);
 
 extern int getSequenceLength(int sequence);
 extern boolean isSnappingSequence(int sequence);

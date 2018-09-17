@@ -88,7 +88,7 @@ static int copy_properties[][5] =
 static int get_graphic_parameter_value(char *, char *, int);
 
 
-void DrawInitAnim()
+void DrawInitAnim(void)
 {
   struct GraphicInfo *graphic_info_last = graphic_info;
   int graphic = 0;
@@ -136,7 +136,7 @@ void DrawInitAnim()
   FrameCounter++;
 }
 
-void FreeGadgets()
+void FreeGadgets(void)
 {
   FreeLevelEditorGadgets();
   FreeGameButtons();
@@ -145,7 +145,7 @@ void FreeGadgets()
   FreeScreenGadgets();
 }
 
-void InitGadgets()
+void InitGadgets(void)
 {
   static boolean gadgets_initialized = FALSE;
 
@@ -171,7 +171,7 @@ inline static void InitElementSmallImagesScaledUp(int graphic)
   CreateImageWithSmallImages(graphic, g->scale_up_factor, g->tile_size);
 }
 
-void InitElementSmallImages()
+void InitElementSmallImages(void)
 {
   print_timestamp_init("InitElementSmallImages");
 
@@ -233,7 +233,7 @@ inline static void InitScaledImagesScaledUp(int graphic)
   ScaleImage(graphic, g->scale_up_factor);
 }
 
-void InitScaledImages()
+void InitScaledImages(void)
 {
   struct PropertyMapping *property_mapping = getImageListPropertyMapping();
   int num_property_mappings = getImageListPropertyMappingSize();
@@ -248,7 +248,7 @@ void InitScaledImages()
     InitScaledImagesScaledUp(property_mapping[i].artwork_index);
 }
 
-void InitBitmapPointers()
+void InitBitmapPointers(void)
 {
   int num_images = getImageListSize();
   int i;
@@ -259,7 +259,7 @@ void InitBitmapPointers()
       graphic_info[i].bitmap = graphic_info[i].bitmaps[IMG_BITMAP_STANDARD];
 }
 
-void InitImageTextures()
+void InitImageTextures(void)
 {
   int i, j, k;
 
@@ -333,7 +333,7 @@ static int getFontFromToken(char *token)
   return FONT_INITIAL_1;
 }
 
-void InitFontGraphicInfo()
+void InitFontGraphicInfo(void)
 {
   static struct FontBitmapInfo *font_bitmap_info = NULL;
   struct PropertyMapping *property_mapping = getImageListPropertyMapping();
@@ -572,7 +572,7 @@ void InitFontGraphicInfo()
 	       getFontBitmapID, getFontFromToken);
 }
 
-void InitGlobalAnimGraphicInfo()
+void InitGlobalAnimGraphicInfo(void)
 {
   struct PropertyMapping *property_mapping = getImageListPropertyMapping();
   int num_property_mappings = getImageListPropertyMappingSize();
@@ -644,7 +644,7 @@ void InitGlobalAnimGraphicInfo()
 #endif
 }
 
-void InitGlobalAnimSoundInfo()
+void InitGlobalAnimSoundInfo(void)
 {
   struct PropertyMapping *property_mapping = getSoundListPropertyMapping();
   int num_property_mappings = getSoundListPropertyMappingSize();
@@ -693,7 +693,7 @@ void InitGlobalAnimSoundInfo()
 #endif
 }
 
-void InitGlobalAnimMusicInfo()
+void InitGlobalAnimMusicInfo(void)
 {
   struct PropertyMapping *property_mapping = getMusicListPropertyMapping();
   int num_property_mappings = getMusicListPropertyMappingSize();
@@ -742,7 +742,7 @@ void InitGlobalAnimMusicInfo()
 #endif
 }
 
-void InitElementGraphicInfo()
+void InitElementGraphicInfo(void)
 {
   struct PropertyMapping *property_mapping = getImageListPropertyMapping();
   int num_property_mappings = getImageListPropertyMappingSize();
@@ -1123,7 +1123,7 @@ void InitElementGraphicInfo()
   UPDATE_BUSY_STATE();
 }
 
-void InitElementSpecialGraphicInfo()
+void InitElementSpecialGraphicInfo(void)
 {
   struct PropertyMapping *property_mapping = getImageListPropertyMapping();
   int num_property_mappings = getImageListPropertyMappingSize();
@@ -1639,7 +1639,7 @@ static void set_cloned_graphic_parameters(int graphic)
   }
 }
 
-static void InitGraphicInfo()
+static void InitGraphicInfo(void)
 {
   int fallback_graphic = IMG_CHAR_EXCLAM;
   int num_images = getImageListSize();
@@ -1819,7 +1819,7 @@ static void InitGraphicInfo()
   }
 }
 
-static void InitGraphicCompatibilityInfo()
+static void InitGraphicCompatibilityInfo(void)
 {
   struct FileInfo *fi_global_door =
     getImageListEntryFromImageID(IMG_GLOBAL_DOOR);
@@ -1861,7 +1861,7 @@ static void InitGraphicCompatibilityInfo()
   InitGraphicCompatibilityInfo_Doors();
 }
 
-static void InitElementSoundInfo()
+static void InitElementSoundInfo(void)
 {
   struct PropertyMapping *property_mapping = getSoundListPropertyMapping();
   int num_property_mappings = getSoundListPropertyMappingSize();
@@ -1965,7 +1965,7 @@ static void InitElementSoundInfo()
 	  element_info[copy_properties[i][0]].sound[act];
 }
 
-static void InitGameModeSoundInfo()
+static void InitGameModeSoundInfo(void)
 {
   int i;
 
@@ -2014,7 +2014,7 @@ static void set_sound_parameters(int sound, char **parameter_raw)
   sound_info[sound].priority = parameter[SND_ARG_PRIORITY];
 }
 
-static void InitSoundInfo()
+static void InitSoundInfo(void)
 {
   int *sound_effect_properties;
   int num_sounds = getSoundListSize();
@@ -2081,7 +2081,7 @@ static void InitSoundInfo()
   free(sound_effect_properties);
 }
 
-static void InitGameModeMusicInfo()
+static void InitGameModeMusicInfo(void)
 {
   struct PropertyMapping *property_mapping = getMusicListPropertyMapping();
   int num_property_mappings = getMusicListPropertyMappingSize();
@@ -2164,7 +2164,7 @@ static void set_music_parameters(int music, char **parameter_raw)
     music_info[music].loop = parameter[MUS_ARG_MODE_LOOP];
 }
 
-static void InitMusicInfo()
+static void InitMusicInfo(void)
 {
   int num_music = getMusicListSize();
   int i, j;
@@ -2200,7 +2200,7 @@ static void InitMusicInfo()
   }
 }
 
-static void ReinitializeGraphics()
+static void ReinitializeGraphics(void)
 {
   print_timestamp_init("ReinitializeGraphics");
 
@@ -2246,7 +2246,7 @@ static void ReinitializeGraphics()
   print_timestamp_done("ReinitializeGraphics");
 }
 
-static void ReinitializeSounds()
+static void ReinitializeSounds(void)
 {
   InitSoundInfo();		/* sound properties mapping */
   InitElementSoundInfo();	/* element game sound mapping */
@@ -2256,7 +2256,7 @@ static void ReinitializeSounds()
   InitPlayLevelSound();		/* internal game sound settings */
 }
 
-static void ReinitializeMusic()
+static void ReinitializeMusic(void)
 {
   InitMusicInfo();		/* music properties mapping */
   InitGameModeMusicInfo();	/* game mode music mapping */
@@ -2448,7 +2448,7 @@ void ResolveGroupElement(int group_element)
   ResolveGroupElementExt(group_element, 0);
 }
 
-void InitElementPropertiesStatic()
+void InitElementPropertiesStatic(void)
 {
   static boolean clipboard_elements_initialized = FALSE;
 
@@ -4725,7 +4725,7 @@ void InitElementPropertiesEngine(int engine_version)
     InitElementGraphicInfo();
 }
 
-void InitElementPropertiesGfxElement()
+void InitElementPropertiesGfxElement(void)
 {
   int i;
 
@@ -4737,7 +4737,7 @@ void InitElementPropertiesGfxElement()
   }
 }
 
-static void InitGlobal()
+static void InitGlobal(void)
 {
   int graphic;
   int i;
@@ -5081,7 +5081,7 @@ void Execute_Command(char *command)
   options.network = setup.network_mode = FALSE;
 }
 
-static void InitSetup()
+static void InitSetup(void)
 {
   LoadSetup();					/* global setup info */
   LoadSetup_AutoSetup();			/* global auto setup info */
@@ -5095,13 +5095,13 @@ static void InitSetup()
     global.show_frames_per_second = TRUE;
 }
 
-static void InitGameInfo()
+static void InitGameInfo(void)
 {
   game.restart_level = FALSE;
   game.restart_game_message = NULL;
 }
 
-static void InitPlayerInfo()
+static void InitPlayerInfo(void)
 {
   int i;
 
@@ -5117,7 +5117,7 @@ static void InitPlayerInfo()
   local_player->connected_locally = TRUE;
 }
 
-static void InitArtworkInfo()
+static void InitArtworkInfo(void)
 {
   LoadArtworkInfo();
 }
@@ -5143,7 +5143,7 @@ static char *get_level_id_suffix(int id_nr)
   return id_suffix;
 }
 
-static void InitArtworkConfig()
+static void InitArtworkConfig(void)
 {
   static char *image_id_prefix[MAX_NUM_ELEMENTS +
 			       NUM_FONTS +
@@ -5263,14 +5263,14 @@ static void InitArtworkConfig()
 		level_id_suffix, ignore_music_tokens);
 }
 
-static void InitMixer()
+static void InitMixer(void)
 {
   OpenAudio();
 
   StartMixer();
 }
 
-static void InitVideoOverlay()
+static void InitVideoOverlay(void)
 {
   // if virtual buttons are not loaded from setup file, repeat initializing
   // virtual buttons grid with default values now that video is initialized
@@ -5281,7 +5281,7 @@ static void InitVideoOverlay()
   InitOverlayInfo();
 }
 
-void InitGfxBuffers()
+void InitGfxBuffers(void)
 {
   static int win_xsize_last = -1;
   static int win_ysize_last = -1;
@@ -5321,7 +5321,7 @@ void InitGfxBuffers()
   InitGfxBuffers_SP();
 }
 
-void InitGfx()
+void InitGfx(void)
 {
   struct GraphicInfo *graphic_info_last = graphic_info;
   char *filename_font_initial = NULL;
@@ -5490,7 +5490,7 @@ void InitGfx()
   init_last = init;
 }
 
-void InitGfxBackground()
+void InitGfxBackground(void)
 {
   fieldbuffer = bitmap_db_field;
   SetDrawtoField(DRAW_TO_BACKBUFFER);
@@ -5500,7 +5500,7 @@ void InitGfxBackground()
   redraw_mask = REDRAW_ALL;
 }
 
-static void InitLevelInfo()
+static void InitLevelInfo(void)
 {
   LoadLevelInfo();				/* global level info */
   LoadLevelSetup_LastSeries();			/* last played series info */
@@ -5518,12 +5518,12 @@ static void InitLevelInfo()
   SetLevelSetInfo(leveldir_current->identifier, level_nr);
 }
 
-static void InitLevelArtworkInfo()
+static void InitLevelArtworkInfo(void)
 {
   LoadLevelArtworkInfo();
 }
 
-static void InitImages()
+static void InitImages(void)
 {
   print_timestamp_init("InitImages");
 
@@ -5626,7 +5626,7 @@ static void InitMusic(char *identifier)
   print_timestamp_done("InitMusic");
 }
 
-static void InitArtworkDone()
+static void InitArtworkDone(void)
 {
   if (program.headless)
     return;
@@ -5634,7 +5634,7 @@ static void InitArtworkDone()
   InitGlobalAnimations();
 }
 
-void InitNetworkSettings()
+void InitNetworkSettings(void)
 {
   InitNetworkInfo(options.network || setup.network_mode,
 		  FALSE,
@@ -5643,7 +5643,7 @@ void InitNetworkSettings()
 		  options.server_port);
 }
 
-void InitNetworkServer()
+void InitNetworkServer(void)
 {
   if (!network.enabled || network.connected)
     return;
@@ -5742,7 +5742,7 @@ static boolean CheckArtworkTypeForRedefinedCustomElements(int type)
   return redefined_ce_found;
 }
 
-static void InitOverrideArtwork()
+static void InitOverrideArtwork(void)
 {
   boolean redefined_ce_found = FALSE;
 
@@ -5943,7 +5943,7 @@ void ReloadCustomArtwork(int force_reload)
   LimitScreenUpdates(FALSE);
 }
 
-void KeyboardAutoRepeatOffUnlessAutoplay()
+void KeyboardAutoRepeatOffUnlessAutoplay(void)
 {
   if (global.autoplay_leveldir == NULL)
     KeyboardAutoRepeatOff();
@@ -6018,7 +6018,7 @@ void DisplayExitMessage(char *format, va_list ap)
 /* OpenAll()                                                                 */
 /* ========================================================================= */
 
-void OpenAll()
+void OpenAll(void)
 {
   print_timestamp_init("OpenAll");
 

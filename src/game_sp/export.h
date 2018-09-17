@@ -175,34 +175,34 @@ extern struct GraphicInfo_SP graphic_info_sp_object[TILE_MAX][8];
 extern struct GraphicInfo_SP graphic_info_sp_player[MAX_PLAYERS][SPR_MAX][8];
 extern struct EngineSnapshotInfo_SP engine_snapshot_sp;
 
-extern void sp_open_all();
-extern void sp_close_all();
+extern void sp_open_all(void);
+extern void sp_close_all(void);
 
-extern void InitPrecedingPlayfieldMemory();
-extern void InitGfxBuffers_SP();
+extern void InitPrecedingPlayfieldMemory(void);
+extern void InitGfxBuffers_SP(void);
 
-extern void InitGameEngine_SP();
+extern void InitGameEngine_SP(void);
 extern void GameActions_SP(byte *, boolean);
 
 extern unsigned int InitEngineRandom_SP(int);
 
-extern void setLevelInfoToDefaults_SP();
-extern void copyInternalEngineVars_SP();
+extern void setLevelInfoToDefaults_SP(void);
+extern void copyInternalEngineVars_SP(void);
 extern boolean LoadNativeLevel_SP(char *, int, boolean);
 extern void SaveNativeLevel_SP(char *);
 
-extern int getFieldbufferOffsetX_SP();
-extern int getFieldbufferOffsetY_SP();
+extern int getFieldbufferOffsetX_SP(void);
+extern int getFieldbufferOffsetY_SP(void);
 
 extern void BlitScreenToBitmap_SP(Bitmap *);
 extern void RedrawPlayfield_SP(boolean);
 
-extern void LoadEngineSnapshotValues_SP();
+extern void LoadEngineSnapshotValues_SP(void);
 extern void SaveEngineSnapshotValues_SP(ListNode **);
 
 extern int map_key_RND_to_SP(int);
 extern int map_key_SP_to_RND(int);
 
-extern int getRedDiskReleaseFlag_SP();
+extern int getRedDiskReleaseFlag_SP(void);
 
 #endif	/* GAME_SP_EXPORT_H */

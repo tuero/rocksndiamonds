@@ -734,27 +734,27 @@ extern struct GraphicInfo_EM graphic_info_em_object[TILE_MAX][8];
 extern struct GraphicInfo_EM graphic_info_em_player[MAX_PLAYERS][SPR_MAX][8];
 extern struct EngineSnapshotInfo_EM engine_snapshot_em;
 
-extern void em_open_all();
-extern void em_close_all();
+extern void em_open_all(void);
+extern void em_close_all(void);
 
-extern void InitGfxBuffers_EM();
+extern void InitGfxBuffers_EM(void);
 
-extern void InitGameEngine_EM();
+extern void InitGameEngine_EM(void);
 extern void GameActions_EM(byte *, boolean);
 
 extern unsigned int InitEngineRandom_EM(int);
 
-extern void setLevelInfoToDefaults_EM();
+extern void setLevelInfoToDefaults_EM(void);
 extern boolean LoadNativeLevel_EM(char *, boolean);
 
-extern int getFieldbufferOffsetX_EM();
-extern int getFieldbufferOffsetY_EM();
+extern int getFieldbufferOffsetX_EM(void);
+extern int getFieldbufferOffsetY_EM(void);
 
 extern void BackToFront_EM(void);
 extern void BlitScreenToBitmap_EM(Bitmap *);
 extern void RedrawPlayfield_EM(boolean);
 
-extern void LoadEngineSnapshotValues_EM();
-extern void SaveEngineSnapshotValues_EM();
+extern void LoadEngineSnapshotValues_EM(void);
+extern void SaveEngineSnapshotValues_EM(void);
 
 #endif	/* EXPORT_H */

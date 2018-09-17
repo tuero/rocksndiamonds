@@ -14,7 +14,7 @@ int DisplayMinX, DisplayMaxX;
 int DisplayMinY, DisplayMaxY;
 
 
-void subDisplayLevel()
+void subDisplayLevel(void)
 {
   if (NoDisplayFlag || ! LevelLoaded)
     return;

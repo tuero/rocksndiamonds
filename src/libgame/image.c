@@ -86,7 +86,7 @@ static void FreeImage(void *ptr)
   free(image);
 }
 
-int getImageListSize()
+int getImageListSize(void)
 {
   return (image_info->num_file_list_entries +
 	  image_info->num_dynamic_file_list_entries);
@@ -160,17 +160,17 @@ int getImageIDFromToken(char *token)
   return -1;
 }
 
-char *getImageConfigFilename()
+char *getImageConfigFilename(void)
 {
   return getCustomArtworkConfigFilename(image_info->type);
 }
 
-int getImageListPropertyMappingSize()
+int getImageListPropertyMappingSize(void)
 {
   return image_info->num_property_mapping_entries;
 }
 
-struct PropertyMapping *getImageListPropertyMapping()
+struct PropertyMapping *getImageListPropertyMapping(void)
 {
   return image_info->property_mapping;
 }
@@ -250,7 +250,7 @@ void InitImageList(struct ConfigInfo *config_list, int num_file_list_entries,
   image_info->free_artwork = FreeImage;
 }
 
-void ReloadCustomImages()
+void ReloadCustomImages(void)
 {
   print_timestamp_init("ReloadCustomImages");
 
@@ -382,7 +382,7 @@ void FreeImageTextures(int pos)
   img_info->contains_textures = FALSE;
 }
 
-void FreeAllImageTextures()
+void FreeAllImageTextures(void)
 {
   int num_images = getImageListSize();
   int i;
@@ -404,7 +404,7 @@ void ScaleImage(int pos, int zoom_factor)
   img_info->scaled_up = TRUE;
 }
 
-void FreeAllImages()
+void FreeAllImages(void)
 {
   FreeCustomArtworkLists(image_info);
 }

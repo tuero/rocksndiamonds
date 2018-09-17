@@ -336,7 +336,7 @@ boolean getTokenValueFromString(char *string, char **token, char **value)
 /* maximal allowed length of a command line option */
 #define MAX_OPTION_LEN		256
 
-static unsigned int getCurrentMS()
+static unsigned int getCurrentMS(void)
 {
   return SDL_GetTicks();
 }
@@ -558,7 +558,7 @@ static char *get_corrected_real_name(char *real_name)
 }
 #endif
 
-char *getLoginName()
+char *getLoginName(void)
 {
   static char *login_name = NULL;
 
@@ -588,7 +588,7 @@ char *getLoginName()
   return login_name;
 }
 
-char *getRealName()
+char *getRealName(void)
 {
   static char *real_name = NULL;
 
@@ -1141,7 +1141,7 @@ void SetError(char *format, ...)
   va_end(ap);
 }
 
-char *GetError()
+char *GetError(void)
 {
   return internal_error;
 }
@@ -2073,7 +2073,7 @@ int get_player_nr_from_string(char *s)
 /* functions for generic lists                                               */
 /* ------------------------------------------------------------------------- */
 
-ListNode *newListNode()
+ListNode *newListNode(void)
 {
   return checked_calloc(sizeof(ListNode));
 }
@@ -3877,7 +3877,7 @@ char *getLogFilename(char *basename)
   return getPath2(getUserGameDataDir(), basename);
 }
 
-void OpenLogFiles()
+void OpenLogFiles(void)
 {
   int i;
 
@@ -3899,7 +3899,7 @@ void OpenLogFiles()
   }
 }
 
-void CloseLogFiles()
+void CloseLogFiles(void)
 {
   int i;
 
@@ -3921,7 +3921,7 @@ void DumpLogFile(int nr)
   fclose(log_file);
 }
 
-void NotifyUserAboutErrorFile()
+void NotifyUserAboutErrorFile(void)
 {
 #if defined(PLATFORM_WIN32)
   char *title_text = getStringCat2(program.program_title, " Error Message");
@@ -3948,7 +3948,7 @@ void NotifyUserAboutErrorFile()
 #define DEBUG_TIME_IN_MICROSECONDS		0
 
 #if DEBUG_TIME_IN_MICROSECONDS
-static double Counter_Microseconds()
+static double Counter_Microseconds(void)
 {
   static struct timeval base_time = { 0, 0 };
   struct timeval current_time;

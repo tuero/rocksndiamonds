@@ -253,7 +253,7 @@ void InitUserLevelDirectory(char *);
 void InitNetworkLevelDirectory(char *);
 void InitLevelSetupDirectory(char *);
 
-TreeInfo *newTreeInfo();
+TreeInfo *newTreeInfo(void);
 TreeInfo *newTreeInfo_setDefaults(int);
 void pushTreeInfo(TreeInfo **, TreeInfo *);
 int numTreeInfo(TreeInfo *);
@@ -301,7 +301,7 @@ SetupFileList *setListEntry(SetupFileList *, char *, char *);
 SetupFileList *addListEntry(SetupFileList *, char *, char *);
 SetupFileList *loadSetupFileList(char *);
 
-SetupFileHash *newSetupFileHash();
+SetupFileHash *newSetupFileHash(void);
 void freeSetupFileHash(SetupFileHash *);
 char *getHashEntry(SetupFileHash *, char *);
 void setHashEntry(SetupFileHash *, char *, char *);
@@ -313,7 +313,7 @@ char *getSetupLine(struct TokenInfo *, char *, int);
 
 unsigned int get_hash_from_key(void *);
 
-boolean AdjustGraphicsForEMC();
+boolean AdjustGraphicsForEMC(void);
 
 void LoadLevelInfo(void);
 void LoadArtworkInfo(void);
@@ -321,14 +321,14 @@ void LoadLevelArtworkInfo(void);
 
 char *getArtworkIdentifierForUserLevelSet(int);
 TreeInfo *getArtworkTreeInfoForUserLevelSet(int);
-boolean checkIfCustomArtworkExistsForCurrentLevelSet();
+boolean checkIfCustomArtworkExistsForCurrentLevelSet(void);
 void AddUserLevelSetToLevelInfo(char *);
 boolean UpdateUserLevelSet(char *, char *, char *, int);
 boolean CreateUserLevelSet(char *, char *, char *, int, boolean);
 
 void LoadLevelSetup_LastSeries(void);
 void SaveLevelSetup_LastSeries(void);
-void SaveLevelSetup_LastSeries_Deactivate();
+void SaveLevelSetup_LastSeries_Deactivate(void);
 void LoadLevelSetup_SeriesInfo(void);
 void SaveLevelSetup_SeriesInfo(void);
 

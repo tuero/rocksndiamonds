@@ -59,9 +59,9 @@
 
 
 void SetDrawtoField_MM(int);
-void BackToFront();
-void FadeToFront();
-void ClearWindow();
+void BackToFront(void);
+void FadeToFront(void);
+void ClearWindow(void);
 
 void MarkTileDirty(int, int);
 
@@ -109,12 +109,12 @@ unsigned int OpenDoor(unsigned int);
 unsigned int CloseDoor(unsigned int);
 unsigned int GetDoorState(void);
 unsigned int MoveDoor(unsigned int);
-void DrawSpecialEditorDoor_MM();
-void UndrawSpecialEditorDoor();
+void DrawSpecialEditorDoor_MM(void);
+void UndrawSpecialEditorDoor(void);
 Pixel ReadPixel(DrawBuffer *, int, int);
 void SetRGB(unsigned int, unsigned short, unsigned short, unsigned short);
 
-void CreateToolButtons();
+void CreateToolButtons(void);
 
 int get_base_element(int);
 int get_element_phase(int);

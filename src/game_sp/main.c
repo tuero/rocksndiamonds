@@ -12,7 +12,7 @@ int GfxGraphic[SP_MAX_PLAYFIELD_WIDTH][SP_MAX_PLAYFIELD_HEIGHT];
 int GfxFrame[SP_MAX_PLAYFIELD_WIDTH][SP_MAX_PLAYFIELD_HEIGHT];
 
 
-void InitGameEngine_SP()
+void InitGameEngine_SP(void)
 {
   int x, y;
 
@@ -64,7 +64,7 @@ void RedrawPlayfield_SP(boolean force_redraw)
   UpdatePlayfield(force_redraw);
 }
 
-void UpdateGameDoorValues_SP()
+void UpdateGameDoorValues_SP(void)
 {
   game_sp.time_played = TimerVar / FRAMES_PER_SECOND;
   game_sp.infotrons_still_needed = InfotronsNeeded;
@@ -94,7 +94,7 @@ void GameActions_SP(byte action[MAX_PLAYERS], boolean warp_mode)
       GfxFrame[x][y]++;
 }
 
-int getRedDiskReleaseFlag_SP()
+int getRedDiskReleaseFlag_SP(void)
 {
   /* 0: when Murphy is moving (including the destination tile!) */
   /* 1: when Murphy is not moving for at least one game frame */

@@ -364,7 +364,7 @@ void SendToServer_PlayerName(char *player_name)
   Error(ERR_NETWORK_CLIENT, "you set your player name to \"%s\"", player_name);
 }
 
-void SendToServer_ProtocolVersion()
+void SendToServer_ProtocolVersion(void)
 {
   initNetworkBufferForWriting(write_buffer, OP_PROTOCOL_VERSION, 0);
 
@@ -384,7 +384,7 @@ void SendToServer_NrWanted(int nr_wanted)
   SendNetworkBufferToServer(write_buffer);
 }
 
-void SendToServer_LevelFile()
+void SendToServer_LevelFile(void)
 {
   initNetworkBufferForWriting(write_buffer, OP_LEVEL_FILE, 0);
 
@@ -422,7 +422,7 @@ void SendToServer_LevelFile()
 #endif
 }
 
-void SendToServer_StartPlaying()
+void SendToServer_StartPlaying(void)
 {
   unsigned int new_random_seed = InitRND(level.random_seed);
 
@@ -435,14 +435,14 @@ void SendToServer_StartPlaying()
   SendNetworkBufferToServer(write_buffer);
 }
 
-void SendToServer_PausePlaying()
+void SendToServer_PausePlaying(void)
 {
   initNetworkBufferForWriting(write_buffer, OP_PAUSE_PLAYING, 0);
 
   SendNetworkBufferToServer(write_buffer);
 }
 
-void SendToServer_ContinuePlaying()
+void SendToServer_ContinuePlaying(void)
 {
   initNetworkBufferForWriting(write_buffer, OP_CONTINUE_PLAYING, 0);
 
@@ -467,7 +467,7 @@ void SendToServer_MovePlayer(byte player_action)
   SendNetworkBufferToServer(write_buffer);
 }
 
-static void Handle_OP_BAD_PROTOCOL_VERSION()
+static void Handle_OP_BAD_PROTOCOL_VERSION(void)
 {
   int protocol_version_major = getNetworkBuffer8BitInteger(read_buffer);
   int protocol_version_minor = getNetworkBuffer8BitInteger(read_buffer);
@@ -490,7 +490,7 @@ static void Handle_OP_BAD_PROTOCOL_VERSION()
   stop_network_client = TRUE;
 }
 
-static void Handle_OP_YOUR_NUMBER()
+static void Handle_OP_YOUR_NUMBER(void)
 {
   int old_client_nr = getNetworkBuffer8BitInteger(read_buffer);
   int new_client_nr = getNetworkBuffer8BitInteger(read_buffer);
@@ -522,7 +522,7 @@ static void Handle_OP_YOUR_NUMBER()
   stored_player[new_index_nr].connected_network = TRUE;
 }
 
-static void Handle_OP_NUMBER_WANTED()
+static void Handle_OP_NUMBER_WANTED(void)
 {
   int old_client_nr    = getNetworkBuffer8BitInteger(read_buffer);
   int client_nr_wanted = getNetworkBuffer8BitInteger(read_buffer);
@@ -581,7 +581,7 @@ static void Handle_OP_NUMBER_WANTED()
     DrawNetworkPlayers();
 }
 
-static void Handle_OP_PLAYER_NAME()
+static void Handle_OP_PLAYER_NAME(void)
 {
   int player_nr = getNetworkBuffer8BitInteger(read_buffer);
   char *player_name = getNetworkBufferString(read_buffer);
@@ -596,7 +596,7 @@ static void Handle_OP_PLAYER_NAME()
 	player_nr, player->name);
 }
 
-static void Handle_OP_PLAYER_CONNECTED()
+static void Handle_OP_PLAYER_CONNECTED(void)
 {
   struct NetworkClientPlayerInfo *player, *last_player = NULL;
   int new_client_nr = getNetworkBuffer8BitInteger(read_buffer);
@@ -622,7 +622,7 @@ static void Handle_OP_PLAYER_CONNECTED()
   stored_player[new_index_nr].connected_network = TRUE;
 }
 
-static void Handle_OP_PLAYER_DISCONNECTED()
+static void Handle_OP_PLAYER_DISCONNECTED(void)
 {
   struct NetworkClientPlayerInfo *player, *player_disconnected;
   int player_nr = getNetworkBuffer8BitInteger(read_buffer);
@@ -660,7 +660,7 @@ static void Handle_OP_PLAYER_DISCONNECTED()
   }
 }
 
-static void Handle_OP_START_PLAYING()
+static void Handle_OP_START_PLAYING(void)
 {
   int player_nr = getNetworkBuffer8BitInteger(read_buffer);
   char *new_leveldir_identifier = getNetworkBufferString(read_buffer);
@@ -703,7 +703,7 @@ static void Handle_OP_START_PLAYING()
   StartGameActions(FALSE, setup.autorecord, new_random_seed);
 }
 
-static void Handle_OP_PAUSE_PLAYING()
+static void Handle_OP_PAUSE_PLAYING(void)
 {
   int player_nr = getNetworkBuffer8BitInteger(read_buffer);
 
@@ -717,7 +717,7 @@ static void Handle_OP_PAUSE_PLAYING()
   }
 }
 
-static void Handle_OP_CONTINUE_PLAYING()
+static void Handle_OP_CONTINUE_PLAYING(void)
 {
   int player_nr = getNetworkBuffer8BitInteger(read_buffer);
 
@@ -731,7 +731,7 @@ static void Handle_OP_CONTINUE_PLAYING()
   }
 }
 
-static void Handle_OP_STOP_PLAYING()
+static void Handle_OP_STOP_PLAYING(void)
 {
   int client_nr = getNetworkBuffer8BitInteger(read_buffer);
   int cause_for_stopping = getNetworkBuffer8BitInteger(read_buffer);
@@ -764,7 +764,7 @@ static void Handle_OP_STOP_PLAYING()
   }
 }
 
-static void Handle_OP_MOVE_PLAYER()
+static void Handle_OP_MOVE_PLAYER(void)
 {
   int player_nr = getNetworkBuffer8BitInteger(read_buffer);
   int server_frame_counter = getNetworkBuffer32BitInteger(read_buffer);
@@ -794,7 +794,7 @@ static void Handle_OP_MOVE_PLAYER()
   network_player_action_received = TRUE;
 }
 
-static void Handle_OP_BROADCAST_MESSAGE()
+static void Handle_OP_BROADCAST_MESSAGE(void)
 {
   int player_nr = getNetworkBuffer8BitInteger(read_buffer);
 
@@ -802,7 +802,7 @@ static void Handle_OP_BROADCAST_MESSAGE()
   Error(ERR_NETWORK_CLIENT, "client %d sends message", player_nr);
 }
 
-static void Handle_OP_LEVEL_FILE()
+static void Handle_OP_LEVEL_FILE(void)
 {
   int player_nr = getNetworkBuffer8BitInteger(read_buffer);
   char *leveldir_identifier;
@@ -872,7 +872,7 @@ static void Handle_OP_LEVEL_FILE()
 #endif
 }
 
-static void HandleNetworkingMessage()
+static void HandleNetworkingMessage(void)
 {
   stop_network_game = FALSE;
 
@@ -947,7 +947,7 @@ static void HandleNetworkingMessage()
     SendToServer_StopPlaying(NETWORK_STOP_BY_ERROR);
 }
 
-static char *HandleNetworkingPackets()
+static char *HandleNetworkingPackets(void)
 {
   while (1)
   {
@@ -993,7 +993,7 @@ static void FreeNetworkClientPlayerInfo(struct NetworkClientPlayerInfo *player)
   checked_free(player);
 }
 
-static void HandleNetworkingDisconnect()
+static void HandleNetworkingDisconnect(void)
 {
   int i;
 
@@ -1016,7 +1016,7 @@ static void HandleNetworkingDisconnect()
   first_player.next = NULL;
 }
 
-void HandleNetworking()
+void HandleNetworking(void)
 {
   char *error_message = HandleNetworkingPackets();
 
@@ -1042,7 +1042,7 @@ void HandleNetworking()
   }
 }
 
-void DisconnectFromNetworkServer()
+void DisconnectFromNetworkServer(void)
 {
   DrawNetworkText_Title("Terminating Network");
   DrawNetworkText("Disconnecting from network server ...");

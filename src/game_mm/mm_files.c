@@ -88,7 +88,7 @@ static void WriteChunk_MM_VERS(FILE *file, int file_version, int game_version)
   fputc(0, file);	/* not used */
 }
 
-void setLevelInfoToDefaults_MM()
+void setLevelInfoToDefaults_MM(void)
 {
   int i, x, y;
 

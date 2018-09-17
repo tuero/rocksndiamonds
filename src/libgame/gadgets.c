@@ -60,7 +60,7 @@ static struct GadgetInfo *getGadgetInfoFromGadgetID(int id)
   return gi;
 }
 
-static int getNewGadgetID()
+static int getNewGadgetID(void)
 {
   int id = next_free_gadget_id++;
 
@@ -1432,37 +1432,37 @@ static void MultiMapGadgets(int mode)
   }
 }
 
-void UnmapAllGadgets()
+void UnmapAllGadgets(void)
 {
   MultiMapGadgets(MULTIMAP_ALL | MULTIMAP_UNMAP);
 }
 
-void RemapAllGadgets()
+void RemapAllGadgets(void)
 {
   MultiMapGadgets(MULTIMAP_ALL | MULTIMAP_REMAP);
 }
 
-boolean anyTextInputGadgetActive()
+boolean anyTextInputGadgetActive(void)
 {
   return (last_gi && (last_gi->type & GD_TYPE_TEXT_INPUT) && last_gi->mapped);
 }
 
-boolean anyTextAreaGadgetActive()
+boolean anyTextAreaGadgetActive(void)
 {
   return (last_gi && (last_gi->type & GD_TYPE_TEXT_AREA) && last_gi->mapped);
 }
 
-boolean anySelectboxGadgetActive()
+boolean anySelectboxGadgetActive(void)
 {
   return (last_gi && (last_gi->type & GD_TYPE_SELECTBOX) && last_gi->mapped);
 }
 
-boolean anyScrollbarGadgetActive()
+boolean anyScrollbarGadgetActive(void)
 {
   return (last_gi && (last_gi->type & GD_TYPE_SCROLLBAR) && last_gi->mapped);
 }
 
-boolean anyTextGadgetActive()
+boolean anyTextGadgetActive(void)
 {
   return (anyTextInputGadgetActive() ||
 	  anyTextAreaGadgetActive() ||
@@ -2274,7 +2274,7 @@ boolean HandleGadgetsKeyInput(Key key)
   return TRUE;
 }
 
-void DumpGadgetIdentifiers()
+void DumpGadgetIdentifiers(void)
 {
   struct GadgetInfo *gi;
 

@@ -7,13 +7,13 @@
 /* functions for loading Supaplex level                                      */
 /* ------------------------------------------------------------------------- */
 
-void setTapeInfoToDefaults_SP()
+void setTapeInfoToDefaults_SP(void)
 {
   native_sp_level.demo.is_available = FALSE;
   native_sp_level.demo.length = 0;
 }
 
-void setLevelInfoToDefaults_SP()
+void setLevelInfoToDefaults_SP(void)
 {
   LevelInfoType *header = &native_sp_level.header;
   char *empty_title = "-------- EMPTY --------";
@@ -58,7 +58,7 @@ void setLevelInfoToDefaults_SP()
   setTapeInfoToDefaults_SP();
 }
 
-void copyInternalEngineVars_SP()
+void copyInternalEngineVars_SP(void)
 {
   int count;
   int i, x, y;

@@ -212,11 +212,11 @@ struct TapeInfo
 void DrawVideoDisplay(unsigned int, unsigned int);
 void DrawCompleteVideoDisplay(void);
 
-void TapeDeactivateDisplayOn();
+void TapeDeactivateDisplayOn(void);
 void TapeDeactivateDisplayOff(boolean);
 
 void TapeSetDateFromEpochSeconds(time_t);
-void TapeSetDateFromNow();
+void TapeSetDateFromNow(void);
 
 void TapeStartRecording(int);
 void TapeHaltRecording(void);
@@ -234,20 +234,20 @@ unsigned int GetTapeLengthSeconds(void);
 void TapeQuickSave(void);
 void TapeQuickLoad(void);
 
-boolean hasSolutionTape();
+boolean hasSolutionTape(void);
 boolean InsertSolutionTape(void);
 boolean PlaySolutionTape(void);
 
 void AutoPlayTape(void);
 
-void CreateTapeButtons();
-void FreeTapeButtons();
-void MapTapeEjectButton();
-void MapTapeWarpButton();
-void MapTapeButtons();
-void UnmapTapeButtons();
-void RedrawTapeButtons();
-void RedrawOrRemapTapeButtons();
+void CreateTapeButtons(void);
+void FreeTapeButtons(void);
+void MapTapeEjectButton(void);
+void MapTapeWarpButton(void);
+void MapTapeButtons(void);
+void UnmapTapeButtons(void);
+void RedrawTapeButtons(void);
+void RedrawOrRemapTapeButtons(void);
 
 void HandleTapeButtonKeys(Key);
 

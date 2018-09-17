@@ -11,6 +11,6 @@
 
 /* helper functions for constructs not supported by C */
 
-extern int MyGetTickCount();
+extern int MyGetTickCount(void);
 
 #endif /* VB_LIB_H */

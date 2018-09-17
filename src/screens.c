@@ -221,7 +221,7 @@ static void HandleSetupScreen_Generic(int, int, int, int, int);
 static void HandleSetupScreen_Input(int, int, int, int, int);
 static void CustomizeKeyboard(int);
 static void ConfigureJoystick(int);
-static void ConfigureVirtualButtons();
+static void ConfigureVirtualButtons(void);
 static void execSetupGame(void);
 static void execSetupGraphics(void);
 static void execSetupSound(void);
@@ -1085,7 +1085,7 @@ static boolean visibleTextPos(struct TextPosInfo *pos)
   return (pos != NULL && pos->x != -1 && pos->y != -1);
 }
 
-static void InitializeMainControls()
+static void InitializeMainControls(void)
 {
   boolean local_team_mode = (!network.enabled && setup.team_mode);
   int i;
@@ -1361,7 +1361,7 @@ static void AdjustChooseTreeScrollbar(int id, int first_entry, TreeInfo *ti)
 		  first_entry);
 }
 
-static void clearMenuListArea()
+static void clearMenuListArea(void)
 {
   int scrollbar_xpos = mSX + SC_SCROLLBAR_XPOS + menu.scrollbar_xoffset;
 
@@ -1415,7 +1415,7 @@ static void drawChooseTreeCursor(int ypos, boolean active)
   drawCursorExt(0, ypos, active, -1);
 }
 
-void DrawHeadline()
+void DrawHeadline(void)
 {
   DrawTextSCentered(MENU_TITLE1_YPOS, FONT_TITLE_1, main_text_title_1);
   DrawTextSCentered(MENU_TITLE2_YPOS, FONT_TITLE_2, main_text_title_2);
@@ -1516,7 +1516,7 @@ void DrawTitleScreenMessage(int nr, boolean initial)
   ResetFontStatus();
 }
 
-void DrawTitleScreen()
+void DrawTitleScreen(void)
 {
   KeyboardAutoRepeatOff();
 
@@ -1540,7 +1540,7 @@ boolean CheckTitleScreen(boolean levelset_has_changed)
   return (show_titlescreen && num_title_screens > 0);
 }
 
-void DrawMainMenu()
+void DrawMainMenu(void)
 {
   static LevelDirTree *leveldir_last_valid = NULL;
   boolean levelset_has_changed = FALSE;
@@ -1686,7 +1686,7 @@ void DrawMainMenu()
   OpenDoor(DOOR_CLOSE_1 | DOOR_OPEN_2);
 }
 
-static void gotoTopLevelDir()
+static void gotoTopLevelDir(void)
 {
   /* move upwards until inside (but not above) top level directory */
   while (leveldir_current->node_parent &&
@@ -2137,56 +2137,56 @@ static struct TokenInfo *info_info;
 static int num_info_info;	/* number of info entries shown on screen */
 static int max_info_info;	/* total number of info entries in list */
 
-static void execInfoTitleScreen()
+static void execInfoTitleScreen(void)
 {
   info_mode = INFO_MODE_TITLE;
 
   DrawInfoScreen();
 }
 
-static void execInfoElements()
+static void execInfoElements(void)
 {
   info_mode = INFO_MODE_ELEMENTS;
 
   DrawInfoScreen();
 }
 
-static void execInfoMusic()
+static void execInfoMusic(void)
 {
   info_mode = INFO_MODE_MUSIC;
 
   DrawInfoScreen();
 }
 
-static void execInfoCredits()
+static void execInfoCredits(void)
 {
   info_mode = INFO_MODE_CREDITS;
 
   DrawInfoScreen();
 }
 
-static void execInfoProgram()
+static void execInfoProgram(void)
 {
   info_mode = INFO_MODE_PROGRAM;
 
   DrawInfoScreen();
 }
 
-static void execInfoVersion()
+static void execInfoVersion(void)
 {
   info_mode = INFO_MODE_VERSION;
 
   DrawInfoScreen();
 }
 
-static void execInfoLevelSet()
+static void execInfoLevelSet(void)
 {
   info_mode = INFO_MODE_LEVELSET;
 
   DrawInfoScreen();
 }
 
-static void execExitInfo()
+static void execExitInfo(void)
 {
   SetGameStatus(GAME_MODE_MAIN);
 
@@ -2307,7 +2307,7 @@ static void drawMenuInfoList(int first_entry, int num_page_entries,
   }
 }
 
-static void DrawInfoScreen_Main()
+static void DrawInfoScreen_Main(void)
 {
   int fade_mask = REDRAW_FIELD;
   int i;
@@ -2885,7 +2885,7 @@ void DrawInfoScreen_HelpText(int element, int action, int direction, int ypos)
 		 TRUE, FALSE, FALSE);
 }
 
-void DrawInfoScreen_TitleScreen()
+void DrawInfoScreen_TitleScreen(void)
 {
   SetGameStatus(GAME_MODE_TITLE);
 
@@ -2897,7 +2897,7 @@ void HandleInfoScreen_TitleScreen(int button)
   HandleTitleScreen(0, 0, 0, 0, button);
 }
 
-void DrawInfoScreen_Elements()
+void DrawInfoScreen_Elements(void)
 {
   SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_ELEMENTS);
 
@@ -2990,7 +2990,7 @@ void HandleInfoScreen_Elements(int button)
   }
 }
 
-void DrawInfoScreen_Music()
+void DrawInfoScreen_Music(void)
 {
   SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_MUSIC);
 
@@ -3401,7 +3401,7 @@ static void DrawInfoScreen_CreditsScreen(int screen_nr)
 		    "Press any key or button for next page");
 }
 
-void DrawInfoScreen_Credits()
+void DrawInfoScreen_Credits(void)
 {
   SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_CREDITS);
 
@@ -3471,7 +3471,7 @@ void HandleInfoScreen_Credits(int button)
   }
 }
 
-void DrawInfoScreen_Program()
+void DrawInfoScreen_Program(void)
 {
   int font_title = MENU_INFO_FONT_TITLE;
   int font_head  = MENU_INFO_FONT_HEAD;
@@ -3556,7 +3556,7 @@ void HandleInfoScreen_Program(int button)
   }
 }
 
-void DrawInfoScreen_Version()
+void DrawInfoScreen_Version(void)
 {
   int font_title = MENU_INFO_FONT_TITLE;
   int font_head  = MENU_INFO_FONT_HEAD;
@@ -3753,7 +3753,7 @@ void HandleInfoScreen_Version(int button)
   }
 }
 
-void DrawInfoScreen_LevelSet()
+void DrawInfoScreen_LevelSet(void)
 {
   struct TitleMessageInfo *tmi = &readme;
   char *filename = getLevelSetInfoFilename();
@@ -3841,7 +3841,7 @@ void HandleInfoScreen_LevelSet(int button)
   }
 }
 
-static void DrawInfoScreen()
+static void DrawInfoScreen(void)
 {
   if (info_mode == INFO_MODE_TITLE)
     DrawInfoScreen_TitleScreen();
@@ -4430,7 +4430,7 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
   }
 }
 
-void DrawChooseLevelSet()
+void DrawChooseLevelSet(void)
 {
   FadeMenuSoundsAndMusic();
 
@@ -4444,7 +4444,7 @@ void HandleChooseLevelSet(int mx, int my, int dx, int dy, int button)
   HandleChooseTree(mx, my, dx, dy, button, &leveldir_current);
 }
 
-void DrawChooseLevelNr()
+void DrawChooseLevelNr(void)
 {
   int i;
 
@@ -4680,14 +4680,14 @@ static char *drop_distance_text;
 static char *transparency_text;
 static char *grid_size_text[2][2];
 
-static void execSetupMain()
+static void execSetupMain(void)
 {
   setup_mode = SETUP_MODE_MAIN;
 
   DrawSetupScreen();
 }
 
-static void execSetupGame_setGameSpeeds()
+static void execSetupGame_setGameSpeeds(void)
 {
   if (game_speeds == NULL)
   {
@@ -4737,7 +4737,7 @@ static void execSetupGame_setGameSpeeds()
   game_speed_text = game_speed_current->name;
 }
 
-static void execSetupGame_setScrollDelays()
+static void execSetupGame_setScrollDelays(void)
 {
   if (scroll_delays == NULL)
   {
@@ -4787,7 +4787,7 @@ static void execSetupGame_setScrollDelays()
   scroll_delay_text = scroll_delay_current->name;
 }
 
-static void execSetupGame_setSnapshotModes()
+static void execSetupGame_setSnapshotModes(void)
 {
   if (snapshot_modes == NULL)
   {
@@ -4837,7 +4837,7 @@ static void execSetupGame_setSnapshotModes()
   snapshot_mode_text = snapshot_mode_current->name;
 }
 
-static void execSetupGame()
+static void execSetupGame(void)
 {
   execSetupGame_setGameSpeeds();
   execSetupGame_setScrollDelays();
@@ -4848,28 +4848,28 @@ static void execSetupGame()
   DrawSetupScreen();
 }
 
-static void execSetupChooseGameSpeed()
+static void execSetupChooseGameSpeed(void)
 {
   setup_mode = SETUP_MODE_CHOOSE_GAME_SPEED;
 
   DrawSetupScreen();
 }
 
-static void execSetupChooseScrollDelay()
+static void execSetupChooseScrollDelay(void)
 {
   setup_mode = SETUP_MODE_CHOOSE_SCROLL_DELAY;
 
   DrawSetupScreen();
 }
 
-static void execSetupChooseSnapshotMode()
+static void execSetupChooseSnapshotMode(void)
 {
   setup_mode = SETUP_MODE_CHOOSE_SNAPSHOT_MODE;
 
   DrawSetupScreen();
 }
 
-static void execSetupEditor()
+static void execSetupEditor(void)
 {
   setup_mode = SETUP_MODE_EDITOR;
 
@@ -4961,7 +4961,7 @@ static void execSetupGraphics_setWindowSizes(boolean update_list)
   window_size_text = window_size_current->name;
 }
 
-static void execSetupGraphics_setScalingTypes()
+static void execSetupGraphics_setScalingTypes(void)
 {
   if (scaling_types == NULL)
   {
@@ -5011,7 +5011,7 @@ static void execSetupGraphics_setScalingTypes()
   scaling_type_text = scaling_type_current->name;
 }
 
-static void execSetupGraphics_setRenderingModes()
+static void execSetupGraphics_setRenderingModes(void)
 {
   if (rendering_modes == NULL)
   {
@@ -5062,7 +5062,7 @@ static void execSetupGraphics_setRenderingModes()
   rendering_mode_text = rendering_mode_current->name;
 }
 
-static void execSetupGraphics()
+static void execSetupGraphics(void)
 {
   // update "setup.window_scaling_percent" from list selection
   // (in this case, window scaling was changed on setup screen)
@@ -5093,49 +5093,49 @@ static void execSetupGraphics()
 #endif
 }
 
-static void execSetupChooseWindowSize()
+static void execSetupChooseWindowSize(void)
 {
   setup_mode = SETUP_MODE_CHOOSE_WINDOW_SIZE;
 
   DrawSetupScreen();
 }
 
-static void execSetupChooseScalingType()
+static void execSetupChooseScalingType(void)
 {
   setup_mode = SETUP_MODE_CHOOSE_SCALING_TYPE;
 
   DrawSetupScreen();
 }
 
-static void execSetupChooseRenderingMode()
+static void execSetupChooseRenderingMode(void)
 {
   setup_mode = SETUP_MODE_CHOOSE_RENDERING;
 
   DrawSetupScreen();
 }
 
-static void execSetupChooseVolumeSimple()
+static void execSetupChooseVolumeSimple(void)
 {
   setup_mode = SETUP_MODE_CHOOSE_VOLUME_SIMPLE;
 
   DrawSetupScreen();
 }
 
-static void execSetupChooseVolumeLoops()
+static void execSetupChooseVolumeLoops(void)
 {
   setup_mode = SETUP_MODE_CHOOSE_VOLUME_LOOPS;
 
   DrawSetupScreen();
 }
 
-static void execSetupChooseVolumeMusic()
+static void execSetupChooseVolumeMusic(void)
 {
   setup_mode = SETUP_MODE_CHOOSE_VOLUME_MUSIC;
 
   DrawSetupScreen();
 }
 
-static void execSetupSound()
+static void execSetupSound(void)
 {
   if (volumes_simple == NULL)
   {
@@ -5355,63 +5355,63 @@ static void execSetupSound()
   DrawSetupScreen();
 }
 
-static void execSetupChooseTouchControls()
+static void execSetupChooseTouchControls(void)
 {
   setup_mode = SETUP_MODE_CHOOSE_TOUCH_CONTROL;
 
   DrawSetupScreen();
 }
 
-static void execSetupChooseMoveDistance()
+static void execSetupChooseMoveDistance(void)
 {
   setup_mode = SETUP_MODE_CHOOSE_MOVE_DISTANCE;
 
   DrawSetupScreen();
 }
 
-static void execSetupChooseDropDistance()
+static void execSetupChooseDropDistance(void)
 {
   setup_mode = SETUP_MODE_CHOOSE_DROP_DISTANCE;
 
   DrawSetupScreen();
 }
 
-static void execSetupChooseTransparency()
+static void execSetupChooseTransparency(void)
 {
   setup_mode = SETUP_MODE_CHOOSE_TRANSPARENCY;
 
   DrawSetupScreen();
 }
 
-static void execSetupChooseGridXSize_0()
+static void execSetupChooseGridXSize_0(void)
 {
   setup_mode = SETUP_MODE_CHOOSE_GRID_XSIZE_0;
 
   DrawSetupScreen();
 }
 
-static void execSetupChooseGridYSize_0()
+static void execSetupChooseGridYSize_0(void)
 {
   setup_mode = SETUP_MODE_CHOOSE_GRID_YSIZE_0;
 
   DrawSetupScreen();
 }
 
-static void execSetupChooseGridXSize_1()
+static void execSetupChooseGridXSize_1(void)
 {
   setup_mode = SETUP_MODE_CHOOSE_GRID_XSIZE_1;
 
   DrawSetupScreen();
 }
 
-static void execSetupChooseGridYSize_1()
+static void execSetupChooseGridYSize_1(void)
 {
   setup_mode = SETUP_MODE_CHOOSE_GRID_YSIZE_1;
 
   DrawSetupScreen();
 }
 
-static void execSetupConfigureVirtualButtons()
+static void execSetupConfigureVirtualButtons(void)
 {
   setup_mode = SETUP_MODE_CONFIG_VIRT_BUTTONS;
 
@@ -5422,7 +5422,7 @@ static void execSetupConfigureVirtualButtons()
   DrawSetupScreen();
 }
 
-static void execSetupTouch()
+static void execSetupTouch(void)
 {
   int i, j, k;
 
@@ -5683,7 +5683,7 @@ static void execSetupTouch()
   DrawSetupScreen();
 }
 
-static void execSetupArtwork()
+static void execSetupArtwork(void)
 {
 #if 0
   printf("::: '%s', '%s', '%s'\n",
@@ -5709,84 +5709,84 @@ static void execSetupArtwork()
   DrawSetupScreen();
 }
 
-static void execSetupChooseGraphics()
+static void execSetupChooseGraphics(void)
 {
   setup_mode = SETUP_MODE_CHOOSE_GRAPHICS;
 
   DrawSetupScreen();
 }
 
-static void execSetupChooseSounds()
+static void execSetupChooseSounds(void)
 {
   setup_mode = SETUP_MODE_CHOOSE_SOUNDS;
 
   DrawSetupScreen();
 }
 
-static void execSetupChooseMusic()
+static void execSetupChooseMusic(void)
 {
   setup_mode = SETUP_MODE_CHOOSE_MUSIC;
 
   DrawSetupScreen();
 }
 
-static void execSetupInput()
+static void execSetupInput(void)
 {
   setup_mode = SETUP_MODE_INPUT;
 
   DrawSetupScreen();
 }
 
-static void execSetupShortcuts()
+static void execSetupShortcuts(void)
 {
   setup_mode = SETUP_MODE_SHORTCUTS;
 
   DrawSetupScreen();
 }
 
-static void execSetupShortcuts1()
+static void execSetupShortcuts1(void)
 {
   setup_mode = SETUP_MODE_SHORTCUTS_1;
 
   DrawSetupScreen();
 }
 
-static void execSetupShortcuts2()
+static void execSetupShortcuts2(void)
 {
   setup_mode = SETUP_MODE_SHORTCUTS_2;
 
   DrawSetupScreen();
 }
 
-static void execSetupShortcuts3()
+static void execSetupShortcuts3(void)
 {
   setup_mode = SETUP_MODE_SHORTCUTS_3;
 
   DrawSetupScreen();
 }
 
-static void execSetupShortcuts4()
+static void execSetupShortcuts4(void)
 {
   setup_mode = SETUP_MODE_SHORTCUTS_4;
 
   DrawSetupScreen();
 }
 
-static void execSetupShortcuts5()
+static void execSetupShortcuts5(void)
 {
   setup_mode = SETUP_MODE_SHORTCUTS_5;
 
   DrawSetupScreen();
 }
 
-static void execExitSetup()
+static void execExitSetup(void)
 {
   SetGameStatus(GAME_MODE_MAIN);
 
   DrawMainMenu();
 }
 
-static void execSaveAndExitSetup()
+static void execSaveAndExitSetup(void)
 {
   SaveSetup();
   execExitSetup();
@@ -5861,7 +5861,7 @@ static struct
   { NULL,				NULL				}
 };
 
-void setHideRelatedSetupEntries()
+void setHideRelatedSetupEntries(void)
 {
   int i;
 
@@ -6205,7 +6205,7 @@ static struct TokenInfo setup_info_shortcuts_5[] =
   { 0,			NULL,			NULL			}
 };
 
-static Key getSetupKey()
+static Key getSetupKey(void)
 {
   Key key = KSYM_UNDEFINED;
   boolean got_key_event = FALSE;
@@ -6507,7 +6507,7 @@ static struct TokenInfo *getSetupInfoFinal(struct TokenInfo *setup_info_orig)
   return setup_info_final;
 }
 
-static void DrawSetupScreen_Generic()
+static void DrawSetupScreen_Generic(void)
 {
   int fade_mask = REDRAW_FIELD;
   boolean redraw_all = FALSE;
@@ -6643,7 +6643,7 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
 		   setup_mode, num_setup_info, max_setup_info);
 }
 
-void DrawSetupScreen_Input()
+void DrawSetupScreen_Input(void)
 {
   int i;
 
@@ -7551,7 +7551,7 @@ void ConfigureJoystick(int player_nr)
   DrawSetupScreen_Input();
 }
 
-boolean ConfigureVirtualButtonsMain()
+boolean ConfigureVirtualButtonsMain(void)
 {
   static char *customize_step_text[] =
   {
@@ -7788,7 +7788,7 @@ boolean ConfigureVirtualButtonsMain()
   return success;
 }
 
-void ConfigureVirtualButtons()
+void ConfigureVirtualButtons(void)
 {
   boolean success = ConfigureVirtualButtonsMain();
 
@@ -7815,7 +7815,7 @@ void ConfigureVirtualButtons()
   }
 }
 
-void DrawSetupScreen()
+void DrawSetupScreen(void)
 {
   if (setup_mode == SETUP_MODE_INPUT)
     DrawSetupScreen_Input();
@@ -7865,7 +7865,7 @@ void DrawSetupScreen()
   PlayMenuSoundsAndMusic();
 }
 
-void RedrawSetupScreenAfterFullscreenToggle()
+void RedrawSetupScreenAfterFullscreenToggle(void)
 {
   if (setup_mode == SETUP_MODE_GRAPHICS ||
       setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE)
@@ -7943,7 +7943,7 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
     HandleSetupScreen_Generic(mx, my, dx, dy, button);
 }
 
-void HandleGameActions()
+void HandleGameActions(void)
 {
   if (game.restart_game_message != NULL)
     RequestRestartGame(game.restart_game_message);
@@ -8094,7 +8094,7 @@ static struct
   }
 };
 
-static void CreateScreenMenubuttons()
+static void CreateScreenMenubuttons(void)
 {
   struct GadgetInfo *gi;
   unsigned int event_mask;
@@ -8159,7 +8159,7 @@ static void CreateScreenMenubuttons()
   }
 }
 
-static void CreateScreenScrollbuttons()
+static void CreateScreenScrollbuttons(void)
 {
   struct GadgetInfo *gi;
   unsigned int event_mask;
@@ -8227,7 +8227,7 @@ static void CreateScreenScrollbuttons()
   }
 }
 
-static void CreateScreenScrollbars()
+static void CreateScreenScrollbars(void)
 {
   int i;
 
@@ -8308,7 +8308,7 @@ static void CreateScreenScrollbars()
   }
 }
 
-void CreateScreenGadgets()
+void CreateScreenGadgets(void)
 {
   CreateScreenMenubuttons();
 
@@ -8316,7 +8316,7 @@ void CreateScreenGadgets()
   CreateScreenScrollbars();
 }
 
-void FreeScreenGadgets()
+void FreeScreenGadgets(void)
 {
   int i;
 
@@ -8451,7 +8451,7 @@ static void HandleScreenGadgets(struct GadgetInfo *gi)
   }
 }
 
-void DumpScreenIdentifiers()
+void DumpScreenIdentifiers(void)
 {
   int i;
 

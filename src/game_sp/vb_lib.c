@@ -9,7 +9,7 @@
 
 /* helper functions for constructs not supported by C */
 
-int MyGetTickCount()
+int MyGetTickCount(void)
 {
   return random_linux_libc(RANDOM_SIMPLE);
 }

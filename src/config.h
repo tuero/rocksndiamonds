@@ -19,9 +19,9 @@ char *getProgramTitleString(void);
 char *getProgramRealVersionString(void);
 char *getProgramVersionString(void);
 char *getProgramInitString(void);
-char *getConfigProgramTitleString();
-char *getConfigProgramCopyrightString();
-char *getConfigProgramCompanyString();
+char *getConfigProgramTitleString(void);
+char *getConfigProgramCopyrightString(void);
+char *getConfigProgramCompanyString(void);
 char *getWindowTitleString(void);
 
 #endif	/* CONFIG_H */

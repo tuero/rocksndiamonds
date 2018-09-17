@@ -166,7 +166,7 @@ static struct DoorPartControlInfo door_part_controls[] =
 
 
 /* forward declaration for internal use */
-static void UnmapToolButtons();
+static void UnmapToolButtons(void);
 static void HandleToolButtons(struct GadgetInfo *);
 static int el_act_dir2crm(int, int, int);
 static int el_act2crm(int, int);
@@ -208,7 +208,7 @@ int correctLevelPosY_EM(int ly)
   return ly;
 }
 
-static int getFieldbufferOffsetX_RND()
+static int getFieldbufferOffsetX_RND(void)
 {
   int full_lev_fieldx = lev_fieldx + (BorderElement != EL_EMPTY ? 2 : 0);
   int dx = (ScreenMovDir & (MV_LEFT | MV_RIGHT) ? ScreenGfxPos : 0);
@@ -240,7 +240,7 @@ static int getFieldbufferOffsetX_RND()
   return fx;
 }
 
-static int getFieldbufferOffsetY_RND()
+static int getFieldbufferOffsetY_RND(void)
 {
   int full_lev_fieldy = lev_fieldy + (BorderElement != EL_EMPTY ? 2 : 0);
   int dy = (ScreenMovDir & (MV_UP | MV_DOWN)    ? ScreenGfxPos : 0);
@@ -479,7 +479,7 @@ void SetDrawtoField(int mode)
   }
 }
 
-static void RedrawPlayfield_RND()
+static void RedrawPlayfield_RND(void)
 {
   if (game.envelope_active)
     return;
@@ -488,7 +488,7 @@ static void RedrawPlayfield_RND()
   DrawAllPlayers();
 }
 
-void RedrawPlayfield()
+void RedrawPlayfield(void)
 {
   if (game_status != GAME_MODE_PLAYING)
     return;
@@ -592,7 +592,7 @@ static void DrawMaskedBorderExt(int redraw_mask, int draw_target)
   }
 }
 
-void DrawMaskedBorder_FIELD()
+void DrawMaskedBorder_FIELD(void)
 {
   DrawMaskedBorderExt_FIELD(DRAW_TO_BACKBUFFER);
 }
@@ -711,7 +711,7 @@ void BlitScreenToBitmap(Bitmap *target_bitmap)
   redraw_mask |= REDRAW_FIELD;
 }
 
-void DrawFramesPerSecond()
+void DrawFramesPerSecond(void)
 {
   char text[100];
   int font_nr = FONT_TEXT_2;
@@ -737,7 +737,7 @@ void DrawFramesPerSecond()
 }
 
 #if DEBUG_FRAME_TIME
-static void PrintFrameTimeDebugging()
+static void PrintFrameTimeDebugging(void)
 {
   static unsigned int last_counter = 0;
   unsigned int counter = Counter();
@@ -790,7 +790,7 @@ static boolean equalRedrawMasks(int mask_1, int mask_2)
   return unifiedRedrawMask(mask_1) == unifiedRedrawMask(mask_2);
 }
 
-void BackToFront()
+void BackToFront(void)
 {
   static int last_redraw_mask = REDRAW_NONE;
 
@@ -985,7 +985,7 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
   ClearAutoRepeatKeyEvents();
 }
 
-static void SetScreenStates_BeforeFadingIn()
+static void SetScreenStates_BeforeFadingIn(void)
 {
   // temporarily set screen mode for animations to screen after fading in
   global.anim_status = global.anim_status_next;
@@ -998,7 +998,7 @@ static void SetScreenStates_BeforeFadingIn()
   global.anim_status = GAME_MODE_PSEUDO_FADING;
 }
 
-static void SetScreenStates_AfterFadingIn()
+static void SetScreenStates_AfterFadingIn(void)
 {
   // store new source screen (to use correct masked border for fading)
   gfx.fade_border_source_status = global.border_status;
@@ -1006,7 +1006,7 @@ static void SetScreenStates_AfterFadingIn()
   global.anim_status = global.anim_status_next;
 }
 
-static void SetScreenStates_BeforeFadingOut()
+static void SetScreenStates_BeforeFadingOut(void)
 {
   // store new target screen (to use correct masked border for fading)
   gfx.fade_border_target_status = game_status;
@@ -1019,7 +1019,7 @@ static void SetScreenStates_BeforeFadingOut()
     PrepareFadeBitmap(DRAW_TO_FADE_SOURCE);
 }
 
-static void SetScreenStates_AfterFadingOut()
+static void SetScreenStates_AfterFadingOut(void)
 {
   global.border_status = game_status;
 }
@@ -1086,28 +1086,28 @@ static void FadeSetLeaveNext(struct TitleFadingInfo fading_leave, boolean set)
     fading = fading_leave_stored;
 }
 
-void FadeSetEnterMenu()
+void FadeSetEnterMenu(void)
 {
   fading = menu.enter_menu;
 
   FadeSetLeaveNext(fading, TRUE);	/* (keep same fade mode) */
 }
 
-void FadeSetLeaveMenu()
+void FadeSetLeaveMenu(void)
 {
   fading = menu.leave_menu;
 
   FadeSetLeaveNext(fading, TRUE);	/* (keep same fade mode) */
 }
 
-void FadeSetEnterScreen()
+void FadeSetEnterScreen(void)
 {
   fading = menu.enter_screen[game_status];
 
   FadeSetLeaveNext(menu.leave_screen[game_status], TRUE);	/* store */
 }
 
-void FadeSetNextScreen()
+void FadeSetNextScreen(void)
 {
   fading = menu.next_screen[game_status];
 
@@ -1115,7 +1115,7 @@ void FadeSetNextScreen()
   // FadeSetLeaveNext(fading, TRUE);	/* (keep same fade mode) */
 }
 
-void FadeSetLeaveScreen()
+void FadeSetLeaveScreen(void)
 {
   FadeSetLeaveNext(menu.leave_screen[game_status], FALSE);	/* recall */
 }
@@ -1130,19 +1130,19 @@ void FadeSetFromType(int type)
     FadeSetLeaveMenu();
 }
 
-void FadeSetDisabled()
+void FadeSetDisabled(void)
 {
   static struct TitleFadingInfo fading_none = { FADE_MODE_NONE, -1, -1, -1 };
 
   fading = fading_none;
 }
 
-void FadeSkipNextFadeIn()
+void FadeSkipNextFadeIn(void)
 {
   FadeExt(0, FADE_MODE_SKIP_FADE_IN, FADE_TYPE_SKIP);
 }
 
-void FadeSkipNextFadeOut()
+void FadeSkipNextFadeOut(void)
 {
   FadeExt(0, FADE_MODE_SKIP_FADE_OUT, FADE_TYPE_SKIP);
 }
@@ -1213,7 +1213,7 @@ void SetDoorBackgroundImage(int graphic)
   SetDoorBackgroundBitmap(getBackgroundBitmap(graphic));
 }
 
-void SetPanelBackground()
+void SetPanelBackground(void)
 {
   struct GraphicInfo *gfx = &graphic_info[IMG_BACKGROUND_PANEL];
 
@@ -1270,7 +1270,7 @@ static int vxsize_last = -1, vysize_last = -1;
 static int ex_last = -1, ey_last = -1;
 static int exsize_last = -1, eysize_last = -1;
 
-boolean CheckIfGlobalBorderHasChanged()
+boolean CheckIfGlobalBorderHasChanged(void)
 {
   // if game status has not changed, global border has not changed either
   if (game_status == game_status_last)
@@ -1282,7 +1282,7 @@ boolean CheckIfGlobalBorderHasChanged()
   return (global_border_bitmap_last != global_border_bitmap);
 }
 
-boolean CheckIfGlobalBorderRedrawIsNeeded()
+boolean CheckIfGlobalBorderRedrawIsNeeded(void)
 {
   // if game status has not changed, nothing has to be redrawn
   if (game_status == game_status_last)
@@ -1327,7 +1327,7 @@ void RedrawGlobalBorderFromBitmap(Bitmap *bitmap)
     ClearRectangle(backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE);
 }
 
-void RedrawGlobalBorder()
+void RedrawGlobalBorder(void)
 {
   Bitmap *bitmap = getGlobalBorderBitmapFromStatus(game_status);
 
@@ -1338,7 +1338,7 @@ void RedrawGlobalBorder()
 
 #define ONLY_REDRAW_GLOBAL_BORDER_IF_NEEDED		0
 
-static void RedrawGlobalBorderIfNeeded()
+static void RedrawGlobalBorderIfNeeded(void)
 {
 #if ONLY_REDRAW_GLOBAL_BORDER_IF_NEEDED
   if (game_status == game_status_last)
@@ -1417,7 +1417,7 @@ static void RedrawGlobalBorderIfNeeded()
   eysize_last = EYSIZE;
 }
 
-void ClearField()
+void ClearField(void)
 {
   RedrawGlobalBorderIfNeeded();
 
@@ -1442,7 +1442,7 @@ void MarkTileDirty(int x, int y)
   redraw_mask |= REDRAW_FIELD;
 }
 
-void SetBorderElement()
+void SetBorderElement(void)
 {
   int x, y;
 
@@ -3510,7 +3510,7 @@ static void DrawPreviewLevelExt(boolean restart)
   }
 }
 
-void DrawPreviewPlayers()
+void DrawPreviewPlayers(void)
 {
   if (game_status != GAME_MODE_MAIN)
     return;
@@ -3585,13 +3585,13 @@ void DrawPreviewPlayers()
   }
 }
 
-void DrawPreviewLevelInitial()
+void DrawPreviewLevelInitial(void)
 {
   DrawPreviewLevelExt(TRUE);
   DrawPreviewPlayers();
 }
 
-void DrawPreviewLevelAnimation()
+void DrawPreviewLevelAnimation(void)
 {
   DrawPreviewLevelExt(FALSE);
 }
@@ -3679,12 +3679,12 @@ void DrawNetworkPlayersExt(boolean force)
   }
 }
 
-void DrawNetworkPlayers()
+void DrawNetworkPlayers(void)
 {
   DrawNetworkPlayersExt(FALSE);
 }
 
-void ClearNetworkPlayers()
+void ClearNetworkPlayers(void)
 {
   DrawNetworkPlayersExt(TRUE);
 }
@@ -3826,7 +3826,7 @@ static boolean equalGraphics(int graphic1, int graphic2)
 	  g1->anim_mode   == g2->anim_mode);
 }
 
-void DrawAllPlayers()
+void DrawAllPlayers(void)
 {
   int i;
 
@@ -4177,7 +4177,7 @@ void DrawPlayer(struct PlayerInfo *player)
 
 /* ------------------------------------------------------------------------- */
 
-void WaitForEventToContinue()
+void WaitForEventToContinue(void)
 {
   boolean still_wait = TRUE;
 
@@ -4838,7 +4838,7 @@ static int compareDoorPartOrderInfo(const void *object1, const void *object2)
   return compare_result;
 }
 
-void InitGraphicCompatibilityInfo_Doors()
+void InitGraphicCompatibilityInfo_Doors(void)
 {
   struct
   {
@@ -4995,7 +4995,7 @@ void InitGraphicCompatibilityInfo_Doors()
   }
 }
 
-void InitDoors()
+void InitDoors(void)
 {
   int i;
 
@@ -5060,7 +5060,7 @@ unsigned int CloseDoor(unsigned int door_state)
   return MoveDoor(door_state);
 }
 
-unsigned int GetDoorState()
+unsigned int GetDoorState(void)
 {
   return MoveDoor(DOOR_GET_STATE);
 }
@@ -5434,7 +5434,7 @@ unsigned int MoveDoor(unsigned int door_state)
   return (door1 | door2);
 }
 
-static boolean useSpecialEditorDoor()
+static boolean useSpecialEditorDoor(void)
 {
   int graphic = IMG_GLOBAL_BORDER_EDITOR;
   boolean redefined = getImageListEntryFromImageID(graphic)->redefined;
@@ -5457,7 +5457,7 @@ static boolean useSpecialEditorDoor()
   return TRUE;
 }
 
-void DrawSpecialEditorDoor()
+void DrawSpecialEditorDoor(void)
 {
   struct GraphicInfo *gfx1 = &graphic_info[IMG_DOOR_2_TOP_BORDER_CORRECTION];
   int top_border_width = gfx1->width;
@@ -5480,7 +5480,7 @@ void DrawSpecialEditorDoor()
   redraw_mask |= REDRAW_ALL;
 }
 
-void UndrawSpecialEditorDoor()
+void UndrawSpecialEditorDoor(void)
 {
   struct GraphicInfo *gfx1 = &graphic_info[IMG_DOOR_2_TOP_BORDER_CORRECTION];
   int top_border_width = gfx1->width;
@@ -5555,7 +5555,7 @@ static struct
   }
 };
 
-void CreateToolButtons()
+void CreateToolButtons(void)
 {
   int i;
 
@@ -5651,7 +5651,7 @@ void CreateToolButtons()
   }
 }
 
-void FreeToolButtons()
+void FreeToolButtons(void)
 {
   int i;
 
@@ -5659,7 +5659,7 @@ void FreeToolButtons()
     FreeGadget(tool_gadget[i]);
 }
 
-static void UnmapToolButtons()
+static void UnmapToolButtons(void)
 {
   int i;
 
@@ -8113,7 +8113,7 @@ int getBeltSwitchElementFromBeltNrAndBeltDir(int belt_nr, int belt_dir)
   return getBeltSwitchElementFromBeltNrAndBeltDirNr(belt_nr, belt_dir_nr);
 }
 
-boolean getTeamMode_EM()
+boolean getTeamMode_EM(void)
 {
   return game.team_mode || network_playing;
 }
@@ -9169,7 +9169,7 @@ void PlayMenuSoundExt(int sound)
     PlaySound(sound);
 }
 
-void PlayMenuSound()
+void PlayMenuSound(void)
 {
   PlayMenuSoundExt(menu.sound[game_status]);
 }
@@ -9202,7 +9202,7 @@ void PlayMenuSoundIfLoopExt(int sound)
     PlaySoundLoop(sound);
 }
 
-void PlayMenuSoundIfLoop()
+void PlayMenuSoundIfLoop(void)
 {
   PlayMenuSoundIfLoopExt(menu.sound[game_status]);
 }
@@ -9221,7 +9221,7 @@ void PlayMenuMusicExt(int music)
     PlayMusic(music);
 }
 
-void PlayMenuMusic()
+void PlayMenuMusic(void)
 {
   char *curr_music = getCurrentlyPlayingMusicFilename();
   char *next_music = getMusicInfoEntryFilename(menu.music[game_status]);
@@ -9230,18 +9230,18 @@ void PlayMenuMusic()
     PlayMenuMusicExt(menu.music[game_status]);
 }
 
-void PlayMenuSoundsAndMusic()
+void PlayMenuSoundsAndMusic(void)
 {
   PlayMenuSound();
   PlayMenuMusic();
 }
 
-static void FadeMenuSounds()
+static void FadeMenuSounds(void)
 {
   FadeSounds();
 }
 
-static void FadeMenuMusic()
+static void FadeMenuMusic(void)
 {
   char *curr_music = getCurrentlyPlayingMusicFilename();
   char *next_music = getMusicInfoEntryFilename(menu.music[game_status]);
@@ -9250,27 +9250,27 @@ static void FadeMenuMusic()
     FadeMusic();
 }
 
-void FadeMenuSoundsAndMusic()
+void FadeMenuSoundsAndMusic(void)
 {
   FadeMenuSounds();
   FadeMenuMusic();
 }
 
-void PlaySoundActivating()
+void PlaySoundActivating(void)
 {
 #if 0
   PlaySound(SND_MENU_ITEM_ACTIVATING);
 #endif
 }
 
-void PlaySoundSelecting()
+void PlaySoundSelecting(void)
 {
 #if 0
   PlaySound(SND_MENU_ITEM_SELECTING);
 #endif
 }
 
-void ToggleFullscreenOrChangeWindowScalingIfNeeded()
+void ToggleFullscreenOrChangeWindowScalingIfNeeded(void)
 {
   boolean change_fullscreen = (setup.fullscreen !=
 			       video.fullscreen_enabled);
@@ -9389,7 +9389,7 @@ void SetFontStatus(int game_status_new)
   }
 }
 
-void ResetFontStatus()
+void ResetFontStatus(void)
 {
   SetFontStatus(-1);
 }
@@ -9401,7 +9401,7 @@ void SetLevelSetInfo(char *identifier, int level_nr)
   levelset.level_nr = level_nr;
 }
 
-boolean CheckIfPlayfieldViewportHasChanged()
+boolean CheckIfPlayfieldViewportHasChanged(void)
 {
   // if game status has not changed, playfield viewport has not changed either
   if (game_status == game_status_last)
@@ -9420,13 +9420,13 @@ boolean CheckIfPlayfieldViewportHasChanged()
 	  new_full_sysize != FULL_SYSIZE);
 }
 
-boolean CheckIfGlobalBorderOrPlayfieldViewportHasChanged()
+boolean CheckIfGlobalBorderOrPlayfieldViewportHasChanged(void)
 {
   return (CheckIfGlobalBorderHasChanged() ||
 	  CheckIfPlayfieldViewportHasChanged());
 }
 
-void ChangeViewportPropertiesIfNeeded()
+void ChangeViewportPropertiesIfNeeded(void)
 {
   boolean use_mini_tilesize = (level.game_engine_type == GAME_ENGINE_TYPE_MM ?
 			       FALSE : setup.small_game_graphics);

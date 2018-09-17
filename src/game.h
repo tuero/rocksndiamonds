@@ -362,7 +362,7 @@ extern struct PlayerInfo	stored_player[MAX_PLAYERS], *local_player;
 
 
 #ifdef DEBUG
-void DEBUG_SetMaximumDynamite();
+void DEBUG_SetMaximumDynamite(void);
 #endif
 
 void GetPlayerConfig(void);
@@ -373,10 +373,10 @@ int getPlayerInventorySize(int);
 void DrawGameValue_Time(int);
 void DrawGameDoorValues(void);
 
-void UpdateAndDisplayGameControlValues();
+void UpdateAndDisplayGameControlValues(void);
 
-void InitGameSound();
-void InitGame();
+void InitGameSound(void);
+void InitGame(void);
 
 void UpdateEngineValues(int, int, int, int);
 void GameWon(void);
@@ -390,15 +390,15 @@ void DrawDynamite(int, int);
 void StartGameActions(boolean, boolean, int);
 
 void GameActions(void);
-void GameActions_EM_Main();
-void GameActions_SP_Main();
-void GameActions_MM_Main();
-void GameActions_RND_Main();
-void GameActions_RND();
+void GameActions_EM_Main(void);
+void GameActions_SP_Main(void);
+void GameActions_MM_Main(void);
+void GameActions_RND_Main(void);
+void GameActions_RND(void);
 
 void ScrollLevel(int, int);
 
-void InitPlayLevelSound();
+void InitPlayLevelSound(void);
 void PlayLevelSound_EM(int, int, int, int);
 void PlayLevelSound_SP(int, int, int, int);
 void PlayLevelSound_MM(int, int, int, int);
@@ -416,26 +416,26 @@ void RequestRestartGame(char *);
 unsigned int InitEngineRandom_RND(int);
 unsigned int RND(int);
 
-void FreeEngineSnapshotSingle();
-void FreeEngineSnapshotList();
-void LoadEngineSnapshotSingle();
-void SaveEngineSnapshotSingle();
-boolean CheckSaveEngineSnapshotToList();
-void SaveEngineSnapshotToList();
-void SaveEngineSnapshotToListInitial();
-boolean CheckEngineSnapshotSingle();
-boolean CheckEngineSnapshotList();
+void FreeEngineSnapshotSingle(void);
+void FreeEngineSnapshotList(void);
+void LoadEngineSnapshotSingle(void);
+void SaveEngineSnapshotSingle(void);
+boolean CheckSaveEngineSnapshotToList(void);
+void SaveEngineSnapshotToList(void);
+void SaveEngineSnapshotToListInitial(void);
+boolean CheckEngineSnapshotSingle(void);
+boolean CheckEngineSnapshotList(void);
 
-void CreateGameButtons();
-void FreeGameButtons();
-void MapUndoRedoButtons();
-void UnmapUndoRedoButtons();
-void MapGameButtons();
-void UnmapGameButtons();
-void RedrawGameButtons();
-void MapGameButtonsOnTape();
-void UnmapGameButtonsOnTape();
-void RedrawGameButtonsOnTape();
+void CreateGameButtons(void);
+void FreeGameButtons(void);
+void MapUndoRedoButtons(void);
+void UnmapUndoRedoButtons(void);
+void MapGameButtons(void);
+void UnmapGameButtons(void);
+void RedrawGameButtons(void);
+void MapGameButtonsOnTape(void);
+void UnmapGameButtonsOnTape(void);
+void RedrawGameButtonsOnTape(void);
 
 void HandleSoundButtonKeys(Key);
 

@@ -270,7 +270,7 @@ void subClearFieldDueToExplosion(int si)
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 }
 
-void subRedDiskReleaseExplosion()
+void subRedDiskReleaseExplosion(void)
 {
   int al, X, Y, si;
 
@@ -297,7 +297,7 @@ void subRedDiskReleaseExplosion()
   }
 }
 
-void subFollowUpExplosions()
+void subFollowUpExplosions(void)
 {
   int ax, si;
 

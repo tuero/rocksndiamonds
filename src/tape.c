@@ -38,8 +38,8 @@
 
 /* forward declaration for internal use */
 static void HandleTapeButtons(struct GadgetInfo *);
-static void TapeStopWarpForward();
-static float GetTapeLengthSecondsFloat();
+static void TapeStopWarpForward(void);
+static float GetTapeLengthSecondsFloat(void);
 
 static struct GadgetInfo *tape_gadget[NUM_TAPE_BUTTONS];
 
@@ -359,7 +359,7 @@ void DrawVideoDisplaySymbol(unsigned int state)
   DrawVideoDisplay(state, VIDEO_DISPLAY_SYMBOL_ONLY);
 }
 
-void DrawVideoDisplayCurrentState()
+void DrawVideoDisplayCurrentState(void)
 {
   int state = 0;
 
@@ -398,7 +398,7 @@ void DrawVideoDisplayCurrentState()
   DrawVideoDisplaySymbol(state);
 }
 
-void DrawCompleteVideoDisplay()
+void DrawCompleteVideoDisplay(void)
 {
   struct GraphicInfo *g_tape = &graphic_info[IMG_BACKGROUND_TAPE];
 
@@ -442,7 +442,7 @@ void DrawCompleteVideoDisplay()
 	     0, 0);
 }
 
-void TapeDeactivateDisplayOn()
+void TapeDeactivateDisplayOn(void)
 {
   SetDrawDeactivationMask(REDRAW_FIELD);
   audio.sound_deactivated = TRUE;
@@ -512,12 +512,12 @@ void TapeSetDateFromEpochSeconds(time_t epoch_seconds)
   tape.date = 10000 * (lt->tm_year % 100) + 100 * lt->tm_mon + lt->tm_mday;
 }
 
-void TapeSetDateFromNow()
+void TapeSetDateFromNow(void)
 {
   TapeSetDateFromEpochSeconds(time(NULL));
 }
 
-void TapeErase()
+void TapeErase(void)
 {
   int i;
 
@@ -550,7 +550,7 @@ void TapeErase()
   tape.use_mouse = (level.game_engine_type == GAME_ENGINE_TYPE_MM);
 }
 
-static void TapeRewind()
+static void TapeRewind(void)
 {
   tape.counter = 0;
   tape.delay_played = 0;
@@ -598,12 +598,12 @@ void TapeStartRecording(int random_seed)
   audio.sound_deactivated = FALSE;
 }
 
-static void TapeStartGameRecording()
+static void TapeStartGameRecording(void)
 {
   StartGameActions(network.enabled, TRUE, level.random_seed);
 }
 
-static void TapeAppendRecording()
+static void TapeAppendRecording(void)
 {
   if (!tape.playing || !tape.pausing)
     return;
@@ -631,7 +631,7 @@ static void TapeAppendRecording()
   UpdateAndDisplayGameControlValues();
 }
 
-void TapeHaltRecording()
+void TapeHaltRecording(void)
 {
   tape.counter++;
 
@@ -644,7 +644,7 @@ void TapeHaltRecording()
   tape.length_seconds = GetTapeLengthSeconds();
 }
 
-void TapeStopRecording()
+void TapeStopRecording(void)
 {
   if (tape.recording)
     TapeHaltRecording();
@@ -771,7 +771,7 @@ void TapeTogglePause(boolean toggle_mode)
   }
 }
 
-void TapeStartPlaying()
+void TapeStartPlaying(void)
 {
   if (TAPE_IS_EMPTY(tape))
     return;
@@ -794,14 +794,14 @@ void TapeStartPlaying()
   audio.sound_deactivated = FALSE;
 }
 
-static void TapeStartGamePlaying()
+static void TapeStartGamePlaying(void)
 {
   TapeStartPlaying();
 
   InitGame();
 }
 
-void TapeStopPlaying()
+void TapeStopPlaying(void)
 {
   tape.playing = FALSE;
   tape.pausing = FALSE;
@@ -813,7 +813,7 @@ void TapeStopPlaying()
   MapTapeEjectButton();
 }
 
-byte *TapePlayAction()
+byte *TapePlayAction(void)
 {
   int update_delay = FRAMES_PER_SECOND / 2;
   boolean update_video_display = (FrameCounter % update_delay == 0);
@@ -908,7 +908,7 @@ byte *TapePlayAction()
   return action;
 }
 
-void TapeStop()
+void TapeStop(void)
 {
   if (tape.pausing)
     TapeTogglePause(TAPE_TOGGLE_MANUAL);
@@ -926,7 +926,7 @@ void TapeStop()
   }
 }
 
-unsigned int GetTapeLengthFrames()
+unsigned int GetTapeLengthFrames(void)
 {
   unsigned int tape_length_frames = 0;
   int i;
@@ -940,12 +940,12 @@ unsigned int GetTapeLengthFrames()
   return tape_length_frames;
 }
 
-unsigned int GetTapeLengthSeconds()
+unsigned int GetTapeLengthSeconds(void)
 {
   return (GetTapeLengthFrames() * GAME_FRAME_DELAY / 1000);
 }
 
-static float GetTapeLengthSecondsFloat()
+static float GetTapeLengthSecondsFloat(void)
 {
   return ((float)GetTapeLengthFrames() * GAME_FRAME_DELAY / 1000);
 }
@@ -964,7 +964,7 @@ static void TapeStartWarpForward(int mode)
   DrawVideoDisplayCurrentState();
 }
 
-static void TapeStopWarpForward()
+static void TapeStopWarpForward(void)
 {
   tape.fast_forward = FALSE;
   tape.warp_forward = FALSE;
@@ -977,7 +977,7 @@ static void TapeStopWarpForward()
   DrawVideoDisplayCurrentState();
 }
 
-static void TapeSingleStep()
+static void TapeSingleStep(void)
 {
   if (network.enabled)
     return;
@@ -990,7 +990,7 @@ static void TapeSingleStep()
   DrawVideoDisplay(VIDEO_STATE_1STEP(tape.single_step), 0);
 }
 
-void TapeQuickSave()
+void TapeQuickSave(void)
 {
   if (game_status == GAME_MODE_MAIN)
   {
@@ -1016,7 +1016,7 @@ void TapeQuickSave()
     SaveEngineSnapshotSingle();
 }
 
-void TapeQuickLoad()
+void TapeQuickLoad(void)
 {
   char *filename = getTapeFilename(level_nr);
 
@@ -1079,7 +1079,7 @@ void TapeQuickLoad()
   }
 }
 
-boolean hasSolutionTape()
+boolean hasSolutionTape(void)
 {
   boolean tape_file_exists = fileExists(getSolutionTapeFilename(level_nr));
   boolean level_has_tape = (level.game_engine_type == GAME_ENGINE_TYPE_SP &&
@@ -1088,7 +1088,7 @@ boolean hasSolutionTape()
   return (tape_file_exists || level_has_tape);
 }
 
-boolean InsertSolutionTape()
+boolean InsertSolutionTape(void)
 {
   if (!hasSolutionTape())
   {
@@ -1117,7 +1117,7 @@ boolean InsertSolutionTape()
   return TRUE;
 }
 
-boolean PlaySolutionTape()
+boolean PlaySolutionTape(void)
 {
   if (!InsertSolutionTape())
     return FALSE;
@@ -1132,7 +1132,7 @@ boolean PlaySolutionTape()
  * tape autoplay functions
  * ------------------------------------------------------------------------- */
 
-void AutoPlayTape()
+void AutoPlayTape(void)
 {
   static LevelDirTree *autoplay_leveldir = NULL;
   static boolean autoplay_initialized = FALSE;
@@ -1311,7 +1311,7 @@ static struct
   }
 };
 
-void CreateTapeButtons()
+void CreateTapeButtons(void)
 {
   int i;
 
@@ -1350,7 +1350,7 @@ void CreateTapeButtons()
   }
 }
 
-void FreeTapeButtons()
+void FreeTapeButtons(void)
 {
   int i;
 
@@ -1358,19 +1358,19 @@ void FreeTapeButtons()
     FreeGadget(tape_gadget[i]);
 }
 
-void MapTapeEjectButton()
+void MapTapeEjectButton(void)
 {
   UnmapGadget(tape_gadget[TAPE_CTRL_ID_EXTRA]);
   MapGadget(tape_gadget[TAPE_CTRL_ID_EJECT]);
 }
 
-void MapTapeWarpButton()
+void MapTapeWarpButton(void)
 {
   UnmapGadget(tape_gadget[TAPE_CTRL_ID_EJECT]);
   MapGadget(tape_gadget[TAPE_CTRL_ID_EXTRA]);
 }
 
-void MapTapeButtons()
+void MapTapeButtons(void)
 {
   int i;
 
@@ -1385,7 +1385,7 @@ void MapTapeButtons()
     MapGameButtonsOnTape();
 }
 
-void UnmapTapeButtons()
+void UnmapTapeButtons(void)
 {
   int i;
 
@@ -1396,7 +1396,7 @@ void UnmapTapeButtons()
     UnmapGameButtonsOnTape();
 }
 
-void RedrawTapeButtons()
+void RedrawTapeButtons(void)
 {
   int i;
 
@@ -1410,7 +1410,7 @@ void RedrawTapeButtons()
   redraw_mask &= ~REDRAW_ALL;
 }
 
-void RedrawOrRemapTapeButtons()
+void RedrawOrRemapTapeButtons(void)
 {
   if (tape_gadget[TAPE_CTRL_ID_PLAY]->mapped)
   {

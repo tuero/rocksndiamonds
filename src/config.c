@@ -15,17 +15,17 @@
 #include "conftime.h"
 
 
-char *getSourceDateString()
+char *getSourceDateString(void)
 {
   return SOURCE_DATE_STRING;
 }
 
-char *getProgramTitleString()
+char *getProgramTitleString(void)
 {
   return program.program_title;
 }
 
-char *getProgramRealVersionString()
+char *getProgramRealVersionString(void)
 {
   static char program_version_string[32];
 
@@ -36,12 +36,12 @@ char *getProgramRealVersionString()
   return program_version_string;
 }
 
-char *getProgramVersionString()
+char *getProgramVersionString(void)
 {
   return program.version_string;
 }
 
-char *getProgramInitString()
+char *getProgramInitString(void)
 {
   static char *program_init_string = NULL;
 
@@ -57,7 +57,7 @@ char *getProgramInitString()
   return program_init_string;
 }
 
-char *getConfigProgramTitleString()
+char *getConfigProgramTitleString(void)
 {
   TreeInfo *graphics_current =
     getArtworkTreeInfoForUserLevelSet(ARTWORK_TYPE_GRAPHICS);
@@ -69,7 +69,7 @@ char *getConfigProgramTitleString()
 	  setup.internal.program_title);
 }
 
-char *getConfigProgramCopyrightString()
+char *getConfigProgramCopyrightString(void)
 {
   TreeInfo *graphics_current =
     getArtworkTreeInfoForUserLevelSet(ARTWORK_TYPE_GRAPHICS);
@@ -81,7 +81,7 @@ char *getConfigProgramCopyrightString()
 	  setup.internal.program_copyright);
 }
 
-char *getConfigProgramCompanyString()
+char *getConfigProgramCompanyString(void)
 {
   TreeInfo *graphics_current =
     getArtworkTreeInfoForUserLevelSet(ARTWORK_TYPE_GRAPHICS);
@@ -93,7 +93,7 @@ char *getConfigProgramCompanyString()
 	  setup.internal.program_company);
 }
 
-char *getWindowTitleString()
+char *getWindowTitleString(void)
 {
   static char *window_title_string = NULL;
 

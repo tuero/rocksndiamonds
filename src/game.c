@@ -1085,8 +1085,8 @@ static void PlayLevelSoundElementAction(int, int, int, int);
 static void PlayLevelSoundElementActionIfLoop(int, int, int, int);
 static void PlayLevelSoundActionIfLoop(int, int, int);
 static void StopLevelSoundActionIfLoop(int, int, int);
-static void PlayLevelMusic();
-static void FadeLevelSoundsAndMusic();
+static void PlayLevelMusic(void);
+static void FadeLevelSoundsAndMusic(void);
 
 static void HandleGameButtons(struct GadgetInfo *);
 
@@ -1562,7 +1562,7 @@ static int playfield_scan_delta_y = 1;
 				     (x) += playfield_scan_delta_x)
 
 #ifdef DEBUG
-void DEBUG_SetMaximumDynamite()
+void DEBUG_SetMaximumDynamite(void)
 {
   int i;
 
@@ -1573,7 +1573,7 @@ void DEBUG_SetMaximumDynamite()
 }
 #endif
 
-static void InitPlayfieldScanModeVars()
+static void InitPlayfieldScanModeVars(void)
 {
   if (game.use_reverse_scan_direction)
   {
@@ -1636,7 +1636,7 @@ static void SetPlayerMoveSpeed(struct PlayerInfo *player, int move_stepsize,
   }
 }
 
-void GetPlayerConfig()
+void GetPlayerConfig(void)
 {
   GameFrameDelay = setup.game_frame_delay;
 
@@ -2103,7 +2103,7 @@ int getPlayerInventorySize(int player_nr)
     return stored_player[player_nr].inventory_size;
 }
 
-void InitGameControlValues()
+void InitGameControlValues(void)
 {
   int i;
 
@@ -2148,7 +2148,7 @@ void InitGameControlValues()
 	sizeof(struct GamePanelOrderInfo), compareGamePanelOrderInfo);
 }
 
-void UpdatePlayfieldElementCount()
+void UpdatePlayfieldElementCount(void)
 {
   boolean use_element_count = FALSE;
   int i, j, x, y;
@@ -2176,7 +2176,7 @@ void UpdatePlayfieldElementCount()
 	  element_info[j].element_count;
 }
 
-void UpdateGameControlValues()
+void UpdateGameControlValues(void)
 {
   int i, k;
   int time = (local_player->LevelSolved ?
@@ -2507,7 +2507,7 @@ void UpdateGameControlValues()
   }
 }
 
-void DisplayGameControlValues()
+void DisplayGameControlValues(void)
 {
   boolean redraw_panel = FALSE;
   int i;
@@ -2758,7 +2758,7 @@ void DisplayGameControlValues()
   SetGameStatus(GAME_MODE_PLAYING);
 }
 
-void UpdateAndDisplayGameControlValues()
+void UpdateAndDisplayGameControlValues(void)
 {
   if (tape.deactivate_display)
     return;
@@ -2767,12 +2767,12 @@ void UpdateAndDisplayGameControlValues()
   DisplayGameControlValues();
 }
 
-void UpdateGameDoorValues()
+void UpdateGameDoorValues(void)
 {
   UpdateGameControlValues();
 }
 
-void DrawGameDoorValues()
+void DrawGameDoorValues(void)
 {
   DisplayGameControlValues();
 }
@@ -2786,7 +2786,7 @@ void DrawGameDoorValues()
   =============================================================================
 */
 
-static void InitGameEngine()
+static void InitGameEngine(void)
 {
   int i, j, k, l, x, y;
 
@@ -3305,7 +3305,7 @@ static void DebugPrintPlayerStatus(char *message)
 }
 #endif
 
-void InitGame()
+void InitGame(void)
 {
   int full_lev_fieldx = lev_fieldx + (BorderElement != EL_EMPTY ? 2 : 0);
   int full_lev_fieldy = lev_fieldy + (BorderElement != EL_EMPTY ? 2 : 0);
@@ -4449,7 +4449,7 @@ static void PlayerWins(struct PlayerInfo *player)
   player->LevelSolved_CountingHealth = player->health_final;
 }
 
-void GameWon()
+void GameWon(void)
 {
   static int time_count_steps;
   static int time, time_final;
@@ -4662,7 +4662,7 @@ void GameWon()
   GameEnd();
 }
 
-void GameEnd()
+void GameEnd(void)
 {
   int hi_pos;
 
@@ -5135,7 +5135,7 @@ static void setMinimalPlayerBoundaries(int *sx1, int *sy1, int *sx2, int *sy2)
   }
 }
 
-static boolean checkIfAllPlayersFitToScreen_RND()
+static boolean checkIfAllPlayersFitToScreen_RND(void)
 {
   int sx1 = 0, sy1 = 0, sx2 = 0, sy2 = 0;
 
@@ -5794,7 +5794,7 @@ void SplashAcid(int x, int y)
   PlayLevelSound(x, y, SND_ACID_SPLASHING);
 }
 
-static void InitBeltMovement()
+static void InitBeltMovement(void)
 {
   static int belt_base_element[4] =
   {
@@ -6028,7 +6028,7 @@ static int getInvisibleFromInvisibleActiveElement(int element)
 	  element);
 }
 
-static void RedrawAllLightSwitchesAndInvisibleElements()
+static void RedrawAllLightSwitchesAndInvisibleElements(void)
 {
   int x, y;
 
@@ -6089,7 +6089,7 @@ static void RedrawAllLightSwitchesAndInvisibleElements()
   }
 }
 
-static void RedrawAllInvisibleElementsForLenses()
+static void RedrawAllInvisibleElementsForLenses(void)
 {
   int x, y;
 
@@ -6138,7 +6138,7 @@ static void RedrawAllInvisibleElementsForLenses()
   }
 }
 
-static void RedrawAllInvisibleElementsForMagnifier()
+static void RedrawAllInvisibleElementsForMagnifier(void)
 {
   int x, y;
 
@@ -9144,7 +9144,7 @@ void CheckExitSP(int x, int y)
   PlayLevelSoundNearest(x, y, SND_CLASS_SP_EXIT_OPENING);
 }
 
-static void CloseAllOpenTimegates()
+static void CloseAllOpenTimegates(void)
 {
   int x, y;
 
@@ -10779,7 +10779,7 @@ static void PlayPlayerSound(struct PlayerInfo *player)
   }
 }
 
-static void PlayAllPlayersSound()
+static void PlayAllPlayersSound(void)
 {
   int i;
 
@@ -11060,7 +11060,7 @@ static void SetTapeActionFromMouseAction(byte *tape_action,
   tape_action[TAPE_ACTION_BUTTON] = mouse_action->button;
 }
 
-static void CheckLevelTime()
+static void CheckLevelTime(void)
 {
   int i;
 
@@ -11243,7 +11243,7 @@ void StartGameActions(boolean init_network_game, boolean record_tape,
   InitGame();
 }
 
-void GameActionsExt()
+void GameActionsExt(void)
 {
 #if 0
   static unsigned int game_frame_delay = 0;
@@ -11551,7 +11551,7 @@ void GameActionsExt()
   }
 }
 
-static void GameActions_CheckSaveEngineSnapshot()
+static void GameActions_CheckSaveEngineSnapshot(void)
 {
   if (!game.snapshot.save_snapshot)
     return;
@@ -11562,14 +11562,14 @@ static void GameActions_CheckSaveEngineSnapshot()
   SaveEngineSnapshotToList();
 }
 
-void GameActions()
+void GameActions(void)
 {
   GameActionsExt();
 
   GameActions_CheckSaveEngineSnapshot();
 }
 
-void GameActions_EM_Main()
+void GameActions_EM_Main(void)
 {
   byte effective_action[MAX_PLAYERS];
   boolean warp_mode = (tape.playing && tape.warp_forward && !tape.pausing);
@@ -11581,7 +11581,7 @@ void GameActions_EM_Main()
   GameActions_EM(effective_action, warp_mode);
 }
 
-void GameActions_SP_Main()
+void GameActions_SP_Main(void)
 {
   byte effective_action[MAX_PLAYERS];
   boolean warp_mode = (tape.playing && tape.warp_forward && !tape.pausing);
@@ -11601,19 +11601,19 @@ void GameActions_SP_Main()
   }
 }
 
-void GameActions_MM_Main()
+void GameActions_MM_Main(void)
 {
   boolean warp_mode = (tape.playing && tape.warp_forward && !tape.pausing);
 
   GameActions_MM(local_player->effective_mouse_action, warp_mode);
 }
 
-void GameActions_RND_Main()
+void GameActions_RND_Main(void)
 {
   GameActions_RND();
 }
 
-void GameActions_RND()
+void GameActions_RND(void)
 {
   int magic_wall_x = 0, magic_wall_y = 0;
   int i, x, y, element, graphic, last_gfx_frame;
@@ -12156,7 +12156,7 @@ static boolean AllPlayersInSight(struct PlayerInfo *player, int x, int y)
   return (max_x - min_x < SCR_FIELDX && max_y - min_y < SCR_FIELDY);
 }
 
-static boolean AllPlayersInVisibleScreen()
+static boolean AllPlayersInVisibleScreen(void)
 {
   int i;
 
@@ -14461,7 +14461,7 @@ static boolean DropElement(struct PlayerInfo *player)
 static int *loop_sound_frame = NULL;
 static int *loop_sound_volume = NULL;
 
-void InitPlayLevelSound()
+void InitPlayLevelSound(void)
 {
   int num_sounds = getSoundListSize();
 
@@ -14564,7 +14564,7 @@ static void StopLevelSoundActionIfLoop(int x, int y, int action)
     StopSound(sound_effect);
 }
 
-static int getLevelMusicNr()
+static int getLevelMusicNr(void)
 {
   if (levelset.music[level_nr] != MUS_UNDEFINED)
     return levelset.music[level_nr];		/* from config file */
@@ -14572,12 +14572,12 @@ static int getLevelMusicNr()
     return MAP_NOCONF_MUSIC(level_nr);		/* from music dir */
 }
 
-static void FadeLevelSounds()
+static void FadeLevelSounds(void)
 {
   FadeSounds();
 }
 
-static void FadeLevelMusic()
+static void FadeLevelMusic(void)
 {
   int music_nr = getLevelMusicNr();
   char *curr_music = getCurrentlyPlayingMusicFilename();
@@ -14587,13 +14587,13 @@ static void FadeLevelMusic()
     FadeMusic();
 }
 
-void FadeLevelSoundsAndMusic()
+void FadeLevelSoundsAndMusic(void)
 {
   FadeLevelSounds();
   FadeLevelMusic();
 }
 
-static void PlayLevelMusic()
+static void PlayLevelMusic(void)
 {
   int music_nr = getLevelMusicNr();
   char *curr_music = getCurrentlyPlayingMusicFilename();
@@ -15010,7 +15010,7 @@ static struct EngineSnapshotInfo engine_snapshot_rnd;
 static char *snapshot_level_identifier = NULL;
 static int snapshot_level_nr = -1;
 
-static void SaveEngineSnapshotValues_RND()
+static void SaveEngineSnapshotValues_RND(void)
 {
   static int belt_base_active_element[4] =
   {
@@ -15049,7 +15049,7 @@ static void SaveEngineSnapshotValues_RND()
   }
 }
 
-static void LoadEngineSnapshotValues_RND()
+static void LoadEngineSnapshotValues_RND(void)
 {
   unsigned int num_random_calls = game.num_random_calls;
   int i, j;
@@ -15095,7 +15095,7 @@ static void LoadEngineSnapshotValues_RND()
   }
 }
 
-void FreeEngineSnapshotSingle()
+void FreeEngineSnapshotSingle(void)
 {
   FreeSnapshotSingle();
 
@@ -15103,12 +15103,12 @@ void FreeEngineSnapshotSingle()
   snapshot_level_nr = -1;
 }
 
-void FreeEngineSnapshotList()
+void FreeEngineSnapshotList(void)
 {
   FreeSnapshotList();
 }
 
-ListNode *SaveEngineSnapshotBuffers()
+ListNode *SaveEngineSnapshotBuffers(void)
 {
   ListNode *buffers = NULL;
 
@@ -15217,7 +15217,7 @@ ListNode *SaveEngineSnapshotBuffers()
   return buffers;
 }
 
-void SaveEngineSnapshotSingle()
+void SaveEngineSnapshotSingle(void)
 {
   ListNode *buffers = SaveEngineSnapshotBuffers();
 
@@ -15229,7 +15229,7 @@ void SaveEngineSnapshotSingle()
   snapshot_level_nr = level_nr;
 }
 
-boolean CheckSaveEngineSnapshotToList()
+boolean CheckSaveEngineSnapshotToList(void)
 {
   boolean save_snapshot =
     ((game.snapshot.mode == SNAPSHOT_MODE_EVERY_STEP) ||
@@ -15245,7 +15245,7 @@ boolean CheckSaveEngineSnapshotToList()
   return save_snapshot;
 }
 
-void SaveEngineSnapshotToList()
+void SaveEngineSnapshotToList(void)
 {
   if (game.snapshot.mode == SNAPSHOT_MODE_OFF ||
       tape.quick_resume)
@@ -15257,14 +15257,14 @@ void SaveEngineSnapshotToList()
   SaveSnapshotToList(buffers);
 }
 
-void SaveEngineSnapshotToListInitial()
+void SaveEngineSnapshotToListInitial(void)
 {
   FreeEngineSnapshotList();
 
   SaveEngineSnapshotToList();
 }
 
-void LoadEngineSnapshotValues()
+void LoadEngineSnapshotValues(void)
 {
   /* restore special values from snapshot structure */
 
@@ -15278,7 +15278,7 @@ void LoadEngineSnapshotValues()
     LoadEngineSnapshotValues_MM();
 }
 
-void LoadEngineSnapshotSingle()
+void LoadEngineSnapshotSingle(void)
 {
   LoadSnapshotSingle();
 
@@ -15299,13 +15299,13 @@ void LoadEngineSnapshot_Redo(int steps)
   LoadEngineSnapshotValues();
 }
 
-boolean CheckEngineSnapshotSingle()
+boolean CheckEngineSnapshotSingle(void)
 {
   return (strEqual(snapshot_level_identifier, leveldir_current->identifier) &&
 	  snapshot_level_nr == level_nr);
 }
 
-boolean CheckEngineSnapshotList()
+boolean CheckEngineSnapshotList(void)
 {
   return CheckSnapshotList();
 }
@@ -15410,7 +15410,7 @@ static struct
   }
 };
 
-void CreateGameButtons()
+void CreateGameButtons(void)
 {
   int i;
 
@@ -15496,7 +15496,7 @@ void CreateGameButtons()
   }
 }
 
-void FreeGameButtons()
+void FreeGameButtons(void)
 {
   int i;
 
@@ -15515,7 +15515,7 @@ static void UnmapGameButtonsAtSamePosition(int id)
       UnmapGadget(game_gadget[i]);
 }
 
-static void UnmapGameButtonsAtSamePosition_All()
+static void UnmapGameButtonsAtSamePosition_All(void)
 {
   if (setup.show_snapshot_buttons)
   {
@@ -15548,7 +15548,7 @@ static void MapGameButtonsAtSamePosition(int id)
   UnmapGameButtonsAtSamePosition_All();
 }
 
-void MapUndoRedoButtons()
+void MapUndoRedoButtons(void)
 {
   UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_UNDO);
   UnmapGameButtonsAtSamePosition(GAME_CTRL_ID_REDO);
@@ -15559,7 +15559,7 @@ void MapUndoRedoButtons()
   ModifyGadget(game_gadget[GAME_CTRL_ID_PAUSE2], GDI_CHECKED, TRUE, GDI_END);
 }
 
-void UnmapUndoRedoButtons()
+void UnmapUndoRedoButtons(void)
 {
   UnmapGadget(game_gadget[GAME_CTRL_ID_UNDO]);
   UnmapGadget(game_gadget[GAME_CTRL_ID_REDO]);
@@ -15628,37 +15628,37 @@ void RedrawSoundButtonGadget(int id)
   RedrawGadget(game_gadget[id2]);
 }
 
-void MapGameButtons()
+void MapGameButtons(void)
 {
   MapGameButtonsExt(FALSE);
 }
 
-void UnmapGameButtons()
+void UnmapGameButtons(void)
 {
   UnmapGameButtonsExt(FALSE);
 }
 
-void RedrawGameButtons()
+void RedrawGameButtons(void)
 {
   RedrawGameButtonsExt(FALSE);
 }
 
-void MapGameButtonsOnTape()
+void MapGameButtonsOnTape(void)
 {
   MapGameButtonsExt(TRUE);
 }
 
-void UnmapGameButtonsOnTape()
+void UnmapGameButtonsOnTape(void)
 {
   UnmapGameButtonsExt(TRUE);
 }
 
-void RedrawGameButtonsOnTape()
+void RedrawGameButtonsOnTape(void)
 {
   RedrawGameButtonsExt(TRUE);
 }
 
-void GameUndoRedoExt()
+void GameUndoRedoExt(void)
 {
   ClearPlayerAction();
 

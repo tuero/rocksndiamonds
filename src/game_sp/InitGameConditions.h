@@ -8,14 +8,14 @@
 #include "global.h"
 
 
-extern int subConvertToEasySymbols();
+extern int subConvertToEasySymbols(void);
 
-extern void InitMurphyPos();
+extern void InitMurphyPos(void);
 extern void InitMurphyPosB(int);
 extern void ResetInfotronsNeeded(int);
-extern void subFetchAndInitLevel();
-extern void subFetchAndInitLevelA();
-extern void subFetchAndInitLevelB();
-extern void subInitGameConditions();
+extern void subFetchAndInitLevel(void);
+extern void subFetchAndInitLevelA(void);
+extern void subFetchAndInitLevelB(void);
+extern void subInitGameConditions(void);
 
 #endif /* INITGAMECONDITIONS_H */

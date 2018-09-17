@@ -151,7 +151,7 @@ boolean isSnappingSequence(int sequence)
   }
 }
 
-void InitGlobals()
+void InitGlobals(void)
 {
   InitPrecedingPlayfieldMemory();
 
@@ -204,7 +204,7 @@ int GetStretchY(int si)
   return StretchWidth * (si / FieldWidth);
 }
 
-void PrepareLevel()
+void PrepareLevel(void)
 {
   copyInternalEngineVars_SP();
 

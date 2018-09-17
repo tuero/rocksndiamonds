@@ -80,7 +80,7 @@ int JoystickButton(int);
 int AnyJoystick(void);
 int AnyJoystickButton(void);
 
-void DeactivateJoystick();
-void ActivateJoystick();
+void DeactivateJoystick(void);
+void ActivateJoystick(void);
 
 #endif	/* JOYSTICK_H */

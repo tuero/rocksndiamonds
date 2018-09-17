@@ -14,17 +14,17 @@
 
 #include "main.h"
 
-void CreateLevelEditorGadgets();
-void FreeLevelEditorGadgets();
-void UnmapLevelEditorGadgets();
+void CreateLevelEditorGadgets(void);
+void FreeLevelEditorGadgets(void);
+void UnmapLevelEditorGadgets(void);
 void DrawLevelEd(void);
 void HandleLevelEditorKeyInput(Key);
-void HandleLevelEditorIdle();
+void HandleLevelEditorIdle(void);
 void HandleEditorGadgetInfoText(void *ptr);
 void RequestExitLevelEditor(boolean, boolean);
-void PrintEditorElementList();
+void PrintEditorElementList(void);
 
-void DumpBrush();
-void DumpBrush_Small();
+void DumpBrush(void);
+void DumpBrush_Small(void);
 
 #endif

@@ -277,11 +277,11 @@ void ReloadCustomArtworkList(struct ArtworkListInfo *);
 void FreeCustomArtworkLists(struct ArtworkListInfo *);
 
 char *getLogFilename(char *);
-void OpenLogFiles();
-void CloseLogFiles();
+void OpenLogFiles(void);
+void CloseLogFiles(void);
 void DumpLogFile(int);
 
-void NotifyUserAboutErrorFile();
+void NotifyUserAboutErrorFile(void);
 
 #if DEBUG
 void debug_print_timestamp(int, char *);

@@ -88,7 +88,7 @@ static void FreeSnapshot(void *snapshot_buffers_ptr)
   FreeSnapshotBuffers(snapshot_buffers_ptr);
 }
 
-void FreeSnapshotSingle()
+void FreeSnapshotSingle(void)
 {
   FreeSnapshotBuffers(snapshot_single);
 
@@ -111,7 +111,7 @@ static void FreeSnapshotList_UpToNode(ListNode *node)
   }
 }
 
-void FreeSnapshotList()
+void FreeSnapshotList(void)
 {
 #if DEBUG_SNAPSHOTS
   printf("::: FreeSnapshotList()\n");
@@ -127,7 +127,7 @@ void FreeSnapshotList()
   snapshot_current = NULL;
 }
 
-void ReduceSnapshotList()
+void ReduceSnapshotList(void)
 {
 #if DEBUG_SNAPSHOTS
   printf("::: (Reducing number of snapshots from %d ",
@@ -202,7 +202,7 @@ void SaveSnapshotToList(ListNode *snapshot_buffers)
     ReduceSnapshotList();
 }
 
-boolean LoadSnapshotSingle()
+boolean LoadSnapshotSingle(void)
 {
   if (snapshot_single)
   {
@@ -252,7 +252,7 @@ boolean LoadSnapshotFromList_Newer(int steps)
   return FALSE;
 }
 
-boolean CheckSnapshotList()
+boolean CheckSnapshotList(void)
 {
   return (snapshot_list ? TRUE : FALSE);
 }

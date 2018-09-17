@@ -24,8 +24,8 @@ struct GameInfo_EM game_em;
 char *progname;
 char *arg_basedir;
 
-extern void tab_generate();
-extern void tab_generate_graphics_info_em();
+extern void tab_generate(void);
+extern void tab_generate_graphics_info_em(void);
 
 int open_all(void)
 {
@@ -39,14 +39,14 @@ int open_all(void)
   return 0;
 }
 
-void InitGfxBuffers_EM()
+void InitGfxBuffers_EM(void)
 {
   ReCreateBitmap(&screenBitmap, MAX_BUF_XSIZE * TILEX, MAX_BUF_YSIZE * TILEY);
 
   global_em_info.screenbuffer = screenBitmap;
 }
 
-void em_open_all()
+void em_open_all(void)
 {
   /* pre-calculate some data */
   tab_generate();

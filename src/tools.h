@@ -75,52 +75,52 @@ int getLevelFromScreenY(int);
 void DumpTile(int, int);
 void DumpTileFromScreen(int, int);
 
-void DrawMaskedBorder_FIELD();
-void DrawMaskedBorder_DOOR_1();
-void DrawMaskedBorder_DOOR_2();
-void DrawMaskedBorder_DOOR_3();
-void DrawMaskedBorder_ALL();
+void DrawMaskedBorder_FIELD(void);
+void DrawMaskedBorder_DOOR_1(void);
+void DrawMaskedBorder_DOOR_2(void);
+void DrawMaskedBorder_DOOR_3(void);
+void DrawMaskedBorder_ALL(void);
 void DrawMaskedBorder(int);
 void DrawMaskedBorderToTarget(int);
 void DrawTileCursor(int);
 
 void SetDrawtoField(int);
-void RedrawPlayfield();
+void RedrawPlayfield(void);
 void BlitScreenToBitmap_RND(Bitmap *);
 void BlitScreenToBitmap(Bitmap *);
-void BackToFront();
+void BackToFront(void);
 void BackToFront_WithFrameDelay(unsigned int);
 
 void FadeIn(int);
 void FadeOut(int);
-void FadeSetEnterMenu();
-void FadeSetLeaveMenu();
-void FadeSetEnterScreen();
-void FadeSetNextScreen();
-void FadeSetLeaveScreen();
+void FadeSetEnterMenu(void);
+void FadeSetLeaveMenu(void);
+void FadeSetEnterScreen(void);
+void FadeSetNextScreen(void);
+void FadeSetLeaveScreen(void);
 void FadeSetFromType(int);
-void FadeSetDisabled();
-void FadeSkipNextFadeIn();
-void FadeSkipNextFadeOut();
+void FadeSetDisabled(void);
+void FadeSkipNextFadeIn(void);
+void FadeSkipNextFadeOut(void);
 
 Bitmap *getGlobalBorderBitmapFromStatus(int);
 
-void ClearField();
+void ClearField(void);
 void SetWindowBackgroundImageIfDefined(int);
 void SetMainBackgroundImageIfDefined(int);
 void SetDoorBackgroundImageIfDefined(int);
 void SetWindowBackgroundImage(int);
 void SetMainBackgroundImage(int);
 void SetDoorBackgroundImage(int);
-void SetPanelBackground();
+void SetPanelBackground(void);
 void DrawBackground(int, int, int, int);
 void DrawBackgroundForFont(int, int, int, int, int);
 void DrawBackgroundForGraphic(int, int, int, int, int);
-boolean CheckIfGlobalBorderHasChanged();
-void RedrawGlobalBorder();
+boolean CheckIfGlobalBorderHasChanged(void);
+void RedrawGlobalBorder(void);
 
 void MarkTileDirty(int, int);
-void SetBorderElement();
+void SetBorderElement(void);
 void FloodFillLevel(int, int, int, short[][MAX_LEV_FIELDY], int, int);
 void FloodFillLevelExt(int, int, int, int, int y, short field[][y], int, int);
 
@@ -210,11 +210,11 @@ unsigned int GetDoorState(void);
 unsigned int SetDoorState(unsigned int);
 unsigned int MoveDoor(unsigned int);
 
-void DrawSpecialEditorDoor();
-void UndrawSpecialEditorDoor();
+void DrawSpecialEditorDoor(void);
+void UndrawSpecialEditorDoor(void);
 
-void CreateToolButtons();
-void FreeToolButtons();
+void CreateToolButtons(void);
+void FreeToolButtons(void);
 
 int map_element_RND_to_EM(int);
 int map_element_EM_to_RND(int);
@@ -262,28 +262,28 @@ unsigned int InitRND(int);
 void InitGraphicInfo_EM(void);
 
 void PlayMenuSoundExt(int);
-void PlayMenuSound();
+void PlayMenuSound(void);
 void PlayMenuSoundStereo(int, int);
 void PlayMenuSoundIfLoopExt(int);
-void PlayMenuSoundIfLoop();
+void PlayMenuSoundIfLoop(void);
 void PlayMenuMusicExt(int);
-void PlayMenuMusic();
-void PlayMenuSoundsAndMusic();
-void FadeMenuSoundsAndMusic();
-void PlaySoundActivating();
-void PlaySoundSelecting();
+void PlayMenuMusic(void);
+void PlayMenuSoundsAndMusic(void);
+void FadeMenuSoundsAndMusic(void);
+void PlaySoundActivating(void);
+void PlaySoundSelecting(void);
 
 void SetAnimStatus(int);
 void SetGameStatus(int);
 void SetFontStatus(int);
-void ResetFontStatus();
+void ResetFontStatus(void);
 
 void SetLevelSetInfo(char *, int);
 
-void ToggleFullscreenOrChangeWindowScalingIfNeeded();
-void ChangeViewportPropertiesIfNeeded();
+void ToggleFullscreenOrChangeWindowScalingIfNeeded(void);
+void ChangeViewportPropertiesIfNeeded(void);
 
-boolean CheckIfPlayfieldViewportHasChanged();
-boolean CheckIfGlobalBorderOrPlayfieldViewportHasChanged();
+boolean CheckIfPlayfieldViewportHasChanged(void);
+boolean CheckIfGlobalBorderOrPlayfieldViewportHasChanged(void);
 
 #endif	/* TOOLS_H */

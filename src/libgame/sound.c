@@ -126,11 +126,11 @@ static struct SoundControl mixer[NUM_MIXER_CHANNELS];
 static int mixer_active_channels = 0;
 static boolean expire_loop_sounds = FALSE;
 
-static void ReloadCustomSounds();
-static void ReloadCustomMusic();
+static void ReloadCustomSounds(void);
+static void ReloadCustomMusic(void);
 static void FreeSound(void *);
 static void FreeMusic(void *);
-static void FreeAllMusic_NoConf();
+static void FreeAllMusic_NoConf(void);
 
 static SoundInfo *getSoundInfoEntryFromSoundID(int);
 static MusicInfo *getMusicInfoEntryFromMusicID(int);
@@ -140,7 +140,7 @@ static MusicInfo *getMusicInfoEntryFromMusicID(int);
 /* mixer functions                                                           */
 /* ------------------------------------------------------------------------- */
 
-void Mixer_InitChannels()
+void Mixer_InitChannels(void)
 {
   int i;
 
@@ -215,7 +215,7 @@ static void Mixer_PlayChannel(int channel)
   mixer_active_channels++;
 }
 
-static void Mixer_PlayMusicChannel()
+static void Mixer_PlayMusicChannel(void)
 {
   Mixer_PlayChannel(audio.music_channel);
 
@@ -251,7 +251,7 @@ static void Mixer_StopChannel(int channel)
   mixer_active_channels--;
 }
 
-static void Mixer_StopMusicChannel()
+static void Mixer_StopMusicChannel(void)
 {
   Mixer_StopChannel(audio.music_channel);
 
@@ -270,7 +270,7 @@ static void Mixer_FadeChannel(int channel)
   Mix_FadeOutChannel(channel, SOUND_FADING_INTERVAL);
 }
 
-static void Mixer_FadeMusicChannel()
+static void Mixer_FadeMusicChannel(void)
 {
   Mixer_FadeChannel(audio.music_channel);
 
@@ -654,13 +654,13 @@ void LoadCustomMusic_NoConf(void)
   draw_init_text = FALSE;
 }
 
-int getSoundListSize()
+int getSoundListSize(void)
 {
   return (sound_info->num_file_list_entries +
 	  sound_info->num_dynamic_file_list_entries);
 }
 
-int getMusicListSize()
+int getMusicListSize(void)
 {
   return (music_info->num_file_list_entries +
 	  music_info->num_dynamic_file_list_entries);
@@ -742,27 +742,27 @@ char *getMusicInfoEntryFilename(int pos)
   return getBaseNamePtr(mus_info->source_filename);
 }
 
-char *getCurrentlyPlayingMusicFilename()
+char *getCurrentlyPlayingMusicFilename(void)
 {
   return currently_playing_music_filename;
 }
 
-int getSoundListPropertyMappingSize()
+int getSoundListPropertyMappingSize(void)
 {
   return sound_info->num_property_mapping_entries;
 }
 
-int getMusicListPropertyMappingSize()
+int getMusicListPropertyMappingSize(void)
 {
   return music_info->num_property_mapping_entries;
 }
 
-struct PropertyMapping *getSoundListPropertyMapping()
+struct PropertyMapping *getSoundListPropertyMapping(void)
 {
   return sound_info->property_mapping;
 }
 
-struct PropertyMapping *getMusicListPropertyMapping()
+struct PropertyMapping *getMusicListPropertyMapping(void)
 {
   return music_info->property_mapping;
 }
@@ -1018,12 +1018,12 @@ void FadeSound(int nr)
   StopSoundExt(nr, SND_CTRL_FADE_SOUND);
 }
 
-void FadeSounds()
+void FadeSounds(void)
 {
   StopSoundExt(-1, SND_CTRL_FADE_ALL);
 }
 
-void FadeSoundsAndMusic()
+void FadeSoundsAndMusic(void)
 {
   FadeSounds();
   FadeMusic();
@@ -1042,7 +1042,7 @@ void StopSound(int nr)
   StopSoundExt(nr, SND_CTRL_STOP_SOUND);
 }
 
-void StopSounds()
+void StopSounds(void)
 {
   StopMusic();
   StopSoundExt(-1, SND_CTRL_STOP_ALL);
@@ -1079,13 +1079,13 @@ void ExpireSoundLoops(boolean active)
   HandleSoundRequest(snd_ctrl);
 }
 
-static void ReloadCustomSounds()
+static void ReloadCustomSounds(void)
 {
   LoadArtworkConfig(sound_info);
   ReloadCustomArtworkList(sound_info);
 }
 
-static void ReloadCustomMusic()
+static void ReloadCustomMusic(void)
 {
   LoadArtworkConfig(music_info);
   ReloadCustomArtworkList(music_info);
@@ -1145,7 +1145,7 @@ void FreeMusic(void *ptr)
   free(music);
 }
 
-static void FreeAllMusic_NoConf()
+static void FreeAllMusic_NoConf(void)
 {
   int i;
 
@@ -1161,12 +1161,12 @@ static void FreeAllMusic_NoConf()
   num_music_noconf = 0;
 }
 
-void FreeAllSounds()
+void FreeAllSounds(void)
 {
   FreeCustomArtworkLists(sound_info);
 }
 
-void FreeAllMusic()
+void FreeAllMusic(void)
 {
   FreeCustomArtworkLists(music_info);
   FreeAllMusic_NoConf();

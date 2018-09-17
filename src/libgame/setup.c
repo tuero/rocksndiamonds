@@ -157,7 +157,7 @@ static char *getLevelSetupDir(char *level_subdir)
   return levelsetup_dir;
 }
 
-static char *getCacheDir()
+static char *getCacheDir(void)
 {
   static char *cache_dir = NULL;
 
@@ -167,7 +167,7 @@ static char *getCacheDir()
   return cache_dir;
 }
 
-static char *getNetworkDir()
+static char *getNetworkDir(void)
 {
   static char *network_dir = NULL;
 
@@ -224,12 +224,12 @@ char *getNetworkLevelDir(char *level_subdir)
   return network_level_dir;
 }
 
-char *getCurrentLevelDir()
+char *getCurrentLevelDir(void)
 {
   return getLevelDirFromTreeInfo(leveldir_current);
 }
 
-char *getNewUserLevelSubdir()
+char *getNewUserLevelSubdir(void)
 {
   static char *new_level_subdir = NULL;
   char *subdir_prefix = getLoginName();
@@ -267,7 +267,7 @@ static char *getTapeDir(char *level_subdir)
   return tape_dir;
 }
 
-static char *getSolutionTapeDir()
+static char *getSolutionTapeDir(void)
 {
   static char *tape_dir = NULL;
   char *data_dir = getCurrentLevelDir();
@@ -339,7 +339,7 @@ static char *getClassicArtworkDir(int type)
 	  getDefaultMusicDir(MUS_CLASSIC_SUBDIR) : "");
 }
 
-static char *getUserGraphicsDir()
+static char *getUserGraphicsDir(void)
 {
   static char *usergraphics_dir = NULL;
 
@@ -349,7 +349,7 @@ static char *getUserGraphicsDir()
   return usergraphics_dir;
 }
 
-static char *getUserSoundsDir()
+static char *getUserSoundsDir(void)
 {
   static char *usersounds_dir = NULL;
 
@@ -359,7 +359,7 @@ static char *getUserSoundsDir()
   return usersounds_dir;
 }
 
-static char *getUserMusicDir()
+static char *getUserMusicDir(void)
 {
   static char *usermusic_dir = NULL;
 
@@ -576,7 +576,7 @@ char *getScoreFilename(int nr)
   return filename;
 }
 
-char *getSetupFilename()
+char *getSetupFilename(void)
 {
   static char *filename = NULL;
 
@@ -587,12 +587,12 @@ char *getSetupFilename()
   return filename;
 }
 
-char *getDefaultSetupFilename()
+char *getDefaultSetupFilename(void)
 {
   return program.config_filename;
 }
 
-char *getEditorSetupFilename()
+char *getEditorSetupFilename(void)
 {
   static char *filename = NULL;
 
@@ -608,7 +608,7 @@ char *getEditorSetupFilename()
   return filename;
 }
 
-char *getHelpAnimFilename()
+char *getHelpAnimFilename(void)
 {
   static char *filename = NULL;
 
@@ -619,7 +619,7 @@ char *getHelpAnimFilename()
   return filename;
 }
 
-char *getHelpTextFilename()
+char *getHelpTextFilename(void)
 {
   static char *filename = NULL;
 
@@ -630,7 +630,7 @@ char *getHelpTextFilename()
   return filename;
 }
 
-char *getLevelSetInfoFilename()
+char *getLevelSetInfoFilename(void)
 {
   static char *filename = NULL;
   char *basenames[] =
@@ -1063,7 +1063,7 @@ void InitScoreDirectory(char *level_subdir)
   createDirectory(getScoreDir(level_subdir), "level score", permissions);
 }
 
-static void SaveUserLevelInfo();
+static void SaveUserLevelInfo(void);
 
 void InitUserLevelDirectory(char *level_subdir)
 {
@@ -1095,7 +1095,7 @@ void InitLevelSetupDirectory(char *level_subdir)
   createDirectory(getLevelSetupDir(level_subdir), "level setup", PERMS_PRIVATE);
 }
 
-void InitCacheDirectory()
+void InitCacheDirectory(void)
 {
   createDirectory(getUserGameDataDir(), "user data", PERMS_PRIVATE);
   createDirectory(getCacheDir(), "cache data", PERMS_PRIVATE);
@@ -1106,7 +1106,7 @@ void InitCacheDirectory()
 /* some functions to handle lists of level and artwork directories           */
 /* ------------------------------------------------------------------------- */
 
-TreeInfo *newTreeInfo()
+TreeInfo *newTreeInfo(void)
 {
   return checked_calloc(sizeof(TreeInfo));
 }
@@ -1433,7 +1433,7 @@ void sortTreeInfo(TreeInfo **node_first)
 #define FILE_PERMS_PUBLIC_ALL	(MODE_R_ALL | MODE_W_ALL)
 
 
-char *getHomeDir()
+char *getHomeDir(void)
 {
   static char *dir = NULL;
 
@@ -1522,7 +1522,7 @@ char *getUserGameDataDir(void)
   return user_game_data_dir;
 }
 
-char *getSetupDir()
+char *getSetupDir(void)
 {
   return getUserGameDataDir();
 }
@@ -1545,7 +1545,7 @@ static int posix_mkdir(const char *pathname, mode_t mode)
 #endif
 }
 
-static boolean posix_process_running_setgid()
+static boolean posix_process_running_setgid(void)
 {
 #if defined(PLATFORM_UNIX)
   return (getgid() != getegid());
@@ -1588,7 +1588,7 @@ void createDirectory(char *dir, char *text, int permission_class)
   posix_umask(last_umask);		/* restore previous umask */
 }
 
-void InitUserDataDirectory()
+void InitUserDataDirectory(void)
 {
   createDirectory(getUserGameDataDir(), "user data", PERMS_PRIVATE);
 }
@@ -1832,7 +1832,7 @@ static int keys_are_equal(void *key1, void *key2)
   return (strEqual((char *)key1, (char *)key2));
 }
 
-SetupFileHash *newSetupFileHash()
+SetupFileHash *newSetupFileHash(void)
 {
   SetupFileHash *new_hash =
     create_hashtable(16, 0.75, get_hash_from_key, keys_are_equal);
@@ -2791,7 +2791,7 @@ static TreeInfo *createTopTreeInfoNode(TreeInfo *node_first)
 /* functions for handling level and custom artwork info cache                 */
 /* -------------------------------------------------------------------------- */
 
-static void LoadArtworkInfoCache()
+static void LoadArtworkInfoCache(void)
 {
   InitCacheDirectory();
 
@@ -2813,7 +2813,7 @@ static void LoadArtworkInfoCache()
     artworkinfo_cache_new = newSetupFileHash();
 }
 
-static void SaveArtworkInfoCache()
+static void SaveArtworkInfoCache(void)
 {
   char *filename = getPath2(getCacheDir(), ARTWORKINFO_CACHE_FILE);
 
@@ -3168,7 +3168,7 @@ static void LoadLevelInfoFromLevelDir(TreeInfo **node_first,
 	  level_directory);
 }
 
-boolean AdjustGraphicsForEMC()
+boolean AdjustGraphicsForEMC(void)
 {
   boolean settings_changed = FALSE;
 
@@ -3178,7 +3178,7 @@ boolean AdjustGraphicsForEMC()
   return settings_changed;
 }
 
-void LoadLevelInfo()
+void LoadLevelInfo(void)
 {
   InitUserLevelDirectory(getLoginName());
 
@@ -3423,7 +3423,7 @@ static TreeInfo *getDummyArtworkInfo(int type)
   return artwork_new;
 }
 
-void LoadArtworkInfo()
+void LoadArtworkInfo(void)
 {
   LoadArtworkInfoCache();
 
@@ -3559,7 +3559,7 @@ void LoadArtworkInfoFromLevelInfo(ArtworkDirTree **artwork_node,
   }
 }
 
-void LoadLevelArtworkInfo()
+void LoadLevelArtworkInfo(void)
 {
   print_timestamp_init("LoadLevelArtworkInfo");
 
@@ -3704,7 +3704,7 @@ TreeInfo *getArtworkTreeInfoForUserLevelSet(int type)
   return getTreeInfoFromIdentifier(artwork_first_node, artwork_set);
 }
 
-boolean checkIfCustomArtworkExistsForCurrentLevelSet()
+boolean checkIfCustomArtworkExistsForCurrentLevelSet(void)
 {
   char *graphics_set =
     getArtworkIdentifierForUserLevelSet(ARTWORK_TYPE_GRAPHICS);
@@ -3863,7 +3863,7 @@ boolean CreateUserLevelSet(char *level_subdir, char *level_name,
   return TRUE;
 }
 
-static void SaveUserLevelInfo()
+static void SaveUserLevelInfo(void)
 {
   CreateUserLevelSet(getLoginName(), getLoginName(), getRealName(), 100, FALSE);
 }
@@ -3975,7 +3975,7 @@ char *getSetupLine(struct TokenInfo *token_info, char *prefix, int token_nr)
   return line;
 }
 
-void LoadLevelSetup_LastSeries()
+void LoadLevelSetup_LastSeries(void)
 {
   /* ----------------------------------------------------------------------- */
   /* ~/.<program>/levelsetup.conf                                            */
@@ -4055,17 +4055,17 @@ static void SaveLevelSetup_LastSeries_Ext(boolean deactivate_last_level_series)
   free(filename);
 }
 
-void SaveLevelSetup_LastSeries()
+void SaveLevelSetup_LastSeries(void)
 {
   SaveLevelSetup_LastSeries_Ext(FALSE);
 }
 
-void SaveLevelSetup_LastSeries_Deactivate()
+void SaveLevelSetup_LastSeries_Deactivate(void)
 {
   SaveLevelSetup_LastSeries_Ext(TRUE);
 }
 
-static void checkSeriesInfo()
+static void checkSeriesInfo(void)
 {
   static char *level_directory = NULL;
   Directory *dir;
@@ -4087,7 +4087,7 @@ static void checkSeriesInfo()
   closeDirectory(dir);
 }
 
-void LoadLevelSetup_SeriesInfo()
+void LoadLevelSetup_SeriesInfo(void)
 {
   char *filename;
   SetupFileHash *level_setup_hash = NULL;
@@ -4185,7 +4185,7 @@ void LoadLevelSetup_SeriesInfo()
   free(filename);
 }
 
-void SaveLevelSetup_SeriesInfo()
+void SaveLevelSetup_SeriesInfo(void)
 {
   char *filename;
   char *level_subdir = leveldir_current->subdir;

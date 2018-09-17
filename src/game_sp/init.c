@@ -57,16 +57,16 @@ Bitmap *bitmap_db_field_sp;
 
 struct EngineSnapshotInfo_SP engine_snapshot_sp;
 
-void sp_open_all()
+void sp_open_all(void)
 {
   Form_Load();
 }
 
-void sp_close_all()
+void sp_close_all(void)
 {
 }
 
-void InitPrecedingPlayfieldMemory()
+void InitPrecedingPlayfieldMemory(void)
 {
   int preceding_buffer_size = 0;
   int i;
@@ -78,7 +78,7 @@ void InitPrecedingPlayfieldMemory()
   game_sp.preceding_buffer_size = preceding_buffer_size;
 }
 
-void InitGfxBuffers_SP()
+void InitGfxBuffers_SP(void)
 {
   ReCreateBitmap(&bitmap_db_field_sp, FXSIZE, FYSIZE);
 }
@@ -192,7 +192,7 @@ void SaveEngineSnapshotValues_SP(ListNode **buffers)
   SaveEngineSnapshotValues_SP_Murphy(buffers);
 }
 
-void LoadEngineSnapshotValues_SP()
+void LoadEngineSnapshotValues_SP(void)
 {
   int i;
 

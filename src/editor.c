@@ -3753,18 +3753,18 @@ static void ModifyEditorCounterLimits(int, int, int);
 static void ModifyEditorSelectboxValue(int, int);
 static void ModifyEditorSelectboxOptions(int, struct ValueTextInfo *);
 static void ModifyEditorDrawingArea(int, int, int);
-static void ModifyEditorElementList();
-static void AdjustElementListScrollbar();
-static void RedrawDrawingElements();
+static void ModifyEditorElementList(void);
+static void AdjustElementListScrollbar(void);
+static void RedrawDrawingElements(void);
 static void DrawDrawingWindowExt(boolean);
-static void DrawDrawingWindow();
-static void DrawLevelInfoWindow();
-static void DrawPropertiesWindow();
-static void DrawPaletteWindow();
-static void UpdateCustomElementGraphicGadgets();
+static void DrawDrawingWindow(void);
+static void DrawLevelInfoWindow(void);
+static void DrawPropertiesWindow(void);
+static void DrawPaletteWindow(void);
+static void UpdateCustomElementGraphicGadgets(void);
 static boolean checkPropertiesConfig(int);
-static void SetAutomaticNumberOfGemsNeeded();
-static void ClearEditorGadgetInfoText();
+static void SetAutomaticNumberOfGemsNeeded(void);
+static void ClearEditorGadgetInfoText(void);
 static void CopyLevelToUndoBuffer(int);
 static void HandleDrawingAreas(struct GadgetInfo *);
 static void HandleCounterButtons(struct GadgetInfo *);
@@ -3778,11 +3778,11 @@ static void HandleCheckbuttons(struct GadgetInfo *);
 static void HandleControlButtons(struct GadgetInfo *);
 static void HandleDrawingAreaInfo(struct GadgetInfo *);
 static void PrintEditorGadgetInfoText(struct GadgetInfo *);
-static boolean AskToCopyAndModifyLevelTemplate();
-static boolean getDrawModeHiRes();
-static int getTabulatorBarWidth();
-static int getTabulatorBarHeight();
-static Pixel getTabulatorBarColor();
+static boolean AskToCopyAndModifyLevelTemplate(void);
+static boolean getDrawModeHiRes(void);
+static int getTabulatorBarWidth(void);
+static int getTabulatorBarHeight(void);
+static Pixel getTabulatorBarColor(void);
 
 static int num_editor_gadgets = 0;	/* dynamically determined */
 
@@ -5385,7 +5385,7 @@ editor_elements_info[] =
   -----------------------------------------------------------------------------
 */
 
-static int getMaxInfoTextLength()
+static int getMaxInfoTextLength(void)
 {
   return (SXSIZE / getFontWidth(INFOTEXT_FONT));
 }
@@ -5477,7 +5477,7 @@ char *getElementDescriptionFilename(int element)
   return NULL;
 }
 
-static boolean suppressBorderElement()
+static boolean suppressBorderElement(void)
 {
   return (level.game_engine_type == GAME_ENGINE_TYPE_MM &&
 	  lev_fieldx <= MAX_ED_FIELDX &&
@@ -5531,7 +5531,7 @@ static void InitDynamicEditorElementList(int **elements, int *num_elements)
     (*elements)[(*num_elements)++] = EL_EMPTY;
 }
 
-static void ReinitializeElementList_EnableSections()
+static void ReinitializeElementList_EnableSections(void)
 {
   /* default: enable all element sections */
 
@@ -5640,7 +5640,7 @@ static void ReinitializeElementList_EnableSections()
   }
 }
 
-static void ReinitializeElementList()
+static void ReinitializeElementList(void)
 {
   static boolean initialization_needed = TRUE;
   int pos = 0;
@@ -5799,7 +5799,7 @@ static void ReinitializeElementList()
   AdjustElementListScrollbar();
 }
 
-void PrintEditorElementList()
+void PrintEditorElementList(void)
 {
   boolean *stop = &setup_editor_el_user_defined;
   int i, j;
@@ -5843,7 +5843,7 @@ void PrintEditorElementList()
   }
 }
 
-static void ReinitializeElementListButtons()
+static void ReinitializeElementListButtons(void)
 {
   static boolean last_setup_value_headlines = FALSE;
   static boolean initialization_needed = TRUE;
@@ -5944,7 +5944,7 @@ static void DrawEditorLevelBorderLine(int x, int y, int xsize, int ysize)
   FillRectangle(drawto, SX + x, SY + y, xsize_thin, ysize_thin, BLACK_PIXEL);
 }
 
-static void DrawEditorLevelBorderLinesIfNeeded()
+static void DrawEditorLevelBorderLinesIfNeeded(void)
 {
   int xsize = lev_fieldx * ed_tilesize;
   int ysize = lev_fieldy * ed_tilesize;
@@ -6041,7 +6041,7 @@ void getEditorGraphicSource(int element, int tile_size, Bitmap **bitmap,
   getSizedGraphicSource(el2edimg(element), 0, tile_size, bitmap, x, y);
 }
 
-static void CreateControlButtons()
+static void CreateControlButtons(void)
 {
   struct GadgetInfo *gi;
   int i;
@@ -6283,7 +6283,7 @@ static void CreateControlButtons()
   }
 }
 
-static void CreateCounterButtons()
+static void CreateCounterButtons(void)
 {
   int max_infotext_len = getMaxInfoTextLength();
   int i;
@@ -6445,7 +6445,7 @@ static void CreateCounterButtons()
   }
 }
 
-static void CreateDrawingAreas()
+static void CreateDrawingAreas(void)
 {
   int i;
 
@@ -6499,7 +6499,7 @@ static void CreateDrawingAreas()
   }
 }
 
-static void CreateTextInputGadgets()
+static void CreateTextInputGadgets(void)
 {
   struct GraphicInfo *gd = &graphic_info[IMG_EDITOR_INPUT_TEXT];
   int max_infotext_len = getMaxInfoTextLength();
@@ -6570,7 +6570,7 @@ static void CreateTextInputGadgets()
   }
 }
 
-static void CreateTextAreaGadgets()
+static void CreateTextAreaGadgets(void)
 {
   int max_infotext_len = getMaxInfoTextLength();
   int i;
@@ -6619,7 +6619,7 @@ static void CreateTextAreaGadgets()
   }
 }
 
-static void CreateSelectboxGadgets()
+static void CreateSelectboxGadgets(void)
 {
   int max_infotext_len = getMaxInfoTextLength();
   int i, j;
@@ -6700,7 +6700,7 @@ static void CreateSelectboxGadgets()
   }
 }
 
-static void CreateTextbuttonGadgets()
+static void CreateTextbuttonGadgets(void)
 {
   int max_infotext_len = getMaxInfoTextLength();
   int i;
@@ -6784,7 +6784,7 @@ static void CreateTextbuttonGadgets()
   }
 }
 
-static void CreateGraphicbuttonGadgets()
+static void CreateGraphicbuttonGadgets(void)
 {
   struct GadgetInfo *gi;
   unsigned int event_mask;
@@ -6840,7 +6840,7 @@ static void CreateGraphicbuttonGadgets()
   }
 }
 
-static void CreateScrollbarGadgets()
+static void CreateScrollbarGadgets(void)
 {
   int i;
 
@@ -6953,7 +6953,7 @@ static void CreateScrollbarGadgets()
   }
 }
 
-static void CreateCheckbuttonGadgets()
+static void CreateCheckbuttonGadgets(void)
 {
   struct GadgetInfo *gi;
   unsigned int event_mask;
@@ -7015,7 +7015,7 @@ static void CreateCheckbuttonGadgets()
   }
 }
 
-static void CreateRadiobuttonGadgets()
+static void CreateRadiobuttonGadgets(void)
 {
   int graphic = IMG_EDITOR_RADIOBUTTON;
   struct GraphicInfo *gd = &graphic_info[graphic];
@@ -7080,7 +7080,7 @@ static void CreateRadiobuttonGadgets()
   }
 }
 
-void CreateLevelEditorGadgets()
+void CreateLevelEditorGadgets(void)
 {
   /* force EDITOR font inside level editor */
   SetFontStatus(GAME_MODE_EDITOR);
@@ -7122,7 +7122,7 @@ void CreateLevelEditorGadgets()
   ResetFontStatus();
 }
 
-void FreeLevelEditorGadgets()
+void FreeLevelEditorGadgets(void)
 {
   int i;
 
@@ -7199,7 +7199,7 @@ static void MapCounterButtons(int id)
   MapGadget(gi_up);
 }
 
-static void MapControlButtons()
+static void MapControlButtons(void)
 {
   int counter_id;
   int i;
@@ -7442,7 +7442,7 @@ static void MapCheckbuttonGadget(int id)
   MapGadget(gi);
 }
 
-static void MapMainDrawingArea()
+static void MapMainDrawingArea(void)
 {
   boolean no_horizontal_scrollbar = (lev_fieldx + 2 <= ed_fieldx);
   boolean no_vertical_scrollbar = (lev_fieldy + 2 <= ed_fieldy);
@@ -7499,12 +7499,12 @@ static void MapOrUnmapLevelEditorToolboxCustomGadgets(boolean map)
   }
 }
 
-static void MapLevelEditorToolboxCustomGadgets()
+static void MapLevelEditorToolboxCustomGadgets(void)
 {
   MapOrUnmapLevelEditorToolboxCustomGadgets(TRUE);
 }
 
-static void UnmapLevelEditorToolboxCustomGadgets()
+static void UnmapLevelEditorToolboxCustomGadgets(void)
 {
   MapOrUnmapLevelEditorToolboxCustomGadgets(FALSE);
 }
@@ -7540,12 +7540,12 @@ static void MapOrUnmapLevelEditorToolboxDrawingGadgets(boolean map)
   }
 }
 
-static void MapLevelEditorToolboxDrawingGadgets()
+static void MapLevelEditorToolboxDrawingGadgets(void)
 {
   MapOrUnmapLevelEditorToolboxDrawingGadgets(TRUE);
 }
 
-static void UnmapLevelEditorToolboxDrawingGadgets()
+static void UnmapLevelEditorToolboxDrawingGadgets(void)
 {
   MapOrUnmapLevelEditorToolboxDrawingGadgets(FALSE);
 }
@@ -7555,7 +7555,7 @@ static void UnmapDrawingArea(int id)
   UnmapGadget(level_editor_gadget[drawingarea_info[id].gadget_id]);
 }
 
-static void UnmapLevelEditorFieldGadgets()
+static void UnmapLevelEditorFieldGadgets(void)
 {
   int i;
 
@@ -7565,7 +7565,7 @@ static void UnmapLevelEditorFieldGadgets()
       UnmapGadget(level_editor_gadget[i]);
 }
 
-void UnmapLevelEditorGadgets()
+void UnmapLevelEditorGadgets(void)
 {
   int i;
 
@@ -7573,7 +7573,7 @@ void UnmapLevelEditorGadgets()
     UnmapGadget(level_editor_gadget[i]);
 }
 
-static void ResetUndoBuffer()
+static void ResetUndoBuffer(void)
 {
   undo_buffer_position = -1;
   undo_buffer_steps = -1;
@@ -7602,12 +7602,12 @@ static void DrawEditModeWindowExt(boolean remap_toolbox_gadgets)
     DrawDrawingWindowExt(remap_toolbox_gadgets);
 }
 
-static void DrawEditModeWindow()
+static void DrawEditModeWindow(void)
 {
   DrawEditModeWindowExt(TRUE);
 }
 
-static void DrawEditModeWindow_PlayfieldOnly()
+static void DrawEditModeWindow_PlayfieldOnly(void)
 {
   DrawEditModeWindowExt(FALSE);
 }
@@ -7619,7 +7619,7 @@ static void ChangeEditModeWindow(int new_edit_mode)
   DrawEditModeWindow();
 }
 
-static boolean LevelChanged()
+static boolean LevelChanged(void)
 {
   boolean field_changed = FALSE;
   int x, y;
@@ -7632,7 +7632,7 @@ static boolean LevelChanged()
   return (level.changed || field_changed);
 }
 
-static boolean PrepareSavingIntoPersonalLevelSet()
+static boolean PrepareSavingIntoPersonalLevelSet(void)
 {
   static LevelDirTree *last_copied_leveldir = NULL;
   static LevelDirTree *last_written_leveldir = NULL;
@@ -7774,7 +7774,7 @@ static int setSelectboxValue(int selectbox_id, int new_value)
   return new_index_value;
 }
 
-static void setSelectboxSpecialActionVariablesIfNeeded()
+static void setSelectboxSpecialActionVariablesIfNeeded(void)
 {
   int i;
 
@@ -7800,7 +7800,7 @@ static void setSelectboxSpecialActionVariablesIfNeeded()
   }
 }
 
-static void setSelectboxSpecialActionOptions()
+static void setSelectboxSpecialActionOptions(void)
 {
   int i;
 
@@ -8132,7 +8132,7 @@ static void CopyElementPropertiesToEditor(int element)
     CopyClassicElementPropertiesToEditor(element);
 }
 
-static boolean AskToCopyAndModifyLevelTemplate()
+static boolean AskToCopyAndModifyLevelTemplate(void)
 {
   if (Request("Copy and modify settings from level template?", REQ_ASK))
   {
@@ -8308,7 +8308,7 @@ static void CopyElementPropertiesToGame(int element)
     CopyClassicElementPropertiesToGame(element);
 }
 
-void CheckElementDescriptions()
+void CheckElementDescriptions(void)
 {
   int i;
 
@@ -8367,7 +8367,7 @@ void InitZoomLevelSettings(int zoom_tilesize)
   MAX_ED_FIELDY = getMaxEdFieldY(FALSE);
 }
 
-static void InitDrawingElements()
+static void InitDrawingElements(void)
 {
   static int game_engine_type_last = GAME_ENGINE_TYPE_UNKNOWN;
 
@@ -8396,7 +8396,7 @@ static void InitDrawingElements()
   game_engine_type_last = level.game_engine_type;
 }
 
-static void InitLevelSetInfo()
+static void InitLevelSetInfo(void)
 {
   snprintf(levelset_name,   MAX_LEVEL_NAME_LEN + 1,
 	   "%s", leveldir_current->name);
@@ -8431,7 +8431,7 @@ static void ChangeEditorToLevelSet(char *levelset_subdir)
   DrawLevelEd();
 }
 
-static boolean useEditorDoorAnimation()
+static boolean useEditorDoorAnimation(void)
 {
   struct RectWithBorder *vp_door_1 = &viewport.door_1[GAME_MODE_MAIN];
   boolean door_1_viewport_unchanged =
@@ -8448,7 +8448,7 @@ static boolean useEditorDoorAnimation()
   return (door_1_viewport_unchanged && door_1_contains_toolbox);
 }
 
-void DrawEditorDoorContent()
+void DrawEditorDoorContent(void)
 {
   /* needed for gadgets drawn on background (like palette scrollbar) */
   SetDoorBackgroundImage(IMG_UNDEFINED);
@@ -8483,7 +8483,7 @@ void DrawEditorDoorContent()
   BlitBitmap(drawto, bitmap_db_door_1, DX, DY, DXSIZE, DYSIZE, 0, 0);
 }
 
-void DrawLevelEd()
+void DrawLevelEd(void)
 {
   int fade_mask = REDRAW_FIELD;
 
@@ -8561,7 +8561,7 @@ void DrawLevelEd()
   SetDoorState(DOOR_OPEN_1 | DOOR_OPEN_2);
 }
 
-static void AdjustDrawingAreaGadgets()
+static void AdjustDrawingAreaGadgets(void)
 {
   int ed_xsize = lev_fieldx + 2;
   int ed_ysize = lev_fieldy + 2;
@@ -8637,7 +8637,7 @@ static void AdjustDrawingAreaGadgets()
 	       GDI_END);
 }
 
-static void AdjustLevelScrollPosition()
+static void AdjustLevelScrollPosition(void)
 {
   if (level_xpos < -1)
     level_xpos = -1;
@@ -8685,7 +8685,7 @@ static void AdjustEditorScrollbar(int id)
 	       GDI_SCROLLBAR_ITEM_POSITION, item_position, GDI_END);
 }
 
-static void AdjustElementListScrollbar()
+static void AdjustElementListScrollbar(void)
 {
   struct GadgetInfo *gi = level_editor_gadget[GADGET_ID_SCROLL_LIST_VERTICAL];
   int items_max, items_visible, item_position;
@@ -8769,7 +8769,7 @@ static void ModifyEditorDrawingArea(int drawingarea_id, int xsize, int ysize)
   ModifyGadget(gi, GDI_AREA_SIZE, xsize, ysize, GDI_END);
 }
 
-static void ModifyEditorElementList()
+static void ModifyEditorElementList(void)
 {
   int i;
 
@@ -8848,7 +8848,7 @@ static void PickDrawingElement(int button, int element)
   redraw_mask |= REDRAW_DOOR_1;
 }
 
-static void RedrawDrawingElements()
+static void RedrawDrawingElements(void)
 {
   PickDrawingElement(1, new_element1);
   PickDrawingElement(2, new_element2);
@@ -8880,12 +8880,12 @@ static void DrawDrawingWindowExt(boolean remap_toolbox_gadgets)
   }
 }
 
-static void DrawDrawingWindow()
+static void DrawDrawingWindow(void)
 {
   DrawDrawingWindowExt(TRUE);
 }
 
-static int getTabulatorBarWidth()
+static int getTabulatorBarWidth(void)
 {
   struct GadgetInfo *gd_gi1 = level_editor_gadget[GADGET_ID_PROPERTIES_INFO];
   struct GadgetInfo *gd_gi4 = level_editor_gadget[GADGET_ID_PROPERTIES_CHANGE];
@@ -8893,12 +8893,12 @@ static int getTabulatorBarWidth()
   return gd_gi4->x - gd_gi1->x + gd_gi4->width;
 }
 
-static int getTabulatorBarHeight()
+static int getTabulatorBarHeight(void)
 {
   return ED_TAB_BAR_HEIGHT;
 }
 
-static Pixel getTabulatorBarColor()
+static Pixel getTabulatorBarColor(void)
 {
   struct GadgetInfo *gd_gi1 = level_editor_gadget[GADGET_ID_LEVELINFO_LEVEL];
   struct GadgetDesign *gd = &gd_gi1->alt_design[GD_BUTTON_UNPRESSED];
@@ -8908,7 +8908,7 @@ static Pixel getTabulatorBarColor()
   return GetPixel(gd->bitmap, gd_x, gd_y);
 }
 
-static void DrawLevelInfoTabulatorGadgets()
+static void DrawLevelInfoTabulatorGadgets(void)
 {
   struct GadgetInfo *gd_gi1 = level_editor_gadget[GADGET_ID_LEVELINFO_LEVEL];
   Pixel tab_color = getTabulatorBarColor();
@@ -8941,7 +8941,7 @@ static void DrawLevelInfoTabulatorGadgets()
 		  getTabulatorBarWidth(), getTabulatorBarHeight(), tab_color);
 }
 
-static void DrawPropertiesTabulatorGadgets()
+static void DrawPropertiesTabulatorGadgets(void)
 {
   struct GadgetInfo *gd_gi1 = level_editor_gadget[GADGET_ID_PROPERTIES_INFO];
   struct GadgetDesign *gd = &gd_gi1->alt_design[GD_BUTTON_UNPRESSED];
@@ -9009,7 +9009,7 @@ static int PrintElementDescriptionFromFile(char *filename, int font_nr,
 		      TRUE, FALSE, FALSE);
 }
 
-static void DrawLevelInfoLevel()
+static void DrawLevelInfoLevel(void)
 {
   int i;
 
@@ -9038,7 +9038,7 @@ static char *getLevelSubdirFromSaveMode(int save_mode)
   return leveldir_current->subdir;
 }
 
-static void DrawLevelInfoLevelSet_DirectoryInfo()
+static void DrawLevelInfoLevelSet_DirectoryInfo(void)
 {
   char *directory_text = "Level set directory:";
   char *directory_name = getLevelSubdirFromSaveMode(levelset_save_mode);
@@ -9053,7 +9053,7 @@ static void DrawLevelInfoLevelSet_DirectoryInfo()
   PrintInfoText(directory_name, font2_nr, x, y);
 }
 
-static void DrawLevelInfoLevelSet()
+static void DrawLevelInfoLevelSet(void)
 {
   boolean artwork_exists = checkIfCustomArtworkExistsForCurrentLevelSet();
   boolean template_exists = fileExists(getLocalLevelTemplateFilename());
@@ -9089,7 +9089,7 @@ static void DrawLevelInfoLevelSet()
   DrawLevelInfoLevelSet_DirectoryInfo();
 }
 
-static void DrawLevelInfoEditor()
+static void DrawLevelInfoEditor(void)
 {
   int i;
 
@@ -9112,7 +9112,7 @@ static void DrawLevelInfoEditor()
   MapTextbuttonGadget(ED_TEXTBUTTON_ID_SAVE_AS_TEMPLATE_2);
 }
 
-static void DrawLevelInfoWindow()
+static void DrawLevelInfoWindow(void)
 {
   char *text = "Global Settings";
   int font_nr = FONT_TITLE_1;
@@ -9141,7 +9141,7 @@ static void DrawLevelInfoWindow()
     DrawLevelInfoEditor();
 }
 
-static void DrawCustomContentArea()
+static void DrawCustomContentArea(void)
 {
   int id = ED_DRAWING_ID_CUSTOM_CONTENT;
   struct GadgetInfo *gi = level_editor_gadget[drawingarea_info[id].gadget_id];
@@ -9158,7 +9158,7 @@ static void DrawCustomContentArea()
   MapDrawingArea(ED_DRAWING_ID_CUSTOM_CONTENT);
 }
 
-static void DrawCustomChangeContentArea()
+static void DrawCustomChangeContentArea(void)
 {
   int id = ED_DRAWING_ID_CUSTOM_CHANGE_CONTENT;
   struct GadgetInfo *gi = level_editor_gadget[drawingarea_info[id].gadget_id];
@@ -9183,7 +9183,7 @@ static void RemoveElementContentArea(int id, int font_height)
 		 ED_GADGET_TEXT_DISTANCE + font_height);
 }
 
-static void DrawYamYamContentAreas()
+static void DrawYamYamContentAreas(void)
 {
   int font_nr = FONT_TEXT_1;
   int font_height = getFontHeight(font_nr);
@@ -9218,7 +9218,7 @@ static void DrawYamYamContentAreas()
   DrawText(x, y + 2 * tilesize, "smashed", font_nr);
 }
 
-static void DrawMagicBallContentAreas()
+static void DrawMagicBallContentAreas(void)
 {
   int font_nr = FONT_TEXT_1;
   int font_height = getFontHeight(font_nr);
@@ -9357,7 +9357,7 @@ static void DrawEnvelopeTextArea(int envelope_nr)
   MapTextAreaGadget(ED_TEXTAREA_ID_ENVELOPE_INFO);
 }
 
-static void DrawPropertiesInfo()
+static void DrawPropertiesInfo(void)
 {
   static struct
   {
@@ -9680,7 +9680,7 @@ static boolean checkPropertiesConfig(int element)
   return FALSE;
 }
 
-static void SetAutomaticNumberOfGemsNeeded()
+static void SetAutomaticNumberOfGemsNeeded(void)
 {
   int x, y;
 
@@ -9705,7 +9705,7 @@ static void SetAutomaticNumberOfGemsNeeded()
   ModifyEditorCounterValue(ED_COUNTER_ID_LEVEL_GEMSLIMIT, level.gems_needed);
 }
 
-static void DrawPropertiesConfig()
+static void DrawPropertiesConfig(void)
 {
   boolean draw_footer_line = FALSE;
   int max_num_element_counters = 4;
@@ -10048,7 +10048,7 @@ static void DrawPropertiesConfig()
   }
 }
 
-static void DrawPropertiesChangeDrawingAreas()
+static void DrawPropertiesChangeDrawingAreas(void)
 {
   if (IS_CUSTOM_ELEMENT(properties_element))
   {
@@ -10062,7 +10062,7 @@ static void DrawPropertiesChangeDrawingAreas()
   redraw_mask |= REDRAW_FIELD;
 }
 
-static void DrawPropertiesChange()
+static void DrawPropertiesChange(void)
 {
   int i;
 
@@ -10156,7 +10156,7 @@ static void DrawEditorElementName(int x, int y, int font_nr)
   }
 }
 
-static void DrawPropertiesWindow()
+static void DrawPropertiesWindow(void)
 {
   struct GraphicInfo *gd = &graphic_info[IMG_EDITOR_INPUT_TEXT];
   int element_border = graphic_info[IMG_EDITOR_ELEMENT_BORDER].border_size;
@@ -10225,7 +10225,7 @@ static void DrawPropertiesWindow()
     DrawPropertiesConfig();
 }
 
-static void DrawPaletteWindow()
+static void DrawPaletteWindow(void)
 {
   int i;
 
@@ -10242,7 +10242,7 @@ static void DrawPaletteWindow()
   MapGadget(level_editor_gadget[GADGET_ID_SCROLL_LIST_DOWN]);
 }
 
-static void UpdateCustomElementGraphicGadgets()
+static void UpdateCustomElementGraphicGadgets(void)
 {
   int i;
 
@@ -11541,7 +11541,7 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
   last_y = y;
 }
 
-static void ResetIntelliDraw()
+static void ResetIntelliDraw(void)
 {
   int x, y;
 
@@ -11561,7 +11561,7 @@ static void SetDrawModeHiRes(int element)
      (IS_MM_WALL_EDITOR(element) || element == EL_EMPTY));
 }
 
-static boolean getDrawModeHiRes()
+static boolean getDrawModeHiRes(void)
 {
   return draw_mode_hires;
 }
@@ -11998,17 +11998,17 @@ static void CopyBrushToCursor(int x, int y)
   CopyBrushExt(x, y, 0, 0, 0, CB_BRUSH_TO_CURSOR);
 }
 
-static void DeleteBrushFromCursor()
+static void DeleteBrushFromCursor(void)
 {
   CopyBrushExt(0, 0, 0, 0, 0, CB_DELETE_OLD_CURSOR);
 }
 
-void DumpBrush()
+void DumpBrush(void)
 {
   CopyBrushExt(0, 0, 0, 0, 0, CB_DUMP_BRUSH);
 }
 
-void DumpBrush_Small()
+void DumpBrush_Small(void)
 {
   CopyBrushExt(0, 0, 0, 0, 0, CB_DUMP_BRUSH_SMALL);
 }
@@ -13853,7 +13853,7 @@ void HandleLevelEditorKeyInput(Key key)
   }
 }
 
-void HandleLevelEditorIdle()
+void HandleLevelEditorIdle(void)
 {
   int element_border = graphic_info[IMG_EDITOR_ELEMENT_BORDER].border_size;
   int x = editor.settings.element_graphic.x + element_border;
@@ -13883,7 +13883,7 @@ void HandleLevelEditorIdle()
   FrameCounter++;	/* increase animation frame counter */
 }
 
-static void ClearEditorGadgetInfoText()
+static void ClearEditorGadgetInfoText(void)
 {
   DrawBackground(INFOTEXT_XPOS, INFOTEXT_YPOS, INFOTEXT_XSIZE, INFOTEXT_YSIZE);
 }

@@ -37,12 +37,12 @@ int screen_x, screen_y;			/* current scroll position */
 static int screentiles[MAX_PLAYFIELD_HEIGHT + 2][MAX_PLAYFIELD_WIDTH + 2];
 static int crumbled_state[MAX_PLAYFIELD_HEIGHT + 2][MAX_PLAYFIELD_WIDTH + 2];
 
-int getFieldbufferOffsetX_EM()
+int getFieldbufferOffsetX_EM(void)
 {
   return screen_x % TILEX;
 }
 
-int getFieldbufferOffsetY_EM()
+int getFieldbufferOffsetY_EM(void)
 {
   return screen_y % TILEY;
 }
@@ -501,7 +501,7 @@ static void setMinimalPlayerBoundaries(int *sx1, int *sy1, int *sx2, int *sy2)
   }
 }
 
-boolean checkIfAllPlayersFitToScreen()
+boolean checkIfAllPlayersFitToScreen(void)
 {
   int sx1 = 0, sy1 = 0, sx2 = 0, sy2 = 0;
 

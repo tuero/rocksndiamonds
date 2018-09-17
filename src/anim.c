@@ -198,8 +198,8 @@ struct AnimClassGameMode
 /* forward declaration for internal use */
 static void HandleGlobalAnim(int, int);
 static void DoAnimationExt(void);
-static void ResetGlobalAnim_Clickable();
-static void ResetGlobalAnim_Clicked();
+static void ResetGlobalAnim_Clickable(void);
+static void ResetGlobalAnim_Clicked(void);
 
 static struct GlobalAnimControlInfo global_anim_ctrl[NUM_GAME_MODES];
 
@@ -325,7 +325,7 @@ static int compareGlobalAnimMainControlInfo(const void *obj1, const void *obj2)
   return compare_result;
 }
 
-static void InitToonControls()
+static void InitToonControls(void)
 {
   int mode_nr_toons = GAME_MODE_PSEUDO_TOONS;
   struct GlobalAnimControlInfo *ctrl = &global_anim_ctrl[mode_nr_toons];
@@ -407,7 +407,7 @@ static void InitToonControls()
   ctrl->num_anims++;
 }
 
-void InitGlobalAnimControls()
+void InitGlobalAnimControls(void)
 {
   int i, m, a, p;
   int mode_nr, anim_nr, part_nr;
@@ -568,7 +568,7 @@ void InitGlobalAnimControls()
   anim_classes_last = ANIM_CLASS_NONE;
 }
 
-void InitGlobalAnimations()
+void InitGlobalAnimations(void)
 {
   InitGlobalAnimControls();
 }
@@ -1453,7 +1453,7 @@ static void HandleGlobalAnim(int action, int game_mode)
   HandleGlobalAnim_Mode(&global_anim_ctrl[game_mode], action);
 }
 
-static void DoAnimationExt()
+static void DoAnimationExt(void)
 {
   int i;
 
@@ -1491,7 +1491,7 @@ static boolean DoGlobalAnim_EventAction(struct GlobalAnimPartControlInfo *part)
   return action_executed;
 }
 
-static void InitGlobalAnim_Clickable()
+static void InitGlobalAnim_Clickable(void)
 {
   int mode_nr;
 
@@ -1642,12 +1642,12 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, boolean clicked)
   return (anything_clicked || any_event_action);
 }
 
-static void ResetGlobalAnim_Clickable()
+static void ResetGlobalAnim_Clickable(void)
 {
   InitGlobalAnim_Clickable();
 }
 
-static void ResetGlobalAnim_Clicked()
+static void ResetGlobalAnim_Clicked(void)
 {
   InitGlobalAnim_Clicked(-1, -1, FALSE);
 }

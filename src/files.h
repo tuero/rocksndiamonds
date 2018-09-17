@@ -30,8 +30,8 @@ void setElementChangeInfoToDefaults(struct ElementChangeInfo *);
 void copyElementInfo(struct ElementInfo *, struct ElementInfo *);
 
 char *getDefaultLevelFilename(int);
-char *getLocalLevelTemplateFilename();
-char *getGlobalLevelTemplateFilename();
+char *getLocalLevelTemplateFilename(void);
+char *getGlobalLevelTemplateFilename(void);
 
 void LoadLevelFromFilename(struct LevelInfo *, char *);
 void LoadLevel(int);
@@ -39,7 +39,7 @@ void LoadLevelTemplate(int);
 void LoadLevelInfoOnly(int);
 void LoadNetworkLevel(struct NetworkLevelInfo *);
 void SaveLevel(int);
-void SaveLevelTemplate();
+void SaveLevelTemplate(void);
 void SaveNativeLevel(struct LevelInfo *);
 void DumpLevel(struct LevelInfo *);
 boolean SaveLevelChecked(int);
@@ -59,31 +59,31 @@ void LoadScore(int);
 void SaveScore(int);
 
 void LoadSetupFromFilename(char *);
-void LoadSetup();
-void SaveSetup();
+void LoadSetup(void);
+void SaveSetup(void);
 
-void LoadSetup_AutoSetup();
-void SaveSetup_AutoSetup();
+void LoadSetup_AutoSetup(void);
+void SaveSetup_AutoSetup(void);
 
-void LoadSetup_EditorCascade();
-void SaveSetup_EditorCascade();
+void LoadSetup_EditorCascade(void);
+void SaveSetup_EditorCascade(void);
 
 void SaveSetup_AddGameControllerMapping(char *);
 
 void setHideSetupEntry(void *);
 boolean hideSetupEntry(void *);
 
-void LoadCustomElementDescriptions();
-void InitMenuDesignSettings_Static();
-void LoadMenuDesignSettings();
-void LoadMenuDesignSettings_AfterGraphics();
+void LoadCustomElementDescriptions(void);
+void InitMenuDesignSettings_Static(void);
+void LoadMenuDesignSettings(void);
+void LoadMenuDesignSettings_AfterGraphics(void);
 void LoadUserDefinedEditorElementList(int **, int *);
-void LoadMusicInfo();
-void LoadHelpAnimInfo();
-void LoadHelpTextInfo();
+void LoadMusicInfo(void);
+void LoadHelpAnimInfo(void);
+void LoadHelpTextInfo(void);
 
-void ConvertLevels();
-void CreateLevelSketchImages();
+void ConvertLevels(void);
+void CreateLevelSketchImages(void);
 void CreateCustomElementImages(char *);
 
 #endif	/* FILES_H */

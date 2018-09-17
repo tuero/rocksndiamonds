@@ -107,7 +107,7 @@ int putNetworkString(byte *ptr, char *s)
   return strlen(s) + 1;
 }
 
-struct NetworkBuffer *newNetworkBuffer()
+struct NetworkBuffer *newNetworkBuffer(void)
 {
   struct NetworkBuffer *new = checked_calloc(sizeof(struct NetworkBuffer));
 

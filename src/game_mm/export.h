@@ -219,35 +219,35 @@ extern struct EngineSnapshotInfo_MM engine_snapshot_mm;
 
 extern short Ur[MM_MAX_PLAYFIELD_WIDTH][MM_MAX_PLAYFIELD_HEIGHT];
 
-extern void mm_open_all();
-extern void mm_close_all();
+extern void mm_open_all(void);
+extern void mm_close_all(void);
 
-void InitElementProperties_MM();
+void InitElementProperties_MM(void);
 
-extern void InitGfxBuffers_MM();
+extern void InitGfxBuffers_MM(void);
 
-extern void InitGameEngine_MM();
-extern void InitGameActions_MM();
+extern void InitGameEngine_MM(void);
+extern void InitGameActions_MM(void);
 extern void GameActions_MM(struct MouseActionInfo, boolean);
 
-extern void DrawLaser_MM();
+extern void DrawLaser_MM(void);
 
 extern boolean ClickElement(int, int, int);
 
 extern unsigned int InitEngineRandom_MM(int);
 
-extern void setLevelInfoToDefaults_MM();
-extern void copyInternalEngineVars_MM();
+extern void setLevelInfoToDefaults_MM(void);
+extern void copyInternalEngineVars_MM(void);
 extern boolean LoadNativeLevel_MM(char *, boolean);
 extern void SaveNativeLevel_MM(char *);
 
-extern int getFieldbufferOffsetX_MM();
-extern int getFieldbufferOffsetY_MM();
+extern int getFieldbufferOffsetX_MM(void);
+extern int getFieldbufferOffsetY_MM(void);
 
 extern void BlitScreenToBitmap_MM(Bitmap *);
-extern void RedrawPlayfield_MM();
+extern void RedrawPlayfield_MM(void);
 
-extern void LoadEngineSnapshotValues_MM();
+extern void LoadEngineSnapshotValues_MM(void);
 extern void SaveEngineSnapshotValues_MM(ListNode **);
 
 extern int getButtonFromTouchPosition(int, int, int, int);

@@ -10,7 +10,7 @@
 // Init game conditions (variables)
 // ==========================================================================
 
-void subInitGameConditions()
+void subInitGameConditions(void)
 {
   MurphyVarFaceLeft = 0;
   KillMurphyFlag = 0;			// no "kill Murphy"
@@ -41,7 +41,7 @@ void subInitGameConditions()
 // Locate Murphy and init location.
 // ==========================================================================
 
-void InitMurphyPos()
+void InitMurphyPos(void)
 {
   int si;
 
@@ -79,7 +79,7 @@ void InitMurphyPosB(int si)
 // Convert to easy symbols and reset Infotron count If not ThenVer62
 // ==========================================================================
 
-int subConvertToEasySymbols()
+int subConvertToEasySymbols(void)
 {
   int ax, bx, cx, dx, i;
   int al;
@@ -225,12 +225,12 @@ void ResetInfotronsNeeded(int dx)
 // Fetch and initialize a level
 // ==========================================================================
 
-void subFetchAndInitLevelB()
+void subFetchAndInitLevelB(void)
 {
   subFetchAndInitLevelA();
 }
 
-void subFetchAndInitLevelA()
+void subFetchAndInitLevelA(void)
 {
   GameBusyFlag = 0;				// restore scissors too
   subFetchAndInitLevel();			// fetch and initialize a level
@@ -239,7 +239,7 @@ void subFetchAndInitLevelA()
   DemoKeyCode = 0;				// delete last demo key!
 }
 
-void subFetchAndInitLevel()
+void subFetchAndInitLevel(void)
 {
   int InfoCountInLevel;
 

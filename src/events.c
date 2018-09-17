@@ -164,7 +164,7 @@ boolean NextValidEvent(Event *event)
   return FALSE;
 }
 
-void HandleEvents()
+void HandleEvents(void)
 {
   Event event;
   unsigned int event_frame_delay = 0;
@@ -283,7 +283,7 @@ void HandleOtherEvents(Event *event)
   }
 }
 
-void HandleMouseCursor()
+void HandleMouseCursor(void)
 {
   if (game_status == GAME_MODE_TITLE)
   {
@@ -347,7 +347,7 @@ void EventLoop(void)
   }
 }
 
-void ClearAutoRepeatKeyEvents()
+void ClearAutoRepeatKeyEvents(void)
 {
   while (PendingEvent())
   {
@@ -364,7 +364,7 @@ void ClearAutoRepeatKeyEvents()
   }
 }
 
-void ClearEventQueue()
+void ClearEventQueue(void)
 {
   Event event;
 
@@ -394,14 +394,14 @@ void ClearEventQueue()
   }
 }
 
-void ClearPlayerMouseAction()
+void ClearPlayerMouseAction(void)
 {
   local_player->mouse_action.lx = 0;
   local_player->mouse_action.ly = 0;
   local_player->mouse_action.button = 0;
 }
 
-void ClearPlayerAction()
+void ClearPlayerAction(void)
 {
   int i;
 
@@ -442,7 +442,7 @@ void SetPlayerMouseAction(int mx, int my, int button)
   SetTileCursorXY(lx, ly);
 }
 
-void SleepWhileUnmapped()
+void SleepWhileUnmapped(void)
 {
   boolean window_unmapped = TRUE;
 
@@ -1399,7 +1399,7 @@ static void HandleButtonOrFinger(int mx, int my, int button)
 
 #if defined(TARGET_SDL2)
 
-static boolean checkTextInputKeyModState()
+static boolean checkTextInputKeyModState(void)
 {
   // when playing, only handle raw key events and ignore text input
   if (game_status == GAME_MODE_PLAYING)
@@ -2215,7 +2215,7 @@ void HandleKey(Key key, int key_status)
   HandleKeysDebug(key);
 }
 
-void HandleNoEvent()
+void HandleNoEvent(void)
 {
   HandleMouseCursor();
 
@@ -2227,7 +2227,7 @@ void HandleNoEvent()
   }
 }
 
-void HandleEventActions()
+void HandleEventActions(void)
 {
   // if (button_status && game_status != GAME_MODE_PLAYING)
   if (button_status && (game_status != GAME_MODE_PLAYING ||
@@ -2290,7 +2290,7 @@ static void HandleTileCursor(int dx, int dy, int button)
   }
 }
 
-static int HandleJoystickForAllPlayers()
+static int HandleJoystickForAllPlayers(void)
 {
   int i;
   int result = 0;
@@ -2323,7 +2323,7 @@ static int HandleJoystickForAllPlayers()
   return result;
 }
 
-void HandleJoystick()
+void HandleJoystick(void)
 {
   static unsigned int joytest_delay = 0;
   static unsigned int joytest_delay_value = GADGET_FRAME_DELAY;

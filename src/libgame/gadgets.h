@@ -277,14 +277,14 @@ void RedrawGadget(struct GadgetInfo *);
 
 void MapGadget(struct GadgetInfo *);
 void UnmapGadget(struct GadgetInfo *);
-void UnmapAllGadgets();
-void RemapAllGadgets();
+void UnmapAllGadgets(void);
+void RemapAllGadgets(void);
 
-boolean anyTextInputGadgetActive();
-boolean anyTextAreaGadgetActive();
-boolean anySelectboxGadgetActive();
-boolean anyScrollbarGadgetActive();
-boolean anyTextGadgetActive();
+boolean anyTextInputGadgetActive(void);
+boolean anyTextAreaGadgetActive(void);
+boolean anySelectboxGadgetActive(void);
+boolean anyScrollbarGadgetActive(void);
+boolean anyTextGadgetActive(void);
 
 void ClickOnGadget(struct GadgetInfo *, int);
 

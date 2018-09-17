@@ -43,7 +43,7 @@ void HandleToonAnimations(void);
 
 void HandleButton(int, int, int, int);
 void HandleKey(Key, int);
-void HandleJoystick();
+void HandleJoystick(void);
 void HandleSpecialGameControllerButtons(Event *);
 void HandleSpecialGameControllerKeys(Key, int);
 

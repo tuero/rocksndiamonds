@@ -4453,7 +4453,7 @@ void create_tab(int *invert, unsigned char *array)
     array[i] = buffer[i];
 }
 
-void create_explode()
+void create_explode(void)
 {
   int i;
   int *tile = tile_explode;
@@ -4476,7 +4476,7 @@ void create_explode()
     tab_explode_dynamite[i] = buffer[i];
 }
 
-void create_obj()
+void create_obj(void)
 {
   int i, j;
   int *map = obj_map;
@@ -4507,7 +4507,7 @@ void create_obj()
       map_obj[i][j] = buffer[7 - i][j];
 }
 
-void create_obj_graphics_info_em()
+void create_obj_graphics_info_em(void)
 {
   int i, j;
 
@@ -4543,7 +4543,7 @@ void create_obj_graphics_info_em()
   }
 }
 
-void create_spr()
+void create_spr(void)
 {
   int i, j, k;
   int *map = spr_map;
@@ -4564,7 +4564,7 @@ void create_spr()
 	map_spr[i][j][k] = buffer[i][7 - j][k];
 }
 
-void create_spr_graphics_info_em()
+void create_spr_graphics_info_em(void)
 {
   int i, j, k;
 
@@ -4599,7 +4599,7 @@ void create_spr_graphics_info_em()
   }
 }
 
-void tab_generate()
+void tab_generate(void)
 {
   create_tab(tile_blank, tab_blank);
   create_tab(tile_acid, tab_acid);
@@ -4610,7 +4610,7 @@ void tab_generate()
   create_spr();
 }
 
-void tab_generate_graphics_info_em()
+void tab_generate_graphics_info_em(void)
 {
   create_obj_graphics_info_em();
   create_spr_graphics_info_em();

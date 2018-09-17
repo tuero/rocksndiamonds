@@ -1628,8 +1628,8 @@ void InitProgramInfo(char *, char *, char *, char *, char *, char *, char *,
 		     char *, int);
 void InitNetworkInfo(boolean, boolean, boolean, char *, int);
 
-void InitScoresInfo();
-void SetWindowTitle();
+void InitScoresInfo(void);
+void SetWindowTitle(void);
 
 void InitWindowTitleFunction(char *(*window_title_function)(void));
 void InitExitMessageFunction(void (*exit_message_function)(char *, va_list));
@@ -1649,10 +1649,10 @@ void InitGfxDrawBusyAnimFunction(void (*draw_busy_anim_function)(void));
 void InitGfxDrawGlobalAnimFunction(void (*draw_global_anim_function)(int, int));
 void InitGfxDrawGlobalBorderFunction(void (*draw_global_border_function)(int));
 void InitGfxDrawTileCursorFunction(void (*draw_tile_cursor_function)(int));
-void InitGfxCustomArtworkInfo();
-void InitGfxOtherSettings();
-void InitTileCursorInfo();
-void InitOverlayInfo();
+void InitGfxCustomArtworkInfo(void);
+void InitGfxOtherSettings(void);
+void InitTileCursorInfo(void);
+void InitOverlayInfo(void);
 void SetTileCursorEnabled(boolean);
 void SetTileCursorActive(boolean);
 void SetTileCursorTargetXY(int, int);
@@ -1661,7 +1661,7 @@ void SetTileCursorSXSY(int, int);
 void SetOverlayEnabled(boolean);
 void SetOverlayActive(boolean);
 void SetOverlayShowGrid(boolean);
-boolean GetOverlayActive();
+boolean GetOverlayActive(void);
 void SetDrawDeactivationMask(int);
 int GetDrawDeactivationMask(void);
 void SetDrawBackgroundMask(int);
@@ -1691,7 +1691,7 @@ void BlitBitmapMasked(Bitmap *, Bitmap *, int, int, int, int, int, int);
 boolean DrawingDeactivatedField(void);
 boolean DrawingDeactivated(int, int, int, int);
 boolean DrawingOnBackground(int, int);
-boolean DrawingAreaChanged();
+boolean DrawingAreaChanged(void);
 void BlitBitmapOnBackground(Bitmap *, Bitmap *, int, int, int, int, int, int);
 void BlitTexture(Bitmap *, int, int, int, int, int, int);
 void BlitTextureMasked(Bitmap *, int, int, int, int, int, int);
@@ -1708,7 +1708,7 @@ void KeyboardAutoRepeatOn(void);
 void KeyboardAutoRepeatOff(void);
 boolean SetVideoMode(boolean);
 void SetVideoFrameDelay(unsigned int);
-unsigned int GetVideoFrameDelay();
+unsigned int GetVideoFrameDelay(void);
 boolean ChangeVideoModeIfNeeded(boolean);
 
 Bitmap *LoadImage(char *);
@@ -1733,15 +1733,15 @@ void PeekEvent(Event *event);
 void CheckQuitEvent(void);
 Key GetEventKey(KeyEvent *, boolean);
 KeyMod HandleKeyModState(Key, int);
-KeyMod GetKeyModState();
-KeyMod GetKeyModStateFromEvents();
+KeyMod GetKeyModState(void);
+KeyMod GetKeyModStateFromEvents(void);
 void StartTextInput(int, int, int, int);
-void StopTextInput();
+void StopTextInput(void);
 boolean CheckCloseWindowEvent(ClientMessageEvent *);
 
-void InitJoysticks();
+void InitJoysticks(void);
 boolean ReadJoystick(int, int *, int *, boolean *, boolean *);
 boolean CheckJoystickOpened(int);
-void ClearJoystickState();
+void ClearJoystickState(void);
 
 #endif /* SYSTEM_H */

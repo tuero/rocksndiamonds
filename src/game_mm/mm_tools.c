@@ -41,7 +41,7 @@ void SetDrawtoField_MM(int mode)
   SetTileCursorSXSY(cSX, cSY);
 }
 
-void ClearWindow()
+void ClearWindow(void)
 {
   ClearRectangle(backbuffer, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
 
@@ -423,7 +423,7 @@ void DrawField_MM(int x, int y)
   DrawElement_MM(x, y, element);
 }
 
-void DrawLevel_MM()
+void DrawLevel_MM(void)
 {
   int x,y;
 
@@ -766,7 +766,7 @@ int el2gfx(int element)
   }
 }
 
-void RedrawPlayfield_MM()
+void RedrawPlayfield_MM(void)
 {
   DrawLevel_MM();
   DrawLaser_MM();

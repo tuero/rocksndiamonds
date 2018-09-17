@@ -58,7 +58,7 @@ int putNetwork32BitInteger(byte *, int);
 char *getNetworkString(byte *);
 int putNetworkString(byte *, char *);
 
-struct NetworkBuffer *newNetworkBuffer();
+struct NetworkBuffer *newNetworkBuffer(void);
 void initNetworkBufferForReceiving(struct NetworkBuffer *);
 void initNetworkBufferForReading(struct NetworkBuffer *);
 void initNetworkBufferForWriting(struct NetworkBuffer *, int, int);

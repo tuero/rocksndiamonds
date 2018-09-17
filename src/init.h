@@ -33,18 +33,18 @@ boolean getBitfieldProperty(int *, int, int);
 void ResolveGroupElement(int);
 void InitElementPropertiesStatic(void);
 void InitElementPropertiesEngine(int);
-void InitElementPropertiesGfxElement();
+void InitElementPropertiesGfxElement(void);
 
 void ReloadCustomArtwork(int);
-void RedrawGlobalBorder();
+void RedrawGlobalBorder(void);
 
-void KeyboardAutoRepeatOffUnlessAutoplay();
+void KeyboardAutoRepeatOffUnlessAutoplay(void);
 
-void InitGfxBuffers();
-void InitGadgets();
-void InitImageTextures();
+void InitGfxBuffers(void);
+void InitGadgets(void);
+void InitImageTextures(void);
 
-void InitNetworkServer();
+void InitNetworkServer(void);
 
 void DisplayExitMessage(char *, va_list);
 

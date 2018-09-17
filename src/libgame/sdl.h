@@ -459,7 +459,7 @@ void SDLSetScreenProperties(void);
 #endif
 
 void SDLSetScreenRenderingMode(char *);
-void SDLRedrawWindow();
+void SDLRedrawWindow(void);
 void SDLSetWindowTitle(void);
 
 void SDLLimitScreenUpdates(boolean);
@@ -497,7 +497,7 @@ void HandleJoystickEvent(Event *);
 void SDLInitJoysticks(void);
 boolean SDLReadJoystick(int, int *, int *, boolean *, boolean *);
 boolean SDLCheckJoystickOpened(int);
-void SDLClearJoystickState();
+void SDLClearJoystickState(void);
 boolean SDLOpenJoystick(int);
 void SDLCloseJoystick(int);
 

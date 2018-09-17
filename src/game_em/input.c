@@ -58,7 +58,7 @@ void game_init_vars(void)
   Boom = Index[3];
 }
 
-void InitGameEngine_EM()
+void InitGameEngine_EM(void)
 {
   prepare_em_level();
 
@@ -67,7 +67,7 @@ void InitGameEngine_EM()
   RedrawPlayfield_EM(FALSE);
 }
 
-void UpdateGameDoorValues_EM()
+void UpdateGameDoorValues_EM(void)
 {
 }
 
@@ -167,7 +167,7 @@ void readjoy(byte action, struct PLAYER *ply)
     ply->joy_snap = snap;
 }
 
-void SaveEngineSnapshotValues_EM()
+void SaveEngineSnapshotValues_EM(void)
 {
   int i, j, k;
 
@@ -194,7 +194,7 @@ void SaveEngineSnapshotValues_EM()
 	engine_snapshot_em.Array[i][j][k] = Array[i][j][k];
 }
 
-void LoadEngineSnapshotValues_EM()
+void LoadEngineSnapshotValues_EM(void)
 {
   int i, j, k;
 

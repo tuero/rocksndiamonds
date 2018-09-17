@@ -116,7 +116,7 @@ void InitNetworkInfo(boolean enabled, boolean connected, boolean serveronly,
   network.server_port = server_port;
 }
 
-void InitScoresInfo()
+void InitScoresInfo(void)
 {
   char *global_scores_dir = getPath2(getCommonDataDir(), SCORES_DIRECTORY);
 
@@ -143,7 +143,7 @@ void InitScoresInfo()
   free(global_scores_dir);
 }
 
-void SetWindowTitle()
+void SetWindowTitle(void)
 {
   program.window_title = program.window_title_function();
 
@@ -307,7 +307,7 @@ void InitGfxDrawTileCursorFunction(void (*draw_tile_cursor_function)(int))
   gfx.draw_tile_cursor_function = draw_tile_cursor_function;
 }
 
-void InitGfxCustomArtworkInfo()
+void InitGfxCustomArtworkInfo(void)
 {
   gfx.override_level_graphics = FALSE;
   gfx.override_level_sounds = FALSE;
@@ -316,12 +316,12 @@ void InitGfxCustomArtworkInfo()
   gfx.draw_init_text = TRUE;
 }
 
-void InitGfxOtherSettings()
+void InitGfxOtherSettings(void)
 {
   gfx.cursor_mode = CURSOR_DEFAULT;
 }
 
-void InitTileCursorInfo()
+void InitTileCursorInfo(void)
 {
   tile_cursor.enabled = FALSE;
   tile_cursor.active = FALSE;
@@ -338,7 +338,7 @@ void InitTileCursorInfo()
   tile_cursor.sy = 0;
 }
 
-void InitOverlayInfo()
+void InitOverlayInfo(void)
 {
   int nr = GRID_ACTIVE_NR();
   int x, y;
@@ -425,7 +425,7 @@ void SetOverlayShowGrid(boolean show_grid)
     SetOverlayEnabled(TRUE);
 }
 
-boolean GetOverlayActive()
+boolean GetOverlayActive(void)
 {
   return overlay.active;
 }
@@ -435,7 +435,7 @@ void SetDrawDeactivationMask(int draw_deactivation_mask)
   gfx.draw_deactivation_mask = draw_deactivation_mask;
 }
 
-int GetDrawDeactivationMask()
+int GetDrawDeactivationMask(void)
 {
   return gfx.draw_deactivation_mask;
 }
@@ -709,7 +709,7 @@ inline static boolean CheckDrawingArea(int x, int y, int width, int height,
   return FALSE;
 }
 
-boolean DrawingDeactivatedField()
+boolean DrawingDeactivatedField(void)
 {
   if (program.headless)
     return TRUE;
@@ -1120,7 +1120,7 @@ void SetVideoFrameDelay(unsigned int frame_delay_value)
   video.frame_delay_value = frame_delay_value;
 }
 
-unsigned int GetVideoFrameDelay()
+unsigned int GetVideoFrameDelay(void)
 {
   return video.frame_delay_value;
 }
@@ -1719,12 +1719,12 @@ KeyMod HandleKeyModState(Key key, int key_status)
   return current_modifiers;
 }
 
-KeyMod GetKeyModState()
+KeyMod GetKeyModState(void)
 {
   return (KeyMod)SDL_GetModState();
 }
 
-KeyMod GetKeyModStateFromEvents()
+KeyMod GetKeyModStateFromEvents(void)
 {
   /* always use key modifier state as tracked from key events (this is needed
      if the modifier key event was injected into the event queue, but the key
@@ -1751,7 +1751,7 @@ void StartTextInput(int x, int y, int width, int height)
 #endif
 }
 
-void StopTextInput()
+void StopTextInput(void)
 {
 #if defined(TARGET_SDL2)
 #if defined(HAS_SCREEN_KEYBOARD)
@@ -1780,7 +1780,7 @@ boolean CheckCloseWindowEvent(ClientMessageEvent *event)
 /* joystick functions                                                        */
 /* ========================================================================= */
 
-void InitJoysticks()
+void InitJoysticks(void)
 {
   int i;
 
@@ -1806,7 +1806,7 @@ boolean CheckJoystickOpened(int nr)
   return SDLCheckJoystickOpened(nr);
 }
 
-void ClearJoystickState()
+void ClearJoystickState(void)
 {
   SDLClearJoystickState();
 }

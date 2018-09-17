@@ -52,7 +52,7 @@
 					 0)
 
 
-int getImageListSize();
+int getImageListSize(void);
 struct FileInfo *getImageListEntryFromImageID(int);
 Bitmap **getBitmapsFromImageID(int);
 int getOriginalImageWidthFromImageID(int);
@@ -60,18 +60,18 @@ int getOriginalImageHeightFromImageID(int);
 char *getTokenFromImageID(int);
 char *getFilenameFromImageID(int);
 int getImageIDFromToken(char *);
-char *getImageConfigFilename();
-int getImageListPropertyMappingSize();
-struct PropertyMapping *getImageListPropertyMapping();
+char *getImageConfigFilename(void);
+int getImageListPropertyMappingSize(void);
+struct PropertyMapping *getImageListPropertyMapping(void);
 void InitImageList(struct ConfigInfo *, int, struct ConfigTypeInfo *,
 		   char **, char **, char **, char **, char **);
 
-void ReloadCustomImages();
+void ReloadCustomImages(void);
 void CreateImageWithSmallImages(int, int, int);
 void CreateImageTextures(int);
-void FreeAllImageTextures();
+void FreeAllImageTextures(void);
 void ScaleImage(int, int);
 
-void FreeAllImages();
+void FreeAllImages(void);
 
 #endif	/* IMAGE_H */

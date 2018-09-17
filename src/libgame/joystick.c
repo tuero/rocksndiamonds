@@ -173,7 +173,7 @@ static int JoystickPositionPercent(int center, int border, int actual)
   return percent;
 }
 
-void CheckJoystickData()
+void CheckJoystickData(void)
 {
   int i;
   int distance = 100;
@@ -279,7 +279,7 @@ int JoystickButton(int player_nr)
   return JoystickButtonExt(player_nr, FALSE);
 }
 
-int AnyJoystick()
+int AnyJoystick(void)
 {
   int i;
   int result = 0;
@@ -290,7 +290,7 @@ int AnyJoystick()
   return result;
 }
 
-int AnyJoystickButton()
+int AnyJoystickButton(void)
 {
   int i;
   int result = JOY_BUTTON_NOT_PRESSED;
@@ -305,7 +305,7 @@ int AnyJoystickButton()
   return result;
 }
 
-void DeactivateJoystick()
+void DeactivateJoystick(void)
 {
   /* Temporarily deactivate joystick. This is needed for calibration
      screens, where the player has to select a joystick device that
@@ -318,7 +318,7 @@ void DeactivateJoystick()
     joystick.status &= ~JOYSTICK_ACTIVE;
 }
 
-void ActivateJoystick()
+void ActivateJoystick(void)
 {
   /* reactivate temporarily deactivated joystick */
 

@@ -13,7 +13,7 @@ extern int TerminalMaxCycles;
 
 extern void subAnimateBugs(int si);
 extern void subAnimateTerminals(int si);
-extern void subRandomize();
-extern int subGetRandomNumber();
+extern void subRandomize(void);
+extern int subGetRandomNumber(void);
 
 #endif /* BUGSTERMINALS_H */

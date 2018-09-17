@@ -13,7 +13,7 @@ int mScrollX_last, mScrollY_last;
 int ScreenBuffer[2 + MAX_PLAYFIELD_WIDTH + 2][2 + MAX_PLAYFIELD_HEIGHT + 2];
 
 
-int getFieldbufferOffsetX_SP()
+int getFieldbufferOffsetX_SP(void)
 {
   int px = 2 * TILEX + (mScrollX - mScrollX_last) % TILEX;
 
@@ -28,7 +28,7 @@ int getFieldbufferOffsetX_SP()
   return px;
 }
 
-int getFieldbufferOffsetY_SP()
+int getFieldbufferOffsetY_SP(void)
 {
   int py = 2 * TILEY + (mScrollY - mScrollY_last) % TILEY;
 
@@ -43,7 +43,7 @@ int getFieldbufferOffsetY_SP()
   return py;
 }
 
-void RestorePlayfield()
+void RestorePlayfield(void)
 {
   int x1 = mScrollX / TILEX - 2;
   int y1 = mScrollY / TILEY - 2;
@@ -148,12 +148,12 @@ static void ScrollPlayfieldIfNeededExt(boolean reset)
   }
 }
 
-static void ScrollPlayfieldIfNeeded()
+static void ScrollPlayfieldIfNeeded(void)
 {
   ScrollPlayfieldIfNeededExt(FALSE);
 }
 
-void InitScrollPlayfield()
+void InitScrollPlayfield(void)
 {
   ScrollPlayfieldIfNeededExt(TRUE);
 }

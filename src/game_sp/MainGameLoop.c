@@ -16,7 +16,7 @@ boolean AutoScrollFlag;
 // Play a game/demo
 // ==========================================================================
 
-void subMainGameLoop_Init()
+void subMainGameLoop_Init(void)
 {
   // This was a bug in the original Supaplex: sometimes red disks could not
   // be released.  This happened if Murphy was killed DURING a red disk release
@@ -79,7 +79,7 @@ void subMainGameLoop_Main(byte action, boolean warp_mode)
     game_sp.GameOver = TRUE;
 }
 
-void subCalculateScreenScrollPos()
+void subCalculateScreenScrollPos(void)
 {
   int jump_pos = TILEX / 2;
 

@@ -59,8 +59,8 @@ boolean SnapField(struct PlayerInfo *, int, int);
 boolean PlaceBomb(struct PlayerInfo *);
 void PlaySoundLevel(int, int, int);
 
-void CreateGameButtons();
-void UnmapGameButtons();
+void CreateGameButtons(void);
+void UnmapGameButtons(void);
 
 void AddLaserEdge(int, int);
 void AddDamagedField(int, int);

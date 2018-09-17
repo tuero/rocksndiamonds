@@ -11,7 +11,7 @@
 extern void ExplodeFieldSP(int);
 extern void subAnimateExplosion(int);
 extern void subClearFieldDueToExplosion(int);
-extern void subFollowUpExplosions();
-extern void subRedDiskReleaseExplosion();
+extern void subFollowUpExplosions(void);
+extern void subRedDiskReleaseExplosion(void);
 
 #endif /* EXPLOSIONS_H */

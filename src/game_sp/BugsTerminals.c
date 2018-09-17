@@ -121,7 +121,7 @@ void subAnimateTerminals(int si)
 // Randomize random number generator
 // ==========================================================================
 
-void subRandomize()
+void subRandomize(void)
 {
   int Tick = MyGetTickCount();
 
@@ -134,7 +134,7 @@ void subRandomize()
 // Generate new random number, first method (see also sub_g_8580)
 // ==========================================================================
 
-int subGetRandomNumber()
+int subGetRandomNumber(void)
 {
   RandomSeed = (RandomSeed * 0x5E5 + 0x31) & 0xFFFF;
 

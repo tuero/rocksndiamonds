@@ -17,7 +17,7 @@ byte AnimationSubTable[SP_MAX_PLAYFIELD_SIZE];
 // Do game stuff
 // ==========================================================================
 
-void subDoGameStuff()
+void subDoGameStuff(void)
 {
   int si, cx, dx, bl;
   int InfotronsNeeded_last = InfotronsNeeded;

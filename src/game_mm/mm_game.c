@@ -357,7 +357,7 @@ static boolean CheckLaserPixel(int x, int y)
   return (pixel == WHITE_PIXEL);
 }
 
-static void CheckExitMM()
+static void CheckExitMM(void)
 {
   int exit_element = EL_EMPTY;
   int exit_x = 0;
@@ -517,7 +517,7 @@ static void InitField(int x, int y, boolean init_game)
   }
 }
 
-static void InitCycleElements_RotateSingleStep()
+static void InitCycleElements_RotateSingleStep(void)
 {
   int i;
 
@@ -542,7 +542,7 @@ static void InitCycleElements_RotateSingleStep()
   }
 }
 
-static void InitLaser()
+static void InitLaser(void)
 {
   int start_element = Feld[laser.start_edge.x][laser.start_edge.y];
   int step = (IS_LASER(start_element) ? 4 : 0);
@@ -580,7 +580,7 @@ static void InitLaser()
 			    native_mm_level.laser_blue  * 0xFF);
 }
 
-void InitGameEngine_MM()
+void InitGameEngine_MM(void)
 {
   int i, x, y;
 
@@ -667,7 +667,7 @@ void InitGameEngine_MM()
   DrawLevel_MM();
 }
 
-void InitGameActions_MM()
+void InitGameActions_MM(void)
 {
   int num_init_game_frames = INIT_GAME_ACTIONS_DELAY;
   int cycle_steps_done = 0;
@@ -778,7 +778,7 @@ void AddDamagedField(int ex, int ey)
   laser.num_damages++;
 }
 
-boolean StepBehind()
+boolean StepBehind(void)
 {
   if (laser.num_edges)
   {
@@ -805,7 +805,7 @@ static int getMaskFromElement(int element)
     return IMG_MM_MASK_CIRCLE;
 }
 
-int ScanPixel()
+int ScanPixel(void)
 {
   int hit_mask = 0;
 
@@ -882,7 +882,7 @@ int ScanPixel()
   return hit_mask;
 }
 
-void ScanLaser()
+void ScanLaser(void)
 {
   int element;
   int end = 0, rf = laser.num_edges;
@@ -1342,7 +1342,7 @@ void DrawLaser(int start_edge, int mode)
   game_mm.laser_enabled = mode;
 }
 
-void DrawLaser_MM()
+void DrawLaser_MM(void)
 {
   DrawLaser(0, game_mm.laser_enabled);
 }
@@ -2959,7 +2959,7 @@ void RotateMirror(int x, int y, int button)
   }
 }
 
-void AutoRotateMirrors()
+void AutoRotateMirrors(void)
 {
   int x, y;
 
@@ -3776,7 +3776,7 @@ void GameActions_MM(struct MouseActionInfo action, boolean warp_mode)
   CheckSingleStepMode_MM(element_clicked, button_released);
 }
 
-void MovePacMen()
+void MovePacMen(void)
 {
   int mx, my, ox, oy, nx, ny;
   int element;
@@ -3881,7 +3881,7 @@ void MovePacMen()
   }
 }
 
-void GameWon_MM()
+void GameWon_MM(void)
 {
   int hi_pos;
   boolean raise_level = FALSE;
@@ -4000,7 +4000,7 @@ void GameWon_MM()
   BackToFront();
 }
 
-int NewHiScore_MM()
+int NewHiScore_MM(void)
 {
   int k, l;
   int position = -1;
@@ -4281,7 +4281,7 @@ void SaveEngineSnapshotValues_MM(ListNode **buffers)
   engine_snapshot_mm.overload_delay = overload_delay;
 }
 
-void LoadEngineSnapshotValues_MM()
+void LoadEngineSnapshotValues_MM(void)
 {
   int x, y;
 

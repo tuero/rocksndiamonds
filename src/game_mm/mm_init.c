@@ -22,7 +22,7 @@ unsigned int InitEngineRandom_MM(int seed)
   return InitEngineRandom(seed);
 }
 
-void InitElementProperties_MM()
+void InitElementProperties_MM(void)
 {
   int i,j;
 
@@ -235,11 +235,11 @@ void InitElementProperties_MM()
     Elementeigenschaften[i] |= EP_BIT_WALL;
 }
 
-void mm_open_all()
+void mm_open_all(void)
 {
   InitElementProperties_MM();
 }
 
-void mm_close_all()
+void mm_close_all(void)
 {
 }

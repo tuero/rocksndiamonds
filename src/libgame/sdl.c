@@ -555,7 +555,7 @@ inline static void SDLInitVideoBuffer_VideoBuffer(boolean fullscreen)
   SDLSetWindowTitle();
 }
 
-inline static void SDLInitVideoBuffer_DrawBuffer()
+inline static void SDLInitVideoBuffer_DrawBuffer(void)
 {
   /* SDL cannot directly draw to the visible video framebuffer like X11,
      but always uses a backbuffer, which is then blitted to the visible
@@ -843,7 +843,7 @@ boolean SDLSetVideoMode(boolean fullscreen)
   return success;
 }
 
-void SDLSetWindowTitle()
+void SDLSetWindowTitle(void)
 {
 #if defined(TARGET_SDL2)
   if (sdl_window == NULL)
@@ -936,7 +936,7 @@ void SDLSetWindowFullscreen(boolean fullscreen)
   }
 }
 
-void SDLSetDisplaySize()
+void SDLSetDisplaySize(void)
 {
   SDL_Rect display_bounds;
 
@@ -990,7 +990,7 @@ void SDLSetScreenSizeForRenderer(int width, int height)
   SDL_RenderSetLogicalSize(sdl_renderer, width, height);
 }
 
-void SDLSetScreenProperties()
+void SDLSetScreenProperties(void)
 {
   SDLSetScreenSizeAndOffsets(video.width, video.height);
   SDLSetScreenSizeForRenderer(video.screen_width, video.screen_height);
@@ -1013,7 +1013,7 @@ void SDLSetScreenRenderingMode(char *screen_rendering_mode)
 #endif
 }
 
-void SDLRedrawWindow()
+void SDLRedrawWindow(void)
 {
   UpdateScreen_WithoutFrameDelay(NULL);
 }
@@ -2607,7 +2607,7 @@ static int sdl_js_axis[MAX_PLAYERS][2];
 static int sdl_js_button[MAX_PLAYERS][2];
 static boolean sdl_is_controller[MAX_PLAYERS];
 
-void SDLClearJoystickState()
+void SDLClearJoystickState(void)
 {
   int i, j;
 
@@ -2848,7 +2848,7 @@ void HandleJoystickEvent(Event *event)
   }
 }
 
-void SDLInitJoysticks()
+void SDLInitJoysticks(void)
 {
   static boolean sdl_joystick_subsystem_initialized = FALSE;
   boolean print_warning = !sdl_joystick_subsystem_initialized;
@@ -3151,7 +3151,7 @@ static void DrawTouchInputOverlay_ShowGridButtons(int alpha)
   SDL_SetRenderDrawColor(sdl_renderer, 0, 0, 0, 255);
 }
 
-static void DrawTouchInputOverlay()
+static void DrawTouchInputOverlay(void)
 {
   static SDL_Texture *texture = NULL;
   static boolean initialized = FALSE;

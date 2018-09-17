@@ -28,7 +28,7 @@
 extern void SetBitmaps_EM(Bitmap **);
 extern void UpdateEngineValues(int, int, int, int);
 
-extern boolean getTeamMode_EM();
+extern boolean getTeamMode_EM(void);
 extern int getGameFrameDelay_EM(int);
 
 extern void PlayLevelSound_EM(int, int, int, int);

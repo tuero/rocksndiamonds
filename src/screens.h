@@ -24,7 +24,7 @@ void DrawAndFadeInMainMenu(int);
 void DrawMainMenu(void);
 void DrawHallOfFame(int, int);
 
-void RedrawSetupScreenAfterFullscreenToggle();
+void RedrawSetupScreenAfterFullscreenToggle(void);
 void RedrawSetupScreenAfterScreenRotation(int);
 
 void HandleTitleScreen(int, int, int, int, int);
@@ -37,10 +37,10 @@ void HandleSetupScreen(int, int, int, int, int);
 void HandleTypeName(int, Key);
 void HandleGameActions(void);
 
-void CreateScreenGadgets();
-void FreeScreenGadgets();
+void CreateScreenGadgets(void);
+void FreeScreenGadgets(void);
 
-void setHideRelatedSetupEntries();
+void setHideRelatedSetupEntries(void);
 
 void DumpScreenIdentifiers(void);
 boolean DoScreenAction(int);
