@@ -253,6 +253,12 @@ static struct LevelFileConfigInfo chunk_config_INFO[] =
 
   {
     -1,					-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(11),
+    &li.solved_by_one_player,		FALSE
+  },
+
+  {
+    -1,					-1,
     -1,					-1,
     NULL,				-1
   }
@@ -6395,6 +6401,10 @@ static void LoadLevel_InitVersion(struct LevelInfo *level)
   /* EM style elements always chain-exploded in R'n'D engine before 3.2.6 */
   if (level->game_version < VERSION_IDENT(3,2,6,0))
     level->em_explodes_by_fire = TRUE;
+
+  /* levels were solved by the first player entering an exit up to 4.1.0.0 */
+  if (level->game_version <= VERSION_IDENT(4,1,0,0))
+    level->solved_by_one_player = TRUE;
 }
 
 static void LoadLevel_InitStandardElements(struct LevelInfo *level)

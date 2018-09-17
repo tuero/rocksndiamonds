@@ -3956,6 +3956,9 @@ void InitGame()
     if (stored_player[i].active)
       local_player->players_still_needed++;
 
+  if (level.solved_by_one_player)
+    local_player->players_still_needed = 1;
+
   /* when recording the game, store which players take part in the game */
   if (tape.recording)
   {
@@ -13425,7 +13428,8 @@ void ExitPlayer(struct PlayerInfo *player)
   DrawPlayer(player);	/* needed here only to cleanup last field */
   RemovePlayer(player);
 
-  local_player->players_still_needed--;
+  if (local_player->players_still_needed > 0)
+    local_player->players_still_needed--;
 }
 
 static void setFieldForSnapping(int x, int y, int element, int direction)

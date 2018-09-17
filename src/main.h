@@ -3094,6 +3094,7 @@ struct LevelInfo
   boolean can_pass_to_walkable;	/* player can pass to empty or walkable tile */
   boolean grow_into_diggable;	/* amoeba can grow into anything diggable */
   boolean auto_exit_sokoban;	/* automatically finish solved Sokoban levels */
+  boolean solved_by_one_player;	/* level is solved if one player enters exit */
 
   boolean continuous_snapping;	/* repeated snapping without releasing key */
   boolean block_snap_field;	/* snapping blocks field to show animation */
