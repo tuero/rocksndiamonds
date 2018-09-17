@@ -4570,8 +4570,8 @@ void InitElementPropertiesEngine(int engine_version)
     if (IS_HISTORIC_SOLID(i) || i == EL_EXPLOSION)
       SET_PROPERTY(i, EP_DRAGONFIRE_PROOF, TRUE);
     else
-      SET_PROPERTY(i, EP_DRAGONFIRE_PROOF, (IS_CUSTOM_ELEMENT(i) &&
-					    IS_INDESTRUCTIBLE(i)));
+      SET_PROPERTY(i, EP_DRAGONFIRE_PROOF, (IS_INDESTRUCTIBLE(i) &&
+					    i != EL_ACID));
 
     /* ---------- EXPLOSION_PROOF ------------------------------------------ */
     if (i == EL_FLAMES)
