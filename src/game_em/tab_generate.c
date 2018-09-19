@@ -4438,7 +4438,7 @@ struct GraphicInfo_EM graphic_info_em_object[TILE_MAX][8];
 /* map player number, frames and action to graphic info */
 struct GraphicInfo_EM graphic_info_em_player[MAX_PLAYERS][SPR_MAX][8];
 
-void create_tab(int *invert, unsigned char *array)
+static void create_tab(int *invert, unsigned char *array)
 {
   int i;
   int buffer[TILE_MAX];
@@ -4453,7 +4453,7 @@ void create_tab(int *invert, unsigned char *array)
     array[i] = buffer[i];
 }
 
-void create_explode(void)
+static void create_explode(void)
 {
   int i;
   int *tile = tile_explode;
@@ -4476,7 +4476,7 @@ void create_explode(void)
     tab_explode_dynamite[i] = buffer[i];
 }
 
-void create_obj(void)
+static void create_obj(void)
 {
   int i, j;
   int *map = obj_map;
@@ -4507,7 +4507,7 @@ void create_obj(void)
       map_obj[i][j] = buffer[7 - i][j];
 }
 
-void create_obj_graphics_info_em(void)
+static void create_obj_graphics_info_em(void)
 {
   int i, j;
 
@@ -4543,7 +4543,7 @@ void create_obj_graphics_info_em(void)
   }
 }
 
-void create_spr(void)
+static void create_spr(void)
 {
   int i, j, k;
   int *map = spr_map;
@@ -4564,7 +4564,7 @@ void create_spr(void)
 	map_spr[i][j][k] = buffer[i][7 - j][k];
 }
 
-void create_spr_graphics_info_em(void)
+static void create_spr_graphics_info_em(void)
 {
   int i, j, k;
 

@@ -88,7 +88,7 @@ static int copy_properties[][5] =
 static int get_graphic_parameter_value(char *, char *, int);
 
 
-void DrawInitAnim(void)
+static void DrawInitAnim(void)
 {
   struct GraphicInfo *graphic_info_last = graphic_info;
   int graphic = 0;
@@ -136,7 +136,7 @@ void DrawInitAnim(void)
   FrameCounter++;
 }
 
-void FreeGadgets(void)
+static void FreeGadgets(void)
 {
   FreeLevelEditorGadgets();
   FreeGameButtons();
@@ -171,7 +171,7 @@ inline static void InitElementSmallImagesScaledUp(int graphic)
   CreateImageWithSmallImages(graphic, g->scale_up_factor, g->tile_size);
 }
 
-void InitElementSmallImages(void)
+static void InitElementSmallImages(void)
 {
   print_timestamp_init("InitElementSmallImages");
 
@@ -233,7 +233,7 @@ inline static void InitScaledImagesScaledUp(int graphic)
   ScaleImage(graphic, g->scale_up_factor);
 }
 
-void InitScaledImages(void)
+static void InitScaledImages(void)
 {
   struct PropertyMapping *property_mapping = getImageListPropertyMapping();
   int num_property_mappings = getImageListPropertyMappingSize();
@@ -248,7 +248,7 @@ void InitScaledImages(void)
     InitScaledImagesScaledUp(property_mapping[i].artwork_index);
 }
 
-void InitBitmapPointers(void)
+static void InitBitmapPointers(void)
 {
   int num_images = getImageListSize();
   int i;
@@ -333,7 +333,7 @@ static int getFontFromToken(char *token)
   return FONT_INITIAL_1;
 }
 
-void InitFontGraphicInfo(void)
+static void InitFontGraphicInfo(void)
 {
   static struct FontBitmapInfo *font_bitmap_info = NULL;
   struct PropertyMapping *property_mapping = getImageListPropertyMapping();
@@ -572,7 +572,7 @@ void InitFontGraphicInfo(void)
 	       getFontBitmapID, getFontFromToken);
 }
 
-void InitGlobalAnimGraphicInfo(void)
+static void InitGlobalAnimGraphicInfo(void)
 {
   struct PropertyMapping *property_mapping = getImageListPropertyMapping();
   int num_property_mappings = getImageListPropertyMappingSize();
@@ -644,7 +644,7 @@ void InitGlobalAnimGraphicInfo(void)
 #endif
 }
 
-void InitGlobalAnimSoundInfo(void)
+static void InitGlobalAnimSoundInfo(void)
 {
   struct PropertyMapping *property_mapping = getSoundListPropertyMapping();
   int num_property_mappings = getSoundListPropertyMappingSize();
@@ -693,7 +693,7 @@ void InitGlobalAnimSoundInfo(void)
 #endif
 }
 
-void InitGlobalAnimMusicInfo(void)
+static void InitGlobalAnimMusicInfo(void)
 {
   struct PropertyMapping *property_mapping = getMusicListPropertyMapping();
   int num_property_mappings = getMusicListPropertyMappingSize();
@@ -742,7 +742,7 @@ void InitGlobalAnimMusicInfo(void)
 #endif
 }
 
-void InitElementGraphicInfo(void)
+static void InitElementGraphicInfo(void)
 {
   struct PropertyMapping *property_mapping = getImageListPropertyMapping();
   int num_property_mappings = getImageListPropertyMappingSize();
@@ -1123,7 +1123,7 @@ void InitElementGraphicInfo(void)
   UPDATE_BUSY_STATE();
 }
 
-void InitElementSpecialGraphicInfo(void)
+static void InitElementSpecialGraphicInfo(void)
 {
   struct PropertyMapping *property_mapping = getImageListPropertyMapping();
   int num_property_mappings = getImageListPropertyMappingSize();
@@ -4874,7 +4874,7 @@ static void InitGlobal(void)
   global.use_envelope_request = FALSE;
 }
 
-void Execute_Command(char *command)
+static void Execute_Command(char *command)
 {
   int i;
 
@@ -5321,7 +5321,7 @@ void InitGfxBuffers(void)
   InitGfxBuffers_SP();
 }
 
-void InitGfx(void)
+static void InitGfx(void)
 {
   struct GraphicInfo *graphic_info_last = graphic_info;
   char *filename_font_initial = NULL;
@@ -5490,7 +5490,7 @@ void InitGfx(void)
   init_last = init;
 }
 
-void InitGfxBackground(void)
+static void InitGfxBackground(void)
 {
   fieldbuffer = bitmap_db_field;
   SetDrawtoField(DRAW_TO_BACKBUFFER);
@@ -5634,7 +5634,7 @@ static void InitArtworkDone(void)
   InitGlobalAnimations();
 }
 
-void InitNetworkSettings(void)
+static void InitNetworkSettings(void)
 {
   InitNetworkInfo(options.network || setup.network_mode,
 		  FALSE,

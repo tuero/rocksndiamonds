@@ -659,7 +659,7 @@ char *getLevelSetInfoFilename(void)
   return NULL;
 }
 
-char *getLevelSetTitleMessageBasename(int nr, boolean initial)
+static char *getLevelSetTitleMessageBasename(int nr, boolean initial)
 {
   static char basename[32];
 
@@ -1095,7 +1095,7 @@ void InitLevelSetupDirectory(char *level_subdir)
   createDirectory(getLevelSetupDir(level_subdir), "level setup", PERMS_PRIVATE);
 }
 
-void InitCacheDirectory(void)
+static void InitCacheDirectory(void)
 {
   createDirectory(getUserGameDataDir(), "user data", PERMS_PRIVATE);
   createDirectory(getCacheDir(), "cache data", PERMS_PRIVATE);
@@ -1240,8 +1240,8 @@ TreeInfo *getTreeInfoFromIdentifier(TreeInfo *node, char *identifier)
   return NULL;
 }
 
-TreeInfo *cloneTreeNode(TreeInfo **node_top, TreeInfo *node_parent,
-			TreeInfo *node, boolean skip_sets_without_levels)
+static TreeInfo *cloneTreeNode(TreeInfo **node_top, TreeInfo *node_parent,
+			       TreeInfo *node, boolean skip_sets_without_levels)
 {
   TreeInfo *node_new;
 
@@ -1268,7 +1268,7 @@ TreeInfo *cloneTreeNode(TreeInfo **node_top, TreeInfo *node_parent,
   return node_new;
 }
 
-void cloneTree(TreeInfo **ti_new, TreeInfo *ti, boolean skip_empty_sets)
+static void cloneTree(TreeInfo **ti_new, TreeInfo *ti, boolean skip_empty_sets)
 {
   TreeInfo *ti_cloned = cloneTreeNode(ti_new, NULL, ti, skip_empty_sets);
 
@@ -2207,7 +2207,7 @@ static boolean loadSetupFileData(void *setup_file_data, char *filename,
   return TRUE;
 }
 
-void saveSetupFileHash(SetupFileHash *hash, char *filename)
+static void saveSetupFileHash(SetupFileHash *hash, char *filename)
 {
   FILE *file;
 
@@ -3503,8 +3503,8 @@ void LoadArtworkInfo(void)
 #endif
 }
 
-void LoadArtworkInfoFromLevelInfo(ArtworkDirTree **artwork_node,
-				  LevelDirTree *level_node)
+static void LoadArtworkInfoFromLevelInfo(ArtworkDirTree **artwork_node,
+					 LevelDirTree *level_node)
 {
   int type = (*artwork_node)->type;
 

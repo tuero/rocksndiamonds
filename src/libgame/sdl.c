@@ -1522,7 +1522,7 @@ Pixel SDLGetPixel(Bitmap *src_bitmap, int x, int y)
 /* http://www.etek.chalmers.se/~e8cal1/sge/index.html                        */
 /* ========================================================================= */
 
-void _PutPixel(SDL_Surface *surface, Sint16 x, Sint16 y, Uint32 color)
+static void _PutPixel(SDL_Surface *surface, Sint16 x, Sint16 y, Uint32 color)
 {
   if (x >= 0 && x <= surface->w - 1 && y >= 0 && y <= surface->h - 1)
   {
@@ -1569,23 +1569,24 @@ void _PutPixel(SDL_Surface *surface, Sint16 x, Sint16 y, Uint32 color)
   }
 }
 
-void _PutPixelRGB(SDL_Surface *surface, Sint16 x, Sint16 y,
-		  Uint8 R, Uint8 G, Uint8 B)
+#if 0
+static void _PutPixelRGB(SDL_Surface *surface, Sint16 x, Sint16 y,
+			 Uint8 R, Uint8 G, Uint8 B)
 {
   _PutPixel(surface, x, y, SDL_MapRGB(surface->format, R, G, B));
 }
 
-void _PutPixel8(SDL_Surface *surface, Sint16 x, Sint16 y, Uint32 color)
+static void _PutPixel8(SDL_Surface *surface, Sint16 x, Sint16 y, Uint32 color)
 {
   *((Uint8 *)surface->pixels + y*surface->pitch + x) = color;
 }
 
-void _PutPixel16(SDL_Surface *surface, Sint16 x, Sint16 y, Uint32 color)
+static void _PutPixel16(SDL_Surface *surface, Sint16 x, Sint16 y, Uint32 color)
 {
   *((Uint16 *)surface->pixels + y*surface->pitch/2 + x) = color;
 }
 
-void _PutPixel24(SDL_Surface *surface, Sint16 x, Sint16 y, Uint32 color)
+static void _PutPixel24(SDL_Surface *surface, Sint16 x, Sint16 y, Uint32 color)
 {
   Uint8 *pix;
   int shift;
@@ -1600,12 +1601,12 @@ void _PutPixel24(SDL_Surface *surface, Sint16 x, Sint16 y, Uint32 color)
   *(pix+shift/8) = color>>shift;
 }
 
-void _PutPixel32(SDL_Surface *surface, Sint16 x, Sint16 y, Uint32 color)
+static void _PutPixel32(SDL_Surface *surface, Sint16 x, Sint16 y, Uint32 color)
 {
   *((Uint32 *)surface->pixels + y*surface->pitch/4 + x) = color;
 }
 
-void _PutPixelX(SDL_Surface *dest,Sint16 x,Sint16 y,Uint32 color)
+static void _PutPixelX(SDL_Surface *dest,Sint16 x,Sint16 y,Uint32 color)
 {
   switch (dest->format->BytesPerPixel)
   {
@@ -1626,8 +1627,9 @@ void _PutPixelX(SDL_Surface *dest,Sint16 x,Sint16 y,Uint32 color)
       break;
   }
 }
+#endif
 
-void sge_PutPixel(SDL_Surface *surface, Sint16 x, Sint16 y, Uint32 color)
+static void sge_PutPixel(SDL_Surface *surface, Sint16 x, Sint16 y, Uint32 color)
 {
   if (SDL_MUSTLOCK(surface))
   {
@@ -1645,13 +1647,14 @@ void sge_PutPixel(SDL_Surface *surface, Sint16 x, Sint16 y, Uint32 color)
   }
 }
 
-void sge_PutPixelRGB(SDL_Surface *surface, Sint16 x, Sint16 y,
-		  Uint8 r, Uint8 g, Uint8 b)
+#if 0
+static void sge_PutPixelRGB(SDL_Surface *surface, Sint16 x, Sint16 y,
+			    Uint8 r, Uint8 g, Uint8 b)
 {
   sge_PutPixel(surface, x, y, SDL_MapRGB(surface->format, r, g, b));
 }
 
-Sint32 sge_CalcYPitch(SDL_Surface *dest, Sint16 y)
+static Sint32 sge_CalcYPitch(SDL_Surface *dest, Sint16 y)
 {
   if (y >= 0 && y <= dest->h - 1)
   {
@@ -1678,7 +1681,8 @@ Sint32 sge_CalcYPitch(SDL_Surface *dest, Sint16 y)
   return -1;
 }
 
-void sge_pPutPixel(SDL_Surface *surface, Sint16 x, Sint32 ypitch, Uint32 color)
+static void sge_pPutPixel(SDL_Surface *surface, Sint16 x, Sint32 ypitch,
+			  Uint32 color)
 {
   if (x >= 0 && x <= surface->w - 1 && ypitch >= 0)
   {
@@ -1725,8 +1729,8 @@ void sge_pPutPixel(SDL_Surface *surface, Sint16 x, Sint32 ypitch, Uint32 color)
   }
 }
 
-void sge_HLine(SDL_Surface *Surface, Sint16 x1, Sint16 x2, Sint16 y,
-	       Uint32 Color)
+static void sge_HLine(SDL_Surface *Surface, Sint16 x1, Sint16 x2, Sint16 y,
+		      Uint32 Color)
 {
   SDL_Rect l;
 
@@ -1766,13 +1770,14 @@ void sge_HLine(SDL_Surface *Surface, Sint16 x1, Sint16 x2, Sint16 y,
   }
 }
 
-void sge_HLineRGB(SDL_Surface *Surface, Sint16 x1, Sint16 x2, Sint16 y,
-		  Uint8 R, Uint8 G, Uint8 B)
+static void sge_HLineRGB(SDL_Surface *Surface, Sint16 x1, Sint16 x2, Sint16 y,
+			 Uint8 R, Uint8 G, Uint8 B)
 {
   sge_HLine(Surface, x1, x2, y, SDL_MapRGB(Surface->format, R, G, B));
 }
 
-void _HLine(SDL_Surface *Surface, Sint16 x1, Sint16 x2, Sint16 y, Uint32 Color)
+static void _HLine(SDL_Surface *Surface, Sint16 x1, Sint16 x2, Sint16 y,
+		   Uint32 Color)
 {
   SDL_Rect l;
 
@@ -1799,8 +1804,8 @@ void _HLine(SDL_Surface *Surface, Sint16 x1, Sint16 x2, Sint16 y, Uint32 Color)
   SDL_FillRect(Surface, &l, Color);
 }
 
-void sge_VLine(SDL_Surface *Surface, Sint16 x, Sint16 y1, Sint16 y2,
-	       Uint32 Color)
+static void sge_VLine(SDL_Surface *Surface, Sint16 x, Sint16 y1, Sint16 y2,
+		      Uint32 Color)
 {
   SDL_Rect l;
 
@@ -1840,13 +1845,14 @@ void sge_VLine(SDL_Surface *Surface, Sint16 x, Sint16 y1, Sint16 y2,
   }
 }
 
-void sge_VLineRGB(SDL_Surface *Surface, Sint16 x, Sint16 y1, Sint16 y2,
-		  Uint8 R, Uint8 G, Uint8 B)
+static void sge_VLineRGB(SDL_Surface *Surface, Sint16 x, Sint16 y1, Sint16 y2,
+			 Uint8 R, Uint8 G, Uint8 B)
 {
   sge_VLine(Surface, x, y1, y2, SDL_MapRGB(Surface->format, R, G, B));
 }
 
-void _VLine(SDL_Surface *Surface, Sint16 x, Sint16 y1, Sint16 y2, Uint32 Color)
+static void _VLine(SDL_Surface *Surface, Sint16 x, Sint16 y1, Sint16 y2,
+		   Uint32 Color)
 {
   SDL_Rect l;
 
@@ -1872,11 +1878,12 @@ void _VLine(SDL_Surface *Surface, Sint16 x, Sint16 y1, Sint16 y2, Uint32 Color)
 
   SDL_FillRect(Surface, &l, Color);
 }
+#endif
 
-void sge_DoLine(SDL_Surface *Surface, Sint16 x1, Sint16 y1,
-		Sint16 x2, Sint16 y2, Uint32 Color,
-		void Callback(SDL_Surface *Surf, Sint16 X, Sint16 Y,
-			      Uint32 Color))
+static void sge_DoLine(SDL_Surface *Surface, Sint16 x1, Sint16 y1,
+		       Sint16 x2, Sint16 y2, Uint32 Color,
+		       void Callback(SDL_Surface *Surf, Sint16 X, Sint16 Y,
+				     Uint32 Color))
 {
   Sint16 dx, dy, sdx, sdy, x, y, px, py;
 
@@ -1928,14 +1935,16 @@ void sge_DoLine(SDL_Surface *Surface, Sint16 x1, Sint16 y1,
   }
 }
 
-void sge_DoLineRGB(SDL_Surface *Surface, Sint16 X1, Sint16 Y1,
-		   Sint16 X2, Sint16 Y2, Uint8 R, Uint8 G, Uint8 B,
-		   void Callback(SDL_Surface *Surf, Sint16 X, Sint16 Y,
-				 Uint32 Color))
+#if 0
+static void sge_DoLineRGB(SDL_Surface *Surface, Sint16 X1, Sint16 Y1,
+			  Sint16 X2, Sint16 Y2, Uint8 R, Uint8 G, Uint8 B,
+			  void Callback(SDL_Surface *Surf, Sint16 X, Sint16 Y,
+					Uint32 Color))
 {
   sge_DoLine(Surface, X1, Y1, X2, Y2,
 	     SDL_MapRGB(Surface->format, R, G, B), Callback);
 }
+#endif
 
 void sge_Line(SDL_Surface *Surface, Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2,
 	      Uint32 Color)
@@ -1956,11 +1965,13 @@ void sge_Line(SDL_Surface *Surface, Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2,
    }
 }
 
-void sge_LineRGB(SDL_Surface *Surface, Sint16 x1, Sint16 y1, Sint16 x2,
-		 Sint16 y2, Uint8 R, Uint8 G, Uint8 B)
+#if 0
+static void sge_LineRGB(SDL_Surface *Surface, Sint16 x1, Sint16 y1, Sint16 x2,
+			Sint16 y2, Uint8 R, Uint8 G, Uint8 B)
 {
   sge_Line(Surface, x1, y1, x2, y2, SDL_MapRGB(Surface->format, R, G, B));
 }
+#endif
 
 void SDLPutPixel(Bitmap *dst_bitmap, int x, int y, Pixel pixel)
 {
@@ -2031,7 +2042,7 @@ typedef struct
   Uint8 a;
 } tColorRGBA;
 
-int zoomSurfaceRGBA_scaleDownBy2(SDL_Surface *src, SDL_Surface *dst)
+static int zoomSurfaceRGBA_scaleDownBy2(SDL_Surface *src, SDL_Surface *dst)
 {
   int x, y;
   tColorRGBA *sp, *csp, *dp;
@@ -2082,7 +2093,7 @@ int zoomSurfaceRGBA_scaleDownBy2(SDL_Surface *src, SDL_Surface *dst)
   return 0;
 }
 
-int zoomSurfaceRGBA(SDL_Surface *src, SDL_Surface *dst)
+static int zoomSurfaceRGBA(SDL_Surface *src, SDL_Surface *dst)
 {
   int x, y, *sax, *say, *csax, *csay;
   float sx, sy;
@@ -2155,7 +2166,7 @@ int zoomSurfaceRGBA(SDL_Surface *src, SDL_Surface *dst)
   -----------------------------------------------------------------------------
 */
 
-int zoomSurfaceY(SDL_Surface * src, SDL_Surface * dst)
+static int zoomSurfaceY(SDL_Surface * src, SDL_Surface * dst)
 {
   Uint32 x, y, sx, sy, *sax, *say, *csax, *csay, csx, csy;
   Uint8 *sp, *dp, *csp;
@@ -2255,7 +2266,7 @@ int zoomSurfaceY(SDL_Surface * src, SDL_Surface * dst)
   -----------------------------------------------------------------------------
 */
 
-SDL_Surface *zoomSurface(SDL_Surface *src, int dst_width, int dst_height)
+static SDL_Surface *zoomSurface(SDL_Surface *src, int dst_width, int dst_height)
 {
   SDL_Surface *zoom_src = NULL;
   SDL_Surface *zoom_dst = NULL;

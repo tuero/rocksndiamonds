@@ -445,7 +445,7 @@ void SetDrawBackgroundMask(int draw_background_mask)
   gfx.draw_background_mask = draw_background_mask;
 }
 
-void SetBackgroundBitmap(Bitmap *background_bitmap_tile, int mask)
+static void SetBackgroundBitmap(Bitmap *background_bitmap_tile, int mask)
 {
   if (background_bitmap_tile != NULL)
     gfx.background_bitmap_mask |= mask;
@@ -659,9 +659,11 @@ void ReCreateBitmap(Bitmap **bitmap, int width, int height)
   }
 }
 
-void CloseWindow(DrawWindow *window)
+#if 0
+static void CloseWindow(DrawWindow *window)
 {
 }
+#endif
 
 void SetRedrawMaskFromArea(int x, int y, int width, int height)
 {
@@ -1018,8 +1020,8 @@ void DrawSimpleWhiteLine(Bitmap *bitmap, int from_x, int from_y,
   SDLDrawSimpleLine(bitmap, from_x, from_y, to_x, to_y, WHITE_PIXEL);
 }
 
-void DrawLine(Bitmap *bitmap, int from_x, int from_y,
-	      int to_x, int to_y, Pixel pixel, int line_width)
+static void DrawLine(Bitmap *bitmap, int from_x, int from_y,
+		     int to_x, int to_y, Pixel pixel, int line_width)
 {
   int x, y;
 

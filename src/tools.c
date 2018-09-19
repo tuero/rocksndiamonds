@@ -711,7 +711,7 @@ void BlitScreenToBitmap(Bitmap *target_bitmap)
   redraw_mask |= REDRAW_FIELD;
 }
 
-void DrawFramesPerSecond(void)
+static void DrawFramesPerSecond(void)
 {
   char text[100];
   int font_nr = FONT_TEXT_2;
@@ -1147,7 +1147,7 @@ void FadeSkipNextFadeOut(void)
   FadeExt(0, FADE_MODE_SKIP_FADE_OUT, FADE_TYPE_SKIP);
 }
 
-Bitmap *getBitmapFromGraphicOrDefault(int graphic, int default_graphic)
+static Bitmap *getBitmapFromGraphicOrDefault(int graphic, int default_graphic)
 {
   boolean redefined = getImageListEntryFromImageID(graphic)->redefined;
 
@@ -1157,12 +1157,12 @@ Bitmap *getBitmapFromGraphicOrDefault(int graphic, int default_graphic)
 	  graphic_info[default_graphic].bitmap);
 }
 
-Bitmap *getBackgroundBitmap(int graphic)
+static Bitmap *getBackgroundBitmap(int graphic)
 {
   return getBitmapFromGraphicOrDefault(graphic, IMG_BACKGROUND);
 }
 
-Bitmap *getGlobalBorderBitmap(int graphic)
+static Bitmap *getGlobalBorderBitmap(int graphic)
 {
   return getBitmapFromGraphicOrDefault(graphic, IMG_GLOBAL_BORDER);
 }
@@ -1282,7 +1282,10 @@ boolean CheckIfGlobalBorderHasChanged(void)
   return (global_border_bitmap_last != global_border_bitmap);
 }
 
-boolean CheckIfGlobalBorderRedrawIsNeeded(void)
+#define ONLY_REDRAW_GLOBAL_BORDER_IF_NEEDED		0
+
+#if ONLY_REDRAW_GLOBAL_BORDER_IF_NEEDED
+static boolean CheckIfGlobalBorderRedrawIsNeeded(void)
 {
   // if game status has not changed, nothing has to be redrawn
   if (game_status == game_status_last)
@@ -1318,8 +1321,9 @@ boolean CheckIfGlobalBorderRedrawIsNeeded(void)
 
   return FALSE;
 }
+#endif
 
-void RedrawGlobalBorderFromBitmap(Bitmap *bitmap)
+static void RedrawGlobalBorderFromBitmap(Bitmap *bitmap)
 {
   if (bitmap)
     BlitBitmap(bitmap, backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
@@ -1335,8 +1339,6 @@ void RedrawGlobalBorder(void)
 
   redraw_mask = REDRAW_ALL;
 }
-
-#define ONLY_REDRAW_GLOBAL_BORDER_IF_NEEDED		0
 
 static void RedrawGlobalBorderIfNeeded(void)
 {
@@ -1974,8 +1976,8 @@ static void DrawGraphicShifted(int x, int y, int dx, int dy,
     DrawGraphicShiftedNormal(x, y, dx, dy, graphic, frame, cut_mode,mask_mode);
 }
 
-void DrawGraphicShiftedThruMask(int x, int y, int dx, int dy, int graphic,
-				int frame, int cut_mode)
+static void DrawGraphicShiftedThruMask(int x, int y, int dx, int dy,
+				       int graphic, int frame, int cut_mode)
 {
   DrawGraphicShifted(x, y, dx, dy, graphic, frame, cut_mode, USE_MASKING);
 }
@@ -2627,15 +2629,15 @@ void DrawSizedWallParts_MM(int x, int y, int element, int tilesize,
 		      element, tilesize, el2edimg, masked, element_bits_draw);
 }
 
-void DrawSizedWall_MM(int dst_x, int dst_y, int element, int tilesize,
-		      int (*el2img_function)(int))
+static void DrawSizedWall_MM(int dst_x, int dst_y, int element, int tilesize,
+			     int (*el2img_function)(int))
 {
   DrawSizedWallExt_MM(dst_x, dst_y, element, tilesize, el2img_function, FALSE,
 		      0x000f);
 }
 
-void DrawSizedElementExt(int x, int y, int element, int tilesize,
-			 boolean masked)
+static void DrawSizedElementExt(int x, int y, int element, int tilesize,
+				boolean masked)
 {
   if (IS_MM_WALL(element))
   {
@@ -2696,9 +2698,9 @@ void DrawMiniElementOrWall(int sx, int sy, int scroll_x, int scroll_y)
     DrawMiniGraphic(sx, sy, el2edimg(getBorderElement(x, y)));
 }
 
-void DrawEnvelopeBackgroundTiles(int graphic, int startx, int starty,
-				 int x, int y, int xsize, int ysize,
-				 int tile_width, int tile_height)
+static void DrawEnvelopeBackgroundTiles(int graphic, int startx, int starty,
+					int x, int y, int xsize, int ysize,
+					int tile_width, int tile_height)
 {
   Bitmap *src_bitmap;
   int src_x, src_y;
@@ -2735,8 +2737,9 @@ void DrawEnvelopeBackgroundTiles(int graphic, int startx, int starty,
 	       dst_x, dst_y);
 }
 
-void DrawEnvelopeBackground(int graphic, int startx, int starty,
-			    int x, int y, int xsize, int ysize, int font_nr)
+static void DrawEnvelopeBackground(int graphic, int startx, int starty,
+				   int x, int y, int xsize, int ysize,
+				   int font_nr)
 {
   int font_width  = getFontWidth(font_nr);
   int font_height = getFontHeight(font_nr);
@@ -2745,7 +2748,7 @@ void DrawEnvelopeBackground(int graphic, int startx, int starty,
 			      font_width, font_height);
 }
 
-void AnimateEnvelope(int envelope_nr, int anim_mode, int action)
+static void AnimateEnvelope(int envelope_nr, int anim_mode, int action)
 {
   int graphic = IMG_BACKGROUND_ENVELOPE_1 + envelope_nr;
   Bitmap *src_bitmap = graphic_info[graphic].bitmap;
@@ -2917,7 +2920,7 @@ static void setRequestPosition(int *x, int *y, boolean add_border_size)
   setRequestPositionExt(x, y, request.width, request.height, add_border_size);
 }
 
-void DrawEnvelopeRequest(char *text)
+static void DrawEnvelopeRequest(char *text)
 {
   char *text_final = text;
   char *text_door_style = NULL;
@@ -3004,7 +3007,7 @@ void DrawEnvelopeRequest(char *text)
     free(text_door_style);
 }
 
-void AnimateEnvelopeRequest(int anim_mode, int action)
+static void AnimateEnvelopeRequest(int anim_mode, int action)
 {
   int graphic = IMG_BACKGROUND_REQUEST;
   boolean draw_masked = graphic_info[graphic].draw_masked;
@@ -3091,7 +3094,7 @@ void AnimateEnvelopeRequest(int anim_mode, int action)
   ClearAutoRepeatKeyEvents();
 }
 
-void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
+static void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
 {
   int graphic = IMG_BACKGROUND_REQUEST;
   int sound_opening = SND_REQUEST_OPENING;
@@ -3172,7 +3175,7 @@ void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
     SetDrawtoField(DRAW_TO_FIELDBUFFER);
 }
 
-void DrawPreviewElement(int dst_x, int dst_y, int element, int tilesize)
+static void DrawPreviewElement(int dst_x, int dst_y, int element, int tilesize)
 {
   if (IS_MM_WALL(element))
   {
@@ -3510,7 +3513,7 @@ static void DrawPreviewLevelExt(boolean restart)
   }
 }
 
-void DrawPreviewPlayers(void)
+static void DrawPreviewPlayers(void)
 {
   if (game_status != GAME_MODE_MAIN)
     return;
@@ -3612,7 +3615,7 @@ static void DrawNetworkPlayer(int x, int y, int player_nr, int tile_size,
   DrawText(x + xoffset_text, y + yoffset_text, player_name, font_nr);
 }
 
-void DrawNetworkPlayersExt(boolean force)
+static void DrawNetworkPlayersExt(boolean force)
 {
   if (game_status != GAME_MODE_MAIN)
     return;
@@ -5070,7 +5073,7 @@ unsigned int SetDoorState(unsigned int door_state)
   return MoveDoor(door_state | DOOR_SET_STATE);
 }
 
-int euclid(int a, int b)
+static int euclid(int a, int b)
 {
   return (b ? euclid(b, a % b) : a);
 }
@@ -8290,10 +8293,12 @@ inline static void set_crumbled_graphics_EM(struct GraphicInfo_EM *g_em,
   }
 }
 
+#if 0
 void ResetGfxAnimation_EM(int x, int y, int tile)
 {
   GfxFrame[x][y] = 0;
 }
+#endif
 
 void SetGfxAnimation_EM(struct GraphicInfo_EM *g_em,
 			int tile, int frame_em, int x, int y)
@@ -9039,10 +9044,10 @@ void InitGraphicInfo_EM(void)
 #endif
 }
 
-void CheckSaveEngineSnapshot_EM(byte action[MAX_PLAYERS], int frame,
-				boolean any_player_moving,
-				boolean any_player_snapping,
-				boolean any_player_dropping)
+static void CheckSaveEngineSnapshot_EM(byte action[MAX_PLAYERS], int frame,
+				       boolean any_player_moving,
+				       boolean any_player_snapping,
+				       boolean any_player_dropping)
 {
   if (frame == 0 && !any_player_dropping)
   {
@@ -9060,8 +9065,8 @@ void CheckSaveEngineSnapshot_EM(byte action[MAX_PLAYERS], int frame,
   }
 }
 
-void CheckSaveEngineSnapshot_SP(boolean murphy_is_waiting,
-				boolean murphy_is_dropping)
+static void CheckSaveEngineSnapshot_SP(boolean murphy_is_waiting,
+				       boolean murphy_is_dropping)
 {
   if (murphy_is_waiting)
   {
@@ -9079,8 +9084,8 @@ void CheckSaveEngineSnapshot_SP(boolean murphy_is_waiting,
   }
 }
 
-void CheckSaveEngineSnapshot_MM(boolean element_clicked,
-				boolean button_released)
+static void CheckSaveEngineSnapshot_MM(boolean element_clicked,
+				       boolean button_released)
 {
   if (button_released)
   {
@@ -9332,8 +9337,8 @@ void ToggleFullscreenOrChangeWindowScalingIfNeeded(void)
   }
 }
 
-void JoinRectangles(int *x, int *y, int *width, int *height,
-		    int x2, int y2, int width2, int height2)
+static void JoinRectangles(int *x, int *y, int *width, int *height,
+			   int x2, int y2, int width2, int height2)
 {
   // do not join with "off-screen" rectangle
   if (x2 == -1 || y2 == -1)

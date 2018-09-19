@@ -127,10 +127,12 @@ void DrawMiniGraphic_MM(int x, int y, int graphic)
   MarkTileDirty(x / 2, y / 2);
 }
 
-void getMicroGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
+#if 0
+static void getMicroGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
 {
   getSizedGraphicSource(graphic, 0, TILESIZE / 4, bitmap, x, y);
 }
+#endif
 
 void DrawMiniGraphicExt_MM(DrawBuffer *d, int x, int y, int graphic)
 {
@@ -551,7 +553,8 @@ void DrawElement_MM(int x, int y, int element)
     DrawGraphic_MM(x, y, el2gfx(element));
 }
 
-void DrawMicroWalls_MM(int x, int y, int element)
+#if 0
+static void DrawMicroWalls_MM(int x, int y, int element)
 {
   Bitmap *bitmap;
   int graphic = el2gfx(WALL_BASE(element));
@@ -572,7 +575,7 @@ void DrawMicroWalls_MM(int x, int y, int element)
   }
 }
 
-void DrawMicroElement_MM(int x, int y, int element)
+static void DrawMicroElement_MM(int x, int y, int element)
 {
   Bitmap *bitmap;
   int graphic = el2gfx(element);
@@ -594,7 +597,7 @@ void DrawMicroElement_MM(int x, int y, int element)
 	     MICROLEV_XPOS + x * MICRO_TILEX, MICROLEV_YPOS + y * MICRO_TILEY);
 }
 
-void DrawMicroLevelExt_MM(int xpos, int ypos)
+static void DrawMicroLevelExt_MM(int xpos, int ypos)
 {
   int x, y;
 
@@ -606,6 +609,7 @@ void DrawMicroLevelExt_MM(int xpos, int ypos)
 
   redraw_mask |= REDRAW_FIELD;
 }
+#endif
 
 void DrawMiniLevel_MM(int size_x, int size_y, int scroll_x, int scroll_y)
 {
@@ -618,7 +622,8 @@ void DrawMiniLevel_MM(int size_x, int size_y, int scroll_x, int scroll_y)
   redraw_mask |= REDRAW_FIELD;
 }
 
-int REQ_in_range(int x, int y)
+#if 0
+static int REQ_in_range(int x, int y)
 {
   if (y > DY + 249 && y < DY + 278)
   {
@@ -630,6 +635,7 @@ int REQ_in_range(int x, int y)
 
   return 0;
 }
+#endif
 
 Pixel ReadPixel(DrawBuffer *bitmap, int x, int y)
 {

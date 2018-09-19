@@ -7,7 +7,7 @@
 /* functions for loading Supaplex level                                      */
 /* ------------------------------------------------------------------------- */
 
-void setTapeInfoToDefaults_SP(void)
+static void setTapeInfoToDefaults_SP(void)
 {
   native_sp_level.demo.is_available = FALSE;
   native_sp_level.demo.length = 0;

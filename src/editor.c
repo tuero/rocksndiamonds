@@ -5457,7 +5457,7 @@ static char *getElementDescriptionFilenameExt(char *basename)
   return NULL;
 }
 
-char *getElementDescriptionFilename(int element)
+static char *getElementDescriptionFilename(int element)
 {
   char basename[MAX_FILENAME_LEN];
   char *filename;
@@ -6035,8 +6035,8 @@ static void ScrollEditorLevel(int from_x, int from_y, int scroll)
   BackToFront();
 }
 
-void getEditorGraphicSource(int element, int tile_size, Bitmap **bitmap,
-			    int *x, int *y)
+static void getEditorGraphicSource(int element, int tile_size, Bitmap **bitmap,
+				   int *x, int *y)
 {
   getSizedGraphicSource(el2edimg(element), 0, tile_size, bitmap, x, y);
 }
@@ -8308,7 +8308,7 @@ static void CopyElementPropertiesToGame(int element)
     CopyClassicElementPropertiesToGame(element);
 }
 
-void CheckElementDescriptions(void)
+static void CheckElementDescriptions(void)
 {
   int i;
 
@@ -8338,7 +8338,7 @@ static int getMaxEdFieldY(boolean has_scrollbar)
   return max_ed_fieldy;
 }
 
-void InitZoomLevelSettings(int zoom_tilesize)
+static void InitZoomLevelSettings(int zoom_tilesize)
 {
   static int last_game_engine_type = GAME_ENGINE_TYPE_UNKNOWN;
 
@@ -8448,7 +8448,7 @@ static boolean useEditorDoorAnimation(void)
   return (door_1_viewport_unchanged && door_1_contains_toolbox);
 }
 
-void DrawEditorDoorContent(void)
+static void DrawEditorDoorContent(void)
 {
   /* needed for gadgets drawn on background (like palette scrollbar) */
   SetDoorBackgroundImage(IMG_UNDEFINED);
@@ -12284,7 +12284,7 @@ static void RandomPlacement(int new_element)
   CopyLevelToUndoBuffer(UNDO_IMMEDIATE);
 }
 
-void WrapLevel(int dx, int dy)
+static void WrapLevel(int dx, int dy)
 {
   int wrap_dx = lev_fieldx - dx;
   int wrap_dy = lev_fieldy - dy;

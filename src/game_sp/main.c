@@ -64,7 +64,7 @@ void RedrawPlayfield_SP(boolean force_redraw)
   UpdatePlayfield(force_redraw);
 }
 
-void UpdateGameDoorValues_SP(void)
+static void UpdateGameDoorValues_SP(void)
 {
   game_sp.time_played = TimerVar / FRAMES_PER_SECOND;
   game_sp.infotrons_still_needed = InfotronsNeeded;

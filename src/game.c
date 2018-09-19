@@ -2103,7 +2103,7 @@ int getPlayerInventorySize(int player_nr)
     return stored_player[player_nr].inventory_size;
 }
 
-void InitGameControlValues(void)
+static void InitGameControlValues(void)
 {
   int i;
 
@@ -2148,7 +2148,7 @@ void InitGameControlValues(void)
 	sizeof(struct GamePanelOrderInfo), compareGamePanelOrderInfo);
 }
 
-void UpdatePlayfieldElementCount(void)
+static void UpdatePlayfieldElementCount(void)
 {
   boolean use_element_count = FALSE;
   int i, j, x, y;
@@ -2176,7 +2176,7 @@ void UpdatePlayfieldElementCount(void)
 	  element_info[j].element_count;
 }
 
-void UpdateGameControlValues(void)
+static void UpdateGameControlValues(void)
 {
   int i, k;
   int time = (local_player->LevelSolved ?
@@ -2507,7 +2507,7 @@ void UpdateGameControlValues(void)
   }
 }
 
-void DisplayGameControlValues(void)
+static void DisplayGameControlValues(void)
 {
   boolean redraw_panel = FALSE;
   int i;
@@ -2767,10 +2767,12 @@ void UpdateAndDisplayGameControlValues(void)
   DisplayGameControlValues();
 }
 
-void UpdateGameDoorValues(void)
+#if 0
+static void UpdateGameDoorValues(void)
 {
   UpdateGameControlValues();
 }
+#endif
 
 void DrawGameDoorValues(void)
 {
@@ -3243,7 +3245,8 @@ static void InitGameEngine(void)
     level.time = 0;
 }
 
-int get_num_special_action(int element, int action_first, int action_last)
+static int get_num_special_action(int element, int action_first,
+				  int action_last)
 {
   int num_special_action = 0;
   int i, j;
@@ -4873,7 +4876,7 @@ static void ResetRandomAnimationValue(int x, int y)
   GfxRandom[x][y] = INIT_GFX_RANDOM();
 }
 
-void InitMovingField(int x, int y, int direction)
+static void InitMovingField(int x, int y, int direction)
 {
   int element = Feld[x][y];
   int dx = (direction == MV_LEFT ? -1 : direction == MV_RIGHT ? +1 : 0);
@@ -4946,7 +4949,7 @@ void Blocked2Moving(int x, int y, int *comes_from_x, int *comes_from_y)
   *comes_from_y = oldy;
 }
 
-int MovingOrBlocked2Element(int x, int y)
+static int MovingOrBlocked2Element(int x, int y)
 {
   int element = Feld[x][y];
 
@@ -5004,7 +5007,7 @@ static void RemoveField(int x, int y)
   GfxDir[x][y] = MV_NONE;
 }
 
-void RemoveMovingField(int x, int y)
+static void RemoveMovingField(int x, int y)
 {
   int oldx = x, oldy = y, newx = x, newy = y;
   int element = Feld[x][y];
@@ -5085,7 +5088,7 @@ void DrawDynamite(int x, int y)
     DrawGraphic(sx, sy, graphic, frame);
 }
 
-void CheckDynamite(int x, int y)
+static void CheckDynamite(int x, int y)
 {
   if (MovDelay[x][y] != 0)	/* dynamite is still waiting to explode */
   {
@@ -5155,8 +5158,8 @@ static void setScreenCenteredToAllPlayers(int *sx, int *sy)
   *sy = (sy1 + sy2) / 2;
 }
 
-void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
-			boolean center_screen, boolean quick_relocation)
+static void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
+			       boolean center_screen, boolean quick_relocation)
 {
   unsigned int frame_delay_value_old = GetVideoFrameDelay();
   boolean ffwd_delay = (tape.playing && tape.fast_forward);
@@ -5246,7 +5249,7 @@ void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
   SetVideoFrameDelay(frame_delay_value_old);
 }
 
-void RelocatePlayer(int jx, int jy, int el_player_raw)
+static void RelocatePlayer(int jx, int jy, int el_player_raw)
 {
   int el_player = GET_PLAYER_ELEMENT(el_player_raw);
   int player_nr = GET_PLAYER_NR(el_player);
@@ -5351,7 +5354,7 @@ void RelocatePlayer(int jx, int jy, int el_player_raw)
   }
 }
 
-void Explode(int ex, int ey, int phase, int mode)
+static void Explode(int ex, int ey, int phase, int mode)
 {
   int x, y;
   int last_phase;
@@ -5654,7 +5657,7 @@ void Explode(int ex, int ey, int phase, int mode)
   }
 }
 
-void DynaExplode(int ex, int ey)
+static void DynaExplode(int ex, int ey)
 {
   int i, j;
   int dynabomb_element = Feld[ex][ey];
@@ -5779,7 +5782,7 @@ void Bang(int x, int y)
   CheckTriggeredElementChange(x, y, element, CE_EXPLOSION_OF_X);
 }
 
-void SplashAcid(int x, int y)
+static void SplashAcid(int x, int y)
 {
   if (IN_LEV_FIELD(x - 1, y - 1) && IS_FREE(x - 1, y - 1) &&
       (!IN_LEV_FIELD(x - 1, y - 2) ||
@@ -6231,7 +6234,7 @@ static void ActivateTimegateSwitch(int x, int y)
 		EL_DC_TIMEGATE_SWITCH_ACTIVE);
 }
 
-void Impact(int x, int y)
+static void Impact(int x, int y)
 {
   boolean last_line = (y == lev_fieldy - 1);
   boolean object_hit = FALSE;
@@ -7335,7 +7338,7 @@ static boolean JustBeingPushed(int x, int y)
   return FALSE;
 }
 
-void StartMoving(int x, int y)
+static void StartMoving(int x, int y)
 {
   boolean started_moving = FALSE;	/* some elements can fall _and_ move */
   int element = Feld[x][y];
@@ -8514,7 +8517,7 @@ int AmoebeNachbarNr(int ax, int ay)
   return group_nr;
 }
 
-void AmoebenVereinigen(int ax, int ay)
+static void AmoebenVereinigen(int ax, int ay)
 {
   int i, x, y, xx, yy;
   int new_group_nr = AmoebaNr[ax][ay];
@@ -8621,7 +8624,7 @@ void AmoebeUmwandeln(int ax, int ay)
   }
 }
 
-void AmoebeUmwandelnBD(int ax, int ay, int new_element)
+static void AmoebeUmwandelnBD(int ax, int ay, int new_element)
 {
   int x, y;
   int group_nr = AmoebaNr[ax][ay];
@@ -8657,7 +8660,7 @@ void AmoebeUmwandelnBD(int ax, int ay, int new_element)
 			    SND_BD_AMOEBA_TURNING_TO_GEM));
 }
 
-void AmoebeWaechst(int x, int y)
+static void AmoebeWaechst(int x, int y)
 {
   static unsigned int sound_delay = 0;
   static unsigned int sound_delay_value = 0;
@@ -8693,7 +8696,7 @@ void AmoebeWaechst(int x, int y)
   }
 }
 
-void AmoebaDisappearing(int x, int y)
+static void AmoebaDisappearing(int x, int y)
 {
   static unsigned int sound_delay = 0;
   static unsigned int sound_delay_value = 0;
@@ -8729,7 +8732,7 @@ void AmoebaDisappearing(int x, int y)
   }
 }
 
-void AmoebeAbleger(int ax, int ay)
+static void AmoebeAbleger(int ax, int ay)
 {
   int i;
   int element = Feld[ax][ay];
@@ -8884,7 +8887,7 @@ void AmoebeAbleger(int ax, int ay)
   TEST_DrawLevelField(newax, neway);
 }
 
-void Life(int ax, int ay)
+static void Life(int ax, int ay)
 {
   int x1, y1, x2, y2;
   int life_time = 40;
@@ -9031,7 +9034,7 @@ static void ActivateMagicBall(int bx, int by)
   game.ball_content_nr = (game.ball_content_nr + 1) % level.num_ball_contents;
 }
 
-void CheckExit(int x, int y)
+static void CheckExit(int x, int y)
 {
   if (local_player->gems_still_needed > 0 ||
       local_player->sokobanfields_still_needed > 0 ||
@@ -9054,7 +9057,7 @@ void CheckExit(int x, int y)
   PlayLevelSoundNearest(x, y, SND_CLASS_EXIT_OPENING);
 }
 
-void CheckExitEM(int x, int y)
+static void CheckExitEM(int x, int y)
 {
   if (local_player->gems_still_needed > 0 ||
       local_player->sokobanfields_still_needed > 0 ||
@@ -9077,7 +9080,7 @@ void CheckExitEM(int x, int y)
   PlayLevelSoundNearest(x, y, SND_CLASS_EM_EXIT_OPENING);
 }
 
-void CheckExitSteel(int x, int y)
+static void CheckExitSteel(int x, int y)
 {
   if (local_player->gems_still_needed > 0 ||
       local_player->sokobanfields_still_needed > 0 ||
@@ -9100,7 +9103,7 @@ void CheckExitSteel(int x, int y)
   PlayLevelSoundNearest(x, y, SND_CLASS_STEEL_EXIT_OPENING);
 }
 
-void CheckExitSteelEM(int x, int y)
+static void CheckExitSteelEM(int x, int y)
 {
   if (local_player->gems_still_needed > 0 ||
       local_player->sokobanfields_still_needed > 0 ||
@@ -9123,7 +9126,7 @@ void CheckExitSteelEM(int x, int y)
   PlayLevelSoundNearest(x, y, SND_CLASS_EM_STEEL_EXIT_OPENING);
 }
 
-void CheckExitSP(int x, int y)
+static void CheckExitSP(int x, int y)
 {
   if (local_player->gems_still_needed > 0)
   {
@@ -9161,7 +9164,7 @@ static void CloseAllOpenTimegates(void)
   }
 }
 
-void DrawTwinkleOnField(int x, int y)
+static void DrawTwinkleOnField(int x, int y)
 {
   if (!IN_SCR_FIELD(SCREENX(x), SCREENY(y)) || IS_MOVING(x, y))
     return;
@@ -9188,7 +9191,7 @@ void DrawTwinkleOnField(int x, int y)
   }
 }
 
-void MauerWaechst(int x, int y)
+static void MauerWaechst(int x, int y)
 {
   int delay = 6;
 
@@ -9238,7 +9241,7 @@ void MauerWaechst(int x, int y)
   }
 }
 
-void MauerAbleger(int ax, int ay)
+static void MauerAbleger(int ax, int ay)
 {
   int element = Feld[ax][ay];
   int graphic = el2img(element);
@@ -9346,7 +9349,7 @@ void MauerAbleger(int ax, int ay)
     PlayLevelSoundAction(ax, ay, ACTION_GROWING);
 }
 
-void MauerAblegerStahl(int ax, int ay)
+static void MauerAblegerStahl(int ax, int ay)
 {
   int element = Feld[ax][ay];
   int graphic = el2img(element);
@@ -9448,7 +9451,7 @@ void MauerAblegerStahl(int ax, int ay)
     PlayLevelSoundAction(ax, ay, ACTION_GROWING);
 }
 
-void CheckForDragon(int x, int y)
+static void CheckForDragon(int x, int y)
 {
   int i, j;
   boolean dragon_found = FALSE;
@@ -11243,7 +11246,7 @@ void StartGameActions(boolean init_network_game, boolean record_tape,
   InitGame();
 }
 
-void GameActionsExt(void)
+static void GameActionsExt(void)
 {
 #if 0
   static unsigned int game_frame_delay = 0;
@@ -15108,7 +15111,7 @@ void FreeEngineSnapshotList(void)
   FreeSnapshotList();
 }
 
-ListNode *SaveEngineSnapshotBuffers(void)
+static ListNode *SaveEngineSnapshotBuffers(void)
 {
   ListNode *buffers = NULL;
 
@@ -15264,7 +15267,7 @@ void SaveEngineSnapshotToListInitial(void)
   SaveEngineSnapshotToList();
 }
 
-void LoadEngineSnapshotValues(void)
+static void LoadEngineSnapshotValues(void)
 {
   /* restore special values from snapshot structure */
 
@@ -15285,14 +15288,14 @@ void LoadEngineSnapshotSingle(void)
   LoadEngineSnapshotValues();
 }
 
-void LoadEngineSnapshot_Undo(int steps)
+static void LoadEngineSnapshot_Undo(int steps)
 {
   LoadSnapshotFromList_Older(steps);
 
   LoadEngineSnapshotValues();
 }
 
-void LoadEngineSnapshot_Redo(int steps)
+static void LoadEngineSnapshot_Redo(int steps)
 {
   LoadSnapshotFromList_Newer(steps);
 
@@ -15570,7 +15573,7 @@ void UnmapUndoRedoButtons(void)
   ModifyGadget(game_gadget[GAME_CTRL_ID_PAUSE2], GDI_CHECKED, FALSE, GDI_END);
 }
 
-void MapGameButtonsExt(boolean on_tape)
+static void MapGameButtonsExt(boolean on_tape)
 {
   int i;
 
@@ -15585,7 +15588,7 @@ void MapGameButtonsExt(boolean on_tape)
   RedrawGameButtons();
 }
 
-void UnmapGameButtonsExt(boolean on_tape)
+static void UnmapGameButtonsExt(boolean on_tape)
 {
   int i;
 
@@ -15594,7 +15597,7 @@ void UnmapGameButtonsExt(boolean on_tape)
       UnmapGadget(game_gadget[i]);
 }
 
-void RedrawGameButtonsExt(boolean on_tape)
+static void RedrawGameButtonsExt(boolean on_tape)
 {
   int i;
 
@@ -15606,7 +15609,7 @@ void RedrawGameButtonsExt(boolean on_tape)
   redraw_mask &= ~REDRAW_ALL;
 }
 
-void SetGadgetState(struct GadgetInfo *gi, boolean state)
+static void SetGadgetState(struct GadgetInfo *gi, boolean state)
 {
   if (gi == NULL)
     return;
@@ -15614,7 +15617,7 @@ void SetGadgetState(struct GadgetInfo *gi, boolean state)
   gi->checked = state;
 }
 
-void RedrawSoundButtonGadget(int id)
+static void RedrawSoundButtonGadget(int id)
 {
   int id2 = (id == SOUND_CTRL_ID_MUSIC        ? SOUND_CTRL_ID_PANEL_MUSIC :
 	     id == SOUND_CTRL_ID_LOOPS        ? SOUND_CTRL_ID_PANEL_LOOPS :
@@ -15658,7 +15661,7 @@ void RedrawGameButtonsOnTape(void)
   RedrawGameButtonsExt(TRUE);
 }
 
-void GameUndoRedoExt(void)
+static void GameUndoRedoExt(void)
 {
   ClearPlayerAction();
 
@@ -15675,7 +15678,7 @@ void GameUndoRedoExt(void)
   BackToFront();
 }
 
-void GameUndo(int steps)
+static void GameUndo(int steps)
 {
   if (!CheckEngineSnapshotList())
     return;
@@ -15685,7 +15688,7 @@ void GameUndo(int steps)
   GameUndoRedoExt();
 }
 
-void GameRedo(int steps)
+static void GameRedo(int steps)
 {
   if (!CheckEngineSnapshotList())
     return;

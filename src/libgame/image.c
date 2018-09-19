@@ -370,7 +370,7 @@ void CreateImageTextures(int pos)
   img_info->contains_textures = TRUE;
 }
 
-void FreeImageTextures(int pos)
+static void FreeImageTextures(int pos)
 {
   ImageInfo *img_info = getImageInfoEntryFromImageID(pos);
 

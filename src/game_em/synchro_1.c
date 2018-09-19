@@ -10,8 +10,6 @@
 
 #define USE_CHANGED_ACID_STUFF		1
 
-extern boolean checkIfAllPlayersFitToScreen(void);
-
 static void check_player(struct PLAYER *);
 static void kill_player(struct PLAYER *);
 static boolean player_digfield(struct PLAYER *, int, int);

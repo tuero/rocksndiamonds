@@ -407,7 +407,7 @@ static void InitToonControls(void)
   ctrl->num_anims++;
 }
 
-void InitGlobalAnimControls(void)
+static void InitGlobalAnimControls(void)
 {
   int i, m, a, p;
   int mode_nr, anim_nr, part_nr;
@@ -573,7 +573,7 @@ void InitGlobalAnimations(void)
   InitGlobalAnimControls();
 }
 
-void DrawGlobalAnimationsExt(int drawing_target, int drawing_stage)
+static void DrawGlobalAnimationsExt(int drawing_target, int drawing_stage)
 {
   Bitmap *fade_bitmap =
     (drawing_target == DRAW_TO_FADE_SOURCE ? gfx.fade_bitmap_source :
@@ -806,7 +806,7 @@ void DrawGlobalAnimations(int drawing_target, int drawing_stage)
     ResetGlobalAnim_Clicked();
 }
 
-boolean SetGlobalAnimPart_Viewport(struct GlobalAnimPartControlInfo *part)
+static boolean SetGlobalAnimPart_Viewport(struct GlobalAnimPartControlInfo *part)
 {
   int viewport_x;
   int viewport_y;
@@ -1035,7 +1035,8 @@ static boolean clickConsumed(struct GlobalAnimPartControlInfo *part)
   return (part->control_info.style & STYLE_PASSTHROUGH ? FALSE : TRUE);
 }
 
-int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
+static int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part,
+				 int state)
 {
   struct GlobalAnimControlInfo *ctrl = &global_anim_ctrl[part->mode_nr];
   struct GlobalAnimMainControlInfo *anim = &ctrl->anim[part->anim_nr];
@@ -1279,7 +1280,8 @@ int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part, int state)
   return ANIM_STATE_RUNNING;
 }
 
-void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
+static void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim,
+				  int action)
 {
   struct GlobalAnimPartControlInfo *part;
   struct GraphicInfo *c = &anim->control_info;
@@ -1431,7 +1433,7 @@ void HandleGlobalAnim_Main(struct GlobalAnimMainControlInfo *anim, int action)
   anim->last_active_part_nr = active_part_nr;
 }
 
-void HandleGlobalAnim_Mode(struct GlobalAnimControlInfo *ctrl, int action)
+static void HandleGlobalAnim_Mode(struct GlobalAnimControlInfo *ctrl, int action)
 {
   int i;
 

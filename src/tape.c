@@ -349,17 +349,17 @@ void DrawVideoDisplay(unsigned int state, unsigned int value)
   DrawVideoDisplay_DateTime(state, value);
 }
 
-void DrawVideoDisplayLabel(unsigned int state)
+static void DrawVideoDisplayLabel(unsigned int state)
 {
   DrawVideoDisplay(state, VIDEO_DISPLAY_LABEL_ONLY);
 }
 
-void DrawVideoDisplaySymbol(unsigned int state)
+static void DrawVideoDisplaySymbol(unsigned int state)
 {
   DrawVideoDisplay(state, VIDEO_DISPLAY_SYMBOL_ONLY);
 }
 
-void DrawVideoDisplayCurrentState(void)
+static void DrawVideoDisplayCurrentState(void)
 {
   int state = 0;
 
@@ -465,7 +465,7 @@ void TapeDeactivateDisplayOff(boolean redraw_display)
 /* tape logging functions                                                    */
 /* ========================================================================= */
 
-void PrintTapeReplayProgress(boolean replay_finished)
+static void PrintTapeReplayProgress(boolean replay_finished)
 {
   static unsigned int counter_last = -1;
   unsigned int counter = Counter();

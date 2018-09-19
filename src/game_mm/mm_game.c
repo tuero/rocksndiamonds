@@ -778,7 +778,7 @@ void AddDamagedField(int ex, int ey)
   laser.num_damages++;
 }
 
-boolean StepBehind(void)
+static boolean StepBehind(void)
 {
   if (laser.num_edges)
   {
@@ -805,7 +805,7 @@ static int getMaskFromElement(int element)
     return IMG_MM_MASK_CIRCLE;
 }
 
-int ScanPixel(void)
+static int ScanPixel(void)
 {
   int hit_mask = 0;
 
@@ -1069,7 +1069,7 @@ void ScanLaser(void)
 #endif
 }
 
-void DrawLaserExt(int start_edge, int num_edges, int mode)
+static void DrawLaserExt(int start_edge, int num_edges, int mode)
 {
   int element;
   int elx, ely;
@@ -2286,7 +2286,7 @@ boolean HitAbsorbingWalls(int element, int hit_mask)
   return TRUE;
 }
 
-void OpenExit(int x, int y)
+static void OpenExit(int x, int y)
 {
   int delay = 6;
 
@@ -2311,7 +2311,7 @@ void OpenExit(int x, int y)
   }
 }
 
-void OpenSurpriseBall(int x, int y)
+static void OpenSurpriseBall(int x, int y)
 {
   int delay = 2;
 
@@ -2348,7 +2348,7 @@ void OpenSurpriseBall(int x, int y)
   }
 }
 
-void MeltIce(int x, int y)
+static void MeltIce(int x, int y)
 {
   int frames = 5;
   int delay = 5;
@@ -2397,7 +2397,7 @@ void MeltIce(int x, int y)
   }
 }
 
-void GrowAmoeba(int x, int y)
+static void GrowAmoeba(int x, int y)
 {
   int frames = 5;
   int delay = 1;
@@ -2959,7 +2959,7 @@ void RotateMirror(int x, int y, int button)
   }
 }
 
-void AutoRotateMirrors(void)
+static void AutoRotateMirrors(void)
 {
   int x, y;
 

@@ -24,7 +24,7 @@
 #define TRANSLATE_JOYSYMBOL_TO_JOYNAME	0
 #define TRANSLATE_JOYNAME_TO_JOYSYMBOL	1
 
-void translate_joyname(int *joysymbol, char **name, int mode)
+static void translate_joyname(int *joysymbol, char **name, int mode)
 {
   static struct
   {
@@ -249,7 +249,7 @@ int Joystick(int player_nr)
   return JoystickExt(player_nr, FALSE);
 }
 
-int JoystickButtonExt(int player_nr, boolean use_as_joystick_nr)
+static int JoystickButtonExt(int player_nr, boolean use_as_joystick_nr)
 {
   static int last_joy_button[MAX_PLAYERS] = { 0, 0, 0, 0 };
   int joy_button = (JoystickExt(player_nr, use_as_joystick_nr) & JOY_BUTTON);

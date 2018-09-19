@@ -142,7 +142,7 @@ static void SendNetworkBufferToServer(struct NetworkBuffer *nb)
   SDLNet_TCP_Send(sfd, nb->buffer, nb->size);
 }
 
-struct NetworkClientPlayerInfo *getNetworkPlayer(int player_nr)
+static struct NetworkClientPlayerInfo *getNetworkPlayer(int player_nr)
 {
   struct NetworkClientPlayerInfo *player = NULL;
 

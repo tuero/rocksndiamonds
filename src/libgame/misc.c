@@ -1507,7 +1507,7 @@ void WriteUnusedBytesToFile(FILE *file, unsigned int bytes)
 #define TRANSLATE_KEYNAME_TO_KEYSYM	2
 #define TRANSLATE_X11KEYNAME_TO_KEYSYM	3
 
-void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
+static void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
 {
   static struct
   {
@@ -2145,7 +2145,8 @@ int getNumNodes(ListNode *node_first)
   return (node_first ? 1 + getNumNodes(node_first->next) : 0);
 }
 
-void dumpList(ListNode *node_first)
+#if 0
+static void dumpList(ListNode *node_first)
 {
   ListNode *node = node_first;
 
@@ -2158,6 +2159,7 @@ void dumpList(ListNode *node_first)
 
   printf("[%d nodes]\n", getNumNodes(node_first));
 }
+#endif
 
 
 /* ------------------------------------------------------------------------- */
@@ -2544,7 +2546,8 @@ boolean fileExists(char *filename)
   return success;
 }
 
-boolean fileHasPrefix(char *basename, char *prefix)
+#if 0
+static boolean fileHasPrefix(char *basename, char *prefix)
 {
   static char *basename_lower = NULL;
   int basename_length, prefix_length;
@@ -2565,8 +2568,9 @@ boolean fileHasPrefix(char *basename, char *prefix)
 
   return FALSE;
 }
+#endif
 
-boolean fileHasSuffix(char *basename, char *suffix)
+static boolean fileHasSuffix(char *basename, char *suffix)
 {
   static char *basename_lower = NULL;
   int basename_length, suffix_length;
@@ -2670,7 +2674,8 @@ char *get_mapped_token(char *token)
   return NULL;
 }
 
-char *get_special_base_token(struct ArtworkListInfo *artwork_info, char *token)
+static char *get_special_base_token(struct ArtworkListInfo *artwork_info,
+				    char *token)
 {
   /* !!! make this dynamically configurable (init.c:InitArtworkConfig) !!! */
   static struct ConfigTypeInfo prefix_list[] =
@@ -2768,7 +2773,7 @@ static boolean string_has_parameter(char *s, char *s_contained)
   return string_has_parameter(substring, s_contained);
 }
 
-int get_anim_parameter_value(char *s)
+static int get_anim_parameter_value(char *s)
 {
   char *pattern_1 = "click:anim_";
   char *pattern_2 = ".part_";
@@ -2835,7 +2840,7 @@ int get_anim_parameter_value(char *s)
   return result;
 }
 
-int get_anim_action_parameter_value(char *token)
+static int get_anim_action_parameter_value(char *token)
 {
   int result = getImageIDFromToken(token);
 
@@ -3968,7 +3973,7 @@ static double Counter_Microseconds(void)
 }
 #endif
 
-char *debug_print_timestamp_get_padding(int padding_size)
+static char *debug_print_timestamp_get_padding(int padding_size)
 {
   static char *padding = NULL;
   int max_padding_size = 100;
@@ -4017,7 +4022,8 @@ void debug_print_timestamp(int counter_nr, char *message)
 	   unit);
 }
 
-void debug_print_parent_only(char *format, ...)
+#if 0
+static void debug_print_parent_only(char *format, ...)
 {
   if (!IS_PARENT_PROCESS())
     return;
@@ -4033,10 +4039,11 @@ void debug_print_parent_only(char *format, ...)
     printf("\n");
   }
 }
+#endif
 
 #endif	/* DEBUG */
 
-void print_timestamp_ext(char *message, char *mode)
+static void print_timestamp_ext(char *message, char *mode)
 {
 #if DEBUG_PRINT_INIT_TIMESTAMPS
   static char *debug_message = NULL;

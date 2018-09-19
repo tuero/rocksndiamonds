@@ -24,6 +24,7 @@
 #include "game_em/game_em.h"
 #include "game_sp/game_sp.h"
 #include "game_mm/game_mm.h"
+#include "engines.h"
 
 #include "conf_gfx.h"	/* include auto-generated data structure definitions */
 #include "conf_snd.h"	/* include auto-generated data structure definitions */

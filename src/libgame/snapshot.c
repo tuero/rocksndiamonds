@@ -127,7 +127,7 @@ void FreeSnapshotList(void)
   snapshot_current = NULL;
 }
 
-void ReduceSnapshotList(void)
+static void ReduceSnapshotList(void)
 {
 #if DEBUG_SNAPSHOTS
   printf("::: (Reducing number of snapshots from %d ",

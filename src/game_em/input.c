@@ -67,7 +67,7 @@ void InitGameEngine_EM(void)
   RedrawPlayfield_EM(FALSE);
 }
 
-void UpdateGameDoorValues_EM(void)
+static void UpdateGameDoorValues_EM(void)
 {
 }
 

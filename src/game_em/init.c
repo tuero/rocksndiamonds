@@ -24,9 +24,6 @@ struct GameInfo_EM game_em;
 char *progname;
 char *arg_basedir;
 
-extern void tab_generate(void);
-extern void tab_generate_graphics_info_em(void);
-
 int open_all(void)
 {
   Bitmap *emc_bitmaps[2];

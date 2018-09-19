@@ -1415,13 +1415,13 @@ static void drawChooseTreeCursor(int ypos, boolean active)
   drawCursorExt(0, ypos, active, -1);
 }
 
-void DrawHeadline(void)
+static void DrawHeadline(void)
 {
   DrawTextSCentered(MENU_TITLE1_YPOS, FONT_TITLE_1, main_text_title_1);
   DrawTextSCentered(MENU_TITLE2_YPOS, FONT_TITLE_2, main_text_title_2);
 }
 
-void DrawTitleScreenImage(int nr, boolean initial)
+static void DrawTitleScreenImage(int nr, boolean initial)
 {
   int graphic = getTitleScreenGraphic(nr, initial);
   Bitmap *bitmap = graphic_info[graphic].bitmap;
@@ -1465,7 +1465,7 @@ void DrawTitleScreenImage(int nr, boolean initial)
   redraw_mask = REDRAW_ALL;
 }
 
-void DrawTitleScreenMessage(int nr, boolean initial)
+static void DrawTitleScreenMessage(int nr, boolean initial)
 {
   char *filename = getLevelSetTitleMessageFilename(nr, initial);
   struct TitleMessageInfo *tmi = getTitleMessageInfo(nr, initial);
@@ -1516,14 +1516,14 @@ void DrawTitleScreenMessage(int nr, boolean initial)
   ResetFontStatus();
 }
 
-void DrawTitleScreen(void)
+static void DrawTitleScreen(void)
 {
   KeyboardAutoRepeatOff();
 
   HandleTitleScreen(0, 0, 0, 0, MB_MENU_INITIALIZE);
 }
 
-boolean CheckTitleScreen(boolean levelset_has_changed)
+static boolean CheckTitleScreen(boolean levelset_has_changed)
 {
   static boolean show_title_initial = TRUE;
   boolean show_titlescreen = FALSE;
@@ -1887,7 +1887,8 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
   }
 }
 
-void HandleMainMenu_SelectLevel(int step, int direction, int selected_level_nr)
+static void HandleMainMenu_SelectLevel(int step, int direction,
+				       int selected_level_nr)
 {
   int old_level_nr = level_nr;
   int new_level_nr;
@@ -2367,8 +2368,9 @@ static void DrawInfoScreen_Main(void)
 
 static void changeSetupValue(int, int, int);
 
-void HandleMenuScreen(int mx, int my, int dx, int dy, int button,
-		      int mode, int num_page_entries, int max_page_entries)
+static void HandleMenuScreen(int mx, int my, int dx, int dy, int button,
+			     int mode, int num_page_entries,
+			     int max_page_entries)
 {
   static int num_page_entries_all_last[NUM_SPECIAL_GFX_ARGS][MAX_MENU_MODES];
   static int choice_stores[NUM_SPECIAL_GFX_ARGS][MAX_MENU_MODES];
@@ -2885,7 +2887,7 @@ void DrawInfoScreen_HelpText(int element, int action, int direction, int ypos)
 		 TRUE, FALSE, FALSE);
 }
 
-void DrawInfoScreen_TitleScreen(void)
+static void DrawInfoScreen_TitleScreen(void)
 {
   SetGameStatus(GAME_MODE_TITLE);
 
@@ -2897,7 +2899,7 @@ void HandleInfoScreen_TitleScreen(int button)
   HandleTitleScreen(0, 0, 0, 0, button);
 }
 
-void DrawInfoScreen_Elements(void)
+static void DrawInfoScreen_Elements(void)
 {
   SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_ELEMENTS);
 
@@ -2990,7 +2992,7 @@ void HandleInfoScreen_Elements(int button)
   }
 }
 
-void DrawInfoScreen_Music(void)
+static void DrawInfoScreen_Music(void)
 {
   SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_MUSIC);
 
@@ -3401,7 +3403,7 @@ static void DrawInfoScreen_CreditsScreen(int screen_nr)
 		    "Press any key or button for next page");
 }
 
-void DrawInfoScreen_Credits(void)
+static void DrawInfoScreen_Credits(void)
 {
   SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_CREDITS);
 
@@ -3471,7 +3473,7 @@ void HandleInfoScreen_Credits(int button)
   }
 }
 
-void DrawInfoScreen_Program(void)
+static void DrawInfoScreen_Program(void)
 {
   int font_title = MENU_INFO_FONT_TITLE;
   int font_head  = MENU_INFO_FONT_HEAD;
@@ -3556,7 +3558,7 @@ void HandleInfoScreen_Program(int button)
   }
 }
 
-void DrawInfoScreen_Version(void)
+static void DrawInfoScreen_Version(void)
 {
   int font_title = MENU_INFO_FONT_TITLE;
   int font_head  = MENU_INFO_FONT_HEAD;
@@ -3753,7 +3755,7 @@ void HandleInfoScreen_Version(int button)
   }
 }
 
-void DrawInfoScreen_LevelSet(void)
+static void DrawInfoScreen_LevelSet(void)
 {
   struct TitleMessageInfo *tmi = &readme;
   char *filename = getLevelSetInfoFilename();
@@ -3815,7 +3817,7 @@ void DrawInfoScreen_LevelSet(void)
   FadeIn(REDRAW_FIELD);
 }
 
-void HandleInfoScreen_LevelSet(int button)
+static void HandleInfoScreen_LevelSet(int button)
 {
   if (button == MB_MENU_LEAVE)
   {
@@ -6643,7 +6645,7 @@ void HandleSetupScreen_Generic(int mx, int my, int dx, int dy, int button)
 		   setup_mode, num_setup_info, max_setup_info);
 }
 
-void DrawSetupScreen_Input(void)
+static void DrawSetupScreen_Input(void)
 {
   int i;
 
@@ -6797,7 +6799,7 @@ static void drawPlayerSetupInputInfo(int player_nr, boolean active)
 
 static int input_player_nr = 0;
 
-void HandleSetupScreen_Input_Player(int step, int direction)
+static void HandleSetupScreen_Input_Player(int step, int direction)
 {
   int old_player_nr = input_player_nr;
   int new_player_nr;
@@ -7551,7 +7553,7 @@ void ConfigureJoystick(int player_nr)
   DrawSetupScreen_Input();
 }
 
-boolean ConfigureVirtualButtonsMain(void)
+static boolean ConfigureVirtualButtonsMain(void)
 {
   static char *customize_step_text[] =
   {
@@ -8333,7 +8335,7 @@ void MapScreenMenuGadgets(int screen_mask)
       MapGadget(screen_gadget[menubutton_info[i].gadget_id]);
 }
 
-void UnmapScreenMenuGadgets(int screen_mask)
+static void UnmapScreenMenuGadgets(int screen_mask)
 {
   int i;
 

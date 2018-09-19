@@ -164,7 +164,7 @@ boolean NextValidEvent(Event *event)
   return FALSE;
 }
 
-void HandleEvents(void)
+static void HandleEvents(void)
 {
   Event event;
   unsigned int event_frame_delay = 0;
@@ -283,7 +283,7 @@ void HandleOtherEvents(Event *event)
   }
 }
 
-void HandleMouseCursor(void)
+static void HandleMouseCursor(void)
 {
   if (game_status == GAME_MODE_TITLE)
   {
@@ -394,7 +394,7 @@ void ClearEventQueue(void)
   }
 }
 
-void ClearPlayerMouseAction(void)
+static void ClearPlayerMouseAction(void)
 {
   local_player->mouse_action.lx = 0;
   local_player->mouse_action.ly = 0;
@@ -414,7 +414,7 @@ void ClearPlayerAction(void)
   ClearPlayerMouseAction();
 }
 
-void SetPlayerMouseAction(int mx, int my, int button)
+static void SetPlayerMouseAction(int mx, int my, int button)
 {
   int lx = getLevelFromScreenX(mx);
   int ly = getLevelFromScreenY(my);
@@ -693,7 +693,7 @@ static struct
   Key key;
 } touch_info[NUM_TOUCH_FINGERS];
 
-void HandleFingerEvent_VirtualButtons(FingerEvent *event)
+static void HandleFingerEvent_VirtualButtons(FingerEvent *event)
 {
 #if 1
   int x = event->x * overlay.grid_xsize;
@@ -853,7 +853,7 @@ void HandleFingerEvent_VirtualButtons(FingerEvent *event)
   }
 }
 
-void HandleFingerEvent_WipeGestures(FingerEvent *event)
+static void HandleFingerEvent_WipeGestures(FingerEvent *event)
 {
   static Key motion_key_x = KSYM_UNDEFINED;
   static Key motion_key_y = KSYM_UNDEFINED;

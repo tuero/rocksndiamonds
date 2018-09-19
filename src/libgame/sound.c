@@ -578,7 +578,7 @@ static void *Load_WAV_or_MOD(char *filename)
     return NULL;
 }
 
-void LoadCustomMusic_NoConf(void)
+static void LoadCustomMusic_NoConf(void)
 {
   static boolean draw_init_text = TRUE;		/* only draw at startup */
   static char *last_music_directory = NULL;

@@ -757,4 +757,9 @@ extern void RedrawPlayfield_EM(boolean);
 extern void LoadEngineSnapshotValues_EM(void);
 extern void SaveEngineSnapshotValues_EM(void);
 
+extern boolean checkIfAllPlayersFitToScreen(void);
+
+extern void tab_generate(void);
+extern void tab_generate_graphics_info_em(void);
+
 #endif	/* EXPORT_H */

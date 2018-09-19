@@ -824,7 +824,7 @@ static void Handle_OP_LEVEL_FILE(struct NetworkServerPlayerInfo *player)
   SendNetworkBufferToAllButOne(write_buffer, player);
 }
 
-void ExitNetworkServer(int exit_value)
+static void ExitNetworkServer(int exit_value)
 {
   Error(ERR_NETWORK_SERVER, "exiting network server");
 

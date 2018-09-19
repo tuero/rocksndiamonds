@@ -2311,7 +2311,7 @@ static void copyLevelFileInfo(struct LevelFileInfo *lfi_from,
 /* functions for loading R'n'D level                                         */
 /* ------------------------------------------------------------------------- */
 
-int getMappedElement(int element)
+static int getMappedElement(int element)
 {
   /* remap some (historic, now obsolete) elements */
 
@@ -2362,7 +2362,7 @@ int getMappedElement(int element)
   return element;
 }
 
-int getMappedElementByVersion(int element, int game_version)
+static int getMappedElementByVersion(int element, int game_version)
 {
   /* remap some elements due to certain game version */
 
@@ -3484,7 +3484,7 @@ static void LoadLevelFromFileInfo_RND(struct LevelInfo *level,
 /* functions for loading EM level                                            */
 /* ------------------------------------------------------------------------- */
 
-void CopyNativeLevel_RND_to_EM(struct LevelInfo *level)
+static void CopyNativeLevel_RND_to_EM(struct LevelInfo *level)
 {
   static int ball_xy[8][2] =
   {
@@ -3612,7 +3612,7 @@ void CopyNativeLevel_RND_to_EM(struct LevelInfo *level)
   }
 }
 
-void CopyNativeLevel_EM_to_RND(struct LevelInfo *level)
+static void CopyNativeLevel_EM_to_RND(struct LevelInfo *level)
 {
   static int ball_xy[8][2] =
   {
@@ -3713,7 +3713,7 @@ void CopyNativeLevel_EM_to_RND(struct LevelInfo *level)
 /* functions for loading SP level                                            */
 /* ------------------------------------------------------------------------- */
 
-void CopyNativeLevel_RND_to_SP(struct LevelInfo *level)
+static void CopyNativeLevel_RND_to_SP(struct LevelInfo *level)
 {
   struct LevelInfo_SP *level_sp = level->native_sp_level;
   LevelInfoType *header = &level_sp->header;
@@ -3797,7 +3797,7 @@ void CopyNativeLevel_RND_to_SP(struct LevelInfo *level)
   }
 }
 
-void CopyNativeLevel_SP_to_RND(struct LevelInfo *level)
+static void CopyNativeLevel_SP_to_RND(struct LevelInfo *level)
 {
   struct LevelInfo_SP *level_sp = level->native_sp_level;
   LevelInfoType *header = &level_sp->header;
@@ -4010,7 +4010,7 @@ static void CopyNativeTape_SP_to_RND(struct LevelInfo *level)
 /* functions for loading MM level                                            */
 /* ------------------------------------------------------------------------- */
 
-void CopyNativeLevel_RND_to_MM(struct LevelInfo *level)
+static void CopyNativeLevel_RND_to_MM(struct LevelInfo *level)
 {
   struct LevelInfo_MM *level_mm = level->native_mm_level;
   int x, y;
@@ -4047,7 +4047,7 @@ void CopyNativeLevel_RND_to_MM(struct LevelInfo *level)
 	level_mm->field[x][y] = map_element_RND_to_MM(level->field[x][y]);
 }
 
-void CopyNativeLevel_MM_to_RND(struct LevelInfo *level)
+static void CopyNativeLevel_MM_to_RND(struct LevelInfo *level)
 {
   struct LevelInfo_MM *level_mm = level->native_mm_level;
   int x, y;
@@ -4093,7 +4093,8 @@ void CopyNativeLevel_MM_to_RND(struct LevelInfo *level)
 
 #define DC_LEVEL_HEADER_SIZE		344
 
-unsigned short getDecodedWord_DC(unsigned short data_encoded, boolean init)
+static unsigned short getDecodedWord_DC(unsigned short data_encoded,
+					boolean init)
 {
   static int last_data_encoded;
   static int offset1;
@@ -4132,7 +4133,7 @@ unsigned short getDecodedWord_DC(unsigned short data_encoded, boolean init)
   return data_decoded;
 }
 
-int getMappedElement_DC(int element)
+static int getMappedElement_DC(int element)
 {
   switch (element)
   {
@@ -7784,7 +7785,7 @@ static int LoadTape_BODY(File *file, int chunk_size, struct TapeInfo *tape)
   return chunk_size;
 }
 
-void LoadTape_SokobanSolution(char *filename)
+static void LoadTape_SokobanSolution(char *filename)
 {
   File *file;
   int move_delay = TILESIZE / level.initial_player_stepsize[0];
@@ -10604,8 +10605,8 @@ void LoadMusicInfo(void)
   }
 }
 
-void add_helpanim_entry(int element, int action, int direction, int delay,
-			int *num_list_entries)
+static void add_helpanim_entry(int element, int action, int direction,
+			       int delay, int *num_list_entries)
 {
   struct HelpAnimInfo *new_list_entry;
   (*num_list_entries)++;
@@ -10621,7 +10622,7 @@ void add_helpanim_entry(int element, int action, int direction, int delay,
   new_list_entry->delay = delay;
 }
 
-void print_unknown_token(char *filename, char *token, int token_nr)
+static void print_unknown_token(char *filename, char *token, int token_nr)
 {
   if (token_nr == 0)
   {
@@ -10633,7 +10634,7 @@ void print_unknown_token(char *filename, char *token, int token_nr)
   Error(ERR_INFO, "- token: '%s'", token);
 }
 
-void print_unknown_token_end(int token_nr)
+static void print_unknown_token_end(int token_nr)
 {
   if (token_nr > 0)
     Error(ERR_INFO_LINE, "-");
