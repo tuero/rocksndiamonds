@@ -68,23 +68,24 @@
 #define SETUP_MODE_CHOOSE_WINDOW_SIZE	19
 #define SETUP_MODE_CHOOSE_SCALING_TYPE	20
 #define SETUP_MODE_CHOOSE_RENDERING	21
-#define SETUP_MODE_CHOOSE_GRAPHICS	22
-#define SETUP_MODE_CHOOSE_SOUNDS	23
-#define SETUP_MODE_CHOOSE_MUSIC		24
-#define SETUP_MODE_CHOOSE_VOLUME_SIMPLE	25
-#define SETUP_MODE_CHOOSE_VOLUME_LOOPS	26
-#define SETUP_MODE_CHOOSE_VOLUME_MUSIC	27
-#define SETUP_MODE_CHOOSE_TOUCH_CONTROL	28
-#define SETUP_MODE_CHOOSE_MOVE_DISTANCE	29
-#define SETUP_MODE_CHOOSE_DROP_DISTANCE	30
-#define SETUP_MODE_CHOOSE_TRANSPARENCY	31
-#define SETUP_MODE_CHOOSE_GRID_XSIZE_0	32
-#define SETUP_MODE_CHOOSE_GRID_YSIZE_0	33
-#define SETUP_MODE_CHOOSE_GRID_XSIZE_1	34
-#define SETUP_MODE_CHOOSE_GRID_YSIZE_1	35
-#define SETUP_MODE_CONFIG_VIRT_BUTTONS	36
+#define SETUP_MODE_CHOOSE_VSYNC		22
+#define SETUP_MODE_CHOOSE_GRAPHICS	23
+#define SETUP_MODE_CHOOSE_SOUNDS	24
+#define SETUP_MODE_CHOOSE_MUSIC		25
+#define SETUP_MODE_CHOOSE_VOLUME_SIMPLE	26
+#define SETUP_MODE_CHOOSE_VOLUME_LOOPS	27
+#define SETUP_MODE_CHOOSE_VOLUME_MUSIC	28
+#define SETUP_MODE_CHOOSE_TOUCH_CONTROL	29
+#define SETUP_MODE_CHOOSE_MOVE_DISTANCE	30
+#define SETUP_MODE_CHOOSE_DROP_DISTANCE	31
+#define SETUP_MODE_CHOOSE_TRANSPARENCY	32
+#define SETUP_MODE_CHOOSE_GRID_XSIZE_0	33
+#define SETUP_MODE_CHOOSE_GRID_YSIZE_0	34
+#define SETUP_MODE_CHOOSE_GRID_XSIZE_1	35
+#define SETUP_MODE_CHOOSE_GRID_YSIZE_1	36
+#define SETUP_MODE_CONFIG_VIRT_BUTTONS	37
 
-#define MAX_SETUP_MODES			37
+#define MAX_SETUP_MODES			38
 
 #define MAX_MENU_MODES			MAX(MAX_INFO_MODES, MAX_SETUP_MODES)
 
@@ -107,6 +108,7 @@
 #define STR_SETUP_CHOOSE_WINDOW_SIZE	"Window Scaling"
 #define STR_SETUP_CHOOSE_SCALING_TYPE	"Anti-Aliasing"
 #define STR_SETUP_CHOOSE_RENDERING	"Rendering Mode"
+#define STR_SETUP_CHOOSE_VSYNC		"VSync Mode"
 #define STR_SETUP_CHOOSE_VOLUME_SIMPLE	"Sound Volume"
 #define STR_SETUP_CHOOSE_VOLUME_LOOPS	"Loops Volume"
 #define STR_SETUP_CHOOSE_VOLUME_MUSIC	"Music Volume"
@@ -265,6 +267,9 @@ static TreeInfo *scaling_type_current = NULL;
 static TreeInfo *rendering_modes = NULL;
 static TreeInfo *rendering_mode_current = NULL;
 
+static TreeInfo *vsync_modes = NULL;
+static TreeInfo *vsync_mode_current = NULL;
+
 static TreeInfo *scroll_delays = NULL;
 static TreeInfo *scroll_delay_current = NULL;
 
@@ -351,6 +356,19 @@ static struct
   {	STR_SPECIAL_RENDERING_DOUBLE,	"Double Texture mode (slower)"	 },
 
   {	NULL,				 NULL				 },
+};
+
+static struct
+{
+  char *value;
+  char *text;
+} vsync_modes_list[] =
+{
+  {	STR_VSYNC_MODE_OFF,		"Off"		},
+  {	STR_VSYNC_MODE_NORMAL,		"Normal"	},
+  {	STR_VSYNC_MODE_ADAPTIVE,	"Adaptive"	},
+
+  {	NULL,				 NULL		},
 };
 
 static struct
@@ -4168,7 +4186,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 	execSetupGame();
       else if (setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE ||
 	       setup_mode == SETUP_MODE_CHOOSE_SCALING_TYPE ||
-	       setup_mode == SETUP_MODE_CHOOSE_RENDERING)
+	       setup_mode == SETUP_MODE_CHOOSE_RENDERING ||
+	       setup_mode == SETUP_MODE_CHOOSE_VSYNC)
 	execSetupGraphics();
       else if (setup_mode == SETUP_MODE_CHOOSE_VOLUME_SIMPLE ||
 	       setup_mode == SETUP_MODE_CHOOSE_VOLUME_LOOPS ||
@@ -4325,7 +4344,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 	    execSetupGame();
 	  else if (setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE ||
 		   setup_mode == SETUP_MODE_CHOOSE_SCALING_TYPE ||
-		   setup_mode == SETUP_MODE_CHOOSE_RENDERING)
+		   setup_mode == SETUP_MODE_CHOOSE_RENDERING ||
+		   setup_mode == SETUP_MODE_CHOOSE_VSYNC)
 	    execSetupGraphics();
 	  else if (setup_mode == SETUP_MODE_CHOOSE_VOLUME_SIMPLE ||
 		   setup_mode == SETUP_MODE_CHOOSE_VOLUME_LOOPS ||
@@ -4396,7 +4416,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 	    execSetupGame();
 	  else if (setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE ||
 		   setup_mode == SETUP_MODE_CHOOSE_SCALING_TYPE ||
-		   setup_mode == SETUP_MODE_CHOOSE_RENDERING)
+		   setup_mode == SETUP_MODE_CHOOSE_RENDERING ||
+		   setup_mode == SETUP_MODE_CHOOSE_VSYNC)
 	    execSetupGraphics();
 	  else if (setup_mode == SETUP_MODE_CHOOSE_VOLUME_SIMPLE ||
 		   setup_mode == SETUP_MODE_CHOOSE_VOLUME_LOOPS ||
@@ -4667,6 +4688,7 @@ static int max_setup_info;	/* total number of setup entries in list */
 static char *window_size_text;
 static char *scaling_type_text;
 static char *rendering_mode_text;
+static char *vsync_mode_text;
 static char *scroll_delay_text;
 static char *snapshot_mode_text;
 static char *game_speed_text;
@@ -5064,6 +5086,56 @@ static void execSetupGraphics_setRenderingModes(void)
   rendering_mode_text = rendering_mode_current->name;
 }
 
+static void execSetupGraphics_setVsyncModes(void)
+{
+  if (vsync_modes == NULL)
+  {
+    int i;
+
+    for (i = 0; vsync_modes_list[i].value != NULL; i++)
+    {
+      TreeInfo *ti = newTreeInfo_setDefaults(TREE_TYPE_UNDEFINED);
+      char identifier[32], name[32];
+      char *value = vsync_modes_list[i].value;
+      char *text = vsync_modes_list[i].text;
+
+      ti->node_top = &vsync_modes;
+      ti->sort_priority = i;
+
+      sprintf(identifier, "%s", value);
+      sprintf(name, "%s", text);
+
+      setString(&ti->identifier, identifier);
+      setString(&ti->name, name);
+      setString(&ti->name_sorting, name);
+      setString(&ti->infotext, STR_SETUP_CHOOSE_VSYNC);
+
+      pushTreeInfo(&vsync_modes, ti);
+    }
+
+    /* sort vsync mode values to start with lowest vsync mode value */
+    sortTreeInfo(&vsync_modes);
+
+    /* set current vsync mode value to configured vsync mode value */
+    vsync_mode_current =
+      getTreeInfoFromIdentifier(vsync_modes, setup.vsync_mode);
+
+    /* if that fails, set current vsync mode to reliable default value */
+    if (vsync_mode_current == NULL)
+      vsync_mode_current =
+	getTreeInfoFromIdentifier(vsync_modes, STR_VSYNC_MODE_DEFAULT);
+
+    /* if that also fails, set current vsync mode to first available one */
+    if (vsync_mode_current == NULL)
+      vsync_mode_current = vsync_modes;
+  }
+
+  setup.vsync_mode = vsync_mode_current->identifier;
+
+  /* needed for displaying vsync mode text instead of identifier */
+  vsync_mode_text = vsync_mode_current->name;
+}
+
 static void execSetupGraphics(void)
 {
   // update "setup.window_scaling_percent" from list selection
@@ -5077,6 +5149,7 @@ static void execSetupGraphics(void)
 
   execSetupGraphics_setScalingTypes();
   execSetupGraphics_setRenderingModes();
+  execSetupGraphics_setVsyncModes();
 
   setup_mode = SETUP_MODE_GRAPHICS;
 
@@ -5092,6 +5165,9 @@ static void execSetupGraphics(void)
 
   // screen rendering mode may have changed at this point
   SDLSetScreenRenderingMode(setup.screen_rendering_mode);
+
+  // screen vsync mode may have changed at this point
+  SDLSetScreenVsyncMode(setup.vsync_mode);
 #endif
 }
 
@@ -5112,6 +5188,13 @@ static void execSetupChooseScalingType(void)
 static void execSetupChooseRenderingMode(void)
 {
   setup_mode = SETUP_MODE_CHOOSE_RENDERING;
+
+  DrawSetupScreen();
+}
+
+static void execSetupChooseVsyncMode(void)
+{
+  setup_mode = SETUP_MODE_CHOOSE_VSYNC;
 
   DrawSetupScreen();
 }
@@ -5818,6 +5901,9 @@ static struct
   { &setup.screen_rendering_mode,	execSetupChooseRenderingMode	},
   { &setup.screen_rendering_mode,	&rendering_mode_text		},
 
+  { &setup.vsync_mode,			execSetupChooseVsyncMode	},
+  { &setup.vsync_mode,			&vsync_mode_text		},
+
   { &setup.graphics_set,		execSetupChooseGraphics		},
   { &setup.graphics_set,		&graphics_set_name		},
 
@@ -5966,6 +6052,8 @@ static struct TokenInfo setup_info_graphics[] =
   { TYPE_ENTER_LIST,	execSetupChooseScrollDelay, "Scroll Delay:"	},
   { TYPE_STRING,	&scroll_delay_text,	""			},
 #endif
+  { TYPE_ENTER_LIST,	execSetupChooseVsyncMode, "Vertical Sync (VSync):" },
+  { TYPE_STRING,	&vsync_mode_text,	""			},
   { TYPE_SWITCH,	&setup.fade_screens,	"Fade Screens:"		},
   { TYPE_SWITCH,	&setup.quick_switch,	"Quick Player Focus Switch:" },
   { TYPE_SWITCH,	&setup.quick_doors,	"Quick Menu Doors:"	},
@@ -7833,6 +7921,8 @@ void DrawSetupScreen(void)
     DrawChooseTree(&scaling_type_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_RENDERING)
     DrawChooseTree(&rendering_mode_current);
+  else if (setup_mode == SETUP_MODE_CHOOSE_VSYNC)
+    DrawChooseTree(&vsync_mode_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_GRAPHICS)
     DrawChooseTree(&artwork.gfx_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SOUNDS)
@@ -7913,6 +8003,8 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
     HandleChooseTree(mx, my, dx, dy, button, &scaling_type_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_RENDERING)
     HandleChooseTree(mx, my, dx, dy, button, &rendering_mode_current);
+  else if (setup_mode == SETUP_MODE_CHOOSE_VSYNC)
+    HandleChooseTree(mx, my, dx, dy, button, &vsync_mode_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_GRAPHICS)
     HandleChooseTree(mx, my, dx, dy, button, &artwork.gfx_current);
   else if (setup_mode == SETUP_MODE_CHOOSE_SOUNDS)

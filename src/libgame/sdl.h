@@ -459,6 +459,7 @@ void SDLSetScreenProperties(void);
 #endif
 
 void SDLSetScreenRenderingMode(char *);
+void SDLSetScreenVsyncMode(char *);
 void SDLRedrawWindow(void);
 void SDLSetWindowTitle(void);
 

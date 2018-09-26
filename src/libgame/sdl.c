@@ -677,6 +677,8 @@ static boolean SDLCreateScreen(boolean fullscreen)
       // SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
       SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, setup.window_scaling_quality);
 
+      SDLSetScreenVsyncMode(setup.vsync_mode);
+
       sdl_texture_stream = SDL_CreateTexture(sdl_renderer,
 					     SDL_PIXELFORMAT_ARGB8888,
 					     SDL_TEXTUREACCESS_STREAMING,
@@ -1010,6 +1012,21 @@ void SDLSetScreenRenderingMode(char *screen_rendering_mode)
      SPECIAL_RENDERING_DOUBLE : SPECIAL_RENDERING_OFF);
 #else
   video.screen_rendering_mode = SPECIAL_RENDERING_BITMAP;
+#endif
+}
+
+void SDLSetScreenVsyncMode(char *vsync_mode)
+{
+#if defined(TARGET_SDL2)
+  int interval =
+    (strEqual(vsync_mode, STR_VSYNC_MODE_NORMAL)   ? VSYNC_MODE_NORMAL :
+     strEqual(vsync_mode, STR_VSYNC_MODE_ADAPTIVE) ? VSYNC_MODE_ADAPTIVE :
+     VSYNC_MODE_OFF);
+  int result = SDL_GL_SetSwapInterval(interval);
+
+  // if adaptive vsync requested, but not supported, retry with normal vsync
+  if (result == -1 && interval == VSYNC_MODE_ADAPTIVE)
+    SDL_GL_SetSwapInterval(VSYNC_MODE_NORMAL);
 #endif
 }
 

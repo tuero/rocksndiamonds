@@ -8353,6 +8353,7 @@ enum
   SETUP_TOKEN_WINDOW_SCALING_PERCENT,
   SETUP_TOKEN_WINDOW_SCALING_QUALITY,
   SETUP_TOKEN_SCREEN_RENDERING_MODE,
+  SETUP_TOKEN_VSYNC_MODE,
   SETUP_TOKEN_ASK_ON_ESCAPE,
   SETUP_TOKEN_ASK_ON_ESCAPE_EDITOR,
   SETUP_TOKEN_QUICK_SWITCH,
@@ -8594,6 +8595,7 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_INTEGER,&si.window_scaling_percent,  "window_scaling_percent"	},
   { TYPE_STRING, &si.window_scaling_quality,  "window_scaling_quality"	},
   { TYPE_STRING, &si.screen_rendering_mode,   "screen_rendering_mode"	},
+  { TYPE_STRING, &si.vsync_mode,              "vsync_mode"		},
   { TYPE_SWITCH, &si.ask_on_escape,           "ask_on_escape"		},
   { TYPE_SWITCH, &si.ask_on_escape_editor,    "ask_on_escape_editor"	},
   { TYPE_SWITCH, &si.quick_switch,            "quick_player_switch"	},
@@ -8814,6 +8816,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->window_scaling_percent = STD_WINDOW_SCALING_PERCENT;
   si->window_scaling_quality = getStringCopy(SCALING_QUALITY_DEFAULT);
   si->screen_rendering_mode = getStringCopy(STR_SPECIAL_RENDERING_DEFAULT);
+  si->vsync_mode = getStringCopy(STR_VSYNC_MODE_DEFAULT);
   si->ask_on_escape = TRUE;
   si->ask_on_escape_editor = TRUE;
   si->quick_switch = FALSE;

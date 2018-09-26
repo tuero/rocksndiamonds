@@ -82,6 +82,19 @@
 #define SPECIAL_RENDERING_DEFAULT	SPECIAL_RENDERING_BITMAP
 #endif
 
+/* values for vertical screen retrace synchronization (vsync) */
+#define STR_VSYNC_MODE_OFF		"off"
+#define STR_VSYNC_MODE_NORMAL		"normal"
+#define STR_VSYNC_MODE_ADAPTIVE		"adaptive"
+
+#define STR_VSYNC_MODE_DEFAULT		STR_VSYNC_MODE_OFF
+
+#define VSYNC_MODE_OFF			0
+#define VSYNC_MODE_NORMAL		1
+#define VSYNC_MODE_ADAPTIVE		-1
+
+#define VSYNC_MODE_DEFAULT		VSYNC_MODE_OFF
+
 /* values for touch control */
 #define TOUCH_CONTROL_OFF		"off"
 #define TOUCH_CONTROL_VIRTUAL_BUTTONS	"virtual_buttons"
@@ -919,6 +932,7 @@ struct VideoSystemInfo
   int window_scaling_percent;
   char *window_scaling_quality;
   int screen_rendering_mode;
+  int vsync_mode;
 
   unsigned int frame_delay;
   unsigned int frame_delay_value;
@@ -1265,6 +1279,7 @@ struct SetupInfo
   int window_scaling_percent;
   char *window_scaling_quality;
   char *screen_rendering_mode;
+  char *vsync_mode;
   boolean ask_on_escape;
   boolean ask_on_escape_editor;
   boolean quick_switch;
