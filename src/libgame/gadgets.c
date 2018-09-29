@@ -1494,11 +1494,18 @@ void ClickOnGadget(struct GadgetInfo *gi, int button)
   if (button_status)
     HandleGadgets(-1, -1, 0);
 
+  int x = gi->x;
+  int y = gi->y;
+
+  /* set cursor position to the end of the text for text input gadgets */
+  if (gi->type & GD_TYPE_TEXT_INPUT)
+    x = gi->x + gi->width - 1;
+
   /* simulate pressing mouse button over specified gadget */
-  HandleGadgets(gi->x, gi->y, button);
+  HandleGadgets(x, y, button);
 
   /* simulate releasing mouse button over specified gadget */
-  HandleGadgets(gi->x, gi->y, 0);
+  HandleGadgets(x, y, 0);
 }
 
 boolean HandleGadgets(int mx, int my, int button)
