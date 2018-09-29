@@ -112,6 +112,7 @@
 #define GDI_INFO_TEXT			48
 #define GDI_ACTIVE			49
 #define GDI_DIRECT_DRAW			50
+#define GDI_CALLBACK_ACTION_ALWAYS	51
 
 /* gadget deactivation hack */
 #define GDI_ACTIVE_POS(a)		((a) < 0 ? POS_OFFSCREEN : (a))
@@ -244,6 +245,7 @@ struct GadgetInfo
   boolean mapped;			/* gadget is mapped on the screen */
   boolean active;			/* gadget is active */
   boolean direct_draw;			/* directly draw to frontbuffer */
+  boolean callback_action_always;	/* also callback if gadget unchanged */
   int font;				/* font to use when inactive */
   int font_active;			/* font to use when active */
   int font_unselectable;		/* font to use when unselectable */

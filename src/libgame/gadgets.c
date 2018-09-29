@@ -213,6 +213,12 @@ static void default_callback_action(void *ptr)
   return;
 }
 
+static void DoGadgetCallbackAction(struct GadgetInfo *gi, boolean changed)
+{
+  if (changed || gi->callback_action_always)
+    gi->callback_action(gi);
+}
+
 static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 {
   struct GadgetDesign *gd;
@@ -839,6 +845,10 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 
       case GDI_DIRECT_DRAW:
 	gi->direct_draw = (boolean)va_arg(ap, int);
+	break;
+
+      case GDI_CALLBACK_ACTION_ALWAYS:
+	gi->callback_action_always = (boolean)va_arg(ap, int);
 	break;
 
       case GDI_CHECKED:
@@ -1611,8 +1621,8 @@ boolean HandleGadgets(int mx, int my, int button)
 
     gi->event.type = GD_EVENT_TEXT_LEAVING;
 
-    if (gadget_changed && !(gi->type & GD_TYPE_SELECTBOX))
-      gi->callback_action(gi);
+    if (!(gi->type & GD_TYPE_SELECTBOX))
+      DoGadgetCallbackAction(gi, gadget_changed);
 
     last_gi = NULL;
 
@@ -1865,8 +1875,8 @@ boolean HandleGadgets(int mx, int my, int button)
 	gi->event.type = GD_EVENT_MOVING;
 	gi->event.off_borders = FALSE;
 
-	if (gi->event_mask & GD_EVENT_MOVING && changed_position)
-	  gi->callback_action(gi);
+	if (gi->event_mask & GD_EVENT_MOVING)
+	  DoGadgetCallbackAction(gi, changed_position);
 
 	return TRUE;
       }
@@ -2021,9 +2031,9 @@ boolean HandleGadgets(int mx, int my, int button)
     gi->event.type = GD_EVENT_MOVING;
     gi->event.off_borders = gadget_moving_off_borders;
 
-    if (gi->event_mask & GD_EVENT_MOVING && changed_position &&
+    if (gi->event_mask & GD_EVENT_MOVING &&
 	(gadget_moving_inside || gi->event_mask & GD_EVENT_OFF_BORDERS))
-      gi->callback_action(gi);
+      DoGadgetCallbackAction(gi, changed_position);
   }
 
   if (gadget_released_inside)
@@ -2055,10 +2065,8 @@ boolean HandleGadgets(int mx, int my, int button)
     gi->state = GD_BUTTON_UNPRESSED;
     gi->event.type = GD_EVENT_RELEASED;
 
-    if ((gi->event_mask & GD_EVENT_RELEASED) && gadget_changed)
-    {
-      gi->callback_action(gi);
-    }
+    if ((gi->event_mask & GD_EVENT_RELEASED))
+      DoGadgetCallbackAction(gi, gadget_changed);
   }
 
   if (gadget_released_off_borders)
@@ -2149,8 +2157,7 @@ boolean HandleGadgetsKeyInput(Key key)
       last_gi = NULL;
     }
 
-    if (gadget_changed)
-      gi->callback_action(gi);
+    DoGadgetCallbackAction(gi, gadget_changed);
   }
   else if (gi->type & GD_TYPE_TEXT_INPUT)	/* only valid for text input */
   {
