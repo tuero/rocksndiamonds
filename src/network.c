@@ -284,7 +284,16 @@ boolean ConnectToServer(char *hostname, int port)
     SDLNet_ResolveHost(&ip, hostname, port);
 
     if (ip.host == INADDR_NONE)
-      Error(ERR_EXIT, "cannot locate host '%s'", hostname);
+    {
+      char message[100];
+
+      sprintf(message, "Failed to resolve network server hostname '%s'!",
+	      hostname);
+
+      DrawNetworkText_Failed(message);
+
+      return FALSE;
+    }
     else
       server_host = SDLNet_Read32(&ip.host);
 
