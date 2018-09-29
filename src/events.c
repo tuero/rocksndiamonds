@@ -2113,6 +2113,10 @@ void HandleKey(Key key, int key_status)
     case GAME_MODE_SETUP:
     case GAME_MODE_INFO:
     case GAME_MODE_SCORES:
+
+      if (anyTextGadgetActiveOrJustFinished && key != KSYM_Escape)
+	break;
+
       switch (key)
       {
 	case KSYM_space:
@@ -2393,6 +2397,9 @@ void HandleJoystick(void)
     case GAME_MODE_INFO:
     case GAME_MODE_SCORES:
     {
+      if (anyTextGadgetActive())
+	break;
+
       if (game_status == GAME_MODE_TITLE)
 	HandleTitleScreen(0,0,dx,dy, newbutton ? MB_MENU_CHOICE : MB_MENU_MARK);
       else if (game_status == GAME_MODE_MAIN)
