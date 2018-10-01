@@ -4203,7 +4203,7 @@ void WaitForEventToContinue(void)
     {
       switch (event.type)
       {
-	case EVENT_BUTTONPRESS:
+	case EVENT_BUTTONRELEASE:
 	case EVENT_KEYPRESS:
 #if defined(TARGET_SDL2)
         case SDL_CONTROLLERBUTTONDOWN:
