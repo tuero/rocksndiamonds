@@ -5951,6 +5951,27 @@ static void execGadgetNetworkServer(void)
   ClickOnGadget(gi, MB_LEFTBUTTON);
 }
 
+static void ToggleNetworkModeIfNeeded(void)
+{
+  if (setup.network_mode == network.enabled)
+    return;
+
+  network.enabled = setup.network_mode;
+
+  FadeOut(REDRAW_ALL);
+
+  ClearField();
+
+  FadeIn(REDRAW_ALL);
+
+  if (network.enabled)
+    InitNetworkServer();
+  else
+    DisconnectFromNetworkServer();
+
+  DrawSetupScreen();
+}
+
 static struct
 {
   void *value;
@@ -6621,24 +6642,9 @@ static void changeSetupValue(int screen_pos, int setup_info_pos_raw, int dx)
   if (si->value == &setup.fullscreen)
     ToggleFullscreenOrChangeWindowScalingIfNeeded();
 
-  if (si->value == &setup.network_mode &&
-      setup.network_mode != network.enabled)
-  {
-    network.enabled = setup.network_mode;
-
-    FadeOut(REDRAW_ALL);
-
-    ClearField();
-
-    FadeIn(REDRAW_ALL);
-
-    if (network.enabled)
-      InitNetworkServer();
-    else
-      DisconnectFromNetworkServer();
-
-    DrawSetupScreen();
-  }
+  // network mode may have changed at this point
+  if (si->value == &setup.network_mode)
+    ToggleNetworkModeIfNeeded();
 }
 
 static struct TokenInfo *getSetupInfoFinal(struct TokenInfo *setup_info_orig)
