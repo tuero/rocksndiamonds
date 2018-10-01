@@ -38,18 +38,19 @@
 #define TYPE_LEAVE_MENU			(1 << 16)
 #define TYPE_ENTER_LIST			(1 << 17)
 #define TYPE_LEAVE_LIST			(1 << 18)
-#define TYPE_EMPTY			(1 << 19)
-#define TYPE_SKIPPABLE			(1 << 20)
-#define TYPE_KEYTEXT			(1 << 21)
+#define TYPE_TEXT_INPUT			(1 << 19)
+#define TYPE_EMPTY			(1 << 20)
+#define TYPE_SKIPPABLE			(1 << 21)
+#define TYPE_KEYTEXT			(1 << 22)
 
-#define TYPE_GHOSTED			(1 << 22)
-#define TYPE_QUERY			(1 << 23)
+#define TYPE_GHOSTED			(1 << 23)
+#define TYPE_QUERY			(1 << 24)
 
 /* additional values for internal purposes */
-#define TYPE_BITFIELD			(1 << 24)
-#define TYPE_CONTENT			(1 << 25)
-#define TYPE_ELEMENT_LIST		(1 << 26)
-#define TYPE_CONTENT_LIST		(1 << 27)
+#define TYPE_BITFIELD			(1 << 25)
+#define TYPE_CONTENT			(1 << 26)
+#define TYPE_ELEMENT_LIST		(1 << 27)
+#define TYPE_CONTENT_LIST		(1 << 28)
 
 /* derived values for setup file handling */
 #define TYPE_BOOLEAN_STYLE		(TYPE_BOOLEAN | \

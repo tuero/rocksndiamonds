@@ -5636,10 +5636,17 @@ static void InitArtworkDone(void)
 
 static void InitNetworkSettings(void)
 {
-  InitNetworkInfo(options.network || setup.network_mode,
+  boolean network_enabled = (options.network || setup.network_mode);
+  char *network_server = (options.server_host != NULL ? options.server_host :
+			  setup.network_server_hostname);
+
+  if (strEqual(network_server, STR_NETWORK_AUTO_DETECT))
+    network_server = NULL;
+
+  InitNetworkInfo(network_enabled,
 		  FALSE,
 		  options.serveronly,
-		  options.server_host,
+		  network_server,
 		  options.server_port);
 }
 

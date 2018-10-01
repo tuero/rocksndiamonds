@@ -130,6 +130,8 @@
 #define MENU_SETUP_FONT_TITLE		FONT_TEXT_1
 #define MENU_SETUP_FONT_TEXT		FONT_TITLE_2
 
+#define MAX_SETUP_TEXT_INPUT_LEN	28
+
 /* for various menu stuff  */
 #define MENU_SCREEN_START_XPOS		1
 #define MENU_SCREEN_START_YPOS		2
@@ -169,7 +171,7 @@
 #define MAX_MENU_TEXT_LENGTH_BIG	13
 #define MAX_MENU_TEXT_LENGTH_MEDIUM	(MAX_MENU_TEXT_LENGTH_BIG * 2)
 
-/* buttons and scrollbars identifiers */
+/* screen gadget identifiers */
 #define SCREEN_CTRL_ID_PREV_LEVEL	0
 #define SCREEN_CTRL_ID_NEXT_LEVEL	1
 #define SCREEN_CTRL_ID_PREV_PLAYER	2
@@ -179,12 +181,14 @@
 #define SCREEN_CTRL_ID_SCROLL_UP	6
 #define SCREEN_CTRL_ID_SCROLL_DOWN	7
 #define SCREEN_CTRL_ID_SCROLL_VERTICAL	8
+#define SCREEN_CTRL_ID_NETWORK_SERVER	9
 
-#define NUM_SCREEN_GADGETS		9
+#define NUM_SCREEN_GADGETS		10
 
 #define NUM_SCREEN_MENUBUTTONS		6
 #define NUM_SCREEN_SCROLLBUTTONS	2
 #define NUM_SCREEN_SCROLLBARS		1
+#define NUM_SCREEN_TEXTINPUT		1
 
 #define SCREEN_MASK_MAIN		(1 << 0)
 #define SCREEN_MASK_MAIN_HAS_SOLUTION	(1 << 1)
@@ -669,6 +673,8 @@ static char str_main_text_name[10];
 static char str_main_text_first_level[10];
 static char str_main_text_last_level[10];
 static char str_main_text_level_number[10];
+
+static char network_server_hostname[MAX_SETUP_TEXT_INPUT_LEN + 1];
 
 static char *main_text_name			= str_main_text_name;
 static char *main_text_first_level		= str_main_text_first_level;
@@ -2236,7 +2242,8 @@ static int getMenuTextFont(int type)
 	      TYPE_PLAYER	|
 	      TYPE_ECS_AGA	|
 	      TYPE_KEYTEXT	|
-	      TYPE_ENTER_LIST))
+	      TYPE_ENTER_LIST	|
+	      TYPE_TEXT_INPUT))
     return FONT_MENU_2;
   else
     return FONT_MENU_1;
@@ -2283,6 +2290,7 @@ static void DrawCursorAndText_Setup(int screen_pos, int menu_info_pos_raw,
 
 static char *window_size_text;
 static char *scaling_type_text;
+static char *network_server_text;
 
 static void drawSetupValue(int, int);
 
@@ -2319,6 +2327,25 @@ static void drawMenuInfoList(int first_entry, int num_page_entries,
       initCursor(i, IMG_MENU_BUTTON);
 
     DrawCursorAndText_Menu(i, menu_info_pos, FALSE);
+
+    if (si->type & TYPE_STRING)
+    {
+      int gadget_id = -1;
+
+      if (value_ptr == &network_server_text)
+	gadget_id = SCREEN_CTRL_ID_NETWORK_SERVER;
+
+      if (gadget_id != -1)
+      {
+	struct GadgetInfo *gi = screen_gadget[gadget_id];
+	int xpos = MENU_SCREEN_START_XPOS;
+	int ypos = MENU_SCREEN_START_YPOS + i;
+	int x = mSX + xpos * 32;
+	int y = mSY + ypos * 32;
+
+	ModifyGadget(gi, GDI_X, x, GDI_Y, y, GDI_END);
+      }
+    }
 
     if (si->type & TYPE_VALUE &&
 	menu_info == setup_info)
@@ -2665,6 +2692,11 @@ static void HandleMenuScreen(int mx, int my, int dx, int dy, int button,
 	  menu_info[first_entry + y - 1].type & TYPE_ENTER_LIST)
 	y--;
 
+      /* when selecting string value, execute function for text input gadget */
+      if (menu_info[first_entry + y].type & TYPE_STRING && y > 0 &&
+	  menu_info[first_entry + y - 1].type & TYPE_TEXT_INPUT)
+	y--;
+
       if (menu_info[first_entry + y].type & TYPE_ENTER_OR_LEAVE)
       {
 	void (*menu_callback_function)(void) =
@@ -2673,6 +2705,13 @@ static void HandleMenuScreen(int mx, int my, int dx, int dy, int button,
 	FadeSetFromType(menu_info[first_entry + y].type);
 
 	menu_callback_function();
+      }
+      else if (menu_info[first_entry + y].type & TYPE_TEXT_INPUT)
+      {
+	void (*gadget_callback_function)(void) =
+	  menu_info[first_entry + y].value;
+
+	gadget_callback_function();
       }
       else if (menu_info[first_entry + y].type & TYPE_VALUE &&
 	       menu_info == setup_info)
@@ -4692,6 +4731,7 @@ static char *vsync_mode_text;
 static char *scroll_delay_text;
 static char *snapshot_mode_text;
 static char *game_speed_text;
+static char *network_server_text;
 static char *graphics_set_name;
 static char *sounds_set_name;
 static char *music_set_name;
@@ -4861,11 +4901,30 @@ static void execSetupGame_setSnapshotModes(void)
   snapshot_mode_text = snapshot_mode_current->name;
 }
 
+static void execSetupGame_setNetworkServerText(void)
+{
+  if (strEqual(setup.network_server_hostname, STR_NETWORK_AUTO_DETECT))
+  {
+    strcpy(network_server_hostname, STR_NETWORK_AUTO_DETECT_SETUP);
+  }
+  else
+  {
+    strncpy(network_server_hostname, setup.network_server_hostname,
+	    MAX_SETUP_TEXT_INPUT_LEN);
+    network_server_hostname[MAX_SETUP_TEXT_INPUT_LEN] = '\0';
+  }
+
+  /* needed for displaying network server text instead of identifier */
+  network_server_text = network_server_hostname;
+}
+
 static void execSetupGame(void)
 {
   execSetupGame_setGameSpeeds();
   execSetupGame_setScrollDelays();
   execSetupGame_setSnapshotModes();
+
+  execSetupGame_setNetworkServerText();
 
   setup_mode = SETUP_MODE_GAME;
 
@@ -5877,6 +5936,21 @@ static void execSaveAndExitSetup(void)
   execExitSetup();
 }
 
+static void execGadgetNetworkServer(void)
+{
+  int gadget_id = SCREEN_CTRL_ID_NETWORK_SERVER;
+  struct GadgetInfo *gi = screen_gadget[gadget_id];
+
+  if (strEqual(setup.network_server_hostname, STR_NETWORK_AUTO_DETECT))
+    network_server_hostname[0] = '\0';
+
+  ModifyGadget(gi, GDI_TEXT_VALUE, network_server_hostname, GDI_END);
+
+  MapGadget(gi);
+
+  ClickOnGadget(gi, MB_LEFTBUTTON);
+}
+
 static struct
 {
   void *value;
@@ -5980,6 +6054,8 @@ static struct TokenInfo setup_info_game[] =
   { TYPE_SWITCH,	&setup.team_mode,	"Team-Mode (Multi-Player):" },
   { TYPE_SWITCH,	&setup.network_mode,	"Network Multi-Player Mode:" },
   { TYPE_PLAYER,	&setup.network_player_nr,"Preferred Network Player:" },
+  { TYPE_TEXT_INPUT,	execGadgetNetworkServer, "Network Server Hostname:" },
+  { TYPE_STRING,	&network_server_text,	""			},
   { TYPE_YES_NO,	&setup.input_on_focus,	"Only Move Focussed Player:" },
   { TYPE_SWITCH,	&setup.time_limit,	"Time Limit:"		},
   { TYPE_SWITCH,	&setup.handicap,	"Handicap:"		},
@@ -8188,6 +8264,26 @@ static struct
   }
 };
 
+static struct
+{
+  int graphic;
+  int gadget_id;
+  int x, y;
+  int size;
+  char *value;
+  char *infotext;
+} textinput_info[NUM_SCREEN_TEXTINPUT] =
+{
+  {
+    IMG_SETUP_INPUT_TEXT,
+    SCREEN_CTRL_ID_NETWORK_SERVER,
+    -1, -1,	/* these values are not constant, but can change at runtime */
+    MAX_SETUP_TEXT_INPUT_LEN,
+    network_server_hostname,
+    "Network Server Hostname / IP"
+  },
+};
+
 static void CreateScreenMenubuttons(void)
 {
   struct GadgetInfo *gi;
@@ -8402,12 +8498,60 @@ static void CreateScreenScrollbars(void)
   }
 }
 
+static void CreateScreenTextInputGadgets(void)
+{
+  int i;
+
+  for (i = 0; i < NUM_SCREEN_TEXTINPUT; i++)
+  {
+    int graphic = textinput_info[i].graphic;
+    struct GraphicInfo *gd = &graphic_info[graphic];
+    int gd_x1 = gd->src_x;
+    int gd_y1 = gd->src_y;
+    int gd_x2 = gd->src_x + gd->active_xoffset;
+    int gd_y2 = gd->src_y + gd->active_yoffset;
+    struct GadgetInfo *gi;
+    unsigned int event_mask;
+    int id = textinput_info[i].gadget_id;
+    int x = textinput_info[i].x;
+    int y = textinput_info[i].y;
+
+    event_mask = GD_EVENT_TEXT_RETURN | GD_EVENT_TEXT_LEAVING;
+
+    gi = CreateGadget(GDI_CUSTOM_ID, id,
+		      GDI_CUSTOM_TYPE_ID, i,
+		      GDI_INFO_TEXT, textinput_info[i].infotext,
+		      GDI_X, SX + x,
+		      GDI_Y, SY + y,
+		      GDI_TYPE, GD_TYPE_TEXT_INPUT_ALPHANUMERIC,
+		      GDI_TEXT_VALUE, textinput_info[i].value,
+		      GDI_TEXT_SIZE, textinput_info[i].size,
+		      GDI_TEXT_FONT, getSetupValueFont(TYPE_STRING, NULL),
+		      GDI_TEXT_FONT_ACTIVE, FONT_TEXT_1,
+		      GDI_DESIGN_UNPRESSED, gd->bitmap, gd_x1, gd_y1,
+		      GDI_DESIGN_PRESSED, gd->bitmap, gd_x2, gd_y2,
+		      GDI_BORDER_SIZE, gd->border_size, gd->border_size,
+		      GDI_DESIGN_WIDTH, gd->width,
+		      GDI_EVENT_MASK, event_mask,
+		      GDI_CALLBACK_ACTION, HandleScreenGadgets,
+		      GDI_CALLBACK_ACTION_ALWAYS, TRUE,
+		      GDI_END);
+
+    if (gi == NULL)
+      Error(ERR_EXIT, "cannot create gadget");
+
+    screen_gadget[id] = gi;
+  }
+}
+
 void CreateScreenGadgets(void)
 {
   CreateScreenMenubuttons();
 
   CreateScreenScrollbuttons();
   CreateScreenScrollbars();
+
+  CreateScreenTextInputGadgets();
 }
 
 void FreeScreenGadgets(void)
@@ -8539,6 +8683,31 @@ static void HandleScreenGadgets(struct GadgetInfo *gi)
       else if (game_status == GAME_MODE_INFO)
 	HandleInfoScreen(0,0, 999,gi->event.item_position,MB_MENU_INITIALIZE);
       break;
+
+    case SCREEN_CTRL_ID_NETWORK_SERVER:
+    {
+      if (!strEqual(gi->textinput.value, ""))
+      {
+	setString(&setup.network_server_hostname, gi->textinput.value);
+
+	network.server_host = setup.network_server_hostname;
+      }
+      else
+      {
+	setString(&setup.network_server_hostname, STR_NETWORK_AUTO_DETECT);
+
+	network.server_host = NULL;
+      }
+
+      if (strEqual(network.server_host, STR_NETWORK_AUTO_DETECT))
+	network.server_host = NULL;
+
+      execSetupGame_setNetworkServerText();
+
+      DrawSetupScreen();
+
+      break;
+    }
 
     default:
       break;

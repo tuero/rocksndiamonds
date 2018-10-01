@@ -7132,6 +7132,14 @@ struct ConfigInfo image_config[] =
   { "gfx.editor.input.level_number.height",	"16"			},
   { "gfx.editor.input.level_number.border_size","1"			},
 
+  { "setup.input.text",				"RocksSP.png"		},
+  { "setup.input.text.x",			"0"			},
+  { "setup.input.text.y",			"0"			},
+  { "setup.input.text.width",			"32"			},
+  { "setup.input.text.height",			"32"			},
+  { "setup.input.text.active_xoffset",		"0"			},
+  { "setup.input.text.border_size",		"0"			},
+
   { "global.border",				"RocksScreen.png"	},
   { "global.border.MAIN",			UNDEFINED_FILENAME	},
   { "global.border.SCORES",			UNDEFINED_FILENAME	},

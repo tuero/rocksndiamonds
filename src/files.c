@@ -8374,6 +8374,7 @@ enum
   SETUP_TOKEN_VOLUME_MUSIC,
   SETUP_TOKEN_NETWORK_MODE,
   SETUP_TOKEN_NETWORK_PLAYER_NR,
+  SETUP_TOKEN_NETWORK_SERVER_HOSTNAME,
   SETUP_TOKEN_TOUCH_CONTROL_TYPE,
   SETUP_TOKEN_TOUCH_MOVE_DISTANCE,
   SETUP_TOKEN_TOUCH_DROP_DISTANCE,
@@ -8616,6 +8617,7 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_INTEGER,&si.volume_music,            "volume_music"		},
   { TYPE_SWITCH, &si.network_mode,            "network_mode"		},
   { TYPE_PLAYER, &si.network_player_nr,       "network_player"		},
+  { TYPE_STRING, &si.network_server_hostname, "network_server_hostname"	},
   { TYPE_STRING, &si.touch.control_type,      "touch.control_type"	},
   { TYPE_INTEGER,&si.touch.move_distance,     "touch.move_distance"	},
   { TYPE_INTEGER,&si.touch.drop_distance,     "touch.drop_distance"	},
@@ -8841,6 +8843,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
 
   si->network_mode = FALSE;
   si->network_player_nr = 0;		/* first player */
+  si->network_server_hostname = getStringCopy(STR_NETWORK_AUTO_DETECT);
 
   si->touch.control_type = getStringCopy(TOUCH_CONTROL_DEFAULT);
   si->touch.move_distance = TOUCH_MOVE_DISTANCE_DEFAULT;	/* percent */

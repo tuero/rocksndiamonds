@@ -95,6 +95,10 @@
 
 #define VSYNC_MODE_DEFAULT		VSYNC_MODE_OFF
 
+/* values for network server settings */
+#define STR_NETWORK_AUTO_DETECT		"auto_detect_network_server"
+#define STR_NETWORK_AUTO_DETECT_SETUP	"(auto detect network server)"
+
 /* values for touch control */
 #define TOUCH_CONTROL_OFF		"off"
 #define TOUCH_CONTROL_VIRTUAL_BUTTONS	"virtual_buttons"
@@ -1303,6 +1307,7 @@ struct SetupInfo
 
   boolean network_mode;
   int network_player_nr;
+  char *network_server_hostname;
 
   struct SetupAutoSetupInfo auto_setup;
   struct SetupEditorInfo editor;
