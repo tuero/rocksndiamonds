@@ -136,6 +136,20 @@ static void DrawInitAnim(void)
   FrameCounter++;
 }
 
+static void DrawProgramInfo(void)
+{
+  int font1_nr = FC_YELLOW;
+  int font2_nr = FC_RED;
+  int font2_height = getFontHeight(font2_nr);
+  int ypos1 = 20;
+  int ypos2 = 50;
+  int ypos3 = WIN_YSIZE - 20 - font2_height;
+
+  DrawInitText(getProgramInitString(),           ypos1, font1_nr);
+  DrawInitText(setup.internal.program_copyright, ypos2, font2_nr);
+  DrawInitText(setup.internal.program_website,   ypos3, font2_nr);
+}
+
 static void FreeGadgets(void)
 {
   FreeLevelEditorGadgets();
@@ -5327,7 +5341,6 @@ static void InitGfx(void)
   char *filename_font_initial = NULL;
   char *filename_anim_initial = NULL;
   Bitmap *bitmap_font_initial = NULL;
-  int font_height;
   int i, j;
 
   /* determine settings for initial font (for displaying startup messages) */
@@ -5378,12 +5391,7 @@ static void InitGfx(void)
 
   InitFontGraphicInfo();
 
-  font_height = getFontHeight(FC_RED);
-
-  DrawInitText(getProgramInitString(), 20, FC_YELLOW);
-  DrawInitText(setup.internal.program_copyright, 50, FC_RED);
-  DrawInitText(setup.internal.program_website, WIN_YSIZE - 20 - font_height,
-	       FC_RED);
+  DrawProgramInfo();
 
   DrawInitText("Loading graphics", 120, FC_GREEN);
 
