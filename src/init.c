@@ -5665,6 +5665,9 @@ void InitNetworkServer(void)
 
   LimitScreenUpdates(FALSE);
 
+  if (game_status == GAME_MODE_LOADING)
+    DrawProgramInfo();
+
   if (!ConnectToServer(network.server_host, network.server_port))
   {
     network.enabled = FALSE;
