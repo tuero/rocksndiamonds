@@ -1059,7 +1059,4 @@ void DisconnectFromNetworkServer(void)
   HandleNetworkingDisconnect();
 
   DrawNetworkText_Success("Successfully disconnected!");
-
-  /* short time to recognize result of network initialization */
-  Delay_WithScreenUpdates(1000);
 }

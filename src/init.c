@@ -5684,7 +5684,8 @@ void InitNetworkServer(void)
   }
 
   /* short time to recognize result of network initialization */
-  Delay_WithScreenUpdates(1000);
+  if (game_status == GAME_MODE_LOADING)
+    Delay_WithScreenUpdates(1000);
 }
 
 static boolean CheckArtworkConfigForCustomElements(char *filename)

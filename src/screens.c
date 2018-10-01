@@ -5980,6 +5980,8 @@ static void ToggleNetworkModeIfNeeded(void)
   DrawTextSCentered(ybottom, font_foot,
 		    "Press any key or button for setup menu");
 
+  WaitForEventToContinue();
+
   DrawSetupScreen();
 }
 
