@@ -5953,6 +5953,12 @@ static void execGadgetNetworkServer(void)
 
 static void ToggleNetworkModeIfNeeded(void)
 {
+  int font_title = FONT_TITLE_1;
+  int font_foot = FC_BLUE;
+  int ystart  = mSY - SY + 16;
+  int ybottom = mSY - SY + SYSIZE - 20;
+  char *text = (setup.network_mode ? "Start Network" : "Stop Network");
+
   if (setup.network_mode == network.enabled)
     return;
 
@@ -5962,12 +5968,17 @@ static void ToggleNetworkModeIfNeeded(void)
 
   ClearField();
 
+  DrawTextSCentered(ystart, font_title, text);
+
   FadeIn(REDRAW_ALL);
 
   if (network.enabled)
     InitNetworkServer();
   else
     DisconnectFromNetworkServer();
+
+  DrawTextSCentered(ybottom, font_foot,
+		    "Press any key or button for setup menu");
 
   DrawSetupScreen();
 }
