@@ -6489,10 +6489,12 @@ static void drawSetupValue(int screen_pos, int setup_info_pos_raw)
   int ypos = MENU_SCREEN_START_YPOS + screen_pos;
   int startx = mSX + xpos * 32;
   int starty = mSY + ypos * 32;
-  int font_nr, font_nr_default, font_width_default;
   int type = si->type;
   void *value = si->value;
   char *value_string = getSetupValue(type, value);
+  int font_nr_default = getSetupValueFont(type, value);
+  int font_width_default = getFontWidth(font_nr_default);
+  int font_nr = font_nr_default;
   int i;
 
   if (value_string == NULL)
@@ -6527,10 +6529,6 @@ static void drawSetupValue(int screen_pos, int setup_info_pos_raw)
 
   startx = mSX + xpos * 32;
   starty = mSY + ypos * 32;
-  font_nr_default = getSetupValueFont(type, value);
-  font_width_default = getFontWidth(font_nr_default);
-
-  font_nr = font_nr_default;
 
   // special check if right-side setup values moved left due to scrollbar
   if (scrollbar_needed && xpos > MENU_SCREEN_START_XPOS)
