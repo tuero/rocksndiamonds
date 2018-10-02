@@ -6596,10 +6596,17 @@ static void drawSetupValue(int screen_pos, int setup_info_pos_raw)
 
   if (type & TYPE_PLAYER)
   {
+    struct FontBitmapInfo *font = getFontBitmapInfo(font_nr);
     int player_nr = *(int *)value;
-    int xoff = getFontWidth(font_nr);
+    int xoff = font->draw_xoffset + getFontWidth(font_nr);
+    int yoff = font->draw_yoffset + (getFontHeight(font_nr) - TILEY) / 2;
+    int startx2 = startx + xoff;
+    int starty2 = starty + yoff;
 
-    DrawFixedGraphicThruMaskExt(drawto, startx + xoff, starty,
+    if (DrawingOnBackground(startx2, starty2))
+      ClearRectangleOnBackground(drawto, startx2, starty2, TILEX, TILEY);
+
+    DrawFixedGraphicThruMaskExt(drawto, startx2, starty2,
 				PLAYER_NR_GFX(IMG_PLAYER_1, player_nr), 0);
   }
 
