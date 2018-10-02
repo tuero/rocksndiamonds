@@ -6509,7 +6509,7 @@ static void drawSetupValue(int screen_pos, int setup_info_pos_raw)
   }
   else if (type & TYPE_STRING)
   {
-    int max_value_len = (SCR_FIELDX - 2) * 2;
+    int max_value_len = (SXSIZE - 2 * TILEX) / font_width_default;
 
     xpos = MENU_SCREEN_START_XPOS;
 
