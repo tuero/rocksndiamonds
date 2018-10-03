@@ -310,11 +310,7 @@ static TreeInfo *grid_size_current[2][2] = { { NULL, NULL }, { NULL, NULL } };
 static TreeInfo *level_number = NULL;
 static TreeInfo *level_number_current = NULL;
 
-static struct
-{
-  int value;
-  char *text;
-} window_sizes_list[] =
+static struct ValueTextInfo window_sizes_list[] =
 {
   {	50,	"50 %"				},
   {	80,	"80 %"				},
@@ -332,11 +328,7 @@ static struct
   {	-1,	NULL				},
 };
 
-static struct
-{
-  char *value;
-  char *text;
-} scaling_types_list[] =
+static struct StringValueTextInfo scaling_types_list[] =
 {
   {	SCALING_QUALITY_NEAREST, "Off"		},
   {	SCALING_QUALITY_LINEAR,	 "Linear"	},
@@ -345,11 +337,7 @@ static struct
   {	NULL,			 NULL		},
 };
 
-static struct
-{
-  char *value;
-  char *text;
-} rendering_modes_list[] =
+static struct StringValueTextInfo rendering_modes_list[] =
 {
   {	STR_SPECIAL_RENDERING_OFF,	"Off (May show artifacts, fast)" },
   {	STR_SPECIAL_RENDERING_BITMAP,	"Bitmap/Texture mode (slower)"	 },
@@ -362,11 +350,7 @@ static struct
   {	NULL,				 NULL				 },
 };
 
-static struct
-{
-  char *value;
-  char *text;
-} vsync_modes_list[] =
+static struct StringValueTextInfo vsync_modes_list[] =
 {
   {	STR_VSYNC_MODE_OFF,		"Off"		},
   {	STR_VSYNC_MODE_NORMAL,		"Normal"	},
@@ -375,11 +359,7 @@ static struct
   {	NULL,				 NULL		},
 };
 
-static struct
-{
-  int value;
-  char *text;
-} game_speeds_list[] =
+static struct ValueTextInfo game_speeds_list[] =
 {
 #if 1
   {	30,	"Very Slow"			},
@@ -406,11 +386,7 @@ static struct
   {	-1,	NULL				},
 };
 
-static struct
-{
-  int value;
-  char *text;
-} scroll_delays_list[] =
+static struct ValueTextInfo scroll_delays_list[] =
 {
   {	0,	"0 Tiles (No Scroll Delay)"	},
   {	1,	"1 Tile"			},
@@ -425,11 +401,7 @@ static struct
   {	-1,	NULL				},
 };
 
-static struct
-{
-  char *value;
-  char *text;
-} snapshot_modes_list[] =
+static struct StringValueTextInfo snapshot_modes_list[] =
 {
   {	STR_SNAPSHOT_MODE_OFF,			"Off"		},
   {	STR_SNAPSHOT_MODE_EVERY_STEP,		"Every Step"	},
@@ -439,11 +411,7 @@ static struct
   {	NULL,			 		NULL		},
 };
 
-static struct
-{
-  int value;
-  char *text;
-} volumes_list[] =
+static struct ValueTextInfo volumes_list[] =
 {
   {	0,	"0 %"				},
   {	1,	"1 %"				},
@@ -463,11 +431,7 @@ static struct
   {	-1,	NULL				},
 };
 
-static struct
-{
-  char *value;
-  char *text;
-} touch_controls_list[] =
+static struct StringValueTextInfo touch_controls_list[] =
 {
   {	TOUCH_CONTROL_OFF,		"Off"			},
   {	TOUCH_CONTROL_VIRTUAL_BUTTONS,	"Virtual Buttons"	},
@@ -477,11 +441,7 @@ static struct
   {	NULL,			 	NULL			},
 };
 
-static struct
-{
-  int value;
-  char *text;
-} distances_list[] =
+static struct ValueTextInfo distances_list[] =
 {
   {	1,	"1 %"				},
   {	2,	"2 %"				},
@@ -496,11 +456,7 @@ static struct
   {	-1,	NULL				},
 };
 
-static struct
-{
-  int value;
-  char *text;
-} transparencies_list[] =
+static struct ValueTextInfo transparencies_list[] =
 {
   {	0,	"0 % (Opaque)"			},
   {	10,	"10 %"				},
@@ -517,11 +473,7 @@ static struct
   {	-1,	NULL				},
 };
 
-static struct
-{
-  int value;
-  char *text;
-} grid_sizes_list[] =
+static struct ValueTextInfo grid_sizes_list[] =
 {
   {	3,	"3"				},
   {	4,	"4"				},

@@ -1417,6 +1417,12 @@ struct ValueTextInfo
   char *text;
 };
 
+struct StringValueTextInfo
+{
+  char *value;
+  char *text;
+};
+
 struct ConfigInfo
 {
   char *token;
