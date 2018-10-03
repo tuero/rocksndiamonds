@@ -280,6 +280,8 @@ static TreeInfo *scroll_delay_current = NULL;
 static TreeInfo *snapshot_modes = NULL;
 static TreeInfo *snapshot_mode_current = NULL;
 
+static TreeInfo *game_speeds_normal = NULL;
+static TreeInfo *game_speeds_extended = NULL;
 static TreeInfo *game_speeds = NULL;
 static TreeInfo *game_speed_current = NULL;
 
@@ -359,32 +361,38 @@ static struct StringValueTextInfo vsync_modes_list[] =
   {	NULL,				 NULL		},
 };
 
-static struct ValueTextInfo game_speeds_list[] =
+static struct ValueTextInfo game_speeds_list_normal[] =
 {
-#if 1
   {	30,	"Very Slow"			},
   {	25,	"Slow"				},
   {	20,	"Normal"			},
   {	15,	"Fast"				},
   {	10,	"Very Fast"			},
-#else
-  {	1000,	"1/1s (Extremely Slow)"		},
-  {	500,	"1/2s"				},
-  {	200,	"1/5s"				},
-  {	100,	"1/10s"				},
-  {	50,	"1/20s"				},
-  {	29,	"1/35s (Original Supaplex)"	},
-  {	25,	"1/40s"				},
-  {	20,	"1/50s (Normal Speed)"		},
-  {	14,	"1/70s (Maximum Supaplex)"	},
-  {	10,	"1/100s"			},
-  {	5,	"1/200s"			},
-  {	2,	"1/500s"			},
-  {	1,	"1/1000s (Extremely Fast)"	},
-#endif
 
   {	-1,	NULL				},
 };
+
+static struct ValueTextInfo game_speeds_list_extended[] =
+{
+  {	1000,	"1 fps (Extremely Slow)"	},
+  {	500,	"2 fps"				},
+  {	200,	"5 fps"				},
+  {	100,	"10 fps"			},
+  {	50,	"20 fps"			},
+  {	29,	"35 fps (Original Supaplex)"	},
+  {	25,	"40 fps"			},
+  {	20,	"50 fps (=== Normal Speed ===)"	},
+  {	16,	"60 fps (60 Hz VSync Speed)"	},
+  {	14,	"70 fps (Maximum Supaplex)"	},
+  {	10,	"100 fps"			},
+  {	5,	"200 fps"			},
+  {	2,	"500 fps"			},
+  {	1,	"1000 fps (Extremely Fast)"	},
+
+  {	-1,	NULL				},
+};
+
+static struct ValueTextInfo *game_speeds_list;
 
 static struct ValueTextInfo scroll_delays_list[] =
 {
@@ -4705,6 +4713,17 @@ static void execSetupMain(void)
 
 static void execSetupGame_setGameSpeeds(boolean update_value)
 {
+  if (setup.game_speed_extended)
+  {
+    game_speeds_list = game_speeds_list_extended;
+    game_speeds      = game_speeds_extended;
+  }
+  else
+  {
+    game_speeds_list = game_speeds_list_normal;
+    game_speeds      = game_speeds_normal;
+  }
+
   if (game_speeds == NULL)
   {
     int i;
@@ -4750,6 +4769,11 @@ static void execSetupGame_setGameSpeeds(boolean update_value)
     /* if that also fails, set current game speed to first available speed */
     if (game_speed_current == NULL)
       game_speed_current = game_speeds;
+
+    if (setup.game_speed_extended)
+      game_speeds_extended = game_speeds;
+    else
+      game_speeds_normal = game_speeds;
   }
 
   setup.game_frame_delay = atoi(game_speed_current->identifier);
@@ -4883,12 +4907,25 @@ static void CheckGameSpeedForVsync(boolean force_vsync_game_speed)
 
   if (force_vsync_game_speed)
   {
+    char message[100];
+    char *game_speed_text = "Fast";
+    int game_speed_value = 15;
+
+    if (setup.game_speed_extended)
+    {
+      game_speed_text = "60 fps";
+      game_speed_value = 16;
+    }
+
+    sprintf(message, "Game speed was set to \"%s\" for VSync to work!",
+	    game_speed_text);
+
     /* set game speed to existing list value that is fast enough for vsync */
-    setup.game_frame_delay = 15;
+    setup.game_frame_delay = game_speed_value;
 
     execSetupGame_setGameSpeeds(TRUE);
 
-    Request("Game speed was set to \"fast\" for VSync to work!", REQ_CONFIRM);
+    Request(message, REQ_CONFIRM);
   }
   else
   {
@@ -5975,6 +6012,30 @@ static void ToggleNetworkModeIfNeeded(void)
   DrawSetupScreen();
 }
 
+static void ToggleGameSpeedsListIfNeeded(void)
+{
+  boolean using_game_speeds_extended = (game_speeds == game_speeds_extended);
+
+  if (setup.game_speed_extended == using_game_speeds_extended)
+    return;
+
+  /* try to match similar values when changing game speeds list */
+  if (setup.game_speed_extended)
+    setup.game_frame_delay = (setup.game_frame_delay == 15 ? 16 :
+			      setup.game_frame_delay == 30 ? 29 :
+			      setup.game_frame_delay);
+  else
+    setup.game_frame_delay = (setup.game_frame_delay == 14 ? 15 :
+			      setup.game_frame_delay == 16 ? 15 :
+			      setup.game_frame_delay >= 29 ? 30 :
+			      setup.game_frame_delay <= 10 ? 10 :
+			      setup.game_frame_delay);
+
+  execSetupGame_setGameSpeeds(TRUE);
+
+  DrawSetupScreen();
+}
+
 static struct
 {
   void *value;
@@ -6090,6 +6151,7 @@ static struct TokenInfo setup_info_game[] =
   { TYPE_SWITCH,	&setup.autorecord,	"Auto-Record Tapes:"	},
   { TYPE_ENTER_LIST,	execSetupChooseGameSpeed, "Game Speed:"		},
   { TYPE_STRING,	&game_speed_text,	""			},
+  { TYPE_SWITCH,	&setup.game_speed_extended, "Game Speed Extended List:" },
 #if 1
   { TYPE_ENTER_LIST,	execSetupChooseScrollDelay, "Scroll Delay:"	},
   { TYPE_STRING,	&scroll_delay_text,	""			},
@@ -6653,6 +6715,10 @@ static void changeSetupValue(int screen_pos, int setup_info_pos_raw, int dx)
   // network mode may have changed at this point
   if (si->value == &setup.network_mode)
     ToggleNetworkModeIfNeeded();
+
+  // game speed list may have changed at this point
+  if (si->value == &setup.game_speed_extended)
+    ToggleGameSpeedsListIfNeeded();
 }
 
 static struct TokenInfo *getSetupInfoFinal(struct TokenInfo *setup_info_orig)

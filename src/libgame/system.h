@@ -1290,6 +1290,7 @@ struct SetupInfo
   boolean quick_switch;
   boolean input_on_focus;
   boolean prefer_aga_graphics;
+  boolean game_speed_extended;
   int game_frame_delay;
   boolean sp_show_border_elements;
   boolean small_game_graphics;

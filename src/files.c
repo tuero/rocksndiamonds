@@ -8359,6 +8359,7 @@ enum
   SETUP_TOKEN_QUICK_SWITCH,
   SETUP_TOKEN_INPUT_ON_FOCUS,
   SETUP_TOKEN_PREFER_AGA_GRAPHICS,
+  SETUP_TOKEN_GAME_SPEED_EXTENDED,
   SETUP_TOKEN_GAME_FRAME_DELAY,
   SETUP_TOKEN_SP_SHOW_BORDER_ELEMENTS,
   SETUP_TOKEN_SMALL_GAME_GRAPHICS,
@@ -8602,6 +8603,7 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_SWITCH, &si.quick_switch,            "quick_player_switch"	},
   { TYPE_SWITCH, &si.input_on_focus,          "input_on_focus"		},
   { TYPE_SWITCH, &si.prefer_aga_graphics,     "prefer_aga_graphics"	},
+  { TYPE_SWITCH, &si.game_speed_extended,     "game_speed_extended"	},
   { TYPE_INTEGER,&si.game_frame_delay,        "game_frame_delay"	},
   { TYPE_SWITCH, &si.sp_show_border_elements, "sp_show_border_elements"	},
   { TYPE_SWITCH, &si.small_game_graphics,     "small_game_graphics"	},
@@ -8824,6 +8826,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->quick_switch = FALSE;
   si->input_on_focus = FALSE;
   si->prefer_aga_graphics = TRUE;
+  si->game_speed_extended = FALSE;
   si->game_frame_delay = GAME_FRAME_DELAY;
   si->sp_show_border_elements = FALSE;
   si->small_game_graphics = FALSE;
