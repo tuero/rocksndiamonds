@@ -89,7 +89,7 @@ int getTextWidth(char *, int);
 
 void getFontCharSource(int, char, Bitmap **, int *, int *);
 
-int maxWordLengthInString(char *);
+int maxWordLengthInRequestString(char *);
 
 void DrawInitText(char *, int, int);
 

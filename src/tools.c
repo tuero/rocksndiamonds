@@ -4555,7 +4555,7 @@ static boolean RequestDoor(char *text, unsigned int req_state)
   int result;
   int ty;
 
-  if (maxWordLengthInString(text) > MAX_REQUEST_LINE_FONT1_LEN)
+  if (maxWordLengthInRequestString(text) > MAX_REQUEST_LINE_FONT1_LEN)
   {
     max_request_line_len = MAX_REQUEST_LINE_FONT2_LEN;
     font_nr = FONT_TEXT_1;

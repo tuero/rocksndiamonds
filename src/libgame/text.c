@@ -114,14 +114,16 @@ void getFontCharSource(int font_nr, char c, Bitmap **bitmap, int *x, int *y)
 /* text string helper functions                                              */
 /* ========================================================================= */
 
-int maxWordLengthInString(char *text)
+int maxWordLengthInRequestString(char *text)
 {
   char *text_ptr;
   int word_len = 0, max_word_len = 0;
 
   for (text_ptr = text; *text_ptr; text_ptr++)
   {
-    word_len = (*text_ptr != ' ' ? word_len + 1 : 0);
+    word_len = (*text_ptr != ' ' &&
+		*text_ptr != '?' &&
+		*text_ptr != '!' ? word_len + 1 : 0);
 
     max_word_len = MAX(word_len, max_word_len);
   }
