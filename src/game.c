@@ -13433,6 +13433,10 @@ void ExitPlayer(struct PlayerInfo *player)
 
   if (local_player->players_still_needed > 0)
     local_player->players_still_needed--;
+
+  /* also set if some players not yet gone, but not needed to solve level */
+  if (local_player->players_still_needed == 0)
+    AllPlayersGone = TRUE;
 }
 
 static void setFieldForSnapping(int x, int y, int element, int direction)
