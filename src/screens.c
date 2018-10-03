@@ -4751,7 +4751,7 @@ static void execSetupMain(void)
   DrawSetupScreen();
 }
 
-static void execSetupGame_setGameSpeeds(void)
+static void execSetupGame_setGameSpeeds(boolean update_value)
 {
   if (game_speeds == NULL)
   {
@@ -4781,6 +4781,11 @@ static void execSetupGame_setGameSpeeds(void)
     /* sort game speed values to start with slowest game speed */
     sortTreeInfo(&game_speeds);
 
+    update_value = TRUE;
+  }
+
+  if (update_value)
+  {
     /* set current game speed to configured game speed value */
     game_speed_current =
       getTreeInfoFromIdentifier(game_speeds, i_to_a(setup.game_frame_delay));
@@ -4918,9 +4923,32 @@ static void execSetupGame_setNetworkServerText(void)
   network_server_text = network_server_hostname;
 }
 
+static void CheckGameSpeedForVsync(boolean force_vsync_game_speed)
+{
+  if (strEqual(setup.vsync_mode, STR_VSYNC_MODE_OFF) ||
+      setup.game_frame_delay <= MAX_VSYNC_FRAME_DELAY)
+    return;
+
+  if (force_vsync_game_speed)
+  {
+    /* set game speed to existing list value that is fast enough for vsync */
+    setup.game_frame_delay = 15;
+
+    execSetupGame_setGameSpeeds(TRUE);
+
+    Request("Game speed was set to \"fast\" for VSync to work!", REQ_CONFIRM);
+  }
+  else
+  {
+    Request("Warning! Game speed too low for VSync to work!", REQ_CONFIRM);
+  }
+}
+
 static void execSetupGame(void)
 {
-  execSetupGame_setGameSpeeds();
+  boolean check_vsync_game_speed = (setup_mode == SETUP_MODE_CHOOSE_GAME_SPEED);
+
+  execSetupGame_setGameSpeeds(FALSE);
   execSetupGame_setScrollDelays();
   execSetupGame_setSnapshotModes();
 
@@ -4929,6 +4957,10 @@ static void execSetupGame(void)
   setup_mode = SETUP_MODE_GAME;
 
   DrawSetupScreen();
+
+  // check if game speed is high enough for 60 Hz vsync to work
+  if (check_vsync_game_speed)
+    CheckGameSpeedForVsync(FALSE);
 }
 
 static void execSetupChooseGameSpeed(void)
@@ -5197,6 +5229,8 @@ static void execSetupGraphics_setVsyncModes(void)
 
 static void execSetupGraphics(void)
 {
+  boolean check_vsync_game_speed = (setup_mode == SETUP_MODE_CHOOSE_VSYNC);
+
   // update "setup.window_scaling_percent" from list selection
   // (in this case, window scaling was changed on setup screen)
   if (setup_mode == SETUP_MODE_CHOOSE_WINDOW_SIZE)
@@ -5213,6 +5247,10 @@ static void execSetupGraphics(void)
   setup_mode = SETUP_MODE_GRAPHICS;
 
   DrawSetupScreen();
+
+  // check if game speed is high enough for 60 Hz vsync to work
+  if (check_vsync_game_speed)
+    CheckGameSpeedForVsync(TRUE);
 
 #if defined(TARGET_SDL2)
   // window scaling may have changed at this point

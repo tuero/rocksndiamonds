@@ -458,6 +458,7 @@
 #define MENU_FRAME_DELAY	20	/* frame delay in milliseconds */
 #define GAME_FRAME_DELAY	20	/* frame delay in milliseconds */
 #define FFWD_FRAME_DELAY	10	/* 200% speed for fast forward */
+#define MAX_VSYNC_FRAME_DELAY	16	/* maximum value for vsync to work */
 #define FRAMES_PER_SECOND	(ONE_SECOND_DELAY / GAME_FRAME_DELAY)
 #define FRAMES_PER_SECOND_SP	35
 
