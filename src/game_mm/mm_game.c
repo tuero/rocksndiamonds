@@ -2494,7 +2494,7 @@ static void Explode_MM(int x, int y, int phase, int mode)
     {
       Store[x][y] = EL_EMPTY;
 
-      game.restart_game_message = "Bomb killed Mc Duffin ! Play it again ?";
+      game.restart_game_message = "Bomb killed Mc Duffin! Play it again?";
     }
 
     Feld[x][y] = Store[x][y];
@@ -3186,10 +3186,10 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
 
       SetTileCursorActive(FALSE);
 
-      game.restart_game_message = "Out of magic energy ! Play it again ?";
+      game.restart_game_message = "Out of magic energy! Play it again?";
 
 #if 0
-      if (Request("Out of magic energy ! Play it again ?",
+      if (Request("Out of magic energy! Play it again?",
 		  REQ_ASK | REQ_STAY_CLOSED))
       {
 	InitGame();
@@ -3320,10 +3320,10 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
 
       SetTileCursorActive(FALSE);
 
-      game.restart_game_message = "Magic spell hit Mc Duffin ! Play it again ?";
+      game.restart_game_message = "Magic spell hit Mc Duffin! Play it again?";
 
 #if 0
-      if (Request("Magic spell hit Mc Duffin ! Play it again ?",
+      if (Request("Magic spell hit Mc Duffin! Play it again?",
 		  REQ_ASK | REQ_STAY_CLOSED))
       {
 	InitGame();
@@ -3367,7 +3367,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
     laser.num_edges = 0;
     Bang_MM(laser.start_edge.x, laser.start_edge.y);
 
-    if (Request("Bomb killed Mc Duffin ! Play it again ?",
+    if (Request("Bomb killed Mc Duffin! Play it again?",
 		REQ_ASK | REQ_STAY_CLOSED))
     {
       InitGame();
@@ -3965,7 +3965,7 @@ void GameWon_MM(void)
 
   CloseDoor(DOOR_CLOSE_1);
 
-  Request("Level solved !", REQ_CONFIRM);
+  Request("Level solved!", REQ_CONFIRM);
 
   if (level_nr == leveldir_current->handicap_level)
   {
