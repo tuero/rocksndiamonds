@@ -245,9 +245,9 @@ boolean ConnectToServer(char *hostname, int port)
 
     SDLNet_UDP_Send(udp, -1, &packet);
 
-    DrawNetworkText("Looking for local network server ...");
+    DrawNetworkText("Looking for nearby network server ...");
 
-    /* wait for any local network server to answer UDP broadcast */
+    /* wait for any nearby network server to answer UDP broadcast */
     for (i = 0; i < 5; i++)
     {
       if (SDLNet_CheckSockets(udp_socket_set, 0) == 1)
@@ -256,9 +256,17 @@ boolean ConnectToServer(char *hostname, int port)
 
 	if (num_packets == 1)
 	{
-	  DrawNetworkText_Success("Network server found!");
+	  char message[100];
 
 	  server_host = SDLNet_Read32(&packet.address.host);
+
+	  sprintf(message, "Network server found at %d.%d.%d.%d!",
+		  (server_host >> 24) & 0xff,
+		  (server_host >> 16) & 0xff,
+		  (server_host >>  8) & 0xff,
+		  (server_host >>  0) & 0xff);
+
+	  DrawNetworkText_Success(message);
 	}
 	else
 	{
@@ -274,19 +282,19 @@ boolean ConnectToServer(char *hostname, int port)
     }
 
     if (server_host == 0)
-      DrawNetworkText_Failed("No network server found!");
+      DrawNetworkText_Failed("No nearby network server found!");
   }
 
   rfds = SDLNet_AllocSocketSet(1);
 
   if (hostname)
   {
+    char message[100];
+
     SDLNet_ResolveHost(&ip, hostname, port);
 
     if (ip.host == INADDR_NONE)
     {
-      char message[100];
-
       sprintf(message, "Failed to resolve network server hostname '%s'!",
 	      hostname);
 
@@ -295,21 +303,31 @@ boolean ConnectToServer(char *hostname, int port)
       return FALSE;
     }
     else
+    {
       server_host = SDLNet_Read32(&ip.host);
+    }
 
-    DrawNetworkText("Connecting to remote host ...");
+    sprintf(message, "Connecting to network server host %s ...", hostname);
+
+    DrawNetworkText(message);
   }
   else
   {
     // if no hostname was given and no network server was auto-detected in the
     // local network, try to connect to a network server at the local host
     if (server_host == 0)
+    {
       server_host = 0x7f000001;			/* 127.0.0.1 */
+
+      DrawNetworkText("Looking for local network server ...");
+    }
+    else
+    {
+      DrawNetworkText("Connecting to network server ...");
+    }
 
     SDLNet_Write32(server_host, &ip.host);
     SDLNet_Write16(port,        &ip.port);
-
-    DrawNetworkText("Connecting to local host ...");
   }
 
   Error(ERR_DEBUG, "trying to connect to network server at %d.%d.%d.%d ...",
@@ -330,7 +348,10 @@ boolean ConnectToServer(char *hostname, int port)
   }
   else
   {
-    DrawNetworkText_Failed("Failed to connect to network server!");
+    if (hostname)
+      DrawNetworkText_Failed("Failed to connect to network server!");
+    else
+      DrawNetworkText_Failed("No local network server found!");
 
     printf("SDLNet_TCP_Open(): %s\n", SDLNet_GetError());
   }
@@ -347,16 +368,17 @@ boolean ConnectToServer(char *hostname, int port)
   {
     if ((sfd = SDLNet_TCP_Open(&ip)))		/* connected */
     {
-      DrawNetworkText_Success("Successfully connected!");
+      DrawNetworkText_Success("Successfully connected to newly started network server!");
 
       SDLNet_TCP_AddSocket(rfds, sfd);
+
       return TRUE;
     }
 
     Delay_WithScreenUpdates(100);
   }
 
-  DrawNetworkText_Failed("Failed to connect to network server!");
+  DrawNetworkText_Failed("Failed to connect to newly started network server!");
 
   /* when reaching this point, connect to newly started server has failed */
   return FALSE;
