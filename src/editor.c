@@ -8308,6 +8308,7 @@ static void CopyElementPropertiesToGame(int element)
     CopyClassicElementPropertiesToGame(element);
 }
 
+#if DEBUG
 static void CheckElementDescriptions(void)
 {
   int i;
@@ -8317,6 +8318,7 @@ static void CheckElementDescriptions(void)
       Error(ERR_WARN, "no element description file for element '%s'",
 	    EL_NAME(i));
 }
+#endif
 
 static int getMaxEdFieldX(boolean has_scrollbar)
 {
