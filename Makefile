@@ -226,7 +226,7 @@ dist-release-all: dist-package-all dist-copy-package-all dist-upload-all
 
 package-all: dist-package-all
 
-copy-package-all: dist-copy-package_all
+copy-package-all: dist-copy-package-all
 
 upload-all: dist-upload-all
 
