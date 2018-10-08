@@ -349,6 +349,7 @@ void EventLoop(void)
 
 void ClearAutoRepeatKeyEvents(void)
 {
+#if defined(TARGET_SDL2)
   while (PendingEvent())
   {
     Event next_event;
@@ -362,6 +363,7 @@ void ClearAutoRepeatKeyEvents(void)
     else
       break;
   }
+#endif
 }
 
 void ClearEventQueue(void)
