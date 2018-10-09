@@ -4556,8 +4556,8 @@ void GameWon(void)
 
 	  Feld[ExitX][ExitY] =
 	    (element == EL_EXIT_OPEN		? EL_EXIT_CLOSING :
-	     element == EL_EM_EXIT_OPEN	? EL_EM_EXIT_CLOSING :
-	     element == EL_SP_EXIT_OPEN	? EL_SP_EXIT_CLOSING:
+	     element == EL_EM_EXIT_OPEN		? EL_EM_EXIT_CLOSING :
+	     element == EL_SP_EXIT_OPEN		? EL_SP_EXIT_CLOSING:
 	     element == EL_STEEL_EXIT_OPEN	? EL_STEEL_EXIT_CLOSING:
 	     EL_EM_STEEL_EXIT_CLOSING);
 
