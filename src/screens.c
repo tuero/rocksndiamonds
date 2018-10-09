@@ -251,6 +251,9 @@ static void HandleInfoScreen_Credits(int);
 static void HandleInfoScreen_Program(int);
 static void HandleInfoScreen_Version(int);
 
+static void ModifyGameSpeedIfNeeded(void);
+static void DisableVsyncIfNeeded(void);
+
 static void MapScreenMenuGadgets(int);
 static void MapScreenGadgets(int);
 static void MapScreenTreeGadgets(TreeInfo *);
@@ -4899,43 +4902,9 @@ static void execSetupGame_setNetworkServerText(void)
   network_server_text = network_server_hostname;
 }
 
-static void CheckGameSpeedForVsync(boolean force_vsync_game_speed)
-{
-  if (strEqual(setup.vsync_mode, STR_VSYNC_MODE_OFF) ||
-      setup.game_frame_delay <= MAX_VSYNC_FRAME_DELAY)
-    return;
-
-  if (force_vsync_game_speed)
-  {
-    char message[100];
-    char *game_speed_text = "Fast";
-    int game_speed_value = 15;
-
-    if (setup.game_speed_extended)
-    {
-      game_speed_text = "60 fps";
-      game_speed_value = 16;
-    }
-
-    sprintf(message, "Game speed was set to \"%s\" for VSync to work!",
-	    game_speed_text);
-
-    /* set game speed to existing list value that is fast enough for vsync */
-    setup.game_frame_delay = game_speed_value;
-
-    execSetupGame_setGameSpeeds(TRUE);
-
-    Request(message, REQ_CONFIRM);
-  }
-  else
-  {
-    Request("Warning! Game speed too low for VSync to work!", REQ_CONFIRM);
-  }
-}
-
 static void execSetupGame(void)
 {
-  boolean check_vsync_game_speed = (setup_mode == SETUP_MODE_CHOOSE_GAME_SPEED);
+  boolean check_vsync_mode = (setup_mode == SETUP_MODE_CHOOSE_GAME_SPEED);
 
   execSetupGame_setGameSpeeds(FALSE);
   execSetupGame_setScrollDelays();
@@ -4947,9 +4916,9 @@ static void execSetupGame(void)
 
   DrawSetupScreen();
 
-  // check if game speed is high enough for 60 Hz vsync to work
-  if (check_vsync_game_speed)
-    CheckGameSpeedForVsync(FALSE);
+  // check if vsync needs to be disabled for this game speed to work
+  if (check_vsync_mode)
+    DisableVsyncIfNeeded();
 }
 
 static void execSetupChooseGameSpeed(void)
@@ -5166,7 +5135,7 @@ static void execSetupGraphics_setRenderingModes(void)
   rendering_mode_text = rendering_mode_current->name;
 }
 
-static void execSetupGraphics_setVsyncModes(void)
+static void execSetupGraphics_setVsyncModes(boolean update_value)
 {
   if (vsync_modes == NULL)
   {
@@ -5196,6 +5165,11 @@ static void execSetupGraphics_setVsyncModes(void)
     /* sort vsync mode values to start with lowest vsync mode value */
     sortTreeInfo(&vsync_modes);
 
+    update_value = TRUE;
+  }
+
+  if (update_value)
+  {
     /* set current vsync mode value to configured vsync mode value */
     vsync_mode_current =
       getTreeInfoFromIdentifier(vsync_modes, setup.vsync_mode);
@@ -5218,7 +5192,7 @@ static void execSetupGraphics_setVsyncModes(void)
 
 static void execSetupGraphics(void)
 {
-  boolean check_vsync_game_speed = (setup_mode == SETUP_MODE_CHOOSE_VSYNC);
+  boolean check_game_speed = (setup_mode == SETUP_MODE_CHOOSE_VSYNC);
 
   // update "setup.window_scaling_percent" from list selection
   // (in this case, window scaling was changed on setup screen)
@@ -5231,15 +5205,15 @@ static void execSetupGraphics(void)
 
   execSetupGraphics_setScalingTypes();
   execSetupGraphics_setRenderingModes();
-  execSetupGraphics_setVsyncModes();
+  execSetupGraphics_setVsyncModes(FALSE);
 
   setup_mode = SETUP_MODE_GRAPHICS;
 
   DrawSetupScreen();
 
   // check if game speed is high enough for 60 Hz vsync to work
-  if (check_vsync_game_speed)
-    CheckGameSpeedForVsync(TRUE);
+  if (check_game_speed)
+    ModifyGameSpeedIfNeeded();
 
 #if defined(TARGET_SDL2)
   // window scaling may have changed at this point
@@ -6034,6 +6008,47 @@ static void ToggleGameSpeedsListIfNeeded(void)
   execSetupGame_setGameSpeeds(TRUE);
 
   DrawSetupScreen();
+}
+
+static void ModifyGameSpeedIfNeeded(void)
+{
+  if (strEqual(setup.vsync_mode, STR_VSYNC_MODE_OFF) ||
+      setup.game_frame_delay <= MAX_VSYNC_FRAME_DELAY)
+    return;
+
+  char message[100];
+  char *game_speed_text = "Fast";
+  int game_speed_value = 15;
+
+  if (setup.game_speed_extended)
+  {
+    game_speed_text = "60 fps";
+    game_speed_value = 16;
+  }
+
+  sprintf(message, "Game speed set to %s for VSync to work!", game_speed_text);
+
+  /* set game speed to existing list value that is fast enough for vsync */
+  setup.game_frame_delay = game_speed_value;
+
+  execSetupGame_setGameSpeeds(TRUE);
+
+  Request(message, REQ_CONFIRM);
+}
+
+static void DisableVsyncIfNeeded(void)
+{
+  if (strEqual(setup.vsync_mode, STR_VSYNC_MODE_OFF) ||
+      (setup.game_frame_delay >= MIN_VSYNC_FRAME_DELAY &&
+       setup.game_frame_delay <= MAX_VSYNC_FRAME_DELAY))
+    return;
+
+  /* disable vsync for the selected game speed to work */
+  setup.vsync_mode = STR_VSYNC_MODE_OFF;
+
+  execSetupGraphics_setVsyncModes(TRUE);
+
+  Request("VSync disabled for this game speed to work!", REQ_CONFIRM);
 }
 
 static struct
