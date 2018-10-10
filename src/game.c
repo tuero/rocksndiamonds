@@ -8916,6 +8916,7 @@ static void Life(int ax, int ay)
   for (y1 = -1; y1 < 2; y1++) for (x1 = -1; x1 < 2; x1++)
   {
     int xx = ax+x1, yy = ay+y1;
+    int old_element = Feld[xx][yy];
     int nachbarn = 0;
 
     if (!IN_LEV_FIELD(xx, yy))
@@ -8941,7 +8942,7 @@ static void Life(int ax, int ay)
 	  nachbarn > life_parameter[1])
       {
 	Feld[xx][yy] = EL_EMPTY;
-	if (!Stop[xx][yy])
+	if (Feld[xx][yy] != old_element)
 	  TEST_DrawLevelField(xx, yy);
 	Stop[xx][yy] = TRUE;
 	changed = TRUE;
@@ -8954,7 +8955,7 @@ static void Life(int ax, int ay)
       {
 	Feld[xx][yy] = element;
 	MovDelay[xx][yy] = (element == EL_GAME_OF_LIFE ? 0 : life_time-1);
-	if (!Stop[xx][yy])
+	if (Feld[xx][yy] != old_element)
 	  TEST_DrawLevelField(xx, yy);
 	Stop[xx][yy] = TRUE;
 	changed = TRUE;
