@@ -8896,6 +8896,7 @@ static void Life(int ax, int ay)
   int *life_parameter = (element == EL_GAME_OF_LIFE ? level.game_of_life :
 			 level.biomaze);
   boolean changed = FALSE;
+  boolean use_life_bugs = FALSE;
 
   if (IS_ANIMATED(graphic))
     DrawLevelGraphicAnimationIfNeeded(ax, ay, graphic);
@@ -8929,12 +8930,27 @@ static void Life(int ax, int ay)
       if (!IN_LEV_FIELD(x, y) || (x == xx && y == yy))
 	continue;
 
-      if (((Feld[x][y] == element ||
-	    (element == EL_GAME_OF_LIFE && IS_PLAYER(x, y))) &&
-	   !Stop[x][y]) ||
-	  (IS_FREE(x, y) && Stop[x][y]))
+      boolean is_player_cell = (element == EL_GAME_OF_LIFE && IS_PLAYER(x, y));
+      boolean is_neighbour = FALSE;
+
+      if (use_life_bugs)
+	is_neighbour =
+	  (((Feld[x][y] == element || is_player_cell) && !Stop[x][y]) ||
+	   (IS_FREE(x, y)                             &&  Stop[x][y]));
+      else
+	is_neighbour =
+	  (Last[x][y] == element || is_player_cell);
+
+      if (is_neighbour)
 	num_neighbours++;
     }
+
+    boolean is_free = FALSE;
+
+    if (use_life_bugs)
+      is_free = (IS_FREE(xx, yy));
+    else
+      is_free = (IS_FREE(xx, yy) && Last[xx][yy] == EL_EMPTY);
 
     if (xx == ax && yy == ay)		/* field in the middle */
     {
@@ -8948,7 +8964,7 @@ static void Life(int ax, int ay)
 	changed = TRUE;
       }
     }
-    else if (IS_FREE(xx, yy) || CAN_GROW_INTO(Feld[xx][yy]))
+    else if (is_free || CAN_GROW_INTO(Feld[xx][yy]))
     {					/* free border field */
       if (num_neighbours >= life_parameter[2] &&
 	  num_neighbours <= life_parameter[3])
