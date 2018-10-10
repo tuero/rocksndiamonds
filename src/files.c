@@ -668,6 +668,11 @@ static struct LevelFileConfigInfo chunk_config_ELEM[] =
     TYPE_INTEGER,			CONF_VALUE_8_BIT(4),
     &li.game_of_life[3],		3
   },
+  {
+    EL_GAME_OF_LIFE,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(5),
+    &li.use_life_bugs,			FALSE
+  },
 
   {
     EL_BIOMAZE,				-1,
@@ -6308,6 +6313,10 @@ static void LoadLevel_InitVersion(struct LevelInfo *level)
     /* extra time score was same value as time left score before 3.2.0-5 */
     level->extra_time_score = level->score[SC_TIME_BONUS];
   }
+
+  /* game logic of "game of life" and "biomaze" was buggy before 4.1.1.1 */
+  if (level->game_version < VERSION_IDENT(4,1,1,1))
+    level->use_life_bugs = TRUE;
 
   if (level->game_version < VERSION_IDENT(3,2,0,7))
   {

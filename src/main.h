@@ -3089,6 +3089,7 @@ struct LevelInfo
   boolean em_explodes_by_fire;	/* EM style chain explosion behaviour */
   boolean use_spring_bug;	/* for compatibility with old levels */
   boolean use_time_orb_bug;	/* for compatibility with old levels */
+  boolean use_life_bugs;	/* for compatibility with old levels */
   boolean instant_relocation;	/* no visual delay when relocating player */
   boolean shifted_relocation;	/* no level centering when relocating player */
   boolean lazy_relocation;	/* only redraw off-screen player relocation */

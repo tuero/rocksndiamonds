@@ -8896,7 +8896,6 @@ static void Life(int ax, int ay)
   int *life_parameter = (element == EL_GAME_OF_LIFE ? level.game_of_life :
 			 level.biomaze);
   boolean changed = FALSE;
-  boolean use_life_bugs = FALSE;
 
   if (IS_ANIMATED(graphic))
     DrawLevelGraphicAnimationIfNeeded(ax, ay, graphic);
@@ -8933,7 +8932,7 @@ static void Life(int ax, int ay)
       boolean is_player_cell = (element == EL_GAME_OF_LIFE && IS_PLAYER(x, y));
       boolean is_neighbour = FALSE;
 
-      if (use_life_bugs)
+      if (level.use_life_bugs)
 	is_neighbour =
 	  (((Feld[x][y] == element || is_player_cell) && !Stop[x][y]) ||
 	   (IS_FREE(x, y)                             &&  Stop[x][y]));
@@ -8947,7 +8946,7 @@ static void Life(int ax, int ay)
 
     boolean is_free = FALSE;
 
-    if (use_life_bugs)
+    if (level.use_life_bugs)
       is_free = (IS_FREE(xx, yy));
     else
       is_free = (IS_FREE(xx, yy) && Last[xx][yy] == EL_EMPTY);
