@@ -3595,7 +3595,7 @@ void InitGame(void)
 
   SCAN_PLAYFIELD(x, y)
   {
-    Feld[x][y] = level.field[x][y];
+    Feld[x][y] = Last[x][y] = level.field[x][y];
     MovPos[x][y] = MovDir[x][y] = MovDelay[x][y] = 0;
     ChangeDelay[x][y] = 0;
     ChangePage[x][y] = -1;
@@ -11733,6 +11733,8 @@ void GameActions_RND(void)
 
   SCAN_PLAYFIELD(x, y)
   {
+    Last[x][y] = Feld[x][y];
+
     ChangeCount[x][y] = 0;
     ChangeEvent[x][y] = -1;
 

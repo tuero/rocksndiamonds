@@ -3552,6 +3552,7 @@ extern SDL_Thread	       *server_thread;
 extern int			key_joystick_mapping;
 
 extern short			Feld[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern short			Last[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			MovPos[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			MovDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			MovDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
