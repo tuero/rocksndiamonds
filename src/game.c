@@ -4734,6 +4734,7 @@ void GameEnd(void)
     DrawHallOfFame(last_level_nr, hi_pos);
   }
   else if (setup.auto_play_next_level && setup.increment_levels &&
+	   last_level_nr < leveldir_current->last_level &&
 	   !network_playing)
   {
     StartGameActions(network.enabled, setup.autorecord, level.random_seed);

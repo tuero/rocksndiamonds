@@ -4662,6 +4662,7 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
 
     if (game_status_last_screen == GAME_MODE_PLAYING &&
 	setup.auto_play_next_level && setup.increment_levels &&
+	level_nr < leveldir_current->last_level &&
 	!network_playing)
     {
       StartGameActions(network.enabled, setup.autorecord, level.random_seed);
