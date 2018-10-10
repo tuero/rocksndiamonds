@@ -8917,7 +8917,7 @@ static void Life(int ax, int ay)
   {
     int xx = ax+x1, yy = ay+y1;
     int old_element = Feld[xx][yy];
-    int nachbarn = 0;
+    int num_neighbours = 0;
 
     if (!IN_LEV_FIELD(xx, yy))
       continue;
@@ -8933,13 +8933,13 @@ static void Life(int ax, int ay)
 	    (element == EL_GAME_OF_LIFE && IS_PLAYER(x, y))) &&
 	   !Stop[x][y]) ||
 	  (IS_FREE(x, y) && Stop[x][y]))
-	nachbarn++;
+	num_neighbours++;
     }
 
     if (xx == ax && yy == ay)		/* field in the middle */
     {
-      if (nachbarn < life_parameter[0] ||
-	  nachbarn > life_parameter[1])
+      if (num_neighbours < life_parameter[0] ||
+	  num_neighbours > life_parameter[1])
       {
 	Feld[xx][yy] = EL_EMPTY;
 	if (Feld[xx][yy] != old_element)
@@ -8950,8 +8950,8 @@ static void Life(int ax, int ay)
     }
     else if (IS_FREE(xx, yy) || CAN_GROW_INTO(Feld[xx][yy]))
     {					/* free border field */
-      if (nachbarn >= life_parameter[2] &&
-	  nachbarn <= life_parameter[3])
+      if (num_neighbours >= life_parameter[2] &&
+	  num_neighbours <= life_parameter[3])
       {
 	Feld[xx][yy] = element;
 	MovDelay[xx][yy] = (element == EL_GAME_OF_LIFE ? 0 : life_time-1);
