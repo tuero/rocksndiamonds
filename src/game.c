@@ -4667,6 +4667,8 @@ void GameWon(void)
 
 void GameEnd(void)
 {
+  /* used instead of "level_nr" (needed for network games) */
+  int last_level_nr = levelset.level_nr;
   int hi_pos;
 
   local_player->LevelSolved_GameEnd = TRUE;
@@ -4723,14 +4725,13 @@ void GameEnd(void)
     }
   }
 
-  /* used instead of last "level_nr" (for network games) */
-  hi_pos = NewHiScore(levelset.level_nr);
+  hi_pos = NewHiScore(last_level_nr);
 
   if (hi_pos >= 0 && !setup.skip_scores_after_game)
   {
     SetGameStatus(GAME_MODE_SCORES);
 
-    DrawHallOfFame(levelset.level_nr, hi_pos);
+    DrawHallOfFame(last_level_nr, hi_pos);
   }
   else if (setup.auto_play_next_level && setup.increment_levels &&
 	   !network_playing)
