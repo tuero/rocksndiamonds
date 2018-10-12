@@ -11081,11 +11081,8 @@ static void SetTapeActionFromMouseAction(byte *tape_action,
   tape_action[TAPE_ACTION_BUTTON] = mouse_action->button;
 }
 
-static void CheckLevelTime(void)
+static void CheckLevelSolved(void)
 {
-  int i;
-
-  /* !!! SAME CODE AS IN "GameActions()" -- FIX THIS !!! */
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
   {
     if (level.native_em_level->lev->home == 0)	/* all players at home */
@@ -11133,6 +11130,11 @@ static void CheckLevelTime(void)
     if (game_mm.game_over)				/* game lost */
       AllPlayersGone = TRUE;
   }
+}
+
+static void CheckLevelTime(void)
+{
+  int i;
 
   if (TimeFrames >= FRAMES_PER_SECOND)
   {
@@ -11297,54 +11299,7 @@ static void GameActionsExt(void)
   if (game.restart_level)
     StartGameActions(network.enabled, setup.autorecord, level.random_seed);
 
-  /* !!! SAME CODE AS IN "CheckLevelTime()" -- FIX THIS !!! */
-  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
-  {
-    if (level.native_em_level->lev->home == 0)	/* all players at home */
-    {
-      PlayerWins(local_player);
-
-      AllPlayersGone = TRUE;
-
-      level.native_em_level->lev->home = -1;
-    }
-
-    if (level.native_em_level->ply[0]->alive == 0 &&
-	level.native_em_level->ply[1]->alive == 0 &&
-	level.native_em_level->ply[2]->alive == 0 &&
-	level.native_em_level->ply[3]->alive == 0)	/* all dead */
-      AllPlayersGone = TRUE;
-  }
-  else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
-  {
-    if (game_sp.LevelSolved &&
-	!game_sp.GameOver)				/* game won */
-    {
-      PlayerWins(local_player);
-
-      game_sp.GameOver = TRUE;
-
-      AllPlayersGone = TRUE;
-    }
-
-    if (game_sp.GameOver)				/* game lost */
-      AllPlayersGone = TRUE;
-  }
-  else if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
-  {
-    if (game_mm.level_solved &&
-	!game_mm.game_over)				/* game won */
-    {
-      PlayerWins(local_player);
-
-      game_mm.game_over = TRUE;
-
-      AllPlayersGone = TRUE;
-    }
-
-    if (game_mm.game_over)				/* game lost */
-      AllPlayersGone = TRUE;
-  }
+  CheckLevelSolved();
 
   if (local_player->LevelSolved && !local_player->LevelSolved_GameEnd)
     GameWon();
@@ -11543,6 +11498,7 @@ static void GameActionsExt(void)
 
   BlitScreenToBitmap(backbuffer);
 
+  CheckLevelSolved();
   CheckLevelTime();
 
   AdvanceFrameAndPlayerCounters(-1);	/* advance counters for all players */
