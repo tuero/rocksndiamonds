@@ -14938,7 +14938,10 @@ void RequestRestartGame(char *message)
 {
   game.restart_game_message = NULL;
 
-  if (Request(message, REQ_ASK | REQ_STAY_CLOSED))
+  boolean has_started_game = hasStartedNetworkGame();
+  int request_mode = (has_started_game ? REQ_ASK : REQ_CONFIRM);
+
+  if (Request(message, request_mode | REQ_STAY_CLOSED) && has_started_game)
   {
     StartGameActions(network.enabled, setup.autorecord, level.random_seed);
   }
@@ -14977,7 +14980,9 @@ void CheckGameOver(void)
   }
 
   if (last_game_over != game_over)
-    game.restart_game_message = "Game over! Play it again?";
+    game.restart_game_message = (hasStartedNetworkGame() ?
+				 "Game over! Play it again?" :
+				 "Game over!");
 
   last_game_over = game_over;
 }

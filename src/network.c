@@ -173,6 +173,11 @@ char *getNetworkPlayerName(int player_nr)
   return(EMPTY_PLAYER_NAME);
 }
 
+boolean hasStartedNetworkGame(void)
+{
+  return !network_level.use_network_level_files;
+}
+
 static boolean hasPathSeparator(char *s)
 {
   return (strchr(s, '/') != NULL);

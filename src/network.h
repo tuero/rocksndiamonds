@@ -18,6 +18,7 @@
 #define NETWORK_STOP_BY_ERROR		1
 
 char *getNetworkPlayerName(int);
+boolean hasStartedNetworkGame(void);
 
 boolean ConnectToServer(char *, int);
 void SendToServer_PlayerName(char *);
