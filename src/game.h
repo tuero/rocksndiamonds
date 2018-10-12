@@ -100,6 +100,9 @@ struct GamePanelInfo
   struct TextPosInfo player_name;
   struct TextPosInfo level_name;
   struct TextPosInfo level_author;
+
+  /* value to determine if panel will be updated or not */
+  boolean active;
 };
 
 struct GameButtonInfo
@@ -266,7 +269,6 @@ struct PlayerInfo
 
   boolean LevelSolved_GameWon;
   boolean LevelSolved_GameEnd;
-  boolean LevelSolved_PanelOff;
   boolean LevelSolved_SaveTape;
   boolean LevelSolved_SaveScore;
 

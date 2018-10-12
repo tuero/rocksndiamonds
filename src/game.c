@@ -81,7 +81,7 @@
 #define EX_TYPE_DYNA		(1 << 4)
 #define EX_TYPE_SINGLE_TILE	(EX_TYPE_CENTER | EX_TYPE_BORDER)
 
-#define PANEL_OFF()		(local_player->LevelSolved_PanelOff)
+#define PANEL_OFF()		(game.panel.active == FALSE)
 #define	PANEL_DEACTIVATED(p)	((p)->x < 0 || (p)->y < 0 || PANEL_OFF())
 #define PANEL_XPOS(p)		(DX + ALIGNED_TEXT_XPOS(p))
 #define PANEL_YPOS(p)		(DY + ALIGNED_TEXT_YPOS(p))
@@ -3525,7 +3525,6 @@ void InitGame(void)
 
     player->LevelSolved_GameWon = FALSE;
     player->LevelSolved_GameEnd = FALSE;
-    player->LevelSolved_PanelOff = FALSE;
     player->LevelSolved_SaveTape = FALSE;
     player->LevelSolved_SaveScore = FALSE;
 
@@ -3558,6 +3557,8 @@ void InitGame(void)
   ScrollStepSize = 0;	/* will be correctly initialized by ScrollScreen() */
 
   AllPlayersGone = FALSE;
+
+  game.panel.active = TRUE;
 
   game.no_time_limit = (level.time == 0);
 
@@ -4653,7 +4654,7 @@ void GameWon(void)
     return;
   }
 
-  local_player->LevelSolved_PanelOff = TRUE;
+  game.panel.active = FALSE;
 
   if (game_over_delay_3 > 0)
   {
