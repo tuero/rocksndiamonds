@@ -6164,6 +6164,7 @@ static struct TokenInfo setup_info_game[] =
   { TYPE_SWITCH,	&setup.increment_levels,"Increment Solved Levels:" },
   { TYPE_SWITCH,	&setup.auto_play_next_level,"Auto-play Next Level:" },
   { TYPE_SWITCH,	&setup.skip_scores_after_game,"Skip Scores After Game:" },
+  { TYPE_YES_NO,	&setup.ask_on_game_over, "Ask on Game Over:"	},
   { TYPE_SWITCH,	&setup.autorecord,	"Auto-Record Tapes:"	},
   { TYPE_ENTER_LIST,	execSetupChooseGameSpeed, "Game Speed:"		},
   { TYPE_STRING,	&game_speed_text,	""			},
@@ -8211,7 +8212,8 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
 
 void HandleGameActions(void)
 {
-  CheckGameOver();
+  if (setup.ask_on_game_over)
+    CheckGameOver();
 
   if (game.restart_game_message != NULL)
   {

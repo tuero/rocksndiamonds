@@ -8365,6 +8365,7 @@ enum
   SETUP_TOKEN_VSYNC_MODE,
   SETUP_TOKEN_ASK_ON_ESCAPE,
   SETUP_TOKEN_ASK_ON_ESCAPE_EDITOR,
+  SETUP_TOKEN_ASK_ON_GAME_OVER,
   SETUP_TOKEN_QUICK_SWITCH,
   SETUP_TOKEN_INPUT_ON_FOCUS,
   SETUP_TOKEN_PREFER_AGA_GRAPHICS,
@@ -8609,6 +8610,7 @@ static struct TokenInfo global_setup_tokens[] =
   { TYPE_STRING, &si.vsync_mode,              "vsync_mode"		},
   { TYPE_SWITCH, &si.ask_on_escape,           "ask_on_escape"		},
   { TYPE_SWITCH, &si.ask_on_escape_editor,    "ask_on_escape_editor"	},
+  { TYPE_SWITCH, &si.ask_on_game_over,        "ask_on_game_over"	},
   { TYPE_SWITCH, &si.quick_switch,            "quick_player_switch"	},
   { TYPE_SWITCH, &si.input_on_focus,          "input_on_focus"		},
   { TYPE_SWITCH, &si.prefer_aga_graphics,     "prefer_aga_graphics"	},
@@ -8832,6 +8834,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->vsync_mode = getStringCopy(STR_VSYNC_MODE_DEFAULT);
   si->ask_on_escape = TRUE;
   si->ask_on_escape_editor = TRUE;
+  si->ask_on_game_over = TRUE;
   si->quick_switch = FALSE;
   si->input_on_focus = FALSE;
   si->prefer_aga_graphics = TRUE;

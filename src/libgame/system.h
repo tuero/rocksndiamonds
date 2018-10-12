@@ -1288,6 +1288,7 @@ struct SetupInfo
   char *vsync_mode;
   boolean ask_on_escape;
   boolean ask_on_escape_editor;
+  boolean ask_on_game_over;
   boolean quick_switch;
   boolean input_on_focus;
   boolean prefer_aga_graphics;
