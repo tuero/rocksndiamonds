@@ -8214,7 +8214,11 @@ void HandleGameActions(void)
   CheckGameOver();
 
   if (game.restart_game_message != NULL)
+  {
     RequestRestartGame(game.restart_game_message);
+
+    return;
+  }
 
   if (game_status != GAME_MODE_PLAYING)
     return;
