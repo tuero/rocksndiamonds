@@ -4236,12 +4236,16 @@ void WaitForEventToContinue(void)
 
 static int RequestHandleEvents(unsigned int req_state)
 {
-  boolean level_solved = (game_status == GAME_MODE_PLAYING &&
-			  local_player->LevelSolved_GameEnd);
+  boolean game_just_ended = (game_status == GAME_MODE_PLAYING &&
+			     checkGameEnded());
   int width  = request.width;
   int height = request.height;
   int sx, sy;
   int result;
+
+  /* when showing request dialog after game ended, deactivate game panel */
+  if (game_just_ended)
+    game.panel.active = FALSE;
 
   game.request_active = TRUE;
 
@@ -4254,7 +4258,7 @@ static int RequestHandleEvents(unsigned int req_state)
 
   while (result < 0)
   {
-    if (level_solved)
+    if (game_just_ended)
     {
       /* the MM game engine does not use a special (scrollable) field buffer */
       if (level.game_engine_type != GAME_ENGINE_TYPE_MM)
@@ -4533,7 +4537,7 @@ static int RequestHandleEvents(unsigned int req_state)
       }
     }
 
-    if (level_solved)
+    if (game_just_ended)
     {
       if (global.use_envelope_request)
       {
