@@ -5113,6 +5113,7 @@ static void InitGameInfo(void)
 {
   game.restart_level = FALSE;
   game.restart_game_message = NULL;
+  game.request_active = FALSE;
 }
 
 static void InitPlayerInfo(void)

@@ -1049,6 +1049,10 @@ static void HandleNetworkingDisconnect(void)
 
 void HandleNetworking(void)
 {
+  /* do not handle any networking packets if request dialog is active */
+  if (game.request_active)
+    return;
+
   char *error_message = HandleNetworkingPackets();
 
   if (error_message != NULL)

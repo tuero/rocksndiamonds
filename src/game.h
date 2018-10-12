@@ -208,6 +208,9 @@ struct GameInfo
   /* trigger message to ask for restarting the game */
   char *restart_game_message;
 
+  /* values for special request dialog control */
+  boolean request_active;
+
   /* values for special game control */
   int centered_player_nr;
   int centered_player_nr_next;

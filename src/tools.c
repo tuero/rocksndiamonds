@@ -4243,6 +4243,8 @@ static int RequestHandleEvents(unsigned int req_state)
   int sx, sy;
   int result;
 
+  game.request_active = TRUE;
+
   setRequestPosition(&sx, &sy, FALSE);
 
   button_status = MB_RELEASED;
@@ -4542,6 +4544,8 @@ static int RequestHandleEvents(unsigned int req_state)
 
     BackToFront();
   }
+
+  game.request_active = FALSE;
 
   return result;
 }
