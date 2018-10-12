@@ -418,6 +418,10 @@ void RequestQuitGameExt(boolean, boolean, char *);
 void RequestQuitGame(boolean);
 void RequestRestartGame(char *);
 
+boolean checkGameSolved(void);
+boolean checkGameFailed(void);
+boolean checkGameEnded(void);
+
 unsigned int InitEngineRandom_RND(int);
 unsigned int RND(int);
 

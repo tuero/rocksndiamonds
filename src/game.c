@@ -14949,6 +14949,32 @@ void RequestRestartGame(char *message)
   }
 }
 
+boolean checkGameSolved(void)
+{
+  /* set for all game engines if level was solved */
+  return local_player->LevelSolved_GameEnd;
+}
+
+boolean checkGameFailed(void)
+{
+  if (!AllPlayersGone)
+    return FALSE;
+
+  if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
+    return (level.native_em_level->lev->home > 0);
+  else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
+    return (game_sp.GameOver && !game_sp.LevelSolved);
+  else if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
+    return (game_mm.game_over && !game_mm.level_solved);
+  else				/* GAME_ENGINE_TYPE_RND */
+    return (local_player->GameOver && !local_player->LevelSolved);
+}
+
+boolean checkGameEnded(void)
+{
+  return (checkGameSolved() || checkGameFailed());
+}
+
 
 /* ------------------------------------------------------------------------- */
 /* random generator functions                                                */
