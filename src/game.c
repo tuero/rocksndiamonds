@@ -14949,6 +14949,38 @@ void RequestRestartGame(char *message)
   }
 }
 
+void CheckGameOver(void)
+{
+  static boolean last_game_over = FALSE;
+  static int game_over_delay = 0;
+  int game_over_delay_value = 50;
+  boolean game_over = checkGameFailed();
+
+  /* do not handle game over if request dialog is already active */
+  if (game.request_active)
+    return;
+
+  if (!game_over)
+  {
+    last_game_over = FALSE;
+    game_over_delay = game_over_delay_value;
+
+    return;
+  }
+
+  if (game_over_delay > 0)
+  {
+    game_over_delay--;
+
+    return;
+  }
+
+  if (last_game_over != game_over)
+    game.restart_game_message = "Game over! Play it again?";
+
+  last_game_over = game_over;
+}
+
 boolean checkGameSolved(void)
 {
   /* set for all game engines if level was solved */
