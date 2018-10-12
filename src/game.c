@@ -11346,7 +11346,8 @@ static void GameActionsExt(void)
     if (game_status != GAME_MODE_PLAYING)
       return;
 
-    if (!network_player_action_received)
+    /* check if network player actions still missing and game still running */
+    if (!network_player_action_received && !checkGameEnded())
       return;		/* failed to get network player actions in time */
 
     /* do not yet reset "network_player_action_received" (for tape.pausing) */
@@ -11386,7 +11387,7 @@ static void GameActionsExt(void)
       stored_player[i].effective_action = stored_player[i].action;
   }
 
-  if (network_playing)
+  if (network_playing && !checkGameEnded())
     SendToServer_MovePlayer(summarized_player_action);
 
   // summarize all actions at local players mapped input device position
