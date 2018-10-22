@@ -1993,7 +1993,7 @@ static void InitField(int x, int y, boolean init_game)
     CheckTriggeredElementChange(x, y, element, CE_CREATION_OF_X);
 }
 
-inline static void InitField_WithBug1(int x, int y, boolean init_game)
+static void InitField_WithBug1(int x, int y, boolean init_game)
 {
   InitField(x, y, init_game);
 
@@ -2003,7 +2003,7 @@ inline static void InitField_WithBug1(int x, int y, boolean init_game)
     InitMovDir(x, y);
 }
 
-inline static void InitField_WithBug2(int x, int y, boolean init_game)
+static void InitField_WithBug2(int x, int y, boolean init_game)
 {
   int old_element = Feld[x][y];
 
@@ -4809,7 +4809,7 @@ int NewHiScore(int level_nr)
   return position;
 }
 
-inline static int getElementMoveStepsizeExt(int x, int y, int direction)
+static int getElementMoveStepsizeExt(int x, int y, int direction)
 {
   int element = Feld[x][y];
   int dx = (direction == MV_LEFT ? -1 : direction == MV_RIGHT ? +1 : 0);
@@ -4831,7 +4831,7 @@ inline static int getElementMoveStepsizeExt(int x, int y, int direction)
   return step;
 }
 
-inline static int getElementMoveStepsize(int x, int y)
+static int getElementMoveStepsize(int x, int y)
 {
   return getElementMoveStepsizeExt(x, y, MovDir[x][y]);
 }
@@ -6497,7 +6497,7 @@ static void Impact(int x, int y)
     PlayLevelSoundElementAction(x, y, element, ACTION_IMPACT);
 }
 
-inline static void TurnRoundExt(int x, int y)
+static void TurnRoundExt(int x, int y)
 {
   static struct
   {

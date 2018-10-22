@@ -495,13 +495,13 @@ void SetDoorBackgroundBitmap(Bitmap *background_bitmap_tile)
 /* video functions                                                           */
 /* ========================================================================= */
 
-inline static int GetRealDepth(int depth)
+static int GetRealDepth(int depth)
 {
   return (depth == DEFAULT_DEPTH ? video.default_depth : depth);
 }
 
-inline static void sysFillRectangle(Bitmap *bitmap, int x, int y,
-				    int width, int height, Pixel color)
+static void sysFillRectangle(Bitmap *bitmap, int x, int y,
+			     int width, int height, Pixel color)
 {
   SDLFillRectangle(bitmap, x, y, width, height, color);
 
@@ -509,9 +509,9 @@ inline static void sysFillRectangle(Bitmap *bitmap, int x, int y,
     SetRedrawMaskFromArea(x, y, width, height);
 }
 
-inline static void sysCopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
-			       int src_x, int src_y, int width, int height,
-			       int dst_x, int dst_y, int mask_mode)
+static void sysCopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
+			int src_x, int src_y, int width, int height,
+			int dst_x, int dst_y, int mask_mode)
 {
   SDLCopyArea(src_bitmap, dst_bitmap, src_x, src_y, width, height,
 	      dst_x, dst_y, mask_mode);
@@ -580,7 +580,7 @@ void InitVideoBuffer(int width, int height, int depth, boolean fullscreen)
   drawto = backbuffer;
 }
 
-inline static void FreeBitmapPointers(Bitmap *bitmap)
+static void FreeBitmapPointers(Bitmap *bitmap)
 {
   if (bitmap == NULL)
     return;
@@ -591,8 +591,8 @@ inline static void FreeBitmapPointers(Bitmap *bitmap)
   bitmap->source_filename = NULL;
 }
 
-inline static void TransferBitmapPointers(Bitmap *src_bitmap,
-					  Bitmap *dst_bitmap)
+static void TransferBitmapPointers(Bitmap *src_bitmap,
+				   Bitmap *dst_bitmap)
 {
   if (src_bitmap == NULL || dst_bitmap == NULL)
     return;
@@ -687,8 +687,8 @@ void SetRedrawMaskFromArea(int x, int y, int width, int height)
     redraw_mask = REDRAW_ALL;
 }
 
-inline static boolean CheckDrawingArea(int x, int y, int width, int height,
-				       int draw_mask)
+static boolean CheckDrawingArea(int x, int y, int width, int height,
+				int draw_mask)
 {
   if (draw_mask == REDRAW_NONE)
     return FALSE;

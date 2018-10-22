@@ -177,7 +177,7 @@ void InitGadgets(void)
   gadgets_initialized = TRUE;
 }
 
-inline static void InitElementSmallImagesScaledUp(int graphic)
+static void InitElementSmallImagesScaledUp(int graphic)
 {
   struct GraphicInfo *g = &graphic_info[graphic];
 
@@ -240,7 +240,7 @@ static void InitElementSmallImages(void)
   print_timestamp_done("InitElementSmallImages");
 }
 
-inline static void InitScaledImagesScaledUp(int graphic)
+static void InitScaledImagesScaledUp(int graphic)
 {
   struct GraphicInfo *g = &graphic_info[graphic];
 

@@ -436,7 +436,7 @@ char *setLevelArtworkDir(TreeInfo *ti)
   return *artwork_set_ptr;
 }
 
-inline static char *getLevelArtworkSet(int type)
+static char *getLevelArtworkSet(int type)
 {
   if (leveldir_current == NULL)
     return NULL;
@@ -444,7 +444,7 @@ inline static char *getLevelArtworkSet(int type)
   return LEVELDIR_ARTWORK_SET(leveldir_current, type);
 }
 
-inline static char *getLevelArtworkDir(int type)
+static char *getLevelArtworkDir(int type)
 {
   if (leveldir_current == NULL)
     return UNDEFINED_FILENAME;

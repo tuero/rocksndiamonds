@@ -1610,8 +1610,8 @@ void getMiniGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
   getSizedGraphicSource(graphic, 0, MINI_TILESIZE, bitmap, x, y);
 }
 
-inline static void getGraphicSourceExt(int graphic, int frame, Bitmap **bitmap,
-				       int *x, int *y, boolean get_backside)
+static void getGraphicSourceExt(int graphic, int frame, Bitmap **bitmap,
+				int *x, int *y, boolean get_backside)
 {
   getSizedGraphicSourceExt(graphic, frame, TILESIZE_VAR, bitmap, x, y,
 			   get_backside);
@@ -1783,9 +1783,9 @@ void DrawMiniGraphicExt(DrawBuffer *d, int x, int y, int graphic)
   BlitBitmap(src_bitmap, d, src_x, src_y, MINI_TILEX, MINI_TILEY, x, y);
 }
 
-inline static void DrawGraphicShiftedNormal(int x, int y, int dx, int dy,
-					    int graphic, int frame,
-					    int cut_mode, int mask_mode)
+static void DrawGraphicShiftedNormal(int x, int y, int dx, int dy,
+				     int graphic, int frame,
+				     int cut_mode, int mask_mode)
 {
   Bitmap *src_bitmap;
   int src_x, src_y;
@@ -1894,9 +1894,9 @@ inline static void DrawGraphicShiftedNormal(int x, int y, int dx, int dy,
   }
 }
 
-inline static void DrawGraphicShiftedDouble(int x, int y, int dx, int dy,
-					    int graphic, int frame,
-					    int cut_mode, int mask_mode)
+static void DrawGraphicShiftedDouble(int x, int y, int dx, int dy,
+				     int graphic, int frame,
+				     int cut_mode, int mask_mode)
 {
   Bitmap *src_bitmap;
   int src_x, src_y;
@@ -3692,9 +3692,9 @@ void ClearNetworkPlayers(void)
   DrawNetworkPlayersExt(TRUE);
 }
 
-inline static void DrawGraphicAnimationExt(DrawBuffer *dst_bitmap, int x, int y,
-					   int graphic, int sync_frame,
-					   int mask_mode)
+static void DrawGraphicAnimationExt(DrawBuffer *dst_bitmap, int x, int y,
+				    int graphic, int sync_frame,
+				    int mask_mode)
 {
   int frame = getGraphicAnimationFrame(graphic, sync_frame);
 
@@ -3715,7 +3715,7 @@ void DrawFixedGraphicAnimationExt(DrawBuffer *dst_bitmap, int x, int y,
     DrawFixedGraphicExt(dst_bitmap, x, y, graphic, frame);
 }
 
-inline static void DrawGraphicAnimation(int x, int y, int graphic)
+static void DrawGraphicAnimation(int x, int y, int graphic)
 {
   int lx = LEVELX(x), ly = LEVELY(y);
 
@@ -8159,7 +8159,7 @@ unsigned int InitRND(int seed)
 static struct Mapping_EM_to_RND_object object_mapping[TILE_MAX];
 static struct Mapping_EM_to_RND_player player_mapping[MAX_PLAYERS][SPR_MAX];
 
-inline static int get_effective_element_EM(int tile, int frame_em)
+static int get_effective_element_EM(int tile, int frame_em)
 {
   int element             = object_mapping[tile].element_rnd;
   int action              = object_mapping[tile].action;
@@ -8226,7 +8226,7 @@ inline static int get_effective_element_EM(int tile, int frame_em)
   }
 }
 
-inline static boolean check_linear_animation_EM(int tile)
+static boolean check_linear_animation_EM(int tile)
 {
   switch (tile)
   {
@@ -8262,9 +8262,9 @@ inline static boolean check_linear_animation_EM(int tile)
   return FALSE;
 }
 
-inline static void set_crumbled_graphics_EM(struct GraphicInfo_EM *g_em,
-					    boolean has_crumbled_graphics,
-					    int crumbled, int sync_frame)
+static void set_crumbled_graphics_EM(struct GraphicInfo_EM *g_em,
+				     boolean has_crumbled_graphics,
+				     int crumbled, int sync_frame)
 {
   /* if element can be crumbled, but certain action graphics are just empty
      space (like instantly snapping sand to empty space in 1 frame), do not

@@ -525,7 +525,7 @@ void SDLInitVideoDisplay(void)
 #endif
 }
 
-inline static void SDLInitVideoBuffer_VideoBuffer(boolean fullscreen)
+static void SDLInitVideoBuffer_VideoBuffer(boolean fullscreen)
 {
   if (program.headless)
     return;
@@ -555,7 +555,7 @@ inline static void SDLInitVideoBuffer_VideoBuffer(boolean fullscreen)
   SDLSetWindowTitle();
 }
 
-inline static void SDLInitVideoBuffer_DrawBuffer(void)
+static void SDLInitVideoBuffer_DrawBuffer(void)
 {
   /* SDL cannot directly draw to the visible video framebuffer like X11,
      but always uses a backbuffer, which is then blitted to the visible
