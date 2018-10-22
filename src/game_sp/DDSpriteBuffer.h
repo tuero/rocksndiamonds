@@ -8,6 +8,6 @@
 #include "global.h"
 
 
-extern void DDSpriteBuffer_BltImg(int pX, int pY, int graphic, int sync_frame);
+void DDSpriteBuffer_BltImg(int pX, int pY, int graphic, int sync_frame);
 
 #endif /* DDSPRITEBUFFER_H */

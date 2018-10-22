@@ -8,10 +8,10 @@
 #include "global.h"
 
 
-extern void ExplodeFieldSP(int);
-extern void subAnimateExplosion(int);
-extern void subClearFieldDueToExplosion(int);
-extern void subFollowUpExplosions(void);
-extern void subRedDiskReleaseExplosion(void);
+void ExplodeFieldSP(int);
+void subAnimateExplosion(int);
+void subClearFieldDueToExplosion(int);
+void subFollowUpExplosions(void);
+void subRedDiskReleaseExplosion(void);
 
 #endif /* EXPLOSIONS_H */

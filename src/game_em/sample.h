@@ -4,8 +4,8 @@
 #include "main_em.h"
 
 
-extern void play_sound(int, int, int);
-extern void play_element_sound(int, int, int, int);
+void play_sound(int, int, int);
+void play_element_sound(int, int, int, int);
 
 extern char play[SAMPLE_MAX];
 extern int sound_pipe[2];

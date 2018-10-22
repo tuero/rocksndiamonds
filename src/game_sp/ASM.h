@@ -8,11 +8,11 @@
 #include "global.h"
 
 
-extern void MovLowByte(int *, int);
-extern void MovHighByte(int *, int);
-extern int LowByte(int);
-extern int HighByte(int);
-extern int SgnHighByte(int);
-extern int ByteToInt(byte);
+void MovLowByte(int *, int);
+void MovHighByte(int *, int);
+int LowByte(int);
+int HighByte(int);
+int SgnHighByte(int);
+int ByteToInt(byte);
 
 #endif /* ASM_H */

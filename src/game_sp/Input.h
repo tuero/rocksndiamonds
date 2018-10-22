@@ -8,6 +8,6 @@
 #include "global.h"
 
 
-extern void subProcessKeyboardInput(byte);
+void subProcessKeyboardInput(byte);
 
 #endif /* INPUT_H */

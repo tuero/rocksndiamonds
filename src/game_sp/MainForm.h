@@ -8,20 +8,20 @@
 #include "global.h"
 
 
-extern void DrawFrameIfNeeded(void);
+void DrawFrameIfNeeded(void);
 
-extern void DisplayLevel(void);
-extern void DrawField(int X, int Y);
-extern void DrawFieldAnimated(int X, int Y);
-extern void DrawFieldNoAnimated(int X, int Y);
-extern void DrawSprite(int X, int Y, int SpritePos);
-extern void DrawImage(int X, int Y, int graphic);
+void DisplayLevel(void);
+void DrawField(int X, int Y);
+void DrawFieldAnimated(int X, int Y);
+void DrawFieldNoAnimated(int X, int Y);
+void DrawSprite(int X, int Y, int SpritePos);
+void DrawImage(int X, int Y, int graphic);
 
-extern void SetDisplayRegion(void);
-extern void SetScrollEdges(void);
+void SetDisplayRegion(void);
+void SetScrollEdges(void);
 
-extern void menPlay_Click(void);
+void menPlay_Click(void);
 
-extern void Form_Load(void);
+void Form_Load(void);
 
 #endif /* MAINFORM_H */

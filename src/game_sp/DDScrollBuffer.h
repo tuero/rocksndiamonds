@@ -12,12 +12,12 @@ extern int mScrollX, mScrollY;
 extern int mScrollX_last, mScrollY_last;
 
 
-extern void InitScrollPlayfield(void);
-extern void UpdatePlayfield(boolean);
-extern void RestorePlayfield(void);
+void InitScrollPlayfield(void);
+void UpdatePlayfield(boolean);
+void RestorePlayfield(void);
 
-extern void DDScrollBuffer_ScrollTo(int X, int Y);
-extern void DDScrollBuffer_ScrollTowards(int X, int Y, double Step);
-extern void DDScrollBuffer_SoftScrollTo(int X, int Y, int TimeMS, int FPS);
+void DDScrollBuffer_ScrollTo(int X, int Y);
+void DDScrollBuffer_ScrollTowards(int X, int Y, double Step);
+void DDScrollBuffer_SoftScrollTo(int X, int Y, int TimeMS, int FPS);
 
 #endif /* DDSCROLLBUFFER_H */

@@ -8,6 +8,6 @@
 #include "global.h"
 
 
-extern void subAnimateOrangeDisks(int);
+void subAnimateOrangeDisks(int);
 
 #endif /* ORANGEDISK_H */

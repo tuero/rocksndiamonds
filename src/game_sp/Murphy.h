@@ -9,12 +9,12 @@
 
 void SaveEngineSnapshotValues_SP_Murphy(ListNode **);
 
-extern void subAdjustZonksInfotronsAboveMurphy(int);
-extern void subAnimateMurphy(int *);
-extern void subCopyFieldToScreen(int, int);
-extern void subCopyImageToScreen(int, int);
-extern void subCopyAnimToScreen(int, int, int);
-extern void subExplodeSnikSnaksBelow(int);
-extern void subSpPortTest(int);
+void subAdjustZonksInfotronsAboveMurphy(int);
+void subAnimateMurphy(int *);
+void subCopyFieldToScreen(int, int);
+void subCopyImageToScreen(int, int);
+void subCopyAnimToScreen(int, int, int);
+void subExplodeSnikSnaksBelow(int);
+void subSpPortTest(int);
 
 #endif /* MURPHY_H */

@@ -8,7 +8,7 @@
 #include "global.h"
 
 
-extern void subAnimateSnikSnaks(int);
-extern void subDrawAnimatedSnikSnaks(int);
+void subAnimateSnikSnaks(int);
+void subDrawAnimatedSnikSnaks(int);
 
 #endif /* SNIKSNAKS_H */

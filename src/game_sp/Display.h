@@ -16,9 +16,9 @@ extern boolean NoDisplayFlag;
 extern int DisplayMinX, DisplayMaxX;
 extern int DisplayMinY, DisplayMaxY;
 
-extern void subDisplayLevel(void);
-extern void ScrollTo(int, int);
-extern void ScrollTowards(int, int);
-extern void SoftScrollTo(int, int, int, int);
+void subDisplayLevel(void);
+void ScrollTo(int, int);
+void ScrollTowards(int, int);
+void SoftScrollTo(int, int, int, int);
 
 #endif /* DISPLAY_H */

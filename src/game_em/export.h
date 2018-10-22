@@ -734,32 +734,32 @@ extern struct GraphicInfo_EM graphic_info_em_object[TILE_MAX][8];
 extern struct GraphicInfo_EM graphic_info_em_player[MAX_PLAYERS][SPR_MAX][8];
 extern struct EngineSnapshotInfo_EM engine_snapshot_em;
 
-extern void em_open_all(void);
-extern void em_close_all(void);
+void em_open_all(void);
+void em_close_all(void);
 
-extern void InitGfxBuffers_EM(void);
+void InitGfxBuffers_EM(void);
 
-extern void InitGameEngine_EM(void);
-extern void GameActions_EM(byte *, boolean);
+void InitGameEngine_EM(void);
+void GameActions_EM(byte *, boolean);
 
-extern unsigned int InitEngineRandom_EM(int);
+unsigned int InitEngineRandom_EM(int);
 
-extern void setLevelInfoToDefaults_EM(void);
-extern boolean LoadNativeLevel_EM(char *, boolean);
+void setLevelInfoToDefaults_EM(void);
+boolean LoadNativeLevel_EM(char *, boolean);
 
-extern int getFieldbufferOffsetX_EM(void);
-extern int getFieldbufferOffsetY_EM(void);
+int getFieldbufferOffsetX_EM(void);
+int getFieldbufferOffsetY_EM(void);
 
-extern void BackToFront_EM(void);
-extern void BlitScreenToBitmap_EM(Bitmap *);
-extern void RedrawPlayfield_EM(boolean);
+void BackToFront_EM(void);
+void BlitScreenToBitmap_EM(Bitmap *);
+void RedrawPlayfield_EM(boolean);
 
-extern void LoadEngineSnapshotValues_EM(void);
-extern void SaveEngineSnapshotValues_EM(void);
+void LoadEngineSnapshotValues_EM(void);
+void SaveEngineSnapshotValues_EM(void);
 
-extern boolean checkIfAllPlayersFitToScreen(void);
+boolean checkIfAllPlayersFitToScreen(void);
 
-extern void tab_generate(void);
-extern void tab_generate_graphics_info_em(void);
+void tab_generate(void);
+void tab_generate_graphics_info_em(void);
 
 #endif	/* EXPORT_H */

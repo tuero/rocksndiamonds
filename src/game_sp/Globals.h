@@ -265,20 +265,20 @@ typedef struct
 #endif
 
 
-extern int GetSI(int X, int Y);
-extern int GetStretchX(int si);
-extern int GetStretchY(int si);
-extern int GetX(int si);
-extern int GetY(int si);
-extern void InitGlobals(void);
+int GetSI(int X, int Y);
+int GetStretchX(int si);
+int GetStretchY(int si);
+int GetX(int si);
+int GetY(int si);
+void InitGlobals(void);
 
-extern void PrepareLevel(void);
+void PrepareLevel(void);
 
-extern int getSequenceLength(int sequence);
-extern boolean isSnappingSequence(int sequence);
+int getSequenceLength(int sequence);
+boolean isSnappingSequence(int sequence);
 
-extern int Min(int A, int B);
-extern int Max(int A, int B);
+int Min(int A, int B);
+int Max(int A, int B);
 
 extern int fiGraphic[];
 extern int aniSnikSnakTurningLeft[];

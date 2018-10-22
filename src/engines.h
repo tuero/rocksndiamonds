@@ -25,16 +25,15 @@
 /* functions and definitions exported from main program to game_em           */
 /* ========================================================================= */
 
-extern void SetBitmaps_EM(Bitmap **);
-extern void UpdateEngineValues(int, int, int, int);
+void SetBitmaps_EM(Bitmap **);
+void UpdateEngineValues(int, int, int, int);
 
-extern boolean getTeamMode_EM(void);
-extern int getGameFrameDelay_EM(int);
+boolean getTeamMode_EM(void);
+int getGameFrameDelay_EM(int);
 
-extern void PlayLevelSound_EM(int, int, int, int);
-extern void InitGraphicInfo_EM(void);
-extern void CheckSingleStepMode_EM(byte action[], int,
-				   boolean, boolean, boolean);
+void PlayLevelSound_EM(int, int, int, int);
+void InitGraphicInfo_EM(void);
+void CheckSingleStepMode_EM(byte action[], int, boolean, boolean, boolean);
 
 void SetGfxAnimation_EM(struct GraphicInfo_EM *, int, int, int, int);
 void getGraphicSourceObjectExt_EM(struct GraphicInfo_EM *, int, int, int, int);

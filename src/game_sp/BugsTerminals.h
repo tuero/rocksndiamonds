@@ -11,9 +11,9 @@ extern byte TerminalState[SP_MAX_PLAYFIELD_SIZE + SP_HEADER_SIZE];
 
 extern int TerminalMaxCycles;
 
-extern void subAnimateBugs(int si);
-extern void subAnimateTerminals(int si);
-extern void subRandomize(void);
-extern int subGetRandomNumber(void);
+void subAnimateBugs(int si);
+void subAnimateTerminals(int si);
+void subRandomize(void);
+int subGetRandomNumber(void);
 
 #endif /* BUGSTERMINALS_H */
