@@ -261,8 +261,8 @@ void Delay_WithScreenUpdates(unsigned int delay)
 
 static void SDLSetWindowIcon(char *basename)
 {
-  /* (setting the window icon on Mac OS X would replace the high-quality
-     dock icon with the currently smaller (and uglier) icon from file) */
+  // (setting the window icon on Mac OS X would replace the high-quality
+  // dock icon with the currently smaller (and uglier) icon from file)
 
 #if !defined(PLATFORM_MACOSX)
   char *filename = getCustomImageFilename(basename);
@@ -1996,11 +1996,9 @@ void SDLPutPixel(Bitmap *dst_bitmap, int x, int y, Pixel pixel)
 }
 
 
-/*
-  -----------------------------------------------------------------------------
-  quick (no, it's slow) and dirty hack to "invert" rectangle inside SDL surface
-  -----------------------------------------------------------------------------
-*/
+// ----------------------------------------------------------------------------
+// quick (no, it's slow) and dirty hack to "invert" rectangle inside SDL surface
+// ----------------------------------------------------------------------------
 
 void SDLInvertArea(Bitmap *bitmap, int src_x, int src_y,
 		   int width, int height, Uint32 color)
@@ -2043,13 +2041,11 @@ void SDLCopyInverseMasked(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 // http://www.ferzkopp.net/Software/SDL_gfx-2.0/index.html
 // ============================================================================
 
-/*
-  -----------------------------------------------------------------------------
-  32 bit zoomer
-
-  zoomes 32bit RGBA/ABGR 'src' surface to 'dst' surface.
-  -----------------------------------------------------------------------------
-*/
+// ----------------------------------------------------------------------------
+// 32 bit zoomer
+//
+// zoomes 32bit RGBA/ABGR 'src' surface to 'dst' surface.
+// ----------------------------------------------------------------------------
 
 typedef struct
 {
@@ -2175,13 +2171,11 @@ static int zoomSurfaceRGBA(SDL_Surface *src, SDL_Surface *dst)
   return 0;
 }
 
-/*
-  -----------------------------------------------------------------------------
-  8 bit zoomer
-
-  zoomes 8 bit palette/Y 'src' surface to 'dst' surface
-  -----------------------------------------------------------------------------
-*/
+// ----------------------------------------------------------------------------
+// 8 bit zoomer
+//
+// zoomes 8 bit palette/Y 'src' surface to 'dst' surface
+// ----------------------------------------------------------------------------
 
 static int zoomSurfaceY(SDL_Surface * src, SDL_Surface * dst)
 {
@@ -2272,16 +2266,14 @@ static int zoomSurfaceY(SDL_Surface * src, SDL_Surface * dst)
   return 0;
 }
 
-/*
-  -----------------------------------------------------------------------------
-  zoomSurface()
-
-  Zooms a 32bit or 8bit 'src' surface to newly created 'dst' surface.
-  'zoomx' and 'zoomy' are scaling factors for width and height.
-  If the surface is not 8bit or 32bit RGBA/ABGR it will be converted
-  into a 32bit RGBA format on the fly.
-  -----------------------------------------------------------------------------
-*/
+// ----------------------------------------------------------------------------
+// zoomSurface()
+//
+// Zooms a 32bit or 8bit 'src' surface to newly created 'dst' surface.
+// 'zoomx' and 'zoomy' are scaling factors for width and height.
+// If the surface is not 8bit or 32bit RGBA/ABGR it will be converted
+// into a 32bit RGBA format on the fly.
+// ----------------------------------------------------------------------------
 
 static SDL_Surface *zoomSurface(SDL_Surface *src, int dst_width, int dst_height)
 {

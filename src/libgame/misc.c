@@ -259,8 +259,7 @@ void PrintLineWithPrefix(char *prefix, char *line_chars, int line_length)
    the used memory is static, but will be overwritten by later calls,
    so if you want to save the result, copy it to a private string buffer;
    there can be 10 local calls of int2str() without buffering the result --
-   the 11th call will then destroy the result from the first call and so on.
-*/
+   the 11th call will then destroy the result from the first call and so on. */
 
 char *int2str(int number, int size)
 {
@@ -286,9 +285,9 @@ char *int2str(int number, int size)
 }
 
 
-/* something similar to "int2str()" above, but allocates its own memory
-   and has a different interface; we cannot use "itoa()", because this
-   seems to be already defined when cross-compiling to the win32 target */
+// something similar to "int2str()" above, but allocates its own memory
+// and has a different interface; we cannot use "itoa()", because this
+// seems to be already defined when cross-compiling to the win32 target
 
 char *i_to_a(unsigned int i)
 {
@@ -307,8 +306,8 @@ char *i_to_a(unsigned int i)
 }
 
 
-/* calculate base-2 logarithm of argument (rounded down to integer;
-   this function returns the number of the highest bit set in argument) */
+// calculate base-2 logarithm of argument (rounded down to integer;
+// this function returns the number of the highest bit set in argument)
 
 int log_2(unsigned int x)
 {
@@ -535,13 +534,13 @@ static char *get_corrected_real_name(char *real_name)
   // copy the name string, but not more than MAX_USERNAME_LEN characters
   while (*from_ptr && (int)(to_ptr - real_name_new) < MAX_USERNAME_LEN - 1)
   {
-    /* the name field read from "passwd" file may also contain additional
-       user information, separated by commas, which will be removed here */
+    // the name field read from "passwd" file may also contain additional
+    // user information, separated by commas, which will be removed here
     if (*from_ptr == ',')
       break;
 
-    /* the user's real name may contain 'german sharp s' characters,
-       which have no equivalent in upper case letters (used by our fonts) */
+    // the user's real name may contain 'german sharp s' characters,
+    // which have no equivalent in upper case letters (used by our fonts)
     if (*from_ptr == CHAR_BYTE_SHARP_S)
     {
       from_ptr++;
@@ -2736,8 +2735,8 @@ static char *get_special_base_token(struct ArtworkListInfo *artwork_info,
   return getStringCopyN(token, strlen(token) - len_suffix);
 }
 
-/* This function checks if a string <s> of the format "string1, string2, ..."
-   exactly contains a string <s_contained>. */
+// This function checks if a string <s> of the format "string1, string2, ..."
+// exactly contains a string <s_contained>.
 
 static boolean string_has_parameter(char *s, char *s_contained)
 {
@@ -3758,9 +3757,9 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
   // check if the old and the new artwork file are the same
   if (*listnode && strEqual((*listnode)->source_filename, filename))
   {
-    /* The old and new artwork are the same (have the same filename and path).
-       This usually means that this artwork does not exist in this artwork set
-       and a fallback to the existing artwork is done. */
+    // The old and new artwork are the same (have the same filename and path).
+    // This usually means that this artwork does not exist in this artwork set
+    // and a fallback to the existing artwork is done.
 
     return;
   }

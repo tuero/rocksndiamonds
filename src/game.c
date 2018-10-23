@@ -2046,8 +2046,8 @@ static int get_next_dropped_element(struct PlayerInfo *player)
 
 static int get_inventory_element_from_pos(struct PlayerInfo *player, int pos)
 {
-  /* pos >= 0: get element from bottom of the stack;
-     pos <  0: get element from top of the stack */
+  // pos >= 0: get element from bottom of the stack;
+  // pos <  0: get element from top of the stack
 
   if (pos < 0)
   {
@@ -2780,13 +2780,11 @@ void DrawGameDoorValues(void)
 }
 
 
-/*
-  =============================================================================
-  InitGameEngine()
-  -----------------------------------------------------------------------------
-  initialize game engine due to level / tape version number
-  =============================================================================
-*/
+// ============================================================================
+// InitGameEngine()
+// ----------------------------------------------------------------------------
+// initialize game engine due to level / tape version number
+// ============================================================================
 
 static void InitGameEngine(void)
 {
@@ -3270,13 +3268,11 @@ static int get_num_special_action(int element, int action_first,
 }
 
 
-/*
-  =============================================================================
-  InitGame()
-  -----------------------------------------------------------------------------
-  initialize and start new game
-  =============================================================================
-*/
+// ============================================================================
+// InitGame()
+// ----------------------------------------------------------------------------
+// initialize and start new game
+// ============================================================================
 
 #if DEBUG_INIT_PLAYER
 static void DebugPrintPlayerStatus(char *message)
@@ -3724,8 +3720,8 @@ void InitGame(void)
   }
   else if (network.enabled)
   {
-    /* add team mode players connected over the network (needed for correct
-       assignment of player figures from level to locally playing players) */
+    // add team mode players connected over the network (needed for correct
+    // assignment of player figures from level to locally playing players)
 
     for (i = 0; i < MAX_PLAYERS; i++)
       if (stored_player[i].connected_network)
@@ -3733,8 +3729,8 @@ void InitGame(void)
   }
   else if (game.team_mode)
   {
-    /* try to guess locally connected team mode players (needed for correct
-       assignment of player figures from level to locally playing players) */
+    // try to guess locally connected team mode players (needed for correct
+    // assignment of player figures from level to locally playing players)
 
     for (i = 0; i < MAX_PLAYERS; i++)
       if (setup.input[i].use_joystick ||
@@ -4006,8 +4002,8 @@ void InitGame(void)
   if (EVEN(SCR_FIELDY) && full_lev_fieldy > SCR_FIELDY)
     SBY_Upper--;
 
-  /* if local player not found, look for custom element that might create
-     the player (make some assumptions about the right custom element) */
+  // if local player not found, look for custom element that might create
+  // the player (make some assumptions about the right custom element)
   if (!local_player->present)
   {
     int start_x = 0, start_y = 0;
@@ -4893,9 +4889,9 @@ static void InitMovingField(int x, int y, int direction)
   is_moving_before = (WasJustMoving[x][y] != 0);
   is_moving_after  = (getElementMoveStepsizeExt(x, y, direction)    != 0);
 
-  /* reset animation only for moving elements which change direction of moving
-     or which just started or stopped moving
-     (else CEs with property "can move" / "not moving" are reset each frame) */
+  // reset animation only for moving elements which change direction of moving
+  // or which just started or stopped moving
+  // (else CEs with property "can move" / "not moving" are reset each frame)
   if (is_moving_before != is_moving_after ||
       direction != MovDir[x][y])
     ResetGfxAnimation(x, y);
@@ -4970,9 +4966,9 @@ static int MovingOrBlocked2Element(int x, int y)
 
 static int MovingOrBlocked2ElementIfNotLeaving(int x, int y)
 {
-  /* like MovingOrBlocked2Element(), but if element is moving
-     and (x,y) is the field the moving element is just leaving,
-     return EL_BLOCKED instead of the element value */
+  // like MovingOrBlocked2Element(), but if element is moving
+  // and (x,y) is the field the moving element is just leaving,
+  // return EL_BLOCKED instead of the element value
   int element = Feld[x][y];
 
   if (IS_MOVING(x, y))
@@ -5026,9 +5022,9 @@ static void RemoveMovingField(int x, int y)
 
     if (Feld[newx][newy] != EL_BLOCKED)
     {
-      /* element is moving, but target field is not free (blocked), but
-	 already occupied by something different (example: acid pool);
-	 in this case, only remove the moving field, but not the target */
+      // element is moving, but target field is not free (blocked), but
+      // already occupied by something different (example: acid pool);
+      // in this case, only remove the moving field, but not the target
 
       RemoveField(oldx, oldy);
 
@@ -5493,8 +5489,8 @@ static void Explode(int ex, int ey, int phase, int mode)
 	  Store[x][y] = EL_EMPTY;
       }
 
-      /* !!! check this case -- currently needed for rnd_rado_negundo_v,
-	 !!! levels 015 018 019 020 021 022 023 026 027 028 !!! */
+      // !!! check this case -- currently needed for rnd_rado_negundo_v,
+      // !!! levels 015 018 019 020 021 022 023 026 027 028 !!!
       else if (ELEM_IS_PLAYER(center_element))
 	Store[x][y] = EL_EMPTY;
       else if (center_element == EL_YAMYAM)
@@ -5502,9 +5498,9 @@ static void Explode(int ex, int ey, int phase, int mode)
       else if (element_info[center_element].content.e[xx][yy] != EL_EMPTY)
 	Store[x][y] = element_info[center_element].content.e[xx][yy];
 #if 1
-      /* needed because EL_BD_BUTTERFLY is not defined as "CAN_EXPLODE"
-	 (killing EL_BD_BUTTERFLY with dynamite would result in BD diamond
-	 otherwise) -- FIX THIS !!! */
+      // needed because EL_BD_BUTTERFLY is not defined as "CAN_EXPLODE"
+      // (killing EL_BD_BUTTERFLY with dynamite would result in BD diamond
+      // otherwise) -- FIX THIS !!!
       else if (!CAN_EXPLODE(element) && element != EL_BD_BUTTERFLY)
 	Store[x][y] = element_info[element].content.e[1][1];
 #else
@@ -5580,9 +5576,9 @@ static void Explode(int ex, int ey, int phase, int mode)
       border_explosion = TRUE;
     }
 
-    /* if an element just explodes due to another explosion (chain-reaction),
-       do not immediately end the new explosion when it was the last frame of
-       the explosion (as it would be done in the following "if"-statement!) */
+    // if an element just explodes due to another explosion (chain-reaction),
+    // do not immediately end the new explosion when it was the last frame of
+    // the explosion (as it would be done in the following "if"-statement!)
     if (border_explosion && phase == last_phase)
       return;
   }
@@ -7781,8 +7777,8 @@ static void StartMoving(int x, int y)
 
     if (!MovDelay[x][y])	// start new movement phase
     {
-      /* all objects that can change their move direction after each step
-	 (YAMYAM, DARK_YAMYAM and PACMAN go straight until they hit a wall */
+      // all objects that can change their move direction after each step
+      // (YAMYAM, DARK_YAMYAM and PACMAN go straight until they hit a wall
 
       if (element != EL_YAMYAM &&
 	  element != EL_DARK_YAMYAM &&
@@ -8729,8 +8725,8 @@ static void AmoebaDisappearing(int x, int y)
       Feld[x][y] = EL_EMPTY;
       TEST_DrawLevelField(x, y);
 
-      /* don't let mole enter this field in this cycle;
-	 (give priority to objects falling to this field from above) */
+      // don't let mole enter this field in this cycle;
+      // (give priority to objects falling to this field from above)
       Stop[x][y] = TRUE;
     }
   }
@@ -10217,8 +10213,8 @@ static void CreateFieldExt(int x, int y, int element, boolean is_change)
       TEST_DrawLevelFieldCrumbledNeighbours(x, y);
   }
 
-  /* check if element under the player changes from accessible to unaccessible
-     (needed for special case of dropping element which then changes) */
+  // check if element under the player changes from accessible to unaccessible
+  // (needed for special case of dropping element which then changes)
   // (must be checked after creating new element for walkable group elements)
   if (IS_PLAYER(x, y) && !player_explosion_protected &&
       IS_ACCESSIBLE(old_element) && !IS_ACCESSIBLE(new_element))
@@ -10253,8 +10249,8 @@ static void CreateElementFromChange(int x, int y, int element)
   {
     int old_element = Feld[x][y];
 
-    /* prevent changed element from moving in same engine frame
-       unless both old and new element can either fall or move */
+    // prevent changed element from moving in same engine frame
+    // unless both old and new element can either fall or move
     if ((!CAN_FALL(old_element) || !CAN_FALL(element)) &&
 	(!CAN_MOVE(old_element) || !CAN_MOVE(element)))
       Stop[x][y] = TRUE;
@@ -10507,8 +10503,8 @@ static void HandleElementChange(int x, int y, int page)
 	This can also be seen from the debug output for this test element.)
       */
 
-      /* when a custom element is about to change (for example by change delay),
-	 do not reset graphic animation when the custom element is moving */
+      // when a custom element is about to change (for example by change delay),
+      // do not reset graphic animation when the custom element is moving
       if (game.graphics_engine_version < 4 &&
 	  !IS_MOVING(x, y))
       {
@@ -10629,9 +10625,9 @@ static boolean CheckTriggeredElementChangeExt(int trigger_x, int trigger_y,
 	    {
 	      if (change->can_change && !change_done)
 	      {
-		/* if element already changed in this frame, not only prevent
-		   another element change (checked in ChangeElement()), but
-		   also prevent additional element actions for this element */
+		// if element already changed in this frame, not only prevent
+		// another element change (checked in ChangeElement()), but
+		// also prevent additional element actions for this element
 
 		if (ChangeCount[x][y] >= game.max_num_changes_per_frame &&
 		    !level.use_action_after_change_bug)
@@ -10644,9 +10640,9 @@ static boolean CheckTriggeredElementChangeExt(int trigger_x, int trigger_y,
 	      }
 	      else if (change->has_action)
 	      {
-		/* if element already changed in this frame, not only prevent
-		   another element change (checked in ChangeElement()), but
-		   also prevent additional element actions for this element */
+		// if element already changed in this frame, not only prevent
+		// another element change (checked in ChangeElement()), but
+		// also prevent additional element actions for this element
 
 		if (ChangeCount[x][y] >= game.max_num_changes_per_frame &&
 		    !level.use_action_after_change_bug)

@@ -13,9 +13,9 @@
 #include "main.h"
 
 
-/* List values that are not defined in the configuration file are set to
-   reliable default values. If that value is GFX_ARG_UNDEFINED, it will
-   be dynamically determined, using some of the other list values. */
+// List values that are not defined in the configuration file are set to
+// reliable default values. If that value is GFX_ARG_UNDEFINED, it will
+// be dynamically determined, using some of the other list values.
 
 struct ConfigTypeInfo image_config_suffix[] =
 {
@@ -7354,8 +7354,8 @@ struct ConfigInfo image_config[] =
   { "door_2.top_border_correction.width",	"108"			},
   { "door_2.top_border_correction.height",	"8"			},
 
-  /* the last image entry apparently gets overwritten by very last entry
-     of "image_config[]"; so far this bug could not be found and fixed */
+  // the last image entry apparently gets overwritten by very last entry
+  // of "image_config[]"; so far this bug could not be found and fixed
   { "last_image_entry_bug",			UNDEFINED_FILENAME	},
 
 
@@ -7363,8 +7363,8 @@ struct ConfigInfo image_config[] =
   // non-image definitions
   // ==========================================================================
 
-  /* the following directives are not associated with an image, but
-     probably make sense to be defined in "graphicsinfo.conf", too */
+  // the following directives are not associated with an image, but
+  // probably make sense to be defined in "graphicsinfo.conf", too
 
   // keyword to start parser: "CONFIG_VARS_START" <-- do not change!
 

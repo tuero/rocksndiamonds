@@ -346,9 +346,9 @@ boolean LoadNativeLevel_MM(char *filename, boolean level_info_only)
       int chunk_size_expected =
 	(chunk_info[i].loader)(file, chunk_size, &native_mm_level);
 
-      /* the size of some chunks cannot be checked before reading other
-	 chunks first (like "HEAD" and "BODY") that contain some header
-	 information, so check them here */
+      // the size of some chunks cannot be checked before reading other
+      // chunks first (like "HEAD" and "BODY") that contain some header
+      // information, so check them here
       if (chunk_size_expected != chunk_size)
 	Error(ERR_WARN, "wrong size (%d) of chunk '%s' in level file '%s'",
 	      chunk_size, chunk_name, filename);

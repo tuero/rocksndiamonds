@@ -95,8 +95,8 @@
 #define VIDEO_PRESS_EJECT(x) ((x) ? VIDEO_PRESS_EJECT_ON: VIDEO_PRESS_EJECT_OFF)
 
 // tags to draw video display labels or symbols only
-/* (negative values to prevent misinterpretation in DrawVideoDisplay(), where
-   the variable "value" is also used for tape length -- better fix this) */
+// (negative values to prevent misinterpretation in DrawVideoDisplay(), where
+// the variable "value" is also used for tape length -- better fix this)
 #define VIDEO_DISPLAY_DEFAULT		0
 #define VIDEO_DISPLAY_LABEL_ONLY	-1
 #define VIDEO_DISPLAY_SYMBOL_ONLY	-2

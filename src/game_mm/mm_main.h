@@ -333,10 +333,10 @@ extern int		num_element_info;
 #define WALL_TOP		(WALL_TOPLEFT    | WALL_TOPRIGHT)
 #define WALL_BOTTOM		(WALL_BOTTOMLEFT | WALL_BOTTOMRIGHT)
 
-/* game elements:
-**	  0 - 499: real elements, stored in level file
-**      500 - 699: flag elements, only used at runtime
-*/
+// game elements:
+//	  0 - 499: real elements, stored in level file
+//      500 - 699: flag elements, only used at runtime
+
 // "real" level elements
 #define EL_MM_START		0
 #define EL_MM_START_1		EL_MM_START
@@ -701,12 +701,11 @@ extern int		num_element_info;
 #define EL_MM_MASK_CIRCLE		709
 
 
-/* game graphics:
-**	  0 -  191: graphics from "MirrorScreen"
-**	192 -  255: pseudo graphics mapped to "MirrorScreen"
-**	256 -  511: graphics from "MirrorFont"
-**	512 -  767: graphics from "MirrorDF"
-*/
+// game graphics:
+//	  0 -  191: graphics from "MirrorScreen"
+//	192 -  255: pseudo graphics mapped to "MirrorScreen"
+//	256 -  511: graphics from "MirrorFont"
+//	512 -  767: graphics from "MirrorDF"
 
 #define IMG_EMPTY		IMG_EMPTY_SPACE
 
@@ -1180,17 +1179,17 @@ extern int		num_element_info;
 #define MM_VERSION_MINOR(x)	VERSION_PART_2(x)
 #define MM_VERSION_PATCH(x)	VERSION_PART_3(x)
 
-/* file version numbers for resource files (levels, score, setup, etc.)
-** currently supported/known file version numbers:
-**	1.4 (still in use)
-**	2.0 (actual)
-*/
+// file version numbers for resource files (levels, score, setup, etc.)
+// currently supported/known file version numbers:
+//	1.4 (still in use)
+//	2.0 (actual)
+
 #define MM_FILE_VERSION_1_4	MM_VERSION_IDENT(1,4,0)
 #define MM_FILE_VERSION_2_0	MM_VERSION_IDENT(2,0,0)
 
-/* file version does not change for every program version, but is changed
-   when new features are introduced that are incompatible with older file
-   versions, so that they can be treated accordingly */
+// file version does not change for every program version, but is changed
+// when new features are introduced that are incompatible with older file
+// versions, so that they can be treated accordingly
 #define MM_FILE_VERSION_ACTUAL	MM_FILE_VERSION_2_0
 
 #define MM_GAME_VERSION_ACTUAL	MM_VERSION_IDENT(PROGRAM_VERSION_MAJOR, \

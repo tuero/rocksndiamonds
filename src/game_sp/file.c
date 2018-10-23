@@ -142,8 +142,8 @@ static void LoadNativeLevelFromFileStream_SP(File *file, int width, int height,
   LevelInfoType *header = &native_sp_level.header;
   int i, x, y;
 
-  /* for details of the Supaplex level format, see Herman Perk's Supaplex
-     documentation file "SPFIX63.DOC" from his Supaplex "SpeedFix" package */
+  // for details of the Supaplex level format, see Herman Perk's Supaplex
+  // documentation file "SPFIX63.DOC" from his Supaplex "SpeedFix" package
 
   native_sp_level.width  = MIN(width,  SP_MAX_PLAYFIELD_WIDTH);
   native_sp_level.height = MIN(height, SP_MAX_PLAYFIELD_HEIGHT);
@@ -179,9 +179,9 @@ static void LoadNativeLevelFromFileStream_SP(File *file, int width, int height,
   // initial "freeze zonks": 2 == "on", anything else (0, 1) == "off"
   header->InitialFreezeZonks = getFile8Bit(file);
 
-  /* number of infotrons needed; 0 means that Supaplex will count the total
-     amount of infotrons in the level and use the low byte of that number
-     (a multiple of 256 infotrons will result in "0 infotrons needed"!) */
+  // number of infotrons needed; 0 means that Supaplex will count the total
+  // amount of infotrons in the level and use the low byte of that number
+  // (a multiple of 256 infotrons will result in "0 infotrons needed"!)
   header->InfotronsNeeded = getFile8Bit(file);
 
   // number of special ("gravity") port entries below (maximum 10 allowed)
@@ -418,8 +418,8 @@ boolean LoadNativeLevel_SP(char *filename, int level_pos,
 
     if (!reading_multipart_level && !is_multipart_level)
     {
-      /* the current level is simply a normal single-part level, and we are
-	 not reading a multi-part level yet, so return the level as it is */
+      // the current level is simply a normal single-part level, and we are
+      // not reading a multi-part level yet, so return the level as it is
 
       break;
     }
@@ -428,9 +428,9 @@ boolean LoadNativeLevel_SP(char *filename, int level_pos,
 
     if (!reading_multipart_level && is_multipart_level && !is_first_part)
     {
-      /* this is a part of a multi-part level, but not the first part
-	 (and we are not already reading parts of a multi-part level);
-	 in this case, use an empty level instead of the single part */
+      // this is a part of a multi-part level, but not the first part
+      // (and we are not already reading parts of a multi-part level);
+      // in this case, use an empty level instead of the single part
 
       use_empty_level = TRUE;
 
@@ -444,9 +444,9 @@ boolean LoadNativeLevel_SP(char *filename, int level_pos,
 	 !strEqualN(header->LevelTitle, multipart_level.header.LevelTitle,
 		    SP_LEVEL_NAME_LEN)))
     {
-      /* we are already reading parts of a multi-part level, but this level is
-	 either not a multi-part level, or a part of a different multi-part
-	 level; in both cases, the multi-part level seems to be complete */
+      // we are already reading parts of a multi-part level, but this level is
+      // either not a multi-part level, or a part of a different multi-part
+      // level; in both cases, the multi-part level seems to be complete
 
       break;
     }

@@ -2889,8 +2889,8 @@ void RotateMirror(int x, int y, int button)
   {
     if (button == MB_LEFTBUTTON)
     {
-      /* left mouse button only for manual adjustment, no auto-rotating;
-	 freeze mirror for until mouse button released */
+      // left mouse button only for manual adjustment, no auto-rotating;
+      // freeze mirror for until mouse button released
       hold_x = x;
       hold_y = y;
     }

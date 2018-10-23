@@ -25,11 +25,9 @@
 #define INFOTEXT_UNKNOWN_ELEMENT	"unknown"
 
 
-/*
-  -----------------------------------------------------------------------------
-  screen and artwork graphic pixel position definitions
-  -----------------------------------------------------------------------------
-*/
+// ----------------------------------------------------------------------------
+// screen and artwork graphic pixel position definitions
+// ----------------------------------------------------------------------------
 
 // values for the control window
 #define ED_CTRL1_BUTTONS_HORIZ		4	// toolbox
@@ -354,11 +352,9 @@
 				      SYSIZE - INFOTEXT_YSIZE)
 
 
-/*
-  -----------------------------------------------------------------------------
-  editor gadget definitions
-  -----------------------------------------------------------------------------
-*/
+// ----------------------------------------------------------------------------
+// editor gadget definitions
+// ----------------------------------------------------------------------------
 
 enum
 {
@@ -1079,11 +1075,9 @@ enum
 #define ED_DRAWING_ID_EDITOR_LAST	ED_DRAWING_ID_RANDOM_BACKGROUND
 
 
-/*
-  -----------------------------------------------------------------------------
-  some internally used definitions
-  -----------------------------------------------------------------------------
-*/
+// ----------------------------------------------------------------------------
+// some internally used definitions
+// ----------------------------------------------------------------------------
 
 // values for CopyLevelToUndoBuffer()
 #define UNDO_IMMEDIATE			0
@@ -1138,11 +1132,9 @@ enum
 #define DEFAULT_EDITOR_TILESIZE_MM	TILESIZE
 
 
-/*
-  -----------------------------------------------------------------------------
-  some internally used data structure definitions
-  -----------------------------------------------------------------------------
-*/
+// ----------------------------------------------------------------------------
+// some internally used data structure definitions
+// ----------------------------------------------------------------------------
 
 static struct
 {
@@ -1154,8 +1146,8 @@ static struct
   char shortcut;
 } controlbutton_info[ED_NUM_CTRL_BUTTONS] =
 {
-  /* note: some additional characters are already reserved for "cheat mode"
-     shortcuts (":XYZ" style) -- for details, see "events.c" */
+  // note: some additional characters are already reserved for "cheat mode"
+  // shortcuts (":XYZ" style) -- for details, see "events.c"
 
   // ---------- toolbox control buttons ---------------------------------------
 
@@ -3747,11 +3739,9 @@ static struct
 };
 
 
-/*
-  -----------------------------------------------------------------------------
-  some internally used variables
-  -----------------------------------------------------------------------------
-*/
+// ----------------------------------------------------------------------------
+// some internally used variables
+// ----------------------------------------------------------------------------
 
 // maximal size of level editor drawing area
 static int MAX_ED_FIELDX, MAX_ED_FIELDY;
@@ -5419,11 +5409,9 @@ editor_elements_info[] =
 };
 
 
-/*
-  -----------------------------------------------------------------------------
-  functions
-  -----------------------------------------------------------------------------
-*/
+// ----------------------------------------------------------------------------
+// functions
+// ----------------------------------------------------------------------------
 
 static int getMaxInfoTextLength(void)
 {
@@ -6682,9 +6670,9 @@ static void CreateSelectboxGadgets(void)
 
     if (selectbox_info[i].size == -1)	// dynamically determine size
     {
-      /* (we cannot use -1 for uninitialized values if we directly compare
-	 with results from strlen(), because the '<' and '>' operation will
-	 implicitely cast -1 to an unsigned integer value!) */
+      // (we cannot use -1 for uninitialized values if we directly compare
+      // with results from strlen(), because the '<' and '>' operation will
+      // implicitely cast -1 to an unsigned integer value!)
       selectbox_info[i].size = 0;
 
       for (j = 0; selectbox_info[i].options[j].text != NULL; j++)
@@ -11769,8 +11757,8 @@ static void DrawArcExt(int from_x, int from_y, int to_x2, int to_y2,
 
   radius = (int)(sqrt((float)(len_x * len_x + len_y * len_y)) + 0.5);
 
-  /* not optimal (some points get drawn twice) but simple,
-     and fast enough for the few points we are drawing */
+  // not optimal (some points get drawn twice) but simple,
+  // and fast enough for the few points we are drawing
 
   for (x = 0; x <= radius; x++)
   {
@@ -13571,8 +13559,8 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 
     case GADGET_ID_SAVE:
     {
-      /* saving read-only levels into personal level set modifies global vars
-	 "leveldir_current" and "level_nr"; restore them after saving level */
+      // saving read-only levels into personal level set modifies global vars
+      // "leveldir_current" and "level_nr"; restore them after saving level
       LevelDirTree *leveldir_former = leveldir_current;
       int level_nr_former = level_nr;
       char *level_filename;

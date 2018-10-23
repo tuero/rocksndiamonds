@@ -7603,8 +7603,8 @@ static boolean ConfigureJoystickMapButtonsAndAxes(SDL_Joystick *joystick)
 	    break;
 
 	  case SDL_JOYHATMOTION:
-	    /* ignore centering; we're probably just coming back
-	       to the center from the previous item we set */
+	    // ignore centering; we're probably just coming back
+	    // to the center from the previous item we set
 	    if (event.jhat.value == SDL_HAT_CENTERED)
 	      break;
 

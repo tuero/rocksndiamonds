@@ -831,8 +831,8 @@ static void ExitNetworkServer(int exit_value)
   exit(exit_value);
 }
 
-/* the following is not used for a standalone server;
-   the pointer points to an integer containing the port-number */
+// the following is not used for a standalone server;
+// the pointer points to an integer containing the port-number
 int NetworkServerThread(void *ptr)
 {
   NetworkServer(*((int *) ptr), 0);

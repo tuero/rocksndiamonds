@@ -1559,8 +1559,8 @@ void createDirectory(char *dir, char *text, int permission_class)
   if (directoryExists(dir))
     return;
 
-  /* leave "other" permissions in umask untouched, but ensure group parts
-     of USERDATA_DIR_MODE are not masked */
+  // leave "other" permissions in umask untouched, but ensure group parts
+  // of USERDATA_DIR_MODE are not masked
   mode_t dir_mode = (permission_class == PERMS_PRIVATE ?
 		     DIR_PERMS_PRIVATE : DIR_PERMS_PUBLIC);
   mode_t last_umask = posix_umask(0);
@@ -2036,9 +2036,9 @@ static boolean getTokenValueFromSetupLineExt(char *line,
 
 boolean getTokenValueFromSetupLine(char *line, char **token, char **value)
 {
-  /* while the internal (old) interface does not require a token/value
-     separator (for downwards compatibility with existing files which
-     don't use them), it is mandatory for the external (new) interface */
+  // while the internal (old) interface does not require a token/value
+  // separator (for downwards compatibility with existing files which
+  // don't use them), it is mandatory for the external (new) interface
 
   return getTokenValueFromSetupLineExt(line, token, value, NULL, NULL, 0, TRUE);
 }

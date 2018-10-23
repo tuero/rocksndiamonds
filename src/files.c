@@ -1906,13 +1906,13 @@ static void ActivateLevelTemplate(void)
     }
   }
 
-  /* Currently there is no special action needed to activate the template
-     data, because 'element_info' property settings overwrite the original
-     level data, while all other variables do not change. */
+  // Currently there is no special action needed to activate the template
+  // data, because 'element_info' property settings overwrite the original
+  // level data, while all other variables do not change.
 
-  /* Exception: 'from_level_template' elements in the original level playfield
-     are overwritten with the corresponding elements at the same position in
-     playfield from the level template. */
+  // Exception: 'from_level_template' elements in the original level playfield
+  // are overwritten with the corresponding elements at the same position in
+  // playfield from the level template.
 
   for (x = 0; x < level.fieldx; x++)
     for (y = 0; y < level.fieldy; y++)
@@ -2018,8 +2018,8 @@ static int getFileTypeFromMagicBytes(char *filename, int type)
 
 static boolean checkForPackageFromBasename(char *basename)
 {
-  /* !!! WON'T WORK ANYMORE IF getFileTypeFromBasename() ALSO DETECTS !!!
-     !!! SINGLE LEVELS (CURRENTLY ONLY DETECTS LEVEL PACKAGES         !!! */
+  // !!! WON'T WORK ANYMORE IF getFileTypeFromBasename() ALSO DETECTS !!!
+  // !!! SINGLE LEVELS (CURRENTLY ONLY DETECTS LEVEL PACKAGES         !!!
 
   return (getFileTypeFromBasename(basename) != LEVEL_FILE_TYPE_UNKNOWN);
 }
@@ -2667,8 +2667,8 @@ static int LoadLevel_CUS1(File *file, int chunk_size, struct LevelInfo *level)
     else
       Error(ERR_WARN, "invalid custom element number %d", element);
 
-    /* older game versions that wrote level files with CUS1 chunks used
-       different default push delay values (not yet stored in level file) */
+    // older game versions that wrote level files with CUS1 chunks used
+    // different default push delay values (not yet stored in level file)
     element_info[element].push_delay_fixed = 2;
     element_info[element].push_delay_random = 8;
   }
@@ -3469,9 +3469,9 @@ static void LoadLevelFromFileInfo_RND(struct LevelInfo *level,
 	int chunk_size_expected =
 	  (chunk_info[i].loader)(file, chunk_size, level);
 
-	/* the size of some chunks cannot be checked before reading other
-	   chunks first (like "HEAD" and "BODY") that contain some header
-	   information, so check them here */
+	// the size of some chunks cannot be checked before reading other
+	// chunks first (like "HEAD" and "BODY") that contain some header
+	// information, so check them here
 	if (chunk_size_expected != chunk_size)
 	{
 	  Error(ERR_WARN, "wrong size (%d) of chunk '%s' in level file '%s'",
@@ -3768,8 +3768,8 @@ static void CopyNativeLevel_RND_to_SP(struct LevelInfo *level)
     else if (element >= EL_SP_GRAVITY_PORT_RIGHT &&
 	     element <= EL_SP_GRAVITY_PORT_UP)
     {
-      /* change R'n'D style gravity inverting special port to normal port
-	 (there are no gravity inverting ports in native Supaplex engine) */
+      // change R'n'D style gravity inverting special port to normal port
+      // (there are no gravity inverting ports in native Supaplex engine)
 
       gravity_port_found = TRUE;
       gravity_port_valid = FALSE;
@@ -3885,8 +3885,8 @@ static void CopyNativeLevel_SP_to_RND(struct LevelInfo *level)
       continue;
     }
 
-    /* change previous (wrong) gravity inverting special port to either
-       gravity enabling special port or gravity disabling special port */
+    // change previous (wrong) gravity inverting special port to either
+    // gravity enabling special port or gravity disabling special port
     level->field[port_x][port_y] +=
       (gravity == 1 ? EL_SP_GRAVITY_ON_PORT_RIGHT :
        EL_SP_GRAVITY_OFF_PORT_RIGHT) - EL_SP_GRAVITY_PORT_RIGHT;
@@ -5718,8 +5718,8 @@ static void LoadLevelFromFileStream_DC(File *file, struct LevelInfo *level,
   level->extra_time		= header[56] | (header[57] << 8);
   level->shield_normal_time	= header[58] | (header[59] << 8);
 
-  /* Diamond Caves has the same (strange) behaviour as Emerald Mine that gems
-     can slip down from flat walls, like normal walls and steel walls */
+  // Diamond Caves has the same (strange) behaviour as Emerald Mine that gems
+  // can slip down from flat walls, like normal walls and steel walls
   level->em_slippery_gems = TRUE;
 }
 
@@ -6437,9 +6437,9 @@ static void LoadLevel_InitCustomElements(struct LevelInfo *level)
 {
   int i, j;
 
-  /* map custom element change events that have changed in newer versions
-     (these following values were accidentally changed in version 3.0.1)
-     (this seems to be needed only for 'ab_levelset3' and 'ab_levelset4') */
+  // map custom element change events that have changed in newer versions
+  // (these following values were accidentally changed in version 3.0.1)
+  // (this seems to be needed only for 'ab_levelset3' and 'ab_levelset4')
   if (level->game_version <= VERSION_IDENT(3,0,0,0))
   {
     for (i = 0; i < NUM_CUSTOM_ELEMENTS; i++)
@@ -7993,9 +7993,9 @@ void LoadTapeFromFilename(char *filename)
 	int chunk_size_expected =
 	  (chunk_info[i].loader)(file, chunk_size, &tape);
 
-	/* the size of some chunks cannot be checked before reading other
-	   chunks first (like "HEAD" and "BODY") that contain some header
-	   information, so check them here */
+	// the size of some chunks cannot be checked before reading other
+	// chunks first (like "HEAD" and "BODY") that contain some header
+	// information, so check them here
 	if (chunk_size_expected != chunk_size)
 	{
 	  Error(ERR_WARN, "wrong size (%d) of chunk '%s' in tape file '%s'",

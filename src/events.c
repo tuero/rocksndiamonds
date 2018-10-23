@@ -45,12 +45,12 @@ static void HandleNoEvent(void);
 static void HandleEventActions(void);
 
 
-/* event filter especially needed for SDL event filtering due to
-   delay problems with lots of mouse motion events when mouse button
-   not pressed (X11 can handle this with 'PointerMotionHintMask') */
+// event filter especially needed for SDL event filtering due to
+// delay problems with lots of mouse motion events when mouse button
+// not pressed (X11 can handle this with 'PointerMotionHintMask')
 
-/* event filter addition for SDL2: as SDL2 does not have a function to enable
-   or disable keyboard auto-repeat, filter repeated keyboard events instead */
+// event filter addition for SDL2: as SDL2 does not have a function to enable
+// or disable keyboard auto-repeat, filter repeated keyboard events instead
 
 static int FilterEvents(const Event *event)
 {
@@ -106,9 +106,9 @@ static int FilterEvents(const Event *event)
   return 1;
 }
 
-/* to prevent delay problems, skip mouse motion events if the very next
-   event is also a mouse motion event (and therefore effectively only
-   handling the last of a row of mouse motion events in the event queue) */
+// to prevent delay problems, skip mouse motion events if the very next
+// event is also a mouse motion event (and therefore effectively only
+// handling the last of a row of mouse motion events in the event queue)
 
 static boolean SkipPressedMouseMotionEvent(const Event *event)
 {
@@ -238,8 +238,8 @@ void HandleOtherEvents(Event *event)
 
     case EVENT_UNMAPNOTIFY:
 #if 0
-      /* This causes the game to stop not only when iconified, but also
-	 when on another virtual desktop, which might be not desired. */
+      // This causes the game to stop not only when iconified, but also
+      // when on another virtual desktop, which might be not desired.
       SleepWhileUnmapped();
 #endif
       break;
@@ -330,8 +330,8 @@ void EventLoop(void)
     // execute event related actions after pending events have been processed
     HandleEventActions();
 
-    /* don't use all CPU time when idle; the main loop while playing
-       has its own synchronization and is CPU friendly, too */
+    // don't use all CPU time when idle; the main loop while playing
+    // has its own synchronization and is CPU friendly, too
 
     if (game_status == GAME_MODE_PLAYING)
       HandleGameActions();
@@ -479,10 +479,9 @@ void SleepWhileUnmapped(void)
 	break;
 
       case EVENT_UNMAPNOTIFY:
-	/* this is only to surely prevent the 'should not happen' case
-	 * of recursively looping between 'SleepWhileUnmapped()' and
-	 * 'HandleOtherEvents()' which usually calls this funtion.
-	 */
+	// this is only to surely prevent the 'should not happen' case
+	// of recursively looping between 'SleepWhileUnmapped()' and
+	// 'HandleOtherEvents()' which usually calls this funtion.
 	break;
 
       default:
@@ -1520,8 +1519,7 @@ void HandleFocusEvent(FocusChangeEvent *event)
        The effect would be keyboard auto repeat while playing the game
        (game_status == GAME_MODE_PLAYING), which is not desired.
        To avoid this special case, we just wait 1/10 second before
-       processing the 'FocusIn' event.
-    */
+       processing the 'FocusIn' event. */
 
     if (game_status == GAME_MODE_PLAYING)
     {

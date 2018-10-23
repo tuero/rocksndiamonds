@@ -13,9 +13,9 @@
 #include "main.h"
 
 
-/* List values that are not defined in the configuration file are set to
-   reliable default values. If that value is MUS_ARG_UNDEFINED, it will
-   be dynamically determined, using some of the other list values. */
+// List values that are not defined in the configuration file are set to
+// reliable default values. If that value is MUS_ARG_UNDEFINED, it will
+// be dynamically determined, using some of the other list values.
 
 struct ConfigTypeInfo music_config_suffix[] =
 {
@@ -58,9 +58,9 @@ struct ConfigInfo music_config[] =
   { "background.titlemessage_4",	UNDEFINED_FILENAME		},
   { "background.titlemessage_5",	UNDEFINED_FILENAME		},
 
-  /* there is no definition for "background.PLAYING", because this would
-     prevent selecting music from music directory that is not defined in
-     "musicinfo.conf", when no default music is defined here */
+  // there is no definition for "background.PLAYING", because this would
+  // prevent selecting music from music directory that is not defined in
+  // "musicinfo.conf", when no default music is defined here
 
   { NULL,				NULL				}
 };

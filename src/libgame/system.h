@@ -654,11 +654,10 @@
 
 
 // areas in bitmap PIX_DOOR
-/* meaning in PIX_DB_DOOR: (3 PAGEs)
-   PAGEX1: 1. buffer for DOOR_1
-   PAGEX2: 2. buffer for DOOR_1
-   PAGEX3: buffer for animations
-*/
+// meaning in PIX_DB_DOOR: (3 PAGEs)
+// PAGEX1: 1. buffer for DOOR_1
+// PAGEX2: 2. buffer for DOOR_1
+// PAGEX3: buffer for animations
 
 // these values are hard-coded to be able to use them in initialization
 #define DOOR_GFX_PAGE_WIDTH	100	// should be set to "gfx.dxsize"

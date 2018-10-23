@@ -481,8 +481,8 @@ static void InitFontGraphicInfo(void)
   }
 
   // reset non-redefined ".active" font graphics if normal font is redefined
-  /* (this different treatment is needed because normal and active fonts are
-     independently defined ("active" is not a property of font definitions!) */
+  // (this different treatment is needed because normal and active fonts are
+  // independently defined ("active" is not a property of font definitions!)
   for (i = 0; i < NUM_FONTS; i++)
   {
     int font_nr_base = i;
@@ -515,8 +515,8 @@ static void InitFontGraphicInfo(void)
 	boolean active_redefined =
 	  getImageListEntryFromImageID(active_graphic)->redefined;
 
-	/* same as above, but check special graphic definitions, for example:
-	   redefined "font.menu_1.MAIN" invalidates "font.menu_1.active.MAIN" */
+	// same as above, but check special graphic definitions, for example:
+	// redefined "font.menu_1.MAIN" invalidates "font.menu_1.active.MAIN"
 	if (base_redefined && !active_redefined)
 	{
 	  font_info[font_nr_active].special_graphic[j] =
@@ -955,8 +955,8 @@ static void InitElementGraphicInfo(void)
 
   UPDATE_BUSY_STATE();
 
-  /* adjust graphics with 2nd tile for movement according to direction
-     (do this before correcting '-1' values to minimize calculations) */
+  // adjust graphics with 2nd tile for movement according to direction
+  // (do this before correcting '-1' values to minimize calculations)
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
   {
     for (act = 0; act < NUM_ACTIONS; act++)
@@ -1970,8 +1970,8 @@ static void InitElementSoundInfo(void)
     }
   }
 
-  /* copy sound settings to some elements that are only stored in level file
-     in native R'n'D levels, but are used by game engine in native EM levels */
+  // copy sound settings to some elements that are only stored in level file
+  // in native R'n'D levels, but are used by game engine in native EM levels
   for (i = 0; copy_properties[i][0] != -1; i++)
     for (j = 1; j <= 4; j++)
       for (act = 0; act < NUM_ACTIONS; act++)
@@ -2151,8 +2151,8 @@ static void InitGameModeMusicInfo(void)
   }
 
   // now set all '-1' values to menu specific default values
-  /* (undefined values of "levelset.music[]" might stay at "-1" to
-     allow dynamic selection of music files from music directory!) */
+  // (undefined values of "levelset.music[]" might stay at "-1" to
+  // allow dynamic selection of music files from music directory!)
   for (i = 0; i < MAX_LEVELS; i++)
     if (levelset.music[i] == -1)
       levelset.music[i] = default_levelset_music;
@@ -3687,8 +3687,8 @@ void InitElementPropertiesStatic(void)
     EL_WALL_PEARL,
     EL_WALL_CRYSTAL,
 
-    /* the following elements are a direct copy of "indestructible" elements,
-       except "EL_ACID", which is "indestructible", but not "solid"! */
+    // the following elements are a direct copy of "indestructible" elements,
+    // except "EL_ACID", which is "indestructible", but not "solid"!
 #if 0
     EL_ACID,
 #endif

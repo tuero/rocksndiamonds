@@ -13,9 +13,9 @@
 #include "main.h"
 
 
-/* List values that are not defined in the configuration file are set to
-   reliable default values. If that value is GFX_ARG_UNDEFINED, it will
-   be dynamically determined, using some of the other list values. */
+// List values that are not defined in the configuration file are set to
+// reliable default values. If that value is GFX_ARG_UNDEFINED, it will
+// be dynamically determined, using some of the other list values.
 
 struct ConfigInfo helpanim_config[] =
 {

@@ -1907,8 +1907,8 @@ static void DrawGraphicShiftedDouble(int x, int y, int dx, int dy,
   int x2 = x + SIGN(dx);
   int y2 = y + SIGN(dy);
 
-  /* movement with two-tile animations must be sync'ed with movement position,
-     not with current GfxFrame (which can be higher when using slow movement) */
+  // movement with two-tile animations must be sync'ed with movement position,
+  // not with current GfxFrame (which can be higher when using slow movement)
   int anim_pos = (dx ? ABS(dx) : ABS(dy));
   int anim_frames = graphic_info[graphic].anim_frames;
 
@@ -3870,8 +3870,8 @@ void DrawPlayer(struct PlayerInfo *player)
   int last_player_frame = player->Frame;
   int frame = 0;
 
-  /* GfxElement[][] is set to the element the player is digging or collecting;
-     remove also for off-screen player if the player is not moving anymore */
+  // GfxElement[][] is set to the element the player is digging or collecting;
+  // remove also for off-screen player if the player is not moving anymore
   if (IN_LEV_FIELD(jx, jy) && !player_is_moving)
     GfxElement[jx][jy] = EL_UNDEFINED;
 
@@ -3989,8 +3989,8 @@ void DrawPlayer(struct PlayerInfo *player)
 
   graphic = getPlayerGraphic(player, move_dir);
 
-  /* in the case of changed player action or direction, prevent the current
-     animation frame from being restarted for identical animations */
+  // in the case of changed player action or direction, prevent the current
+  // animation frame from being restarted for identical animations
   if (player->Frame == 0 && equalGraphics(graphic, last_player_graphic))
     player->Frame = last_player_frame;
 
@@ -4094,8 +4094,8 @@ void DrawPlayer(struct PlayerInfo *player)
 
   graphic = getPlayerGraphic(player, move_dir);
 
-  /* in the case of changed player action or direction, prevent the current
-     animation frame from being restarted for identical animations */
+  // in the case of changed player action or direction, prevent the current
+  // animation frame from being restarted for identical animations
   if (player->Frame == 0 && equalGraphics(graphic, last_player_graphic))
     player->Frame = last_player_frame;
 
@@ -8266,9 +8266,9 @@ static void set_crumbled_graphics_EM(struct GraphicInfo_EM *g_em,
 				     boolean has_crumbled_graphics,
 				     int crumbled, int sync_frame)
 {
-  /* if element can be crumbled, but certain action graphics are just empty
-     space (like instantly snapping sand to empty space in 1 frame), do not
-     treat these empty space graphics as crumbled graphics in EMC engine */
+  // if element can be crumbled, but certain action graphics are just empty
+  // space (like instantly snapping sand to empty space in 1 frame), do not
+  // treat these empty space graphics as crumbled graphics in EMC engine
   if (crumbled == IMG_EMPTY_SPACE)
     has_crumbled_graphics = FALSE;
 
@@ -8332,9 +8332,9 @@ void SetGfxAnimation_EM(struct GraphicInfo_EM *g_em,
 			     action == ACTION_FILLING ||
 			     action == ACTION_EMPTYING);
 
-  /* special case: graphic uses "2nd movement tile" and has defined
-     7 frames for movement animation (or less) => use default graphic
-     for last (8th) frame which ends the movement animation */
+  // special case: graphic uses "2nd movement tile" and has defined
+  // 7 frames for movement animation (or less) => use default graphic
+  // for last (8th) frame which ends the movement animation
   if (g->double_movement && g->anim_frames < 8 && frame_em == 7)
   {
     action = ACTION_DEFAULT;	// (keep action_* unchanged for now)
@@ -8427,9 +8427,9 @@ void getGraphicSourceObjectExt_EM(struct GraphicInfo_EM *g_em,
   struct GraphicInfo *g = &graphic_info[graphic];
   int sync_frame;
 
-  /* special case: graphic uses "2nd movement tile" and has defined
-     7 frames for movement animation (or less) => use default graphic
-     for last (8th) frame which ends the movement animation */
+  // special case: graphic uses "2nd movement tile" and has defined
+  // 7 frames for movement animation (or less) => use default graphic
+  // for last (8th) frame which ends the movement animation
   if (g->double_movement && g->anim_frames < 8 && frame_em == 7)
   {
     effective_action = ACTION_DEFAULT;
@@ -8463,8 +8463,8 @@ void getGraphicSourceObjectExt_EM(struct GraphicInfo_EM *g_em,
   getGraphicSourceExt(graphic, frame, &g_em->bitmap, &g_em->src_x, &g_em->src_y,
 		      g->double_movement && is_backside);
 
-  /* (updating the "crumbled" graphic definitions is probably not really needed,
-     as animations for crumbled graphics can't be longer than one EMC cycle) */
+  // (updating the "crumbled" graphic definitions is probably not really needed,
+  // as animations for crumbled graphics can't be longer than one EMC cycle)
   set_crumbled_graphics_EM(g_em, has_crumbled_graphics, crumbled,
 			   sync_frame);
 }

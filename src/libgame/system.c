@@ -820,8 +820,8 @@ void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 
   if (src_bitmap == dst_bitmap)
   {
-    /* needed when blitting directly to same bitmap -- should not be needed with
-       recent SDL libraries, but apparently does not work in 1.2.11 directly */
+    // needed when blitting directly to same bitmap -- should not be needed with
+    // recent SDL libraries, but apparently does not work in 1.2.11 directly
 
     static Bitmap *tmp_bitmap = NULL;
     static int tmp_bitmap_xsize = 0;
@@ -1175,9 +1175,9 @@ void ReloadCustomImage(Bitmap *bitmap, char *basename)
 
   if (strEqual(filename, bitmap->source_filename))
   {
-    /* The old and new image are the same (have the same filename and path).
-       This usually means that this image does not exist in this graphic set
-       and a fallback to the existing image is done. */
+    // The old and new image are the same (have the same filename and path).
+    // This usually means that this image does not exist in this graphic set
+    // and a fallback to the existing image is done.
 
     return;
   }
@@ -1503,8 +1503,8 @@ static const char *cursor_image_dot[] =
 };
 static const char **cursor_image_playfield = cursor_image_dot;
 #else
-/* some people complained about a "white dot" on the screen and thought it
-   was a graphical error... OK, let's just remove the whole pointer :-) */
+// some people complained about a "white dot" on the screen and thought it
+// was a graphical error... OK, let's just remove the whole pointer :-)
 static const char **cursor_image_playfield = cursor_image_none;
 #endif
 

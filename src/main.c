@@ -7444,9 +7444,9 @@ struct SpecialSuffixInfo special_suffix_info[NUM_SPECIAL_GFX_ARGS + 1 + 1] =
 // font definitions
 // ----------------------------------------------------------------------------
 
-/* Important: When one entry is a prefix of another entry, the longer entry
-   must come first, because the dynamic configuration does prefix matching!
-   (These definitions must match the corresponding definitions in "main.h"!) */
+// Important: When one entry is a prefix of another entry, the longer entry
+// must come first, because the dynamic configuration does prefix matching!
+// (These definitions must match the corresponding definitions in "main.h"!)
 
 struct FontInfo font_info[NUM_FONTS + 1] =
 {
