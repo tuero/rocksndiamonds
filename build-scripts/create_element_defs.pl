@@ -243,12 +243,12 @@ sub print_file_header
     close FILE;
 
     print "\n";
-    print "/* ----- $text_auto ----- */\n";
+    print "// ------- $text_auto -------\n";
     print "\n";
     print "#ifndef $filename_def\n";
     print "#define $filename_def\n";
     print "\n";
-    print "/* $comment */\n";
+    print "// $comment\n";
     print "\n";
 }
 
@@ -259,7 +259,7 @@ sub print_file_footer
     $filename_def =~ s/\./_/;
 
     print "\n";
-    print "#endif	/* $filename_def */\n";
+    print "#endif	// $filename_def\n";
 }
 
 sub get_tabs
