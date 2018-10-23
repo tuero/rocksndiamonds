@@ -17,7 +17,7 @@ int getFieldbufferOffsetX_SP(void)
 {
   int px = 2 * TILEX + (mScrollX - mScrollX_last) % TILEX;
 
-  /* scroll correction for even number of visible tiles (half tile shifted) */
+  // scroll correction for even number of visible tiles (half tile shifted)
   px += game_sp.scroll_xoffset;
 
   if (ExplosionShakeMurphy != 0)
@@ -32,7 +32,7 @@ int getFieldbufferOffsetY_SP(void)
 {
   int py = 2 * TILEY + (mScrollY - mScrollY_last) % TILEY;
 
-  /* scroll correction for even number of visible tiles (half tile shifted) */
+  // scroll correction for even number of visible tiles (half tile shifted)
   py += game_sp.scroll_yoffset;
 
   if (ExplosionShakeMurphy != 0)
@@ -130,7 +130,7 @@ static void ScrollPlayfieldIfNeededExt(boolean reset)
     return;
   }
 
-  /* check if scrolling the playfield requires redrawing the viewport bitmap */
+  // check if scrolling the playfield requires redrawing the viewport bitmap
   if ((mScrollX != mScrollX_last ||
        mScrollY != mScrollY_last) &&
       (ABS(mScrollX - mScrollX_last) >= TILEX ||
@@ -198,7 +198,7 @@ void UpdatePlayfield(boolean force_redraw)
       if (element != GfxElementLast[x][y] &&
 	  graphic == GfxGraphicLast[x][y])
       {
-	/* element changed, but not graphic => disable updating graphic */
+	// element changed, but not graphic => disable updating graphic
 
 	GfxElementLast[x][y] = element;
 	GfxGraphicLast[x][y] = GfxGraphic[x][y] = -1;
@@ -240,7 +240,7 @@ void UpdatePlayfield(boolean force_redraw)
 
 void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
 {
-  /* copy playfield buffer to target bitmap at scroll position */
+  // copy playfield buffer to target bitmap at scroll position
 
   int px = getFieldbufferOffsetX_SP();
   int py = getFieldbufferOffsetY_SP();

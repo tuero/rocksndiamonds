@@ -24,13 +24,13 @@
 #include "anim.h"
 #include "config.h"
 
-#include "conf_e2g.c"	/* include auto-generated data structure definitions */
-#include "conf_esg.c"	/* include auto-generated data structure definitions */
-#include "conf_e2s.c"	/* include auto-generated data structure definitions */
-#include "conf_fnt.c"	/* include auto-generated data structure definitions */
-#include "conf_g2s.c"	/* include auto-generated data structure definitions */
-#include "conf_g2m.c"	/* include auto-generated data structure definitions */
-#include "conf_act.c"	/* include auto-generated data structure definitions */
+#include "conf_e2g.c"	// include auto-generated data structure definitions
+#include "conf_esg.c"	// include auto-generated data structure definitions
+#include "conf_e2s.c"	// include auto-generated data structure definitions
+#include "conf_fnt.c"	// include auto-generated data structure definitions
+#include "conf_g2s.c"	// include auto-generated data structure definitions
+#include "conf_g2m.c"	// include auto-generated data structure definitions
+#include "conf_act.c"	// include auto-generated data structure definitions
 
 
 #define CONFIG_TOKEN_FONT_INITIAL		"font.initial"
@@ -84,7 +84,7 @@ static int copy_properties[][5] =
 };
 
 
-/* forward declaration for internal use */
+// forward declaration for internal use
 static int get_graphic_parameter_value(char *, char *, int);
 
 
@@ -97,7 +97,7 @@ static void DrawInitAnim(void)
   int sync_frame = FrameCounter;
   int x, y;
 
-  /* prevent OS (Windows) from complaining about program not responding */
+  // prevent OS (Windows) from complaining about program not responding
   CheckQuitEvent();
 
   if (game_status != GAME_MODE_LOADING)
@@ -117,7 +117,7 @@ static void DrawInitAnim(void)
   x = ALIGNED_TEXT_XPOS(&init_last.busy);
   y = ALIGNED_TEXT_YPOS(&init_last.busy);
 
-  graphic_info = &anim_initial;		/* graphic == 0 => anim_initial */
+  graphic_info = &anim_initial;		// graphic == 0 => anim_initial
 
   if (sync_frame % anim_initial.anim_delay == 0)
   {
@@ -216,23 +216,23 @@ static void InitElementSmallImages(void)
   print_timestamp_time("getImageListPropertyMapping/Size");
 
   print_timestamp_init("InitElementSmallImagesScaledUp (1)");
-  /* initialize normal element images from static configuration */
+  // initialize normal element images from static configuration
   for (i = 0; element_to_graphic[i].element > -1; i++)
     InitElementSmallImagesScaledUp(element_to_graphic[i].graphic);
   print_timestamp_done("InitElementSmallImagesScaledUp (1)");
 
-  /* initialize special element images from static configuration */
+  // initialize special element images from static configuration
   for (i = 0; element_to_special_graphic[i].element > -1; i++)
     InitElementSmallImagesScaledUp(element_to_special_graphic[i].graphic);
   print_timestamp_time("InitElementSmallImagesScaledUp (2)");
 
-  /* initialize element images from dynamic configuration */
+  // initialize element images from dynamic configuration
   for (i = 0; i < num_property_mappings; i++)
     if (property_mapping[i].base_index < MAX_NUM_ELEMENTS)
       InitElementSmallImagesScaledUp(property_mapping[i].artwork_index);
   print_timestamp_time("InitElementSmallImagesScaledUp (3)");
 
-  /* initialize special non-element images from above list */
+  // initialize special non-element images from above list
   for (i = 0; special_graphics[i] > -1; i++)
     InitElementSmallImagesScaledUp(special_graphics[i]);
   print_timestamp_time("InitElementSmallImagesScaledUp (4)");
@@ -253,11 +253,11 @@ static void InitScaledImages(void)
   int num_property_mappings = getImageListPropertyMappingSize();
   int i;
 
-  /* scale normal images from static configuration, if not already scaled */
+  // scale normal images from static configuration, if not already scaled
   for (i = 0; i < NUM_IMAGE_FILES; i++)
     InitScaledImagesScaledUp(i);
 
-  /* scale images from dynamic configuration, if not already scaled */
+  // scale images from dynamic configuration, if not already scaled
   for (i = 0; i < num_property_mappings; i++)
     InitScaledImagesScaledUp(property_mapping[i].artwork_index);
 }
@@ -303,7 +303,7 @@ void InitImageTextures(void)
 }
 
 #if 1
-/* !!! FIX THIS (CHANGE TO USING NORMAL ELEMENT GRAPHIC DEFINITIONS) !!! */
+// !!! FIX THIS (CHANGE TO USING NORMAL ELEMENT GRAPHIC DEFINITIONS) !!!
 void SetBitmaps_EM(Bitmap **em_bitmap)
 {
   em_bitmap[0] = graphic_info[IMG_EMC_OBJECT].bitmap;
@@ -312,7 +312,7 @@ void SetBitmaps_EM(Bitmap **em_bitmap)
 #endif
 
 #if 0
-/* !!! FIX THIS (CHANGE TO USING NORMAL ELEMENT GRAPHIC DEFINITIONS) !!! */
+// !!! FIX THIS (CHANGE TO USING NORMAL ELEMENT GRAPHIC DEFINITIONS) !!!
 void SetBitmaps_SP(Bitmap **sp_bitmap)
 {
   *sp_bitmap = graphic_info[IMG_SP_OBJECTS].bitmap;
@@ -323,7 +323,7 @@ static int getFontBitmapID(int font_nr)
 {
   int special = -1;
 
-  /* (special case: do not use special font for GAME_MODE_LOADING) */
+  // (special case: do not use special font for GAME_MODE_LOADING)
   if (game_status >= GAME_MODE_TITLE_INITIAL &&
       game_status <= GAME_MODE_PSEUDO_PREVIEW)
     special = game_status;
@@ -343,7 +343,7 @@ static int getFontFromToken(char *token)
   if (value != NULL)
     return atoi(value);
 
-  /* if font not found, use reliable default value */
+  // if font not found, use reliable default value
   return FONT_INITIAL_1;
 }
 
@@ -355,7 +355,7 @@ static void InitFontGraphicInfo(void)
   int num_font_bitmaps = NUM_FONTS;
   int i, j;
 
-  if (graphic_info == NULL)		/* still at startup phase */
+  if (graphic_info == NULL)		// still at startup phase
   {
     InitFontInfo(font_initial, NUM_INITIAL_FONTS,
 		 getFontBitmapID, getFontFromToken);
@@ -363,13 +363,13 @@ static void InitFontGraphicInfo(void)
     return;
   }
 
-  /* ---------- initialize font graphic definitions ---------- */
+  // ---------- initialize font graphic definitions ----------
 
-  /* always start with reliable default values (normal font graphics) */
+  // always start with reliable default values (normal font graphics)
   for (i = 0; i < NUM_FONTS; i++)
     font_info[i].graphic = IMG_FONT_INITIAL_1;
 
-  /* initialize normal font/graphic mapping from static configuration */
+  // initialize normal font/graphic mapping from static configuration
   for (i = 0; font_to_graphic[i].font_nr > -1; i++)
   {
     int font_nr = font_to_graphic[i].font_nr;
@@ -382,7 +382,7 @@ static void InitFontGraphicInfo(void)
     font_info[font_nr].graphic = graphic;
   }
 
-  /* always start with reliable default values (special font graphics) */
+  // always start with reliable default values (special font graphics)
   for (i = 0; i < NUM_FONTS; i++)
   {
     for (j = 0; j < NUM_SPECIAL_GFX_ARGS; j++)
@@ -392,7 +392,7 @@ static void InitFontGraphicInfo(void)
     }
   }
 
-  /* initialize special font/graphic mapping from static configuration */
+  // initialize special font/graphic mapping from static configuration
   for (i = 0; font_to_graphic[i].font_nr > -1; i++)
   {
     int font_nr      = font_to_graphic[i].font_nr;
@@ -423,7 +423,7 @@ static void InitFontGraphicInfo(void)
     }
   }
 
-  /* initialize special font/graphic mapping from dynamic configuration */
+  // initialize special font/graphic mapping from dynamic configuration
   for (i = 0; i < num_property_mappings; i++)
   {
     int font_nr = property_mapping[i].base_index - MAX_NUM_ELEMENTS;
@@ -480,7 +480,7 @@ static void InitFontGraphicInfo(void)
     }
   }
 
-  /* reset non-redefined ".active" font graphics if normal font is redefined */
+  // reset non-redefined ".active" font graphics if normal font is redefined
   /* (this different treatment is needed because normal and active fonts are
      independently defined ("active" is not a property of font definitions!) */
   for (i = 0; i < NUM_FONTS; i++)
@@ -488,7 +488,7 @@ static void InitFontGraphicInfo(void)
     int font_nr_base = i;
     int font_nr_active = FONT_ACTIVE(font_nr_base);
 
-    /* check only those fonts with exist as normal and ".active" variant */
+    // check only those fonts with exist as normal and ".active" variant
     if (font_nr_base != font_nr_active)
     {
       int base_graphic = font_info[font_nr_base].graphic;
@@ -505,7 +505,7 @@ static void InitFontGraphicInfo(void)
       if (base_redefined && !active_redefined)
 	font_info[font_nr_active].graphic = base_graphic;
 
-      /* now also check each "special" font (which may be the same as above) */
+      // now also check each "special" font (which may be the same as above)
       for (j = 0; j < NUM_SPECIAL_GFX_ARGS; j++)
       {
 	int base_graphic = font_info[font_nr_base].special_graphic[j];
@@ -528,7 +528,7 @@ static void InitFontGraphicInfo(void)
     }
   }
 
-  /* ---------- initialize font bitmap array ---------- */
+  // ---------- initialize font bitmap array ----------
 
   if (font_bitmap_info != NULL)
     FreeFontInfo(font_bitmap_info);
@@ -536,7 +536,7 @@ static void InitFontGraphicInfo(void)
   font_bitmap_info =
     checked_calloc(num_font_bitmaps * sizeof(struct FontBitmapInfo));
 
-  /* ---------- initialize font bitmap definitions ---------- */
+  // ---------- initialize font bitmap definitions ----------
 
   for (i = 0; i < NUM_FONTS; i++)
   {
@@ -551,14 +551,14 @@ static void InitFontGraphicInfo(void)
       int font_bitmap_id = font_info[i].special_bitmap_id[j];
       int graphic = font_info[i].special_graphic[j];
 
-      /* set 'graphic_info' for font entries, if uninitialized (guessed) */
+      // set 'graphic_info' for font entries, if uninitialized (guessed)
       if (graphic_info[graphic].anim_frames < MIN_NUM_CHARS_PER_FONT)
       {
 	graphic_info[graphic].anim_frames = DEFAULT_NUM_CHARS_PER_FONT;
 	graphic_info[graphic].anim_frames_per_line = DEFAULT_NUM_CHARS_PER_LINE;
       }
 
-      /* copy font relevant information from graphics information */
+      // copy font relevant information from graphics information
       font_bitmap_info[font_bitmap_id].bitmap = graphic_info[graphic].bitmap;
       font_bitmap_info[font_bitmap_id].src_x  = graphic_info[graphic].src_x;
       font_bitmap_info[font_bitmap_id].src_y  = graphic_info[graphic].src_y;
@@ -592,16 +592,16 @@ static void InitGlobalAnimGraphicInfo(void)
   int num_property_mappings = getImageListPropertyMappingSize();
   int i, j, k;
 
-  if (graphic_info == NULL)		/* still at startup phase */
+  if (graphic_info == NULL)		// still at startup phase
     return;
 
-  /* always start with reliable default values (no global animations) */
+  // always start with reliable default values (no global animations)
   for (i = 0; i < NUM_GLOBAL_ANIM_TOKENS; i++)
     for (j = 0; j < NUM_GLOBAL_ANIM_PARTS_ALL; j++)
       for (k = 0; k < NUM_SPECIAL_GFX_ARGS; k++)
 	global_anim_info[i].graphic[j][k] = IMG_UNDEFINED;
 
-  /* initialize global animation definitions from static configuration */
+  // initialize global animation definitions from static configuration
   for (i = 0; i < NUM_GLOBAL_ANIM_TOKENS; i++)
   {
     int j = GLOBAL_ANIM_ID_PART_BASE;
@@ -610,7 +610,7 @@ static void InitGlobalAnimGraphicInfo(void)
     global_anim_info[i].graphic[j][k] = IMG_GFX_GLOBAL_ANIM_1 + i;
   }
 
-  /* initialize global animation definitions from dynamic configuration */
+  // initialize global animation definitions from dynamic configuration
   for (i = 0; i < num_property_mappings; i++)
   {
     int anim_nr = property_mapping[i].base_index - MAX_NUM_ELEMENTS - NUM_FONTS;
@@ -621,17 +621,17 @@ static void InitGlobalAnimGraphicInfo(void)
     if (anim_nr < 0 || anim_nr >= NUM_GLOBAL_ANIM_TOKENS)
       continue;
 
-    /* set animation part to base part, if not specified */
+    // set animation part to base part, if not specified
     if (!IS_GLOBAL_ANIM_PART(part_nr))
       part_nr = GLOBAL_ANIM_ID_PART_BASE;
 
-    /* set animation screen to default, if not specified */
+    // set animation screen to default, if not specified
     if (!IS_SPECIAL_GFX_ARG(special))
       special = GFX_SPECIAL_ARG_DEFAULT;
 
     global_anim_info[anim_nr].graphic[part_nr][special] = graphic;
 
-    /* fix default value for ".draw_masked" (for backward compatibility) */
+    // fix default value for ".draw_masked" (for backward compatibility)
     struct GraphicInfo *g = &graphic_info[graphic];
     struct FileInfo *image = getImageListEntryFromImageID(graphic);
     char **parameter_raw = image->parameter;
@@ -640,7 +640,7 @@ static void InitGlobalAnimGraphicInfo(void)
 						  image_config_suffix[p].token,
 						  image_config_suffix[p].type);
 
-    /* if ".draw_masked" parameter is undefined, use default value "TRUE" */
+    // if ".draw_masked" parameter is undefined, use default value "TRUE"
     if (draw_masked == ARG_UNDEFINED_VALUE)
       g->draw_masked = TRUE;
   }
@@ -664,13 +664,13 @@ static void InitGlobalAnimSoundInfo(void)
   int num_property_mappings = getSoundListPropertyMappingSize();
   int i, j, k;
 
-  /* always start with reliable default values (no global animation sounds) */
+  // always start with reliable default values (no global animation sounds)
   for (i = 0; i < NUM_GLOBAL_ANIM_TOKENS; i++)
     for (j = 0; j < NUM_GLOBAL_ANIM_PARTS_ALL; j++)
       for (k = 0; k < NUM_SPECIAL_GFX_ARGS; k++)
 	global_anim_info[i].sound[j][k] = SND_UNDEFINED;
 
-  /* initialize global animation sound definitions from dynamic configuration */
+  // initialize global animation sound definitions from dynamic configuration
   for (i = 0; i < num_property_mappings; i++)
   {
     int anim_nr = property_mapping[i].base_index - 2 * MAX_NUM_ELEMENTS;
@@ -684,11 +684,11 @@ static void InitGlobalAnimSoundInfo(void)
     if (anim_nr < 0 || anim_nr >= NUM_GLOBAL_ANIM_TOKENS)
       continue;
 
-    /* set animation part to base part, if not specified */
+    // set animation part to base part, if not specified
     if (!IS_GLOBAL_ANIM_PART(part_nr))
       part_nr = GLOBAL_ANIM_ID_PART_BASE;
 
-    /* set animation screen to default, if not specified */
+    // set animation screen to default, if not specified
     if (!IS_SPECIAL_GFX_ARG(special))
       special = GFX_SPECIAL_ARG_DEFAULT;
 
@@ -713,13 +713,13 @@ static void InitGlobalAnimMusicInfo(void)
   int num_property_mappings = getMusicListPropertyMappingSize();
   int i, j, k;
 
-  /* always start with reliable default values (no global animation music) */
+  // always start with reliable default values (no global animation music)
   for (i = 0; i < NUM_GLOBAL_ANIM_TOKENS; i++)
     for (j = 0; j < NUM_GLOBAL_ANIM_PARTS_ALL; j++)
       for (k = 0; k < NUM_SPECIAL_GFX_ARGS; k++)
 	global_anim_info[i].music[j][k] = MUS_UNDEFINED;
 
-  /* initialize global animation music definitions from dynamic configuration */
+  // initialize global animation music definitions from dynamic configuration
   for (i = 0; i < num_property_mappings; i++)
   {
     int anim_nr = property_mapping[i].base_index - NUM_MUSIC_PREFIXES;
@@ -733,11 +733,11 @@ static void InitGlobalAnimMusicInfo(void)
     if (anim_nr < 0 || anim_nr >= NUM_GLOBAL_ANIM_TOKENS)
       continue;
 
-    /* set animation part to base part, if not specified */
+    // set animation part to base part, if not specified
     if (!IS_GLOBAL_ANIM_PART(part_nr))
       part_nr = GLOBAL_ANIM_ID_PART_BASE;
 
-    /* set animation screen to default, if not specified */
+    // set animation screen to default, if not specified
     if (!IS_SPECIAL_GFX_ARG(special))
       special = GFX_SPECIAL_ARG_DEFAULT;
 
@@ -762,10 +762,10 @@ static void InitElementGraphicInfo(void)
   int num_property_mappings = getImageListPropertyMappingSize();
   int i, act, dir;
 
-  if (graphic_info == NULL)		/* still at startup phase */
+  if (graphic_info == NULL)		// still at startup phase
     return;
 
-  /* set values to -1 to identify later as "uninitialized" values */
+  // set values to -1 to identify later as "uninitialized" values
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
   {
     for (act = 0; act < NUM_ACTIONS; act++)
@@ -783,7 +783,7 @@ static void InitElementGraphicInfo(void)
 
   UPDATE_BUSY_STATE();
 
-  /* initialize normal element/graphic mapping from static configuration */
+  // initialize normal element/graphic mapping from static configuration
   for (i = 0; element_to_graphic[i].element > -1; i++)
   {
     int element      = element_to_graphic[i].element;
@@ -831,7 +831,7 @@ static void InitElementGraphicInfo(void)
     }
   }
 
-  /* initialize normal element/graphic mapping from dynamic configuration */
+  // initialize normal element/graphic mapping from dynamic configuration
   for (i = 0; i < num_property_mappings; i++)
   {
     int element   = property_mapping[i].base_index;
@@ -880,7 +880,7 @@ static void InitElementGraphicInfo(void)
     }
   }
 
-  /* now copy all graphics that are defined to be cloned from other graphics */
+  // now copy all graphics that are defined to be cloned from other graphics
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
   {
     int graphic = element_info[i].graphic[ACTION_DEFAULT];
@@ -913,10 +913,10 @@ static void InitElementGraphicInfo(void)
     }
   }
 
-  /* set hardcoded definitions for some runtime elements without graphic */
+  // set hardcoded definitions for some runtime elements without graphic
   element_info[EL_AMOEBA_TO_DIAMOND].graphic[ACTION_DEFAULT] = IMG_AMOEBA_DEAD;
 
-  /* set hardcoded definitions for some internal elements without graphic */
+  // set hardcoded definitions for some internal elements without graphic
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
   {
     if (IS_EDITOR_CASCADE_INACTIVE(i))
@@ -925,7 +925,7 @@ static void InitElementGraphicInfo(void)
       element_info[i].graphic[ACTION_DEFAULT] = IMG_EDITOR_CASCADE_LIST_ACTIVE;
   }
 
-  /* now set all undefined/invalid graphics to -1 to set to default after it */
+  // now set all undefined/invalid graphics to -1 to set to default after it
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
   {
     for (act = 0; act < NUM_ACTIONS; act++)
@@ -966,7 +966,7 @@ static void InitElementGraphicInfo(void)
 	int graphic = element_info[i].direction_graphic[act][dir];
 	int move_dir = (act == ACTION_FALLING ? MV_BIT_DOWN : dir);
 
-	if (act == ACTION_FALLING)	/* special case */
+	if (act == ACTION_FALLING)	// special case
 	  graphic = element_info[i].graphic[act];
 
 	if (graphic != -1 &&
@@ -990,21 +990,21 @@ static void InitElementGraphicInfo(void)
 	      (move_dir == MV_BIT_RIGHT &&  front_is_left_or_upper) ||
 	      (move_dir == MV_BIT_DOWN  &&  front_is_left_or_upper)));
 
-	  /* swap frontside and backside graphic tile coordinates, if needed */
+	  // swap frontside and backside graphic tile coordinates, if needed
 	  if (swap_movement_tiles_always || swap_movement_tiles_autodetected)
 	  {
-	    /* get current (wrong) backside tile coordinates */
+	    // get current (wrong) backside tile coordinates
 	    getGraphicSourceXY(graphic, 0, &src_x_back, &src_y_back, TRUE);
 
-	    /* set frontside tile coordinates to backside tile coordinates */
+	    // set frontside tile coordinates to backside tile coordinates
 	    g->src_x = src_x_back;
 	    g->src_y = src_y_back;
 
-	    /* invert tile offset to point to new backside tile coordinates */
+	    // invert tile offset to point to new backside tile coordinates
 	    g->offset2_x *= -1;
 	    g->offset2_y *= -1;
 
-	    /* do not swap front and backside tiles again after correction */
+	    // do not swap front and backside tiles again after correction
 	    g->swap_double_tiles = 0;
 	  }
 	}
@@ -1014,7 +1014,7 @@ static void InitElementGraphicInfo(void)
 
   UPDATE_BUSY_STATE();
 
-  /* now set all '-1' values to element specific default values */
+  // now set all '-1' values to element specific default values
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
   {
     int default_graphic = element_info[i].graphic[ACTION_DEFAULT];
@@ -1052,7 +1052,7 @@ static void InitElementGraphicInfo(void)
 			     act == ACTION_TURNING_FROM_UP ||
 			     act == ACTION_TURNING_FROM_DOWN);
 
-      /* generic default action graphic (defined by "[default]" directive) */
+      // generic default action graphic (defined by "[default]" directive)
       int default_action_graphic = element_info[EL_DEFAULT].graphic[act];
       int default_action_crumbled = element_info[EL_DEFAULT].crumbled[act];
       int default_remove_graphic = IMG_EMPTY;
@@ -1060,7 +1060,7 @@ static void InitElementGraphicInfo(void)
       if (act_remove && default_action_graphic != -1)
 	default_remove_graphic = default_action_graphic;
 
-      /* look for special default action graphic (classic game specific) */
+      // look for special default action graphic (classic game specific)
       if (IS_BD_ELEMENT(i) && element_info[EL_BD_DEFAULT].graphic[act] != -1)
 	default_action_graphic = element_info[EL_BD_DEFAULT].graphic[act];
       if (IS_SP_ELEMENT(i) && element_info[EL_SP_DEFAULT].graphic[act] != -1)
@@ -1079,8 +1079,8 @@ static void InitElementGraphicInfo(void)
       if (IS_MM_ELEMENT(i) && element_info[EL_MM_DEFAULT].crumbled[act] != -1)
 	default_action_crumbled = element_info[EL_MM_DEFAULT].crumbled[act];
 
-      /* !!! needed because EL_EMPTY_SPACE treated as IS_SP_ELEMENT !!! */
-      /* !!! make this better !!! */
+      // !!! needed because EL_EMPTY_SPACE treated as IS_SP_ELEMENT !!!
+      // !!! make this better !!!
       if (i == EL_EMPTY_SPACE)
       {
 	default_action_graphic = element_info[EL_DEFAULT].graphic[act];
@@ -1095,11 +1095,11 @@ static void InitElementGraphicInfo(void)
 
       for (dir = 0; dir < NUM_DIRECTIONS_FULL; dir++)
       {
-	/* use action graphic as the default direction graphic, if undefined */
+	// use action graphic as the default direction graphic, if undefined
 	int default_action_direction_graphic = element_info[i].graphic[act];
 	int default_action_direction_crumbled = element_info[i].crumbled[act];
 
-	/* no graphic for current action -- use default direction graphic */
+	// no graphic for current action -- use default direction graphic
 	if (default_action_direction_graphic == -1)
 	  default_action_direction_graphic =
 	    (act_remove ? default_remove_graphic :
@@ -1122,7 +1122,7 @@ static void InitElementGraphicInfo(void)
 	    default_action_direction_crumbled;
       }
 
-      /* no graphic for this specific action -- use default action graphic */
+      // no graphic for this specific action -- use default action graphic
       if (element_info[i].graphic[act] == -1)
 	element_info[i].graphic[act] =
 	  (act_remove ? default_remove_graphic :
@@ -1143,13 +1143,13 @@ static void InitElementSpecialGraphicInfo(void)
   int num_property_mappings = getImageListPropertyMappingSize();
   int i, j;
 
-  /* always start with reliable default values */
+  // always start with reliable default values
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
     for (j = 0; j < NUM_SPECIAL_GFX_ARGS; j++)
       element_info[i].special_graphic[j] =
 	element_info[i].graphic[ACTION_DEFAULT];
 
-  /* initialize special element/graphic mapping from static configuration */
+  // initialize special element/graphic mapping from static configuration
   for (i = 0; element_to_special_graphic[i].element > -1; i++)
   {
     int element = element_to_special_graphic[i].element;
@@ -1171,7 +1171,7 @@ static void InitElementSpecialGraphicInfo(void)
     element_info[element].special_graphic[special] = graphic;
   }
 
-  /* initialize special element/graphic mapping from dynamic configuration */
+  // initialize special element/graphic mapping from dynamic configuration
   for (i = 0; i < num_property_mappings; i++)
   {
     int element   = property_mapping[i].base_index;
@@ -1180,7 +1180,7 @@ static void InitElementSpecialGraphicInfo(void)
     int special   = property_mapping[i].ext3_index;
     int graphic   = property_mapping[i].artwork_index;
 
-    /* for action ".active", replace element with active element, if exists */
+    // for action ".active", replace element with active element, if exists
     if (action == ACTION_ACTIVE && element != ELEMENT_ACTIVE(element))
     {
       element = ELEMENT_ACTIVE(element);
@@ -1190,7 +1190,7 @@ static void InitElementSpecialGraphicInfo(void)
     if (element >= MAX_NUM_ELEMENTS)
       continue;
 
-    /* do not change special graphic if action or direction was specified */
+    // do not change special graphic if action or direction was specified
     if (action != -1 || direction != -1)
       continue;
 
@@ -1198,7 +1198,7 @@ static void InitElementSpecialGraphicInfo(void)
       element_info[element].special_graphic[special] = graphic;
   }
 
-  /* now set all undefined/invalid graphics to default */
+  // now set all undefined/invalid graphics to default
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
     for (j = 0; j < NUM_SPECIAL_GFX_ARGS; j++)
       if (graphic_info[element_info[i].special_graphic[j]].bitmap == NULL)
@@ -1277,24 +1277,24 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   int anim_frames_per_row = 1, anim_frames_per_col = 1;
   int anim_frames_per_line = 1;
 
-  /* always start with reliable default values */
+  // always start with reliable default values
   g->src_image_width = 0;
   g->src_image_height = 0;
   g->src_x = 0;
   g->src_y = 0;
-  g->width  = TILEX;			/* default for element graphics */
-  g->height = TILEY;			/* default for element graphics */
-  g->offset_x = 0;			/* one or both of these values ... */
-  g->offset_y = 0;			/* ... will be corrected later */
-  g->offset2_x = 0;			/* one or both of these values ... */
-  g->offset2_y = 0;			/* ... will be corrected later */
-  g->swap_double_tiles = -1;		/* auto-detect tile swapping */
-  g->crumbled_like = -1;		/* do not use clone element */
-  g->diggable_like = -1;		/* do not use clone element */
-  g->border_size = TILEX / 8;		/* "CRUMBLED" border size */
-  g->scale_up_factor = 1;		/* default: no scaling up */
-  g->tile_size = TILESIZE;		/* default: standard tile size */
-  g->clone_from = -1;			/* do not use clone graphic */
+  g->width  = TILEX;			// default for element graphics
+  g->height = TILEY;			// default for element graphics
+  g->offset_x = 0;			// one or both of these values ...
+  g->offset_y = 0;			// ... will be corrected later
+  g->offset2_x = 0;			// one or both of these values ...
+  g->offset2_y = 0;			// ... will be corrected later
+  g->swap_double_tiles = -1;		// auto-detect tile swapping
+  g->crumbled_like = -1;		// do not use clone element
+  g->diggable_like = -1;		// do not use clone element
+  g->border_size = TILEX / 8;		// "CRUMBLED" border size
+  g->scale_up_factor = 1;		// default: no scaling up
+  g->tile_size = TILESIZE;		// default: standard tile size
+  g->clone_from = -1;			// do not use clone graphic
   g->init_delay_fixed = 0;
   g->init_delay_random = 0;
   g->anim_delay_fixed = 0;
@@ -1311,22 +1311,22 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   g->fade_delay = -1;
   g->post_delay = -1;
   g->auto_delay = -1;
-  g->align = ALIGN_CENTER;		/* default for title screens */
-  g->valign = VALIGN_MIDDLE;		/* default for title screens */
-  g->sort_priority = 0;			/* default for title screens */
+  g->align = ALIGN_CENTER;		// default for title screens
+  g->valign = VALIGN_MIDDLE;		// default for title screens
+  g->sort_priority = 0;			// default for title screens
   g->class = 0;
   g->style = STYLE_DEFAULT;
 
   g->bitmaps = src_bitmaps;
   g->bitmap = src_bitmap;
 
-  /* optional zoom factor for scaling up the image to a larger size */
+  // optional zoom factor for scaling up the image to a larger size
   if (parameter[GFX_ARG_SCALE_UP_FACTOR] != ARG_UNDEFINED_VALUE)
     g->scale_up_factor = parameter[GFX_ARG_SCALE_UP_FACTOR];
   if (g->scale_up_factor < 1)
-    g->scale_up_factor = 1;		/* no scaling */
+    g->scale_up_factor = 1;		// no scaling
 
-  /* optional tile size for using non-standard image size */
+  // optional tile size for using non-standard image size
   if (parameter[GFX_ARG_TILE_SIZE] != ARG_UNDEFINED_VALUE)
   {
     g->tile_size = parameter[GFX_ARG_TILE_SIZE];
@@ -1334,7 +1334,7 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
 #if 0
     // CHECK: should tile sizes less than standard tile size be allowed?
     if (g->tile_size < TILESIZE)
-      g->tile_size = TILESIZE;		/* standard tile size */
+      g->tile_size = TILESIZE;		// standard tile size
 #endif
 
     // when setting tile size, also set width and height accordingly
@@ -1344,24 +1344,24 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
 
   if (g->use_image_size)
   {
-    /* set new default bitmap size (with scaling, but without small images) */
+    // set new default bitmap size (with scaling, but without small images)
     g->width  = get_scaled_graphic_width(graphic);
     g->height = get_scaled_graphic_height(graphic);
   }
 
-  /* optional width and height of each animation frame */
+  // optional width and height of each animation frame
   if (parameter[GFX_ARG_WIDTH] != ARG_UNDEFINED_VALUE)
     g->width = parameter[GFX_ARG_WIDTH];
   if (parameter[GFX_ARG_HEIGHT] != ARG_UNDEFINED_VALUE)
     g->height = parameter[GFX_ARG_HEIGHT];
 
-  /* optional x and y tile position of animation frame sequence */
+  // optional x and y tile position of animation frame sequence
   if (parameter[GFX_ARG_XPOS] != ARG_UNDEFINED_VALUE)
     g->src_x = parameter[GFX_ARG_XPOS] * g->width;
   if (parameter[GFX_ARG_YPOS] != ARG_UNDEFINED_VALUE)
     g->src_y = parameter[GFX_ARG_YPOS] * g->height;
 
-  /* optional x and y pixel position of animation frame sequence */
+  // optional x and y pixel position of animation frame sequence
   if (parameter[GFX_ARG_X] != ARG_UNDEFINED_VALUE)
     g->src_x = parameter[GFX_ARG_X];
   if (parameter[GFX_ARG_Y] != ARG_UNDEFINED_VALUE)
@@ -1376,7 +1376,7 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
 	    g->width, getTokenFromImageID(graphic), TILEX);
       Error(ERR_INFO_LINE, "-");
 
-      g->width = TILEX;		/* will be checked to be inside bitmap later */
+      g->width = TILEX;		// will be checked to be inside bitmap later
     }
 
     if (g->height <= 0)
@@ -1386,19 +1386,19 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
 	    g->height, getTokenFromImageID(graphic), TILEY);
       Error(ERR_INFO_LINE, "-");
 
-      g->height = TILEY;	/* will be checked to be inside bitmap later */
+      g->height = TILEY;	// will be checked to be inside bitmap later
     }
   }
 
   if (src_bitmap)
   {
-    /* get final bitmap size (with scaling, but without small images) */
+    // get final bitmap size (with scaling, but without small images)
     int src_image_width  = get_scaled_graphic_width(graphic);
     int src_image_height = get_scaled_graphic_height(graphic);
 
     if (src_image_width == 0 || src_image_height == 0)
     {
-      /* only happens when loaded outside artwork system (like "global.busy") */
+      // only happens when loaded outside artwork system (like "global.busy")
       src_image_width  = src_bitmap->width;
       src_image_height = src_bitmap->height;
     }
@@ -1418,51 +1418,51 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
     g->src_image_height = src_image_height;
   }
 
-  /* correct x or y offset dependent of vertical or horizontal frame order */
-  if (parameter[GFX_ARG_VERTICAL])	/* frames are ordered vertically */
+  // correct x or y offset dependent of vertical or horizontal frame order
+  if (parameter[GFX_ARG_VERTICAL])	// frames are ordered vertically
   {
     g->offset_y = (parameter[GFX_ARG_OFFSET] != ARG_UNDEFINED_VALUE ?
 		   parameter[GFX_ARG_OFFSET] : g->height);
     anim_frames_per_line = anim_frames_per_col;
   }
-  else					/* frames are ordered horizontally */
+  else					// frames are ordered horizontally
   {
     g->offset_x = (parameter[GFX_ARG_OFFSET] != ARG_UNDEFINED_VALUE ?
 		   parameter[GFX_ARG_OFFSET] : g->width);
     anim_frames_per_line = anim_frames_per_row;
   }
 
-  /* optionally, the x and y offset of frames can be specified directly */
+  // optionally, the x and y offset of frames can be specified directly
   if (parameter[GFX_ARG_XOFFSET] != ARG_UNDEFINED_VALUE)
     g->offset_x = parameter[GFX_ARG_XOFFSET];
   if (parameter[GFX_ARG_YOFFSET] != ARG_UNDEFINED_VALUE)
     g->offset_y = parameter[GFX_ARG_YOFFSET];
 
-  /* optionally, moving animations may have separate start and end graphics */
+  // optionally, moving animations may have separate start and end graphics
   g->double_movement = parameter[GFX_ARG_2ND_MOVEMENT_TILE];
 
   if (parameter[GFX_ARG_2ND_VERTICAL] == ARG_UNDEFINED_VALUE)
     parameter[GFX_ARG_2ND_VERTICAL] = !parameter[GFX_ARG_VERTICAL];
 
-  /* correct x or y offset2 dependent of vertical or horizontal frame order */
-  if (parameter[GFX_ARG_2ND_VERTICAL])	/* frames are ordered vertically */
+  // correct x or y offset2 dependent of vertical or horizontal frame order
+  if (parameter[GFX_ARG_2ND_VERTICAL])	// frames are ordered vertically
     g->offset2_y = (parameter[GFX_ARG_2ND_OFFSET] != ARG_UNDEFINED_VALUE ?
 		    parameter[GFX_ARG_2ND_OFFSET] : g->height);
-  else					/* frames are ordered horizontally */
+  else					// frames are ordered horizontally
     g->offset2_x = (parameter[GFX_ARG_2ND_OFFSET] != ARG_UNDEFINED_VALUE ?
 		    parameter[GFX_ARG_2ND_OFFSET] : g->width);
 
-  /* optionally, the x and y offset of 2nd graphic can be specified directly */
+  // optionally, the x and y offset of 2nd graphic can be specified directly
   if (parameter[GFX_ARG_2ND_XOFFSET] != ARG_UNDEFINED_VALUE)
     g->offset2_x = parameter[GFX_ARG_2ND_XOFFSET];
   if (parameter[GFX_ARG_2ND_YOFFSET] != ARG_UNDEFINED_VALUE)
     g->offset2_y = parameter[GFX_ARG_2ND_YOFFSET];
 
-  /* optionally, the second movement tile can be specified as start tile */
+  // optionally, the second movement tile can be specified as start tile
   if (parameter[GFX_ARG_2ND_SWAP_TILES] != ARG_UNDEFINED_VALUE)
     g->swap_double_tiles= parameter[GFX_ARG_2ND_SWAP_TILES];
 
-  /* automatically determine correct number of frames, if not defined */
+  // automatically determine correct number of frames, if not defined
   if (parameter[GFX_ARG_FRAMES] != ARG_UNDEFINED_VALUE)
     g->anim_frames = parameter[GFX_ARG_FRAMES];
   else if (parameter[GFX_ARG_XPOS] == 0 && !parameter[GFX_ARG_VERTICAL])
@@ -1472,7 +1472,7 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   else
     g->anim_frames = 1;
 
-  if (g->anim_frames == 0)		/* frames must be at least 1 */
+  if (g->anim_frames == 0)		// frames must be at least 1
     g->anim_frames = 1;
 
   g->anim_frames_per_line =
@@ -1480,12 +1480,12 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
      parameter[GFX_ARG_FRAMES_PER_LINE] : anim_frames_per_line);
 
   g->anim_delay = parameter[GFX_ARG_DELAY];
-  if (g->anim_delay == 0)		/* delay must be at least 1 */
+  if (g->anim_delay == 0)		// delay must be at least 1
     g->anim_delay = 1;
 
   g->anim_mode = parameter[GFX_ARG_ANIM_MODE];
 
-  /* automatically determine correct start frame, if not defined */
+  // automatically determine correct start frame, if not defined
   if (parameter[GFX_ARG_START_FRAME] == ARG_UNDEFINED_VALUE)
     g->anim_start_frame = 0;
   else if (g->anim_mode & ANIM_REVERSE)
@@ -1493,22 +1493,22 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   else
     g->anim_start_frame = parameter[GFX_ARG_START_FRAME];
 
-  /* animation synchronized with global frame counter, not move position */
+  // animation synchronized with global frame counter, not move position
   g->anim_global_sync = parameter[GFX_ARG_GLOBAL_SYNC];
 
-  /* optional element for cloning crumble graphics */
+  // optional element for cloning crumble graphics
   if (parameter[GFX_ARG_CRUMBLED_LIKE] != ARG_UNDEFINED_VALUE)
     g->crumbled_like = parameter[GFX_ARG_CRUMBLED_LIKE];
 
-  /* optional element for cloning digging graphics */
+  // optional element for cloning digging graphics
   if (parameter[GFX_ARG_DIGGABLE_LIKE] != ARG_UNDEFINED_VALUE)
     g->diggable_like = parameter[GFX_ARG_DIGGABLE_LIKE];
 
-  /* optional border size for "crumbling" diggable graphics */
+  // optional border size for "crumbling" diggable graphics
   if (parameter[GFX_ARG_BORDER_SIZE] != ARG_UNDEFINED_VALUE)
     g->border_size = parameter[GFX_ARG_BORDER_SIZE];
 
-  /* used for global animations and player "boring" and "sleeping" actions */
+  // used for global animations and player "boring" and "sleeping" actions
   if (parameter[GFX_ARG_INIT_DELAY_FIXED] != ARG_UNDEFINED_VALUE)
     g->init_delay_fixed = parameter[GFX_ARG_INIT_DELAY_FIXED];
   if (parameter[GFX_ARG_INIT_DELAY_RANDOM] != ARG_UNDEFINED_VALUE)
@@ -1522,7 +1522,7 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   if (parameter[GFX_ARG_POST_DELAY_RANDOM] != ARG_UNDEFINED_VALUE)
     g->post_delay_random = parameter[GFX_ARG_POST_DELAY_RANDOM];
 
-  /* used for global animations */
+  // used for global animations
   if (parameter[GFX_ARG_INIT_EVENT] != ARG_UNDEFINED_VALUE)
     g->init_event = parameter[GFX_ARG_INIT_EVENT];
   if (parameter[GFX_ARG_ANIM_EVENT] != ARG_UNDEFINED_VALUE)
@@ -1532,7 +1532,7 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   if (parameter[GFX_ARG_ANIM_EVENT_ACTION] != ARG_UNDEFINED_VALUE)
     g->anim_event_action = parameter[GFX_ARG_ANIM_EVENT_ACTION];
 
-  /* used for toon animations and global animations */
+  // used for toon animations and global animations
   g->step_offset  = parameter[GFX_ARG_STEP_OFFSET];
   g->step_xoffset = parameter[GFX_ARG_STEP_XOFFSET];
   g->step_yoffset = parameter[GFX_ARG_STEP_YOFFSET];
@@ -1542,28 +1542,28 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   g->x            = parameter[GFX_ARG_X];	// (may be uninitialized,
   g->y            = parameter[GFX_ARG_Y];	// unlike src_x and src_y)
 
-  /* this is only used for drawing font characters */
+  // this is only used for drawing font characters
   g->draw_xoffset = parameter[GFX_ARG_DRAW_XOFFSET];
   g->draw_yoffset = parameter[GFX_ARG_DRAW_YOFFSET];
 
-  /* use a different default value for global animations and toons */
+  // use a different default value for global animations and toons
   if ((graphic >= IMG_GFX_GLOBAL_ANIM_1 && graphic <= IMG_GFX_GLOBAL_ANIM_8) ||
       (graphic >= IMG_TOON_1            && graphic <= IMG_TOON_20))
     g->draw_masked = TRUE;
 
-  /* this is used for drawing envelopes, global animations and toons */
+  // this is used for drawing envelopes, global animations and toons
   if (parameter[GFX_ARG_DRAW_MASKED] != ARG_UNDEFINED_VALUE)
     g->draw_masked = parameter[GFX_ARG_DRAW_MASKED];
 
-  /* used for toon animations and global animations */
+  // used for toon animations and global animations
   if (parameter[GFX_ARG_DRAW_ORDER] != ARG_UNDEFINED_VALUE)
     g->draw_order = parameter[GFX_ARG_DRAW_ORDER];
 
-  /* optional graphic for cloning all graphics settings */
+  // optional graphic for cloning all graphics settings
   if (parameter[GFX_ARG_CLONE_FROM] != ARG_UNDEFINED_VALUE)
     g->clone_from = parameter[GFX_ARG_CLONE_FROM];
 
-  /* optional settings for drawing title screens and title messages */
+  // optional settings for drawing title screens and title messages
   if (parameter[GFX_ARG_FADE_MODE] != ARG_UNDEFINED_VALUE)
     g->fade_mode = parameter[GFX_ARG_FADE_MODE];
   if (parameter[GFX_ARG_FADE_DELAY] != ARG_UNDEFINED_VALUE)
@@ -1584,7 +1584,7 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   if (parameter[GFX_ARG_STYLE] != ARG_UNDEFINED_VALUE)
     g->style = parameter[GFX_ARG_STYLE];
 
-  /* this is only used for drawing menu buttons and text */
+  // this is only used for drawing menu buttons and text
   g->active_xoffset = parameter[GFX_ARG_ACTIVE_XOFFSET];
   g->active_yoffset = parameter[GFX_ARG_ACTIVE_YOFFSET];
   g->pressed_xoffset = parameter[GFX_ARG_PRESSED_XOFFSET];
@@ -1599,11 +1599,11 @@ static void set_graphic_parameters(int graphic)
   int parameter[NUM_GFX_ARGS];
   int i;
 
-  /* if fallback to default artwork is done, also use the default parameters */
+  // if fallback to default artwork is done, also use the default parameters
   if (image->fallback_to_default)
     parameter_raw = image->default_parameter;
 
-  /* get integer values from string parameters */
+  // get integer values from string parameters
   for (i = 0; i < NUM_GFX_ARGS; i++)
     parameter[i] = get_graphic_parameter_value(parameter_raw[i],
 					       image_config_suffix[i].token,
@@ -1659,7 +1659,7 @@ static void InitGraphicInfo(void)
   int num_images = getImageListSize();
   int i;
 
-  /* use image size as default values for width and height for these images */
+  // use image size as default values for width and height for these images
   static int full_size_graphics[] =
   {
     IMG_GLOBAL_BORDER,
@@ -1727,19 +1727,19 @@ static void InitGraphicInfo(void)
 
   graphic_info = checked_calloc(num_images * sizeof(struct GraphicInfo));
 
-  /* initialize "use_image_size" flag with default value */
+  // initialize "use_image_size" flag with default value
   for (i = 0; i < num_images; i++)
     graphic_info[i].use_image_size = FALSE;
 
-  /* initialize "use_image_size" flag from static configuration above */
+  // initialize "use_image_size" flag from static configuration above
   for (i = 0; full_size_graphics[i] != -1; i++)
     graphic_info[full_size_graphics[i]].use_image_size = TRUE;
 
-  /* first set all graphic paramaters ... */
+  // first set all graphic paramaters ...
   for (i = 0; i < num_images; i++)
     set_graphic_parameters(i);
 
-  /* ... then copy these parameters for cloned graphics */
+  // ... then copy these parameters for cloned graphics
   for (i = 0; i < num_images; i++)
     if (graphic_info[i].clone_from != -1)
       set_cloned_graphic_parameters(i);
@@ -1752,23 +1752,23 @@ static void InitGraphicInfo(void)
     int last_frame;
     int src_bitmap_width, src_bitmap_height;
 
-    /* now check if no animation frames are outside of the loaded image */
+    // now check if no animation frames are outside of the loaded image
 
     if (graphic_info[i].bitmap == NULL)
-      continue;		/* skip check for optional images that are undefined */
+      continue;		// skip check for optional images that are undefined
 
-    /* get image size (this can differ from the standard element tile size!) */
+    // get image size (this can differ from the standard element tile size!)
     width  = graphic_info[i].width;
     height = graphic_info[i].height;
 
-    /* get final bitmap size (with scaling, but without small images) */
+    // get final bitmap size (with scaling, but without small images)
     src_bitmap_width  = graphic_info[i].src_image_width;
     src_bitmap_height = graphic_info[i].src_image_height;
 
-    /* check if first animation frame is inside specified bitmap */
+    // check if first animation frame is inside specified bitmap
 
-    /* do not use getGraphicSourceXY() here to get position of first frame; */
-    /* this avoids calculating wrong start position for out-of-bounds frame */
+    // do not use getGraphicSourceXY() here to get position of first frame;
+    // this avoids calculating wrong start position for out-of-bounds frame
     src_x = graphic_info[i].src_x;
     src_y = graphic_info[i].src_y;
 
@@ -1798,11 +1798,11 @@ static void InitGraphicInfo(void)
 
       graphic_info[i] = graphic_info[fallback_graphic];
 
-      /* if first frame out of bounds, do not check last frame anymore */
+      // if first frame out of bounds, do not check last frame anymore
       continue;
     }
 
-    /* check if last animation frame is inside specified bitmap */
+    // check if last animation frame is inside specified bitmap
 
     last_frame = graphic_info[i].anim_frames - 1;
     getGraphicSourceXY(i, last_frame, &src_x, &src_y, FALSE);
@@ -1850,17 +1850,17 @@ static void InitGraphicCompatibilityInfo(void)
      to solve this, remap all those individual definitions that are not
      redefined to the new bitmap of "global.door" if it was redefined */
 
-  /* special compatibility handling if image "global.door" was redefined */
+  // special compatibility handling if image "global.door" was redefined
   if (fi_global_door->redefined)
   {
     for (i = 0; i < num_images; i++)
     {
       struct FileInfo *fi = getImageListEntryFromImageID(i);
 
-      /* process only those images that still use the default settings */
+      // process only those images that still use the default settings
       if (!fi->redefined)
       {
-	/* process all images which default to same image as "global.door" */
+	// process all images which default to same image as "global.door"
 	if (strEqual(fi->default_filename, fi_global_door->default_filename))
 	{
 	  // printf("::: special treatment needed for token '%s'\n", fi->token);
@@ -1881,12 +1881,12 @@ static void InitElementSoundInfo(void)
   int num_property_mappings = getSoundListPropertyMappingSize();
   int i, j, act;
 
-  /* set values to -1 to identify later as "uninitialized" values */
+  // set values to -1 to identify later as "uninitialized" values
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
     for (act = 0; act < NUM_ACTIONS; act++)
       element_info[i].sound[act] = -1;
 
-  /* initialize element/sound mapping from static configuration */
+  // initialize element/sound mapping from static configuration
   for (i = 0; element_to_sound[i].element > -1; i++)
   {
     int element      = element_to_sound[i].element;
@@ -1906,7 +1906,7 @@ static void InitElementSoundInfo(void)
 	  element_info[j].sound[action] = sound;
   }
 
-  /* initialize element class/sound mapping from dynamic configuration */
+  // initialize element class/sound mapping from dynamic configuration
   for (i = 0; i < num_property_mappings; i++)
   {
     int element_class = property_mapping[i].base_index - MAX_NUM_ELEMENTS;
@@ -1925,7 +1925,7 @@ static void InitElementSoundInfo(void)
 	element_info[j].sound[action] = sound;
   }
 
-  /* initialize element/sound mapping from dynamic configuration */
+  // initialize element/sound mapping from dynamic configuration
   for (i = 0; i < num_property_mappings; i++)
   {
     int element = property_mapping[i].base_index;
@@ -1941,15 +1941,15 @@ static void InitElementSoundInfo(void)
     element_info[element].sound[action] = sound;
   }
 
-  /* now set all '-1' values to element specific default values */
+  // now set all '-1' values to element specific default values
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
   {
     for (act = 0; act < NUM_ACTIONS; act++)
     {
-      /* generic default action sound (defined by "[default]" directive) */
+      // generic default action sound (defined by "[default]" directive)
       int default_action_sound = element_info[EL_DEFAULT].sound[act];
 
-      /* look for special default action sound (classic game specific) */
+      // look for special default action sound (classic game specific)
       if (IS_BD_ELEMENT(i) && element_info[EL_BD_DEFAULT].sound[act] != -1)
 	default_action_sound = element_info[EL_BD_DEFAULT].sound[act];
       if (IS_SP_ELEMENT(i) && element_info[EL_SP_DEFAULT].sound[act] != -1)
@@ -1959,12 +1959,12 @@ static void InitElementSoundInfo(void)
       if (IS_MM_ELEMENT(i) && element_info[EL_MM_DEFAULT].sound[act] != -1)
 	default_action_sound = element_info[EL_MM_DEFAULT].sound[act];
 
-      /* !!! needed because EL_EMPTY_SPACE treated as IS_SP_ELEMENT !!! */
-      /* !!! make this better !!! */
+      // !!! needed because EL_EMPTY_SPACE treated as IS_SP_ELEMENT !!!
+      // !!! make this better !!!
       if (i == EL_EMPTY_SPACE)
 	default_action_sound = element_info[EL_DEFAULT].sound[act];
 
-      /* no sound for this specific action -- use default action sound */
+      // no sound for this specific action -- use default action sound
       if (element_info[i].sound[act] == -1)
 	element_info[i].sound[act] = default_action_sound;
     }
@@ -1983,11 +1983,11 @@ static void InitGameModeSoundInfo(void)
 {
   int i;
 
-  /* set values to -1 to identify later as "uninitialized" values */
+  // set values to -1 to identify later as "uninitialized" values
   for (i = 0; i < NUM_SPECIAL_GFX_ARGS; i++)
     menu.sound[i] = -1;
 
-  /* initialize gamemode/sound mapping from static configuration */
+  // initialize gamemode/sound mapping from static configuration
   for (i = 0; gamemode_to_sound[i].sound > -1; i++)
   {
     int gamemode = gamemode_to_sound[i].gamemode;
@@ -1999,7 +1999,7 @@ static void InitGameModeSoundInfo(void)
     menu.sound[gamemode] = sound;
   }
 
-  /* now set all '-1' values to levelset specific default values */
+  // now set all '-1' values to levelset specific default values
   for (i = 0; i < NUM_SPECIAL_GFX_ARGS; i++)
     if (menu.sound[i] == -1)
       menu.sound[i] = menu.sound[GAME_MODE_DEFAULT];
@@ -2010,21 +2010,21 @@ static void set_sound_parameters(int sound, char **parameter_raw)
   int parameter[NUM_SND_ARGS];
   int i;
 
-  /* get integer values from string parameters */
+  // get integer values from string parameters
   for (i = 0; i < NUM_SND_ARGS; i++)
     parameter[i] =
       get_parameter_value(parameter_raw[i],
 			  sound_config_suffix[i].token,
 			  sound_config_suffix[i].type);
 
-  /* explicit loop mode setting in configuration overrides default value */
+  // explicit loop mode setting in configuration overrides default value
   if (parameter[SND_ARG_MODE_LOOP] != ARG_UNDEFINED_VALUE)
     sound_info[sound].loop = parameter[SND_ARG_MODE_LOOP];
 
-  /* sound volume to change the original volume when loading the sound file */
+  // sound volume to change the original volume when loading the sound file
   sound_info[sound].volume = parameter[SND_ARG_VOLUME];
 
-  /* sound priority to give certain sounds a higher or lower priority */
+  // sound priority to give certain sounds a higher or lower priority
   sound_info[sound].priority = parameter[SND_ARG_PRIORITY];
 }
 
@@ -2039,7 +2039,7 @@ static void InitSoundInfo(void)
   sound_effect_properties = checked_calloc(num_sounds * sizeof(int));
   sound_info = checked_calloc(num_sounds * sizeof(struct SoundInfo));
 
-  /* initialize sound effect for all elements to "no sound" */
+  // initialize sound effect for all elements to "no sound"
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
     for (j = 0; j < NUM_ACTIONS; j++)
       element_info[i].sound[j] = SND_UNDEFINED;
@@ -2050,9 +2050,9 @@ static void InitSoundInfo(void)
     int len_effect_text = strlen(sound->token);
 
     sound_effect_properties[i] = ACTION_OTHER;
-    sound_info[i].loop = FALSE;		/* default: play sound only once */
+    sound_info[i].loop = FALSE;		// default: play sound only once
 
-    /* determine all loop sounds and identify certain sound classes */
+    // determine all loop sounds and identify certain sound classes
 
     for (j = 0; element_action_info[j].suffix; j++)
     {
@@ -2069,7 +2069,7 @@ static void InitSoundInfo(void)
       }
     }
 
-    /* associate elements and some selected sound actions */
+    // associate elements and some selected sound actions
 
     for (j = 0; j < MAX_NUM_ELEMENTS; j++)
     {
@@ -2102,13 +2102,13 @@ static void InitGameModeMusicInfo(void)
   int default_levelset_music = -1;
   int i;
 
-  /* set values to -1 to identify later as "uninitialized" values */
+  // set values to -1 to identify later as "uninitialized" values
   for (i = 0; i < MAX_LEVELS; i++)
     levelset.music[i] = -1;
   for (i = 0; i < NUM_SPECIAL_GFX_ARGS; i++)
     menu.music[i] = -1;
 
-  /* initialize gamemode/music mapping from static configuration */
+  // initialize gamemode/music mapping from static configuration
   for (i = 0; gamemode_to_music[i].music > -1; i++)
   {
     int gamemode = gamemode_to_music[i].gamemode;
@@ -2120,7 +2120,7 @@ static void InitGameModeMusicInfo(void)
     menu.music[gamemode] = music;
   }
 
-  /* initialize gamemode/music mapping from dynamic configuration */
+  // initialize gamemode/music mapping from dynamic configuration
   for (i = 0; i < num_property_mappings; i++)
   {
     int prefix   = property_mapping[i].base_index;
@@ -2134,7 +2134,7 @@ static void InitGameModeMusicInfo(void)
     if (gamemode < 0)
       gamemode = GAME_MODE_DEFAULT;
 
-    /* level specific music only allowed for in-game music */
+    // level specific music only allowed for in-game music
     if (level != -1 && gamemode == GAME_MODE_DEFAULT)
       gamemode = GAME_MODE_PLAYING;
 
@@ -2150,7 +2150,7 @@ static void InitGameModeMusicInfo(void)
       menu.music[gamemode] = music;
   }
 
-  /* now set all '-1' values to menu specific default values */
+  // now set all '-1' values to menu specific default values
   /* (undefined values of "levelset.music[]" might stay at "-1" to
      allow dynamic selection of music files from music directory!) */
   for (i = 0; i < MAX_LEVELS; i++)
@@ -2166,14 +2166,14 @@ static void set_music_parameters(int music, char **parameter_raw)
   int parameter[NUM_MUS_ARGS];
   int i;
 
-  /* get integer values from string parameters */
+  // get integer values from string parameters
   for (i = 0; i < NUM_MUS_ARGS; i++)
     parameter[i] =
       get_parameter_value(parameter_raw[i],
 			  music_config_suffix[i].token,
 			  music_config_suffix[i].type);
 
-  /* explicit loop mode setting in configuration overrides default value */
+  // explicit loop mode setting in configuration overrides default value
   if (parameter[MUS_ARG_MODE_LOOP] != ARG_UNDEFINED_VALUE)
     music_info[music].loop = parameter[MUS_ARG_MODE_LOOP];
 }
@@ -2192,9 +2192,9 @@ static void InitMusicInfo(void)
     struct FileInfo *music = getMusicListEntry(i);
     int len_music_text = strlen(music->token);
 
-    music_info[i].loop = TRUE;		/* default: play music in loop mode */
+    music_info[i].loop = TRUE;		// default: play music in loop mode
 
-    /* determine all loop music */
+    // determine all loop music
 
     for (j = 0; music_prefix_info[j].prefix; j++)
     {
@@ -2220,28 +2220,28 @@ static void ReinitializeGraphics(void)
 
   InitGfxTileSizeInfo(game.tile_size, TILESIZE);
 
-  InitGraphicInfo();			/* graphic properties mapping */
+  InitGraphicInfo();			// graphic properties mapping
   print_timestamp_time("InitGraphicInfo");
-  InitElementGraphicInfo();		/* element game graphic mapping */
+  InitElementGraphicInfo();		// element game graphic mapping
   print_timestamp_time("InitElementGraphicInfo");
-  InitElementSpecialGraphicInfo();	/* element special graphic mapping */
+  InitElementSpecialGraphicInfo();	// element special graphic mapping
   print_timestamp_time("InitElementSpecialGraphicInfo");
 
-  InitElementSmallImages();		/* scale elements to all needed sizes */
+  InitElementSmallImages();		// scale elements to all needed sizes
   print_timestamp_time("InitElementSmallImages");
-  InitScaledImages();			/* scale all other images, if needed */
+  InitScaledImages();			// scale all other images, if needed
   print_timestamp_time("InitScaledImages");
-  InitBitmapPointers();			/* set standard size bitmap pointers */
+  InitBitmapPointers();			// set standard size bitmap pointers
   print_timestamp_time("InitBitmapPointers");
-  InitFontGraphicInfo();		/* initialize text drawing functions */
+  InitFontGraphicInfo();		// initialize text drawing functions
   print_timestamp_time("InitFontGraphicInfo");
-  InitGlobalAnimGraphicInfo();		/* initialize global animation config */
+  InitGlobalAnimGraphicInfo();		// initialize global animation config
   print_timestamp_time("InitGlobalAnimGraphicInfo");
 
-  InitImageTextures();			/* create textures for certain images */
+  InitImageTextures();			// create textures for certain images
   print_timestamp_time("InitImageTextures");
 
-  InitGraphicInfo_EM();			/* graphic mapping for EM engine */
+  InitGraphicInfo_EM();			// graphic mapping for EM engine
   print_timestamp_time("InitGraphicInfo_EM");
 
   InitGraphicCompatibilityInfo();
@@ -2262,19 +2262,19 @@ static void ReinitializeGraphics(void)
 
 static void ReinitializeSounds(void)
 {
-  InitSoundInfo();		/* sound properties mapping */
-  InitElementSoundInfo();	/* element game sound mapping */
-  InitGameModeSoundInfo();	/* game mode sound mapping */
-  InitGlobalAnimSoundInfo();	/* global animation sound settings */
+  InitSoundInfo();		// sound properties mapping
+  InitElementSoundInfo();	// element game sound mapping
+  InitGameModeSoundInfo();	// game mode sound mapping
+  InitGlobalAnimSoundInfo();	// global animation sound settings
 
-  InitPlayLevelSound();		/* internal game sound settings */
+  InitPlayLevelSound();		// internal game sound settings
 }
 
 static void ReinitializeMusic(void)
 {
-  InitMusicInfo();		/* music properties mapping */
-  InitGameModeMusicInfo();	/* game mode music mapping */
-  InitGlobalAnimMusicInfo();	/* global animation music settings */
+  InitMusicInfo();		// music properties mapping
+  InitGameModeMusicInfo();	// game mode music mapping
+  InitGlobalAnimMusicInfo();	// global animation music settings
 }
 
 static int get_special_property_bit(int element, int property_bit_nr)
@@ -2287,7 +2287,7 @@ static int get_special_property_bit(int element, int property_bit_nr)
 
   static struct PropertyBitInfo pb_can_move_into_acid[] =
   {
-    /* the player may be able fall into acid when gravity is activated */
+    // the player may be able fall into acid when gravity is activated
     { EL_PLAYER_1,		0	},
     { EL_PLAYER_2,		0	},
     { EL_PLAYER_3,		0	},
@@ -2295,7 +2295,7 @@ static int get_special_property_bit(int element, int property_bit_nr)
     { EL_SP_MURPHY,		0	},
     { EL_SOKOBAN_FIELD_PLAYER,	0	},
 
-    /* all elements that can move may be able to also move into acid */
+    // all elements that can move may be able to also move into acid
     { EL_BUG,			1	},
     { EL_BUG_LEFT,		1	},
     { EL_BUG_RIGHT,		1	},
@@ -2414,21 +2414,21 @@ static void ResolveGroupElementExt(int group_element, int recursion_depth)
   struct ElementGroupInfo *actual_group = element_info[group_element].group;
   int i;
 
-  if (actual_group == NULL)			/* not yet initialized */
+  if (actual_group == NULL)			// not yet initialized
     return;
 
-  if (recursion_depth > NUM_GROUP_ELEMENTS)	/* recursion too deep */
+  if (recursion_depth > NUM_GROUP_ELEMENTS)	// recursion too deep
   {
     Error(ERR_WARN, "recursion too deep when resolving group element %d",
 	  group_element - EL_GROUP_START + 1);
 
-    /* replace element which caused too deep recursion by question mark */
+    // replace element which caused too deep recursion by question mark
     group->element_resolved[group->num_elements_resolved++] = EL_UNKNOWN;
 
     return;
   }
 
-  if (recursion_depth == 0)			/* initialization */
+  if (recursion_depth == 0)			// initialization
   {
     group = actual_group;
     group_nr = GROUP_NR(group_element);
@@ -2477,8 +2477,8 @@ void InitElementPropertiesStatic(void)
     EL_INVISIBLE_SAND_ACTIVE,
     EL_EMC_GRASS,
 
-    /* !!! currently not diggable, but handled by 'ep_dont_run_into' !!! */
-    /* (if amoeba can grow into anything diggable, maybe keep these out) */
+    // !!! currently not diggable, but handled by 'ep_dont_run_into' !!!
+    // (if amoeba can grow into anything diggable, maybe keep these out)
 #if 0
     EL_LANDMINE,
     EL_DC_LANDMINE,
@@ -2532,8 +2532,8 @@ void InitElementPropertiesStatic(void)
     EL_EMC_MAGNIFIER,
 
 #if 0
-    /* !!! handle separately !!! */
-    EL_DC_LANDMINE,	/* deadly when running into, but can be snapped */
+    // !!! handle separately !!!
+    EL_DC_LANDMINE,	// deadly when running into, but can be snapped
 #endif
 
     -1
@@ -2541,13 +2541,13 @@ void InitElementPropertiesStatic(void)
 
   static int ep_dont_run_into[] =
   {
-    /* same elements as in 'ep_dont_touch' */
+    // same elements as in 'ep_dont_touch'
     EL_BUG,
     EL_SPACESHIP,
     EL_BD_BUTTERFLY,
     EL_BD_FIREFLY,
 
-    /* same elements as in 'ep_dont_collide_with' */
+    // same elements as in 'ep_dont_collide_with'
     EL_YAMYAM,
     EL_DARK_YAMYAM,
     EL_ROBOT,
@@ -2555,11 +2555,11 @@ void InitElementPropertiesStatic(void)
     EL_SP_SNIKSNAK,
     EL_SP_ELECTRON,
 
-    /* new elements */
+    // new elements
     EL_AMOEBA_DROP,
     EL_ACID,
 
-    /* !!! maybe this should better be handled by 'ep_diggable' !!! */
+    // !!! maybe this should better be handled by 'ep_diggable' !!!
 #if 1
     EL_LANDMINE,
     EL_DC_LANDMINE,
@@ -2573,13 +2573,13 @@ void InitElementPropertiesStatic(void)
 
   static int ep_dont_collide_with[] =
   {
-    /* same elements as in 'ep_dont_touch' */
+    // same elements as in 'ep_dont_touch'
     EL_BUG,
     EL_SPACESHIP,
     EL_BD_BUTTERFLY,
     EL_BD_FIREFLY,
 
-    /* new elements */
+    // new elements
     EL_YAMYAM,
     EL_DARK_YAMYAM,
     EL_ROBOT,
@@ -2810,7 +2810,7 @@ void InitElementPropertiesStatic(void)
 
   static int ep_can_move[] =
   {
-    /* same elements as in 'pb_can_move_into_acid' */
+    // same elements as in 'pb_can_move_into_acid'
     EL_BUG,
     EL_SPACESHIP,
     EL_BD_BUTTERFLY,
@@ -2910,18 +2910,18 @@ void InitElementPropertiesStatic(void)
 
   static int ep_explodes_by_fire[] =
   {
-    /* same elements as in 'ep_explodes_impact' */
+    // same elements as in 'ep_explodes_impact'
     EL_BOMB,
     EL_SP_DISK_ORANGE,
     EL_DX_SUPABOMB,
 
-    /* same elements as in 'ep_explodes_smashed' */
+    // same elements as in 'ep_explodes_smashed'
     EL_SATELLITE,
     EL_PIG,
     EL_DRAGON,
     EL_MOLE,
 
-    /* new elements */
+    // new elements
     EL_DYNAMITE,
     EL_DYNAMITE_ACTIVE,
     EL_EM_DYNAMITE,
@@ -2949,12 +2949,12 @@ void InitElementPropertiesStatic(void)
 
   static int ep_explodes_smashed[] =
   {
-    /* same elements as in 'ep_explodes_impact' */
+    // same elements as in 'ep_explodes_impact'
     EL_BOMB,
     EL_SP_DISK_ORANGE,
     EL_DX_SUPABOMB,
 
-    /* new elements */
+    // new elements
     EL_SATELLITE,
     EL_PIG,
     EL_DRAGON,
@@ -3129,7 +3129,7 @@ void InitElementPropertiesStatic(void)
 
   static int ep_protected[] =
   {
-    /* same elements as in 'ep_walkable_inside' */
+    // same elements as in 'ep_walkable_inside'
     EL_TUBE_ANY,
     EL_TUBE_VERTICAL,
     EL_TUBE_HORIZONTAL,
@@ -3142,7 +3142,7 @@ void InitElementPropertiesStatic(void)
     EL_TUBE_RIGHT_UP,
     EL_TUBE_RIGHT_DOWN,
 
-    /* same elements as in 'ep_passable_over' */
+    // same elements as in 'ep_passable_over'
     EL_EM_GATE_1,
     EL_EM_GATE_2,
     EL_EM_GATE_3,
@@ -3173,7 +3173,7 @@ void InitElementPropertiesStatic(void)
     EL_SWITCHGATE_OPEN,
     EL_TIMEGATE_OPEN,
 
-    /* same elements as in 'ep_passable_inside' */
+    // same elements as in 'ep_passable_inside'
     EL_SP_PORT_LEFT,
     EL_SP_PORT_RIGHT,
     EL_SP_PORT_UP,
@@ -3204,18 +3204,18 @@ void InitElementPropertiesStatic(void)
 
   static int ep_can_explode[] =
   {
-    /* same elements as in 'ep_explodes_impact' */
+    // same elements as in 'ep_explodes_impact'
     EL_BOMB,
     EL_SP_DISK_ORANGE,
     EL_DX_SUPABOMB,
 
-    /* same elements as in 'ep_explodes_smashed' */
+    // same elements as in 'ep_explodes_smashed'
     EL_SATELLITE,
     EL_PIG,
     EL_DRAGON,
     EL_MOLE,
 
-    /* elements that can explode by explosion or by dragonfire */
+    // elements that can explode by explosion or by dragonfire
     EL_DYNAMITE,
     EL_DYNAMITE_ACTIVE,
     EL_EM_DYNAMITE,
@@ -3235,7 +3235,7 @@ void InitElementPropertiesStatic(void)
     EL_SP_SNIKSNAK,
     EL_SP_ELECTRON,
 
-    /* elements that can explode only by explosion */
+    // elements that can explode only by explosion
     EL_BLACK_ORB,
 
     -1
@@ -3389,10 +3389,10 @@ void InitElementPropertiesStatic(void)
 
   static int ep_sp_element[] =
   {
-    /* should always be valid */
+    // should always be valid
     EL_EMPTY,
 
-    /* standard classic Supaplex elements */
+    // standard classic Supaplex elements
     EL_SP_EMPTY,
     EL_SP_ZONK,
     EL_SP_BASE,
@@ -3435,10 +3435,10 @@ void InitElementPropertiesStatic(void)
     EL_SP_CHIP_TOP,
     EL_SP_CHIP_BOTTOM,
 
-    /* additional elements that appeared in newer Supaplex levels */
+    // additional elements that appeared in newer Supaplex levels
     EL_INVISIBLE_WALL,
 
-    /* additional gravity port elements (not switching, but setting gravity) */
+    // additional gravity port elements (not switching, but setting gravity)
     EL_SP_GRAVITY_ON_PORT_LEFT,
     EL_SP_GRAVITY_ON_PORT_RIGHT,
     EL_SP_GRAVITY_ON_PORT_UP,
@@ -3448,10 +3448,10 @@ void InitElementPropertiesStatic(void)
     EL_SP_GRAVITY_OFF_PORT_UP,
     EL_SP_GRAVITY_OFF_PORT_DOWN,
 
-    /* more than one Murphy in a level results in an inactive clone */
+    // more than one Murphy in a level results in an inactive clone
     EL_SP_MURPHY_CLONE,
 
-    /* runtime Supaplex elements */
+    // runtime Supaplex elements
     EL_SP_DISK_RED_ACTIVE,
     EL_SP_TERMINAL_ACTIVE,
     EL_SP_BUGGY_BASE_ACTIVATING,
@@ -4040,7 +4040,7 @@ void InitElementPropertiesStatic(void)
 
   static int ep_can_turn_each_move[] =
   {
-    /* !!! do something with this one !!! */
+    // !!! do something with this one !!!
     -1
   };
 
@@ -4445,28 +4445,28 @@ void InitElementPropertiesStatic(void)
 
   int i, j, k;
 
-  /* always start with reliable default values (element has no properties) */
-  /* (but never initialize clipboard elements after the very first time) */
-  /* (to be able to use clipboard elements between several levels) */
+  // always start with reliable default values (element has no properties)
+  // (but never initialize clipboard elements after the very first time)
+  // (to be able to use clipboard elements between several levels)
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
     if (!IS_CLIPBOARD_ELEMENT(i) || !clipboard_elements_initialized)
       for (j = 0; j < NUM_ELEMENT_PROPERTIES; j++)
 	SET_PROPERTY(i, j, FALSE);
 
-  /* set all base element properties from above array definitions */
+  // set all base element properties from above array definitions
   for (i = 0; element_properties[i].elements != NULL; i++)
     for (j = 0; (element_properties[i].elements)[j] != -1; j++)
       SET_PROPERTY((element_properties[i].elements)[j],
 		   element_properties[i].property, TRUE);
 
-  /* copy properties to some elements that are only stored in level file */
+  // copy properties to some elements that are only stored in level file
   for (i = 0; i < NUM_ELEMENT_PROPERTIES; i++)
     for (j = 0; copy_properties[j][0] != -1; j++)
       if (HAS_PROPERTY(copy_properties[j][0], i))
 	for (k = 1; k <= 4; k++)
 	  SET_PROPERTY(copy_properties[j][k], i, TRUE);
 
-  /* set static element properties that are not listed in array definitions */
+  // set static element properties that are not listed in array definitions
   for (i = EL_STEEL_CHAR_START; i <= EL_STEEL_CHAR_END; i++)
     SET_PROPERTY(i, EP_INDESTRUCTIBLE, TRUE);
 
@@ -4512,24 +4512,24 @@ void InitElementPropertiesEngine(int engine_version)
      property (which means that conditional property changes must be set to
      a reliable default value before) */
 
-  /* resolve group elements */
+  // resolve group elements
   for (i = 0; i < NUM_GROUP_ELEMENTS; i++)
     ResolveGroupElement(EL_GROUP_START + i);
 
-  /* set all special, combined or engine dependent element properties */
+  // set all special, combined or engine dependent element properties
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
   {
-    /* do not change (already initialized) clipboard elements here */
+    // do not change (already initialized) clipboard elements here
     if (IS_CLIPBOARD_ELEMENT(i))
       continue;
 
-    /* ---------- INACTIVE ------------------------------------------------- */
+    // ---------- INACTIVE ----------------------------------------------------
     SET_PROPERTY(i, EP_INACTIVE, ((i >= EL_CHAR_START &&
 				   i <= EL_CHAR_END) ||
 				  (i >= EL_STEEL_CHAR_START &&
 				   i <= EL_STEEL_CHAR_END)));
 
-    /* ---------- WALKABLE, PASSABLE, ACCESSIBLE --------------------------- */
+    // ---------- WALKABLE, PASSABLE, ACCESSIBLE ------------------------------
     SET_PROPERTY(i, EP_WALKABLE, (IS_WALKABLE_OVER(i) ||
 				  IS_WALKABLE_INSIDE(i) ||
 				  IS_WALKABLE_UNDER(i)));
@@ -4550,19 +4550,19 @@ void InitElementPropertiesEngine(int engine_version)
     SET_PROPERTY(i, EP_ACCESSIBLE, (IS_WALKABLE(i) ||
 				    IS_PASSABLE(i)));
 
-    /* ---------- COLLECTIBLE ---------------------------------------------- */
+    // ---------- COLLECTIBLE -------------------------------------------------
     SET_PROPERTY(i, EP_COLLECTIBLE, (IS_COLLECTIBLE_ONLY(i) ||
 				     IS_DROPPABLE(i) ||
 				     IS_THROWABLE(i)));
 
-    /* ---------- SNAPPABLE ------------------------------------------------ */
+    // ---------- SNAPPABLE ---------------------------------------------------
     SET_PROPERTY(i, EP_SNAPPABLE, (IS_DIGGABLE(i) ||
 				   IS_COLLECTIBLE(i) ||
 				   IS_SWITCHABLE(i) ||
 				   i == EL_BD_ROCK));
 
-    /* ---------- WALL ----------------------------------------------------- */
-    SET_PROPERTY(i, EP_WALL, TRUE);	/* default: element is wall */
+    // ---------- WALL --------------------------------------------------------
+    SET_PROPERTY(i, EP_WALL, TRUE);	// default: element is wall
 
     for (j = 0; no_wall_properties[j] != -1; j++)
       if (HAS_PROPERTY(i, no_wall_properties[j]) ||
@@ -4572,7 +4572,7 @@ void InitElementPropertiesEngine(int engine_version)
     if (IS_HISTORIC_WALL(i))
       SET_PROPERTY(i, EP_WALL, TRUE);
 
-    /* ---------- SOLID_FOR_PUSHING ---------------------------------------- */
+    // ---------- SOLID_FOR_PUSHING -------------------------------------------
     if (engine_version < VERSION_IDENT(2,2,0,0))
       SET_PROPERTY(i, EP_SOLID_FOR_PUSHING, IS_HISTORIC_SOLID(i));
     else
@@ -4580,14 +4580,14 @@ void InitElementPropertiesEngine(int engine_version)
 					     !IS_DIGGABLE(i) &&
 					     !IS_COLLECTIBLE(i)));
 
-    /* ---------- DRAGONFIRE_PROOF ----------------------------------------- */
+    // ---------- DRAGONFIRE_PROOF --------------------------------------------
     if (IS_HISTORIC_SOLID(i) || i == EL_EXPLOSION)
       SET_PROPERTY(i, EP_DRAGONFIRE_PROOF, TRUE);
     else
       SET_PROPERTY(i, EP_DRAGONFIRE_PROOF, (IS_INDESTRUCTIBLE(i) &&
 					    i != EL_ACID));
 
-    /* ---------- EXPLOSION_PROOF ------------------------------------------ */
+    // ---------- EXPLOSION_PROOF ---------------------------------------------
     if (i == EL_FLAMES)
       SET_PROPERTY(i, EP_EXPLOSION_PROOF, TRUE);
     else if (engine_version < VERSION_IDENT(2,2,0,0))
@@ -4599,101 +4599,101 @@ void InitElementPropertiesEngine(int engine_version)
 
     if (IS_CUSTOM_ELEMENT(i))
     {
-      /* these are additional properties which are initially false when set */
+      // these are additional properties which are initially false when set
 
-      /* ---------- DONT_COLLIDE_WITH / DONT_RUN_INTO ---------------------- */
+      // ---------- DONT_COLLIDE_WITH / DONT_RUN_INTO -------------------------
       if (DONT_TOUCH(i))
 	SET_PROPERTY(i, EP_DONT_COLLIDE_WITH, TRUE);
       if (DONT_COLLIDE_WITH(i))
 	SET_PROPERTY(i, EP_DONT_RUN_INTO, TRUE);
 
-      /* ---------- CAN_SMASH_ENEMIES / CAN_SMASH_PLAYER ------------------- */
+      // ---------- CAN_SMASH_ENEMIES / CAN_SMASH_PLAYER ----------------------
       if (CAN_SMASH_EVERYTHING(i))
 	SET_PROPERTY(i, EP_CAN_SMASH_ENEMIES, TRUE);
       if (CAN_SMASH_ENEMIES(i))
 	SET_PROPERTY(i, EP_CAN_SMASH_PLAYER, TRUE);
     }
 
-    /* ---------- CAN_SMASH ------------------------------------------------ */
+    // ---------- CAN_SMASH ---------------------------------------------------
     SET_PROPERTY(i, EP_CAN_SMASH, (CAN_SMASH_PLAYER(i) ||
 				   CAN_SMASH_ENEMIES(i) ||
 				   CAN_SMASH_EVERYTHING(i)));
 
-    /* ---------- CAN_EXPLODE_BY_FIRE -------------------------------------- */
+    // ---------- CAN_EXPLODE_BY_FIRE -----------------------------------------
     SET_PROPERTY(i, EP_CAN_EXPLODE_BY_FIRE, (CAN_EXPLODE(i) &&
 					     EXPLODES_BY_FIRE(i)));
 
-    /* ---------- CAN_EXPLODE_SMASHED -------------------------------------- */
+    // ---------- CAN_EXPLODE_SMASHED -----------------------------------------
     SET_PROPERTY(i, EP_CAN_EXPLODE_SMASHED, (CAN_EXPLODE(i) &&
 					     EXPLODES_SMASHED(i)));
 
-    /* ---------- CAN_EXPLODE_IMPACT --------------------------------------- */
+    // ---------- CAN_EXPLODE_IMPACT ------------------------------------------
     SET_PROPERTY(i, EP_CAN_EXPLODE_IMPACT, (CAN_EXPLODE(i) &&
 					    EXPLODES_IMPACT(i)));
 
-    /* ---------- CAN_EXPLODE_BY_DRAGONFIRE -------------------------------- */
+    // ---------- CAN_EXPLODE_BY_DRAGONFIRE -----------------------------------
     SET_PROPERTY(i, EP_CAN_EXPLODE_BY_DRAGONFIRE, CAN_EXPLODE_BY_FIRE(i));
 
-    /* ---------- CAN_EXPLODE_BY_EXPLOSION --------------------------------- */
+    // ---------- CAN_EXPLODE_BY_EXPLOSION ------------------------------------
     SET_PROPERTY(i, EP_CAN_EXPLODE_BY_EXPLOSION, (CAN_EXPLODE_BY_FIRE(i) ||
 						  i == EL_BLACK_ORB));
 
-    /* ---------- COULD_MOVE_INTO_ACID ------------------------------------- */
+    // ---------- COULD_MOVE_INTO_ACID ----------------------------------------
     SET_PROPERTY(i, EP_COULD_MOVE_INTO_ACID, (ELEM_IS_PLAYER(i) ||
 					      CAN_MOVE(i) ||
 					      IS_CUSTOM_ELEMENT(i)));
 
-    /* ---------- MAYBE_DONT_COLLIDE_WITH ---------------------------------- */
+    // ---------- MAYBE_DONT_COLLIDE_WITH -------------------------------------
     SET_PROPERTY(i, EP_MAYBE_DONT_COLLIDE_WITH, (i == EL_SP_SNIKSNAK ||
 						 i == EL_SP_ELECTRON));
 
-    /* ---------- CAN_MOVE_INTO_ACID --------------------------------------- */
+    // ---------- CAN_MOVE_INTO_ACID ------------------------------------------
     if (COULD_MOVE_INTO_ACID(i) && !IS_CUSTOM_ELEMENT(i))
       SET_PROPERTY(i, EP_CAN_MOVE_INTO_ACID,
 		   getMoveIntoAcidProperty(&level, i));
 
-    /* ---------- DONT_COLLIDE_WITH ---------------------------------------- */
+    // ---------- DONT_COLLIDE_WITH -------------------------------------------
     if (MAYBE_DONT_COLLIDE_WITH(i))
       SET_PROPERTY(i, EP_DONT_COLLIDE_WITH,
 		   getDontCollideWithProperty(&level, i));
 
-    /* ---------- SP_PORT -------------------------------------------------- */
+    // ---------- SP_PORT -----------------------------------------------------
     SET_PROPERTY(i, EP_SP_PORT, (IS_SP_ELEMENT(i) &&
 				 IS_PASSABLE_INSIDE(i)));
 
-    /* ---------- CAN_BE_CLONED_BY_ANDROID --------------------------------- */
+    // ---------- CAN_BE_CLONED_BY_ANDROID ------------------------------------
     for (j = 0; j < level.num_android_clone_elements; j++)
       SET_PROPERTY(i, EP_CAN_BE_CLONED_BY_ANDROID,
 		   (i != EL_EMPTY &&
 		    IS_EQUAL_OR_IN_GROUP(i, level.android_clone_element[j])));
 
-    /* ---------- CAN_CHANGE ----------------------------------------------- */
-    SET_PROPERTY(i, EP_CAN_CHANGE, FALSE);	/* default: cannot change */
+    // ---------- CAN_CHANGE --------------------------------------------------
+    SET_PROPERTY(i, EP_CAN_CHANGE, FALSE);	// default: cannot change
     for (j = 0; j < element_info[i].num_change_pages; j++)
       if (element_info[i].change_page[j].can_change)
 	SET_PROPERTY(i, EP_CAN_CHANGE, TRUE);
 
-    /* ---------- HAS_ACTION ----------------------------------------------- */
-    SET_PROPERTY(i, EP_HAS_ACTION, FALSE);	/* default: has no action */
+    // ---------- HAS_ACTION --------------------------------------------------
+    SET_PROPERTY(i, EP_HAS_ACTION, FALSE);	// default: has no action
     for (j = 0; j < element_info[i].num_change_pages; j++)
       if (element_info[i].change_page[j].has_action)
 	SET_PROPERTY(i, EP_HAS_ACTION, TRUE);
 
-    /* ---------- CAN_CHANGE_OR_HAS_ACTION --------------------------------- */
+    // ---------- CAN_CHANGE_OR_HAS_ACTION ------------------------------------
     SET_PROPERTY(i, EP_CAN_CHANGE_OR_HAS_ACTION, (CAN_CHANGE(i) ||
 						  HAS_ACTION(i)));
 
-    /* ---------- GFX_CRUMBLED --------------------------------------------- */
+    // ---------- GFX_CRUMBLED ------------------------------------------------
     SET_PROPERTY(i, EP_GFX_CRUMBLED,
 		 element_info[i].crumbled[ACTION_DEFAULT] !=
 		 element_info[i].graphic[ACTION_DEFAULT]);
 
-    /* ---------- EDITOR_CASCADE ------------------------------------------- */
+    // ---------- EDITOR_CASCADE ----------------------------------------------
     SET_PROPERTY(i, EP_EDITOR_CASCADE, (IS_EDITOR_CASCADE_ACTIVE(i) ||
 					IS_EDITOR_CASCADE_INACTIVE(i)));
   }
 
-  /* dynamically adjust element properties according to game engine version */
+  // dynamically adjust element properties according to game engine version
   {
     static int ep_em_slippery_wall[] =
     {
@@ -4718,23 +4718,23 @@ void InitElementPropertiesEngine(int engine_version)
       -1
     };
 
-    /* special EM style gems behaviour */
+    // special EM style gems behaviour
     for (i = 0; ep_em_slippery_wall[i] != -1; i++)
       SET_PROPERTY(ep_em_slippery_wall[i], EP_EM_SLIPPERY_WALL,
 		   level.em_slippery_gems);
 
-    /* "EL_EXPANDABLE_WALL_GROWING" wasn't slippery for EM gems in 2.0.1 */
+    // "EL_EXPANDABLE_WALL_GROWING" wasn't slippery for EM gems in 2.0.1
     SET_PROPERTY(EL_EXPANDABLE_WALL_GROWING, EP_EM_SLIPPERY_WALL,
 		 (level.em_slippery_gems &&
 		  engine_version > VERSION_IDENT(2,0,1,0)));
 
-    /* special EM style explosion behaviour regarding chain reactions */
+    // special EM style explosion behaviour regarding chain reactions
     for (i = 0; ep_em_explodes_by_fire[i] != -1; i++)
       SET_PROPERTY(ep_em_explodes_by_fire[i], EP_EXPLODES_BY_FIRE,
 		   level.em_explodes_by_fire);
   }
 
-  /* this is needed because some graphics depend on element properties */
+  // this is needed because some graphics depend on element properties
   if (game_status == GAME_MODE_PLAYING)
     InitElementGraphicInfo();
 }
@@ -4758,7 +4758,7 @@ static void InitGlobal(void)
 
   for (i = 0; i < MAX_NUM_ELEMENTS + 1; i++)
   {
-    /* check if element_name_info entry defined for each element in "main.h" */
+    // check if element_name_info entry defined for each element in "main.h"
     if (i < MAX_NUM_ELEMENTS && element_name_info[i].token_name == NULL)
       Error(ERR_EXIT, "undefined 'element_name_info' entry for element %d", i);
 
@@ -4769,7 +4769,7 @@ static void InitGlobal(void)
 
   for (i = 0; i < NUM_GLOBAL_ANIM_TOKENS + 1; i++)
   {
-    /* check if global_anim_name_info defined for each entry in "main.h" */
+    // check if global_anim_name_info defined for each entry in "main.h"
     if (i < NUM_GLOBAL_ANIM_TOKENS &&
 	global_anim_name_info[i].token_name == NULL)
       Error(ERR_EXIT, "undefined 'global_anim_name_info' entry for anim %d", i);
@@ -4777,21 +4777,21 @@ static void InitGlobal(void)
     global_anim_info[i].token_name = global_anim_name_info[i].token_name;
   }
 
-  /* create hash from image config list */
+  // create hash from image config list
   image_config_hash = newSetupFileHash();
   for (i = 0; image_config[i].token != NULL; i++)
     setHashEntry(image_config_hash,
 		 image_config[i].token,
 		 image_config[i].value);
 
-  /* create hash from element token list */
+  // create hash from element token list
   element_token_hash = newSetupFileHash();
   for (i = 0; element_name_info[i].token_name != NULL; i++)
     setHashEntry(element_token_hash,
 		 element_name_info[i].token_name,
 		 int2str(i, 0));
 
-  /* create hash from graphic token list */
+  // create hash from graphic token list
   graphic_token_hash = newSetupFileHash();
   for (graphic = 0, i = 0; image_config[i].token != NULL; i++)
     if (strSuffix(image_config[i].value, ".png") ||
@@ -4802,14 +4802,14 @@ static void InitGlobal(void)
 		   image_config[i].token,
 		   int2str(graphic++, 0));
 
-  /* create hash from font token list */
+  // create hash from font token list
   font_token_hash = newSetupFileHash();
   for (i = 0; font_info[i].token_name != NULL; i++)
     setHashEntry(font_token_hash,
 		 font_info[i].token_name,
 		 int2str(i, 0));
 
-  /* set default filenames for all cloned graphics in static configuration */
+  // set default filenames for all cloned graphics in static configuration
   for (i = 0; image_config[i].token != NULL; i++)
   {
     if (strEqual(image_config[i].value, UNDEFINED_FILENAME))
@@ -4824,10 +4824,10 @@ static void InitGlobal(void)
 
 	if (value_cloned != NULL)
 	{
-	  /* set default filename in static configuration */
+	  // set default filename in static configuration
 	  image_config[i].value = value_cloned;
 
-	  /* set default filename in image config hash */
+	  // set default filename in image config hash
 	  setHashEntry(image_config_hash, token, value_cloned);
 	}
       }
@@ -4836,11 +4836,11 @@ static void InitGlobal(void)
     }
   }
 
-  /* always start with reliable default values (all elements) */
+  // always start with reliable default values (all elements)
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
     ActiveElement[i] = i;
 
-  /* now add all entries that have an active state (active elements) */
+  // now add all entries that have an active state (active elements)
   for (i = 0; element_with_active_state[i].element != -1; i++)
   {
     int element = element_with_active_state[i].element;
@@ -4849,11 +4849,11 @@ static void InitGlobal(void)
     ActiveElement[element] = element_active;
   }
 
-  /* always start with reliable default values (all buttons) */
+  // always start with reliable default values (all buttons)
   for (i = 0; i < NUM_IMAGE_FILES; i++)
     ActiveButton[i] = i;
 
-  /* now add all entries that have an active state (active buttons) */
+  // now add all entries that have an active state (active buttons)
   for (i = 0; button_with_active_state[i].button != -1; i++)
   {
     int button = button_with_active_state[i].button;
@@ -4862,11 +4862,11 @@ static void InitGlobal(void)
     ActiveButton[button] = button_active;
   }
 
-  /* always start with reliable default values (all fonts) */
+  // always start with reliable default values (all fonts)
   for (i = 0; i < NUM_FONTS; i++)
     ActiveFont[i] = i;
 
-  /* now add all entries that have an active state (active fonts) */
+  // now add all entries that have an active state (active fonts)
   for (i = 0; font_with_active_state[i].font_nr != -1; i++)
   {
     int font = font_with_active_state[i].font_nr;
@@ -4946,7 +4946,7 @@ static void Execute_Command(char *command)
     Print("# (The entries below are default and therefore commented out.)\n");
     Print("\n");
 
-    /* this is needed to be able to check element list for cascade elements */
+    // this is needed to be able to check element list for cascade elements
     InitElementPropertiesStatic();
     InitElementPropertiesEngine(GAME_VERSION_ACTUAL);
 
@@ -5012,7 +5012,7 @@ static void Execute_Command(char *command)
 	   strPrefix(command, "autoffwd ") ||
 	   strPrefix(command, "autowarp "))
   {
-    char *str_ptr = getStringCopy(&command[9]);	/* read command parameters */
+    char *str_ptr = getStringCopy(&command[9]);	// read command parameters
 
     global.autoplay_mode =
       (strPrefix(command, "autotest") ? AUTOPLAY_MODE_TEST :
@@ -5021,26 +5021,26 @@ static void Execute_Command(char *command)
        strPrefix(command, "autowarp") ? AUTOPLAY_MODE_WARP :
        AUTOPLAY_MODE_NONE);
 
-    while (*str_ptr != '\0')			/* continue parsing string */
+    while (*str_ptr != '\0')			// continue parsing string
     {
-      /* cut leading whitespace from string, replace it by string terminator */
+      // cut leading whitespace from string, replace it by string terminator
       while (*str_ptr == ' ' || *str_ptr == '\t')
 	*str_ptr++ = '\0';
 
-      if (*str_ptr == '\0')			/* end of string reached */
+      if (*str_ptr == '\0')			// end of string reached
 	break;
 
-      if (global.autoplay_leveldir == NULL)	/* read level set string */
+      if (global.autoplay_leveldir == NULL)	// read level set string
       {
 	global.autoplay_leveldir = str_ptr;
-	global.autoplay_all = TRUE;		/* default: play all tapes */
+	global.autoplay_all = TRUE;		// default: play all tapes
 
 	for (i = 0; i < MAX_TAPES_PER_SET; i++)
 	  global.autoplay_level[i] = FALSE;
       }
-      else					/* read level number string */
+      else					// read level number string
       {
-	int level_nr = atoi(str_ptr);		/* get level_nr value */
+	int level_nr = atoi(str_ptr);		// get level_nr value
 
 	if (level_nr >= 0 && level_nr < MAX_TAPES_PER_SET)
 	  global.autoplay_level[level_nr] = TRUE;
@@ -5048,7 +5048,7 @@ static void Execute_Command(char *command)
 	global.autoplay_all = FALSE;
       }
 
-      /* advance string pointer to the next whitespace (or end of string) */
+      // advance string pointer to the next whitespace (or end of string)
       while (*str_ptr != ' ' && *str_ptr != '\t' && *str_ptr != '\0')
 	str_ptr++;
     }
@@ -5064,10 +5064,10 @@ static void Execute_Command(char *command)
     global.convert_leveldir = str_copy;
     global.convert_level_nr = -1;
 
-    if (str_ptr != NULL)			/* level number follows */
+    if (str_ptr != NULL)			// level number follows
     {
-      *str_ptr++ = '\0';			/* terminate leveldir string */
-      global.convert_level_nr = atoi(str_ptr);	/* get level_nr value */
+      *str_ptr++ = '\0';			// terminate leveldir string
+      global.convert_level_nr = atoi(str_ptr);	// get level_nr value
     }
 
     program.headless = TRUE;
@@ -5091,16 +5091,16 @@ static void Execute_Command(char *command)
     Error(ERR_EXIT_HELP, "unrecognized command '%s'", command);
   }
 
-  /* disable networking if any valid command was recognized */
+  // disable networking if any valid command was recognized
   options.network = setup.network_mode = FALSE;
 }
 
 static void InitSetup(void)
 {
-  LoadSetup();					/* global setup info */
-  LoadSetup_AutoSetup();			/* global auto setup info */
+  LoadSetup();					// global setup info
+  LoadSetup_AutoSetup();			// global auto setup info
 
-  /* set some options from setup file */
+  // set some options from setup file
 
   if (setup.options.verbose)
     options.verbose = TRUE;
@@ -5120,7 +5120,7 @@ static void InitPlayerInfo(void)
 {
   int i;
 
-  /* choose default local player */
+  // choose default local player
   local_player = &stored_player[0];
 
   for (i = 0; i < MAX_PLAYERS; i++)
@@ -5191,12 +5191,12 @@ static void InitArtworkConfig(void)
   int num_ignore_music_tokens;
   int i;
 
-  /* dynamically determine list of generic tokens to be ignored */
+  // dynamically determine list of generic tokens to be ignored
   num_ignore_generic_tokens = 0;
   for (i = 0; ignore_generic_tokens[i] != NULL; i++)
     num_ignore_generic_tokens++;
 
-  /* dynamically determine list of image tokens to be ignored */
+  // dynamically determine list of image tokens to be ignored
   num_ignore_image_tokens = num_ignore_generic_tokens;
   for (i = 0; image_config_vars[i].token != NULL; i++)
     num_ignore_image_tokens++;
@@ -5209,7 +5209,7 @@ static void InitArtworkConfig(void)
       image_config_vars[i].token;
   ignore_image_tokens[num_ignore_image_tokens] = NULL;
 
-  /* dynamically determine list of sound tokens to be ignored */
+  // dynamically determine list of sound tokens to be ignored
   num_ignore_sound_tokens = num_ignore_generic_tokens;
   ignore_sound_tokens =
     checked_malloc((num_ignore_sound_tokens + 1) * sizeof(char *));
@@ -5217,7 +5217,7 @@ static void InitArtworkConfig(void)
     ignore_sound_tokens[i] = ignore_generic_tokens[i];
   ignore_sound_tokens[num_ignore_sound_tokens] = NULL;
 
-  /* dynamically determine list of music tokens to be ignored */
+  // dynamically determine list of music tokens to be ignored
   num_ignore_music_tokens = num_ignore_generic_tokens;
   ignore_music_tokens =
     checked_malloc((num_ignore_music_tokens + 1) * sizeof(char *));
@@ -5301,11 +5301,11 @@ void InitGfxBuffers(void)
   static int win_xsize_last = -1;
   static int win_ysize_last = -1;
 
-  /* create additional image buffers for double-buffering and cross-fading */
+  // create additional image buffers for double-buffering and cross-fading
 
   if (WIN_XSIZE != win_xsize_last || WIN_YSIZE != win_ysize_last)
   {
-    /* used to temporarily store the backbuffer -- only re-create if changed */
+    // used to temporarily store the backbuffer -- only re-create if changed
     ReCreateBitmap(&bitmap_db_store_1, WIN_XSIZE, WIN_YSIZE);
     ReCreateBitmap(&bitmap_db_store_2, WIN_XSIZE, WIN_YSIZE);
 
@@ -5318,7 +5318,7 @@ void InitGfxBuffers(void)
   ReCreateBitmap(&bitmap_db_door_1, 3 * DXSIZE, DYSIZE);
   ReCreateBitmap(&bitmap_db_door_2, 3 * VXSIZE, VYSIZE);
 
-  /* initialize screen properties */
+  // initialize screen properties
   InitGfxFieldInfo(SX, SY, SXSIZE, SYSIZE,
 		   REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE,
 		   bitmap_db_field);
@@ -5329,7 +5329,7 @@ void InitGfxBuffers(void)
   InitGfxScrollbufferInfo(FXSIZE, FYSIZE);
   InitGfxClipRegion(FALSE, -1, -1, -1, -1);
 
-  /* required if door size definitions have changed */
+  // required if door size definitions have changed
   InitGraphicCompatibilityInfo_Doors();
 
   InitGfxBuffers_EM();
@@ -5344,7 +5344,7 @@ static void InitGfx(void)
   Bitmap *bitmap_font_initial = NULL;
   int i, j;
 
-  /* determine settings for initial font (for displaying startup messages) */
+  // determine settings for initial font (for displaying startup messages)
   for (i = 0; image_config[i].token != NULL; i++)
   {
     for (j = 0; j < NUM_INITIAL_FONTS; j++)
@@ -5378,7 +5378,7 @@ static void InitGfx(void)
     font_initial[j].num_chars_per_line = DEFAULT_NUM_CHARS_PER_LINE;
   }
 
-  if (filename_font_initial == NULL)	/* should not happen */
+  if (filename_font_initial == NULL)	// should not happen
     Error(ERR_EXIT, "cannot get filename for '%s'", CONFIG_TOKEN_FONT_INITIAL);
 
   InitGfxBuffers();
@@ -5396,7 +5396,7 @@ static void InitGfx(void)
 
   DrawInitText("Loading graphics", 120, FC_GREEN);
 
-  /* initialize settings for busy animation with default values */
+  // initialize settings for busy animation with default values
   int parameter[NUM_GFX_ARGS];
   for (i = 0; i < NUM_GFX_ARGS; i++)
     parameter[i] = get_graphic_parameter_value(image_config_suffix[i].value,
@@ -5406,7 +5406,7 @@ static void InitGfx(void)
   char *anim_token = CONFIG_TOKEN_GLOBAL_BUSY;
   int len_anim_token = strlen(anim_token);
 
-  /* read settings for busy animation from default custom artwork config */
+  // read settings for busy animation from default custom artwork config
   char *gfx_config_filename = getPath3(options.graphics_directory,
 				       GFX_DEFAULT_SUBDIR,
 				       GRAPHICSINFO_FILENAME);
@@ -5443,7 +5443,7 @@ static void InitGfx(void)
 
   if (filename_anim_initial == NULL)
   {
-    /* read settings for busy animation from static default artwork config */
+    // read settings for busy animation from static default artwork config
     for (i = 0; image_config[i].token != NULL; i++)
     {
       if (strEqual(image_config[i].token, anim_token))
@@ -5464,7 +5464,7 @@ static void InitGfx(void)
     }
   }
 
-  if (filename_anim_initial == NULL)	/* should not happen */
+  if (filename_anim_initial == NULL)	// should not happen
     Error(ERR_EXIT, "cannot get filename for '%s'", CONFIG_TOKEN_GLOBAL_BUSY);
 
   anim_initial.bitmaps =
@@ -5475,7 +5475,7 @@ static void InitGfx(void)
 
   checked_free(filename_anim_initial);
 
-  graphic_info = &anim_initial;		/* graphic == 0 => anim_initial */
+  graphic_info = &anim_initial;		// graphic == 0 => anim_initial
 
   set_graphic_parameters_ext(0, parameter, anim_initial.bitmaps);
 
@@ -5495,7 +5495,7 @@ static void InitGfx(void)
   gfx.fade_border_target_status = global.border_status;
   gfx.masked_border_bitmap_ptr = backbuffer;
 
-  /* use copy of busy animation to prevent change while reloading artwork */
+  // use copy of busy animation to prevent change while reloading artwork
   init_last = init;
 }
 
@@ -5511,9 +5511,9 @@ static void InitGfxBackground(void)
 
 static void InitLevelInfo(void)
 {
-  LoadLevelInfo();				/* global level info */
-  LoadLevelSetup_LastSeries();			/* last played series info */
-  LoadLevelSetup_SeriesInfo();			/* last played level info */
+  LoadLevelInfo();				// global level info
+  LoadLevelSetup_LastSeries();			// last played series info
+  LoadLevelSetup_SeriesInfo();			// last played level info
 
   if (global.autoplay_leveldir &&
       global.autoplay_mode != AUTOPLAY_MODE_TEST)
@@ -5604,7 +5604,7 @@ static void InitSound(char *identifier)
   if (identifier == NULL)
     identifier = artwork.snd_current->identifier;
 
-  /* set artwork path to send it to the sound server process */
+  // set artwork path to send it to the sound server process
   setLevelArtworkDir(artwork.snd_first);
 
   InitReloadCustomSounds(identifier);
@@ -5623,7 +5623,7 @@ static void InitMusic(char *identifier)
   if (identifier == NULL)
     identifier = artwork.mus_current->identifier;
 
-  /* set artwork path to send it to the sound server process */
+  // set artwork path to send it to the sound server process
   setLevelArtworkDir(artwork.mus_first);
 
   InitReloadCustomMusic(identifier);
@@ -5684,7 +5684,7 @@ void InitNetworkServer(void)
     network.connected = TRUE;
   }
 
-  /* short time to recognize result of network initialization */
+  // short time to recognize result of network initialization
   if (game_status == GAME_MODE_LOADING)
     Delay_WithScreenUpdates(1000);
 }
@@ -5694,7 +5694,7 @@ static boolean CheckArtworkConfigForCustomElements(char *filename)
   SetupFileHash *setup_file_hash;
   boolean redefined_ce_found = FALSE;
 
-  /* !!! CACHE THIS BY USING HASH 'filename' => 'true/false' !!! */
+  // !!! CACHE THIS BY USING HASH 'filename' => 'true/false' !!!
 
   if ((setup_file_hash = loadSetupFileHash(filename)) != NULL)
   {
@@ -5736,7 +5736,7 @@ static boolean CheckArtworkTypeForRedefinedCustomElements(int type)
 	 LEVELDIR_ARTWORK_SET(leveldir_current, type));
 #endif
 
-  /* first look for special artwork configured in level series config */
+  // first look for special artwork configured in level series config
   filename_base = getCustomArtworkLevelConfigFilename(type);
 
 #if 0
@@ -5766,12 +5766,12 @@ static void InitOverrideArtwork(void)
 {
   boolean redefined_ce_found = FALSE;
 
-  /* to check if this level set redefines any CEs, do not use overriding */
+  // to check if this level set redefines any CEs, do not use overriding
   gfx.override_level_graphics = FALSE;
   gfx.override_level_sounds   = FALSE;
   gfx.override_level_music    = FALSE;
 
-  /* now check if this level set has definitions for custom elements */
+  // now check if this level set has definitions for custom elements
   if (setup.override_level_graphics == AUTO ||
       setup.override_level_sounds   == AUTO ||
       setup.override_level_music    == AUTO)
@@ -5786,14 +5786,14 @@ static void InitOverrideArtwork(void)
 
   if (redefined_ce_found)
   {
-    /* this level set has CE definitions: change "AUTO" to "FALSE" */
+    // this level set has CE definitions: change "AUTO" to "FALSE"
     gfx.override_level_graphics = (setup.override_level_graphics == TRUE);
     gfx.override_level_sounds   = (setup.override_level_sounds   == TRUE);
     gfx.override_level_music    = (setup.override_level_music    == TRUE);
   }
   else
   {
-    /* this level set has no CE definitions: change "AUTO" to "TRUE" */
+    // this level set has no CE definitions: change "AUTO" to "TRUE"
     gfx.override_level_graphics = (setup.override_level_graphics != FALSE);
     gfx.override_level_sounds   = (setup.override_level_sounds   != FALSE);
     gfx.override_level_music    = (setup.override_level_music    != FALSE);
@@ -5817,13 +5817,13 @@ static char *getNewArtworkIdentifier(int type)
   boolean setup_override_artwork = GFX_OVERRIDE_ARTWORK(type);
   char *setup_artwork_set = SETUP_ARTWORK_SET(setup, type);
   char *leveldir_identifier = leveldir_current->identifier;
-  /* !!! setLevelArtworkDir() should be moved to an earlier stage !!! */
+  // !!! setLevelArtworkDir() should be moved to an earlier stage !!!
   char *leveldir_artwork_set = setLevelArtworkDir(artwork_first_node);
   boolean has_level_artwork_set = (leveldir_artwork_set != NULL);
   char *artwork_current_identifier;
-  char *artwork_new_identifier = NULL;	/* default: nothing has changed */
+  char *artwork_new_identifier = NULL;	// default: nothing has changed
 
-  /* leveldir_current may be invalid (level group, parent link) */
+  // leveldir_current may be invalid (level group, parent link)
   if (!validLevelSeries(leveldir_current))
     return NULL;
 
@@ -5848,7 +5848,7 @@ static char *getNewArtworkIdentifier(int type)
   /* 2nd step: check if it is really needed to reload artwork set
      ------------------------------------------------------------ */
 
-  /* ---------- reload if level set and also artwork set has changed ------- */
+  // ---------- reload if level set and also artwork set has changed ----------
   if (leveldir_current_identifier[type] != leveldir_identifier &&
       (last_has_level_artwork_set[type] || has_level_artwork_set))
     artwork_new_identifier = artwork_current_identifier;
@@ -5856,20 +5856,20 @@ static char *getNewArtworkIdentifier(int type)
   leveldir_current_identifier[type] = leveldir_identifier;
   last_has_level_artwork_set[type] = has_level_artwork_set;
 
-  /* ---------- reload if "override artwork" setting has changed ----------- */
+  // ---------- reload if "override artwork" setting has changed --------------
   if (last_override_level_artwork[type] != setup_override_artwork)
     artwork_new_identifier = artwork_current_identifier;
 
   last_override_level_artwork[type] = setup_override_artwork;
 
-  /* ---------- reload if current artwork identifier has changed ----------- */
+  // ---------- reload if current artwork identifier has changed --------------
   if (!strEqual(ARTWORK_CURRENT_IDENTIFIER(artwork, type),
 		artwork_current_identifier))
     artwork_new_identifier = artwork_current_identifier;
 
   *(ARTWORK_CURRENT_IDENTIFIER_PTR(artwork, type))= artwork_current_identifier;
 
-  /* ---------- do not reload directly after starting ---------------------- */
+  // ---------- do not reload directly after starting -------------------------
   if (!initialized[type])
     artwork_new_identifier = NULL;
 
@@ -5880,7 +5880,7 @@ static char *getNewArtworkIdentifier(int type)
 
 void ReloadCustomArtwork(int force_reload)
 {
-  int last_game_status = game_status;	/* save current game status */
+  int last_game_status = game_status;	// save current game status
   char *gfx_new_identifier;
   char *snd_new_identifier;
   char *mus_new_identifier;
@@ -5943,15 +5943,15 @@ void ReloadCustomArtwork(int force_reload)
 
   InitArtworkDone();
 
-  SetGameStatus(last_game_status);	/* restore current game status */
+  SetGameStatus(last_game_status);	// restore current game status
 
-  init_last = init;			/* switch to new busy animation */
+  init_last = init;			// switch to new busy animation
 
   FadeOut(REDRAW_ALL);
 
   RedrawGlobalBorder();
 
-  /* force redraw of (open or closed) door graphics */
+  // force redraw of (open or closed) door graphics
   SetDoorState(DOOR_OPEN_ALL);
   CloseDoor(DOOR_CLOSE_ALL | DOOR_NO_DELAY);
 
@@ -6022,21 +6022,21 @@ void DisplayExitMessage(char *format, va_list ap)
 
   redraw_mask = REDRAW_ALL;
 
-  /* force drawing exit message even if screen updates are currently limited */
+  // force drawing exit message even if screen updates are currently limited
   LimitScreenUpdates(FALSE);
 
   BackToFront();
 
-  /* deactivate toons on error message screen */
+  // deactivate toons on error message screen
   setup.toons = FALSE;
 
   WaitForEventToContinue();
 }
 
 
-/* ========================================================================= */
-/* OpenAll()                                                                 */
-/* ========================================================================= */
+// ============================================================================
+// OpenAll()
+// ============================================================================
 
 void OpenAll(void)
 {
@@ -6046,7 +6046,7 @@ void OpenAll(void)
 
   InitCounter();
 
-  InitGlobal();			/* initialize some global variables */
+  InitGlobal();			// initialize some global variables
 
   print_timestamp_time("[init global stuff]");
 
@@ -6069,16 +6069,16 @@ void OpenAll(void)
     Error(ERR_WARN, "networking only supported in Unix version");
 #endif
 
-    exit(0);			/* never reached, server loops forever */
+    exit(0);			// never reached, server loops forever
   }
 
   InitGameInfo();
   print_timestamp_time("[init setup/config stuff (2)]");
   InitPlayerInfo();
   print_timestamp_time("[init setup/config stuff (3)]");
-  InitArtworkInfo();		/* needed before loading gfx, sound & music */
+  InitArtworkInfo();		// needed before loading gfx, sound & music
   print_timestamp_time("[init setup/config stuff (4)]");
-  InitArtworkConfig();		/* needed before forking sound child process */
+  InitArtworkConfig();		// needed before forking sound child process
   print_timestamp_time("[init setup/config stuff (5)]");
   InitMixer();
   print_timestamp_time("[init setup/config stuff (6)]");
@@ -6113,16 +6113,16 @@ void OpenAll(void)
   InitLevelArtworkInfo();
   print_timestamp_time("InitLevelArtworkInfo");
 
-  InitOverrideArtwork();	/* needs to know current level directory */
+  InitOverrideArtwork();	// needs to know current level directory
   print_timestamp_time("InitOverrideArtwork");
 
-  InitImages();			/* needs to know current level directory */
+  InitImages();			// needs to know current level directory
   print_timestamp_time("InitImages");
 
-  InitSound(NULL);		/* needs to know current level directory */
+  InitSound(NULL);		// needs to know current level directory
   print_timestamp_time("InitSound");
 
-  InitMusic(NULL);		/* needs to know current level directory */
+  InitMusic(NULL);		// needs to know current level directory
   print_timestamp_time("InitMusic");
 
   InitArtworkDone();
@@ -6187,7 +6187,7 @@ void CloseAllAndExit(int exit_value)
   StopSounds();
   FreeAllSounds();
   FreeAllMusic();
-  CloseAudio();		/* called after freeing sounds (needed for SDL) */
+  CloseAudio();		// called after freeing sounds (needed for SDL)
 
   em_close_all();
   sp_close_all();
@@ -6200,7 +6200,7 @@ void CloseAllAndExit(int exit_value)
   // set a flag to tell the network server thread to quit and wait for it
   // using SDL_WaitThread()
 #else
-  if (network_server)	/* terminate network server */
+  if (network_server)	// terminate network server
     SDL_KillThread(server_thread);
 #endif
 #endif
@@ -6210,12 +6210,12 @@ void CloseAllAndExit(int exit_value)
 
   if (exit_value != 0 && !options.execute_command)
   {
-    /* fall back to default level set (current set may have caused an error) */
+    // fall back to default level set (current set may have caused an error)
     SaveLevelSetup_LastSeries_Deactivate();
 
-    /* tell user where to find error log file which may contain more details */
+    // tell user where to find error log file which may contain more details
     // (error notification now directly displayed on screen inside R'n'D
-    // NotifyUserAboutErrorFile();	/* currently only works for Windows */
+    // NotifyUserAboutErrorFile();	// currently only works for Windows
   }
 
   exit(exit_value);

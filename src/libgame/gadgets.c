@@ -18,7 +18,7 @@
 #include "misc.h"
 
 
-/* values for DrawGadget() */
+// values for DrawGadget()
 #define DG_UNPRESSED		0
 #define DG_PRESSED		1
 
@@ -64,9 +64,9 @@ static int getNewGadgetID(void)
 {
   int id = next_free_gadget_id++;
 
-  if (next_free_gadget_id <= 0)		/* counter overrun */
+  if (next_free_gadget_id <= 0)		// counter overrun
   {
-    gadget_id_wrapped = TRUE;		/* now we must check each ID */
+    gadget_id_wrapped = TRUE;		// now we must check each ID
     next_free_gadget_id = 0;
   }
 
@@ -77,7 +77,7 @@ static int getNewGadgetID(void)
       next_free_gadget_id++;
   }
 
-  if (next_free_gadget_id <= 0)		/* cannot get new gadget id */
+  if (next_free_gadget_id <= 0)		// cannot get new gadget id
     Error(ERR_EXIT, "too much gadgets -- this should not happen");
 
   return id;
@@ -88,14 +88,14 @@ static struct GadgetInfo *getGadgetInfoFromMousePosition(int mx, int my,
 {
   struct GadgetInfo *gi;
 
-  /* first check for scrollbars in case of mouse scroll wheel button events */
+  // first check for scrollbars in case of mouse scroll wheel button events
   if (IS_WHEEL_BUTTON(button))
   {
-    /* real horizontal wheel or vertical wheel with modifier key pressed */
+    // real horizontal wheel or vertical wheel with modifier key pressed
     boolean check_horizontal = (IS_WHEEL_BUTTON_HORIZONTAL(button) ||
 				GetKeyModState() & KMOD_Shift);
 
-    /* check for the first active scrollbar directly under the mouse pointer */
+    // check for the first active scrollbar directly under the mouse pointer
     for (gi = gadget_list_first_entry; gi != NULL; gi = gi->next)
     {
       if (gi->mapped && gi->active &&
@@ -105,7 +105,7 @@ static struct GadgetInfo *getGadgetInfoFromMousePosition(int mx, int my,
 	return gi;
     }
 
-    /* check for the first active scrollbar with matching mouse wheel area */
+    // check for the first active scrollbar with matching mouse wheel area
     for (gi = gadget_list_first_entry; gi != NULL; gi = gi->next)
     {
       if (gi->mapped && gi->active &&
@@ -116,11 +116,11 @@ static struct GadgetInfo *getGadgetInfoFromMousePosition(int mx, int my,
 	return gi;
     }
 
-    /* no active scrollbar found -- ignore this scroll wheel button event */
+    // no active scrollbar found -- ignore this scroll wheel button event
     return NULL;
   }
 
-  /* open selectboxes may overlap other active gadgets, so check them first */
+  // open selectboxes may overlap other active gadgets, so check them first
   for (gi = gadget_list_first_entry; gi != NULL; gi = gi->next)
   {
     if (gi->mapped && gi->active &&
@@ -130,7 +130,7 @@ static struct GadgetInfo *getGadgetInfoFromMousePosition(int mx, int my,
       return gi;
   }
 
-  /* check all other gadgets */
+  // check all other gadgets
   for (gi = gadget_list_first_entry; gi != NULL; gi = gi->next)
   {
     if (gi->mapped && gi->active &&
@@ -156,12 +156,12 @@ static void setTextAreaCursorExt(struct GadgetInfo *gi, boolean set_cursor_pos)
 
   while (*text)
   {
-    if (set_cursor_pos)		/* x/y => position */
+    if (set_cursor_pos)		// x/y => position
     {
       if (y == cursor_y && (x == cursor_x || (x < cursor_x && *text == '\n')))
 	break;
     }
-    else			/* position => x/y */
+    else			// position => x/y
     {
       if (pos == cursor_position)
 	break;
@@ -273,23 +273,23 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	int text_size = strlen(gi->textbutton.value);
 	int text_start = (gi->width - text_size * font_width) / 2;
 
-	/* left part of gadget */
+	// left part of gadget
 	BlitBitmapOnBackground(gd->bitmap, drawto, gd->x, gd->y,
 			       border_x, gi->height, gi->x, gi->y);
 
-	/* middle part of gadget */
+	// middle part of gadget
 	for (i=0; i < gi->textbutton.size; i++)
 	  BlitBitmapOnBackground(gd->bitmap, drawto, gd->x + border_x, gd->y,
 				 font_width, gi->height,
 				 gi->x + border_x + i * font_width, gi->y);
 
-	/* right part of gadget */
+	// right part of gadget
 	BlitBitmapOnBackground(gd->bitmap, drawto,
 			       gd->x + gi->border.width - border_x, gd->y,
 			       border_x, gi->height,
 			       gi->x + gi->width - border_x, gi->y);
 
-	/* gadget text value */
+	// gadget text value
 	DrawTextExt(drawto,
 		    gi->x + text_start + (pressed ? gi->deco.xshift : 0),
 		    gi->y + border_y   + (pressed ? gi->deco.yshift : 0),
@@ -309,27 +309,27 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	int border_x = gi->border.xsize;
 	int border_y = gi->border.ysize;
 
-	/* left part of gadget */
+	// left part of gadget
 	BlitBitmapOnBackground(gd->bitmap, drawto, gd->x, gd->y,
 			       border_x, gi->height, gi->x, gi->y);
 
-	/* middle part of gadget */
+	// middle part of gadget
 	for (i=0; i < gi->textinput.size + 1; i++)
 	  BlitBitmapOnBackground(gd->bitmap, drawto, gd->x + border_x, gd->y,
 				 font_width, gi->height,
 				 gi->x + border_x + i * font_width, gi->y);
 
-	/* right part of gadget */
+	// right part of gadget
 	BlitBitmapOnBackground(gd->bitmap, drawto,
 			       gd->x + gi->border.width - border_x, gd->y,
 			       border_x, gi->height,
 			       gi->x + gi->width - border_x, gi->y);
 
-	/* set text value */
+	// set text value
 	strcpy(text, gi->textinput.value);
 	strcat(text, " ");
 
-	/* gadget text value */
+	// gadget text value
 	DrawTextExt(drawto,
 		    gi->x + border_x, gi->y + border_y, text,
 		    font_nr, BLIT_MASKED);
@@ -338,7 +338,7 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	cursor_string[0] = (cursor_letter != '\0' ? cursor_letter : ' ');
 	cursor_string[1] = '\0';
 
-	/* draw cursor, if active */
+	// draw cursor, if active
 	if (pressed)
 	  DrawTextExt(drawto,
 		      gi->x + border_x +
@@ -360,23 +360,23 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	int border_y = gi->border.ysize;
 	int gd_height = 2 * border_y + font_height;
 
-	/* top left part of gadget border */
+	// top left part of gadget border
 	BlitBitmapOnBackground(gd->bitmap, drawto, gd->x, gd->y,
 			       border_x, border_y, gi->x, gi->y);
 
-	/* top middle part of gadget border */
+	// top middle part of gadget border
 	for (i=0; i < gi->textarea.xsize; i++)
 	  BlitBitmapOnBackground(gd->bitmap, drawto, gd->x + border_x, gd->y,
 				 font_width, border_y,
 				 gi->x + border_x + i * font_width, gi->y);
 
-	/* top right part of gadget border */
+	// top right part of gadget border
 	BlitBitmapOnBackground(gd->bitmap, drawto,
 			       gd->x + gi->border.width - border_x, gd->y,
 			       border_x, border_y,
 			       gi->x + gi->width - border_x, gi->y);
 
-	/* left and right part of gadget border for each row */
+	// left and right part of gadget border for each row
 	for (i=0; i < gi->textarea.ysize; i++)
 	{
 	  BlitBitmapOnBackground(gd->bitmap, drawto, gd->x, gd->y + border_y,
@@ -390,13 +390,13 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 				 gi->y + border_y + i * font_height);
 	}
 
-	/* bottom left part of gadget border */
+	// bottom left part of gadget border
 	BlitBitmapOnBackground(gd->bitmap, drawto,
 			       gd->x, gd->y + gd_height - border_y,
 			       border_x, border_y,
 			       gi->x, gi->y + gi->height - border_y);
 
-	/* bottom middle part of gadget border */
+	// bottom middle part of gadget border
 	for (i=0; i < gi->textarea.xsize; i++)
 	  BlitBitmapOnBackground(gd->bitmap, drawto,
 				 gd->x + border_x,
@@ -405,7 +405,7 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 				 gi->x + border_x + i * font_width,
 				 gi->y + gi->height - border_y);
 
-	/* bottom right part of gadget border */
+	// bottom right part of gadget border
 	BlitBitmapOnBackground(gd->bitmap, drawto,
 			       gd->x + gi->border.width - border_x,
 			       gd->y + gd_height - border_y,
@@ -419,7 +419,7 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 				   gi->width - 2 * border_x,
 				   gi->height - 2 * border_y);
 
-	/* gadget text value */
+	// gadget text value
 	DrawTextBuffer(gi->x + border_x, gi->y + border_y, gi->textarea.value,
 		       font_nr, gi->textarea.xsize, -1, gi->textarea.ysize, 0,
 		       BLIT_ON_BACKGROUND, FALSE, FALSE, FALSE);
@@ -428,7 +428,7 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	cursor_string[0] = (cursor_letter != '\0' ? cursor_letter : ' ');
 	cursor_string[1] = '\0';
 
-	/* draw cursor, if active */
+	// draw cursor, if active
 	if (pressed)
 	  DrawTextExt(drawto,
 		      gi->x + border_x + gi->textarea.cursor_x * font_width,
@@ -453,38 +453,38 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	int box_width = gi->selectbox.width;
 	int box_height = gi->selectbox.height;
 
-	/* left part of gadget */
+	// left part of gadget
 	BlitBitmapOnBackground(gd->bitmap, drawto, gd->x, gd->y,
 			       border_x, gi->height, gi->x, gi->y);
 
-	/* middle part of gadget */
+	// middle part of gadget
 	for (i=0; i < gi->selectbox.size; i++)
 	  BlitBitmapOnBackground(gd->bitmap, drawto, gd->x + border_x, gd->y,
 				 font_width, gi->height,
 				 gi->x + border_x + i * font_width, gi->y);
 
-	/* button part of gadget */
+	// button part of gadget
 	BlitBitmapOnBackground(gd->bitmap, drawto,
 			       gd->x + border_x + width_inner, gd->y,
 			       button, gi->height,
 			       gi->x + gi->width - border_x - button, gi->y);
 
-	/* right part of gadget */
+	// right part of gadget
 	BlitBitmapOnBackground(gd->bitmap, drawto,
 			       gd->x + gi->border.width - border_x, gd->y,
 			       border_x, gi->height,
 			       gi->x + gi->width - border_x, gi->y);
 
-	/* set text value */
+	// set text value
 	strncpy(text, gi->selectbox.options[gi->selectbox.index].text,
 		gi->selectbox.size);
 	text[gi->selectbox.size] = '\0';
 
-	/* set font value */
+	// set font value
 	font_nr = (OPTION_TEXT_SELECTABLE(gi, text) ? font_nr_default :
 		   gi->font_unselectable);
 
-	/* gadget text value */
+	// gadget text value
 	DrawTextExt(drawto, gi->x + border_x, gi->y + border_y, text,
 		    font_nr, BLIT_MASKED);
 
@@ -496,42 +496,42 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	    gi->selectbox.stay_open = FALSE;
 	    gi->selectbox.current_index = gi->selectbox.index;
 
-	    /* save background under selectbox */
+	    // save background under selectbox
 	    BlitBitmap(drawto, gfx.field_save_buffer,
 		       gi->selectbox.x,     gi->selectbox.y,
 		       gi->selectbox.width, gi->selectbox.height,
 		       gi->selectbox.x,     gi->selectbox.y);
 	  }
 
-	  /* draw open selectbox */
+	  // draw open selectbox
 
-	  /* top left part of gadget border */
+	  // top left part of gadget border
 	  BlitBitmapOnBackground(gd->bitmap, drawto, gd->x, gd->y,
 				 border_x, border_y,
 				 gi->selectbox.x, gi->selectbox.y);
 
-	  /* top middle part of gadget border */
+	  // top middle part of gadget border
 	  for (i=0; i < gi->selectbox.size; i++)
 	    BlitBitmapOnBackground(gd->bitmap, drawto, gd->x + border_x, gd->y,
 				   font_width, border_y,
 				   gi->selectbox.x + border_x + i * font_width,
 				   gi->selectbox.y);
 
-	  /* top button part of gadget border */
+	  // top button part of gadget border
 	  BlitBitmapOnBackground(gd->bitmap, drawto,
 				 gd->x + border_x + width_inner, gd->y,
 				 button, border_y,
 				 gi->selectbox.x + box_width -border_x -button,
 				 gi->selectbox.y);
 
-	  /* top right part of gadget border */
+	  // top right part of gadget border
 	  BlitBitmapOnBackground(gd->bitmap, drawto,
 				 gd->x + gi->border.width - border_x, gd->y,
 				 border_x, border_y,
 				 gi->selectbox.x + box_width - border_x,
 				 gi->selectbox.y);
 
-	  /* left and right part of gadget border for each row */
+	  // left and right part of gadget border for each row
 	  for (i=0; i < gi->selectbox.num_values; i++)
 	  {
 	    BlitBitmapOnBackground(gd->bitmap, drawto, gd->x, gd->y + border_y,
@@ -546,14 +546,14 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 				   gi->selectbox.y + border_y + i*font_height);
 	  }
 
-	  /* bottom left part of gadget border */
+	  // bottom left part of gadget border
 	  BlitBitmapOnBackground(gd->bitmap, drawto,
 				 gd->x, gd->y + gi->height - border_y,
 				 border_x, border_y,
 				 gi->selectbox.x,
 				 gi->selectbox.y + box_height - border_y);
 
-	  /* bottom middle part of gadget border */
+	  // bottom middle part of gadget border
 	  for (i=0; i < gi->selectbox.size; i++)
 	    BlitBitmapOnBackground(gd->bitmap, drawto,
 				   gd->x + border_x,
@@ -562,7 +562,7 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 				   gi->selectbox.x + border_x + i * font_width,
 				   gi->selectbox.y + box_height - border_y);
 
-	  /* bottom button part of gadget border */
+	  // bottom button part of gadget border
 	  BlitBitmapOnBackground(gd->bitmap, drawto,
 				 gd->x + border_x + width_inner,
 				 gd->y + gi->height - border_y,
@@ -570,7 +570,7 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 				 gi->selectbox.x + box_width -border_x -button,
 				 gi->selectbox.y + box_height - border_y);
 
-	  /* bottom right part of gadget border */
+	  // bottom right part of gadget border
 	  BlitBitmapOnBackground(gd->bitmap, drawto,
 				 gd->x + gi->border.width - border_x,
 				 gd->y + gi->height - border_y,
@@ -584,7 +584,7 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 				     gi->selectbox.width - 2 * border_x,
 				     gi->selectbox.height - 2 * border_y);
 
-	  /* selectbox text values */
+	  // selectbox text values
 	  for (i=0; i < gi->selectbox.num_values; i++)
 	  {
 	    int mask_mode = BLIT_MASKED;
@@ -604,7 +604,7 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 			    gi->selectbox.width - 2 * border_x, font_height,
 			    gi->selectbox.inverse_color);
 
-	      /* prevent use of cursor graphic by drawing at least two chars */
+	      // prevent use of cursor graphic by drawing at least two chars
 	      strcat(text, "  ");
 	      text[gi->selectbox.size] = '\0';
 
@@ -623,13 +623,13 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	{
 	  gi->selectbox.open = FALSE;
 
-	  /* restore background under selectbox */
+	  // restore background under selectbox
 	  BlitBitmap(gfx.field_save_buffer, drawto,
 		     gi->selectbox.x,     gi->selectbox.y,
 		     gi->selectbox.width, gi->selectbox.height,
 		     gi->selectbox.x,     gi->selectbox.y);
 
-	  /* redraw closed selectbox */
+	  // redraw closed selectbox
 	  DrawGadget(gi, FALSE, FALSE);
 
 	  redraw_selectbox = TRUE;
@@ -649,17 +649,17 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	int num_steps = size_body / design_body;
 	int step_size_remain = size_body - num_steps * design_body;
 
-	/* clear scrollbar area */
+	// clear scrollbar area
 	ClearRectangleOnBackground(backbuffer, gi->x, gi->y,
 				   gi->width, gi->height);
 
-	/* upper part of gadget */
+	// upper part of gadget
 	BlitBitmapOnBackground(gd->bitmap, drawto,
 			       gd->x, gd->y,
 			       gi->width, gi->border.ysize,
 			       xpos, ypos);
 
-	/* middle part of gadget */
+	// middle part of gadget
 	for (i=0; i < num_steps; i++)
 	  BlitBitmapOnBackground(gd->bitmap, drawto,
 				 gd->x, gd->y + gi->border.ysize,
@@ -667,7 +667,7 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 				 xpos,
 				 ypos + gi->border.ysize + i * design_body);
 
-	/* remaining middle part of gadget */
+	// remaining middle part of gadget
 	if (step_size_remain > 0)
 	  BlitBitmapOnBackground(gd->bitmap, drawto,
 				 gd->x,  gd->y + gi->border.ysize,
@@ -676,7 +676,7 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 				 ypos + gi->border.ysize
 				 + num_steps * design_body);
 
-	/* lower part of gadget */
+	// lower part of gadget
 	BlitBitmapOnBackground(gd->bitmap, drawto,
 			       gd->x, gd->y + design_full - gi->border.ysize,
 			       gi->width, gi->border.ysize,
@@ -696,17 +696,17 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 	int num_steps = size_body / design_body;
 	int step_size_remain = size_body - num_steps * design_body;
 
-	/* clear scrollbar area */
+	// clear scrollbar area
 	ClearRectangleOnBackground(backbuffer, gi->x, gi->y,
 				   gi->width, gi->height);
 
-	/* left part of gadget */
+	// left part of gadget
 	BlitBitmapOnBackground(gd->bitmap, drawto,
 			       gd->x, gd->y,
 			       gi->border.xsize, gi->height,
 			       xpos, ypos);
 
-	/* middle part of gadget */
+	// middle part of gadget
 	for (i=0; i < num_steps; i++)
 	  BlitBitmapOnBackground(gd->bitmap, drawto,
 				 gd->x + gi->border.xsize, gd->y,
@@ -714,7 +714,7 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 				 xpos + gi->border.xsize + i * design_body,
 				 ypos);
 
-	/* remaining middle part of gadget */
+	// remaining middle part of gadget
 	if (step_size_remain > 0)
 	  BlitBitmapOnBackground(gd->bitmap, drawto,
 				 gd->x + gi->border.xsize, gd->y,
@@ -723,7 +723,7 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 				 + num_steps * design_body,
 				 ypos);
 
-	/* right part of gadget */
+	// right part of gadget
 	BlitBitmapOnBackground(gd->bitmap, drawto,
 			       gd->x + design_full - gi->border.xsize, gd->y,
 			       gi->border.xsize, gi->height,
@@ -764,14 +764,14 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
 
 static int get_minimal_size_for_numeric_input(int minmax_value)
 {
-  int min_size = 1;	/* value needs at least one digit */
+  int min_size = 1;	// value needs at least one digit
   int i;
 
-  /* add number of digits needed for absolute value */
+  // add number of digits needed for absolute value
   for (i = 10; i <= ABS(minmax_value); i *= 10)
     min_size++;
 
-  /* if min/max value is negative, add one digit for minus sign */
+  // if min/max value is negative, add one digit for minus sign
   if (minmax_value < 0)
     min_size++;
 
@@ -899,7 +899,7 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 	  gi->textinput.value[max_textsize] = '\0';
 	  gi->textinput.cursor_position = strlen(gi->textinput.value);
 
-	  /* same tag also used for other gadget definitions */
+	  // same tag also used for other gadget definitions
 	  strcpy(gi->textbutton.value, gi->textinput.value);
 	  strcpy(gi->textarea.value, gi->textinput.value);
 	  strcpy(gi->textarea.last_value, gi->textinput.value);
@@ -915,7 +915,7 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 	  gi->textinput.value[max_textsize] = '\0';
 	  strcpy(gi->textinput.last_value, gi->textinput.value);
 
-	  /* same tag also used for other gadget definitions */
+	  // same tag also used for other gadget definitions
 
 	  gi->textarea.size = max_textsize;
 	  gi->textarea.value[max_textsize] = '\0';
@@ -1026,7 +1026,7 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 	gi->drawing.area_xsize = va_arg(ap, int);
 	gi->drawing.area_ysize = va_arg(ap, int);
 
-	/* determine dependent values for drawing area gadget, if needed */
+	// determine dependent values for drawing area gadget, if needed
 	if (gi->drawing.item_xsize != 0 && gi->drawing.item_ysize != 0)
 	{
 	  gi->width = gi->drawing.area_xsize * gi->drawing.item_xsize;
@@ -1038,11 +1038,11 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 	  gi->drawing.item_ysize = gi->height / gi->drawing.area_ysize;
 	}
 
-	/* same tag also used for other gadget definitions */
+	// same tag also used for other gadget definitions
 	gi->textarea.xsize = gi->drawing.area_xsize;
 	gi->textarea.ysize = gi->drawing.area_ysize;
 
-	if (gi->type & GD_TYPE_TEXT_AREA)	/* force recalculation */
+	if (gi->type & GD_TYPE_TEXT_AREA)	// force recalculation
 	{
 	  gi->width = 0;
 	  gi->height = 0;
@@ -1054,7 +1054,7 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 	gi->drawing.item_xsize = va_arg(ap, int);
 	gi->drawing.item_ysize = va_arg(ap, int);
 
-	/* determine dependent values for drawing area gadget, if needed */
+	// determine dependent values for drawing area gadget, if needed
 	if (gi->drawing.area_xsize != 0 && gi->drawing.area_ysize != 0)
 	{
 	  gi->width = gi->drawing.area_xsize * gi->drawing.item_xsize;
@@ -1107,22 +1107,22 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 	Error(ERR_EXIT, "HandleGadgetTags(): unknown tag %d", tag);
     }
 
-    tag = va_arg(ap, int);	/* read next tag */
+    tag = va_arg(ap, int);	// read next tag
   }
 
   gi->deactivated = FALSE;
 
-  /* check if gadget has undefined bitmaps */
+  // check if gadget has undefined bitmaps
   if (gi->type != GD_TYPE_DRAWING_AREA &&
       (gi->design[GD_BUTTON_UNPRESSED].bitmap == NULL ||
        gi->design[GD_BUTTON_PRESSED].bitmap == NULL))
     gi->deactivated = TRUE;
 
-  /* check if gadget is placed off-screen */
+  // check if gadget is placed off-screen
   if (gi->x < 0 || gi->y < 0)
     gi->deactivated = TRUE;
 
-  /* adjust gadget values in relation to other gadget values */
+  // adjust gadget values in relation to other gadget values
 
   if (gi->type & GD_TYPE_TEXT_INPUT)
   {
@@ -1140,7 +1140,7 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
       int min_size_max = get_minimal_size_for_numeric_input(number_max);
       int min_size = MAX(min_size_min, min_size_max);
 
-      /* expand gadget text input size, if maximal value is too large */
+      // expand gadget text input size, if maximal value is too large
       if (gi->textinput.size < min_size)
 	gi->textinput.size = min_size;
     }
@@ -1171,7 +1171,7 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
     while (gi->selectbox.options[gi->selectbox.num_values].text != NULL)
       gi->selectbox.num_values++;
 
-    /* calculate values for open selectbox */
+    // calculate values for open selectbox
     gi->selectbox.width = gi->width;
     gi->selectbox.height =
       2 * border_ysize + gi->selectbox.num_values * font_height;
@@ -1187,12 +1187,12 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
     src_x += font_width / 2;
     src_y += font_height / 2;
 
-    /* there may be esoteric cases with missing or too small font bitmap */
+    // there may be esoteric cases with missing or too small font bitmap
     if (src_bitmap != NULL &&
 	src_x < src_bitmap->width && src_y < src_bitmap->height)
       gi->selectbox.inverse_color = GetPixel(src_bitmap, src_x, src_y);
 
-    /* always start with closed selectbox */
+    // always start with closed selectbox
     gi->selectbox.open = FALSE;
   }
 
@@ -1229,7 +1229,7 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 	gs->items_max == 0 || gs->items_visible == 0)
       Error(ERR_EXIT, "scrollbar gadget incomplete (missing tags)");
 
-    /* calculate internal scrollbar values */
+    // calculate internal scrollbar values
     gs->size_min = (gi->type == GD_TYPE_SCROLLBAR_VERTICAL ?
 		    gi->width : gi->height);
     gs->size_max = (gi->type == GD_TYPE_SCROLLBAR_VERTICAL ?
@@ -1243,7 +1243,7 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
     gs->position_max = gs->size_max - gs->size;
     gs->correction = gs->size_max / gs->items_max / 2;
 
-    /* finetuning for maximal right/bottom position */
+    // finetuning for maximal right/bottom position
     if (gs->item_position == gs->items_max - gs->items_visible)
       gs->position = gs->position_max;
   }
@@ -1294,7 +1294,7 @@ struct GadgetInfo *CreateGadget(int first_tag, ...)
   struct GadgetInfo *new_gadget = checked_calloc(sizeof(struct GadgetInfo));
   va_list ap;
 
-  /* always start with reliable default values */
+  // always start with reliable default values
   new_gadget->id = getNewGadgetID();
   new_gadget->image_id = -1;
   new_gadget->callback_info = default_callback_info;
@@ -1308,7 +1308,7 @@ struct GadgetInfo *CreateGadget(int first_tag, ...)
   HandleGadgetTags(new_gadget, first_tag, ap);
   va_end(ap);
 
-  /* insert new gadget into global gadget list */
+  // insert new gadget into global gadget list
   if (gadget_list_last_entry)
   {
     gadget_list_last_entry->next = new_gadget;
@@ -1327,7 +1327,7 @@ void FreeGadget(struct GadgetInfo *gi)
   if (gi == NULL)
     return;
 
-  /* prevent "last_info_gi" from pointing to memory that will be freed */
+  // prevent "last_info_gi" from pointing to memory that will be freed
   if (last_info_gi == gi)
     last_info_gi = NULL;
 
@@ -1366,7 +1366,7 @@ static void CheckRangeOfNumericInputGadget(struct GadgetInfo *gi)
     gi->textinput.cursor_position = strlen(gi->textinput.value);
 }
 
-/* global pointer to gadget actually in use (when mouse button pressed) */
+// global pointer to gadget actually in use (when mouse button pressed)
 static struct GadgetInfo *last_gi = NULL;
 
 static void MapGadgetExt(struct GadgetInfo *gi, boolean redraw)
@@ -1500,21 +1500,21 @@ void ClickOnGadget(struct GadgetInfo *gi, int button)
   if (gi == NULL || gi->deactivated || !gi->mapped)
     return;
 
-  /* simulate releasing mouse button over last gadget, if still pressed */
+  // simulate releasing mouse button over last gadget, if still pressed
   if (button_status)
     HandleGadgets(-1, -1, 0);
 
   int x = gi->x;
   int y = gi->y;
 
-  /* set cursor position to the end of the text for text input gadgets */
+  // set cursor position to the end of the text for text input gadgets
   if (gi->type & GD_TYPE_TEXT_INPUT)
     x = gi->x + gi->width - 1;
 
-  /* simulate pressing mouse button over specified gadget */
+  // simulate pressing mouse button over specified gadget
   HandleGadgets(x, y, button);
 
-  /* simulate releasing mouse button over specified gadget */
+  // simulate releasing mouse button over specified gadget
   HandleGadgets(x, y, 0);
 }
 
@@ -1551,26 +1551,26 @@ boolean HandleGadgets(int mx, int my, int button)
   boolean gadget_released_off_borders;
   boolean changed_position = FALSE;
 
-  /* check if there are any gadgets defined */
+  // check if there are any gadgets defined
   if (gadget_list_first_entry == NULL)
     return FALSE;
 
-  /* simulated release of mouse button over last gadget */
+  // simulated release of mouse button over last gadget
   if (mx == -1 && my == -1 && button == 0)
   {
     mx = last_mx;
     my = last_my;
   }
 
-  /* check which gadget is under the mouse pointer */
+  // check which gadget is under the mouse pointer
   new_gi = getGadgetInfoFromMousePosition(mx, my, button);
 
-  /* check if button state has changed since last invocation */
+  // check if button state has changed since last invocation
   press_event   = (button != 0 && last_button == 0);
   release_event = (button == 0 && last_button != 0);
   last_button = button;
 
-  /* check if mouse has been moved since last invocation */
+  // check if mouse has been moved since last invocation
   mouse_moving = ((mx != last_mx || my != last_my) && motion_status);
   last_mx = mx;
   last_my = my;
@@ -1594,7 +1594,7 @@ boolean HandleGadgets(int mx, int my, int button)
      new_gi->type & GD_TYPE_SELECTBOX && new_gi->selectbox.open &&
      insideSelectboxLine(new_gi, mx, my));
 
-  /* if mouse button pressed outside text or selectbox gadget, deactivate it */
+  // if mouse button pressed outside text or selectbox gadget, deactivate it
   if (anyTextGadgetActive() &&
       (gadget_pressed_off_borders ||
        (gadget_pressed_inside_select_line && !mouse_inside_select_area)))
@@ -1602,7 +1602,7 @@ boolean HandleGadgets(int mx, int my, int button)
     struct GadgetInfo *gi = last_gi;
     boolean gadget_changed = ((gi->event_mask & GD_EVENT_TEXT_LEAVING) != 0);
 
-    /* check if text gadget has changed its value */
+    // check if text gadget has changed its value
     if (gi->type & GD_TYPE_TEXT_INPUT)
     {
       CheckRangeOfNumericInputGadget(gi);
@@ -1613,7 +1613,7 @@ boolean HandleGadgets(int mx, int my, int button)
 	gadget_changed = FALSE;
     }
 
-    /* selectbox does not change its value when closed by clicking outside */
+    // selectbox does not change its value when closed by clicking outside
     if (gi->type & GD_TYPE_SELECTBOX)
       gadget_changed = FALSE;
 
@@ -1648,55 +1648,55 @@ boolean HandleGadgets(int mx, int my, int button)
   gadget_moving_inside =      (gadget_moving && new_gi == last_gi);
   gadget_moving_off_borders = (gadget_moving && new_gi != last_gi);
 
-  /* when handling selectbox, set additional state values */
+  // when handling selectbox, set additional state values
   if (gadget_released_inside && (last_gi->type & GD_TYPE_SELECTBOX))
     gadget_released_inside_select_area = insideSelectboxArea(last_gi, mx, my);
   else
     gadget_released_inside_select_area = FALSE;
 
-  /* setting state for handling over-large selectbox */
+  // setting state for handling over-large selectbox
   if (keep_selectbox_open && (press_event || !mouse_inside_select_line))
     keep_selectbox_open = FALSE;
 
-  /* if new gadget pressed, store this gadget  */
+  // if new gadget pressed, store this gadget
   if (gadget_pressed)
     last_gi = new_gi;
 
-  /* 'gi' is actually handled gadget */
+  // 'gi' is actually handled gadget
   gi = last_gi;
 
-  /* if gadget is scrollbar, choose mouse position value */
+  // if gadget is scrollbar, choose mouse position value
   if (gi && gi->type & GD_TYPE_SCROLLBAR)
     scrollbar_mouse_pos =
       (gi->type == GD_TYPE_SCROLLBAR_HORIZONTAL ? mx - gi->x : my - gi->y);
 
-  /* if mouse button released, no gadget needs to be handled anymore */
+  // if mouse button released, no gadget needs to be handled anymore
   if (gadget_released)
   {
     if (gi->type & GD_TYPE_SELECTBOX &&
 	(keep_selectbox_open ||
 	 mouse_released_where_pressed ||
 	 !gadget_released_inside_select_area ||
-	 !CURRENT_OPTION_SELECTABLE(gi)))	    /* selectbox stays open */
+	 !CURRENT_OPTION_SELECTABLE(gi)))	    // selectbox stays open
     {
       gi->selectbox.stay_open = TRUE;
       pressed_mx = 0;
       pressed_my = 0;
     }
     else if (!(gi->type & GD_TYPE_TEXT_INPUT ||
-	       gi->type & GD_TYPE_TEXT_AREA))	    /* text input stays open */
+	       gi->type & GD_TYPE_TEXT_AREA))	    // text input stays open
       last_gi = NULL;
   }
 
-  /* modify event position values even if no gadget is pressed */
+  // modify event position values even if no gadget is pressed
   if (button == 0 && !release_event)
     gi = new_gi;
 
-  /* if new gadget or if no gadget was pressed, release stopped processing */
+  // if new gadget or if no gadget was pressed, release stopped processing
   if (gadget_pressed || new_gi == NULL)
     gadget_stopped = FALSE;
 
-  /* if gadget was stopped while being handled, stop gadget processing here */
+  // if gadget was stopped while being handled, stop gadget processing here
   if (gadget_stopped)
     return TRUE;
 
@@ -1724,7 +1724,7 @@ boolean HandleGadgets(int mx, int my, int button)
     {
       int old_cursor_position = gi->textinput.cursor_position;
 
-      /* if mouse button pressed inside activated text gadget, set cursor */
+      // if mouse button pressed inside activated text gadget, set cursor
       gi->textinput.cursor_position =
 	(mx - gi->x - gi->border.xsize) / getFontWidth(gi->font);
 
@@ -1761,7 +1761,7 @@ boolean HandleGadgets(int mx, int my, int button)
     {
       int old_index = gi->selectbox.current_index;
 
-      /* if mouse moving inside activated selectbox, select value */
+      // if mouse moving inside activated selectbox, select value
       if (my >= gi->selectbox.y && my < gi->selectbox.y + gi->selectbox.height)
 	gi->selectbox.current_index =
 	  (my - gi->selectbox.y - gi->border.ysize) / getFontHeight(gi->font);
@@ -1776,7 +1776,7 @@ boolean HandleGadgets(int mx, int my, int button)
     }
   }
 
-  /* handle gadget popup info text */
+  // handle gadget popup info text
   if (last_info_gi != new_gi ||
       (new_gi && new_gi->type == GD_TYPE_DRAWING_AREA && changed_position))
   {
@@ -1796,34 +1796,34 @@ boolean HandleGadgets(int mx, int my, int button)
 
   gadget_draggable = (gi && gi->type & GD_TYPE_SCROLLBAR);
 
-  /* reset drag position for newly pressed scrollbar to "not dragging" */
+  // reset drag position for newly pressed scrollbar to "not dragging"
   if (gadget_pressed && gadget_draggable)
     gi->scrollbar.drag_position = -1;
 
   gadget_dragging = (gadget_draggable && gi->scrollbar.drag_position != -1);
 
-  /* clicking next to a scrollbar to move it is not considered "moving" */
+  // clicking next to a scrollbar to move it is not considered "moving"
   if (gadget_draggable && !gadget_dragging)
     gadget_moving = FALSE;
 
-  /* when leaving scrollbar area when jump-scrolling, stop gadget processing */
+  // when leaving scrollbar area when jump-scrolling, stop gadget processing
   if (gadget_draggable && !gadget_dragging && gadget_moving_off_borders)
     gadget_stopped = TRUE;
 
   if ((gadget_pressed) ||
       (gadget_pressed_repeated && gadget_pressed_delay_reached))
   {
-    if (gadget_pressed)		/* gadget pressed the first time */
+    if (gadget_pressed)		// gadget pressed the first time
     {
-      /* initialize delay counter */
+      // initialize delay counter
       DelayReached(&pressed_delay, 0);
 
-      /* start gadget delay with longer delay after first click on gadget */
+      // start gadget delay with longer delay after first click on gadget
       pressed_delay_value = GADGET_FRAME_DELAY_FIRST;
     }
-    else			/* gadget hold pressed for some time */
+    else			// gadget hold pressed for some time
     {
-      /* after first repeated gadget click, continue with shorter delay value */
+      // after first repeated gadget click, continue with shorter delay value
       pressed_delay_value = GADGET_FRAME_DELAY;
     }
 
@@ -1837,7 +1837,7 @@ boolean HandleGadgets(int mx, int my, int button)
 
       if (IS_WHEEL_BUTTON(button) || !inside_slider)
       {
-	/* click scrollbar one scrollbar length up/left or down/right */
+	// click scrollbar one scrollbar length up/left or down/right
 
 	struct GadgetScrollbar *gs = &gi->scrollbar;
 	int old_item_position = gs->item_position;
@@ -1882,7 +1882,7 @@ boolean HandleGadgets(int mx, int my, int button)
       }
       else
       {
-	/* don't handle this scrollbar anymore when mouse position reached */
+	// don't handle this scrollbar anymore when mouse position reached
 	if (gadget_pressed_repeated)
 	{
 	  gadget_stopped = TRUE;
@@ -1931,14 +1931,14 @@ boolean HandleGadgets(int mx, int my, int button)
 
       if (!IS_WHEEL_BUTTON(button) && inside_slider)
       {
-	/* start dragging scrollbar */
+	// start dragging scrollbar
 	gi->scrollbar.drag_position =
 	  scrollbar_mouse_pos - gi->scrollbar.position;
       }
     }
     else if (gi->type & GD_TYPE_SELECTBOX)
     {
-      /* keep selectbox open in case of over-large selectbox */
+      // keep selectbox open in case of over-large selectbox
       keep_selectbox_open = (mouse_inside_select_line &&
 			     mouse_inside_select_area);
     }
@@ -1975,7 +1975,7 @@ boolean HandleGadgets(int mx, int my, int button)
     {
       int old_index = gi->selectbox.current_index;
 
-      /* if mouse moving inside activated selectbox, select value */
+      // if mouse moving inside activated selectbox, select value
       if (my >= gi->selectbox.y && my < gi->selectbox.y + gi->selectbox.height)
 	gi->selectbox.current_index =
 	  (my - gi->selectbox.y - gi->border.ysize) / getFontHeight(gi->font);
@@ -1995,7 +1995,7 @@ boolean HandleGadgets(int mx, int my, int button)
 
       gs->position = scrollbar_mouse_pos - gs->drag_position;
 
-      /* make sure to always precisely reach end positions when dragging */
+      // make sure to always precisely reach end positions when dragging
       if (gs->position <= 0)
       {
 	gs->position = 0;
@@ -2046,7 +2046,7 @@ boolean HandleGadgets(int mx, int my, int button)
       if (keep_selectbox_open ||
 	  mouse_released_where_pressed ||
 	  !gadget_released_inside_select_area ||
-	  !CURRENT_OPTION_SELECTABLE(gi))	    /* selectbox stays open */
+	  !CURRENT_OPTION_SELECTABLE(gi))	    // selectbox stays open
       {
 	deactivate_gadget = FALSE;
 	gadget_changed = FALSE;
@@ -2059,7 +2059,7 @@ boolean HandleGadgets(int mx, int my, int button)
 
     if (deactivate_gadget &&
 	!(gi->type & GD_TYPE_TEXT_INPUT ||
-	  gi->type & GD_TYPE_TEXT_AREA))	    /* text input stays open */
+	  gi->type & GD_TYPE_TEXT_AREA))	    // text input stays open
       DrawGadget(gi, DG_UNPRESSED, gi->direct_draw);
 
     gi->state = GD_BUTTON_UNPRESSED;
@@ -2082,7 +2082,7 @@ boolean HandleGadgets(int mx, int my, int button)
       gi->callback_action(gi);
   }
 
-  /* handle gadgets unmapped/mapped between pressing and releasing */
+  // handle gadgets unmapped/mapped between pressing and releasing
   if (release_event && !gadget_released && new_gi)
     new_gi->state = GD_BUTTON_UNPRESSED;
 
@@ -2095,7 +2095,7 @@ static void insertCharIntoTextArea(struct GadgetInfo *gi, char c)
   char text[MAX_GADGET_TEXTSIZE + 1];
   int cursor_position = gi->textarea.cursor_position;
 
-  if (strlen(gi->textarea.value) >= MAX_GADGET_TEXTSIZE) /* no space left */
+  if (strlen(gi->textarea.value) >= MAX_GADGET_TEXTSIZE) // no space left
     return;
 
   strcpy(text, gi->textarea.value);
@@ -2119,7 +2119,7 @@ boolean HandleGadgetsKeyInput(Key key)
   {
     StopTextInput();
   }
-  else if (key == KSYM_Return)	/* valid for both text input and selectbox */
+  else if (key == KSYM_Return)	// valid for both text input and selectbox
   {
     boolean gadget_changed = ((gi->event_mask & GD_EVENT_TEXT_RETURN) != 0);
 
@@ -2159,7 +2159,7 @@ boolean HandleGadgetsKeyInput(Key key)
 
     DoGadgetCallbackAction(gi, gadget_changed);
   }
-  else if (gi->type & GD_TYPE_TEXT_INPUT)	/* only valid for text input */
+  else if (gi->type & GD_TYPE_TEXT_INPUT)	// only valid for text input
   {
     char text[MAX_GADGET_TEXTSIZE + 1];
     int text_length = strlen(gi->textinput.value);
@@ -2206,7 +2206,7 @@ boolean HandleGadgetsKeyInput(Key key)
       DrawGadget(gi, DG_PRESSED, gi->direct_draw);
     }
   }
-  else if (gi->type & GD_TYPE_TEXT_AREA)	/* only valid for text area */
+  else if (gi->type & GD_TYPE_TEXT_AREA)	// only valid for text area
   {
     char text[MAX_GADGET_TEXTSIZE + 1];
     int text_length = strlen(gi->textarea.value);
@@ -2266,7 +2266,7 @@ boolean HandleGadgetsKeyInput(Key key)
       DrawGadget(gi, DG_PRESSED, gi->direct_draw);
     }
   }
-  else if (gi->type & GD_TYPE_SELECTBOX)	/* only valid for selectbox */
+  else if (gi->type & GD_TYPE_SELECTBOX)	// only valid for selectbox
   {
     int index = gi->selectbox.current_index;
     int num_values = gi->selectbox.num_values;

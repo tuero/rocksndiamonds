@@ -72,7 +72,7 @@ void InitPrecedingPlayfieldMemory(void)
   int i;
 
   for (i = 0; preceding_playfield_memory[i] != NULL; i++)
-    preceding_buffer_size += 8;		/* eight 16-bit integer values */
+    preceding_buffer_size += 8;		// eight 16-bit integer values
 
   game_sp.preceding_buffer = preceding_playfield_memory;
   game_sp.preceding_buffer_size = preceding_buffer_size;
@@ -98,9 +98,9 @@ unsigned int InitEngineRandom_SP(int seed)
 }
 
 
-/* ------------------------------------------------------------------------- */
-/* Supaplex game engine snapshot handling functions                          */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// Supaplex game engine snapshot handling functions
+// ----------------------------------------------------------------------------
 
 void SaveEngineSnapshotValues_SP(ListNode **buffers)
 {
@@ -108,7 +108,7 @@ void SaveEngineSnapshotValues_SP(ListNode **buffers)
 
   engine_snapshot_sp.game_sp = game_sp;
 
-  /* these arrays have playfield-size dependent variable size */
+  // these arrays have playfield-size dependent variable size
 
   for (i = 0; i < FieldWidth * FieldHeight + HeaderSize; i++)
     engine_snapshot_sp.PlayField16[i] = PlayField16[i];
@@ -124,7 +124,7 @@ void SaveEngineSnapshotValues_SP(ListNode **buffers)
   for (i = 0; i < FieldWidth * FieldHeight + HeaderSize; i++)
     engine_snapshot_sp.TerminalState[i] = TerminalState[i];
 
-  /* store special data into engine snapshot buffers */
+  // store special data into engine snapshot buffers
 
   SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(FieldWidth));
   SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(FieldHeight));
@@ -196,11 +196,11 @@ void LoadEngineSnapshotValues_SP(void)
 {
   int i;
 
-  /* stored engine snapshot buffers already restored at this point */
+  // stored engine snapshot buffers already restored at this point
 
   game_sp = engine_snapshot_sp.game_sp;
 
-  /* these arrays have playfield-size dependent variable size */
+  // these arrays have playfield-size dependent variable size
 
   for (i = 0; i < FieldWidth * FieldHeight + HeaderSize; i++)
     PlayField16[i] = engine_snapshot_sp.PlayField16[i];

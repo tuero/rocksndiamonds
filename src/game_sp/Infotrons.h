@@ -11,4 +11,4 @@
 void subAnimateInfotrons(int);
 void subCleanUpForInfotronsAbove(int);
 
-#endif /* INFOTRONS_H */
+#endif // INFOTRONS_H

@@ -1,13 +1,13 @@
 #ifndef GAME_MM_EXPORT_H
 #define GAME_MM_EXPORT_H
 
-/* ========================================================================= */
-/* functions and definitions exported from game_mm to main program           */
-/* ========================================================================= */
+// ============================================================================
+// functions and definitions exported from game_mm to main program
+// ============================================================================
 
-/* ------------------------------------------------------------------------- */
-/* constant definitions                                                      */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// constant definitions
+// ----------------------------------------------------------------------------
 
 #define MM_MAX_PLAYFIELD_WIDTH		MAX_PLAYFIELD_WIDTH
 #define MM_MAX_PLAYFIELD_HEIGHT		MAX_PLAYFIELD_HEIGHT
@@ -46,18 +46,18 @@
 #define EL_MM_DUMMY_START_NATIVE	700
 #define EL_MM_DUMMY_END_NATIVE		709
 
-/* elements to be specially mapped */
+// elements to be specially mapped
 #define EL_MM_EMPTY_NATIVE		0
 #define EL_DF_EMPTY_NATIVE		304
 
-/* sounds */
+// sounds
 #define SND_MM_GAME_LEVELTIME_CHARGING	0
 #define SND_MM_GAME_HEALTH_CHARGING	1
 
 
-/* ------------------------------------------------------------------------- */
-/* data structure definitions                                                */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// data structure definitions
+// ----------------------------------------------------------------------------
 
 struct GlobalInfo_MM
 {
@@ -156,9 +156,9 @@ struct GameInfo_MM
 
 struct LevelInfo_MM
 {
-  int file_version;		/* version of file the level was stored with */
-  int game_version;		/* version of game engine to play this level */
-  boolean encoding_16bit_field;		/* level contains 16-bit elements */
+  int file_version;		// version of file the level was stored with
+  int game_version;		// version of game engine to play this level
+  boolean encoding_16bit_field;		// level contains 16-bit elements
 
   int fieldx;
   int fieldy;
@@ -208,9 +208,9 @@ struct EngineSnapshotInfo_MM
 };
 
 
-/* ------------------------------------------------------------------------- */
-/* exported functions                                                        */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// exported functions
+// ----------------------------------------------------------------------------
 
 extern struct GlobalInfo_MM global_mm_info;
 extern struct GameInfo_MM game_mm;
@@ -252,4 +252,4 @@ void SaveEngineSnapshotValues_MM(ListNode **);
 
 int getButtonFromTouchPosition(int, int, int, int);
 
-#endif	/* GAME_MM_EXPORT_H */
+#endif	// GAME_MM_EXPORT_H

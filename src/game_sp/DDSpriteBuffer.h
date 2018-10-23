@@ -10,4 +10,4 @@
 
 void DDSpriteBuffer_BltImg(int pX, int pY, int graphic, int sync_frame);
 
-#endif /* DDSPRITEBUFFER_H */
+#endif // DDSPRITEBUFFER_H

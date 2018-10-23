@@ -18,4 +18,4 @@ void subFetchAndInitLevelA(void);
 void subFetchAndInitLevelB(void);
 void subInitGameConditions(void);
 
-#endif /* INITGAMECONDITIONS_H */
+#endif // INITGAMECONDITIONS_H

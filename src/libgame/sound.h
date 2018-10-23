@@ -15,7 +15,7 @@
 #include "system.h"
 
 
-/* values for platform specific sound initialization */
+// values for platform specific sound initialization
 #define AUDIO_SAMPLE_RATE_22050		22050
 
 #define AUDIO_FRAGMENT_SIZE_512		512
@@ -47,7 +47,7 @@
 #define FIRST_SOUND_CHANNEL		1
 
 
-/* values for PlaySound(), StopSound() and friends */
+// values for PlaySound(), StopSound() and friends
 #define SND_CTRL_NONE			(0)
 #define SND_CTRL_MUSIC			(1 << 0)
 #define SND_CTRL_LOOP			(1 << 1)
@@ -93,15 +93,15 @@
 #define SOUND_MIDDLE			(SOUND_MAX_LEFT2RIGHT / 2)
 
 
-/* general sound functions */
+// general sound functions
 void UnixOpenAudio(void);
 void UnixCloseAudio(void);
 
-/* mixer functions */ 
+// mixer functions
 void Mixer_InitChannels(void);
 void StartMixer(void);
 
-/* sound client functions */
+// sound client functions
 void PlayMusic(int);
 void PlayMusicLoop(int);
 void PlaySound(int);

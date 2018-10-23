@@ -10,4 +10,4 @@
 
 void subAnimateOrangeDisks(int);
 
-#endif /* ORANGEDISK_H */
+#endif // ORANGEDISK_H

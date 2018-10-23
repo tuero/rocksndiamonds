@@ -17,18 +17,18 @@
 #include "main_mm.h"
 
 
-/* for DrawElementShifted */
+// for DrawElementShifted
 #define NO_CUTTING		0
 #define CUT_ABOVE		(1 << 0)
 #define CUT_BELOW		(1 << 1)
 #define CUT_LEFT		(1 << 2)
 #define CUT_RIGHT		(1 << 3)
 
-/* for masking functions */
+// for masking functions
 #define NO_MASKING		0
 #define USE_MASKING		1
 
-/* for MoveDoor */
+// for MoveDoor
 #define DOOR_OPEN_1		(1 << 0)
 #define DOOR_OPEN_2		(1 << 1)
 #define DOOR_CLOSE_1		(1 << 2)
@@ -42,7 +42,7 @@
 #define DOOR_NO_DELAY		(1 << 5)
 #define DOOR_GET_STATE		(1 << 6)
 
-/* for Request */
+// for Request
 #define REQ_ASK			(1 << 0)
 #define REQ_OPEN		(1 << 1)
 #define REQ_CLOSE		(1 << 2)
@@ -52,7 +52,7 @@
 
 #define REQUEST_WAIT_FOR	(REQ_ASK | REQ_CONFIRM)
 
-/* font types */
+// font types
 #define FS_SMALL		0
 #define FS_BIG			1
 #define FS_MEDIUM		2

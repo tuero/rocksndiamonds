@@ -33,7 +33,7 @@
 #define IN_LEV_FIELD(x, y)	IN_FIELD(x, y, lev_fieldx, lev_fieldy)
 #define IN_SCR_FIELD(x, y)	IN_FIELD_MINMAX(x, y, BX1, BY1, BX2, BY2)
 
-/* values for 'Elementeigenschaften' */
+// values for 'Elementeigenschaften'
 #define EP_BIT_GRID		(1 << 0)
 #define EP_BIT_MCDUFFIN		(1 << 1)
 #define EP_BIT_RECTANGLE	(1 << 2)
@@ -135,7 +135,7 @@
 #define WALL_BASE(e)		((e) & 0xfff0)
 #define WALL_BITS(e)		((e) & 0x000f)
 
-/* Bitmaps with graphic file */
+// Bitmaps with graphic file
 #define PIX_BACK		0
 #define PIX_DOOR		1
 #define PIX_TOONS		2
@@ -143,23 +143,23 @@
 #define	PIX_BIGFONT		4
 #define PIX_SMALLFONT		5
 #define PIX_MEDIUMFONT		6
-/* Bitmaps without graphic file */
+// Bitmaps without graphic file
 #define PIX_DB_DOOR		7
 
 #define NUM_PICTURES		7
 #define NUM_BITMAPS		8
 
-/* boundaries of arrays etc. */
+// boundaries of arrays etc.
 #define MAX_PLAYER_NAME_LEN	10
 #define MAX_LEVEL_NAME_LEN	32
 #define MAX_LEVEL_AUTHOR_LEN	32
 #define MAX_SCORE_ENTRIES	100
-#define MAX_ELEMENTS		700		/* 500 static + 200 runtime */
+#define MAX_ELEMENTS		700		// 500 static + 200 runtime
 
-#define MICROLEVEL_SCROLL_DELAY	50	/* delay for scrolling micro level */
-#define MICROLEVEL_LABEL_DELAY	250	/* delay for micro level label */
+#define MICROLEVEL_SCROLL_DELAY	50	// delay for scrolling micro level
+#define MICROLEVEL_LABEL_DELAY	250	// delay for micro level label
 
-/* score for elements */
+// score for elements
 #define SC_COLLECTIBLE		0
 #define SC_UNUSED_1		1
 #define SC_UNUSED_2		2
@@ -177,7 +177,7 @@
 #define SC_LIGHTBALL		14
 #define SC_UNUSED_15		15
 
-#define LEVEL_SCORE_ELEMENTS	16	/* level elements with score */
+#define LEVEL_SCORE_ELEMENTS	16	// level elements with score
 
 
 struct HiScore_MM
@@ -268,7 +268,7 @@ extern int		num_bg_loops;
 extern char	       *element_info[];
 extern int		num_element_info;
 
-/* often used screen positions */
+// often used screen positions
 #define DX			534
 #define DY			60
 #define EX			DX
@@ -323,7 +323,7 @@ extern int		num_element_info;
 #define MICRO_FONT_STARTY	(MICRO_DF_STARTY + 8 * MICRO_TILEY)
 #define MICRO_FONT_PER_LINE	8
 
-/* wall positions (that can be OR'ed together) */
+// wall positions (that can be OR'ed together)
 #define WALL_TOPLEFT		1
 #define WALL_TOPRIGHT		2
 #define WALL_BOTTOMLEFT		4
@@ -337,7 +337,7 @@ extern int		num_element_info;
 **	  0 - 499: real elements, stored in level file
 **      500 - 699: flag elements, only used at runtime
 */
-/* "real" level elements */
+// "real" level elements
 #define EL_MM_START		0
 #define EL_MM_START_1		EL_MM_START
 
@@ -518,7 +518,7 @@ extern int		num_element_info;
 
 #define EL_MM_START_2		240
 
-/* elements for "Deflektor" style levels */
+// elements for "Deflektor" style levels
 #define EL_DF_START		EL_MM_START_2
 
 #define EL_DF_MIRROR_START	EL_DF_START
@@ -541,25 +541,25 @@ extern int		num_element_info;
 #define EL_DF_MIRROR_END	EL_DF_MIRROR_15
 
 #define EL_GRID_WOOD_FIXED_START 256
-#define EL_GRID_WOOD_FIXED_00	(EL_GRID_WOOD_FIXED_START + 0)	/*   0.0° */
-#define EL_GRID_WOOD_FIXED_01	(EL_GRID_WOOD_FIXED_START + 1)	/*  22.5° */
-#define EL_GRID_WOOD_FIXED_02	(EL_GRID_WOOD_FIXED_START + 2)	/*  45.0° */
-#define EL_GRID_WOOD_FIXED_03	(EL_GRID_WOOD_FIXED_START + 3)	/*  67.5° */
-#define EL_GRID_WOOD_FIXED_04	(EL_GRID_WOOD_FIXED_START + 4)	/*  90.0° */
-#define EL_GRID_WOOD_FIXED_05	(EL_GRID_WOOD_FIXED_START + 5)	/* 112.5° */
-#define EL_GRID_WOOD_FIXED_06	(EL_GRID_WOOD_FIXED_START + 6)	/* 135.0° */
-#define EL_GRID_WOOD_FIXED_07	(EL_GRID_WOOD_FIXED_START + 7)	/* 157.5° */
+#define EL_GRID_WOOD_FIXED_00	(EL_GRID_WOOD_FIXED_START + 0)	//   0.0°
+#define EL_GRID_WOOD_FIXED_01	(EL_GRID_WOOD_FIXED_START + 1)	//  22.5°
+#define EL_GRID_WOOD_FIXED_02	(EL_GRID_WOOD_FIXED_START + 2)	//  45.0°
+#define EL_GRID_WOOD_FIXED_03	(EL_GRID_WOOD_FIXED_START + 3)	//  67.5°
+#define EL_GRID_WOOD_FIXED_04	(EL_GRID_WOOD_FIXED_START + 4)	//  90.0°
+#define EL_GRID_WOOD_FIXED_05	(EL_GRID_WOOD_FIXED_START + 5)	// 112.5°
+#define EL_GRID_WOOD_FIXED_06	(EL_GRID_WOOD_FIXED_START + 6)	// 135.0°
+#define EL_GRID_WOOD_FIXED_07	(EL_GRID_WOOD_FIXED_START + 7)	// 157.5°
 #define EL_GRID_WOOD_FIXED_END	EL_GRID_WOOD_FIXED_07
 
 #define EL_GRID_STEEL_FIXED_START 264
-#define EL_GRID_STEEL_FIXED_00	(EL_GRID_STEEL_FIXED_START + 0)	/*   0.0° */
-#define EL_GRID_STEEL_FIXED_01	(EL_GRID_STEEL_FIXED_START + 1)	/*  22.5° */
-#define EL_GRID_STEEL_FIXED_02	(EL_GRID_STEEL_FIXED_START + 2)	/*  45.0° */
-#define EL_GRID_STEEL_FIXED_03	(EL_GRID_STEEL_FIXED_START + 3)	/*  67.5° */
-#define EL_GRID_STEEL_FIXED_04	(EL_GRID_STEEL_FIXED_START + 4)	/*  90.0° */
-#define EL_GRID_STEEL_FIXED_05	(EL_GRID_STEEL_FIXED_START + 5)	/* 112.5° */
-#define EL_GRID_STEEL_FIXED_06	(EL_GRID_STEEL_FIXED_START + 6)	/* 135.0° */
-#define EL_GRID_STEEL_FIXED_07	(EL_GRID_STEEL_FIXED_START + 7)	/* 157.5° */
+#define EL_GRID_STEEL_FIXED_00	(EL_GRID_STEEL_FIXED_START + 0)	//   0.0°
+#define EL_GRID_STEEL_FIXED_01	(EL_GRID_STEEL_FIXED_START + 1)	//  22.5°
+#define EL_GRID_STEEL_FIXED_02	(EL_GRID_STEEL_FIXED_START + 2)	//  45.0°
+#define EL_GRID_STEEL_FIXED_03	(EL_GRID_STEEL_FIXED_START + 3)	//  67.5°
+#define EL_GRID_STEEL_FIXED_04	(EL_GRID_STEEL_FIXED_START + 4)	//  90.0°
+#define EL_GRID_STEEL_FIXED_05	(EL_GRID_STEEL_FIXED_START + 5)	// 112.5°
+#define EL_GRID_STEEL_FIXED_06	(EL_GRID_STEEL_FIXED_START + 6)	// 135.0°
+#define EL_GRID_STEEL_FIXED_07	(EL_GRID_STEEL_FIXED_START + 7)	// 157.5°
 #define EL_GRID_STEEL_FIXED_END	EL_GRID_STEEL_FIXED_07
 
 #define EL_DF_WALL_WOOD		272
@@ -654,7 +654,7 @@ extern int		num_element_info;
 #define EL_BEAMER_BLUE_START	404
 #define EL_BEAMER_BLUE_END	(EL_BEAMER_BLUE_START + 15)
 
-/* element definitions partially used for drawing graphics */
+// element definitions partially used for drawing graphics
 #define EL_MCDUFFIN		420
 #define EL_PACMAN		421
 #define EL_FUSE_OFF		422
@@ -670,7 +670,7 @@ extern int		num_element_info;
 #define EL_MM_END_2		430
 #define EL_MM_END		EL_MM_END_2
 
-/* "real" (and therefore drawable) runtime elements */
+// "real" (and therefore drawable) runtime elements
 #define EL_EXIT_OPENING		500
 #define EL_EXIT_CLOSING		501
 #define EL_GRAY_BALL_OPENING	502
@@ -683,12 +683,12 @@ extern int		num_element_info;
 
 #define EL_FIRST_RUNTIME_EL	EL_EXIT_OPENING
 
-/* "unreal" (and therefore not drawable) runtime elements */
+// "unreal" (and therefore not drawable) runtime elements
 #define EL_BLOCKED		600
 #define EL_EXPLODING_OPAQUE	601
 #define EL_EXPLODING_TRANSP	602
 
-/* dummy elements (never used as game elements, only used as graphics) */
+// dummy elements (never used as game elements, only used as graphics)
 #define EL_MM_MASK_MCDUFFIN_RIGHT	700
 #define EL_MM_MASK_MCDUFFIN_UP		701
 #define EL_MM_MASK_MCDUFFIN_LEFT	702
@@ -721,9 +721,9 @@ extern int		num_element_info;
 
 #define NUM_TILES		512
 
-/* graphics from "MirrorScreen" */
+// graphics from "MirrorScreen"
 #define GFX_EMPTY		(-1)
-/* row 0 (0) */
+// row 0 (0)
 #define GFX_MIRROR_START	0
 #define GFX_MIRROR		GFX_MIRROR_START
 #define GFX_MIRROR_00		(GFX_MIRROR_START + 0)
@@ -743,7 +743,7 @@ extern int		num_element_info;
 #define GFX_MIRROR_14		(GFX_MIRROR_START + 14)
 #define GFX_MIRROR_15		(GFX_MIRROR_START + 15)
 #define GFX_MIRROR_END		GFX_MIRROR_15
-/* row 1 (16) */
+// row 1 (16)
 #define GFX_GRID_STEEL_START	16
 #define GFX_GRID_STEEL		GFX_GRID_STEEL_START
 #define GFX_GRID_STEEL_00	(GFX_GRID_STEEL_START + 0)
@@ -762,7 +762,7 @@ extern int		num_element_info;
 #define GFX_EXIT_OPEN		27
 #define GFX_KETTLE		28
 #define GFX_EXPLOSION_KETTLE	29
-/* row 2 (32) */
+// row 2 (32)
 #define GFX_PRISM		32
 #define GFX_WALL_SEVERAL	33
 #define GFX_WALL_ANIMATION	34
@@ -778,10 +778,10 @@ extern int		num_element_info;
 #define GFX_BALL_BLUE		45
 #define GFX_BALL_YELLOW		46
 #define GFX_BALL_GRAY		47
-/* row 3 (48) */
+// row 3 (48)
 #define GFX_BEAMER_START	48
 #define GFX_BEAMER_END		63
-/* row 4 (64) */
+// row 4 (64)
 #define GFX_PACMAN_START	64
 #define GFX_PACMAN		GFX_PACMAN_START
 #define GFX_PACMAN_RIGHT	(GFX_PACMAN_START + 0)
@@ -791,10 +791,10 @@ extern int		num_element_info;
 #define GFX_EXPLOSION_START	72
 #define GFX_EXPLOSION_SHORT	76
 #define GFX_EXPLOSION_LAST	78
-/* row 5 (80) */
+// row 5 (80)
 #define GFX_POLAR_START		80
 #define GFX_POLAR_END		95
-/* row 6 (96) */
+// row 6 (96)
 #define GFX_POLAR_CROSS_START	96
 #define GFX_POLAR_CROSS		GFX_POLAR_CROSS_START
 #define GFX_POLAR_CROSS_00	(GFX_POLAR_CROSS_START + 0)
@@ -807,7 +807,7 @@ extern int		num_element_info;
 #define GFX_MIRROR_FIXED_01	(GFX_MIRROR_FIXED_START + 1)
 #define GFX_MIRROR_FIXED_02	(GFX_MIRROR_FIXED_START + 2)
 #define GFX_MIRROR_FIXED_03	(GFX_MIRROR_FIXED_START + 3)
-/* row 7 (112) */
+// row 7 (112)
 #define GFX_BLOCK_STONE		112
 #define GFX_GATE_WOOD		113
 #define GFX_FUEL_FULL		114
@@ -816,7 +816,7 @@ extern int		num_element_info;
 #define GFX_GRID_WOOD_01	117
 #define GFX_GRID_WOOD_02	118
 #define GFX_GRID_WOOD_03	119
-/* row 8 (128) */
+// row 8 (128)
 #define GFX_ARROW_BLUE_LEFT	128
 #define GFX_ARROW_BLUE_RIGHT	129
 #define GFX_ARROW_BLUE_UP	130
@@ -825,10 +825,10 @@ extern int		num_element_info;
 #define GFX_ARROW_RED_RIGHT	133
 #define GFX_ARROW_RED_UP	134
 #define GFX_ARROW_RED_DOWN	135
-/* row 9 (144) */
+// row 9 (144)
 #define GFX_SCROLLBAR_BLUE	144
 #define GFX_SCROLLBAR_RED	145
-/* row 10 (160) */
+// row 10 (160)
 #define GFX_MASK_CIRCLE		160
 #define GFX_MASK_RECTANGLE	161
 #define GFX_MASK_RECTANGLE2	162
@@ -837,13 +837,13 @@ extern int		num_element_info;
 #define GFX_MASK_GRID_01	165
 #define GFX_MASK_GRID_02	166
 #define GFX_MASK_GRID_03	167
-/* row 11 (176) */
+// row 11 (176)
 #define GFX_MASK_MCDUFFIN_00	176
 #define GFX_MASK_MCDUFFIN_01	177
 #define GFX_MASK_MCDUFFIN_02	178
 #define GFX_MASK_MCDUFFIN_03	179
 
-/* pseudo-graphics; will be mapped to other graphics */
+// pseudo-graphics; will be mapped to other graphics
 #define GFX_WALL_STEEL		192
 #define GFX_WALL_WOOD		193
 #define GFX_WALL_ICE		194
@@ -856,7 +856,7 @@ extern int		num_element_info;
 #define GFX_KUGEL_GELB		GFX_BALL_YELLOW
 #define GFX_KUGEL_GRAU		GFX_BALL_GRAY
 
-/* graphics from "MirrorFont" */
+// graphics from "MirrorFont"
 #define GFX_CHAR_START		(GFX_START_MIRRORFONT)
 #define GFX_CHAR_ASCII0		(GFX_CHAR_START - 32)
 #define GFX_CHAR_AUSRUF		(GFX_CHAR_ASCII0 + 33)
@@ -888,7 +888,7 @@ extern int		num_element_info;
 #define GFX_CHAR_COPY		(GFX_CHAR_ASCII0 + 94)
 #define GFX_CHAR_END		(GFX_CHAR_START + 79)
 
-/* graphics from "MirrorDF" */
+// graphics from "MirrorDF"
 #define GFX_DF_MIRROR_00	(GFX_START_MIRRORDF +  0 * DF_PER_LINE +  0)
 #define GFX_DF_MIRROR_01	(GFX_START_MIRRORDF +  0 * DF_PER_LINE +  1)
 #define GFX_DF_MIRROR_02	(GFX_START_MIRRORDF +  0 * DF_PER_LINE +  2)
@@ -1004,7 +1004,7 @@ extern int		num_element_info;
 #define GFX_FIBRE_OPTIC_ED_06	(GFX_START_MIRRORDF + 11 * DF_PER_LINE +  6)
 #define GFX_FIBRE_OPTIC_ED_07	(GFX_START_MIRRORDF + 11 * DF_PER_LINE +  7)
 
-/* the names of the sounds */
+// the names of the sounds
 #define SND_AMOEBE		0
 #define SND_ANTIGRAV		1
 #define SND_AUTSCH		2
@@ -1028,7 +1028,7 @@ extern int		num_element_info;
 
 #define NUM_SOUNDS		20
 
-/* values for graphics/sounds action types */
+// values for graphics/sounds action types
 #define MM_ACTION_DEFAULT	0
 #define MM_ACTION_WAITING	1
 #define MM_ACTION_FALLING	2
@@ -1083,13 +1083,13 @@ extern int		num_element_info;
 #define MM_ACTION_SPLASHING		51
 #define MM_ACTION_HITTING		52
 
-/* laser angles (directions) */
+// laser angles (directions)
 #define ANG_RAY_RIGHT		0
 #define ANG_RAY_UP		4
 #define ANG_RAY_LEFT		8
 #define ANG_RAY_DOWN		12
 
-/* laser angles (degree) */
+// laser angles (degree)
 #define ANG_RAY_0		0
 #define ANG_RAY_90		4
 #define ANG_RAY_180		8
@@ -1099,18 +1099,18 @@ extern int		num_element_info;
 #define IS_HORIZ_ANGLE(angle)	(!((angle) % 8))
 #define IS_VERT_ANGLE(angle)	((angle) % 8)
 
-/* mirror angles */
+// mirror angles
 #define ANG_MIRROR_0		0
 #define ANG_MIRROR_45		4
 #define ANG_MIRROR_90		8
 #define ANG_MIRROR_135		12
 
-/* positions for checking where laser already hits element */
+// positions for checking where laser already hits element
 #define HIT_POS_CENTER		1
 #define HIT_POS_EDGE		2
 #define HIT_POS_BETWEEN		4
 
-/* masks for scanning elements */
+// masks for scanning elements
 #define HIT_MASK_NO_HIT		0
 #define HIT_MASK_TOPLEFT	1
 #define HIT_MASK_TOPRIGHT	2
@@ -1122,7 +1122,7 @@ extern int		num_element_info;
 #define HIT_MASK_BOTTOM		(HIT_MASK_BOTTOMLEFT | HIT_MASK_BOTTOMRIGHT)
 #define HIT_MASK_ALL		(HIT_MASK_LEFT | HIT_MASK_RIGHT)
 
-/* step values for rotating elements */
+// step values for rotating elements
 #define ROTATE_NO_ROTATING	0
 #define ROTATE_LEFT		(+1)
 #define ROTATE_RIGHT		(-1)
@@ -1130,12 +1130,12 @@ extern int		num_element_info;
 				 (button) == MB_RIGHTBUTTON ? ROTATE_RIGHT : \
 				 ROTATE_NO_ROTATING)
 
-/* game over values */
+// game over values
 #define GAME_OVER_NO_ENERGY	1
 #define GAME_OVER_OVERLOADED	2
 #define GAME_OVER_BOMB		3
 
-/* values for game_status */
+// values for game_status
 #define EXITGAME		0
 #define MAINMENU		1
 #define PLAYING			2
@@ -1146,12 +1146,12 @@ extern int		num_element_info;
 #define HALLOFFAME		7
 #define SETUP			8
 
-/* return values for GameActions */
+// return values for GameActions
 #define ACT_GO_ON		0
 #define ACT_GAME_OVER		1
 #define ACT_NEW_GAME		2
 
-/* values for color_status */
+// values for color_status
 #define STATIC_COLORS		0
 #define DYNAMIC_COLORS		1
 
@@ -1174,7 +1174,7 @@ extern int		num_element_info;
 #define X11_ICONMASK_FILENAME	"mirrormagic_iconmask.xbm"
 #define MSDOS_POINTER_FILENAME	"mouse.pcx"
 
-/* functions for version handling */
+// functions for version handling
 #define MM_VERSION_IDENT(x,y,z)	VERSION_IDENT(x,y,z,0)
 #define MM_VERSION_MAJOR(x)	VERSION_PART_1(x)
 #define MM_VERSION_MINOR(x)	VERSION_PART_2(x)
@@ -1197,8 +1197,8 @@ extern int		num_element_info;
 						 PROGRAM_VERSION_MINOR, \
 						 PROGRAM_VERSION_PATCH)
 
-/* sound control */
+// sound control
 
 #define ST(x)           (((x) - 8) * 16)
 
-#endif	/* MM_MAIN_H */
+#endif	// MM_MAIN_H

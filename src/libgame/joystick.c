@@ -17,9 +17,9 @@
 #include "misc.h"
 
 
-/* ========================================================================= */
-/* platform independent joystick functions                                   */
-/* ========================================================================= */
+// ============================================================================
+// platform independent joystick functions
+// ============================================================================
 
 #define TRANSLATE_JOYSYMBOL_TO_JOYNAME	0
 #define TRANSLATE_JOYNAME_TO_JOYSYMBOL	1
@@ -320,7 +320,7 @@ void DeactivateJoystick(void)
 
 void ActivateJoystick(void)
 {
-  /* reactivate temporarily deactivated joystick */
+  // reactivate temporarily deactivated joystick
 
   if (joystick.status & JOYSTICK_AVAILABLE)
     joystick.status |= JOYSTICK_ACTIVE;

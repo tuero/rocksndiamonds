@@ -10,4 +10,4 @@
 
 void subSoundFX(int, int, int);
 
-#endif /* GAME_SP_SOUND_H */
+#endif // GAME_SP_SOUND_H

@@ -159,35 +159,35 @@ void DrawGraphicShifted_MM(int x,int y, int dx,int dy, int graphic,
     return;
   }
 
-  if (dx || dy)			/* Verschiebung der Grafik? */
+  if (dx || dy)			// Verschiebung der Grafik?
   {
-    if (x < BX1)		/* Element kommt von links ins Bild */
+    if (x < BX1)		// Element kommt von links ins Bild
     {
       x = BX1;
       width = dx;
       cx = TILEX - dx;
       dx = 0;
     }
-    else if (x > BX2)		/* Element kommt von rechts ins Bild */
+    else if (x > BX2)		// Element kommt von rechts ins Bild
     {
       x = BX2;
       width = -dx;
       dx = TILEX + dx;
     }
-    else if (x==BX1 && dx < 0)	/* Element verläßt links das Bild */
+    else if (x==BX1 && dx < 0)	// Element verläßt links das Bild
     {
       width += dx;
       cx = -dx;
       dx = 0;
     }
-    else if (x==BX2 && dx > 0)	/* Element verläßt rechts das Bild */
+    else if (x==BX2 && dx > 0)	// Element verläßt rechts das Bild
       width -= dx;
-    else if (dx)		/* allg. Bewegung in x-Richtung */
+    else if (dx)		// allg. Bewegung in x-Richtung
       MarkTileDirty(x + SIGN(dx), y);
 
-    if (y < BY1)		/* Element kommt von oben ins Bild */
+    if (y < BY1)		// Element kommt von oben ins Bild
     {
-      if (cut_mode==CUT_BELOW)	/* Element oberhalb des Bildes */
+      if (cut_mode==CUT_BELOW)	// Element oberhalb des Bildes
 	return;
 
       y = BY1;
@@ -195,13 +195,13 @@ void DrawGraphicShifted_MM(int x,int y, int dx,int dy, int graphic,
       cy = TILEY - dy;
       dy = 0;
     }
-    else if (y > BY2)		/* Element kommt von unten ins Bild */
+    else if (y > BY2)		// Element kommt von unten ins Bild
     {
       y = BY2;
       height = -dy;
       dy = TILEY + dy;
     }
-    else if (y==BY1 && dy < 0)	/* Element verläßt oben das Bild */
+    else if (y==BY1 && dy < 0)	// Element verläßt oben das Bild
     {
       height += dy;
       cy = -dy;
@@ -209,19 +209,19 @@ void DrawGraphicShifted_MM(int x,int y, int dx,int dy, int graphic,
     }
     else if (dy > 0 && cut_mode == CUT_ABOVE)
     {
-      if (y == BY2)		/* Element unterhalb des Bildes */
+      if (y == BY2)		// Element unterhalb des Bildes
 	return;
 
       height = dy;
       cy = TILEY - dy;
       dy = TILEY;
       MarkTileDirty(x, y + 1);
-    }				/* Element verläßt unten das Bild */
+    }				// Element verläßt unten das Bild
     else if (dy > 0 && (y == BY2 || cut_mode == CUT_BELOW))
     {
       height -= dy;
     }
-    else if (dy)		/* allg. Bewegung in y-Richtung */
+    else if (dy)		// allg. Bewegung in y-Richtung
     {
       MarkTileDirty(x, y + SIGN(dy));
     }

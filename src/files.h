@@ -86,4 +86,4 @@ void ConvertLevels(void);
 void CreateLevelSketchImages(void);
 void CreateCustomElementImages(char *);
 
-#endif	/* FILES_H */
+#endif	// FILES_H

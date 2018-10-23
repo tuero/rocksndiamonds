@@ -15,4 +15,4 @@ int HighByte(int);
 int SgnHighByte(int);
 int ByteToInt(byte);
 
-#endif /* ASM_H */
+#endif // ASM_H

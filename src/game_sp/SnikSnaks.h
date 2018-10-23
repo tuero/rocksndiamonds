@@ -11,4 +11,4 @@
 void subAnimateSnikSnaks(int);
 void subDrawAnimatedSnikSnaks(int);
 
-#endif /* SNIKSNAKS_H */
+#endif // SNIKSNAKS_H

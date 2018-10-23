@@ -24,4 +24,4 @@ char *getConfigProgramCopyrightString(void);
 char *getConfigProgramCompanyString(void);
 char *getWindowTitleString(void);
 
-#endif	/* CONFIG_H */
+#endif	// CONFIG_H

@@ -100,7 +100,7 @@ short Sign[16] =
 
 char *element_info_mm[] =
 {
-  "empty space",				/* 0 */
+  "empty space",				// 0
   "mirror (0\xb0)",
   "mirror (11.25\xb0)",
   "mirror (22.5\xb0)",
@@ -110,7 +110,7 @@ char *element_info_mm[] =
   "mirror (67.5\xb0)",
   "mirror (78.75\xb0)",
   "mirror (90\xb0)",
-  "mirror (101.25\xb0)",			/* 10 */
+  "mirror (101.25\xb0)",			// 10
   "mirror (112.5\xb0)",
   "mirror (123.75\xb0)",
   "mirror (135\xb0)",
@@ -120,7 +120,7 @@ char *element_info_mm[] =
   "fixed steel polarizer (0\xb0)",
   "fixed steel polarizer (90\xb0)",
   "fixed steel polarizer (45\xb0)",
-  "fixed steel polarizer (135\xb0)",		/* 20 */
+  "fixed steel polarizer (135\xb0)",		// 20
   "Gregor McDuffin (looking right)",
   "Gregor McDuffin (looking up)",
   "Gregor McDuffin (looking left)",
@@ -130,7 +130,7 @@ char *element_info_mm[] =
   "opening exit",
   "open exit",
   "magic kettle",
-  "bomb",					/* 30 */
+  "bomb",					// 30
   "prism",
   "steel wall",
   "steel wall",
@@ -140,7 +140,7 @@ char *element_info_mm[] =
   "steel wall",
   "steel wall",
   "steel wall",
-  "steel wall",					/* 40 */
+  "steel wall",					// 40
   "steel wall",
   "steel wall",
   "steel wall",
@@ -150,7 +150,7 @@ char *element_info_mm[] =
   "steel wall",
   "wooden wall",
   "wooden wall",
-  "wooden wall",				/* 50 */
+  "wooden wall",				// 50
   "wooden wall",
   "wooden wall",
   "wooden wall",
@@ -160,7 +160,7 @@ char *element_info_mm[] =
   "wooden wall",
   "wooden wall",
   "wooden wall",
-  "wooden wall",				/* 60 */
+  "wooden wall",				// 60
   "wooden wall",
   "wooden wall",
   "wooden wall",
@@ -170,7 +170,7 @@ char *element_info_mm[] =
   "ice wall",
   "ice wall",
   "ice wall",
-  "ice wall",					/* 70 */
+  "ice wall",					// 70
   "ice wall",
   "ice wall",
   "ice wall",
@@ -180,7 +180,7 @@ char *element_info_mm[] =
   "ice wall",
   "ice wall",
   "ice wall",
-  "amoeba wall",				/* 80 */
+  "amoeba wall",				// 80
   "amoeba wall",
   "amoeba wall",
   "amoeba wall",
@@ -190,7 +190,7 @@ char *element_info_mm[] =
   "amoeba wall",
   "amoeba wall",
   "amoeba wall",
-  "amoeba wall",				/* 90 */
+  "amoeba wall",				// 90
   "amoeba wall",
   "amoeba wall",
   "amoeba wall",
@@ -200,7 +200,7 @@ char *element_info_mm[] =
   "gray ball",
   "teleporter (0\xb0)",
   "teleporter (22.5\xb0)",
-  "teleporter (45\xb0)",			/* 100 */
+  "teleporter (45\xb0)",			// 100
   "teleporter (67.5\xb0)",
   "teleporter (90\xb0)",
   "teleporter (112.5\xb0)",
@@ -210,7 +210,7 @@ char *element_info_mm[] =
   "teleporter (202.5\xb0)",
   "teleporter (225\xb0)",
   "teleporter (247.5\xb0)",
-  "teleporter (270\xb0)",			/* 110 */
+  "teleporter (270\xb0)",			// 110
   "teleporter (292.5\xb0)",
   "teleporter (315\xb0)",
   "teleporter (337.5\xb0)",
@@ -220,7 +220,7 @@ char *element_info_mm[] =
   "pac man (starts moving left)",
   "pac man (starts moving down)",
   "polarizer (0\xb0)",
-  "polarizer (11.25\xb0)",			/* 120 */
+  "polarizer (11.25\xb0)",			// 120
   "polarizer (22.5\xb0)",
   "polarizer (33.75\xb0)",
   "polarizer (45\xb0)",
@@ -230,7 +230,7 @@ char *element_info_mm[] =
   "polarizer (90\xb0)",
   "polarizer (101.25\xb0)",
   "polarizer (112.5\xb0)",
-  "polarizer (123.75\xb0)",			/* 130 */
+  "polarizer (123.75\xb0)",			// 130
   "polarizer (135\xb0)",
   "polarizer (146.25\xb0)",
   "polarizer (157.5\xb0)",
@@ -240,7 +240,7 @@ char *element_info_mm[] =
   "two-way polarizer (45\xb0)",
   "two-way polarizer (67.5\xb0)",
   "fixed mirror (0\xb0)",
-  "fixed mirror (45\xb0)",			/* 140 */
+  "fixed mirror (45\xb0)",			// 140
   "fixed mirror (90\xb0)",
   "fixed mirror (135\xb0)",
   "reflecting stone lock",
@@ -250,7 +250,7 @@ char *element_info_mm[] =
   "bonus ball",
   "reflecting stone block",
   "wooden lock",
-  "extra energy ball (full)",			/* 150 */
+  "extra energy ball (full)",			// 150
   "fixed wooden polarizer (0\xb0)",
   "fixed wooden polarizer (90\xb0)",
   "fixed wooden polarizer (45\xb0)",
@@ -260,7 +260,7 @@ char *element_info_mm[] =
   "unused",
   "unused",
   "unused",
-  "letter ' '",					/* 160 */
+  "letter ' '",					// 160
   "letter '!'",
   "letter '\"'",
   "letter '#'",
@@ -270,7 +270,7 @@ char *element_info_mm[] =
   "letter '''",
   "letter '('",
   "letter ')'",
-  "letter '*'",					/* 170 */
+  "letter '*'",					// 170
   "letter '+'",
   "letter ','",
   "letter '-'",
@@ -280,7 +280,7 @@ char *element_info_mm[] =
   "letter '1'",
   "letter '2'",
   "letter '3'",
-  "letter '4'",					/* 180 */
+  "letter '4'",					// 180
   "letter '5'",
   "letter '6'",
   "letter '7'",
@@ -290,7 +290,7 @@ char *element_info_mm[] =
   "letter ';'",
   "letter '<'",
   "letter '='",
-  "letter '>'",					/* 190 */
+  "letter '>'",					// 190
   "letter '?'",
   "letter '@'",
   "letter 'A'",
@@ -300,7 +300,7 @@ char *element_info_mm[] =
   "letter 'E'",
   "letter 'F'",
   "letter 'G'",
-  "letter 'H'",					/* 200 */
+  "letter 'H'",					// 200
   "letter 'I'",
   "letter 'J'",
   "letter 'K'",
@@ -310,7 +310,7 @@ char *element_info_mm[] =
   "letter 'O'",
   "letter 'P'",
   "letter 'Q'",
-  "letter 'R'",					/* 210 */
+  "letter 'R'",					// 210
   "letter 'S'",
   "letter 'T'",
   "letter 'U'",
@@ -320,7 +320,7 @@ char *element_info_mm[] =
   "letter 'Y'",
   "letter 'Z'",
   "letter '\xc4'",
-  "letter '\xd6'",				/* 220 */
+  "letter '\xd6'",				// 220
   "letter '\xdc'",
   "letter '^'",
   "letter ''",
@@ -330,7 +330,7 @@ char *element_info_mm[] =
   "letter ''",
   "letter ''",
   "letter ''",
-  "letter ''",					/* 230 */
+  "letter ''",					// 230
   "letter ''",
   "letter ''",
   "letter ''",
@@ -340,7 +340,7 @@ char *element_info_mm[] =
   "letter ''",
   "letter ''",
   "letter ''",
-  "mirror (0\xb0)",				/* 240 */
+  "mirror (0\xb0)",				// 240
   "mirror (11.25\xb0)",
   "mirror (22.5\xb0)",
   "mirror (33.75\xb0)",
@@ -350,7 +350,7 @@ char *element_info_mm[] =
   "mirror (78.75\xb0)",
   "mirror (90\xb0)",
   "mirror (101.25\xb0)",
-  "mirror (112.5\xb0)",				/* 250 */
+  "mirror (112.5\xb0)",				// 250
   "mirror (123.75\xb0)",
   "mirror (135\xb0)",
   "mirror (146.25\xb0)",
@@ -360,7 +360,7 @@ char *element_info_mm[] =
   "fixed wooden polarizer (22.5\xb0)",
   "fixed wooden polarizer (45\xb0)",
   "fixed wooden polarizer (67.5\xb0)",
-  "fixed wooden polarizer (90\xb0)",		/* 260 */
+  "fixed wooden polarizer (90\xb0)",		// 260
   "fixed wooden polarizer (112.5\xb0)",
   "fixed wooden polarizer (135\xb0)",
   "fixed wooden polarizer (157.5\xb0)",
@@ -370,7 +370,7 @@ char *element_info_mm[] =
   "fixed steel polarizer (67.5\xb0)",
   "fixed steel polarizer (90\xb0)",
   "fixed steel polarizer (112.5\xb0)",
-  "fixed steel polarizer (135\xb0)",		/* 270 */
+  "fixed steel polarizer (135\xb0)",		// 270
   "fixed steel polarizer (157.5\xb0)",
   "deflektor style wooden wall",
   "deflektor style wooden wall",
@@ -380,7 +380,7 @@ char *element_info_mm[] =
   "deflektor style wooden wall",
   "deflektor style wooden wall",
   "deflektor style wooden wall",
-  "deflektor style wooden wall",		/* 280 */
+  "deflektor style wooden wall",		// 280
   "deflektor style wooden wall",
   "deflektor style wooden wall",
   "deflektor style wooden wall",
@@ -390,7 +390,7 @@ char *element_info_mm[] =
   "deflektor style wooden wall",
   "deflektor style steel wall",
   "deflektor style steel wall",
-  "deflektor style steel wall",			/* 290 */
+  "deflektor style steel wall",			// 290
   "deflektor style steel wall",
   "deflektor style steel wall",
   "deflektor style steel wall",
@@ -400,7 +400,7 @@ char *element_info_mm[] =
   "deflektor style steel wall",
   "deflektor style steel wall",
   "deflektor style steel wall",
-  "deflektor style steel wall",			/* 300 */
+  "deflektor style steel wall",			// 300
   "deflektor style steel wall",
   "deflektor style steel wall",
   "deflektor style steel wall",
@@ -410,7 +410,7 @@ char *element_info_mm[] =
   "refractor",
   "laser cannon (shooting right)",
   "laser cannon (shooting up)",
-  "laser cannon (shooting left)",		/* 310 */
+  "laser cannon (shooting left)",		// 310
   "laser cannon (shooting down)",
   "laser receiver (directed right)",
   "laser receiver (directed up)",
@@ -420,7 +420,7 @@ char *element_info_mm[] =
   "fibre optic (1b)",
   "fibre optic (2a)",
   "fibre optic (2b)",
-  "fibre optic (3a)",				/* 320 */
+  "fibre optic (3a)",				// 320
   "fibre optic (3b)",
   "fibre optic (4a)",
   "fibre optic (4b)",
@@ -430,7 +430,7 @@ char *element_info_mm[] =
   "rotating mirror (33.75\xb0)",
   "rotating mirror (45\xb0)",
   "rotating mirror (56.25\xb0)",
-  "rotating mirror (67.5\xb0)",			/* 330 */
+  "rotating mirror (67.5\xb0)",			// 330
   "rotating mirror (78.75\xb0)",
   "rotating mirror (90\xb0)",
   "rotating mirror (101.25\xb0)",
@@ -440,7 +440,7 @@ char *element_info_mm[] =
   "rotating mirror (146.25\xb0)",
   "rotating mirror (157.5\xb0)",
   "rotating mirror (168.75\xb0)",
-  "rotating wooden polarizer (0\xb0)",		/* 340 */
+  "rotating wooden polarizer (0\xb0)",		// 340
   "rotating wooden polarizer (22.5\xb0)",
   "rotating wooden polarizer (45\xb0)",
   "rotating wooden polarizer (67.5\xb0)",
@@ -450,7 +450,7 @@ char *element_info_mm[] =
   "rotating wooden polarizer (157.5\xb0)",
   "rotating steel polarizer (0\xb0)",
   "rotating steel polarizer (22.5\xb0)",
-  "rotating steel polarizer (45\xb0)",		/* 350 */
+  "rotating steel polarizer (45\xb0)",		// 350
   "rotating steel polarizer (67.5\xb0)",
   "rotating steel polarizer (90\xb0)",
   "rotating steel polarizer (112.5\xb0)",
@@ -460,7 +460,7 @@ char *element_info_mm[] =
   "red teleporter (22.5\xb0)",
   "red teleporter (45\xb0)",
   "red teleporter (67.5\xb0)",
-  "red teleporter (90\xb0)",			/* 360 */
+  "red teleporter (90\xb0)",			// 360
   "red teleporter (112.5\xb0)",
   "red teleporter (135\xb0)",
   "red teleporter (157.5\xb0)",
@@ -470,7 +470,7 @@ char *element_info_mm[] =
   "red teleporter (247.5\xb0)",
   "red teleporter (270\xb0)",
   "red teleporter (292.5\xb0)",
-  "red teleporter (315\xb0)",			/* 370 */
+  "red teleporter (315\xb0)",			// 370
   "red teleporter (337.5\xb0)",
   "yellow teleporter (0\xb0)",
   "yellow teleporter (22.5\xb0)",
@@ -480,7 +480,7 @@ char *element_info_mm[] =
   "yellow teleporter (112.5\xb0)",
   "yellow teleporter (135\xb0)",
   "yellow teleporter (157.5\xb0)",
-  "yellow teleporter (180\xb0)",		/* 380 */
+  "yellow teleporter (180\xb0)",		// 380
   "yellow teleporter (202.5\xb0)",
   "yellow teleporter (225\xb0)",
   "yellow teleporter (247.5\xb0)",
@@ -490,7 +490,7 @@ char *element_info_mm[] =
   "yellow teleporter (337.5\xb0)",
   "green teleporter (0\xb0)",
   "green teleporter (22.5\xb0)",
-  "green teleporter (45\xb0)",			/* 390 */
+  "green teleporter (45\xb0)",			// 390
   "green teleporter (67.5\xb0)",
   "green teleporter (90\xb0)",
   "green teleporter (112.5\xb0)",
@@ -500,7 +500,7 @@ char *element_info_mm[] =
   "green teleporter (202.5\xb0)",
   "green teleporter (225\xb0)",
   "green teleporter (247.5\xb0)",
-  "green teleporter (270\xb0)",			/* 400 */
+  "green teleporter (270\xb0)",			// 400
   "green teleporter (292.5\xb0)",
   "green teleporter (315\xb0)",
   "green teleporter (337.5\xb0)",
@@ -510,7 +510,7 @@ char *element_info_mm[] =
   "blue teleporter (67.5\xb0)",
   "blue teleporter (90\xb0)",
   "blue teleporter (112.5\xb0)",
-  "blue teleporter (135\xb0)",			/* 410 */
+  "blue teleporter (135\xb0)",			// 410
   "blue teleporter (157.5\xb0)",
   "blue teleporter (180\xb0)",
   "blue teleporter (202.5\xb0)",
@@ -520,7 +520,7 @@ char *element_info_mm[] =
   "blue teleporter (292.5\xb0)",
   "blue teleporter (315\xb0)",
   "blue teleporter (337.5\xb0)",
-  "unknown",					/* 420 */
+  "unknown",					// 420
 
   /*
   "-------------------------------",

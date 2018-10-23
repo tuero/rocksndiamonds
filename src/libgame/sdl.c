@@ -15,16 +15,16 @@
 #include "misc.h"
 #include "setup.h"
 
-#define ENABLE_UNUSED_CODE	0	/* currently unused functions */
+#define ENABLE_UNUSED_CODE	0	// currently unused functions
 
 #define DEBUG_JOYSTICKS		0
 
 
-/* ========================================================================= */
-/* video functions                                                           */
-/* ========================================================================= */
+// ============================================================================
+// video functions
+// ============================================================================
 
-/* SDL internal variables */
+// SDL internal variables
 #if defined(TARGET_SDL2)
 static SDL_Window *sdl_window = NULL;
 static SDL_Renderer *sdl_renderer = NULL;
@@ -36,11 +36,11 @@ static boolean fullscreen_enabled = FALSE;
 static boolean limit_screen_updates = FALSE;
 
 
-/* functions from SGE library */
+// functions from SGE library
 void sge_Line(SDL_Surface *, Sint16, Sint16, Sint16, Sint16, Uint32);
 
 #if defined(USE_TOUCH_INPUT_OVERLAY)
-/* functions to draw overlay graphics for touch device input */
+// functions to draw overlay graphics for touch device input
 static void DrawTouchInputOverlay();
 #endif
 
@@ -71,7 +71,7 @@ static void FinalizeScreen(int draw_target)
 static void UpdateScreenExt(SDL_Rect *rect, boolean with_frame_delay)
 {
   static unsigned int update_screen_delay = 0;
-  unsigned int update_screen_delay_value = 50;		/* (milliseconds) */
+  unsigned int update_screen_delay_value = 50;		// (milliseconds)
   SDL_Surface *screen = backbuffer->surface;
 
   if (limit_screen_updates &&
@@ -282,7 +282,7 @@ static void SDLSetWindowIcon(char *basename)
     return;
   }
 
-  /* set transparent color */
+  // set transparent color
   SDL_SetColorKey(surface, SET_TRANSPARENT_PIXEL,
 		  SDL_MapRGB(surface->format, 0x00, 0x00, 0x00));
 
@@ -513,11 +513,11 @@ void SDLInitVideoDisplay(void)
   SDL_putenv("SDL_VIDEO_CENTERED=1");
 #endif
 
-  /* initialize SDL video */
+  // initialize SDL video
   if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
     Error(ERR_EXIT, "SDL_InitSubSystem() failed: %s", SDL_GetError());
 
-  /* set default SDL depth */
+  // set default SDL depth
 #if !defined(TARGET_SDL2)
   video.default_depth = SDL_GetVideoInfo()->vfmt->BitsPerPixel;
 #else
@@ -543,15 +543,15 @@ static void SDLInitVideoBuffer_VideoBuffer(boolean fullscreen)
   video.fullscreen_available = FALSE;
 #endif
 
-  /* open SDL video output device (window or fullscreen mode) */
+  // open SDL video output device (window or fullscreen mode)
   if (!SDLSetVideoMode(fullscreen))
     Error(ERR_EXIT, "setting video mode failed");
 
-  /* !!! SDL2 can only set the window icon if the window already exists !!! */
-  /* set window icon */
+  // !!! SDL2 can only set the window icon if the window already exists !!!
+  // set window icon
   SDLSetWindowIcon(program.icon_filename);
 
-  /* set window and icon title */
+  // set window and icon title
   SDLSetWindowTitle();
 }
 
@@ -570,10 +570,10 @@ static void SDLInitVideoBuffer_DrawBuffer(void)
      buffer 'window' at the same size as the SDL backbuffer. Although it
      should never be drawn to directly, it would do no harm nevertheless. */
 
-  /* create additional (symbolic) buffer for double-buffering */
+  // create additional (symbolic) buffer for double-buffering
   ReCreateBitmap(&window, video.width, video.height);
 
-  /* create dummy drawing buffer for headless mode, if needed */
+  // create dummy drawing buffer for headless mode, if needed
   if (program.headless)
     ReCreateBitmap(&backbuffer, video.width, video.height);
 }
@@ -772,12 +772,12 @@ boolean SDLSetVideoMode(boolean fullscreen)
 
   if (fullscreen && !video.fullscreen_enabled && video.fullscreen_available)
   {
-    /* switch display to fullscreen mode, if available */
+    // switch display to fullscreen mode, if available
     success = SDLCreateScreen(TRUE);
 
     if (!success)
     {
-      /* switching display to fullscreen mode failed -- do not try it again */
+      // switching display to fullscreen mode failed -- do not try it again
       video.fullscreen_available = FALSE;
     }
     else
@@ -788,12 +788,12 @@ boolean SDLSetVideoMode(boolean fullscreen)
 
   if ((!fullscreen && video.fullscreen_enabled) || !success)
   {
-    /* switch display to window mode */
+    // switch display to window mode
     success = SDLCreateScreen(FALSE);
 
     if (!success)
     {
-      /* switching display to window mode failed -- should not happen */
+      // switching display to window mode failed -- should not happen
     }
     else
     {
@@ -1191,8 +1191,8 @@ void SDLFadeRectangle(int x, int y, int width, int height,
 
   dst_rect.x = dst_x;
   dst_rect.y = dst_y;
-  dst_rect.w = width;		/* (ignored) */
-  dst_rect.h = height;		/* (ignored) */
+  dst_rect.w = width;		// (ignored)
+  dst_rect.h = height;		// (ignored)
 
   dst_rect2 = dst_rect;
 
@@ -1200,7 +1200,7 @@ void SDLFadeRectangle(int x, int y, int width, int height,
   if (fade_mode & (FADE_TYPE_FADE_IN | FADE_TYPE_TRANSFORM))
     SDL_BlitSurface(surface_screen, &dst_rect, surface_backup, &src_rect);
 
-  /* copy source and target surfaces to temporary surfaces for fading */
+  // copy source and target surfaces to temporary surfaces for fading
   if (fade_mode & FADE_TYPE_TRANSFORM)
   {
     // (source and target fading buffer already prepared)
@@ -1210,7 +1210,7 @@ void SDLFadeRectangle(int x, int y, int width, int height,
     // (target fading buffer already prepared)
     SDL_BlitSurface(surface_black,  &src_rect, surface_source, &src_rect);
   }
-  else		/* FADE_TYPE_FADE_OUT */
+  else		// FADE_TYPE_FADE_OUT
   {
     // (source fading buffer already prepared)
     SDL_BlitSurface(surface_black,  &src_rect, surface_target, &src_rect);
@@ -1231,13 +1231,13 @@ void SDLFadeRectangle(int x, int y, int width, int height,
 
     SDL_BlitSurface(surface_source, &src_rect, surface_screen, &dst_rect);
 
-    SDLSetAlpha(surface_target, FALSE, 0);	/* disable alpha blending */
+    SDLSetAlpha(surface_target, FALSE, 0);	// disable alpha blending
 
     ypos[0] = -GetSimpleRandom(16);
 
     for (i = 1 ; i < melt_columns; i++)
     {
-      int r = GetSimpleRandom(3) - 1;	/* randomly choose from { -1, 0, -1 } */
+      int r = GetSimpleRandom(3) - 1;	// randomly choose from { -1, 0, -1 }
 
       ypos[i] = ypos[i - 1] + r;
 
@@ -1279,7 +1279,7 @@ void SDLFadeRectangle(int x, int y, int width, int height,
 	  if (ypos[i] + dy >= height)
 	    dy = height - ypos[i];
 
-	  /* copy part of (appearing) target surface to upper area */
+	  // copy part of (appearing) target surface to upper area
 	  src_rect.x = src_x + i * melt_pixels;
 	  // src_rect.y = src_y + ypos[i];
 	  src_rect.y = src_y;
@@ -1297,7 +1297,7 @@ void SDLFadeRectangle(int x, int y, int width, int height,
 
 	  ypos[i] += dy;
 
-	  /* copy part of (disappearing) source surface to lower area */
+	  // copy part of (disappearing) source surface to lower area
 	  src_rect.x = src_x + i * melt_pixels;
 	  src_rect.y = src_y;
 	  src_rect.w = melt_pixels;
@@ -1345,7 +1345,7 @@ void SDLFadeRectangle(int x, int y, int width, int height,
 
     SDL_BlitSurface(surface_target, &src_rect, surface_screen, &dst_rect);
 
-    SDLSetAlpha(surface_source, FALSE, 0);	/* disable alpha blending */
+    SDLSetAlpha(surface_source, FALSE, 0);	// disable alpha blending
 
     for (xx = 0; xx < xx_size;)
     {
@@ -1362,7 +1362,7 @@ void SDLFadeRectangle(int x, int y, int width, int height,
       dst_rect.x = dst_x;
       dst_rect.y = dst_y;
 
-      /* draw new (target) image to screen buffer */
+      // draw new (target) image to screen buffer
       SDL_BlitSurface(surface_target, &src_rect, surface_screen, &dst_rect);
 
       if (xx_final < xx_size)
@@ -1370,14 +1370,14 @@ void SDLFadeRectangle(int x, int y, int width, int height,
 	src_rect.w = xx_size - xx_final;
 	src_rect.h = height;
 
-	/* draw old (source) image to screen buffer (left side) */
+	// draw old (source) image to screen buffer (left side)
 
 	src_rect.x = src_x + xx_final;
 	dst_rect.x = dst_x;
 
 	SDL_BlitSurface(surface_source, &src_rect, surface_screen, &dst_rect);
 
-	/* draw old (source) image to screen buffer (right side) */
+	// draw old (source) image to screen buffer (right side)
 
 	src_rect.x = src_x + xx_size;
 	dst_rect.x = dst_x + xx_size + xx_final;
@@ -1388,11 +1388,11 @@ void SDLFadeRectangle(int x, int y, int width, int height,
       if (draw_border_function != NULL)
 	draw_border_function();
 
-      /* only update the region of the screen that is affected from fading */
+      // only update the region of the screen that is affected from fading
       UpdateScreen_WithFrameDelay(&dst_rect2);
     }
   }
-  else		/* fading in, fading out or cross-fading */
+  else		// fading in, fading out or cross-fading
   {
     float alpha;
     int alpha_final;
@@ -1404,17 +1404,17 @@ void SDLFadeRectangle(int x, int y, int width, int height,
       alpha += 255 * ((float)(time_current - time_last) / fade_delay);
       alpha_final = MIN(MAX(0, alpha), 255);
 
-      /* draw existing (source) image to screen buffer */
+      // draw existing (source) image to screen buffer
       SDL_BlitSurface(surface_source, &src_rect, surface_screen, &dst_rect);
 
-      /* draw new (target) image to screen buffer using alpha blending */
+      // draw new (target) image to screen buffer using alpha blending
       SDLSetAlpha(surface_target, TRUE, alpha_final);
       SDL_BlitSurface(surface_target, &src_rect, surface_screen, &dst_rect);
 
       if (draw_border_function != NULL)
 	draw_border_function();
 
-      /* only update the region of the screen that is affected from fading */
+      // only update the region of the screen that is affected from fading
       UpdateScreen_WithFrameDelay(&dst_rect);
     }
   }
@@ -1492,21 +1492,21 @@ Pixel SDLGetPixel(Bitmap *src_bitmap, int x, int y)
 
   switch (surface->format->BytesPerPixel)
   {
-    case 1:		/* assuming 8-bpp */
+    case 1:		// assuming 8-bpp
     {
       return *((Uint8 *)surface->pixels + y * surface->pitch + x);
     }
     break;
 
-    case 2:		/* probably 15-bpp or 16-bpp */
+    case 2:		// probably 15-bpp or 16-bpp
     {
       return *((Uint16 *)surface->pixels + y * surface->pitch / 2 + x);
     }
     break;
 
-  case 3:		/* slow 24-bpp mode; usually not used */
+  case 3:		// slow 24-bpp mode; usually not used
     {
-      /* does this work? */
+      // does this work?
       Uint8 *pix = (Uint8 *)surface->pixels + y * surface->pitch + x * 3;
       Uint32 color = 0;
       int shift;
@@ -1522,7 +1522,7 @@ Pixel SDLGetPixel(Bitmap *src_bitmap, int x, int y)
     }
     break;
 
-  case 4:		/* probably 32-bpp */
+  case 4:		// probably 32-bpp
     {
       return *((Uint32 *)surface->pixels + y * surface->pitch / 4 + x);
     }
@@ -1533,11 +1533,11 @@ Pixel SDLGetPixel(Bitmap *src_bitmap, int x, int y)
 }
 
 
-/* ========================================================================= */
-/* The following functions were taken from the SGE library                   */
-/* (SDL Graphics Extension Library) by Anders Lindström                      */
-/* http://www.etek.chalmers.se/~e8cal1/sge/index.html                        */
-/* ========================================================================= */
+// ============================================================================
+// The following functions were taken from the SGE library
+// (SDL Graphics Extension Library) by Anders Lindström
+// http://www.etek.chalmers.se/~e8cal1/sge/index.html
+// ============================================================================
 
 static void _PutPixel(SDL_Surface *surface, Sint16 x, Sint16 y, Uint32 color)
 {
@@ -1547,25 +1547,25 @@ static void _PutPixel(SDL_Surface *surface, Sint16 x, Sint16 y, Uint32 color)
     {
       case 1:
       {
-	/* Assuming 8-bpp */
+	// Assuming 8-bpp
 	*((Uint8 *)surface->pixels + y*surface->pitch + x) = color;
       }
       break;
 
       case 2:
       {
-	/* Probably 15-bpp or 16-bpp */
+	// Probably 15-bpp or 16-bpp
 	*((Uint16 *)surface->pixels + y*surface->pitch/2 + x) = color;
       }
       break;
 
       case 3:
       {
-	/* Slow 24-bpp mode, usually not used */
+	// Slow 24-bpp mode, usually not used
 	Uint8 *pix;
 	int shift;
 
-	/* Gack - slow, but endian correct */
+	// Gack - slow, but endian correct
 	pix = (Uint8 *)surface->pixels + y * surface->pitch + x*3;
 	shift = surface->format->Rshift;
 	*(pix+shift/8) = color>>shift;
@@ -1578,7 +1578,7 @@ static void _PutPixel(SDL_Surface *surface, Sint16 x, Sint16 y, Uint32 color)
 
       case 4:
       {
-	/* Probably 32-bpp */
+	// Probably 32-bpp
 	*((Uint32 *)surface->pixels + y*surface->pitch/4 + x) = color;
       }
       break;
@@ -1608,7 +1608,7 @@ static void _PutPixel24(SDL_Surface *surface, Sint16 x, Sint16 y, Uint32 color)
   Uint8 *pix;
   int shift;
 
-  /* Gack - slow, but endian correct */
+  // Gack - slow, but endian correct
   pix = (Uint8 *)surface->pixels + y * surface->pitch + x*3;
   shift = surface->format->Rshift;
   *(pix+shift/8) = color>>shift;
@@ -1707,25 +1707,25 @@ static void sge_pPutPixel(SDL_Surface *surface, Sint16 x, Sint32 ypitch,
     {
       case 1:
       {
-	/* Assuming 8-bpp */
+	// Assuming 8-bpp
 	*((Uint8 *)surface->pixels + ypitch + x) = color;
       }
       break;
 
       case 2:
       {
-	/* Probably 15-bpp or 16-bpp */
+	// Probably 15-bpp or 16-bpp
 	*((Uint16 *)surface->pixels + ypitch + x) = color;
       }
       break;
 
       case 3:
       {
-	/* Slow 24-bpp mode, usually not used */
+	// Slow 24-bpp mode, usually not used
 	Uint8 *pix;
 	int shift;
 
-	/* Gack - slow, but endian correct */
+	// Gack - slow, but endian correct
 	pix = (Uint8 *)surface->pixels + ypitch + x*3;
 	shift = surface->format->Rshift;
 	*(pix+shift/8) = color>>shift;
@@ -1738,7 +1738,7 @@ static void sge_pPutPixel(SDL_Surface *surface, Sint16 x, Sint32 ypitch,
 
       case 4:
       {
-	/* Probably 32-bpp */
+	// Probably 32-bpp
 	*((Uint32 *)surface->pixels + ypitch + x) = color;
       }
       break;
@@ -1766,7 +1766,7 @@ static void sge_HLine(SDL_Surface *Surface, Sint16 x1, Sint16 x2, Sint16 y,
     x2 = tmp;
   }
 
-  /* Do the clipping */
+  // Do the clipping
   if (y < 0 || y > Surface->h - 1 || x1 > Surface->w - 1 || x2 < 0)
     return;
   if (x1 < 0)
@@ -1805,7 +1805,7 @@ static void _HLine(SDL_Surface *Surface, Sint16 x1, Sint16 x2, Sint16 y,
     x2 = tmp;
   }
 
-  /* Do the clipping */
+  // Do the clipping
   if (y < 0 || y > Surface->h - 1 || x1 > Surface->w - 1 || x2 < 0)
     return;
   if (x1 < 0)
@@ -1841,7 +1841,7 @@ static void sge_VLine(SDL_Surface *Surface, Sint16 x, Sint16 y1, Sint16 y2,
     y2 = tmp;
   }
 
-  /* Do the clipping */
+  // Do the clipping
   if (x < 0 || x > Surface->w - 1 || y1 > Surface->h - 1 || y2 < 0)
     return;
   if (y1 < 0)
@@ -1880,7 +1880,7 @@ static void _VLine(SDL_Surface *Surface, Sint16 x, Sint16 y1, Sint16 y2,
     y2 = tmp;
   }
 
-  /* Do the clipping */
+  // Do the clipping
   if (x < 0 || x > Surface->w - 1 || y1 > Surface->h - 1 || y2 < 0)
     return;
   if (y1 < 0)
@@ -1972,10 +1972,10 @@ void sge_Line(SDL_Surface *Surface, Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2,
       return;
    }
 
-   /* Draw the line */
+   // Draw the line
    sge_DoLine(Surface, x1, y1, x2, y2, Color, _PutPixel);
 
-   /* unlock the display */
+   // unlock the display
    if (SDL_MUSTLOCK(Surface))
    {
       SDL_UnlockSurface(Surface);
@@ -2037,11 +2037,11 @@ void SDLCopyInverseMasked(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 }
 
 
-/* ========================================================================= */
-/* The following functions were taken from the SDL_gfx library version 2.0.3 */
-/* (Rotozoomer) by Andreas Schiffler                                         */
-/* http://www.ferzkopp.net/Software/SDL_gfx-2.0/index.html                   */
-/* ========================================================================= */
+// ============================================================================
+// The following functions were taken from the SDL_gfx library version 2.0.3
+// (Rotozoomer) by Andreas Schiffler
+// http://www.ferzkopp.net/Software/SDL_gfx-2.0/index.html
+// ============================================================================
 
 /*
   -----------------------------------------------------------------------------
@@ -2065,7 +2065,7 @@ static int zoomSurfaceRGBA_scaleDownBy2(SDL_Surface *src, SDL_Surface *dst)
   tColorRGBA *sp, *csp, *dp;
   int dgap;
 
-  /* pointer setup */
+  // pointer setup
   sp = csp = (tColorRGBA *) src->pixels;
   dp = (tColorRGBA *) dst->pixels;
   dgap = dst->pitch - dst->w * 4;
@@ -2084,26 +2084,26 @@ static int zoomSurfaceRGBA_scaleDownBy2(SDL_Surface *src, SDL_Surface *dst)
       tColorRGBA *sp11 = &sp1[1];
       tColorRGBA new;
 
-      /* create new color pixel from all four source color pixels */
+      // create new color pixel from all four source color pixels
       new.r = (sp00->r + sp01->r + sp10->r + sp11->r) / 4;
       new.g = (sp00->g + sp01->g + sp10->g + sp11->g) / 4;
       new.b = (sp00->b + sp01->b + sp10->b + sp11->b) / 4;
       new.a = (sp00->a + sp01->a + sp10->a + sp11->a) / 4;
 
-      /* draw */
+      // draw
       *dp = new;
 
-      /* advance source pointers */
+      // advance source pointers
       sp += 2;
 
-      /* advance destination pointer */
+      // advance destination pointer
       dp++;
     }
 
-    /* advance source pointer */
+    // advance source pointer
     csp = (tColorRGBA *) ((Uint8 *) csp + 2 * src->pitch);
 
-    /* advance destination pointers */
+    // advance destination pointers
     dp = (tColorRGBA *) ((Uint8 *) dp + dgap);
   }
 
@@ -2117,27 +2117,27 @@ static int zoomSurfaceRGBA(SDL_Surface *src, SDL_Surface *dst)
   tColorRGBA *sp, *csp, *csp0, *dp;
   int dgap;
 
-  /* use specialized zoom function when scaling down to exactly half size */
+  // use specialized zoom function when scaling down to exactly half size
   if (src->w == 2 * dst->w &&
       src->h == 2 * dst->h)
     return zoomSurfaceRGBA_scaleDownBy2(src, dst);
 
-  /* variable setup */
+  // variable setup
   sx = (float) src->w / (float) dst->w;
   sy = (float) src->h / (float) dst->h;
 
-  /* allocate memory for row increments */
+  // allocate memory for row increments
   csax = sax = (int *)checked_malloc((dst->w + 1) * sizeof(Uint32));
   csay = say = (int *)checked_malloc((dst->h + 1) * sizeof(Uint32));
 
-  /* precalculate row increments */
+  // precalculate row increments
   for (x = 0; x <= dst->w; x++)
     *csax++ = (int)(sx * x);
 
   for (y = 0; y <= dst->h; y++)
     *csay++ = (int)(sy * y);
 
-  /* pointer setup */
+  // pointer setup
   sp = csp = csp0 = (tColorRGBA *) src->pixels;
   dp = (tColorRGBA *) dst->pixels;
   dgap = dst->pitch - dst->w * 4;
@@ -2150,22 +2150,22 @@ static int zoomSurfaceRGBA(SDL_Surface *src, SDL_Surface *dst)
 
     for (x = 0; x < dst->w; x++)
     {
-      /* draw */
+      // draw
       *dp = *sp;
 
-      /* advance source pointers */
+      // advance source pointers
       csax++;
       sp = csp + *csax;
 
-      /* advance destination pointer */
+      // advance destination pointer
       dp++;
     }
 
-    /* advance source pointer */
+    // advance source pointer
     csay++;
     csp = (tColorRGBA *) ((Uint8 *) csp0 + *csay * src->pitch);
 
-    /* advance destination pointers */
+    // advance destination pointers
     dp = (tColorRGBA *) ((Uint8 *) dp + dgap);
   }
 
@@ -2189,15 +2189,15 @@ static int zoomSurfaceY(SDL_Surface * src, SDL_Surface * dst)
   Uint8 *sp, *dp, *csp;
   int dgap;
 
-  /* variable setup */
+  // variable setup
   sx = (Uint32) (65536.0 * (float) src->w / (float) dst->w);
   sy = (Uint32) (65536.0 * (float) src->h / (float) dst->h);
 
-  /* allocate memory for row increments */
+  // allocate memory for row increments
   sax = (Uint32 *)checked_malloc(dst->w * sizeof(Uint32));
   say = (Uint32 *)checked_malloc(dst->h * sizeof(Uint32));
 
-  /* precalculate row increments */
+  // precalculate row increments
   csx = 0;
   csax = sax;
   for (x = 0; x < dst->w; x++)
@@ -2234,12 +2234,12 @@ static int zoomSurfaceY(SDL_Surface * src, SDL_Surface * dst)
     csay++;
   }
 
-  /* pointer setup */
+  // pointer setup
   sp = csp = (Uint8 *) src->pixels;
   dp = (Uint8 *) dst->pixels;
   dgap = dst->pitch - dst->w;
 
-  /* draw */
+  // draw
   csay = say;
   for (y = 0; y < dst->h; y++)
   {
@@ -2247,22 +2247,22 @@ static int zoomSurfaceY(SDL_Surface * src, SDL_Surface * dst)
     sp = csp;
     for (x = 0; x < dst->w; x++)
     {
-      /* draw */
+      // draw
       *dp = *sp;
 
-      /* advance source pointers */
+      // advance source pointers
       sp += (*csax);
       csax++;
 
-      /* advance destination pointer */
+      // advance destination pointer
       dp++;
     }
 
-    /* advance source pointer (for row) */
+    // advance source pointer (for row)
     csp += ((*csay) * src->pitch);
     csay++;
 
-    /* advance destination pointers */
+    // advance destination pointers
     dp += dgap;
   }
 
@@ -2294,17 +2294,17 @@ static SDL_Surface *zoomSurface(SDL_Surface *src, int dst_width, int dst_height)
   if (src == NULL)
     return NULL;
 
-  /* determine if source surface is 32 bit or 8 bit */
+  // determine if source surface is 32 bit or 8 bit
   is_32bit = (src->format->BitsPerPixel == 32);
 
   if (is_32bit || src->format->BitsPerPixel == 8)
   {
-    /* use source surface 'as is' */
+    // use source surface 'as is'
     zoom_src = src;
   }
   else
   {
-    /* new source surface is 32 bit with a defined RGB ordering */
+    // new source surface is 32 bit with a defined RGB ordering
     zoom_src = SDL_CreateRGBSurface(SURFACE_FLAGS, src->w, src->h, 32,
 				    0x000000ff, 0x0000ff00, 0x00ff0000,
 				    (src->format->Amask ? 0xff000000 : 0));
@@ -2313,10 +2313,10 @@ static SDL_Surface *zoomSurface(SDL_Surface *src, int dst_width, int dst_height)
     is_converted = TRUE;
   }
 
-  /* allocate surface to completely contain the zoomed surface */
+  // allocate surface to completely contain the zoomed surface
   if (is_32bit)
   {
-    /* target surface is 32 bit with source RGBA/ABGR ordering */
+    // target surface is 32 bit with source RGBA/ABGR ordering
     zoom_dst = SDL_CreateRGBSurface(SURFACE_FLAGS, dst_width, dst_height, 32,
 				    zoom_src->format->Rmask,
 				    zoom_src->format->Gmask,
@@ -2325,40 +2325,40 @@ static SDL_Surface *zoomSurface(SDL_Surface *src, int dst_width, int dst_height)
   }
   else
   {
-    /* target surface is 8 bit */
+    // target surface is 8 bit
     zoom_dst = SDL_CreateRGBSurface(SURFACE_FLAGS, dst_width, dst_height, 8,
 				    0, 0, 0, 0);
   }
 
-  /* lock source surface */
+  // lock source surface
   SDL_LockSurface(zoom_src);
 
-  /* check which kind of surface we have */
+  // check which kind of surface we have
   if (is_32bit)
   {
-    /* call the 32 bit transformation routine to do the zooming */
+    // call the 32 bit transformation routine to do the zooming
     zoomSurfaceRGBA(zoom_src, zoom_dst);
   }
   else
   {
-    /* copy palette */
+    // copy palette
     for (i = 0; i < zoom_src->format->palette->ncolors; i++)
       zoom_dst->format->palette->colors[i] =
 	zoom_src->format->palette->colors[i];
     zoom_dst->format->palette->ncolors = zoom_src->format->palette->ncolors;
 
-    /* call the 8 bit transformation routine to do the zooming */
+    // call the 8 bit transformation routine to do the zooming
     zoomSurfaceY(zoom_src, zoom_dst);
   }
 
-  /* unlock source surface */
+  // unlock source surface
   SDL_UnlockSurface(zoom_src);
 
-  /* free temporary surface */
+  // free temporary surface
   if (is_converted)
     SDL_FreeSurface(zoom_src);
 
-  /* return destination surface */
+  // return destination surface
   return zoom_dst;
 }
 
@@ -2372,10 +2372,10 @@ static SDL_Surface *SDLGetOpaqueSurface(SDL_Surface *surface)
   if ((new_surface = SDLGetNativeSurface(surface)) == NULL)
     Error(ERR_EXIT, "SDLGetNativeSurface() failed");
 
-  /* remove alpha channel from native non-transparent surface, if defined */
+  // remove alpha channel from native non-transparent surface, if defined
   SDLSetAlpha(new_surface, FALSE, 0);
 
-  /* remove transparent color from native non-transparent surface, if defined */
+  // remove transparent color from native non-transparent surface, if defined
   SDL_SetColorKey(new_surface, UNSET_TRANSPARENT_PIXEL, 0);
 
   return new_surface;
@@ -2387,36 +2387,36 @@ Bitmap *SDLZoomBitmap(Bitmap *src_bitmap, int dst_width, int dst_height)
   SDL_Surface *src_surface = src_bitmap->surface_masked;
   SDL_Surface *dst_surface;
 
-  dst_width  = MAX(1, dst_width);	/* prevent zero bitmap width */
-  dst_height = MAX(1, dst_height);	/* prevent zero bitmap height */
+  dst_width  = MAX(1, dst_width);	// prevent zero bitmap width
+  dst_height = MAX(1, dst_height);	// prevent zero bitmap height
 
   dst_bitmap->width  = dst_width;
   dst_bitmap->height = dst_height;
 
-  /* create zoomed temporary surface from source surface */
+  // create zoomed temporary surface from source surface
   dst_surface = zoomSurface(src_surface, dst_width, dst_height);
 
-  /* create native format destination surface from zoomed temporary surface */
+  // create native format destination surface from zoomed temporary surface
   SDLSetNativeSurface(&dst_surface);
 
-  /* set color key for zoomed surface from source surface, if defined */
+  // set color key for zoomed surface from source surface, if defined
   if (SDLHasColorKey(src_surface))
     SDL_SetColorKey(dst_surface, SET_TRANSPARENT_PIXEL,
 		    SDLGetColorKey(src_surface));
 
-  /* create native non-transparent surface for opaque blitting */
+  // create native non-transparent surface for opaque blitting
   dst_bitmap->surface = SDLGetOpaqueSurface(dst_surface);
 
-  /* set native transparent surface for masked blitting */
+  // set native transparent surface for masked blitting
   dst_bitmap->surface_masked = dst_surface;
 
   return dst_bitmap;
 }
 
 
-/* ========================================================================= */
-/* load image to bitmap                                                      */
-/* ========================================================================= */
+// ============================================================================
+// load image to bitmap
+// ============================================================================
 
 Bitmap *SDLLoadImage(char *filename)
 {
@@ -2425,7 +2425,7 @@ Bitmap *SDLLoadImage(char *filename)
 
   if (program.headless)
   {
-    /* prevent sanity check warnings at later stage */
+    // prevent sanity check warnings at later stage
     new_bitmap->width = new_bitmap->height = 1;
 
     return new_bitmap;
@@ -2435,7 +2435,7 @@ Bitmap *SDLLoadImage(char *filename)
 
   print_timestamp_time(getBaseNamePtr(filename));
 
-  /* load image to temporary surface */
+  // load image to temporary surface
   if ((sdl_image_tmp = IMG_Load(filename)) == NULL)
     Error(ERR_EXIT, "IMG_Load() failed: %s", SDL_GetError());
 
@@ -2443,7 +2443,7 @@ Bitmap *SDLLoadImage(char *filename)
 
   UPDATE_BUSY_STATE();
 
-  /* create native non-transparent surface for current image */
+  // create native non-transparent surface for current image
   if ((new_bitmap->surface = SDLGetOpaqueSurface(sdl_image_tmp)) == NULL)
     Error(ERR_EXIT, "SDLGetOpaqueSurface() failed");
 
@@ -2451,13 +2451,13 @@ Bitmap *SDLLoadImage(char *filename)
 
   UPDATE_BUSY_STATE();
 
-  /* set black pixel to transparent if no alpha channel / transparent color */
+  // set black pixel to transparent if no alpha channel / transparent color
   if (!SDLHasAlpha(sdl_image_tmp) &&
       !SDLHasColorKey(sdl_image_tmp))
     SDL_SetColorKey(sdl_image_tmp, SET_TRANSPARENT_PIXEL,
 		    SDL_MapRGB(sdl_image_tmp->format, 0x00, 0x00, 0x00));
 
-  /* create native transparent surface for current image */
+  // create native transparent surface for current image
   if ((new_bitmap->surface_masked = SDLGetNativeSurface(sdl_image_tmp)) == NULL)
     Error(ERR_EXIT, "SDLGetNativeSurface() failed");
 
@@ -2465,7 +2465,7 @@ Bitmap *SDLLoadImage(char *filename)
 
   UPDATE_BUSY_STATE();
 
-  /* free temporary surface */
+  // free temporary surface
   SDL_FreeSurface(sdl_image_tmp);
 
   new_bitmap->width = new_bitmap->surface->w;
@@ -2477,9 +2477,9 @@ Bitmap *SDLLoadImage(char *filename)
 }
 
 
-/* ------------------------------------------------------------------------- */
-/* custom cursor fuctions                                                    */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// custom cursor fuctions
+// ----------------------------------------------------------------------------
 
 static SDL_Cursor *create_cursor(struct MouseCursorInfo *cursor_info)
 {
@@ -2495,18 +2495,18 @@ void SDLSetMouseCursor(struct MouseCursorInfo *cursor_info)
   static SDL_Cursor *cursor_default = NULL;
   static SDL_Cursor *cursor_current = NULL;
 
-  /* if invoked for the first time, store the SDL default cursor */
+  // if invoked for the first time, store the SDL default cursor
   if (cursor_default == NULL)
     cursor_default = SDL_GetCursor();
 
-  /* only create new cursor if cursor info (custom only) has changed */
+  // only create new cursor if cursor info (custom only) has changed
   if (cursor_info != NULL && cursor_info != last_cursor_info)
   {
     cursor_current = create_cursor(cursor_info);
     last_cursor_info = cursor_info;
   }
 
-  /* only set new cursor if cursor info (custom or NULL) has changed */
+  // only set new cursor if cursor info (custom or NULL) has changed
   if (cursor_info != last_cursor_info2)
     SDL_SetCursor(cursor_info ? cursor_current : cursor_default);
 
@@ -2514,9 +2514,9 @@ void SDLSetMouseCursor(struct MouseCursorInfo *cursor_info)
 }
 
 
-/* ========================================================================= */
-/* audio functions                                                           */
-/* ========================================================================= */
+// ============================================================================
+// audio functions
+// ============================================================================
 
 void SDLOpenAudio(void)
 {
@@ -2547,7 +2547,7 @@ void SDLOpenAudio(void)
   audio.loops_available = TRUE;
   audio.sound_enabled = TRUE;
 
-  /* set number of available mixer channels */
+  // set number of available mixer channels
   audio.num_channels = Mix_AllocateChannels(NUM_MIXER_CHANNELS);
   audio.music_channel = MUSIC_CHANNEL;
   audio.first_sound_channel = FIRST_SOUND_CHANNEL;
@@ -2565,9 +2565,9 @@ void SDLCloseAudio(void)
 }
 
 
-/* ========================================================================= */
-/* event functions                                                           */
-/* ========================================================================= */
+// ============================================================================
+// event functions
+// ============================================================================
 
 void SDLWaitEvent(Event *event)
 {
@@ -2621,9 +2621,9 @@ void SDLHandleWindowManagerEvent(Event *event)
 }
 
 
-/* ========================================================================= */
-/* joystick functions                                                        */
-/* ========================================================================= */
+// ============================================================================
+// joystick functions
+// ============================================================================
 
 #if defined(TARGET_SDL2)
 static void *sdl_joystick[MAX_PLAYERS];		// game controller or joystick
@@ -2908,7 +2908,7 @@ void SDLInitJoysticks(void)
 #if defined(TARGET_SDL2)
     num_mappings = SDL_GameControllerAddMappingsFromFile(mappings_file_base);
 
-    /* the included game controller base mappings should always be found */
+    // the included game controller base mappings should always be found
     if (num_mappings == -1)
       Error(ERR_WARN, "no game controller base mappings found");
 #if DEBUG_JOYSTICKS
@@ -2919,7 +2919,7 @@ void SDLInitJoysticks(void)
     num_mappings = SDL_GameControllerAddMappingsFromFile(mappings_file_user);
 
 #if DEBUG_JOYSTICKS
-    /* the personal game controller user mappings may or may not be found */
+    // the personal game controller user mappings may or may not be found
     if (num_mappings == -1)
       Error(ERR_WARN, "no game controller user mappings found");
     else
@@ -2954,10 +2954,10 @@ void SDLInitJoysticks(void)
 #endif
   }
 
-  /* assign joysticks from configured to connected joystick for all players */
+  // assign joysticks from configured to connected joystick for all players
   for (i = 0; i < MAX_PLAYERS; i++)
   {
-    /* get configured joystick for this player */
+    // get configured joystick for this player
     char *device_name = setup.input[i].joy.device_name;
     int joystick_nr = getJoystickNrFromDeviceName(device_name);
 
@@ -2969,14 +2969,14 @@ void SDLInitJoysticks(void)
       joystick_nr = -1;
     }
 
-    /* store configured joystick number for each player */
+    // store configured joystick number for each player
     joystick.nr[i] = joystick_nr;
   }
 
-  /* now open all connected joysticks (regardless if configured or not) */
+  // now open all connected joysticks (regardless if configured or not)
   for (i = 0; i < SDL_NumJoysticks(); i++)
   {
-    /* this allows subsequent calls to 'InitJoysticks' for re-initialization */
+    // this allows subsequent calls to 'InitJoysticks' for re-initialization
     if (SDLCheckJoystickOpened(i))
       SDLCloseJoystick(i);
 
@@ -3008,9 +3008,9 @@ boolean SDLReadJoystick(int nr, int *x, int *y, boolean *b1, boolean *b2)
 }
 
 
-/* ========================================================================= */
-/* touch input overlay functions                                             */
-/* ========================================================================= */
+// ============================================================================
+// touch input overlay functions
+// ============================================================================
 
 #if defined(USE_TOUCH_INPUT_OVERLAY)
 static void DrawTouchInputOverlay_ShowGrid(int alpha)
@@ -3241,7 +3241,7 @@ static void DrawTouchInputOverlay(void)
     width  = surface->w;
     height = surface->h;
 
-    /* set black pixel to transparent if no alpha channel / transparent color */
+    // set black pixel to transparent if no alpha channel / transparent color
     if (!SDLHasAlpha(surface) &&
 	!SDLHasColorKey(surface))
       SDL_SetColorKey(surface, SET_TRANSPARENT_PIXEL,

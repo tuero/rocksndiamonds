@@ -12,4 +12,4 @@ extern byte AnimationSubTable[SP_MAX_PLAYFIELD_SIZE];
 
 void subDoGameStuff(void);
 
-#endif /* DOGAMESTUFF_H */
+#endif // DOGAMESTUFF_H

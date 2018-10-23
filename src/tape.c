@@ -21,7 +21,7 @@
 
 #define DEBUG_TAPE_WHEN_PLAYING			FALSE
 
-/* tape button identifiers */
+// tape button identifiers
 #define TAPE_CTRL_ID_EJECT			0
 #define TAPE_CTRL_ID_EXTRA			1
 #define TAPE_CTRL_ID_STOP			2
@@ -33,10 +33,10 @@
 
 #define NUM_TAPE_BUTTONS			8
 
-/* values for tape handling */
+// values for tape handling
 #define TAPE_PAUSE_SECONDS_BEFORE_DEATH		5
 
-/* forward declaration for internal use */
+// forward declaration for internal use
 static void HandleTapeButtons(struct GadgetInfo *);
 static void TapeStopWarpForward(void);
 static float GetTapeLengthSecondsFloat(void);
@@ -44,9 +44,9 @@ static float GetTapeLengthSecondsFloat(void);
 static struct GadgetInfo *tape_gadget[NUM_TAPE_BUTTONS];
 
 
-/* ========================================================================= */
-/* video tape definitions                                                    */
-/* ========================================================================= */
+// ============================================================================
+// video tape definitions
+// ============================================================================
 
 #define VIDEO_INFO_OFF			(VIDEO_STATE_DATE_OFF	|	\
 					 VIDEO_STATE_TIME_OFF	|	\
@@ -98,9 +98,9 @@ static struct GadgetInfo *tape_gadget[NUM_TAPE_BUTTONS];
 #define NUM_TAPE_FUNCTION_STATES	2
 
 
-/* ========================================================================= */
-/* video display functions                                                   */
-/* ========================================================================= */
+// ============================================================================
+// video display functions
+// ============================================================================
 
 static void DrawVideoDisplay_Graphics(unsigned int state, unsigned int value)
 {
@@ -134,7 +134,7 @@ static void DrawVideoDisplay_Graphics(unsigned int state, unsigned int value)
       { -1,					NULL			},
     },
     {
-      /* (no label for displaying optional frame) */
+      // (no label for displaying optional frame)
       { -1,					NULL			},
       { -1,					NULL			},
     },
@@ -160,11 +160,11 @@ static void DrawVideoDisplay_Graphics(unsigned int state, unsigned int value)
     },
   };
 
-  for (k = 0; k < NUM_TAPE_FUNCTION_STATES; k++)	/* on or off states */
+  for (k = 0; k < NUM_TAPE_FUNCTION_STATES; k++)	// on or off states
   {
-    for (i = 0; i < NUM_TAPE_FUNCTIONS; i++)		/* record, play, ... */
+    for (i = 0; i < NUM_TAPE_FUNCTIONS; i++)		// record, play, ...
     {
-      for (j = 0; j < NUM_TAPE_FUNCTION_PARTS; j++)	/* label or symbol */
+      for (j = 0; j < NUM_TAPE_FUNCTION_PARTS; j++)	// label or symbol
       {
 	int graphic = video_pos[i][j].graphic;
 	struct XY *pos = video_pos[i][j].pos;
@@ -186,20 +186,20 @@ static void DrawVideoDisplay_Graphics(unsigned int state, unsigned int value)
 	  if (value == skip_value)
 	    continue;
 
-	  if (k == 1)		/* on */
+	  if (k == 1)		// on
 	  {
 	    gd_bitmap = gfx->bitmap;
 	    gd_x = gfx->src_x;
 	    gd_y = gfx->src_y;
 	  }
-	  else			/* off */
+	  else			// off
 	  {
 	    gd_bitmap = gfx_bg->bitmap;
 	    gd_x = gfx_bg->src_x + pos->x;
 	    gd_y = gfx_bg->src_y + pos->y;
 	  }
 
-	  /* some tape graphics may be undefined -- only draw if defined */
+	  // some tape graphics may be undefined -- only draw if defined
 	  if (gd_bitmap != NULL)
 	    BlitBitmap(gd_bitmap, drawto, gd_x, gd_y, gfx->width, gfx->height,
 		       VX + pos->x, VY + pos->y);
@@ -402,11 +402,11 @@ void DrawCompleteVideoDisplay(void)
 {
   struct GraphicInfo *g_tape = &graphic_info[IMG_BACKGROUND_TAPE];
 
-  /* draw tape background */
+  // draw tape background
   BlitBitmap(g_tape->bitmap, drawto, g_tape->src_x, g_tape->src_y,
 	     gfx.vxsize, gfx.vysize, gfx.vx, gfx.vy);
 
-  /* draw tape buttons (forced) */
+  // draw tape buttons (forced)
   RedrawOrRemapTapeButtons();
 
   DrawVideoDisplay(VIDEO_ALL_OFF, 0);
@@ -461,9 +461,9 @@ void TapeDeactivateDisplayOff(boolean redraw_display)
 }
 
 
-/* ========================================================================= */
-/* tape logging functions                                                    */
-/* ========================================================================= */
+// ============================================================================
+// tape logging functions
+// ============================================================================
 
 static void PrintTapeReplayProgress(boolean replay_finished)
 {
@@ -501,9 +501,9 @@ static void PrintTapeReplayProgress(boolean replay_finished)
 }
 
 
-/* ========================================================================= */
-/* tape control functions                                                    */
-/* ========================================================================= */
+// ============================================================================
+// tape control functions
+// ============================================================================
 
 void TapeSetDateFromEpochSeconds(time_t epoch_seconds)
 {
@@ -660,7 +660,7 @@ boolean TapeAddAction(byte action[MAX_PLAYERS])
 {
   int i;
 
-  if (tape.pos[tape.counter].delay > 0)		/* already stored action */
+  if (tape.pos[tape.counter].delay > 0)		// already stored action
   {
     boolean changed_events = FALSE;
 
@@ -680,7 +680,7 @@ boolean TapeAddAction(byte action[MAX_PLAYERS])
       tape.pos[tape.counter].delay++;
   }
 
-  if (tape.pos[tape.counter].delay == 0)	/* store new action */
+  if (tape.pos[tape.counter].delay == 0)	// store new action
   {
     for (i = 0; i < MAX_PLAYERS; i++)
       tape.pos[tape.counter].action[i] = action[i];
@@ -696,7 +696,7 @@ void TapeRecordAction(byte action_raw[MAX_PLAYERS])
   byte action[MAX_PLAYERS];
   int i;
 
-  if (!tape.recording)		/* (record action even when tape is paused) */
+  if (!tape.recording)		// (record action even when tape is paused)
     return;
 
   for (i = 0; i < MAX_PLAYERS; i++)
@@ -835,7 +835,7 @@ byte *TapePlayAction(void)
     }
   }
 
-  if (tape.counter >= tape.length)	/* end of tape reached */
+  if (tape.counter >= tape.length)	// end of tape reached
   {
     if (tape.warp_forward && !tape.auto_play)
     {
@@ -1003,7 +1003,7 @@ void TapeQuickSave(void)
     return;
 
   if (tape.recording)
-    TapeHaltRecording();	/* prepare tape for saving on-the-fly */
+    TapeHaltRecording();	// prepare tape for saving on-the-fly
 
   if (TAPE_IS_EMPTY(tape))
   {
@@ -1071,7 +1071,7 @@ void TapeQuickLoad(void)
 
     tape.quick_resume = TRUE;
   }
-  else	/* this should not happen (basically checked above) */
+  else	// this should not happen (basically checked above)
   {
     int reopen_door = (game_status == GAME_MODE_PLAYING ? REQ_REOPEN : 0);
 
@@ -1145,7 +1145,7 @@ void AutoPlayTape(void)
 
   if (autoplay_initialized)
   {
-    /* just finished auto-playing tape */
+    // just finished auto-playing tape
     PrintTapeReplayProgress(TRUE);
 
     num_levels_played++;
@@ -1213,7 +1213,7 @@ void AutoPlayTape(void)
     }
 
 #if 0
-    /* ACTIVATE THIS FOR LOADING/TESTING OF LEVELS ONLY */
+    // ACTIVATE THIS FOR LOADING/TESTING OF LEVELS ONLY
     Print("Level %03d: (only testing level)\n", level_nr);
     continue;
 #endif
@@ -1266,7 +1266,7 @@ void AutoPlayTape(void)
 }
 
 
-/* ---------- new tape button stuff ---------------------------------------- */
+// ---------- new tape button stuff -------------------------------------------
 
 static struct
 {
@@ -1281,7 +1281,7 @@ static struct
     TAPE_CTRL_ID_EJECT,			"eject tape"
   },
   {
-    /* (same position as "eject" button) */
+    // (same position as "eject" button)
     IMG_GFX_TAPE_BUTTON_EXTRA,		&tape.button.eject,
     TAPE_CTRL_ID_EXTRA,			"extra functions"
   },
@@ -1483,7 +1483,7 @@ static void HandleTapeButtonsExt(int id)
       }
       else if (tape.pausing)
       {
-	if (tape.playing)			/* PLAY -> PAUSE -> RECORD */
+	if (tape.playing)			// PLAY -> PAUSE -> RECORD
 	  TapeAppendRecording();
 	else
 	  TapeTogglePause(TAPE_TOGGLE_MANUAL);
@@ -1492,7 +1492,7 @@ static void HandleTapeButtonsExt(int id)
       break;
 
     case TAPE_CTRL_ID_PLAY:
-      if (tape.recording && tape.pausing)	/* PAUSE -> RECORD */
+      if (tape.recording && tape.pausing)	// PAUSE -> RECORD
       {
 	// ("TAPE_IS_EMPTY(tape)" is TRUE here -- probably fix this)
 
@@ -1508,25 +1508,25 @@ static void HandleTapeButtonsExt(int id)
       }
       else if (tape.playing)
       {
-	if (tape.pausing)			/* PAUSE -> PLAY */
+	if (tape.pausing)			// PAUSE -> PLAY
 	{
 	  TapeTogglePause(TAPE_TOGGLE_MANUAL | TAPE_TOGGLE_PLAY_PAUSE);
 	}
-	else if (!tape.fast_forward)		/* PLAY -> FFWD */
+	else if (!tape.fast_forward)		// PLAY -> FFWD
 	{
 	  tape.fast_forward = TRUE;
 	}
-	else if (!tape.warp_forward)		/* FFWD -> WARP */
+	else if (!tape.warp_forward)		// FFWD -> WARP
 	{
 	  tape.warp_forward = TRUE;
 	}
-	else if (!tape.deactivate_display)	/* WARP -> WARP BLIND */
+	else if (!tape.deactivate_display)	// WARP -> WARP BLIND
 	{
 	  tape.deactivate_display = TRUE;
 
 	  TapeDeactivateDisplayOn();
 	}
-	else					/* WARP BLIND -> PLAY */
+	else					// WARP BLIND -> PLAY
 	{
 	  tape.fast_forward = FALSE;
 	  tape.warp_forward = FALSE;

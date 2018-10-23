@@ -31,20 +31,20 @@
   -----------------------------------------------------------------------------
 */
 
-/* values for the control window */
-#define ED_CTRL1_BUTTONS_HORIZ		4	/* toolbox */
+// values for the control window
+#define ED_CTRL1_BUTTONS_HORIZ		4	// toolbox
 #define ED_CTRL1_BUTTONS_VERT		4
-#define ED_CTRL2_BUTTONS_HORIZ		3	/* level */
+#define ED_CTRL2_BUTTONS_HORIZ		3	// level
 #define ED_CTRL2_BUTTONS_VERT		2
-#define ED_CTRL3_BUTTONS_HORIZ		3	/* CE and GE */
+#define ED_CTRL3_BUTTONS_HORIZ		3	// CE and GE
 #define ED_CTRL3_BUTTONS_VERT		1
-#define ED_CTRL4_BUTTONS_HORIZ		2	/* CE and GE */
+#define ED_CTRL4_BUTTONS_HORIZ		2	// CE and GE
 #define ED_CTRL4_BUTTONS_VERT		1
-#define ED_CTRL5_BUTTONS_HORIZ		1	/* properties */
+#define ED_CTRL5_BUTTONS_HORIZ		1	// properties
 #define ED_CTRL5_BUTTONS_VERT		1
-#define ED_CTRL6_BUTTONS_HORIZ		3	/* properties */
+#define ED_CTRL6_BUTTONS_HORIZ		3	// properties
 #define ED_CTRL6_BUTTONS_VERT		1
-#define ED_CTRL7_BUTTONS_HORIZ		1	/* palette */
+#define ED_CTRL7_BUTTONS_HORIZ		1	// palette
 #define ED_CTRL7_BUTTONS_VERT		1
 
 #define ED_NUM_CTRL1_BUTTONS   (ED_CTRL1_BUTTONS_HORIZ * ED_CTRL1_BUTTONS_VERT)
@@ -62,7 +62,7 @@
 #define ED_NUM_CTRL1_7_BUTTONS (ED_NUM_CTRL1_6_BUTTONS + ED_NUM_CTRL7_BUTTONS)
 #define ED_NUM_CTRL_BUTTONS    ED_NUM_CTRL1_7_BUTTONS
 
-/* values for the element list */
+// values for the element list
 #define ED_ELEMENTLIST_XPOS		(editor.palette.x)
 #define ED_ELEMENTLIST_YPOS		(editor.palette.y)
 #define ED_ELEMENTLIST_XSIZE		(graphic_info[IMG_EDITOR_PALETTE_BUTTON].width)
@@ -72,7 +72,7 @@
 #define ED_NUM_ELEMENTLIST_BUTTONS	(ED_ELEMENTLIST_BUTTONS_HORIZ *	\
 					 ED_ELEMENTLIST_BUTTONS_VERT)
 
-/* standard distances */
+// standard distances
 #define ED_GADGET_NORMAL_DISTANCE	(editor.gadget.normal_spacing)
 #define ED_GADGET_SMALL_DISTANCE	(editor.gadget.small_spacing)
 #define ED_GADGET_TINY_DISTANCE		(editor.gadget.tiny_spacing)
@@ -83,14 +83,14 @@
 					 ED_DRAWINGAREA_BORDER_SIZE)
 #define ED_GADGET_SPACE_DISTANCE	(getFontWidth(FONT_TEXT_1))
 
-/* values for drawingarea gadgets */
+// values for drawingarea gadgets
 #define IMG_BORDER_1			IMG_EDITOR_ELEMENT_BORDER
 #define IMG_BORDER_2			IMG_EDITOR_ELEMENT_BORDER_INPUT
 #define ED_ELEMENT_BORDER		(graphic_info[IMG_BORDER_1].border_size)
 #define ED_DRAWINGAREA_BORDER_SIZE	(graphic_info[IMG_BORDER_2].border_size)
 #define ED_DRAWINGAREA_TILE_SIZE	(editor.drawingarea.tile_size)
 
-/* values for checkbutton gadgets */
+// values for checkbutton gadgets
 #define ED_CHECKBUTTON_XSIZE	     (graphic_info[IMG_EDITOR_CHECKBOX].width)
 #define ED_CHECKBUTTON_YSIZE	     (graphic_info[IMG_EDITOR_CHECKBOX].height)
 
@@ -249,7 +249,7 @@
 				    ED_AREA_YOFFSET_1((i).y) -		\
 				    ED_AREA_YOFFSET_2((i).area_ysize))
 
-/* values for element content drawing areas */
+// values for element content drawing areas
 #define ED_AREA_1X1_LSETTINGS_XPOS(n)	ED_LEVEL_SETTINGS_XPOS(n)
 #define ED_AREA_1X1_LSETTINGS_YPOS(n)	ED_LEVEL_SETTINGS_YPOS(n)
 #define ED_AREA_1X1_LSETTINGS_XOFF	(0)
@@ -265,11 +265,11 @@
 #define ED_AREA_3X3_SETTINGS_XOFF	(0)
 #define ED_AREA_3X3_SETTINGS_YOFF	(0)
 
-/* element content */
+// element content
 #define ED_AREA_ELEMENT_CONTENT_XOFF(n)	(n)
 #define ED_AREA_ELEMENT_CONTENT_YOFF(n)	(n)
 
-/* yamyam content */
+// yamyam content
 #define ED_XPOS_YAM			0
 #define ED_YPOS_YAM			5
 #define ED_AREA_YAMYAM_CONTENT_XPOS	ED_ELEMENT_SETTINGS_XPOS(ED_XPOS_YAM)
@@ -283,7 +283,7 @@
 					 ED_AREA_YOFFSET_1(ED_YPOS_YAM) - \
 					 ED_AREA_YOFFSET_2(3))
 
-/* magic ball content */
+// magic ball content
 #define ED_XPOS_BALL			0
 #define ED_YPOS_BALL			6
 #define ED_AREA_MAGIC_BALL_CONTENT_XPOS	ED_ELEMENT_SETTINGS_XPOS(ED_XPOS_BALL)
@@ -297,7 +297,7 @@
 					 ED_AREA_YOFFSET_1(ED_YPOS_BALL) - \
 					 ED_AREA_YOFFSET_2(3))
 
-/* values for scrolling gadgets for drawing area */
+// values for scrolling gadgets for drawing area
 #define ED_SCROLLBUTTON_XSIZE		(graphic_info[IMG_EDITOR_PLAYFIELD_SCROLLBAR].width)
 #define ED_SCROLLBUTTON_YSIZE		(graphic_info[IMG_EDITOR_PLAYFIELD_SCROLLBAR].height)
 
@@ -320,7 +320,7 @@
 #define ED_SCROLL_VERTICAL_XSIZE	ED_SCROLLBUTTON_XSIZE
 #define ED_SCROLL_VERTICAL_YSIZE	(SYSIZE - 4 * ED_SCROLLBUTTON_YSIZE)
 
-/* values for scrolling gadgets for element list */
+// values for scrolling gadgets for element list
 #define ED_SCROLLBUTTON2_XSIZE		(graphic_info[IMG_EDITOR_PALETTE_SCROLL_UP].width)
 #define ED_SCROLLBUTTON2_YSIZE		(graphic_info[IMG_EDITOR_PALETTE_SCROLL_UP].height)
 
@@ -341,7 +341,7 @@
 					 ED_ELEMENTLIST_YSIZE -		\
 					 2 * ED_SCROLLBUTTON2_YSIZE)
 
-/* values for ClearEditorGadgetInfoText() and HandleEditorGadgetInfoText() */
+// values for ClearEditorGadgetInfoText() and HandleEditorGadgetInfoText()
 #define INFOTEXT_FONT		FONT_TEXT_2
 #define INFOTEXT_XSIZE		SXSIZE
 #define INFOTEXT_YSIZE		getFontHeight(INFOTEXT_FONT)
@@ -364,7 +364,7 @@ enum
 {
   GADGET_ID_NONE = -1,
 
-  /* drawing toolbox buttons */
+  // drawing toolbox buttons
 
   GADGET_ID_SINGLE_ITEMS,
   GADGET_ID_CONNECTED_ITEMS,
@@ -402,7 +402,7 @@ enum
   GADGET_ID_ELEMENT_RIGHT,
   GADGET_ID_PALETTE,
 
-  /* counter gadget identifiers */
+  // counter gadget identifiers
 
   GADGET_ID_SELECT_LEVEL_DOWN,
   GADGET_ID_SELECT_LEVEL_TEXT,
@@ -510,7 +510,7 @@ enum
   GADGET_ID_GROUP_CONTENT_TEXT,
   GADGET_ID_GROUP_CONTENT_UP,
 
-  /* drawing area identifiers */
+  // drawing area identifiers
 
   GADGET_ID_DRAWING_LEVEL,
   GADGET_ID_YAMYAM_CONTENT_0,
@@ -546,7 +546,7 @@ enum
   GADGET_ID_GROUP_CONTENT,
   GADGET_ID_RANDOM_BACKGROUND,
 
-  /* text input identifiers */
+  // text input identifiers
 
   GADGET_ID_LEVEL_NAME,
   GADGET_ID_LEVEL_AUTHOR,
@@ -554,11 +554,11 @@ enum
   GADGET_ID_LEVELSET_AUTHOR,
   GADGET_ID_ELEMENT_NAME,
 
-  /* text area identifiers */
+  // text area identifiers
 
   GADGET_ID_ENVELOPE_INFO,
 
-  /* selectbox identifiers */
+  // selectbox identifiers
 
   GADGET_ID_TIME_OR_STEPS,
   GADGET_ID_GAME_ENGINE_TYPE,
@@ -591,7 +591,7 @@ enum
   GADGET_ID_SELECT_CHANGE_PAGE,
   GADGET_ID_GROUP_CHOICE_MODE,
 
-  /* textbutton identifiers */
+  // textbutton identifiers
 
   GADGET_ID_LEVELINFO_LEVEL,
   GADGET_ID_LEVELINFO_LEVELSET,
@@ -607,14 +607,14 @@ enum
   GADGET_ID_ADD_CHANGE_PAGE,
   GADGET_ID_DEL_CHANGE_PAGE,
 
-  /* graphicbutton identifiers */
+  // graphicbutton identifiers
 
   GADGET_ID_PREV_CHANGE_PAGE,
   GADGET_ID_NEXT_CHANGE_PAGE,
   GADGET_ID_COPY_CHANGE_PAGE,
   GADGET_ID_PASTE_CHANGE_PAGE,
 
-  /* gadgets for scrolling of drawing area */
+  // gadgets for scrolling of drawing area
 
   GADGET_ID_SCROLL_UP,
   GADGET_ID_SCROLL_DOWN,
@@ -623,13 +623,13 @@ enum
   GADGET_ID_SCROLL_HORIZONTAL,
   GADGET_ID_SCROLL_VERTICAL,
 
-  /* gadgets for scrolling element list */
+  // gadgets for scrolling element list
 
   GADGET_ID_SCROLL_LIST_UP,
   GADGET_ID_SCROLL_LIST_DOWN,
   GADGET_ID_SCROLL_LIST_VERTICAL,
 
-  /* checkbuttons/radiobuttons for level/element properties */
+  // checkbuttons/radiobuttons for level/element properties
 
   GADGET_ID_AUTO_COUNT_GEMS,
   GADGET_ID_USE_LEVELSET_ARTWORK,
@@ -703,14 +703,14 @@ enum
   NUM_STATIC_GADGET_IDS
 };
 
-/* gadgets for buttons in element list (dynamic) */
+// gadgets for buttons in element list (dynamic)
 #define GADGET_ID_ELEMENTLIST_FIRST	(NUM_STATIC_GADGET_IDS)
 #define GADGET_ID_ELEMENTLIST_LAST	(GADGET_ID_ELEMENTLIST_FIRST +	\
 	 				ED_NUM_ELEMENTLIST_BUTTONS - 1)
 
 #define NUM_EDITOR_GADGETS		(GADGET_ID_ELEMENTLIST_LAST + 1)
 
-/* radio button numbers */
+// radio button numbers
 enum
 {
   RADIO_NR_NONE,
@@ -718,7 +718,7 @@ enum
   RADIO_NR_RANDOM_ELEMENTS
 };
 
-/* values for counter gadgets */
+// values for counter gadgets
 enum
 {
   ED_COUNTER_ID_SELECT_LEVEL,
@@ -777,7 +777,7 @@ enum
 #define ED_COUNTER_ID_CHANGE_FIRST	ED_COUNTER_ID_CHANGE_DELAY_FIX
 #define ED_COUNTER_ID_CHANGE_LAST	ED_COUNTER_ID_CHANGE_CONT_RND
 
-/* values for scrollbutton gadgets */
+// values for scrollbutton gadgets
 enum
 {
   ED_SCROLLBUTTON_ID_AREA_UP,
@@ -793,7 +793,7 @@ enum
 #define ED_SCROLLBUTTON_ID_AREA_FIRST	ED_SCROLLBUTTON_ID_AREA_UP
 #define ED_SCROLLBUTTON_ID_AREA_LAST	ED_SCROLLBUTTON_ID_AREA_RIGHT
 
-/* values for scrollbar gadgets */
+// values for scrollbar gadgets
 enum
 {
   ED_SCROLLBAR_ID_AREA_HORIZONTAL,
@@ -806,7 +806,7 @@ enum
 #define ED_SCROLLBAR_ID_AREA_FIRST	ED_SCROLLBAR_ID_AREA_HORIZONTAL
 #define ED_SCROLLBAR_ID_AREA_LAST	ED_SCROLLBAR_ID_AREA_VERTICAL
 
-/* values for text input gadgets */
+// values for text input gadgets
 enum
 {
   ED_TEXTINPUT_ID_LEVEL_NAME,
@@ -824,7 +824,7 @@ enum
 #define ED_TEXTINPUT_ID_LEVELSET_FIRST	ED_TEXTINPUT_ID_LEVELSET_NAME
 #define ED_TEXTINPUT_ID_LEVELSET_LAST	ED_TEXTINPUT_ID_LEVELSET_AUTHOR
 
-/* values for text area gadgets */
+// values for text area gadgets
 enum
 {
   ED_TEXTAREA_ID_ENVELOPE_INFO,
@@ -835,7 +835,7 @@ enum
 #define ED_TEXTAREA_ID_LEVEL_FIRST	ED_TEXTAREA_ID_ENVELOPE
 #define ED_TEXTAREA_ID_LEVEL_LAST	ED_TEXTAREA_ID_ENVELOPE
 
-/* values for selectbox gadgets */
+// values for selectbox gadgets
 enum
 {
   ED_SELECTBOX_ID_TIME_OR_STEPS,
@@ -888,7 +888,7 @@ enum
 #define ED_SELECTBOX_ID_CHANGE_FIRST	ED_SELECTBOX_ID_CHANGE_TIME_UNITS
 #define ED_SELECTBOX_ID_CHANGE_LAST	ED_SELECTBOX_ID_SELECT_CHANGE_PAGE
 
-/* values for textbutton gadgets */
+// values for textbutton gadgets
 enum
 {
   ED_TEXTBUTTON_ID_LEVELINFO_LEVEL,
@@ -917,7 +917,7 @@ enum
 #define ED_TEXTBUTTON_ID_CHANGE_FIRST	ED_TEXTBUTTON_ID_ADD_CHANGE_PAGE
 #define ED_TEXTBUTTON_ID_CHANGE_LAST	ED_TEXTBUTTON_ID_DEL_CHANGE_PAGE
 
-/* values for graphicbutton gadgets */
+// values for graphicbutton gadgets
 enum
 {
   ED_GRAPHICBUTTON_ID_PREV_CHANGE_PAGE,
@@ -931,7 +931,7 @@ enum
 #define ED_GRAPHICBUTTON_ID_CHANGE_FIRST  ED_GRAPHICBUTTON_ID_PREV_CHANGE_PAGE
 #define ED_GRAPHICBUTTON_ID_CHANGE_LAST   ED_GRAPHICBUTTON_ID_PASTE_CHANGE_PAGE
 
-/* values for checkbutton gadgets */
+// values for checkbutton gadgets
 enum
 {
   ED_CHECKBUTTON_ID_AUTO_COUNT_GEMS,
@@ -1023,7 +1023,7 @@ enum
 #define ED_CHECKBUTTON_ID_CHANGE_FIRST	ED_CHECKBUTTON_ID_CUSTOM_CAN_CHANGE
 #define ED_CHECKBUTTON_ID_CHANGE_LAST	ED_CHECKBUTTON_ID_CHANGE_HAS_ACTION
 
-/* values for radiobutton gadgets */
+// values for radiobutton gadgets
 enum
 {
   ED_RADIOBUTTON_ID_PERCENTAGE,
@@ -1035,7 +1035,7 @@ enum
 #define ED_RADIOBUTTON_ID_EDITOR_FIRST	ED_RADIOBUTTON_ID_PERCENTAGE
 #define ED_RADIOBUTTON_ID_EDITOR_LAST	ED_RADIOBUTTON_ID_QUANTITY
 
-/* values for drawing area gadgets */
+// values for drawing area gadgets
 enum
 {
   ED_DRAWING_ID_DRAWING_LEVEL,
@@ -1085,55 +1085,55 @@ enum
   -----------------------------------------------------------------------------
 */
 
-/* values for CopyLevelToUndoBuffer() */
+// values for CopyLevelToUndoBuffer()
 #define UNDO_IMMEDIATE			0
 #define UNDO_ACCUMULATE			1
 
-/* values for scrollbars */
+// values for scrollbars
 #define ED_SCROLL_NO			0
 #define ED_SCROLL_LEFT			1
 #define ED_SCROLL_RIGHT			2
 #define ED_SCROLL_UP			4
 #define ED_SCROLL_DOWN			8
 
-/* screens in the level editor */
+// screens in the level editor
 #define ED_MODE_DRAWING			0
 #define ED_MODE_INFO			1
 #define ED_MODE_PROPERTIES		2
 #define ED_MODE_PALETTE			3
 
-/* sub-screens in the global settings section */
+// sub-screens in the global settings section
 #define ED_MODE_LEVELINFO_LEVEL		ED_TEXTBUTTON_ID_LEVELINFO_LEVEL
 #define ED_MODE_LEVELINFO_LEVELSET	ED_TEXTBUTTON_ID_LEVELINFO_LEVELSET
 #define ED_MODE_LEVELINFO_EDITOR	ED_TEXTBUTTON_ID_LEVELINFO_EDITOR
 
-/* sub-screens in the element properties section */
+// sub-screens in the element properties section
 #define ED_MODE_PROPERTIES_INFO		ED_TEXTBUTTON_ID_PROPERTIES_INFO
 #define ED_MODE_PROPERTIES_CONFIG	ED_TEXTBUTTON_ID_PROPERTIES_CONFIG
 #define ED_MODE_PROPERTIES_CONFIG_1	ED_TEXTBUTTON_ID_PROPERTIES_CONFIG_1
 #define ED_MODE_PROPERTIES_CONFIG_2	ED_TEXTBUTTON_ID_PROPERTIES_CONFIG_2
 #define ED_MODE_PROPERTIES_CHANGE	ED_TEXTBUTTON_ID_PROPERTIES_CHANGE
 
-/* how many steps can be cancelled */
+// how many steps can be cancelled
 #define NUM_UNDO_STEPS			(64 + 1)
 
-/* values for elements with score for certain actions */
+// values for elements with score for certain actions
 #define MIN_SCORE			0
 #define MAX_SCORE			999
 
-/* values for elements with count for collecting */
+// values for elements with count for collecting
 #define MIN_COLLECT_COUNT		0
 #define MAX_COLLECT_COUNT		999
 
-/* values for random placement */
+// values for random placement
 #define RANDOM_USE_PERCENTAGE		0
 #define RANDOM_USE_QUANTITY		1
 
-/* values for level set save mode */
+// values for level set save mode
 #define LEVELSET_SAVE_MODE_UPDATE	0
 #define LEVELSET_SAVE_MODE_CREATE	1
 
-/* default value for element tile size in drawing area */
+// default value for element tile size in drawing area
 #define DEFAULT_EDITOR_TILESIZE		MINI_TILESIZE
 #define DEFAULT_EDITOR_TILESIZE_MM	TILESIZE
 
@@ -1157,7 +1157,7 @@ static struct
   /* note: some additional characters are already reserved for "cheat mode"
      shortcuts (":XYZ" style) -- for details, see "events.c" */
 
-  /* ---------- toolbox control buttons ------------------------------------ */
+  // ---------- toolbox control buttons ---------------------------------------
 
   {
     IMG_GFX_EDITOR_BUTTON_DRAW_SINGLE,		GADGET_ID_SINGLE_ITEMS,
@@ -1240,7 +1240,7 @@ static struct
     "pick drawing element",			','
   },
 
-  /* ---------- level control buttons -------------------------------------- */
+  // ---------- level control buttons -----------------------------------------
 
   {
     IMG_GFX_EDITOR_BUTTON_UNDO,			GADGET_ID_UNDO,
@@ -1273,7 +1273,7 @@ static struct
     "exit level editor",			'E'
   },
 
-  /* ---------- CE and GE control buttons ---------------------------------- */
+  // ---------- CE and GE control buttons -------------------------------------
 
   {
     IMG_GFX_EDITOR_BUTTON_CE_COPY_FROM,		GADGET_ID_CUSTOM_COPY_FROM,
@@ -1301,7 +1301,7 @@ static struct
     "paste settings to this element",		0
   },
 
-  /* ---------- palette control buttons ------------------------------------ */
+  // ---------- palette control buttons ---------------------------------------
 
   {
     IMG_GFX_EDITOR_BUTTON_PROPERTIES,		GADGET_ID_PROPERTIES,
@@ -1359,10 +1359,10 @@ static struct
   char *text_above, *text_left, *text_right;
 } counterbutton_info[ED_NUM_COUNTERBUTTONS] =
 {
-  /* ---------- current level number --------------------------------------- */
+  // ---------- current level number ------------------------------------------
 
   {
-    -1, -1,	/* these values are not constant, but can change at runtime */
+    -1, -1,	// these values are not constant, but can change at runtime
     1,					100,
     GADGET_ID_SELECT_LEVEL_DOWN,	GADGET_ID_SELECT_LEVEL_UP,
     GADGET_ID_SELECT_LEVEL_TEXT,	GADGET_ID_NONE,
@@ -1370,7 +1370,7 @@ static struct
     NULL,				NULL, NULL
   },
 
-  /* ---------- level and editor settings ---------------------------------- */
+  // ---------- level and editor settings -------------------------------------
 
   {
     ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(4),
@@ -1437,14 +1437,14 @@ static struct
     "random element placement:",	NULL, "in"
   },
 
-  /* ---------- element settings: configure (various elements) ------------- */
+  // ---------- element settings: configure (various elements) ----------------
 
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(0),
     MIN_SCORE,				MAX_SCORE,
     GADGET_ID_ELEMENT_VALUE1_DOWN,	GADGET_ID_ELEMENT_VALUE1_UP,
     GADGET_ID_ELEMENT_VALUE1_TEXT,	GADGET_ID_NONE,
-    NULL,				/* will be set when used */
+    NULL,				// will be set when used
     NULL,				NULL, NULL
   },
   {
@@ -1452,7 +1452,7 @@ static struct
     MIN_SCORE,				MAX_SCORE,
     GADGET_ID_ELEMENT_VALUE2_DOWN,	GADGET_ID_ELEMENT_VALUE2_UP,
     GADGET_ID_ELEMENT_VALUE2_TEXT,	GADGET_ID_NONE,
-    NULL,				/* will be set when used */
+    NULL,				// will be set when used
     NULL,				NULL, NULL
   },
   {
@@ -1460,7 +1460,7 @@ static struct
     MIN_SCORE,				MAX_SCORE,
     GADGET_ID_ELEMENT_VALUE3_DOWN,	GADGET_ID_ELEMENT_VALUE3_UP,
     GADGET_ID_ELEMENT_VALUE3_TEXT,	GADGET_ID_NONE,
-    NULL,				/* will be set when used */
+    NULL,				// will be set when used
     NULL,				NULL, NULL
   },
   {
@@ -1468,7 +1468,7 @@ static struct
     MIN_SCORE,				MAX_SCORE,
     GADGET_ID_ELEMENT_VALUE4_DOWN,	GADGET_ID_ELEMENT_VALUE4_UP,
     GADGET_ID_ELEMENT_VALUE4_TEXT,	GADGET_ID_NONE,
-    NULL,				/* will be set when used */
+    NULL,				// will be set when used
     NULL,				NULL, NULL
   },
   {
@@ -1500,7 +1500,7 @@ static struct
     MIN_ENVELOPE_XSIZE,			MAX_ENVELOPE_XSIZE,
     GADGET_ID_ENVELOPE_XSIZE_DOWN,	GADGET_ID_ENVELOPE_XSIZE_UP,
     GADGET_ID_ENVELOPE_XSIZE_TEXT,	GADGET_ID_NONE,
-    NULL,				/* will be set when used */
+    NULL,				// will be set when used
     NULL,				NULL, "width",
   },
   {
@@ -1508,7 +1508,7 @@ static struct
     MIN_ENVELOPE_YSIZE,			MAX_ENVELOPE_YSIZE,
     GADGET_ID_ENVELOPE_YSIZE_DOWN,	GADGET_ID_ENVELOPE_YSIZE_UP,
     GADGET_ID_ENVELOPE_YSIZE_TEXT,	GADGET_ID_ENVELOPE_XSIZE_UP,
-    NULL,				/* will be set when used */
+    NULL,				// will be set when used
     NULL,				" ", "height",
   },
   {
@@ -1520,7 +1520,7 @@ static struct
     NULL,				NULL, "number of inventory elements"
   },
 
-  /* ---------- element settings: configure 1 (custom elements) ------------ */
+  // ---------- element settings: configure 1 (custom elements) ---------------
 
   {
     ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(5),
@@ -1587,7 +1587,7 @@ static struct
     NULL,				"+random", NULL
   },
 
-  /* ---------- element settings: configure 2 (custom elements) ------------ */
+  // ---------- element settings: configure 2 (custom elements) ---------------
 
   {
     ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(5),
@@ -1622,7 +1622,7 @@ static struct
     NULL,				"ignition delay", "(by fire)"
   },
 
-  /* ---------- element settings: configure (group elements) --------------- */
+  // ---------- element settings: configure (group elements) ------------------
 
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(3),
@@ -1633,7 +1633,7 @@ static struct
     NULL,				NULL, "number of elements in group"
   },
 
-  /* ---------- element settings: advanced (custom elements) --------------- */
+  // ---------- element settings: advanced (custom elements) ------------------
 
   {
     ED_ELEMENT_SETTINGS_XPOS(2),	ED_ELEMENT_SETTINGS_YPOS(2),
@@ -1699,9 +1699,9 @@ static struct
     "Author:", "Author for this or new level set"
   },
   {
-    -1, -1,	/* these values are not constant, but can change at runtime */
+    -1, -1,	// these values are not constant, but can change at runtime
     GADGET_ID_ELEMENT_NAME,
-    MAX_ELEMENT_NAME_LEN - 2,		/* currently 2 chars less editable */
+    MAX_ELEMENT_NAME_LEN - 2,		// currently 2 chars less editable
     custom_element.description,
     NULL, "Element name"
   }
@@ -2441,13 +2441,13 @@ static struct
   int x, y;
   int gadget_id;
   int gadget_id_align;
-  int size;	/* char size of selectbox or '-1' (dynamically determined) */
+  int size;	// char size of selectbox or '-1' (dynamically determined)
   struct ValueTextInfo *options;
   int *value;
   char *text_above, *text_left, *text_right, *infotext;
 } selectbox_info[ED_NUM_SELECTBOX] =
 {
-  /* ---------- level and editor settings ---------------------------------- */
+  // ---------- level and editor settings -------------------------------------
 
   {
     -1,					ED_LEVEL_SETTINGS_YPOS(8),
@@ -2474,7 +2474,7 @@ static struct
     "Action:", NULL, NULL,		"action when saving level set"
   },
 
-  /* ---------- element settings: configure (several elements) ------------- */
+  // ---------- element settings: configure (several elements) ----------------
 
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(0),
@@ -2493,7 +2493,7 @@ static struct
     NULL, "initial player speed:", NULL,	"initial player speed"
   },
 
-  /* ---------- element settings: configure 1 (custom elements) ------------ */
+  // ---------- element settings: configure 1 (custom elements) ---------------
 
   {
     ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(2),
@@ -2536,7 +2536,7 @@ static struct
     NULL, NULL, NULL,			"diggable/collectible/pushable"
   },
 
-  /* ---------- element settings: configure 2 (custom elements) ------------ */
+  // ---------- element settings: configure 2 (custom elements) ---------------
 
   {
     ED_ELEMENT_SETTINGS_XPOS(1),	ED_ELEMENT_SETTINGS_YPOS(1),
@@ -2606,7 +2606,7 @@ static struct
     NULL, "can explode", NULL,		"explosion type"
   },
 
-  /* ---------- element settings: advanced (custom elements) --------------- */
+  // ---------- element settings: advanced (custom elements) ------------------
 
   {
     ED_ELEMENT_SETTINGS_XPOS(2),	ED_ELEMENT_SETTINGS_YPOS(3),
@@ -2697,7 +2697,7 @@ static struct
     NULL, NULL, NULL,			"element change page"
   },
 
-  /* ---------- element settings: configure (group elements) --------------- */
+  // ---------- element settings: configure (group elements) ------------------
 
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(4),
@@ -2719,7 +2719,7 @@ static struct
   char *text_above, *text_left, *text_right, *infotext;
 } textbutton_info[ED_NUM_TEXTBUTTONS] =
 {
-  /* ---------- level and editor settings (tabs) --------------------------- */
+  // ---------- level and editor settings (tabs) ------------------------------
 
   {
     ED_LEVEL_TABS_XPOS(0),		ED_LEVEL_TABS_YPOS(0),
@@ -2740,7 +2740,7 @@ static struct
     NULL, NULL, NULL,			"Configure editor properties"
   },
 
-  /* ---------- element settings (tabs) ------------------------------------ */
+  // ---------- element settings (tabs) ---------------------------------------
 
   {
     ED_ELEMENT_TABS_XPOS(0),		ED_ELEMENT_TABS_YPOS(0),
@@ -2773,7 +2773,7 @@ static struct
     NULL, NULL, NULL,			"Configure custom element change pages"
   },
 
-  /* ---------- level and editor settings (buttons) ------------------------ */
+  // ---------- level and editor settings (buttons) ---------------------------
 
   {
     ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(10),
@@ -2789,7 +2789,7 @@ static struct
     "Save current settings as new template"
   },
 
-  /* ---------- element settings (buttons) --------------------------------- */
+  // ---------- element settings (buttons) ------------------------------------
 
   {
     -1,					-1,
@@ -2964,7 +2964,7 @@ static struct
   char *text_above, *text_left, *text_right, *infotext;
 } checkbutton_info[ED_NUM_CHECKBUTTONS] =
 {
-  /* ---------- level and editor settings ---------------------------------- */
+  // ---------- level and editor settings -------------------------------------
 
   {
     ED_LEVEL_SETTINGS_XPOS(0),		ED_LEVEL_SETTINGS_YPOS(6),
@@ -3009,7 +3009,7 @@ static struct
     "use template for custom elements",	"use template for custom properties"
   },
 
-  /* ---------- element settings: configure (various elements) ------------- */
+  // ---------- element settings: configure (various elements) ----------------
 
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(0),
@@ -3257,7 +3257,7 @@ static struct
     "blue",				"use blue color components in laser"
   },
 
-  /* ---------- element settings: configure 1 (custom elements) ----------- */
+  // ---------- element settings: configure 1 (custom elements) ---------------
 
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(1),
@@ -3309,7 +3309,7 @@ static struct
     "indestructible",			"element is indestructible"
   },
 
-  /* ---------- element settings: configure 2 (custom elements) ----------- */
+  // ---------- element settings: configure 2 (custom elements) ---------------
 
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(1),
@@ -3375,7 +3375,7 @@ static struct
     "impact",				"element can explode on impact"
   },
 
-  /* ---------- element settings: advanced (custom elements) --------------- */
+  // ---------- element settings: advanced (custom elements) ------------------
 
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(1),
@@ -3453,18 +3453,18 @@ static struct
   char *text_left, *text_right, *text_below, *infotext;
 } drawingarea_info[ED_NUM_DRAWING_AREAS] =
 {
-  /* ---------- level playfield content ------------------------------------ */
+  // ---------- level playfield content ---------------------------------------
 
   {
     0,					0,
     0,					0,
     GADGET_ID_DRAWING_LEVEL,		GADGET_ID_NONE,
     NULL,
-    -1, -1,	/* these values are not constant, but can change at runtime */
+    -1, -1,	// these values are not constant, but can change at runtime
     NULL, NULL, NULL,			NULL
   },
 
-  /* ---------- yam yam content -------------------------------------------- */
+  // ---------- yam yam content -----------------------------------------------
 
   {
     ED_AREA_YAMYAM_CONTENT_XPOS,	ED_AREA_YAMYAM_CONTENT_YPOS,
@@ -3523,7 +3523,7 @@ static struct
     NULL, NULL, "8",			NULL
   },
 
-  /* ---------- magic ball content ----------------------------------------- */
+  // ---------- magic ball content --------------------------------------------
 
   {
     ED_AREA_MAGIC_BALL_CONTENT_XPOS,	ED_AREA_MAGIC_BALL_CONTENT_YPOS,
@@ -3582,7 +3582,7 @@ static struct
     NULL, NULL, "8",			NULL
   },
 
-  /* ---------- android content -------------------------------------------- */
+  // ---------- android content -----------------------------------------------
 
   {
     ED_AREA_1X1_SETTINGS_XPOS(0),	ED_AREA_1X1_SETTINGS_YPOS(5),
@@ -3592,7 +3592,7 @@ static struct
     "elements:", NULL, NULL,		"elements android can clone"
   },
 
-  /* ---------- amoeba content --------------------------------------------- */
+  // ---------- amoeba content ------------------------------------------------
 
   {
     ED_AREA_1X1_SETTINGS_XPOS(0),	ED_AREA_1X1_SETTINGS_YPOS(3),
@@ -3602,7 +3602,7 @@ static struct
     "content:", NULL, NULL,		"amoeba content"
   },
 
-  /* ---------- level start element ---------------------------------------- */
+  // ---------- level start element -------------------------------------------
 
   {
     -1,					ED_AREA_1X1_SETTINGS_YPOS(10),
@@ -3612,7 +3612,7 @@ static struct
     NULL, NULL, NULL,			"level start element"
   },
 
-  /* ---------- player artwork element ------------------------------------- */
+  // ---------- player artwork element ----------------------------------------
 
   {
     -1,					ED_AREA_1X1_SETTINGS_YPOS(11),
@@ -3622,7 +3622,7 @@ static struct
     NULL, NULL, NULL,			"element for player artwork"
   },
 
-  /* ---------- player explosion element ----------------------------------- */
+  // ---------- player explosion element --------------------------------------
 
   {
     -1,					ED_AREA_1X1_SETTINGS_YPOS(12),
@@ -3632,7 +3632,7 @@ static struct
     NULL, NULL, NULL,			"element for player explosion"
   },
 
-  /* ---------- player initial inventory ----------------------------------- */
+  // ---------- player initial inventory --------------------------------------
 
   {
     -1,					ED_AREA_1X1_SETTINGS_YPOS(1),
@@ -3642,9 +3642,9 @@ static struct
     NULL, NULL, NULL,			"content for initial inventory"
   },
 
-  /* ---------- element settings: configure 1 (custom elements) ----------- */
+  // ---------- element settings: configure 1 (custom elements) ---------------
 
-  /* ---------- custom graphic --------------------------------------------- */
+  // ---------- custom graphic ------------------------------------------------
 
   {
     -1,					ED_AREA_1X1_SETTINGS_YPOS(1),
@@ -3654,19 +3654,19 @@ static struct
     NULL, NULL, NULL,			"custom graphic element"
   },
 
-  /* ---------- element settings: configure 2 (custom elements) ----------- */
+  // ---------- element settings: configure 2 (custom elements) ---------------
 
-  /* ---------- custom content (when exploding) ---------------------------- */
+  // ---------- custom content (when exploding) -------------------------------
 
   {
     -1,					ED_AREA_3X3_SETTINGS_YPOS(10),
     0,					ED_AREA_3X3_SETTINGS_YOFF,
-    GADGET_ID_CUSTOM_CONTENT,		GADGET_ID_NONE,	/* align three rows */
+    GADGET_ID_CUSTOM_CONTENT,		GADGET_ID_NONE,	// align three rows
     &custom_element.content.e[0][0],	3, 3,
     "content:", NULL, NULL,		NULL
   },
 
-  /* ---------- custom enter and leave element (when moving) --------------- */
+  // ---------- custom enter and leave element (when moving) ------------------
 
   {
     ED_AREA_1X1_SETTINGS_XPOS(1),	ED_AREA_1X1_SETTINGS_YPOS(3),
@@ -3683,9 +3683,9 @@ static struct
     NULL, NULL, NULL,			"element that will be left behind"
   },
 
-  /* ---------- element settings: advanced (custom elements) --------------- */
+  // ---------- element settings: advanced (custom elements) ------------------
 
-  /* ---------- custom change target --------------------------------------- */
+  // ---------- custom change target ------------------------------------------
 
   {
     -1,					ED_AREA_1X1_SETTINGS_YPOS(1),
@@ -3695,17 +3695,17 @@ static struct
     NULL, "after/when:", NULL,		"new target element after change"
   },
 
-  /* ---------- custom change content (extended change target) ------------- */
+  // ---------- custom change content (extended change target) ----------------
 
   {
     -1,					ED_AREA_3X3_SETTINGS_YPOS(9),
     0,					ED_AREA_3X3_SETTINGS_YOFF,
-    GADGET_ID_CUSTOM_CHANGE_CONTENT,	GADGET_ID_NONE,	/* align three rows */
+    GADGET_ID_CUSTOM_CHANGE_CONTENT,	GADGET_ID_NONE,	// align three rows
     &custom_element_change.target_content.e[0][0], 3, 3,
     NULL, NULL, NULL,			"new extended elements after change"
   },
 
-  /* ---------- custom change trigger (element causing change) ------------- */
+  // ---------- custom change trigger (element causing change) ----------------
 
   {
     -1,					ED_AREA_1X1_SETTINGS_YPOS(5),
@@ -3715,7 +3715,7 @@ static struct
     NULL, NULL, NULL,			"other element triggering change"
   },
 
-  /* ---------- custom change action (element used for action) ------------- */
+  // ---------- custom change action (element used for action) ----------------
 
   {
     -1,					ED_AREA_1X1_SETTINGS_YPOS(13),
@@ -3725,7 +3725,7 @@ static struct
     NULL, NULL, NULL,			"element used as action parameter"
   },
 
-  /* ---------- group element content -------------------------------------- */
+  // ---------- group element content -----------------------------------------
 
   {
     ED_AREA_1X1_SETTINGS_XPOS(0),	ED_AREA_1X1_SETTINGS_YPOS(2),
@@ -3735,7 +3735,7 @@ static struct
     "content:", NULL, NULL,		NULL
   },
 
-  /* ---------- random background (for random painting) -------------------- */
+  // ---------- random background (for random painting) -----------------------
 
   {
     -1,					ED_AREA_1X1_LSETTINGS_YPOS(1),
@@ -3753,22 +3753,22 @@ static struct
   -----------------------------------------------------------------------------
 */
 
-/* maximal size of level editor drawing area */
+// maximal size of level editor drawing area
 static int MAX_ED_FIELDX, MAX_ED_FIELDY;
 
-/* actual size of level editor drawing area */
+// actual size of level editor drawing area
 static int ed_fieldx, ed_fieldy;
 
-/* actual position of level editor drawing area in level playfield */
+// actual position of level editor drawing area in level playfield
 static int level_xpos = -1, level_ypos = -1;
 
-/* actual tile size used to display playfield drawing area */
+// actual tile size used to display playfield drawing area
 static int ed_tilesize = DEFAULT_EDITOR_TILESIZE;
 static int ed_tilesize_default = DEFAULT_EDITOR_TILESIZE;
 
 #define IN_ED_FIELD(x,y)	IN_FIELD(x, y, ed_fieldx, ed_fieldy)
 
-/* drawing elements on the three mouse buttons */
+// drawing elements on the three mouse buttons
 static int new_element1 = EL_WALL;
 static int new_element2 = EL_EMPTY;
 static int new_element3 = EL_SAND;
@@ -3787,7 +3787,7 @@ static int use_permanent_palette = TRUE;
 #define PXSIZE		(use_permanent_palette ? DXSIZE : SXSIZE)
 #define PYSIZE		(use_permanent_palette ? DYSIZE : SYSIZE)
 
-/* forward declaration for internal use */
+// forward declaration for internal use
 static void ModifyEditorCounterValue(int, int);
 static void ModifyEditorCounterLimits(int, int, int);
 static void ModifyEditorSelectboxValue(int, int);
@@ -3824,7 +3824,7 @@ static int getTabulatorBarWidth(void);
 static int getTabulatorBarHeight(void);
 static Pixel getTabulatorBarColor(void);
 
-static int num_editor_gadgets = 0;	/* dynamically determined */
+static int num_editor_gadgets = 0;	// dynamically determined
 
 static struct GadgetInfo **level_editor_gadget = NULL;
 static int *right_gadget_border = NULL;
@@ -4072,8 +4072,8 @@ static int editor_hl_rnd[] =
 
 static int editor_el_rnd[] =
 {
-  EL_DYNAMITE,			/* RND */
-  EL_DYNAMITE_ACTIVE,		/* RND */
+  EL_DYNAMITE,			// RND
+  EL_DYNAMITE_ACTIVE,		// RND
   EL_EMPTY,
   EL_EMPTY,
 
@@ -4120,7 +4120,7 @@ static int editor_el_rnd[] =
   EL_PACMAN_LEFT,
   EL_DARK_YAMYAM,
   EL_PACMAN_RIGHT,
-  EL_YAMYAM,			/* RND */
+  EL_YAMYAM,			// RND
 
   EL_BLACK_ORB,
   EL_PACMAN_DOWN,
@@ -4267,10 +4267,10 @@ static int editor_hl_diamond_caves[] =
 
 static int editor_el_diamond_caves[] =
 {
-  EL_EM_STEEL_EXIT_CLOSED,	/* DC2 */
-  EL_EM_STEEL_EXIT_OPEN,	/* DC2 */
-  EL_WALL_EMERALD,		/* DC2 */
-  EL_WALL_DIAMOND,		/* DC2 */
+  EL_EM_STEEL_EXIT_CLOSED,	// DC2
+  EL_EM_STEEL_EXIT_OPEN,	// DC2
+  EL_WALL_EMERALD,		// DC2
+  EL_WALL_DIAMOND,		// DC2
 
   EL_PEARL,
   EL_CRYSTAL,
@@ -5246,17 +5246,17 @@ static int num_editor_hl_dynamic = ARRAY_SIZE(editor_hl_dynamic);
 static int num_editor_el_dynamic = 0;
 
 static int editor_hl_empty[] = { EL_EMPTY };
-static int *editor_el_empty = NULL;	/* dynamically allocated */
+static int *editor_el_empty = NULL;	// dynamically allocated
 
 static int *editor_hl_empty_ptr = editor_hl_empty;
 static int *editor_el_empty_ptr = NULL;
 static int num_editor_hl_empty = 0;
-static int num_editor_el_empty = 0;	/* dynamically determined, if needed */
+static int num_editor_el_empty = 0;	// dynamically determined, if needed
 
 static boolean use_el_empty = FALSE;
 
-static int *editor_elements = NULL;	/* dynamically allocated */
-static int num_editor_elements = 0;	/* dynamically determined */
+static int *editor_elements = NULL;	// dynamically allocated
+static int num_editor_elements = 0;	// dynamically determined
 
 static boolean setup_editor_cascade_never = FALSE;
 
@@ -5482,14 +5482,14 @@ static char *getElementDescriptionFilenameExt(char *basename)
 
   checked_free(filename);
 
-  /* 1st try: look for element description in current level set directory */
+  // 1st try: look for element description in current level set directory
   filename = getPath3(getCurrentLevelDir(), elements_subdir2, basename);
   if (fileExists(filename))
     return filename;
 
   free(filename);
 
-  /* 2nd try: look for element description in the game's base directory */
+  // 2nd try: look for element description in the game's base directory
   filename = getPath3(options.docs_directory, elements_subdir, basename);
   if (fileExists(filename))
     return filename;
@@ -5502,13 +5502,13 @@ static char *getElementDescriptionFilename(int element)
   char basename[MAX_FILENAME_LEN];
   char *filename;
 
-  /* 1st try: look for element description file for exactly this element */
+  // 1st try: look for element description file for exactly this element
   sprintf(basename, "%s.txt", element_info[element].token_name);
   filename = getElementDescriptionFilenameExt(basename);
   if (filename != NULL)
     return filename;
 
-  /* 2nd try: look for element description file for this element's class */
+  // 2nd try: look for element description file for this element's class
   sprintf(basename, "%s.txt", element_info[element].class_name);
   filename = getElementDescriptionFilenameExt(basename);
   if (filename != NULL)
@@ -5529,51 +5529,51 @@ static void InitDynamicEditorElementList(int **elements, int *num_elements)
   boolean element_found[NUM_FILE_ELEMENTS];
   int i, x, y;
 
-  /* initialize list of used elements to "not used" */
+  // initialize list of used elements to "not used"
   for (i = 0; i < NUM_FILE_ELEMENTS; i++)
     element_found[i] = FALSE;
 
-  /* find all elements used in current level */
+  // find all elements used in current level
   for (y = 0; y < lev_fieldy; y++)
     for (x = 0; x < lev_fieldx; x++)
-      if (Feld[x][y] < NUM_FILE_ELEMENTS)	/* should always be true */
+      if (Feld[x][y] < NUM_FILE_ELEMENTS)	// should always be true
 	element_found[Feld[x][y]] = TRUE;
 
   *num_elements = 0;
 
-  /* count number of elements used in current level */
+  // count number of elements used in current level
   for (i = 0; i < NUM_FILE_ELEMENTS; i++)
     if (element_found[i])
       (*num_elements)++;
 
-  /* add space for up to 3 more elements for padding that may be needed */
+  // add space for up to 3 more elements for padding that may be needed
   *num_elements += 3;
 
-  /* free memory for old list of elements, if needed */
+  // free memory for old list of elements, if needed
   checked_free(*elements);
 
-  /* allocate memory for new list of elements */
+  // allocate memory for new list of elements
   *elements = checked_malloc(*num_elements * sizeof(int));
 
   *num_elements = 0;
 
-  /* add all elements used in current level (non-custom/group elements) */
+  // add all elements used in current level (non-custom/group elements)
   for (i = 0; i < NUM_FILE_ELEMENTS; i++)
     if (element_found[i] && !(IS_CUSTOM_ELEMENT(i) || IS_GROUP_ELEMENT(i)))
       (*elements)[(*num_elements)++] = i;
 
-  /* add all elements used in current level (custom/group elements) */
+  // add all elements used in current level (custom/group elements)
   for (i = 0; i < NUM_FILE_ELEMENTS; i++)
     if (element_found[i] && (IS_CUSTOM_ELEMENT(i) || IS_GROUP_ELEMENT(i)))
       (*elements)[(*num_elements)++] = i;
 
-  while (*num_elements % 4)	/* pad with empty elements, if needed */
+  while (*num_elements % 4)	// pad with empty elements, if needed
     (*elements)[(*num_elements)++] = EL_EMPTY;
 }
 
 static void ReinitializeElementList_EnableSections(void)
 {
-  /* default: enable all element sections */
+  // default: enable all element sections
 
   setup_editor_el_players		= TRUE;
   setup_editor_el_boulderdash		= TRUE;
@@ -5593,7 +5593,7 @@ static void ReinitializeElementList_EnableSections(void)
   setup_editor_el_user_defined		= TRUE;
   setup_editor_el_dynamic		= TRUE;
 
-  /* now disable all element sections not to be displayed */
+  // now disable all element sections not to be displayed
 
   if (!setup.editor.el_classic)
   {
@@ -5690,9 +5690,9 @@ static void ReinitializeElementList(void)
 
   if (initialization_needed)
   {
-    LoadSetup_EditorCascade();		/* load last editor cascade state */
+    LoadSetup_EditorCascade();		// load last editor cascade state
 
-    /* initialize editor cascade element from saved cascade state */
+    // initialize editor cascade element from saved cascade state
     for (i = 0; editor_elements_info[i].setup_value != NULL; i++)
     {
       int *cascade_element = &(*editor_elements_info[i].headline_list)[0];
@@ -5709,19 +5709,19 @@ static void ReinitializeElementList(void)
 
   checked_free(editor_elements);
 
-  /* reload optional user defined element list for each invocation of editor */
+  // reload optional user defined element list for each invocation of editor
   LoadUserDefinedEditorElementList(&editor_el_user_defined_ptr,
 				   &num_editor_el_user_defined);
 
-  /* initialize dynamic level element list for each invocation of editor */
+  // initialize dynamic level element list for each invocation of editor
   InitDynamicEditorElementList(&editor_el_dynamic_ptr,
 			       &num_editor_el_dynamic);
 
-  /* initialize list of empty elements (used for padding, if needed) */
+  // initialize list of empty elements (used for padding, if needed)
   for (i = 0; i < ED_NUM_ELEMENTLIST_BUTTONS; i++)
     editor_el_empty[i] = EL_EMPTY;
 
-  /* do some sanity checks for each element from element list */
+  // do some sanity checks for each element from element list
   for (i = 0; editor_elements_info[i].setup_value != NULL; i++)
   {
     for (j = 0; j < *editor_elements_info[i].element_list_size; j++)
@@ -5739,7 +5739,7 @@ static void ReinitializeElementList(void)
   num_editor_elements = 0;
   use_el_empty = FALSE;
 
-  /* determine size of element list */
+  // determine size of element list
   for (i = 0; editor_elements_info[i].setup_value != NULL; i++)
   {
     boolean found_inactive_cascade = FALSE;
@@ -5776,7 +5776,7 @@ static void ReinitializeElementList(void)
 
   if (num_editor_elements < ED_NUM_ELEMENTLIST_BUTTONS)
   {
-    /* offer at least as many elements as element buttons exist */
+    // offer at least as many elements as element buttons exist
     use_el_empty = TRUE;
     num_editor_el_empty = ED_NUM_ELEMENTLIST_BUTTONS - num_editor_elements;
 
@@ -5789,7 +5789,7 @@ static void ReinitializeElementList(void)
 
   editor_elements = checked_malloc(num_editor_elements * sizeof(int));
 
-  /* fill element list */
+  // fill element list
   for (i = 0; editor_elements_info[i].setup_value != NULL; i++)
   {
     boolean found_inactive_cascade = FALSE;
@@ -5835,7 +5835,7 @@ static void ReinitializeElementList(void)
     }
   }
 
-  /* (this function is also called before editor gadgets are initialized!) */
+  // (this function is also called before editor gadgets are initialized!)
   AdjustElementListScrollbar();
 }
 
@@ -5889,7 +5889,7 @@ static void ReinitializeElementListButtons(void)
   static boolean initialization_needed = TRUE;
   int i;
 
-  if (!initialization_needed)	/* check if editor element setup has changed */
+  if (!initialization_needed)	// check if editor element setup has changed
   {
     if (last_setup_value_headlines != setup.editor.el_headlines)
       initialization_needed = TRUE;
@@ -5906,7 +5906,7 @@ static void ReinitializeElementListButtons(void)
   FreeLevelEditorGadgets();
   CreateLevelEditorGadgets();
 
-  /* store current setup values for next invocation of this function */
+  // store current setup values for next invocation of this function
   last_setup_value_headlines = setup.editor.el_headlines;
   for (i = 0; editor_elements_info[i].setup_value != NULL; i++)
     editor_elements_info[i].last_setup_value =
@@ -5976,7 +5976,7 @@ static void DrawEditorLevelBorderLine(int x, int y, int xsize, int ysize)
   int ysize_thin = (ysize < ed_tilesize ? 1 : ysize);
   Pixel line_color = getTabulatorBarColor();
 
-  if (line_color == BLACK_PIXEL)		/* black => transparent */
+  if (line_color == BLACK_PIXEL)		// black => transparent
     return;
 
   FillRectangle(drawto, SX + x, SY + y, xsize_tile, ysize_tile, BLACK_PIXEL);
@@ -5993,7 +5993,7 @@ static void DrawEditorLevelBorderLinesIfNeeded(void)
   if (!suppressBorderElement())
     return;
 
-  /* draw little border line around editable level playfield */
+  // draw little border line around editable level playfield
 
   if (xsize < SXSIZE)
     DrawEditorLevelBorderLine(xsize, 0, line_size, ysize);
@@ -6086,7 +6086,7 @@ static void CreateControlButtons(void)
   struct GadgetInfo *gi;
   int i;
 
-  /* create toolbox buttons */
+  // create toolbox buttons
   for (i = 0; i < ED_NUM_CTRL_BUTTONS; i++)
   {
     int id = controlbutton_info[i].gadget_id;
@@ -6203,7 +6203,7 @@ static void CreateControlButtons(void)
     level_editor_gadget[id] = gi;
   }
 
-  /* these values are not constant, but can change at runtime */
+  // these values are not constant, but can change at runtime
   scrollbutton_pos[ED_SCROLLBUTTON_ID_AREA_UP].x    = ED_SCROLL_UP_XPOS;
   scrollbutton_pos[ED_SCROLLBUTTON_ID_AREA_UP].y    = ED_SCROLL_UP_YPOS;
   scrollbutton_pos[ED_SCROLLBUTTON_ID_AREA_DOWN].x  = ED_SCROLL_DOWN_XPOS;
@@ -6217,7 +6217,7 @@ static void CreateControlButtons(void)
   scrollbutton_pos[ED_SCROLLBUTTON_ID_LIST_DOWN].x  = ED_SCROLL2_DOWN_XPOS;
   scrollbutton_pos[ED_SCROLLBUTTON_ID_LIST_DOWN].y  = ED_SCROLL2_DOWN_YPOS;
 
-  /* create buttons for scrolling of drawing area and element list */
+  // create buttons for scrolling of drawing area and element list
   for (i = 0; i < ED_NUM_SCROLLBUTTONS; i++)
   {
     int id = scrollbutton_info[i].gadget_id;
@@ -6269,7 +6269,7 @@ static void CreateControlButtons(void)
     level_editor_gadget[id] = gi;
   }
 
-  /* create buttons for element list */
+  // create buttons for element list
   for (i = 0; i < ED_NUM_ELEMENTLIST_BUTTONS; i++)
   {
     int id = GADGET_ID_ELEMENTLIST_FIRST + i;
@@ -6331,15 +6331,15 @@ static void CreateCounterButtons(void)
   for (i = 0; i < ED_NUM_COUNTERBUTTONS; i++)
   {
     int j;
-    int x = SX + ED_SETTINGS_X(counterbutton_info[i].x); /* down count button */
+    int x = SX + ED_SETTINGS_X(counterbutton_info[i].x); // down count button
     int y = SY + ED_SETTINGS_Y(counterbutton_info[i].y);
 
-    /* determine horizontal position to the right of specified gadget */
+    // determine horizontal position to the right of specified gadget
     if (counterbutton_info[i].gadget_id_align != GADGET_ID_NONE)
       x = (right_gadget_border[counterbutton_info[i].gadget_id_align] +
 	   ED_GADGET_TEXT_DISTANCE);
 
-    /* determine horizontal offset for leading text */
+    // determine horizontal offset for leading text
     if (counterbutton_info[i].text_left != NULL)
       x += getTextWidthForGadget(counterbutton_info[i].text_left);
 
@@ -6417,7 +6417,7 @@ static void CreateCounterButtons(void)
       right_gadget_border[id] =
 	getRightGadgetBorder(gi, counterbutton_info[i].text_right);
 
-      x += gi->width + ED_GADGET_SMALL_DISTANCE;	/* text count button */
+      x += gi->width + ED_GADGET_SMALL_DISTANCE;	// text count button
 
       if (j == 0)
       {
@@ -6460,7 +6460,7 @@ static void CreateCounterButtons(void)
 			  GDI_NUMBER_VALUE, 0,
 			  GDI_NUMBER_MIN, counterbutton_info[i].min_value,
 			  GDI_NUMBER_MAX, counterbutton_info[i].max_value,
-			  GDI_TEXT_SIZE, 3,	/* minimal counter text size */
+			  GDI_TEXT_SIZE, 3,	// minimal counter text size
 			  GDI_TEXT_FONT, font_type,
 			  GDI_TEXT_FONT_ACTIVE, font_type_active,
 			  GDI_DESIGN_UNPRESSED, gd->bitmap, gd_x1, gd_y1,
@@ -6479,7 +6479,7 @@ static void CreateCounterButtons(void)
 	right_gadget_border[id] =
 	  getRightGadgetBorder(gi, counterbutton_info[i].text_right);
 
-	x += gi->width + ED_GADGET_SMALL_DISTANCE;	/* up count button */
+	x += gi->width + ED_GADGET_SMALL_DISTANCE;	// up count button
       }
     }
   }
@@ -6489,7 +6489,7 @@ static void CreateDrawingAreas(void)
 {
   int i;
 
-  /* these values are not constant, but can change at runtime */
+  // these values are not constant, but can change at runtime
   drawingarea_info[ED_DRAWING_ID_DRAWING_LEVEL].area_xsize = MAX_ED_FIELDX;
   drawingarea_info[ED_DRAWING_ID_DRAWING_LEVEL].area_ysize = MAX_ED_FIELDY;
 
@@ -6509,12 +6509,12 @@ static void CreateDrawingAreas(void)
       GD_EVENT_PRESSED | GD_EVENT_RELEASED | GD_EVENT_MOVING |
       GD_EVENT_OFF_BORDERS | GD_EVENT_PIXEL_PRECISE;
 
-    /* determine horizontal position to the right of specified gadget */
+    // determine horizontal position to the right of specified gadget
     if (drawingarea_info[i].gadget_id_align != GADGET_ID_NONE)
       x = (right_gadget_border[drawingarea_info[i].gadget_id_align] +
 	   ED_DRAWINGAREA_TEXT_DISTANCE);
 
-    /* determine horizontal offset for leading text */
+    // determine horizontal offset for leading text
     if (drawingarea_info[i].text_left != NULL)
       x += getTextWidthForDrawingArea(drawingarea_info[i].text_left);
 
@@ -6680,7 +6680,7 @@ static void CreateSelectboxGadgets(void)
     int x = SX + ED_SETTINGS_X(selectbox_info[i].x);
     int y = SY + ED_SETTINGS_Y(selectbox_info[i].y);
 
-    if (selectbox_info[i].size == -1)	/* dynamically determine size */
+    if (selectbox_info[i].size == -1)	// dynamically determine size
     {
       /* (we cannot use -1 for uninitialized values if we directly compare
 	 with results from strlen(), because the '<' and '>' operation will
@@ -6691,18 +6691,18 @@ static void CreateSelectboxGadgets(void)
 	if (strlen(selectbox_info[i].options[j].text) > selectbox_info[i].size)
 	  selectbox_info[i].size = strlen(selectbox_info[i].options[j].text);
 
-      selectbox_info[i].size++;		/* add one character empty space */
+      selectbox_info[i].size++;		// add one character empty space
     }
 
     event_mask = GD_EVENT_RELEASED |
       GD_EVENT_TEXT_RETURN | GD_EVENT_TEXT_LEAVING;
 
-    /* determine horizontal position to the right of specified gadget */
+    // determine horizontal position to the right of specified gadget
     if (selectbox_info[i].gadget_id_align != GADGET_ID_NONE)
       x = (right_gadget_border[selectbox_info[i].gadget_id_align] +
 	   ED_GADGET_TEXT_DISTANCE);
 
-    /* determine horizontal offset for leading text */
+    // determine horizontal offset for leading text
     if (selectbox_info[i].text_left != NULL)
       x += getTextWidthForGadget(selectbox_info[i].text_left);
 
@@ -6770,7 +6770,7 @@ static void CreateTextbuttonGadgets(void)
     int x = SX + ED_SETTINGS_X(textbutton_info[i].x);
     int y = SY + ED_SETTINGS_Y(textbutton_info[i].y);
 
-    if (textbutton_info[i].size == -1)	/* dynamically determine size */
+    if (textbutton_info[i].size == -1)	// dynamically determine size
       textbutton_info[i].size = strlen(textbutton_info[i].text);
 
     event_mask = GD_EVENT_RELEASED;
@@ -6778,7 +6778,7 @@ static void CreateTextbuttonGadgets(void)
     sprintf(infotext, "%s", textbutton_info[i].infotext);
     infotext[max_infotext_len] = '\0';
 
-    /* determine horizontal position to the right of specified gadget */
+    // determine horizontal position to the right of specified gadget
     if (textbutton_info[i].gadget_id_align != GADGET_ID_NONE)
     {
       int gadget_id_align = textbutton_info[i].gadget_id_align;
@@ -6789,7 +6789,7 @@ static void CreateTextbuttonGadgets(void)
 	y = level_editor_gadget[gadget_id_align]->y;
     }
 
-    /* determine horizontal offset for leading text */
+    // determine horizontal offset for leading text
     if (textbutton_info[i].text_left != NULL)
       x += getTextWidthForGadget(textbutton_info[i].text_left);
 
@@ -6830,7 +6830,7 @@ static void CreateGraphicbuttonGadgets(void)
   unsigned int event_mask;
   int i;
 
-  /* create buttons for scrolling of drawing area and element list */
+  // create buttons for scrolling of drawing area and element list
   for (i = 0; i < ED_NUM_GRAPHICBUTTONS; i++)
   {
     int id = graphicbutton_info[i].gadget_id;
@@ -6845,12 +6845,12 @@ static void CreateGraphicbuttonGadgets(void)
 
     event_mask = GD_EVENT_PRESSED | GD_EVENT_REPEATED;
 
-    /* determine horizontal position to the right of specified gadget */
+    // determine horizontal position to the right of specified gadget
     if (graphicbutton_info[i].gadget_id_align != GADGET_ID_NONE)
       x = (right_gadget_border[graphicbutton_info[i].gadget_id_align] +
 	   ED_GADGET_TEXT_DISTANCE);
 
-    /* determine horizontal offset for leading text */
+    // determine horizontal offset for leading text
     if (graphicbutton_info[i].text_left != NULL)
       x += getTextWidthForGadget(graphicbutton_info[i].text_left);
 
@@ -6884,7 +6884,7 @@ static void CreateScrollbarGadgets(void)
 {
   int i;
 
-  /* these values are not constant, but can change at runtime */
+  // these values are not constant, but can change at runtime
   scrollbar_pos[ED_SCROLLBAR_ID_AREA_HORIZONTAL].x =
     SX + ED_SCROLL_HORIZONTAL_XPOS;
   scrollbar_pos[ED_SCROLLBAR_ID_AREA_HORIZONTAL].y =
@@ -6943,7 +6943,7 @@ static void CreateScrollbarGadgets(void)
       items_visible = ED_ELEMENTLIST_BUTTONS_VERT;
       item_position = element_shift / ED_ELEMENTLIST_BUTTONS_HORIZ;
     }
-    else	/* drawing area scrollbars */
+    else	// drawing area scrollbars
     {
       if (scrollbar_info[i].type == GD_TYPE_SCROLLBAR_HORIZONTAL)
       {
@@ -7018,12 +7018,12 @@ static void CreateCheckbuttonGadgets(void)
     int x = SX + ED_SETTINGS_X(checkbutton_info[i].x);
     int y = SY + ED_SETTINGS_Y(checkbutton_info[i].y);
 
-    /* determine horizontal position to the right of specified gadget */
+    // determine horizontal position to the right of specified gadget
     if (checkbutton_info[i].gadget_id_align != GADGET_ID_NONE)
       x = (right_gadget_border[checkbutton_info[i].gadget_id_align] +
 	   ED_GADGET_TEXT_DISTANCE);
 
-    /* determine horizontal offset for leading text */
+    // determine horizontal offset for leading text
     if (checkbutton_info[i].text_left != NULL)
       x += getTextWidthForGadget(checkbutton_info[i].text_left);
 
@@ -7082,12 +7082,12 @@ static void CreateRadiobuttonGadgets(void)
     int checked =
       (*radiobutton_info[i].value == radiobutton_info[i].checked_value);
 
-    /* determine horizontal position to the right of specified gadget */
+    // determine horizontal position to the right of specified gadget
     if (radiobutton_info[i].gadget_id_align != GADGET_ID_NONE)
       x = (right_gadget_border[radiobutton_info[i].gadget_id_align] +
 	   ED_GADGET_TEXT_DISTANCE);
 
-    /* determine horizontal offset for leading text */
+    // determine horizontal offset for leading text
     if (radiobutton_info[i].text_left != NULL)
       x += getTextWidthForGadget(radiobutton_info[i].text_left);
 
@@ -7122,10 +7122,10 @@ static void CreateRadiobuttonGadgets(void)
 
 void CreateLevelEditorGadgets(void)
 {
-  /* force EDITOR font inside level editor */
+  // force EDITOR font inside level editor
   SetFontStatus(GAME_MODE_EDITOR);
 
-  /* these values are not constant, but can change at runtime */
+  // these values are not constant, but can change at runtime
   ed_fieldx = MAX_ED_FIELDX - 1;
   ed_fieldy = MAX_ED_FIELDY - 1;
 
@@ -7148,7 +7148,7 @@ void CreateLevelEditorGadgets(void)
   CreateControlButtons();
   CreateScrollbarGadgets();
 
-  /* order of function calls is important because of cross-references */
+  // order of function calls is important because of cross-references
   CreateCheckbuttonGadgets();
   CreateCounterButtons();
   CreateRadiobuttonGadgets();
@@ -7196,21 +7196,21 @@ static void MapCounterButtons(int id)
   int yoffset_above = font_height + ED_GADGET_LINE_DISTANCE;
   int yoffset = (gi_down->height - font_height) / 2;
   int x_left = gi_down->x - xoffset_left;
-  int x_right;	/* set after gadget position was modified */
+  int x_right;	// set after gadget position was modified
   int y_above = gi_down->y - yoffset_above;
   int x = gi_down->x;
-  int y;	/* set after gadget position was modified */
+  int y;	// set after gadget position was modified
 
-  /* counter limits must be changed first to prevent value truncation */
+  // counter limits must be changed first to prevent value truncation
   ModifyEditorCounterLimits(id, counterbutton_info[id].min_value,
 			    counterbutton_info[id].max_value);
 
-  /* right text position might have changed after setting position above */
+  // right text position might have changed after setting position above
   x_right = gi_up->x + gi_up->width + xoffset_right;
 
   ModifyEditorCounterValue(id, *counterbutton_info[id].value);
 
-  /* set position for "value[1,2,3,4]" counter gadgets (score in most cases) */
+  // set position for "value[1,2,3,4]" counter gadgets (score in most cases)
   if (id >= ED_COUNTER_ID_ELEMENT_VALUE1 &&
       id <= ED_COUNTER_ID_ELEMENT_VALUE4)
   {
@@ -7222,7 +7222,7 @@ static void MapCounterButtons(int id)
 		 SY + ED_SETTINGS_Y(counterbutton_info[id].y), GDI_END);
   }
 
-  /* vertical position might have changed after setting position above */
+  // vertical position might have changed after setting position above
   y = gi_up->y + yoffset;
 
   if (counterbutton_info[id].text_above)
@@ -7244,17 +7244,17 @@ static void MapControlButtons(void)
   int counter_id;
   int i;
 
-  /* map toolbox buttons (excluding special CE toolbox buttons) */
+  // map toolbox buttons (excluding special CE toolbox buttons)
   for (i = 0; i < ED_NUM_CTRL1_2_BUTTONS; i++)
     MapGadget(level_editor_gadget[i]);
 
-  /* map toolbox buttons (element properties buttons) */
+  // map toolbox buttons (element properties buttons)
   for (i = ED_NUM_CTRL1_4_BUTTONS; i < ED_NUM_CTRL1_7_BUTTONS; i++)
     MapGadget(level_editor_gadget[i]);
 
   if (use_permanent_palette)
   {
-    /* map buttons to select elements */
+    // map buttons to select elements
     for (i = 0; i < ED_NUM_ELEMENTLIST_BUTTONS; i++)
       MapGadget(level_editor_gadget[GADGET_ID_ELEMENTLIST_FIRST + i]);
     MapGadget(level_editor_gadget[GADGET_ID_SCROLL_LIST_VERTICAL]);
@@ -7262,7 +7262,7 @@ static void MapControlButtons(void)
     MapGadget(level_editor_gadget[GADGET_ID_SCROLL_LIST_DOWN]);
   }
 
-  /* map buttons to select level */
+  // map buttons to select level
   counter_id = ED_COUNTER_ID_SELECT_LEVEL;
   counterbutton_info[counter_id].min_value = leveldir_current->first_level;
   counterbutton_info[counter_id].max_value = leveldir_current->last_level;
@@ -7383,7 +7383,7 @@ static void MapTextbuttonGadget(int id)
   int x = gi->x;
   int y = gi->y + yoffset;
 
-  /* only show button to delete change pages when more than minimum pages */
+  // only show button to delete change pages when more than minimum pages
   if (id == ED_TEXTBUTTON_ID_DEL_CHANGE_PAGE &&
       custom_element.num_change_pages == MIN_CHANGE_PAGES)
     return;
@@ -7457,10 +7457,10 @@ static void MapCheckbuttonGadget(int id)
   int yoffset = (gi->height - font_height) / 2;
   int y_above = gi->y - yoffset_above;
   int x = gi->x;
-  int x_left, x_right, y;	/* set after gadget position was modified */
+  int x_left, x_right, y;	// set after gadget position was modified
 
-  /* set position for gadgets with dynamically determined position */
-  if (checkbutton_info[id].x != -1)	/* do not change dynamic positions */
+  // set position for gadgets with dynamically determined position
+  if (checkbutton_info[id].x != -1)	// do not change dynamic positions
     ModifyGadget(gi, GDI_X, SX + ED_SETTINGS_X(checkbutton_info[id].x),GDI_END);
   ModifyGadget(gi, GDI_Y, SY + ED_SETTINGS_Y(checkbutton_info[id].y), GDI_END);
 
@@ -7638,7 +7638,7 @@ static void DrawEditModeWindowExt(boolean remap_toolbox_gadgets)
     DrawPropertiesWindow();
   else if (edit_mode == ED_MODE_PALETTE)
     DrawPaletteWindow();
-  else	/* edit_mode == ED_MODE_DRAWING */
+  else	// edit_mode == ED_MODE_DRAWING
     DrawDrawingWindowExt(remap_toolbox_gadgets);
 }
 
@@ -7818,19 +7818,19 @@ static void setSelectboxSpecialActionVariablesIfNeeded(void)
 {
   int i;
 
-  /* change action mode and arg variables according to action type variable */
+  // change action mode and arg variables according to action type variable
   for (i = 0; action_arg_options[i].value != -1; i++)
   {
     if (action_arg_options[i].value == custom_element_change.action_type)
     {
       int mode = action_arg_options[i].mode;
 
-      /* only change if corresponding selectbox has changed */
+      // only change if corresponding selectbox has changed
       if (selectbox_info[ED_SELECTBOX_ID_ACTION_MODE].options !=
 	  action_arg_modes[mode])
 	custom_element_change.action_mode = -1;
 
-      /* only change if corresponding selectbox has changed */
+      // only change if corresponding selectbox has changed
       if (selectbox_info[ED_SELECTBOX_ID_ACTION_ARG].options !=
 	  action_arg_options[i].options)
 	custom_element_change.action_arg = -1;
@@ -7844,7 +7844,7 @@ static void setSelectboxSpecialActionOptions(void)
 {
   int i;
 
-  /* change action mode and arg selectbox according to action type selectbox */
+  // change action mode and arg selectbox according to action type selectbox
   for (i = 0; action_arg_options[i].value != -1; i++)
   {
     if (action_arg_options[i].value == custom_element_change.action_type)
@@ -7906,7 +7906,7 @@ static void replace_custom_element_in_settings(int element_from,
 	    change->target_content.e[x][y] = element_to;
     }
 
-    if (ei->group != NULL)				/* group or internal */
+    if (ei->group != NULL)				// group or internal
       for (j = 0; j < MAX_ELEMENTS_IN_GROUP; j++)
 	if (ei->group->element[j] == element_from)
 	  ei->group->element[j] = element_to;
@@ -7960,7 +7960,7 @@ static boolean CopyCustomElement(int element_old, int element_new,
     level.changed = TRUE;
   }
 
-  /* when modifying custom/group element, ask for copying level template */
+  // when modifying custom/group element, ask for copying level template
   if (copy_mode_orig != GADGET_ID_CUSTOM_COPY && level.use_custom_template)
   {
     if (!AskToCopyAndModifyLevelTemplate())
@@ -8001,7 +8001,7 @@ static void CopyCustomElementPropertiesToEditor(int element)
   int i;
   int current_change_page = element_info[element].current_change_page;
 
-  /* dynamically (re)build selectbox for selecting change page */
+  // dynamically (re)build selectbox for selecting change page
   for (i = 0; i < element_info[element].num_change_pages; i++)
   {
     sprintf(options_change_page_strings[i], "%d", i + 1);
@@ -8013,7 +8013,7 @@ static void CopyCustomElementPropertiesToEditor(int element)
   options_change_page[i].value = -1;
   options_change_page[i].text = NULL;
 
-  /* needed here to initialize combined element properties */
+  // needed here to initialize combined element properties
   InitElementPropertiesEngine(level.game_version);
 
   element_info[element].change =
@@ -8022,10 +8022,10 @@ static void CopyCustomElementPropertiesToEditor(int element)
   custom_element = element_info[element];
   custom_element_change = *element_info[element].change;
 
-  /* needed to initially set selectbox options for special action options */
+  // needed to initially set selectbox options for special action options
   setSelectboxSpecialActionOptions();
 
-  /* needed to initially set selectbox value variables to reliable defaults */
+  // needed to initially set selectbox value variables to reliable defaults
   for (i = 0; i < ED_NUM_SELECTBOX; i++)
     setSelectboxValue(i, *selectbox_info[i].value);
 
@@ -8035,9 +8035,9 @@ static void CopyCustomElementPropertiesToEditor(int element)
   for (i = 0; i < NUM_CHANGE_EVENTS; i++)
     custom_element_change_events[i] = HAS_CHANGE_EVENT(element, i);
 
-  /* ---------- element settings: configure (custom elements) ------------- */
+  // ---------- element settings: configure (custom elements) -----------------
 
-  /* set accessible layer selectbox help value */
+  // set accessible layer selectbox help value
   custom_element.access_type =
     (IS_WALKABLE(element) ? EP_WALKABLE :
      IS_PASSABLE(element) ? EP_PASSABLE :
@@ -8054,7 +8054,7 @@ static void CopyCustomElementPropertiesToEditor(int element)
      IS_ACCESSIBLE_INSIDE(element) ||
      IS_ACCESSIBLE_UNDER(element));
 
-  /* set walk-to-object action selectbox help value */
+  // set walk-to-object action selectbox help value
   custom_element.walk_to_action =
     (IS_DIGGABLE(element) ? EP_DIGGABLE :
      IS_COLLECTIBLE_ONLY(element) ? EP_COLLECTIBLE_ONLY :
@@ -8069,7 +8069,7 @@ static void CopyCustomElementPropertiesToEditor(int element)
      IS_THROWABLE(element) ||
      IS_PUSHABLE(element));
 
-  /* set smash targets selectbox help value */
+  // set smash targets selectbox help value
   custom_element.smash_targets =
     (CAN_SMASH_EVERYTHING(element) ? EP_CAN_SMASH_EVERYTHING :
      CAN_SMASH_ENEMIES(element) ? EP_CAN_SMASH_ENEMIES :
@@ -8080,7 +8080,7 @@ static void CopyCustomElementPropertiesToEditor(int element)
      CAN_SMASH_ENEMIES(element) ||
      CAN_SMASH_PLAYER(element));
 
-  /* set deadliness selectbox help value */
+  // set deadliness selectbox help value
   custom_element.deadliness =
     (DONT_TOUCH(element) ? EP_DONT_TOUCH :
      DONT_GET_HIT_BY(element) ? EP_DONT_GET_HIT_BY :
@@ -8093,9 +8093,9 @@ static void CopyCustomElementPropertiesToEditor(int element)
      DONT_COLLIDE_WITH(element) ||
      DONT_RUN_INTO(element));
 
-  /* ---------- element settings: advanced (custom elements) --------------- */
+  // ---------- element settings: advanced (custom elements) ------------------
 
-  /* set "change by direct action" selectbox help value */
+  // set "change by direct action" selectbox help value
   custom_element_change.direct_action =
     (HAS_CHANGE_EVENT(element, CE_TOUCHED_BY_PLAYER) ? CE_TOUCHED_BY_PLAYER :
      HAS_CHANGE_EVENT(element, CE_PRESSED_BY_PLAYER) ? CE_PRESSED_BY_PLAYER :
@@ -8117,7 +8117,7 @@ static void CopyCustomElementPropertiesToEditor(int element)
      HAS_CHANGE_EVENT(element, CE_SCORE_GETS_ZERO) ? CE_SCORE_GETS_ZERO :
      custom_element_change.direct_action);
 
-  /* set "change by other element action" selectbox help value */
+  // set "change by other element action" selectbox help value
   custom_element_change.other_action =
     (HAS_CHANGE_EVENT(element, CE_PLAYER_TOUCHES_X) ? CE_PLAYER_TOUCHES_X :
      HAS_CHANGE_EVENT(element, CE_PLAYER_PRESSES_X) ? CE_PLAYER_PRESSES_X :
@@ -8148,7 +8148,7 @@ static void CopyCustomElementPropertiesToEditor(int element)
 static void CopyGroupElementPropertiesToEditor(int element)
 {
   group_element_info = *element_info[element].group;
-  custom_element = element_info[element];	/* needed for description */
+  custom_element = element_info[element];	// needed for description
 }
 
 static void CopyClassicElementPropertiesToEditor(int element)
@@ -8187,9 +8187,9 @@ static boolean AskToCopyAndModifyLevelTemplate(void)
   }
   else
   {
-    LoadLevelTemplate(-1);	/* this resets all element modifications ... */
+    LoadLevelTemplate(-1);	// this resets all element modifications ...
 
-    DrawEditModeWindow();	/* ... and copies them to 'custom_element' */
+    DrawEditModeWindow();	// ... and copies them to 'custom_element'
 
     return FALSE;
   }
@@ -8200,7 +8200,7 @@ static void CopyCustomElementPropertiesToGame(int element)
   int i;
   int access_type_and_layer;
 
-  /* mark that this custom element has been modified */
+  // mark that this custom element has been modified
   custom_element.modified_settings = TRUE;
   level.changed = TRUE;
 
@@ -8210,9 +8210,9 @@ static void CopyCustomElementPropertiesToGame(int element)
   element_info[element] = custom_element;
   *element_info[element].change = custom_element_change;
 
-  /* ---------- element settings: configure (custom elements) ------------- */
+  // ---------- element settings: configure (custom elements) -----------------
 
-  /* set accessible property from checkbox and selectbox */
+  // set accessible property from checkbox and selectbox
   custom_element_properties[EP_WALKABLE_OVER] = FALSE;
   custom_element_properties[EP_WALKABLE_INSIDE] = FALSE;
   custom_element_properties[EP_WALKABLE_UNDER] = FALSE;
@@ -8228,7 +8228,7 @@ static void CopyCustomElementPropertiesToGame(int element)
     (custom_element.access_protected != 0 &&
      custom_element_properties[EP_ACCESSIBLE]);
 
-  /* set walk-to-object property from checkbox and selectbox */
+  // set walk-to-object property from checkbox and selectbox
   custom_element_properties[EP_DIGGABLE] = FALSE;
   custom_element_properties[EP_COLLECTIBLE_ONLY] = FALSE;
   custom_element_properties[EP_DROPPABLE] = FALSE;
@@ -8237,14 +8237,14 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_properties[custom_element.walk_to_action] =
     custom_element_properties[EP_WALK_TO_OBJECT];
 
-  /* set smash property from checkbox and selectbox */
+  // set smash property from checkbox and selectbox
   custom_element_properties[EP_CAN_SMASH_PLAYER] = FALSE;
   custom_element_properties[EP_CAN_SMASH_ENEMIES] = FALSE;
   custom_element_properties[EP_CAN_SMASH_EVERYTHING] = FALSE;
   custom_element_properties[custom_element.smash_targets] =
     custom_element_properties[EP_CAN_SMASH];
 
-  /* set deadliness property from checkbox and selectbox */
+  // set deadliness property from checkbox and selectbox
   custom_element_properties[EP_DONT_RUN_INTO] = FALSE;
   custom_element_properties[EP_DONT_COLLIDE_WITH] = FALSE;
   custom_element_properties[EP_DONT_GET_HIT_BY] = FALSE;
@@ -8252,9 +8252,9 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_properties[custom_element.deadliness] =
     custom_element_properties[EP_DEADLY];
 
-  /* ---------- element settings: advanced (custom elements) --------------- */
+  // ---------- element settings: advanced (custom elements) ------------------
 
-  /* set player change event from checkbox and selectbox */
+  // set player change event from checkbox and selectbox
   custom_element_change_events[CE_TOUCHED_BY_PLAYER] = FALSE;
   custom_element_change_events[CE_PRESSED_BY_PLAYER] = FALSE;
   custom_element_change_events[CE_SWITCHED_BY_PLAYER] = FALSE;
@@ -8276,7 +8276,7 @@ static void CopyCustomElementPropertiesToGame(int element)
   custom_element_change_events[custom_element_change.direct_action] =
     custom_element_change_events[CE_BY_DIRECT_ACTION];
 
-  /* set other element action change event from checkbox and selectbox */
+  // set other element action change event from checkbox and selectbox
   custom_element_change_events[CE_PLAYER_TOUCHES_X] = FALSE;
   custom_element_change_events[CE_PLAYER_PRESSES_X] = FALSE;
   custom_element_change_events[CE_PLAYER_SWITCHES_X] = FALSE;
@@ -8309,14 +8309,14 @@ static void CopyCustomElementPropertiesToGame(int element)
   for (i = 0; i < NUM_CHANGE_EVENTS; i++)
     SET_CHANGE_EVENT(element, i, custom_element_change_events[i]);
 
-  /* copy change events also to special level editor variable */
+  // copy change events also to special level editor variable
   custom_element = element_info[element];
   custom_element_change = *element_info[element].change;
 }
 
 static void CopyGroupElementPropertiesToGame(int element)
 {
-  /* mark that this group element has been modified */
+  // mark that this group element has been modified
   custom_element.modified_settings = TRUE;
   level.changed = TRUE;
 
@@ -8492,10 +8492,10 @@ static boolean useEditorDoorAnimation(void)
 
 static void DrawEditorDoorContent(void)
 {
-  /* needed for gadgets drawn on background (like palette scrollbar) */
+  // needed for gadgets drawn on background (like palette scrollbar)
   SetDoorBackgroundImage(IMG_UNDEFINED);
 
-  /* copy default editor door content to main double buffer */
+  // copy default editor door content to main double buffer
   BlitBitmap(graphic_info[IMG_BACKGROUND_PALETTE].bitmap, drawto,
 	     graphic_info[IMG_BACKGROUND_PALETTE].src_x,
 	     graphic_info[IMG_BACKGROUND_PALETTE].src_y,
@@ -8503,10 +8503,10 @@ static void DrawEditorDoorContent(void)
 	     MIN(DYSIZE, graphic_info[IMG_BACKGROUND_PALETTE].height),
 	     DX, DY);
 
-  /* draw bigger door */
+  // draw bigger door
   DrawSpecialEditorDoor();
 
-  /* draw new control window */
+  // draw new control window
   BlitBitmap(graphic_info[IMG_BACKGROUND_TOOLBOX].bitmap, drawto,
 	     graphic_info[IMG_BACKGROUND_TOOLBOX].src_x,
 	     graphic_info[IMG_BACKGROUND_TOOLBOX].src_y,
@@ -8514,14 +8514,14 @@ static void DrawEditorDoorContent(void)
 	     MIN(EYSIZE, graphic_info[IMG_BACKGROUND_TOOLBOX].height),
 	     EX, EY);
 
-  /* draw all toolbox gadgets to editor doors */
+  // draw all toolbox gadgets to editor doors
   MapControlButtons();
 
-  /* draw all palette gadgets to editor doors */
+  // draw all palette gadgets to editor doors
   ModifyEditorElementList();
   RedrawDrawingElements();
 
-  /* copy actual editor door content to door double buffer for OpenDoor() */
+  // copy actual editor door content to door double buffer for OpenDoor()
   BlitBitmap(drawto, bitmap_db_door_1, DX, DY, DXSIZE, DYSIZE, 0, 0);
 }
 
@@ -8536,7 +8536,7 @@ void DrawLevelEd(void)
 
   FadeOut(fade_mask);
 
-  /* needed if different viewport properties defined for editor */
+  // needed if different viewport properties defined for editor
   ChangeViewportPropertiesIfNeeded();
 
   ClearField();
@@ -8573,8 +8573,8 @@ void DrawLevelEd(void)
   FreeLevelEditorGadgets();
   CreateLevelEditorGadgets();
 
-  ReinitializeElementList();		/* update dynamic level element list */
-  ReinitializeElementListButtons();	/* custom element may look different */
+  ReinitializeElementList();		// update dynamic level element list
+  ReinitializeElementListButtons();	// custom element may look different
 
   InitElementPropertiesGfxElement();
 
@@ -8619,19 +8619,19 @@ static void AdjustDrawingAreaGadgets(void)
     ed_ysize = max_ed_fieldy;
   }
 
-  /* check if we need any scrollbars */
+  // check if we need any scrollbars
   horizontal_scrollbar_needed = (ed_xsize > max_ed_fieldx);
   vertical_scrollbar_needed   = (ed_ysize > max_ed_fieldy);
 
-  /* check if we have a smaller editor field because of scrollbars */
+  // check if we have a smaller editor field because of scrollbars
   max_ed_fieldx = getMaxEdFieldX(vertical_scrollbar_needed);
   max_ed_fieldy = getMaxEdFieldY(horizontal_scrollbar_needed);
 
-  /* check again if we now need more scrollbars because of less space */
+  // check again if we now need more scrollbars because of less space
   horizontal_scrollbar_needed = (ed_xsize > max_ed_fieldx);
   vertical_scrollbar_needed   = (ed_ysize > max_ed_fieldy);
 
-  /* check if editor field gets even smaller after adding new scrollbars */
+  // check if editor field gets even smaller after adding new scrollbars
   max_ed_fieldx = getMaxEdFieldX(vertical_scrollbar_needed);
   max_ed_fieldy = getMaxEdFieldY(horizontal_scrollbar_needed);
 
@@ -8644,13 +8644,13 @@ static void AdjustDrawingAreaGadgets(void)
   width  = ed_fieldx * ed_tilesize - 2 * ED_SCROLLBUTTON_XSIZE;
   height = ed_fieldy * ed_tilesize - 2 * ED_SCROLLBUTTON_YSIZE;
 
-  /* adjust drawing area gadget */
+  // adjust drawing area gadget
   ModifyGadget(level_editor_gadget[GADGET_ID_DRAWING_LEVEL],
 	       GDI_AREA_SIZE, ed_fieldx, ed_fieldy,
 	       GDI_ITEM_SIZE, ed_tilesize, ed_tilesize,
 	       GDI_END);
 
-  /* adjust horizontal scrollbar gadgets */
+  // adjust horizontal scrollbar gadgets
   ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_LEFT],
 	       GDI_Y, y,
 	       GDI_END);
@@ -8664,7 +8664,7 @@ static void AdjustDrawingAreaGadgets(void)
 	       GDI_SCROLLBAR_ITEMS_VISIBLE, ed_fieldx,
 	       GDI_END);
 
-  /* adjust vertical scrollbar gadgets */
+  // adjust vertical scrollbar gadgets
   ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_UP],
 	       GDI_X, x,
 	       GDI_END);
@@ -8732,7 +8732,7 @@ static void AdjustElementListScrollbar(void)
   struct GadgetInfo *gi = level_editor_gadget[GADGET_ID_SCROLL_LIST_VERTICAL];
   int items_max, items_visible, item_position;
 
-  /* correct position of element list scrollbar */
+  // correct position of element list scrollbar
   if (element_shift < 0)
     element_shift = 0;
   if (element_shift > num_editor_elements - ED_NUM_ELEMENTLIST_BUTTONS)
@@ -8795,7 +8795,7 @@ static void ModifyEditorSelectboxOptions(int selectbox_id,
 
   selectbox_info[selectbox_id].options = options;
 
-  /* set index to zero -- list may be shorter now (correct later, if needed) */
+  // set index to zero -- list may be shorter now (correct later, if needed)
   ModifyGadget(gi, GDI_SELECTBOX_INDEX, 0,
 	       GDI_SELECTBOX_OPTIONS, options, GDI_END);
 }
@@ -8964,11 +8964,11 @@ static void DrawLevelInfoTabulatorGadgets(void)
     struct GadgetInfo *gi = level_editor_gadget[gadget_id];
     boolean active = (i != edit_mode_levelinfo);
 
-    /* draw background line below tabulator button */
+    // draw background line below tabulator button
     ClearRectangleOnBackground(drawto, gi->x, gi->y + gi->height, gi->width, 1);
 
-    /* draw solid line below inactive tabulator buttons */
-    if (!active && tab_color != BLACK_PIXEL)	/* black => transparent */
+    // draw solid line below inactive tabulator buttons
+    if (!active && tab_color != BLACK_PIXEL)	// black => transparent
       FillRectangle(drawto, gi->x, gi->y + gi->height, gi->width,
 		    ED_GADGET_TINY_DISTANCE, tab_color);
 
@@ -8976,8 +8976,8 @@ static void DrawLevelInfoTabulatorGadgets(void)
     MapTextbuttonGadget(i);
   }
 
-  /* draw little border line below tabulator buttons */
-  if (tab_color != BLACK_PIXEL)			/* black => transparent */
+  // draw little border line below tabulator buttons
+  if (tab_color != BLACK_PIXEL)			// black => transparent
     FillRectangle(drawto, gd_gi1->x, gd_gi1->y + gd_gi1->height +
 		  ED_GADGET_TINY_DISTANCE,
 		  getTabulatorBarWidth(), getTabulatorBarHeight(), tab_color);
@@ -8994,11 +8994,11 @@ static void DrawPropertiesTabulatorGadgets(void)
   int id_last  = ED_TEXTBUTTON_ID_PROPERTIES_CONFIG;
   int i;
 
-  /* draw two config tabulators for player elements */
+  // draw two config tabulators for player elements
   if (ELEM_IS_PLAYER(properties_element))
     id_last = ED_TEXTBUTTON_ID_PROPERTIES_CONFIG_2;
 
-  /* draw two config and one "change" tabulator for custom elements */
+  // draw two config and one "change" tabulator for custom elements
   if (IS_CUSTOM_ELEMENT(properties_element))
     id_last = ED_TEXTBUTTON_ID_PROPERTIES_CHANGE;
 
@@ -9008,17 +9008,17 @@ static void DrawPropertiesTabulatorGadgets(void)
     struct GadgetInfo *gi = level_editor_gadget[gadget_id];
     boolean active = (i != edit_mode_properties);
 
-    /* use "config 1" and "config 2" instead of "config" for players and CEs */
+    // use "config 1" and "config 2" instead of "config" for players and CEs
     if (i == ED_TEXTBUTTON_ID_PROPERTIES_CONFIG &&
 	(ELEM_IS_PLAYER(properties_element) ||
 	 IS_CUSTOM_ELEMENT(properties_element)))
       continue;
 
-    /* draw background line below tabulator button */
+    // draw background line below tabulator button
     ClearRectangleOnBackground(drawto, gi->x, gi->y + gi->height, gi->width, 1);
 
-    /* draw solid line below inactive tabulator buttons */
-    if (!active && tab_color != BLACK_PIXEL)	/* black => transparent */
+    // draw solid line below inactive tabulator buttons
+    if (!active && tab_color != BLACK_PIXEL)	// black => transparent
       FillRectangle(drawto, gi->x, gi->y + gi->height, gi->width,
 		    ED_GADGET_TINY_DISTANCE, tab_color);
 
@@ -9026,8 +9026,8 @@ static void DrawPropertiesTabulatorGadgets(void)
     MapTextbuttonGadget(i);
   }
 
-  /* draw little border line below tabulator buttons */
-  if (tab_color != BLACK_PIXEL)			/* black => transparent */
+  // draw little border line below tabulator buttons
+  if (tab_color != BLACK_PIXEL)			// black => transparent
     FillRectangle(drawto, gd_gi1->x, gd_gi1->y + gd_gi1->height +
 		  ED_GADGET_TINY_DISTANCE,
 		  getTabulatorBarWidth(), getTabulatorBarHeight(), tab_color);
@@ -9055,19 +9055,19 @@ static void DrawLevelInfoLevel(void)
 {
   int i;
 
-  /* draw counter gadgets */
+  // draw counter gadgets
   for (i = ED_COUNTER_ID_LEVEL_FIRST; i <= ED_COUNTER_ID_LEVEL_LAST; i++)
     MapCounterButtons(i);
 
-  /* draw checkbutton gadgets */
+  // draw checkbutton gadgets
   for (i = ED_CHECKBUTTON_ID_LEVEL_FIRST; i<= ED_CHECKBUTTON_ID_LEVEL_LAST; i++)
     MapCheckbuttonGadget(i);
 
-  /* draw selectbox gadgets */
+  // draw selectbox gadgets
   for (i = ED_SELECTBOX_ID_LEVEL_FIRST; i <= ED_SELECTBOX_ID_LEVEL_LAST; i++)
     MapSelectboxGadget(i);
 
-  /* draw text input gadgets */
+  // draw text input gadgets
   for (i = ED_TEXTINPUT_ID_LEVEL_FIRST; i <= ED_TEXTINPUT_ID_LEVEL_LAST; i++)
     MapTextInputGadget(i);
 }
@@ -9101,11 +9101,11 @@ static void DrawLevelInfoLevelSet(void)
   boolean template_exists = fileExists(getLocalLevelTemplateFilename());
   int i;
 
-  /* draw counter gadgets */
+  // draw counter gadgets
   for (i = ED_COUNTER_ID_LEVELSET_FIRST; i <= ED_COUNTER_ID_LEVELSET_LAST; i++)
     MapCounterButtons(i);
 
-  /* draw checkbutton gadgets */
+  // draw checkbutton gadgets
   for (i = ED_CHECKBUTTON_ID_LEVELSET_FIRST; i <= ED_CHECKBUTTON_ID_LEVELSET_LAST; i++)
   {
     if (levelset_save_mode == LEVELSET_SAVE_MODE_UPDATE ||
@@ -9116,18 +9116,18 @@ static void DrawLevelInfoLevelSet(void)
     MapCheckbuttonGadget(i);
   }
 
-  /* draw selectbox gadgets */
+  // draw selectbox gadgets
   for (i = ED_SELECTBOX_ID_LEVELSET_FIRST; i <= ED_SELECTBOX_ID_LEVELSET_LAST; i++)
     MapSelectboxGadget(i);
 
-  /* draw text input gadgets */
+  // draw text input gadgets
   for (i = ED_TEXTINPUT_ID_LEVELSET_FIRST; i <= ED_TEXTINPUT_ID_LEVELSET_LAST; i++)
     MapTextInputGadget(i);
 
-  /* draw textbutton gadgets */
+  // draw textbutton gadgets
   MapTextbuttonGadget(ED_TEXTBUTTON_ID_SAVE_LEVELSET);
 
-  /* draw info text */
+  // draw info text
   DrawLevelInfoLevelSet_DirectoryInfo();
 }
 
@@ -9135,22 +9135,22 @@ static void DrawLevelInfoEditor(void)
 {
   int i;
 
-  /* draw counter gadgets */
+  // draw counter gadgets
   for (i = ED_COUNTER_ID_EDITOR_FIRST; i <= ED_COUNTER_ID_EDITOR_LAST; i++)
     MapCounterButtons(i);
 
-  /* draw checkbutton gadgets */
+  // draw checkbutton gadgets
   for (i=ED_CHECKBUTTON_ID_EDITOR_FIRST; i<= ED_CHECKBUTTON_ID_EDITOR_LAST; i++)
     MapCheckbuttonGadget(i);
 
-  /* draw radiobutton gadgets */
+  // draw radiobutton gadgets
   for (i=ED_RADIOBUTTON_ID_EDITOR_FIRST; i<= ED_RADIOBUTTON_ID_EDITOR_LAST; i++)
     MapRadiobuttonGadget(i);
 
-  /* draw drawing area */
+  // draw drawing area
   MapDrawingArea(ED_DRAWING_ID_RANDOM_BACKGROUND);
 
-  /* draw textbutton gadgets */
+  // draw textbutton gadgets
   MapTextbuttonGadget(ED_TEXTBUTTON_ID_SAVE_AS_TEMPLATE_2);
 }
 
@@ -9192,7 +9192,7 @@ static void DrawCustomContentArea(void)
   int x3 = right_gadget_border[GADGET_ID_CUSTOM_EXPLODE_IMPACT];
   int xoffset = ED_GADGET_SPACE_DISTANCE;
 
-  /* add distance for potential left text (without drawing area border) */
+  // add distance for potential left text (without drawing area border)
   x2 += getTextWidthForGadget(drawingarea_info[id].text_left);
 
   ModifyGadget(gi, GDI_X, MAX(x1, MAX(x2, x3)) + xoffset, GDI_END);
@@ -9235,7 +9235,7 @@ static void DrawYamYamContentAreas(void)
   int y = SY + ED_AREA_YAMYAM_CONTENT_Y(3) + yoffset;
   int i;
 
-  /* display counter to choose number of element content areas */
+  // display counter to choose number of element content areas
   MapCounterButtons(ED_COUNTER_ID_YAMYAM_CONTENT);
 
   for (i = 0; i < MAX_ELEMENT_CONTENTS; i++)
@@ -9250,7 +9250,7 @@ static void DrawYamYamContentAreas(void)
     {
       UnmapDrawingArea(id);
 
-      /* delete content areas in case of reducing number of them */
+      // delete content areas in case of reducing number of them
       RemoveElementContentArea(id, font_height);
     }
   }
@@ -9270,7 +9270,7 @@ static void DrawMagicBallContentAreas(void)
   int y = SY + ED_AREA_MAGIC_BALL_CONTENT_Y(3) + yoffset;
   int i;
 
-  /* display counter to choose number of element content areas */
+  // display counter to choose number of element content areas
   MapCounterButtons(ED_COUNTER_ID_BALL_CONTENT);
 
   for (i = 0; i < MAX_ELEMENT_CONTENTS; i++)
@@ -9285,7 +9285,7 @@ static void DrawMagicBallContentAreas(void)
     {
       UnmapDrawingArea(id);
 
-      /* delete content areas in case of reducing number of them */
+      // delete content areas in case of reducing number of them
       RemoveElementContentArea(id, font_height);
     }
   }
@@ -9305,7 +9305,7 @@ static void DrawAndroidElementArea(int element)
   int xsize = MAX_ANDROID_ELEMENTS;
   int ysize = 1;
 
-  /* display counter to choose number of element areas */
+  // display counter to choose number of element areas
   MapCounterButtons(ED_COUNTER_ID_ANDROID_CONTENT);
 
   if (drawingarea_info[id].text_left != NULL)
@@ -9315,7 +9315,7 @@ static void DrawAndroidElementArea(int element)
 
   ModifyEditorDrawingArea(id, num_elements, 1);
 
-  /* delete content areas in case of reducing number of them */
+  // delete content areas in case of reducing number of them
   DrawBackground(sx, sy,
 		 xsize * ED_DRAWINGAREA_TILE_SIZE + 2 * border_size,
 		 ysize * ED_DRAWINGAREA_TILE_SIZE + 2 * border_size);
@@ -9340,7 +9340,7 @@ static void DrawGroupElementArea(int element)
 
   ModifyEditorDrawingArea(id, num_elements, 1);
 
-  /* delete content areas in case of reducing number of them */
+  // delete content areas in case of reducing number of them
   DrawBackground(sx, sy,
 		 xsize * ED_DRAWINGAREA_TILE_SIZE + 2 * border_size,
 		 ysize * ED_DRAWINGAREA_TILE_SIZE + 2 * border_size);
@@ -9359,12 +9359,12 @@ static void DrawPlayerInitialInventoryArea(int element)
   int xsize = MAX_INITIAL_INVENTORY_SIZE;
   int ysize = 1;
 
-  /* determine horizontal position to the right of specified gadget */
+  // determine horizontal position to the right of specified gadget
   if (drawingarea_info[id].gadget_id_align != GADGET_ID_NONE)
     sx = (right_gadget_border[drawingarea_info[id].gadget_id_align] +
 	  ED_DRAWINGAREA_TEXT_DISTANCE);
 
-  /* determine horizontal offset for leading text */
+  // determine horizontal offset for leading text
   if (drawingarea_info[id].text_left != NULL)
     sx += getTextWidthForDrawingArea(drawingarea_info[id].text_left);
 
@@ -9372,7 +9372,7 @@ static void DrawPlayerInitialInventoryArea(int element)
 
   ModifyEditorDrawingArea(id, num_elements, 1);
 
-  /* delete content areas in case of reducing number of them */
+  // delete content areas in case of reducing number of them
   DrawBackground(sx, sy,
 		 xsize * ED_DRAWINGAREA_TILE_SIZE + 2 * border_size,
 		 ysize * ED_DRAWINGAREA_TILE_SIZE + 2 * border_size);
@@ -9408,7 +9408,7 @@ static void DrawPropertiesInfo(void)
   }
   properties[] =
   {
-    /* configurable properties */
+    // configurable properties
 
     { EP_WALKABLE_OVER,		"- player can walk over it"		},
     { EP_WALKABLE_INSIDE,	"- player can walk inside it"		},
@@ -9449,7 +9449,7 @@ static void DrawPropertiesInfo(void)
 
     { EP_CAN_CHANGE,		"- can change to other element"		},
 
-    /* pre-defined properties */
+    // pre-defined properties
     { EP_CAN_PASS_MAGIC_WALL,	"- can pass magic walls"		},
     { EP_CAN_PASS_DC_MAGIC_WALL,"- can pass magic walls (DC style)"	},
     { EP_SWITCHABLE,		"- can be switched"			},
@@ -9492,7 +9492,7 @@ static void DrawPropertiesInfo(void)
     ypos += 2 * font3_height;
   }
 
-  /* ----- print number of elements / percentage of this element in level */
+  // ----- print number of elements / percentage of this element in level
 
   num_elements_in_level = 0;
   for (y = 0; y < lev_fieldy; y++) 
@@ -9512,7 +9512,7 @@ static void DrawPropertiesInfo(void)
 
   ypos += 2 * MAX(font1_height, font2_height);
 
-  /* ----- print standard properties of this element */
+  // ----- print standard properties of this element
 
   DrawTextS(xpos, ypos, font1_nr, properties_text);
 
@@ -9540,7 +9540,7 @@ static void DrawPropertiesInfo(void)
 
   ypos += MAX(font1_height, font2_height);
 
-  /* ----- print special description of this element */
+  // ----- print special description of this element
 
   PrintInfoText(description_text, font1_nr, xpos, ypos);
 
@@ -9765,7 +9765,7 @@ static void DrawPropertiesConfig(void)
     return;
   }
 
-  /* check if there are elements where a value can be chosen for */
+  // check if there are elements where a value can be chosen for
   for (i = 0; elements_with_counter[i].element != -1; i++)
   {
     if (elements_with_counter[i].element == properties_element)
@@ -9787,12 +9787,12 @@ static void DrawPropertiesConfig(void)
       if (properties_element == EL_GAME_OF_LIFE ||
 	  properties_element == EL_BIOMAZE)
       {
-	counterbutton_info[counter_id].min_value = 0;	/* min neighbours */
-	counterbutton_info[counter_id].max_value = 8;	/* max neighbours */
+	counterbutton_info[counter_id].min_value = 0;	// min neighbours
+	counterbutton_info[counter_id].max_value = 8;	// max neighbours
       }
       else
       {
-	/* !!! CHANGE THIS FOR CERTAIN ELEMENTS !!! */
+	// !!! CHANGE THIS FOR CERTAIN ELEMENTS !!!
 	counterbutton_info[counter_id].min_value = MIN_SCORE;
 	counterbutton_info[counter_id].max_value = MAX_SCORE;
       }
@@ -9807,7 +9807,7 @@ static void DrawPropertiesConfig(void)
 
   if (HAS_EDITOR_CONTENT(properties_element))
   {
-    /* draw stickybutton gadget */
+    // draw stickybutton gadget
     MapCheckbuttonGadget(ED_CHECKBUTTON_ID_STICK_ELEMENT);
 
     if (IS_AMOEBOID(properties_element))
@@ -9833,7 +9833,7 @@ static void DrawPropertiesConfig(void)
   {
     int player_nr = GET_PLAYER_NR(properties_element);
 
-    /* these properties can be set for every player individually */
+    // these properties can be set for every player individually
 
     if (edit_mode_properties == ED_MODE_PROPERTIES_CONFIG_1)
     {
@@ -9889,13 +9889,13 @@ static void DrawPropertiesConfig(void)
       checkbutton_info[ED_CHECKBUTTON_ID_USE_INITIAL_INVENTORY].value =
 	&level.use_initial_inventory[player_nr];
 
-      /* draw checkbutton gadgets */
+      // draw checkbutton gadgets
       MapCheckbuttonGadget(ED_CHECKBUTTON_ID_USE_INITIAL_INVENTORY);
 
-      /* draw counter gadgets */
+      // draw counter gadgets
       MapCounterButtons(ED_COUNTER_ID_INVENTORY_SIZE);
 
-      /* draw drawing area gadgets */
+      // draw drawing area gadgets
       DrawPlayerInitialInventoryArea(properties_element);
     }
   }
@@ -9911,7 +9911,7 @@ static void DrawPropertiesConfig(void)
       (!IS_CUSTOM_ELEMENT(properties_element) ||
        edit_mode_properties == ED_MODE_PROPERTIES_CONFIG_2))
   {
-    /* set position for checkbutton for "can move into acid" */
+    // set position for checkbutton for "can move into acid"
     checkbutton_info[ED_CHECKBUTTON_ID_CAN_MOVE_INTO_ACID].x =
       ED_ELEMENT_SETTINGS_XPOS(IS_CUSTOM_ELEMENT(properties_element) ? 1 : 0);
     checkbutton_info[ED_CHECKBUTTON_ID_CAN_MOVE_INTO_ACID].y =
@@ -9965,11 +9965,11 @@ static void DrawPropertiesConfig(void)
     checkbutton_info[button1_id].value = &level.envelope[envelope_nr].autowrap;
     checkbutton_info[button2_id].value = &level.envelope[envelope_nr].centered;
 
-    /* display counter to choose size of envelope text area */
+    // display counter to choose size of envelope text area
     MapCounterButtons(counter1_id);
     MapCounterButtons(counter2_id);
 
-    /* display checkbuttons to choose auto-wrap and alignment properties */
+    // display checkbuttons to choose auto-wrap and alignment properties
     MapCheckbuttonGadget(button1_id);
     MapCheckbuttonGadget(button2_id);
 
@@ -9992,55 +9992,55 @@ static void DrawPropertiesConfig(void)
 
   if (IS_CUSTOM_ELEMENT(properties_element))
   {
-    /* draw stickybutton gadget */
+    // draw stickybutton gadget
     MapCheckbuttonGadget(ED_CHECKBUTTON_ID_STICK_ELEMENT);
 
     if (edit_mode_properties == ED_MODE_PROPERTIES_CONFIG_1)
     {
-      /* draw checkbutton gadgets */
+      // draw checkbutton gadgets
       for (i =  ED_CHECKBUTTON_ID_CUSTOM1_FIRST;
 	   i <= ED_CHECKBUTTON_ID_CUSTOM1_LAST; i++)
 	MapCheckbuttonGadget(i);
 
-      /* draw counter gadgets */
+      // draw counter gadgets
       for (i =  ED_COUNTER_ID_CUSTOM1_FIRST;
 	   i <= ED_COUNTER_ID_CUSTOM1_LAST; i++)
 	MapCounterButtons(i);
 
-      /* draw selectbox gadgets */
+      // draw selectbox gadgets
       for (i =  ED_SELECTBOX_ID_CUSTOM1_FIRST;
 	   i <= ED_SELECTBOX_ID_CUSTOM1_LAST; i++)
 	MapSelectboxGadget(i);
 
-      /* draw textbutton gadgets */
+      // draw textbutton gadgets
       MapTextbuttonGadget(ED_TEXTBUTTON_ID_SAVE_AS_TEMPLATE_1);
 
-      /* draw text input gadgets */
+      // draw text input gadgets
       MapTextInputGadget(ED_TEXTINPUT_ID_ELEMENT_NAME);
 
-      /* draw drawing area gadgets */
+      // draw drawing area gadgets
       MapDrawingArea(ED_DRAWING_ID_CUSTOM_GRAPHIC);
 
       draw_footer_line = TRUE;
     }
     else if (edit_mode_properties == ED_MODE_PROPERTIES_CONFIG_2)
     {
-      /* draw checkbutton gadgets */
+      // draw checkbutton gadgets
       for (i =  ED_CHECKBUTTON_ID_CUSTOM2_FIRST;
 	   i <= ED_CHECKBUTTON_ID_CUSTOM2_LAST; i++)
 	MapCheckbuttonGadget(i);
 
-      /* draw counter gadgets */
+      // draw counter gadgets
       for (i =  ED_COUNTER_ID_CUSTOM2_FIRST;
 	   i <= ED_COUNTER_ID_CUSTOM2_LAST; i++)
 	MapCounterButtons(i);
 
-      /* draw selectbox gadgets */
+      // draw selectbox gadgets
       for (i =  ED_SELECTBOX_ID_CUSTOM2_FIRST;
 	   i <= ED_SELECTBOX_ID_CUSTOM2_LAST; i++)
 	MapSelectboxGadget(i);
 
-      /* draw drawing area gadgets */
+      // draw drawing area gadgets
       MapDrawingArea(ED_DRAWING_ID_CUSTOM_MOVE_ENTER);
       MapDrawingArea(ED_DRAWING_ID_CUSTOM_MOVE_LEAVE);
       DrawCustomContentArea();
@@ -10048,35 +10048,35 @@ static void DrawPropertiesConfig(void)
   }
   else if (IS_GROUP_ELEMENT(properties_element))
   {
-    /* draw stickybutton gadget */
+    // draw stickybutton gadget
     MapCheckbuttonGadget(ED_CHECKBUTTON_ID_STICK_ELEMENT);
 
-    /* draw checkbutton gadgets */
+    // draw checkbutton gadgets
     MapCheckbuttonGadget(ED_CHECKBUTTON_ID_CUSTOM_USE_GRAPHIC);
     MapCheckbuttonGadget(ED_CHECKBUTTON_ID_CUSTOM_USE_TEMPLATE_1);
 
-    /* draw counter gadgets */
+    // draw counter gadgets
     MapCounterButtons(ED_COUNTER_ID_GROUP_CONTENT);
 
-    /* draw selectbox gadgets */
+    // draw selectbox gadgets
     MapSelectboxGadget(ED_SELECTBOX_ID_GROUP_CHOICE_MODE);
 
-    /* draw textbutton gadgets */
+    // draw textbutton gadgets
     MapTextbuttonGadget(ED_TEXTBUTTON_ID_SAVE_AS_TEMPLATE_1);
 
-    /* draw drawing area gadgets */
+    // draw drawing area gadgets
     DrawGroupElementArea(properties_element);
 
-    /* draw text input gadgets */
+    // draw text input gadgets
     MapTextInputGadget(ED_TEXTINPUT_ID_ELEMENT_NAME);
 
-    /* draw drawing area gadgets */
+    // draw drawing area gadgets
     MapDrawingArea(ED_DRAWING_ID_CUSTOM_GRAPHIC);
 
     draw_footer_line = TRUE;
   }
 
-  /* draw little footer border line above CE/GE use/save template gadgets */
+  // draw little footer border line above CE/GE use/save template gadgets
   if (draw_footer_line)
   {
     struct GadgetInfo *gd_gi1 = level_editor_gadget[GADGET_ID_PROPERTIES_INFO];
@@ -10085,7 +10085,7 @@ static void DrawPropertiesConfig(void)
     int gd_y = gd->y + gd_gi1->height - 1;
     Pixel tab_color = GetPixel(gd->bitmap, gd_x, gd_y);
 
-    if (tab_color != BLACK_PIXEL)		/* black => transparent */
+    if (tab_color != BLACK_PIXEL)		// black => transparent
       FillRectangle(drawto,
 		    SX + ED_ELEMENT_SETTINGS_X(0),
 		    SY + ED_ELEMENT_SETTINGS_Y(14) - ED_SETTINGS_TABS_YOFFSET -
@@ -10112,38 +10112,38 @@ static void DrawPropertiesChange(void)
 {
   int i;
 
-  /* needed to initially set selectbox options for special action options */
+  // needed to initially set selectbox options for special action options
   setSelectboxSpecialActionOptions();
 
-  /* draw stickybutton gadget */
+  // draw stickybutton gadget
   MapCheckbuttonGadget(ED_CHECKBUTTON_ID_STICK_ELEMENT);
 
-  /* draw checkbutton gadgets */
+  // draw checkbutton gadgets
   for (i =  ED_CHECKBUTTON_ID_CHANGE_FIRST;
        i <= ED_CHECKBUTTON_ID_CHANGE_LAST; i++)
     MapCheckbuttonGadget(i);
 
-  /* draw counter gadgets */
+  // draw counter gadgets
   for (i =  ED_COUNTER_ID_CHANGE_FIRST;
        i <= ED_COUNTER_ID_CHANGE_LAST; i++)
     MapCounterButtons(i);
 
-  /* draw selectbox gadgets */
+  // draw selectbox gadgets
   for (i =  ED_SELECTBOX_ID_CHANGE_FIRST;
        i <= ED_SELECTBOX_ID_CHANGE_LAST; i++)
     MapSelectboxGadget(i);
 
-  /* draw textbutton gadgets */
+  // draw textbutton gadgets
   for (i =  ED_TEXTBUTTON_ID_CHANGE_FIRST;
        i <= ED_TEXTBUTTON_ID_CHANGE_LAST; i++)
     MapTextbuttonGadget(i);
 
-  /* draw graphicbutton gadgets */
+  // draw graphicbutton gadgets
   for (i =  ED_GRAPHICBUTTON_ID_CHANGE_FIRST;
        i <= ED_GRAPHICBUTTON_ID_CHANGE_LAST; i++)
     MapGraphicbuttonGadget(i);
 
-  /* draw drawing area gadgets */
+  // draw drawing area gadgets
   DrawPropertiesChangeDrawingAreas();
 }
 
@@ -10225,7 +10225,7 @@ static void DrawPropertiesWindow(void)
 
   stick_element_properties_window = FALSE;
 
-  /* make sure that previous properties edit mode exists for this element */
+  // make sure that previous properties edit mode exists for this element
   if (edit_mode_properties > ED_MODE_PROPERTIES_CONFIG_2 &&
       !IS_CUSTOM_ELEMENT(properties_element))
     edit_mode_properties = ED_MODE_PROPERTIES_CONFIG_2;
@@ -10255,7 +10255,7 @@ static void DrawPropertiesWindow(void)
 
   DrawText(sx, sy, text, font2_nr);
 
-  FrameCounter = 0;	/* restart animation frame counter */
+  FrameCounter = 0;	// restart animation frame counter
 
   DrawElementBorder(SX + x1, SY + y1, TILEX, TILEY, FALSE);
   DrawEditorElementAnimation(SX + x1, SY + y1);
@@ -10267,7 +10267,7 @@ static void DrawPropertiesWindow(void)
     DrawPropertiesInfo();
   else if (edit_mode_properties == ED_MODE_PROPERTIES_CHANGE)
     DrawPropertiesChange();
-  else	/* (edit_mode_properties == ED_MODE_PROPERTIES_CONFIG[_1|_2]) */
+  else	// (edit_mode_properties == ED_MODE_PROPERTIES_CONFIG[_1|_2])
     DrawPropertiesConfig();
 }
 
@@ -10280,7 +10280,7 @@ static void DrawPaletteWindow(void)
   SetMainBackgroundImage(IMG_BACKGROUND_EDITOR);
   ClearField();
 
-  /* map buttons to select elements */
+  // map buttons to select elements
   for (i = 0; i < ED_NUM_ELEMENTLIST_BUTTONS; i++)
     MapGadget(level_editor_gadget[GADGET_ID_ELEMENTLIST_FIRST + i]);
   MapGadget(level_editor_gadget[GADGET_ID_SCROLL_LIST_VERTICAL]);
@@ -10297,7 +10297,7 @@ static void UpdateCustomElementGraphicGadgets(void)
   ModifyEditorElementList();
   RedrawDrawingElements();
 
-  /* force redraw of all mapped drawing area gadgets */
+  // force redraw of all mapped drawing area gadgets
   for (i = 0; i < ED_NUM_DRAWING_AREAS; i++)
   {
     struct GadgetInfo *gi = level_editor_gadget[drawingarea_info[i].gadget_id];
@@ -10343,7 +10343,7 @@ static int getTubeFromOpenDirection(int direction)
     case (MV_VERTICAL | MV_RIGHT):	return EL_TUBE_VERTICAL_RIGHT;
     case (MV_ANY_DIRECTION):		return EL_TUBE_ANY;
 
-    /* if only one direction, fall back to simple tube with that direction */
+    // if only one direction, fall back to simple tube with that direction
     case (MV_LEFT):			return EL_TUBE_HORIZONTAL;
     case (MV_RIGHT):			return EL_TUBE_HORIZONTAL;
     case (MV_UP):			return EL_TUBE_VERTICAL;
@@ -10791,15 +10791,15 @@ static void MergeAndCloseNeighbourElements(int x1, int y1, int *element1,
 					   int (*close_function)(int, int),
 					   boolean change_level)
 {
-  /* set neighbour elements to newly determined connections */
+  // set neighbour elements to newly determined connections
   SetElementSimple(x1, y1, *element1, change_level);
   SetElementSimple(x2, y2, *element2, change_level);
 
-  /* remove all open connections of neighbour elements */
+  // remove all open connections of neighbour elements
   *element1 = close_function(x1, y1);
   *element2 = close_function(x2, y2);
 
-  /* set neighbour elements to new, minimized connections */
+  // set neighbour elements to new, minimized connections
   SetElementSimple(x1, y1, *element1, change_level);
   SetElementSimple(x2, y2, *element2, change_level);
 }
@@ -10832,7 +10832,7 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
     int direction = MV_NONE;
     int i;
 
-    /* if old element is of same kind, keep all existing directions */
+    // if old element is of same kind, keep all existing directions
     if (IS_TUBE(old_element))
       direction |= getOpenDirectionFromTube(old_element);
 
@@ -10870,7 +10870,7 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
     int direction = MV_NONE;
     int i;
 
-    /* if old element is of same kind, keep all existing directions */
+    // if old element is of same kind, keep all existing directions
     if (IS_BELT(old_element))
       direction |= getOpenDirectionFromBelt(old_element);
 
@@ -10908,7 +10908,7 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
     int direction = MV_NONE;
     int i;
 
-    /* if old element is of same kind, keep all existing directions */
+    // if old element is of same kind, keep all existing directions
     if (IS_ACID_POOL_OR_ACID(old_element))
       direction |= getOpenDirectionFromPool(old_element);
 
@@ -10932,7 +10932,7 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
       }
     }
 
-    /* special corrections needed for intuitively correct acid pool drawing */
+    // special corrections needed for intuitively correct acid pool drawing
     if (last_element_new == EL_EMPTY)
       last_element_new = new_element;
     else if (last_element_new != EL_UNDEFINED)
@@ -10951,7 +10951,7 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
     int direction = MV_NONE;
     int i;
 
-    /* if old element is of same kind, keep all existing directions */
+    // if old element is of same kind, keep all existing directions
     if (IS_EMC_PILLAR(old_element))
       direction |= getOpenDirectionFromPillar(old_element);
 
@@ -10988,7 +10988,7 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
     int direction = MV_NONE;
     int i;
 
-    /* if old element is of same kind, keep all existing directions */
+    // if old element is of same kind, keep all existing directions
     if (IS_DC_STEELWALL_2(old_element))
       direction |= getOpenDirectionFromSteel2(old_element);
 
@@ -11025,7 +11025,7 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
     int direction = MV_NONE;
     int i;
 
-    /* (do not keep existing directions, regardless of kind of old element) */
+    // (do not keep existing directions, regardless of kind of old element)
 
     for (i = 0; i < NUM_DIRECTIONS; i++)
     {
@@ -11698,19 +11698,19 @@ static void DrawLine(int from_x, int from_y, int to_x, int to_y,
   int dy = (to_y < from_y ? -1 : +1);
   int i;
 
-  if (from_y == to_y)			/* horizontal line */
+  if (from_y == to_y)			// horizontal line
   {
     for (i = 0; i <= xsize; i++)
       DrawLineElement(from_x + i * dx, from_y, element, change_level);
   }
-  else if (from_x == to_x)		/* vertical line */
+  else if (from_x == to_x)		// vertical line
   {
     for (i = 0; i <= ysize; i++)
       DrawLineElement(from_x, from_y + i * dy, element, change_level);
   }
-  else					/* diagonal line */
+  else					// diagonal line
   {
-    if (ysize < xsize)			/* a < 1 */
+    if (ysize < xsize)			// a < 1
     {
       float a = (float)ysize / (float)xsize;
 
@@ -11722,7 +11722,7 @@ static void DrawLine(int from_x, int from_y, int to_x, int to_y,
 	DrawLineElement(from_x + x, from_y + y, element, change_level);
       }
     }
-    else				/* a >= 1 */
+    else				// a >= 1
     {
       float a = (float)xsize / (float)ysize;
 
@@ -11876,7 +11876,7 @@ static void SelectArea(int from_x, int from_y, int to_x, int to_y,
     DrawAreaBorder(from_x, from_y, to_x, to_y);
 }
 
-/* values for CopyBrushExt() */
+// values for CopyBrushExt()
 #define CB_AREA_TO_BRUSH	0
 #define CB_BRUSH_TO_CURSOR	1
 #define CB_BRUSH_TO_LEVEL	2
@@ -12086,7 +12086,7 @@ static void FloodFillWall_MM(int from_sx2, int from_sy2, int fill_element)
 	SetLevelElementHiRes(x, y, FillFeld[x][y]);
 }
 
-/* values for DrawLevelText() modes */
+// values for DrawLevelText() modes
 #define TEXT_INIT		0
 #define TEXT_SETCURSOR		1
 #define TEXT_WRITECHAR		2
@@ -12104,7 +12104,7 @@ static int DrawLevelText(int sx, int sy, char letter, int mode)
   int letter_element = EL_CHAR_ASCII0 + letter;
   int lx = 0, ly = 0;
 
-  /* map lower case letters to upper case and convert special characters */
+  // map lower case letters to upper case and convert special characters
   if (letter >= 'a' && letter <= 'z')
     letter_element = EL_CHAR_ASCII0 + letter + (int)('A' - 'a');
   else if (letter == CHAR_BYTE_UMLAUT_a || letter == CHAR_BYTE_UMLAUT_A)
@@ -12255,21 +12255,21 @@ static void CopyLevelToUndoBuffer(int mode)
 
   if (new_undo_buffer_position)
   {
-    /* advance position in undo buffer ring */
+    // advance position in undo buffer ring
     undo_buffer_position = (undo_buffer_position + 1) % NUM_UNDO_STEPS;
 
     if (undo_buffer_steps < NUM_UNDO_STEPS - 1)
       undo_buffer_steps++;
   }
 
-  /* always reset redo buffer when storing level change into undo buffer */
+  // always reset redo buffer when storing level change into undo buffer
   redo_buffer_steps = 0;
 
   for (x = 0; x < lev_fieldx; x++)
     for (y = 0; y < lev_fieldy; y++)
       UndoBuffer[undo_buffer_position][x][y] = Feld[x][y];
 
-  /* check if drawing operation forces change of border style */
+  // check if drawing operation forces change of border style
   CheckLevelBorderElement(TRUE);
 
   level.changed = TRUE;
@@ -12284,7 +12284,7 @@ static void RandomPlacement(int new_element)
 
   ResetIntelliDraw();
 
-  /* determine number of free positions for randomly placing the new element */
+  // determine number of free positions for randomly placing the new element
   for (x = 0; x < lev_fieldx; x++) for (y = 0; y < lev_fieldy; y++)
   {
     free_position[x][y] =
@@ -12296,12 +12296,12 @@ static void RandomPlacement(int new_element)
       num_free_positions++;
   }
 
-  /* determine number of new elements to place there */
+  // determine number of new elements to place there
   num_percentage = num_free_positions * random_placement_value / 100;
   num_elements = (random_placement_method == RANDOM_USE_PERCENTAGE ?
 		  num_percentage : random_placement_value);
 
-  /* if less free positions than elements to place, fill all these positions */
+  // if less free positions than elements to place, fill all these positions
   if (num_free_positions < num_elements)
   {
     for (x = 0; x < lev_fieldx; x++)
@@ -12316,7 +12316,7 @@ static void RandomPlacement(int new_element)
       x = GetSimpleRandom(lev_fieldx);
       y = GetSimpleRandom(lev_fieldy);
 
-      /* don't place element at the same position twice */
+      // don't place element at the same position twice
       if (free_position[x][y])
       {
 	free_position[x][y] = FALSE;
@@ -12392,29 +12392,29 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
   button_press_event = (gi->event.type == GD_EVENT_PRESSED);
   button_release_event = (gi->event.type == GD_EVENT_RELEASED);
 
-  /* make sure to stay inside drawing area boundaries */
+  // make sure to stay inside drawing area boundaries
   sx = (sx < min_sx ? min_sx : sx > max_sx ? max_sx : sx);
   sy = (sy < min_sy ? min_sy : sy > max_sy ? max_sy : sy);
 
   if (draw_level)
   {
-    /* get positions inside level field */
+    // get positions inside level field
     lx = sx + level_xpos;
     ly = sy + level_ypos;
 
     if (!IN_LEV_FIELD(lx, ly))
       inside_drawing_area = FALSE;
 
-    /* make sure to stay inside level field boundaries */
+    // make sure to stay inside level field boundaries
     lx = (lx < min_lx ? min_lx : lx > max_lx ? max_lx : lx);
     ly = (ly < min_ly ? min_ly : ly > max_ly ? max_ly : ly);
 
-    /* correct drawing area positions accordingly */
+    // correct drawing area positions accordingly
     sx = lx - level_xpos;
     sy = ly - level_ypos;
   }
 
-  /* also correct MM wall-sized (double) drawing area positions accordingly */
+  // also correct MM wall-sized (double) drawing area positions accordingly
   if (sx2 / 2 < sx || sx2 / 2 > sx)
   {
     dx = (sx2 / 2 < sx ? 0 : 1);
@@ -12435,7 +12435,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
   }
   else if (!button_press_event)
   {
-    /* prevent handling events for every pixel position when moving mouse */
+    // prevent handling events for every pixel position when moving mouse
     if ((sx == last_sx && sy == last_sy &&
 	 !IS_MM_WALL_EDITOR(new_element) && new_element != EL_EMPTY) ||
 	(sx2 == last_sx2 && sy2 == last_sy2))
@@ -12459,15 +12459,15 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
   if (!button && !button_release_event)
     return;
 
-  /* handle info callback for each invocation of action callback */
+  // handle info callback for each invocation of action callback
   gi->callback_info(gi);
 
-  /* automatically switch to 'single item' drawing mode, if needed */
+  // automatically switch to 'single item' drawing mode, if needed
   actual_drawing_function =
     (draw_level || drawing_function == GADGET_ID_PICK_ELEMENT ?
      drawing_function : GADGET_ID_SINGLE_ITEMS);
 
-  /* clicking into drawing area with pressed Control key picks element */
+  // clicking into drawing area with pressed Control key picks element
   if (GetKeyModState() & KMOD_Control)
   {
     last_drawing_function = drawing_function;
@@ -12480,7 +12480,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
       ResetIntelliDraw();
   }
 
-  SetDrawModeHiRes(-1);		/* reset to normal draw mode */
+  SetDrawModeHiRes(-1);		// reset to normal draw mode
 
   switch (actual_drawing_function)
   {
@@ -12509,7 +12509,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 
 	  if (new_element == EL_PLAYER_1)
 	  {
-	    /* remove player at old position */
+	    // remove player at old position
 	    for (y = 0; y < lev_fieldy; y++)
 	      for (x = 0; x < lev_fieldx; x++)
 		if (Feld[x][y] == EL_PLAYER_1)
@@ -12545,7 +12545,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	{
 	  UpdateCustomElementGraphicGadgets();
 
-	  FrameCounter = 0;	/* restart animation frame counter */
+	  FrameCounter = 0;	// restart animation frame counter
 	}
       }
       break;
@@ -12588,7 +12588,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	sx = sx2;
 	sy = sy2;
       }
-      /* FALLTHROUGH */
+      // FALLTHROUGH
     case GADGET_ID_GRAB_BRUSH:
     case GADGET_ID_TEXT:
       {
@@ -12608,7 +12608,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	  draw_func = DrawFilledBox;
 	else if (drawing_function == GADGET_ID_GRAB_BRUSH)
 	  draw_func = SelectArea;
-	else /* (drawing_function == GADGET_ID_TEXT) */
+	else // (drawing_function == GADGET_ID_TEXT)
 	  draw_func = SetTextCursor;
 
 	if (button_press_event)
@@ -12639,7 +12639,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	else if (last_sx != sx || last_sy != sy)
 	{
 	  draw_func(start_sx, start_sy, last_sx, last_sy, -1, FALSE);
-          if (IS_MM_WALL_EDITOR(new_element))	/* clear wall background */
+          if (IS_MM_WALL_EDITOR(new_element))	// clear wall background
             draw_func(start_sx, start_sy, sx, sy, EL_EMPTY, FALSE);
 	  draw_func(start_sx, start_sy, sx, sy, new_element, FALSE);
 	  last_sx = sx;
@@ -12678,7 +12678,7 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
       break;
   }
 
-  /* do not mark level as modified for certain non-level-changing gadgets */
+  // do not mark level as modified for certain non-level-changing gadgets
   if ((type_id >= ED_DRAWING_ID_EDITOR_FIRST &&
        type_id <= ED_DRAWING_ID_EDITOR_LAST) ||
       actual_drawing_function == GADGET_ID_GRAB_BRUSH ||
@@ -12737,7 +12737,7 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
 
     if (level.game_engine_type != last_game_engine_type)
     {
-      /* update element selection list */
+      // update element selection list
       ReinitializeElementList();
       ModifyEditorElementList();
     }
@@ -12778,7 +12778,7 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
       lev_fieldx = level.fieldx;
       lev_fieldy = level.fieldy;
 
-      /* check if resizing of level results in change of border border */
+      // check if resizing of level results in change of border border
       SetBorderElement();
 
       break;
@@ -12793,7 +12793,7 @@ static void HandleCounterButtons(struct GadgetInfo *gi)
        counter_id <= ED_COUNTER_ID_CHANGE_LAST))
     CopyElementPropertiesToGame(properties_element);
 
-  /* do not mark level as modified for certain non-level-changing gadgets */
+  // do not mark level as modified for certain non-level-changing gadgets
   if ((counter_id >= ED_COUNTER_ID_LEVELSET_FIRST &&
        counter_id <= ED_COUNTER_ID_LEVELSET_LAST) ||
       (counter_id >= ED_COUNTER_ID_EDITOR_FIRST &&
@@ -12813,10 +12813,10 @@ static void HandleTextInputGadgets(struct GadgetInfo *gi)
   {
     CopyElementPropertiesToGame(properties_element);
 
-    ModifyEditorElementList();	/* update changed button info text */
+    ModifyEditorElementList();	// update changed button info text
   }
 
-  /* do not mark level as modified for certain non-level-changing gadgets */
+  // do not mark level as modified for certain non-level-changing gadgets
   if (type_id >= ED_TEXTINPUT_ID_LEVELSET_FIRST &&
       type_id <= ED_TEXTINPUT_ID_LEVELSET_LAST)
     return;
@@ -12861,7 +12861,7 @@ static void HandleSelectboxGadgets(struct GadgetInfo *gi)
   {
     if (type_id == ED_SELECTBOX_ID_ACTION_TYPE)
     {
-      /* when changing action type, also check action mode and action arg */
+      // when changing action type, also check action mode and action arg
       if (value_old != value_new)
 	setSelectboxSpecialActionVariablesIfNeeded();
 
@@ -12872,12 +12872,12 @@ static void HandleSelectboxGadgets(struct GadgetInfo *gi)
   }
   else if (type_id == ED_SELECTBOX_ID_GAME_ENGINE_TYPE)
   {
-    /* update element selection list */
+    // update element selection list
     ReinitializeElementList();
     ModifyEditorElementList();
   }
 
-  /* do not mark level as modified for certain non-level-changing gadgets */
+  // do not mark level as modified for certain non-level-changing gadgets
   if (type_id == ED_SELECTBOX_ID_LEVELSET_SAVE_MODE ||
       type_id == ED_SELECTBOX_ID_SELECT_CHANGE_PAGE)
     return;
@@ -12909,10 +12909,10 @@ static void HandleTextbuttonGadgets(struct GadgetInfo *gi)
   {
     boolean new_template = !fileExists(getLocalLevelTemplateFilename());
 
-    /* backup original "level.field" (needed to track playfield changes) */
+    // backup original "level.field" (needed to track playfield changes)
     CopyPlayfield(level.field, FieldBackup);
 
-    /* "SaveLevelTemplate()" uses "level.field", so copy editor playfield */
+    // "SaveLevelTemplate()" uses "level.field", so copy editor playfield
     CopyPlayfield(Feld, level.field);
 
     if (new_template ||
@@ -12922,7 +12922,7 @@ static void HandleTextbuttonGadgets(struct GadgetInfo *gi)
     if (new_template)
       Request("Template saved!", REQ_CONFIRM);
 
-    /* restore original "level.field" (needed to track playfield changes) */
+    // restore original "level.field" (needed to track playfield changes)
     CopyPlayfield(FieldBackup, level.field);
   }
   else if (type_id == ED_TEXTBUTTON_ID_SAVE_LEVELSET)
@@ -12996,13 +12996,13 @@ static void HandleTextbuttonGadgets(struct GadgetInfo *gi)
   {
     struct ElementInfo *ei = &element_info[properties_element];
 
-    /* when modifying custom element, ask for copying level template */
+    // when modifying custom element, ask for copying level template
     if (level.use_custom_template && !AskToCopyAndModifyLevelTemplate())
       return;
 
     setElementChangePages(ei, ei->num_change_pages + 1);
 
-    /* set new change page to be new current change page */
+    // set new change page to be new current change page
     ei->current_change_page = ei->num_change_pages - 1;
     ei->change = &ei->change_page[ei->current_change_page];
 
@@ -13017,11 +13017,11 @@ static void HandleTextbuttonGadgets(struct GadgetInfo *gi)
   {
     struct ElementInfo *ei = &element_info[properties_element];
 
-    /* when modifying custom element, ask for copying level template */
+    // when modifying custom element, ask for copying level template
     if (level.use_custom_template && !AskToCopyAndModifyLevelTemplate())
       return;
 
-    /* copy all change pages after change page to be deleted */
+    // copy all change pages after change page to be deleted
     for (i = ei->current_change_page; i < ei->num_change_pages - 1; i++)
       ei->change_page[i] = ei->change_page[i + 1];
 
@@ -13066,7 +13066,7 @@ static void HandleGraphicbuttonGadgets(struct GadgetInfo *gi)
     }
     else if (type_id == ED_GRAPHICBUTTON_ID_PASTE_CHANGE_PAGE)
     {
-      /* when modifying custom element, ask for copying level template */
+      // when modifying custom element, ask for copying level template
       if (level.use_custom_template && !AskToCopyAndModifyLevelTemplate())
 	return;
 
@@ -13087,7 +13087,7 @@ static void HandleRadiobuttons(struct GadgetInfo *gi)
   *radiobutton_info[type_id].value =
     radiobutton_info[type_id].checked_value;
 
-  /* do not mark level as modified for certain non-level-changing gadgets */
+  // do not mark level as modified for certain non-level-changing gadgets
   if (type_id >= ED_RADIOBUTTON_ID_EDITOR_FIRST &&
       type_id <= ED_RADIOBUTTON_ID_EDITOR_LAST)
     return;
@@ -13123,7 +13123,7 @@ static void HandleCheckbuttons(struct GadgetInfo *gi)
     boolean template_related_changes_found = FALSE;
     int i;
 
-    /* check if any custom or group elements have been changed */
+    // check if any custom or group elements have been changed
     for (i = 0; i < NUM_FILE_ELEMENTS; i++)
       if ((IS_CUSTOM_ELEMENT(i) || IS_GROUP_ELEMENT(i)) &&
 	  element_info[i].modified_settings)
@@ -13199,7 +13199,7 @@ static void HandleCheckbuttons(struct GadgetInfo *gi)
     SetAutomaticNumberOfGemsNeeded();
   }
 
-  /* do not mark level as modified for certain non-level-changing gadgets */
+  // do not mark level as modified for certain non-level-changing gadgets
   if ((type_id >= ED_CHECKBUTTON_ID_LEVELSET_FIRST &&
        type_id <= ED_CHECKBUTTON_ID_LEVELSET_LAST) ||
       (type_id >= ED_CHECKBUTTON_ID_EDITOR_FIRST &&
@@ -13235,11 +13235,11 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       !(GetKeyModState() & KMOD_Control))
     ChangeEditModeWindow(ED_MODE_DRAWING);
 
-  /* element copy mode active, but no element button pressed => deactivate */
+  // element copy mode active, but no element button pressed => deactivate
   if (last_custom_copy_mode != -1 && id < ED_NUM_CTRL_BUTTONS)
     last_custom_copy_mode = -1;
 
-  /* when showing palette on element buttons, change element of button used */
+  // when showing palette on element buttons, change element of button used
   if (editor.palette.show_on_element_buttons &&
       id >= GADGET_ID_ELEMENT_LEFT && id <= GADGET_ID_ELEMENT_RIGHT)
   {
@@ -13464,11 +13464,11 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       {
 	DrawDrawingWindow();
 
-	/* redraw zoom gadget info text */
+	// redraw zoom gadget info text
 	PrintEditorGadgetInfoText(level_editor_gadget[id]);
       }
 
-      /* save current editor zoom tilesize */
+      // save current editor zoom tilesize
       SaveSetup_AutoSetup();
 
       break;
@@ -13514,7 +13514,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 
       if (button == 1)
       {
-	/* undo */
+	// undo
 
 	undo_buffer_position =
 	  (undo_buffer_position - 1 + NUM_UNDO_STEPS) % NUM_UNDO_STEPS;
@@ -13524,7 +13524,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       }
       else
       {
-	/* redo */
+	// redo
 
 	undo_buffer_position = (undo_buffer_position + 1) % NUM_UNDO_STEPS;
 
@@ -13536,7 +13536,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	for (y = 0; y < lev_fieldy; y++)
 	  Feld[x][y] = UndoBuffer[undo_buffer_position][x][y];
 
-      /* check if undo operation forces change of border style */
+      // check if undo operation forces change of border style
       CheckLevelBorderElement(FALSE);
 
       DrawEditorLevel(ed_fieldx, ed_fieldy, level_xpos, level_ypos);
@@ -13613,7 +13613,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	}
       }
 
-      /* "cd" back to copied-from levelset (in case of saved read-only level) */
+      // "cd" back to copied-from levelset (in case of saved read-only level)
       leveldir_current = leveldir_former;
       level_nr = level_nr_former;
 
@@ -13634,7 +13634,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 
       CloseDoor(DOOR_CLOSE_ALL);
 
-      /* needed before playing if editor playfield area has different size */
+      // needed before playing if editor playfield area has different size
       ClearRectangle(drawto, REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
 
       // redraw_mask = REDRAW_ALL;
@@ -13646,7 +13646,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       break;
 
     case GADGET_ID_EXIT:
-      RequestExitLevelEditor(TRUE, FALSE);  /* if level has changed, ask user */
+      RequestExitLevelEditor(TRUE, FALSE);  // if level has changed, ask user
       break;
 
     default:
@@ -13670,14 +13670,14 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	      *cascade_element = EL_CASCADE_TOGGLE(*cascade_element);
 	      *cascade_value = IS_EDITOR_CASCADE_ACTIVE(*cascade_element);
 
-	      /* update element selection list */
+	      // update element selection list
 	      ReinitializeElementList();
 	      ModifyEditorElementList();
 
-	      /* update cascading gadget info text */
+	      // update cascading gadget info text
 	      PrintEditorGadgetInfoText(level_editor_gadget[id]);
 
-	      /* save current editor cascading state */
+	      // save current editor cascading state
 	      SaveSetup_EditorCascade();
 
 	      break;
@@ -13701,7 +13701,7 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 	  break;
 	}
 
-	/* change element of button used to show palette */
+	// change element of button used to show palette
 	if (editor.palette.show_on_element_buttons)
 	  button = last_button;
 
@@ -13810,18 +13810,18 @@ void HandleLevelEditorKeyInput(Key key)
       case KSYM_Insert:
       case KSYM_Delete:
 
-	/* this is needed to prevent interference with running "True X-Mouse" */
+	// this is needed to prevent interference with running "True X-Mouse"
 	if (GetKeyModStateFromEvents() & KMOD_Control)
 	  break;
 
-	/* check for last or next editor cascade block in element list */
+	// check for last or next editor cascade block in element list
 	for (i = 0; i < num_editor_elements; i++)
 	{
 	  if ((key == KSYM_Insert && i == element_shift) ||
 	      (key == KSYM_Delete && new_element_shift > element_shift))
 	    break;
 
-	  /* jump to next cascade block (or to start of element list) */
+	  // jump to next cascade block (or to start of element list)
 	  if (i == 0 || IS_EDITOR_CASCADE(editor_elements[i]))
 	    new_element_shift = i;
 	}
@@ -13857,7 +13857,7 @@ void HandleLevelEditorKeyInput(Key key)
 	{
 	  HandleControlButtons(level_editor_gadget[GADGET_ID_PALETTE]);
 	}
-	else		/* should never happen */
+	else		// should never happen
 	{
 	  ChangeEditModeWindow(ED_MODE_DRAWING);
 	}
@@ -13926,7 +13926,7 @@ void HandleLevelEditorIdle(void)
 
   redraw_mask |= REDRAW_FIELD;
 
-  FrameCounter++;	/* increase animation frame counter */
+  FrameCounter++;	// increase animation frame counter
 }
 
 static void ClearEditorGadgetInfoText(void)
@@ -13986,7 +13986,7 @@ void HandleEditorGadgetInfoText(void *ptr)
   if (gi == NULL || gi->event.type == GD_EVENT_INFO_LEAVING)
     return;
 
-  /* misuse this function to delete brush cursor, if needed */
+  // misuse this function to delete brush cursor, if needed
   if (edit_mode == ED_MODE_DRAWING && draw_with_brush)
     DeleteBrushFromCursor();
 
@@ -14010,9 +14010,9 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
   char infotext[MAX_OUTPUT_LINESIZE + 1];
   char *text;
 
-  infotext[0] = '\0';		/* start with empty info text */
+  infotext[0] = '\0';		// start with empty info text
 
-  /* pressed Control key: simulate picking element */
+  // pressed Control key: simulate picking element
   if (GetKeyModState() & KMOD_Control)
     actual_drawing_function = GADGET_ID_PICK_ELEMENT;
 
@@ -14021,7 +14021,7 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
   if (gi->event.type == GD_EVENT_INFO_LEAVING)
     return;
 
-  /* make sure to stay inside drawing area boundaries */
+  // make sure to stay inside drawing area boundaries
   sx = (sx < min_sx ? min_sx : sx > max_sx ? max_sx : sx);
   sy = (sy < min_sy ? min_sy : sy > max_sy ? max_sy : sy);
 
@@ -14032,22 +14032,22 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
       int min_lx = 0, min_ly = 0;
       int max_lx = lev_fieldx - 1, max_ly = lev_fieldy - 1;
 
-      /* get positions inside level field */
+      // get positions inside level field
       lx = sx + level_xpos;
       ly = sy + level_ypos;
 
-      /* make sure to stay inside level field boundaries */
+      // make sure to stay inside level field boundaries
       lx = (lx < min_lx ? min_lx : lx > max_lx ? max_lx : lx);
       ly = (ly < min_ly ? min_ly : ly > max_ly ? max_ly : ly);
 
-      /* correct drawing area positions accordingly */
+      // correct drawing area positions accordingly
       sx = lx - level_xpos;
       sy = ly - level_ypos;
     }
 
     if (IN_ED_FIELD(sx,sy) && IN_LEV_FIELD(lx, ly))
     {
-      if (button_status)	/* if (gi->state == GD_BUTTON_PRESSED) */
+      if (button_status)	// if (gi->state == GD_BUTTON_PRESSED)
       {
 	if (gi->event.type == GD_EVENT_PRESSED)
 	{
@@ -14105,7 +14105,7 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
 	sprintf(infotext, "Level position: %d, %d", lx, ly);
     }
 
-    /* misuse this function to draw brush cursor, if needed */
+    // misuse this function to draw brush cursor, if needed
     if (edit_mode == ED_MODE_DRAWING && draw_with_brush && !button_status)
     {
       if (IN_ED_FIELD(sx, sy) && IN_LEV_FIELD(lx, ly))
@@ -14158,7 +14158,7 @@ void RequestExitLevelEditor(boolean ask_if_level_has_changed,
     struct RectWithBorder *vp_door_1 = &viewport.door_1[GAME_MODE_MAIN];
     struct RectWithBorder *vp_door_2 = &viewport.door_2[GAME_MODE_MAIN];
 
-    /* draw normal door */
+    // draw normal door
     UndrawSpecialEditorDoor();
 
     // use door animation if door 1 viewport is unchanged and contains toolbox

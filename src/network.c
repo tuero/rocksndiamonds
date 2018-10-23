@@ -38,11 +38,11 @@ static struct NetworkClientPlayerInfo first_player =
   NULL
 };
 
-/* server stuff */
+// server stuff
 
-static TCPsocket sfd;		/* TCP server socket */
-static UDPsocket udp;		/* UDP server socket */
-static SDLNet_SocketSet rfds;	/* socket set */
+static TCPsocket sfd;		// TCP server socket
+static UDPsocket udp;		// UDP server socket
+static SDLNet_SocketSet rfds;	// socket set
 
 static struct NetworkBuffer *read_buffer = NULL;
 static struct NetworkBuffer *write_buffer = NULL;
@@ -82,7 +82,7 @@ static void DrawNetworkTextExt(char *message, int font_nr, boolean initialize)
 
       DrawTextSCentered(ypos_1, font_nr, message);
 
-      /* calculate offset to x position caused by rounding */
+      // calculate offset to x position caused by rounding
       int max_chars_per_line = max_line_width / font_width;
       int xoffset = (max_line_width - max_chars_per_line * font_width) / 2;
 
@@ -135,10 +135,10 @@ static void SendNetworkBufferToServer(struct NetworkBuffer *nb)
   if (!network.enabled)
     return;
 
-  /* set message length header */
+  // set message length header
   putNetwork32BitInteger(nb->buffer, nb->size - 4);
 
-  /* directly send the buffer to the network server */
+  // directly send the buffer to the network server
   SDLNet_TCP_Send(sfd, nb->buffer, nb->size);
 }
 
@@ -150,7 +150,7 @@ static struct NetworkClientPlayerInfo *getNetworkPlayer(int player_nr)
     if (player->nr == player_nr)
       break;
 
-  if (player == NULL)	/* should not happen */
+  if (player == NULL)	// should not happen
     Error(ERR_EXIT, "protocol error: reference to non-existing player %d",
 	  player_nr);
 
@@ -235,7 +235,7 @@ boolean ConnectToServer(char *hostname, int port)
     int data_len = strlen(data_ptr) + 1;
     IPaddress ip_address;
 
-    SDLNet_Write32(0xffffffff, &ip_address.host);	/* 255.255.255.255 */
+    SDLNet_Write32(0xffffffff, &ip_address.host);	// 255.255.255.255
     SDLNet_Write16(port,       &ip_address.port);
 
     UDPpacket packet =
@@ -252,7 +252,7 @@ boolean ConnectToServer(char *hostname, int port)
 
     DrawNetworkText("Looking for nearby network server ...");
 
-    /* wait for any nearby network server to answer UDP broadcast */
+    // wait for any nearby network server to answer UDP broadcast
     for (i = 0; i < 5; i++)
     {
       if (SDLNet_CheckSockets(udp_socket_set, 0) == 1)
@@ -322,7 +322,7 @@ boolean ConnectToServer(char *hostname, int port)
     // local network, try to connect to a network server at the local host
     if (server_host == 0)
     {
-      server_host = 0x7f000001;			/* 127.0.0.1 */
+      server_host = 0x7f000001;			// 127.0.0.1
 
       DrawNetworkText("Looking for local network server ...");
     }
@@ -361,17 +361,17 @@ boolean ConnectToServer(char *hostname, int port)
     printf("SDLNet_TCP_Open(): %s\n", SDLNet_GetError());
   }
 
-  if (hostname)			/* connect to specified server failed */
+  if (hostname)			// connect to specified server failed
     return FALSE;
 
   DrawNetworkText("Starting new local network server ...");
 
   StartNetworkServer(port);
 
-  /* wait for server to start up and try connecting several times */
+  // wait for server to start up and try connecting several times
   for (i = 0; i < 30; i++)
   {
-    if ((sfd = SDLNet_TCP_Open(&ip)))		/* connected */
+    if ((sfd = SDLNet_TCP_Open(&ip)))		// connected
     {
       DrawNetworkText_Success("Successfully connected to newly started network server!");
 
@@ -385,7 +385,7 @@ boolean ConnectToServer(char *hostname, int port)
 
   DrawNetworkText_Failed("Failed to connect to newly started network server!");
 
-  /* when reaching this point, connect to newly started server has failed */
+  // when reaching this point, connect to newly started server has failed
   return FALSE;
 }
 
@@ -442,7 +442,7 @@ void SendToServer_LevelFile(void)
 
   setString(&network_level.leveldir_identifier, leveldir_current->identifier);
 
-  /* the sending client does not use network level files (but the real ones) */
+  // the sending client does not use network level files (but the real ones)
   network_level.use_network_level_files = FALSE;
 
 #if 0
@@ -539,7 +539,7 @@ static void Handle_OP_YOUR_NUMBER(void)
 
   if (old_local_player != new_local_player)
   {
-    /* set relevant player settings and change to new player */
+    // set relevant player settings and change to new player
 
     local_player = new_local_player;
 
@@ -571,19 +571,19 @@ static void Handle_OP_NUMBER_WANTED(void)
 
   printf("OP_NUMBER_WANTED: %d\n", old_client_nr);
 
-  if (new_client_nr == client_nr_wanted)	/* switching succeeded */
+  if (new_client_nr == client_nr_wanted)	// switching succeeded
   {
     struct NetworkClientPlayerInfo *player;
 
-    if (old_client_nr != client_nr_wanted)	/* client's nr has changed */
+    if (old_client_nr != client_nr_wanted)	// client's nr has changed
       Error(ERR_NETWORK_CLIENT, "client %d switches to # %d",
 	    old_client_nr, new_client_nr);
-    else if (old_client_nr == first_player.nr)	/* local player keeps his nr */
+    else if (old_client_nr == first_player.nr)	// local player keeps his nr
       Error(ERR_NETWORK_CLIENT, "keeping client # %d", new_client_nr);
 
     if (old_client_nr != new_client_nr)
     {
-      /* set relevant player settings and change to new player */
+      // set relevant player settings and change to new player
 
       old_player->connected_network = FALSE;
       new_player->connected_network = TRUE;
@@ -592,7 +592,7 @@ static void Handle_OP_NUMBER_WANTED(void)
     player = getNetworkPlayer(old_client_nr);
     player->nr = new_client_nr;
 
-    if (old_player == local_player)		/* local player switched */
+    if (old_player == local_player)		// local player switched
     {
       local_player = new_player;
 
@@ -600,7 +600,7 @@ static void Handle_OP_NUMBER_WANTED(void)
       new_player->connected_locally = TRUE;
     }
   }
-  else if (old_client_nr == first_player.nr)	/* failed -- local player? */
+  else if (old_client_nr == first_player.nr)	// failed -- local player?
   {
     char request[100];
 
@@ -726,7 +726,7 @@ static void Handle_OP_START_PLAYING(void)
     level_nr = new_level_nr;
   }
 
-  /* needed if level set of network game changed graphics, sounds or music */
+  // needed if level set of network game changed graphics, sounds or music
   ReloadCustomArtwork(0);
 
   TapeErase();
@@ -822,7 +822,7 @@ static void Handle_OP_MOVE_PLAYER(void)
     return;
   }
 
-  /* copy valid player actions (will be set to 0 for not connected players) */
+  // copy valid player actions (will be set to 0 for not connected players)
   for (i = 0; i < MAX_PLAYERS; i++)
     stored_player[i].effective_action =
       getNetworkBuffer8BitInteger(read_buffer);
@@ -892,7 +892,7 @@ static void Handle_OP_LEVEL_FILE(void)
   network_level.leveldir_identifier = leveldir_identifier;
   network_level.use_custom_template = use_custom_template;
 
-  /* the receiving client(s) use(s) the transferred network level files */
+  // the receiving client(s) use(s) the transferred network level files
   network_level.use_network_level_files = TRUE;
 
 #if 0
@@ -978,7 +978,7 @@ static void HandleNetworkingMessage(void)
 
   fflush(stdout);
 
-  /* in case of internal error, stop network game */
+  // in case of internal error, stop network game
   if (stop_network_game)
     SendToServer_StopPlaying(NETWORK_STOP_BY_ERROR);
 }
@@ -987,7 +987,7 @@ static char *HandleNetworkingPackets(void)
 {
   while (1)
   {
-    /* ---------- check network server for activity ---------- */
+    // ---------- check network server for activity ----------
 
     int num_active_sockets = SDLNet_CheckSockets(rfds, 0);
 
@@ -997,7 +997,7 @@ static char *HandleNetworkingPackets(void)
     if (num_active_sockets == 0)
       break;	// no active sockets, stop here
 
-    /* ---------- read packets from network server ---------- */
+    // ---------- read packets from network server ----------
 
     initNetworkBufferForReceiving(read_buffer);
 
@@ -1054,7 +1054,7 @@ static void HandleNetworkingDisconnect(void)
 
 void HandleNetworking(void)
 {
-  /* do not handle any networking packets if request dialog is active */
+  // do not handle any networking packets if request dialog is active
   if (game.request_active)
     return;
 

@@ -19,11 +19,11 @@
 #include "system.h"
 
 
-/* values for InitCounter() and Counter() */
+// values for InitCounter() and Counter()
 #define INIT_COUNTER			0
 #define READ_COUNTER			1
 
-/* values for InitRND() */
+// values for InitRND()
 #define NEW_RANDOMIZE			0
 
 #define RANDOM_ENGINE			0
@@ -34,7 +34,7 @@
 #define GetEngineRandom(max)		get_random_number(RANDOM_ENGINE, max)
 #define GetSimpleRandom(max)		get_random_number(RANDOM_SIMPLE, max)
 
-/* values for Error() */
+// values for Error()
 #define ERR_UNKNOWN			0
 #define ERR_DEBUG			(1 << 0)
 #define ERR_INFO			(1 << 1)
@@ -51,32 +51,32 @@
 #define ERR_EXIT_NETWORK_SERVER		(ERR_EXIT | ERR_NETWORK_SERVER)
 #define ERR_EXIT_NETWORK_CLIENT		(ERR_EXIT | ERR_NETWORK_CLIENT)
 
-/* values for getFile...() and putFile...() */
+// values for getFile...() and putFile...()
 #define BYTE_ORDER_BIG_ENDIAN		0
 #define BYTE_ORDER_LITTLE_ENDIAN	1
 
-/* values for cursor bitmap creation */
+// values for cursor bitmap creation
 #define BIT_ORDER_MSB			0
 #define BIT_ORDER_LSB			1
 
-/* values for createDirectory() */
+// values for createDirectory()
 #define PERMS_PRIVATE			0
 #define PERMS_PUBLIC			1
 
-/* values for general file handling stuff */
+// values for general file handling stuff
 #define MAX_FILENAME_LEN		256
 #define MAX_LINE_LEN			1024
 
-/* values for general username handling stuff */
+// values for general username handling stuff
 #define MAX_USERNAME_LEN		1024
 
 #if defined(PLATFORM_ANDROID)
-/* values for Android asset handling */
+// values for Android asset handling
 #define ASSET_TOC_BASENAME		".toc"
 #endif
 
 
-/* structure definitions */
+// structure definitions
 
 typedef struct
 {
@@ -111,7 +111,7 @@ typedef struct
 } Directory;
 
 
-/* function definitions */
+// function definitions
 
 void fprintf_line(FILE *, char *, int);
 void fprintf_line_with_prefix(FILE *, char *, char *, int);
@@ -291,4 +291,4 @@ void print_timestamp_time(char *);
 void print_timestamp_done(char *);
 
 
-#endif /* MISC_H */
+#endif // MISC_H

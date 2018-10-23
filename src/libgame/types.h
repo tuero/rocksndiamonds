@@ -76,4 +76,4 @@ struct ListNode
 };
 typedef struct ListNode ListNode;
 
-#endif /* TYPES_H */
+#endif // TYPES_H

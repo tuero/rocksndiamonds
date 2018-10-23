@@ -21,17 +21,17 @@ struct ImageInfo
 
   Bitmap *bitmaps[NUM_IMG_BITMAP_POINTERS];
 
-  int original_width;			/* original image file width */
-  int original_height;			/* original image file height */
+  int original_width;			// original image file width
+  int original_height;			// original image file height
 
-  boolean contains_small_images;	/* set after adding small images */
-  boolean contains_textures;		/* set after adding GPU textures */
-  boolean scaled_up;			/* set after scaling up */
+  boolean contains_small_images;	// set after adding small images
+  boolean contains_textures;		// set after adding GPU textures
+  boolean scaled_up;			// set after scaling up
 
-  int conf_tile_size;			/* tile size as defined in config */
-  int game_tile_size;			/* tile size as resized for game */
+  int conf_tile_size;			// tile size as defined in config
+  int game_tile_size;			// tile size as resized for game
 
-  char *leveldir;			/* level set when image was loaded */
+  char *leveldir;			// level set when image was loaded
 };
 typedef struct ImageInfo ImageInfo;
 
@@ -186,7 +186,7 @@ void InitImageList(struct ConfigInfo *config_list, int num_file_list_entries,
   image_info = checked_calloc(sizeof(struct ArtworkListInfo));
   image_info->type = ARTWORK_TYPE_GRAPHICS;
 
-  /* ---------- initialize file list and suffix lists ---------- */
+  // ---------- initialize file list and suffix lists ----------
 
   image_info->num_file_list_entries = num_file_list_entries;
   image_info->num_dynamic_file_list_entries = 0;
@@ -202,7 +202,7 @@ void InitImageList(struct ConfigInfo *config_list, int num_file_list_entries,
 
   image_info->suffix_list = config_suffix_list;
 
-  /* ---------- initialize base prefix and suffixes lists ---------- */
+  // ---------- initialize base prefix and suffixes lists ----------
 
   image_info->num_base_prefixes = 0;
   for (i = 0; base_prefixes[i] != NULL; i++)
@@ -234,7 +234,7 @@ void InitImageList(struct ConfigInfo *config_list, int num_file_list_entries,
 
   image_info->property_mapping = NULL;
 
-  /* ---------- initialize artwork reference and content lists ---------- */
+  // ---------- initialize artwork reference and content lists ----------
 
   image_info->sizeof_artwork_list_entry = sizeof(ImageInfo *);
 
@@ -244,7 +244,7 @@ void InitImageList(struct ConfigInfo *config_list, int num_file_list_entries,
 
   image_info->content_list = NULL;
 
-  /* ---------- initialize artwork loading/freeing functions ---------- */
+  // ---------- initialize artwork loading/freeing functions ----------
 
   image_info->load_artwork = Load_Image;
   image_info->free_artwork = FreeImage;

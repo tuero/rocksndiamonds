@@ -17,4 +17,4 @@ void subMainGameLoop_Init(void);
 void subMainGameLoop_Main(byte, boolean);
 void subCalculateScreenScrollPos(void);
 
-#endif /* MAINGAMELOOP_H */
+#endif // MAINGAMELOOP_H

@@ -7,7 +7,7 @@
 #include "vb_lib.h"
 
 
-/* helper functions for constructs not supported by C */
+// helper functions for constructs not supported by C
 
 int MyGetTickCount(void)
 {

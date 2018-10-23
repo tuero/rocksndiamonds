@@ -15,4 +15,4 @@
 #include <android/log.h>
 
 
-#endif /* ANDROID_H */
+#endif // ANDROID_H

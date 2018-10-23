@@ -78,7 +78,7 @@ void subDoGameStuff(void)
       ExplodeFieldSP(MurphyExplodePos);		// Explode
       LeadOutCounter = 0x40;			// quit: start lead-out
 
-      /* give Murphy some more time (LeadOutCounter) to reach the exit */
+      // give Murphy some more time (LeadOutCounter) to reach the exit
     }
   } //  loc_g_22FB:
 }

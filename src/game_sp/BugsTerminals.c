@@ -75,26 +75,26 @@ void subAnimateTerminals(int si)
   if (LowByte(PlayField16[si]) != fiTerminal)
     return;
 
-  /* use native frame handling (undo frame incrementation in main loop) */
+  // use native frame handling (undo frame incrementation in main loop)
   if (game.use_native_sp_graphics_engine)
     GfxFrame[lx][ly]--;
 
-  /* get last random animation delay */
+  // get last random animation delay
   bl = SgnHighByte(PlayField16[si]);
 
   bl = bl + 1;
-  if (bl <= 0)		/* return if random animation delay not yet reached */
+  if (bl <= 0)		// return if random animation delay not yet reached
   {
     MovHighByte(&PlayField16[si], bl);
 
     return;
   }
 
-  /* calculate new random animation delay */
+  // calculate new random animation delay
   bl = -(subGetRandomNumber() & TerminalMaxCycles); // generate new random number
   MovHighByte(&PlayField16[si], bl); // save new sequence number
 
-  /* check terminal state (active or inactive) */
+  // check terminal state (active or inactive)
   bl = TerminalState[si] + 1;
   if (bl == 8)
     bl = 0;

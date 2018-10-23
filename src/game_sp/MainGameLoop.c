@@ -74,7 +74,7 @@ void subMainGameLoop_Main(byte action, boolean warp_mode)
   // lead-out done: exit now
   // ---------------------- END OF GAME-BUSY LOOP (including lead-out) ---------
 
-  /* if the game is not won when reaching this point, then it is lost */
+  // if the game is not won when reaching this point, then it is lost
   if (!game_sp.LevelSolved)
     game_sp.GameOver = TRUE;
 }
@@ -83,7 +83,7 @@ void subCalculateScreenScrollPos(void)
 {
   int jump_pos = TILEX / 2;
 
-  /* handle wrap-around */
+  // handle wrap-around
   if (MurphyScreenXPos < -jump_pos)
   {
     MurphyScreenXPos = FieldWidth * TILEX + MurphyScreenXPos;

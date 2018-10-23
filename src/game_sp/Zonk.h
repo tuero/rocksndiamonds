@@ -9,4 +9,4 @@
 
 void subAnimateZonks(int si);
 
-#endif /* ZONK_H */
+#endif // ZONK_H

@@ -323,4 +323,4 @@ extern int SnikSnaksElectronsFrozen;
 extern int YellowDisksExploded;
 extern int YawnSleepCounter;
 
-#endif /* GLOBALS_H */
+#endif // GLOBALS_H

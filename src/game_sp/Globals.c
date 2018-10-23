@@ -166,13 +166,13 @@ void InitGlobals(void)
   bPlaying = False;
   menBorder = False;
 
-  /* add preceding playfield buffer (as large as preceding memory area) */
+  // add preceding playfield buffer (as large as preceding memory area)
   PlayField16 = checked_calloc((game_sp.preceding_buffer_size +
 				SP_MAX_PLAYFIELD_SIZE +
 				SP_HEADER_SIZE) * sizeof(int));
   PlayField16 = &PlayField16[game_sp.preceding_buffer_size];
 
-  /* add preceding playfield buffer (as large as one playfield row) */
+  // add preceding playfield buffer (as large as one playfield row)
   PlayField8 = checked_calloc((SP_MAX_PLAYFIELD_WIDTH +
 			       SP_MAX_PLAYFIELD_SIZE +
 			       SP_HEADER_SIZE) * sizeof(byte));

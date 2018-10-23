@@ -3,9 +3,9 @@
 #include "global.h"
 
 
-/* ------------------------------------------------------------------------- */
-/* functions for loading Supaplex level                                      */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// functions for loading Supaplex level
+// ----------------------------------------------------------------------------
 
 static void setTapeInfoToDefaults_SP(void)
 {
@@ -28,7 +28,7 @@ void setLevelInfoToDefaults_SP(void)
     for (y = 0; y < native_sp_level.height; y++)
       native_sp_level.playfield[x][y] = fiSpace;
 
-  /* copy string (without terminating '\0' character!) */
+  // copy string (without terminating '\0' character!)
   for (i = 0; i < SP_LEVEL_NAME_LEN; i++)
     header->LevelTitle[i] = empty_title[i];
 
@@ -51,7 +51,7 @@ void setLevelInfoToDefaults_SP(void)
     port->FreezeEnemies = 0;
   }
 
-  /* set raw header bytes (used for subsequent buffer zone) to "hardware" */
+  // set raw header bytes (used for subsequent buffer zone) to "hardware"
   for (i = 0; i < SP_HEADER_SIZE; i++)
     native_sp_level.header_raw_bytes[i] = 0x20;
 
@@ -72,11 +72,11 @@ void copyInternalEngineVars_SP(void)
   FieldMax = (FieldWidth * FieldHeight) + HeaderSize - 1;
   LevelMax = (FieldWidth * FieldHeight) - 1;
 
-  /* initialize preceding playfield buffer */
+  // initialize preceding playfield buffer
   for (i = -game_sp.preceding_buffer_size; i < 0; i++)
     PlayField16[i] = 0;
 
-  /* initialize preceding playfield buffer */
+  // initialize preceding playfield buffer
   for (i = -SP_MAX_PLAYFIELD_WIDTH; i < 0; i++)
     PlayField8[i] = 0;
 
@@ -84,7 +84,7 @@ void copyInternalEngineVars_SP(void)
   for (i = 0; game_sp.preceding_buffer[i] != NULL; i++)
   {
     char *s = game_sp.preceding_buffer[i];
-    boolean hi_byte = FALSE;	/* little endian data => start with low byte */
+    boolean hi_byte = FALSE;	// little endian data => start with low byte
 
     while (s[0] != '\0' && s[1] != '\0')
     {
@@ -114,7 +114,7 @@ void copyInternalEngineVars_SP(void)
     for (x = 0; x < native_sp_level.width; x++)
       PlayField8[count++] = native_sp_level.playfield[x][y];
 
-  /* add raw header bytes to subsequent playfield buffer zone */
+  // add raw header bytes to subsequent playfield buffer zone
   for (i = 0; i < SP_HEADER_SIZE; i++)
     PlayField8[count++] = native_sp_level.header_raw_bytes[i];
 
@@ -133,7 +133,7 @@ void copyInternalEngineVars_SP(void)
 
   LevelLoaded = True;
 
-  /* random seed set by main game tape code to native random generator seed */
+  // random seed set by main game tape code to native random generator seed
 }
 
 static void LoadNativeLevelFromFileStream_SP(File *file, int width, int height,
@@ -148,8 +148,8 @@ static void LoadNativeLevelFromFileStream_SP(File *file, int width, int height,
   native_sp_level.width  = MIN(width,  SP_MAX_PLAYFIELD_WIDTH);
   native_sp_level.height = MIN(height, SP_MAX_PLAYFIELD_HEIGHT);
 
-  /* read level playfield (width * height == 60 * 24 tiles == 1440 bytes) */
-  /* (MPX levels may have non-standard playfield size -- check max. size) */
+  // read level playfield (width * height == 60 * 24 tiles == 1440 bytes)
+  // (MPX levels may have non-standard playfield size -- check max. size)
   for (y = 0; y < height; y++)
   {
     for (x = 0; x < width; x++)
@@ -162,21 +162,21 @@ static void LoadNativeLevelFromFileStream_SP(File *file, int width, int height,
     }
   }
 
-  /* read level header (96 bytes) */
+  // read level header (96 bytes)
 
-  ReadUnusedBytesFromFile(file, 4);	/* (not used by Supaplex engine) */
+  ReadUnusedBytesFromFile(file, 4);	// (not used by Supaplex engine)
 
-  /* initial gravity: 1 == "on", anything else (0) == "off" */
+  // initial gravity: 1 == "on", anything else (0) == "off"
   header->InitialGravity = getFile8Bit(file);
 
-  /* SpeedFixVersion XOR 0x20 */
+  // SpeedFixVersion XOR 0x20
   header->Version = getFile8Bit(file);
 
-  /* level title in uppercase letters, padded with dashes ("-") (23 bytes) */
+  // level title in uppercase letters, padded with dashes ("-") (23 bytes)
   for (i = 0; i < SP_LEVEL_NAME_LEN; i++)
     header->LevelTitle[i] = getFile8Bit(file);
 
-  /* initial "freeze zonks": 2 == "on", anything else (0, 1) == "off" */
+  // initial "freeze zonks": 2 == "on", anything else (0, 1) == "off"
   header->InitialFreezeZonks = getFile8Bit(file);
 
   /* number of infotrons needed; 0 means that Supaplex will count the total
@@ -184,10 +184,10 @@ static void LoadNativeLevelFromFileStream_SP(File *file, int width, int height,
      (a multiple of 256 infotrons will result in "0 infotrons needed"!) */
   header->InfotronsNeeded = getFile8Bit(file);
 
-  /* number of special ("gravity") port entries below (maximum 10 allowed) */
+  // number of special ("gravity") port entries below (maximum 10 allowed)
   header->SpecialPortCount = getFile8Bit(file);
 
-  /* database of properties of up to 10 special ports (6 bytes per port) */
+  // database of properties of up to 10 special ports (6 bytes per port)
   for (i = 0; i < SP_MAX_SPECIAL_PORTS; i++)
   {
     SpecialPortType *port = &header->SpecialPort[i];
@@ -197,30 +197,30 @@ static void LoadNativeLevelFromFileStream_SP(File *file, int width, int height,
        the 16 bit value here calculates as 2 * (x + (y * 60)) (this is twice
        of what may be expected: Supaplex works with a game field in memory
        which is 2 bytes per tile) */
-    port->PortLocation = getFile16BitBE(file);		/* yes, big endian */
+    port->PortLocation = getFile16BitBE(file);		// yes, big endian
 
-    /* change gravity: 1 == "turn on", anything else (0) == "turn off" */
+    // change gravity: 1 == "turn on", anything else (0) == "turn off"
     port->Gravity = getFile8Bit(file);
 
-    /* "freeze zonks": 2 == "turn on", anything else (0, 1) == "turn off" */
+    // "freeze zonks": 2 == "turn on", anything else (0, 1) == "turn off"
     port->FreezeZonks = getFile8Bit(file);
 
-    /* "freeze enemies": 1 == "turn on", anything else (0) == "turn off" */
+    // "freeze enemies": 1 == "turn on", anything else (0) == "turn off"
     port->FreezeEnemies = getFile8Bit(file);
 
-    ReadUnusedBytesFromFile(file, 1);	/* (not used by Supaplex engine) */
+    ReadUnusedBytesFromFile(file, 1);	// (not used by Supaplex engine)
   }
 
-  /* SpeedByte XOR Highbyte(RandomSeed) */
+  // SpeedByte XOR Highbyte(RandomSeed)
   header->SpeedByte = getFile8Bit(file);
 
-  /* CheckSum XOR SpeedByte */
+  // CheckSum XOR SpeedByte
   header->CheckSumByte = getFile8Bit(file);
 
-  /* random seed used for recorded demos */
-  header->DemoRandomSeed = getFile16BitLE(file);	/* yes, little endian */
+  // random seed used for recorded demos
+  header->DemoRandomSeed = getFile16BitLE(file);	// yes, little endian
 
-  /* auto-determine number of infotrons if it was stored as "0" -- see above */
+  // auto-determine number of infotrons if it was stored as "0" -- see above
   if (header->InfotronsNeeded == 0)
   {
     for (x = 0; x < native_sp_level.width; x++)
@@ -228,22 +228,22 @@ static void LoadNativeLevelFromFileStream_SP(File *file, int width, int height,
 	if (native_sp_level.playfield[x][y] == fiInfotron)
 	  header->InfotronsNeeded++;
 
-    header->InfotronsNeeded &= 0xff;	/* only use low byte -- see above */
+    header->InfotronsNeeded &= 0xff;	// only use low byte -- see above
   }
 
-  /* read raw level header bytes (96 bytes) */
+  // read raw level header bytes (96 bytes)
 
-  seekFile(file, -(SP_HEADER_SIZE), SEEK_CUR);	/* rewind file */
+  seekFile(file, -(SP_HEADER_SIZE), SEEK_CUR);	// rewind file
   for (i = 0; i < SP_HEADER_SIZE; i++)
     native_sp_level.header_raw_bytes[i] = getByteFromFile(file);
 
-  /* also load demo tape, if available (only in single level files) */
+  // also load demo tape, if available (only in single level files)
 
   if (demo_available)
   {
     int level_nr = getFile8Bit(file);
 
-    level_nr &= 0x7f;			/* clear highest bit */
+    level_nr &= 0x7f;			// clear highest bit
     level_nr = (level_nr < 1   ? 1   :
 		level_nr > 111 ? 111 : level_nr);
 
@@ -253,7 +253,7 @@ static void LoadNativeLevelFromFileStream_SP(File *file, int width, int height,
     {
       native_sp_level.demo.data[i] = getFile8Bit(file);
 
-      if (native_sp_level.demo.data[i] == 0xff)	/* "end of demo" byte */
+      if (native_sp_level.demo.data[i] == 0xff)	// "end of demo" byte
 	break;
     }
 
@@ -287,7 +287,7 @@ boolean LoadNativeLevel_SP(char *filename, int level_pos,
   int level_width  = SP_STD_PLAYFIELD_WIDTH;
   int level_height = SP_STD_PLAYFIELD_HEIGHT;
 
-  /* always start with reliable default values */
+  // always start with reliable default values
   setLevelInfoToDefaults_SP();
   copyInternalEngineVars_SP();
 
@@ -352,7 +352,7 @@ boolean LoadNativeLevel_SP(char *filename, int level_pos,
 
       ldesc->Width  = getFile16BitLE(file);
       ldesc->Height = getFile16BitLE(file);
-      ldesc->OffSet = getFile32BitLE(file);	/* starts with 1, not with 0 */
+      ldesc->OffSet = getFile32BitLE(file);	// starts with 1, not with 0
       ldesc->Size   = getFile32BitLE(file);
     }
 
@@ -362,7 +362,7 @@ boolean LoadNativeLevel_SP(char *filename, int level_pos,
     file_seek_pos = mpx_level_desc[level_pos].OffSet - 1;
   }
 
-  /* position file stream to the requested level (in case of level package) */
+  // position file stream to the requested level (in case of level package)
   if (seekFile(file, file_seek_pos, SEEK_SET) != 0)
   {
     Error(ERR_WARN, "cannot fseek in file '%s' -- using empty level", filename);
@@ -383,7 +383,7 @@ boolean LoadNativeLevel_SP(char *filename, int level_pos,
     LoadNativeLevelFromFileStream_SP(file, level_width, level_height,
 				     demo_available);
 
-    /* check if this level is a part of a bigger multi-part level */
+    // check if this level is a part of a bigger multi-part level
 
     if (is_single_level_file)
       break;
@@ -401,20 +401,20 @@ boolean LoadNativeLevel_SP(char *filename, int level_pos,
 
     if (is_multipart_level)
     {
-      /* correct leading multipart level meta information in level name */
+      // correct leading multipart level meta information in level name
       for (i = 0;
 	   i < SP_LEVEL_NAME_LEN && header->LevelTitle[i] == name_first;
 	   i++)
 	header->LevelTitle[i] = '-';
 
-      /* correct trailing multipart level meta information in level name */
+      // correct trailing multipart level meta information in level name
       for (i = SP_LEVEL_NAME_LEN - 1;
 	   i >= 0 && header->LevelTitle[i] == name_last;
 	   i--)
 	header->LevelTitle[i] = '-';
     }
 
-    /* ---------- check for normal single level ---------- */
+    // ---------- check for normal single level ----------
 
     if (!reading_multipart_level && !is_multipart_level)
     {
@@ -424,7 +424,7 @@ boolean LoadNativeLevel_SP(char *filename, int level_pos,
       break;
     }
 
-    /* ---------- check for empty level (unused multi-part) ---------- */
+    // ---------- check for empty level (unused multi-part) ----------
 
     if (!reading_multipart_level && is_multipart_level && !is_first_part)
     {
@@ -437,7 +437,7 @@ boolean LoadNativeLevel_SP(char *filename, int level_pos,
       break;
     }
 
-    /* ---------- check for finished multi-part level ---------- */
+    // ---------- check for finished multi-part level ----------
 
     if (reading_multipart_level &&
 	(!is_multipart_level ||
@@ -451,16 +451,16 @@ boolean LoadNativeLevel_SP(char *filename, int level_pos,
       break;
     }
 
-    /* ---------- here we have one part of a multi-part level ---------- */
+    // ---------- here we have one part of a multi-part level ----------
 
     reading_multipart_level = TRUE;
 
-    if (is_first_part)	/* start with first part of new multi-part level */
+    if (is_first_part)	// start with first part of new multi-part level
     {
-      /* copy level info structure from first part */
+      // copy level info structure from first part
       multipart_level = native_sp_level;
 
-      /* clear playfield of new multi-part level */
+      // clear playfield of new multi-part level
       for (x = 0; x < SP_MAX_PLAYFIELD_WIDTH; x++)
 	for (y = 0; y < SP_MAX_PLAYFIELD_HEIGHT; y++)
 	  multipart_level.playfield[x][y] = fiSpace;
@@ -487,7 +487,7 @@ boolean LoadNativeLevel_SP(char *filename, int level_pos,
     multipart_level.height = MAX(multipart_level.height,
 				 multipart_ypos * SP_STD_PLAYFIELD_HEIGHT);
 
-    /* copy level part at the right position of multi-part level */
+    // copy level part at the right position of multi-part level
     for (x = 0; x < SP_STD_PLAYFIELD_WIDTH; x++)
     {
       for (y = 0; y < SP_STD_PLAYFIELD_HEIGHT; y++)
@@ -531,12 +531,12 @@ void SaveNativeLevel_SP(char *filename)
     return;
   }
 
-  /* write level playfield (width * height == 60 * 24 tiles == 1440 bytes) */
+  // write level playfield (width * height == 60 * 24 tiles == 1440 bytes)
   for (y = 0; y < native_sp_level.height; y++)
     for (x = 0; x < native_sp_level.width; x++)
       putFile8Bit(file, native_sp_level.playfield[x][y]);
 
-  /* write level header (96 bytes) */
+  // write level header (96 bytes)
 
   WriteUnusedBytesToFile(file, 4);
 
@@ -566,7 +566,7 @@ void SaveNativeLevel_SP(char *filename)
   putFile8Bit(file, header->CheckSumByte);
   putFile16BitLE(file, header->DemoRandomSeed);
 
-  /* also save demo tape, if available */
+  // also save demo tape, if available
 
   if (native_sp_level.demo.is_available)
   {
@@ -575,7 +575,7 @@ void SaveNativeLevel_SP(char *filename)
     for (i = 0; i < native_sp_level.demo.length; i++)
       putFile8Bit(file, native_sp_level.demo.data[i]);
 
-    putFile8Bit(file, 0xff);	/* "end of demo" byte */
+    putFile8Bit(file, 0xff);	// "end of demo" byte
   }
 
   fclose(file);

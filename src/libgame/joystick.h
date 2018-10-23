@@ -35,8 +35,8 @@
 #define DEV_JOYSTICK_3		"/dev/js3"
 #endif
 
-/* get these values from the program 'js' from the joystick package, */
-/* set JOYSTICK_PERCENT to a threshold appropriate for your joystick */
+// get these values from the program 'js' from the joystick package,
+// set JOYSTICK_PERCENT to a threshold appropriate for your joystick
 
 #define JOYSTICK_MAX_AXIS_POS	32767
 
@@ -83,4 +83,4 @@ int AnyJoystickButton(void);
 void DeactivateJoystick(void);
 void ActivateJoystick(void);
 
-#endif	/* JOYSTICK_H */
+#endif	// JOYSTICK_H

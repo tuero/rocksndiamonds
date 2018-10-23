@@ -16,4 +16,4 @@ void subAnimateTerminals(int si);
 void subRandomize(void);
 int subGetRandomNumber(void);
 
-#endif /* BUGSTERMINALS_H */
+#endif // BUGSTERMINALS_H

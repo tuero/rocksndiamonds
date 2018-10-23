@@ -91,7 +91,7 @@ struct ConfigInfo image_config[] =
   // image definitions for game elements (for in-game and editor graphics)
   // ==========================================================================
 
-  /* images for Boulder Dash style elements and actions */
+  // images for Boulder Dash style elements and actions
 
   { "bd_wall",					"RocksDC.png"		},
   { "bd_wall.xpos",				"12"			},
@@ -293,7 +293,7 @@ struct ConfigInfo image_config[] =
   { "bd_firefly.down.EDITOR.xpos",		"15"			},
   { "bd_firefly.down.EDITOR.ypos",		"12"			},
 
-  /* images for Supaplex style elements and actions */
+  // images for Supaplex style elements and actions
 
   { "[sp_default].exploding",			"RocksSP.png"		},
   { "[sp_default].exploding.xpos",		"8"			},
@@ -831,7 +831,7 @@ struct ConfigInfo image_config[] =
   { "sp_hardware_base_6.ypos",			"4"			},
   { "sp_hardware_base_6.frames",		"1"			},
 
-  /* images for Sokoban style elements and actions */
+  // images for Sokoban style elements and actions
 
   { "sokoban_object",				"RocksElements.png"	},
   { "sokoban_object.xpos",			"9"			},
@@ -859,7 +859,7 @@ struct ConfigInfo image_config[] =
   { "sokoban_field_player.EDITOR.xpos",		"1"			},
   { "sokoban_field_player.EDITOR.ypos",		"15"			},
 
-  /* images for Emerald Mine style elements and actions */
+  // images for Emerald Mine style elements and actions
 
   { "empty_space",				"RocksSP.png"		},
   { "empty_space.xpos",				"0"			},
@@ -1724,7 +1724,7 @@ struct ConfigInfo image_config[] =
   { "em_steel_exit.closing.delay",		"6"			},
   { "em_steel_exit.closing.anim_mode",		"linear"		},
 
-  /* images for Emerald Mine Club style elements and actions */
+  // images for Emerald Mine Club style elements and actions
 
   { "balloon",					"RocksDC.png"		},
   { "balloon.xpos",				"12"			},
@@ -1822,7 +1822,7 @@ struct ConfigInfo image_config[] =
   { "emc_wall_8.ypos",				"7"			},
   { "emc_wall_8.frames",			"1"			},
 
-  /* images for Diamond Caves style elements and actions */
+  // images for Diamond Caves style elements and actions
 
   { "invisible_steelwall",			"RocksSP.png"		},
   { "invisible_steelwall.xpos",			"3"			},
@@ -2461,7 +2461,7 @@ struct ConfigInfo image_config[] =
   { "dc_steelwall_2_single.ypos",		"0"			},
   { "dc_steelwall_2_single.frames",		"1"			},
 
-  /* images for DX Boulderdash style elements and actions */
+  // images for DX Boulderdash style elements and actions
 
   { "tube_right_down",				"RocksDC.png"		},
   { "tube_right_down.xpos",			"9"			},
@@ -2537,7 +2537,7 @@ struct ConfigInfo image_config[] =
   { "dx_supabomb.ypos",				"9"			},
   { "dx_supabomb.frames",			"1"			},
 
-  /* images for Rocks'n'Diamonds style elements and actions */
+  // images for Rocks'n'Diamonds style elements and actions
 
   { "key_1",					"RocksElements.png"	},
   { "key_1.xpos",				"4"			},
@@ -3249,7 +3249,7 @@ struct ConfigInfo image_config[] =
   { "stoneblock.ypos",				"1"			},
   { "stoneblock.frames",			"1"			},
 
-  /* images for other elements and actions */
+  // images for other elements and actions
 
   { "player_1",					"RocksHeroes.png"	},
   { "player_1.xpos",				"0"			},
@@ -5671,7 +5671,7 @@ struct ConfigInfo image_config[] =
   { "df_mine.ypos",				"8"			},
   { "df_mine.frames",				"1"			},
 
-  /* (these are only defined as elements to support ".PANEL" definitions) */
+  // (these are only defined as elements to support ".PANEL" definitions)
   { "graphic_1",				UNDEFINED_FILENAME	},
   { "graphic_2",				UNDEFINED_FILENAME	},
   { "graphic_3",				UNDEFINED_FILENAME	},
@@ -5681,27 +5681,27 @@ struct ConfigInfo image_config[] =
   { "graphic_7",				UNDEFINED_FILENAME	},
   { "graphic_8",				UNDEFINED_FILENAME	},
 
-#include "conf_chr.c"	/* include auto-generated data structure definitions */
-#include "conf_cus.c"	/* include auto-generated data structure definitions */
-#include "conf_grp.c"	/* include auto-generated data structure definitions */
+#include "conf_chr.c"	// include auto-generated data structure definitions
+#include "conf_cus.c"	// include auto-generated data structure definitions
+#include "conf_grp.c"	// include auto-generated data structure definitions
 
 
   // ==========================================================================
   // image definitions not associated with game elements (menu screens etc.)
   // ==========================================================================
 
-  /* keyword to stop parser: "NO_MORE_ELEMENT_IMAGES" <-- do not change! */
+  // keyword to stop parser: "NO_MORE_ELEMENT_IMAGES" <-- do not change!
 
 #if 1
-  /* !!! TEMPORARILY STORED HERE -- PROBABLY TO BE CHANGED !!! */
+  // !!! TEMPORARILY STORED HERE -- PROBABLY TO BE CHANGED !!!
 
-  /* (for testing, change filename back to "emc_objects dot png") */
+  // (for testing, change filename back to "emc_objects dot png")
   { "emc_object",				"RocksEMC.png"		},
 #if 0
   { "emc_object.scale_up_factor",		"2"			},
 #endif
 
-  /* (for testing, change filename back to "emc_players dot png") */
+  // (for testing, change filename back to "emc_players dot png")
   { "emc_sprite",				"RocksEMC.png"		},
 #if 0
   { "emc_sprite.scale_up_factor",		"2"			},
@@ -7366,7 +7366,7 @@ struct ConfigInfo image_config[] =
   /* the following directives are not associated with an image, but
      probably make sense to be defined in "graphicsinfo.conf", too */
 
-  /* keyword to start parser: "CONFIG_VARS_START" <-- do not change! */
+  // keyword to start parser: "CONFIG_VARS_START" <-- do not change!
 
   { "[title_initial].fade_mode",		"fade"			},
   { "[title_initial].fade_delay",		"500"			},

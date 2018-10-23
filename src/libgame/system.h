@@ -27,7 +27,7 @@
 #include "sdl.h"
 
 
-/* the additional 'b' is needed for Win32 to open files in binary mode */
+// the additional 'b' is needed for Win32 to open files in binary mode
 #define MODE_READ			"rb"
 #define MODE_WRITE			"wb"
 #define MODE_APPEND			"ab"
@@ -39,11 +39,11 @@
 #define BLIT_INVERSE			2
 #define BLIT_ON_BACKGROUND		3
 
-/* values for fullscreen status */
+// values for fullscreen status
 #define FULLSCREEN_NOT_AVAILABLE	FALSE
 #define FULLSCREEN_AVAILABLE		TRUE
 
-/* values for window scaling */
+// values for window scaling
 #define WINDOW_SCALING_NOT_AVAILABLE	FALSE
 #define WINDOW_SCALING_AVAILABLE	TRUE
 
@@ -52,14 +52,14 @@
 #define MAX_WINDOW_SCALING_PERCENT	400
 #define STEP_WINDOW_SCALING_PERCENT	10
 
-/* values for window scaling quality */
+// values for window scaling quality
 #define SCALING_QUALITY_NEAREST		"nearest"
 #define SCALING_QUALITY_LINEAR		"linear"
 #define SCALING_QUALITY_BEST		"best"
 
 #define SCALING_QUALITY_DEFAULT		SCALING_QUALITY_LINEAR
 
-/* values for screen rendering mode */
+// values for screen rendering mode
 #define STR_SPECIAL_RENDERING_OFF	"stream_texture_only"
 #define STR_SPECIAL_RENDERING_BITMAP	"bitmap_and_stream_texture"
 #define STR_SPECIAL_RENDERING_TARGET	"target_texture_only"
@@ -82,7 +82,7 @@
 #define SPECIAL_RENDERING_DEFAULT	SPECIAL_RENDERING_BITMAP
 #endif
 
-/* values for vertical screen retrace synchronization (vsync) */
+// values for vertical screen retrace synchronization (vsync)
 #define STR_VSYNC_MODE_OFF		"off"
 #define STR_VSYNC_MODE_NORMAL		"normal"
 #define STR_VSYNC_MODE_ADAPTIVE		"adaptive"
@@ -95,11 +95,11 @@
 
 #define VSYNC_MODE_DEFAULT		VSYNC_MODE_OFF
 
-/* values for network server settings */
+// values for network server settings
 #define STR_NETWORK_AUTO_DETECT		"auto_detect_network_server"
 #define STR_NETWORK_AUTO_DETECT_SETUP	"(auto detect network server)"
 
-/* values for touch control */
+// values for touch control
 #define TOUCH_CONTROL_OFF		"off"
 #define TOUCH_CONTROL_VIRTUAL_BUTTONS	"virtual_buttons"
 #define TOUCH_CONTROL_WIPE_GESTURES	"wipe_gestures"
@@ -118,7 +118,7 @@
 #define ALPHA_FROM_TRANSPARENCY(x)	((100 - x) * SDL_ALPHA_OPAQUE / 100)
 #define ALPHA_FADING_STEPSIZE(x)	((x) / 25)
 
-/* values for special settings for mobile devices */
+// values for special settings for mobile devices
 #if defined(PLATFORM_ANDROID)
 #define USE_TOUCH_INPUT_OVERLAY
 #define USE_COMPLETE_DISPLAY
@@ -126,7 +126,7 @@
 #define SCREEN_KEYBOARD_POS(h)		((h) / 2)
 #endif
 
-/* default input keys */
+// default input keys
 #define DEFAULT_KEY_LEFT		KSYM_Left
 #define DEFAULT_KEY_RIGHT		KSYM_Right
 #define DEFAULT_KEY_UP			KSYM_Up
@@ -141,7 +141,7 @@
 #define DEFAULT_KEY_OKAY		KSYM_Return
 #define DEFAULT_KEY_CANCEL		KSYM_Escape
 
-/* default shortcut keys */
+// default shortcut keys
 #define DEFAULT_KEY_SAVE_GAME		KSYM_F1
 #define DEFAULT_KEY_LOAD_GAME		KSYM_F2
 #define DEFAULT_KEY_TOGGLE_PAUSE	KSYM_space
@@ -164,7 +164,7 @@
 #define DEFAULT_KEY_SNAP_UP		KSYM_UNDEFINED
 #define DEFAULT_KEY_SNAP_DOWN		KSYM_UNDEFINED
 
-/* default debug setup keys and values */
+// default debug setup keys and values
 #define DEFAULT_FRAME_DELAY_0		20		// 100 % speed
 #define DEFAULT_FRAME_DELAY_1		500		// 4 % speed
 #define DEFAULT_FRAME_DELAY_2		250		// 8 % speed
@@ -192,12 +192,12 @@
 #define DEFAULT_FRAME_DELAY_USE_MOD_KEY	FALSE
 #define DEFAULT_FRAME_DELAY_GAME_ONLY	TRUE
 
-/* values for key_status */
+// values for key_status
 #define KEY_NOT_PRESSED			FALSE
 #define KEY_RELEASED			FALSE
 #define KEY_PRESSED			TRUE
 
-/* values for button status */
+// values for button status
 #define MB_NOT_PRESSED			FALSE
 #define MB_NOT_RELEASED			TRUE
 #define MB_RELEASED			FALSE
@@ -225,7 +225,7 @@
 					 (b) == MB_MIDDLEBUTTON ?  5 :	\
 					 (b) == MB_RIGHTBUTTON  ? 10 : 1)
 
-/* values for move directions */
+// values for move directions
 #define MV_BIT_LEFT			0
 #define MV_BIT_RIGHT			1
 #define MV_BIT_UP			2
@@ -233,7 +233,7 @@
 
 #define NUM_DIRECTIONS			4
 
-/* diagonal movement directions are used in a different contect than buttons */
+// diagonal movement directions are used in a different contect than buttons
 #define MV_BIT_UPLEFT			4
 #define MV_BIT_UPRIGHT			5
 #define MV_BIT_DOWNLEFT			6
@@ -241,27 +241,27 @@
 
 #define NUM_DIRECTIONS_FULL		8
 
-/* values for special "button" bitmasks */
+// values for special "button" bitmasks
 #define BUTTON_1			4
 #define BUTTON_2			5
 
 #define NUM_PLAYER_ACTIONS		6
 
-/* values for special "focus player" bitmasks */
+// values for special "focus player" bitmasks
 #define BIT_SET_FOCUS			6
 
-/* values for drawing stages for global animations */
+// values for drawing stages for global animations
 #define DRAW_GLOBAL_ANIM_STAGE_1	1
 #define DRAW_GLOBAL_ANIM_STAGE_2	2
 
-/* values for drawing target (various functions) */
+// values for drawing target (various functions)
 #define DRAW_TO_BACKBUFFER		0
 #define DRAW_TO_FIELDBUFFER		1
 #define DRAW_TO_SCREEN			2
 #define DRAW_TO_FADE_SOURCE		3
 #define DRAW_TO_FADE_TARGET		4
 
-/* values for move directions and special "button" key bitmasks */
+// values for move directions and special "button" key bitmasks
 #define MV_NONE			0
 #define MV_LEFT			(1 << MV_BIT_LEFT)
 #define MV_RIGHT		(1 << MV_BIT_RIGHT)
@@ -316,8 +316,8 @@
 				 (x) == MV_DOWNRIGHT ? MV_UPLEFT    : \
 				 MV_NONE)
 
-/* values for animation mode (frame order and direction) */
-/* (stored in level files -- never change existing values) */
+// values for animation mode (frame order and direction)
+// (stored in level files -- never change existing values)
 #define ANIM_NONE		0
 #define ANIM_LOOP		(1 << 0)
 #define ANIM_LINEAR		(1 << 1)
@@ -330,8 +330,8 @@
 #define ANIM_REVERSE		(1 << 8)
 #define ANIM_OPAQUE_PLAYER	(1 << 9)
 
-/* values for special (non game element) animation modes */
-/* (not stored in level files -- can be changed, if needed) */
+// values for special (non game element) animation modes
+// (not stored in level files -- can be changed, if needed)
 #define ANIM_HORIZONTAL		(1 << 10)
 #define ANIM_VERTICAL		(1 << 11)
 #define ANIM_CENTERED		(1 << 12)
@@ -341,19 +341,19 @@
 
 #define ANIM_DEFAULT		ANIM_LOOP
 
-/* values for special drawing styles (currently only for crumbled graphics) */
+// values for special drawing styles (currently only for crumbled graphics)
 #define STYLE_NONE		0
 #define STYLE_ACCURATE_BORDERS	(1 << 0)
 #define STYLE_INNER_CORNERS	(1 << 1)
 #define STYLE_REVERSE		(1 << 2)
 
-/* values for special event handling style (used for global animation) */
+// values for special event handling style (used for global animation)
 #define STYLE_PASSTHROUGH	(1 << 3)
 #define STYLE_MULTIPLE_ACTIONS	(1 << 4)
 
 #define STYLE_DEFAULT		STYLE_NONE
 
-/* values for special global animation events */
+// values for special global animation events
 #define ANIM_EVENT_NONE		0
 #define ANIM_EVENT_SELF		(1 << 16)
 #define ANIM_EVENT_ANY		(1 << 17)
@@ -366,10 +366,10 @@
 
 #define ANIM_EVENT_DEFAULT	ANIM_EVENT_NONE
 
-/* values for special global animation event actions */
+// values for special global animation event actions
 #define ANIM_EVENT_ACTION_NONE	-1
 
-/* values for fade mode */
+// values for fade mode
 #define FADE_TYPE_NONE		0
 #define FADE_TYPE_FADE_IN	(1 << 0)
 #define FADE_TYPE_FADE_OUT	(1 << 1)
@@ -392,7 +392,7 @@
 
 #define FADE_MODE_DEFAULT	FADE_MODE_FADE
 
-/* values for toon positions */
+// values for toon positions
 #define POS_UNDEFINED		-1
 #define POS_LEFT		0
 #define POS_RIGHT		1
@@ -404,7 +404,7 @@
 #define POS_ANY			7
 #define POS_LAST		8
 
-/* values for text alignment */
+// values for text alignment
 #define ALIGN_LEFT		(1 << 0)
 #define ALIGN_RIGHT		(1 << 1)
 #define ALIGN_CENTER		(1 << 2)
@@ -422,7 +422,7 @@
 #define ALIGNED_TEXT_XPOS(p)	ALIGNED_XPOS((p)->x, (p)->width,  (p)->align)
 #define ALIGNED_TEXT_YPOS(p)	ALIGNED_YPOS((p)->y, (p)->height, (p)->valign)
 
-/* values for redraw_mask */
+// values for redraw_mask
 #define REDRAW_NONE		(0)
 #define REDRAW_ALL		(1 << 0)
 #define REDRAW_FIELD		(1 << 1)
@@ -448,39 +448,39 @@
 #define IN_GFX_DOOR_3(x, y)	(x >= gfx.ex && x < gfx.ex + gfx.exsize && \
 				 y >= gfx.ey && y < gfx.ey + gfx.eysize)
 
-/* values for mouse cursor */
+// values for mouse cursor
 #define CURSOR_DEFAULT		0
 #define CURSOR_NONE		1
 #define CURSOR_PLAYFIELD	2
 
-/* fundamental game speed values */
-#define ONE_SECOND_DELAY	1000	/* delay value for one second */
-#define MENU_FRAME_DELAY	20	/* frame delay in milliseconds */
-#define GAME_FRAME_DELAY	20	/* frame delay in milliseconds */
-#define FFWD_FRAME_DELAY	10	/* 200% speed for fast forward */
-#define MIN_VSYNC_FRAME_DELAY	15	/* minimum value for vsync to keep */
-#define MAX_VSYNC_FRAME_DELAY	16	/* maximum value for vsync to work */
+// fundamental game speed values
+#define ONE_SECOND_DELAY	1000	// delay value for one second
+#define MENU_FRAME_DELAY	20	// frame delay in milliseconds
+#define GAME_FRAME_DELAY	20	// frame delay in milliseconds
+#define FFWD_FRAME_DELAY	10	// 200% speed for fast forward
+#define MIN_VSYNC_FRAME_DELAY	15	// minimum value for vsync to keep
+#define MAX_VSYNC_FRAME_DELAY	16	// maximum value for vsync to work
 #define FRAMES_PER_SECOND	(ONE_SECOND_DELAY / GAME_FRAME_DELAY)
 #define FRAMES_PER_SECOND_SP	35
 
-/* maximum playfield size supported by libgame functions */
+// maximum playfield size supported by libgame functions
 #define MAX_PLAYFIELD_WIDTH	128
 #define MAX_PLAYFIELD_HEIGHT	128
 
-/* maximum number of parallel players supported by libgame functions */
+// maximum number of parallel players supported by libgame functions
 #define MAX_PLAYERS		4
 
-/* maximum allowed length of player name */
+// maximum allowed length of player name
 #define MAX_PLAYER_NAME_LEN	10
 
-/* maximum number of levels in a level set */
+// maximum number of levels in a level set
 #define MAX_LEVELS		1000
 
-/* maximum number of global animation and parts */
+// maximum number of global animation and parts
 #define MAX_GLOBAL_ANIMS		32
 #define MAX_GLOBAL_ANIM_PARTS		32
 
-/* minimum/maximum/default x/y grid size for virtual buttons */
+// minimum/maximum/default x/y grid size for virtual buttons
 #define MIN_GRID_XSIZE			3
 #define MIN_GRID_YSIZE			3
 #define MAX_GRID_XSIZE			32
@@ -510,7 +510,7 @@
 #define GRID_ACTIVE_NR()		(video.screen_width >	\
 					 video.screen_height ? 0 : 1)
 
-/* values for grid button characters for virtual buttons */
+// values for grid button characters for virtual buttons
 #define CHAR_GRID_BUTTON_NONE		' '
 #define CHAR_GRID_BUTTON_LEFT		'<'
 #define CHAR_GRID_BUTTON_RIGHT		'>'
@@ -533,38 +533,38 @@
 					 JOY_BUTTON_2 :			 \
 					 JOY_NO_ACTION)
 
-/* default name for empty highscore entry */
+// default name for empty highscore entry
 #define EMPTY_PLAYER_NAME	"no name"
 
-/* default name for unknown player names */
+// default name for unknown player names
 #define ANONYMOUS_NAME		"anonymous"
 
-/* default for other unknown names */
+// default for other unknown names
 #define UNKNOWN_NAME		"unknown"
 
-/* default name for new levels */
+// default name for new levels
 #define NAMELESS_LEVEL_NAME	"nameless level"
 
-/* default text for non-existant artwork */
+// default text for non-existant artwork
 #define NOT_AVAILABLE		"(not available)"
 
-/* default value for undefined filename */
+// default value for undefined filename
 #define UNDEFINED_FILENAME	"[NONE]"
 
-/* default value for undefined levelset */
+// default value for undefined levelset
 #define UNDEFINED_LEVELSET	"[NONE]"
 
-/* default value for undefined parameter */
+// default value for undefined parameter
 #define ARG_DEFAULT		"[DEFAULT]"
 
-/* default values for undefined configuration file parameters */
+// default values for undefined configuration file parameters
 #define ARG_UNDEFINED		"-1000000"
 #define ARG_UNDEFINED_VALUE	(-1000000)
 
-/* default value for off-screen positions */
+// default value for off-screen positions
 #define POS_OFFSCREEN		(-1000000)
 
-/* definitions for game sub-directories */
+// definitions for game sub-directories
 #ifndef RO_GAME_DIR
 #define RO_GAME_DIR		"."
 #endif
@@ -576,7 +576,7 @@
 #define RO_BASE_PATH		RO_GAME_DIR
 #define RW_BASE_PATH		RW_GAME_DIR
 
-/* directory names */
+// directory names
 #define GRAPHICS_DIRECTORY	"graphics"
 #define SOUNDS_DIRECTORY	"sounds"
 #define MUSIC_DIRECTORY		"music"
@@ -602,7 +602,7 @@
 
 #define DEFAULT_LEVELSET	(setup.internal.default_level_series)
 
-/* file names and filename extensions */
+// file names and filename extensions
 #define LEVELSETUP_DIRECTORY	"levelsetup"
 #define SETUP_FILENAME		"setup.conf"
 #define AUTOSETUP_FILENAME	"autosetup.conf"
@@ -653,16 +653,16 @@
 #endif
 
 
-/* areas in bitmap PIX_DOOR */
+// areas in bitmap PIX_DOOR
 /* meaning in PIX_DB_DOOR: (3 PAGEs)
    PAGEX1: 1. buffer for DOOR_1
    PAGEX2: 2. buffer for DOOR_1
    PAGEX3: buffer for animations
 */
 
-/* these values are hard-coded to be able to use them in initialization */
-#define DOOR_GFX_PAGE_WIDTH	100	/* should be set to "gfx.dxsize" */
-#define DOOR_GFX_PAGE_HEIGHT	280	/* should be set to "gfx.dysize" */
+// these values are hard-coded to be able to use them in initialization
+#define DOOR_GFX_PAGE_WIDTH	100	// should be set to "gfx.dxsize"
+#define DOOR_GFX_PAGE_HEIGHT	280	// should be set to "gfx.dysize"
 
 #define DOOR_GFX_PAGESIZE	(DOOR_GFX_PAGE_WIDTH)
 #define DOOR_GFX_PAGEX1		(0 * DOOR_GFX_PAGESIZE)
@@ -677,7 +677,7 @@
 #define DOOR_GFX_PAGEY2		(DOOR_GFX_PAGE_HEIGHT)
 
 
-/* macros for version handling */
+// macros for version handling
 #define VERSION_PART_1(x)	((x) / 1000000)
 #define VERSION_PART_2(x)	(((x) % 1000000) / 10000)
 #define VERSION_PART_3(x)	(((x) % 10000) / 100)
@@ -690,7 +690,7 @@
 #define VERSION_IDENT(a,b,c,d)	((a) * 1000000 + (b) * 10000 + (c) * 100 + (d))
 
 
-/* macros for parent/child process identification */
+// macros for parent/child process identification
 #if defined(PLATFORM_UNIX)
 #define IS_PARENT_PROCESS()	(audio.mixer_pid != getpid())
 #define IS_CHILD_PROCESS()	(audio.mixer_pid == getpid())
@@ -702,7 +702,7 @@
 #endif
 
 
-/* values for artwork type */
+// values for artwork type
 #define ARTWORK_TYPE_GRAPHICS	0
 #define ARTWORK_TYPE_SOUNDS	1
 #define ARTWORK_TYPE_MUSIC	2
@@ -710,7 +710,7 @@
 #define NUM_ARTWORK_TYPES	3
 
 
-/* values for tree type (chosen to match artwork type) */
+// values for tree type (chosen to match artwork type)
 #define TREE_TYPE_UNDEFINED	-1
 #define TREE_TYPE_GRAPHICS_DIR	ARTWORK_TYPE_GRAPHICS
 #define TREE_TYPE_SOUNDS_DIR	ARTWORK_TYPE_SOUNDS
@@ -739,7 +739,7 @@
 				 INFOTEXT_MUSIC_DIR :			\
 				 INFOTEXT_UNDEFINED)
 
-/* values for artwork handling */
+// values for artwork handling
 #define LEVELDIR_ARTWORK_SET_PTR(leveldir, type)			\
 				((type) == ARTWORK_TYPE_GRAPHICS ?	\
 				 &(leveldir)->graphics_set :		\
@@ -841,19 +841,19 @@
 }
 
 
-/* structure definitions */
+// structure definitions
 
 struct ProgramInfo
 {
-  char *command_basepath;	/* path to the program binary */
-  char *command_basename;	/* base filename of the program binary */
+  char *command_basepath;	// path to the program binary
+  char *command_basename;	// base filename of the program binary
 
-  char *config_filename;	/* optional global program config filename */
+  char *config_filename;	// optional global program config filename
 
-  char *maindata_path;		/* main game data (installation) directory */
+  char *maindata_path;		// main game data (installation) directory
 
-  char *userdata_subdir;	/* personal user game data directory */
-  char *userdata_path;		/* resulting full path to game data directory */
+  char *userdata_subdir;	// personal user game data directory
+  char *userdata_path;		// resulting full path to game data directory
 
   char *program_title;
   char *window_title;
@@ -863,9 +863,9 @@ struct ProgramInfo
 
   char *cookie_prefix;
 
-  char *log_filename[NUM_LOGS];		/* log filenames for out/err messages */
-  FILE *log_file[NUM_LOGS];		/* log file handles for out/err files */
-  FILE *log_file_default[NUM_LOGS];	/* default log file handles (out/err) */
+  char *log_filename[NUM_LOGS];		// log filenames for out/err messages
+  FILE *log_file[NUM_LOGS];		// log file handles for out/err files
+  FILE *log_file_default[NUM_LOGS];	// default log file handles (out/err)
 
   int version_super;
   int version_major;
@@ -959,7 +959,7 @@ struct AudioSystemInfo
   boolean music_available;
 
   boolean sound_enabled;
-  boolean sound_deactivated;	/* for temporarily disabling sound */
+  boolean sound_deactivated;	// for temporarily disabling sound
 
   int mixer_pipe[2];
   int mixer_pid;
@@ -975,14 +975,14 @@ struct FontBitmapInfo
 {
   Bitmap *bitmap;
 
-  int src_x, src_y;		/* start position of font characters */
-  int width, height;		/* width / height of font characters */
+  int src_x, src_y;		// start position of font characters
+  int width, height;		// width / height of font characters
 
-  int offset_x;			/* offset to next font character */
-  int offset_y;			/* offset to next font character */
+  int offset_x;			// offset to next font character
+  int offset_y;			// offset to next font character
 
-  int draw_xoffset;		/* offset for drawing font characters */
-  int draw_yoffset;		/* offset for drawing font characters */
+  int draw_xoffset;		// offset for drawing font characters
+  int draw_yoffset;		// offset for drawing font characters
 
   int num_chars;
   int num_chars_per_line;
@@ -1055,21 +1055,21 @@ struct GfxInfo
 
 struct TileCursorInfo
 {
-  boolean enabled;		/* tile cursor generally enabled or disabled */
-  boolean active;		/* tile cursor activated (depending on game) */
-  boolean moving;		/* tile cursor moving to target position */
+  boolean enabled;		// tile cursor generally enabled or disabled
+  boolean active;		// tile cursor activated (depending on game)
+  boolean moving;		// tile cursor moving to target position
 
-  int xpos, ypos;		/* tile cursor level playfield position */
-  int x, y;			/* tile cursor current screen position */
-  int target_x, target_y;	/* tile cursor target screen position */
+  int xpos, ypos;		// tile cursor level playfield position
+  int x, y;			// tile cursor current screen position
+  int target_x, target_y;	// tile cursor target screen position
 
-  int sx, sy;			/* tile cursor screen start position */
+  int sx, sy;			// tile cursor screen start position
 };
 
 struct OverlayInfo
 {
-  boolean enabled;		/* overlay generally enabled or disabled */
-  boolean active;		/* overlay activated (depending on game mode) */
+  boolean enabled;		// overlay generally enabled or disabled
+  boolean active;		// overlay activated (depending on game mode)
 
   boolean show_grid;
 
@@ -1085,12 +1085,12 @@ struct OverlayInfo
 struct JoystickInfo
 {
   int status;
-  int nr[MAX_PLAYERS];		/* joystick number for each player */
+  int nr[MAX_PLAYERS];		// joystick number for each player
 };
 
 struct SetupJoystickInfo
 {
-  char *device_name;		/* device name of player's joystick */
+  char *device_name;		// device name of player's joystick
 
   int xleft, xmiddle, xright;
   int yupper, ymiddle, ylower;
@@ -1114,7 +1114,7 @@ struct SetupTouchInfo
 
   char grid_button[2][MAX_GRID_XSIZE][MAX_GRID_YSIZE];
 
-  int transparency;		/* in percent (0 == opaque, 100 == invisible) */
+  int transparency;		// in percent (0 == opaque, 100 == invisible)
   boolean draw_outlined;
   boolean draw_pressed;
 
@@ -1301,9 +1301,9 @@ struct SetupInfo
   char *graphics_set;
   char *sounds_set;
   char *music_set;
-  int override_level_graphics;		/* not boolean -- can also be "AUTO" */
-  int override_level_sounds;		/* not boolean -- can also be "AUTO" */
-  int override_level_music;		/* not boolean -- can also be "AUTO" */
+  int override_level_graphics;		// not boolean -- can also be "AUTO"
+  int override_level_sounds;		// not boolean -- can also be "AUTO"
+  int override_level_music;		// not boolean -- can also be "AUTO"
 
   int volume_simple;
   int volume_loops;
@@ -1328,69 +1328,69 @@ struct SetupInfo
 
 struct TreeInfo
 {
-  struct TreeInfo **node_top;		/* topmost node in tree */
-  struct TreeInfo *node_parent;		/* parent level directory info */
-  struct TreeInfo *node_group;		/* level group sub-directory info */
-  struct TreeInfo *next;		/* next level series structure node */
+  struct TreeInfo **node_top;		// topmost node in tree
+  struct TreeInfo *node_parent;		// parent level directory info
+  struct TreeInfo *node_group;		// level group sub-directory info
+  struct TreeInfo *next;		// next level series structure node
 
-  int cl_first;		/* internal control field for setup screen */
-  int cl_cursor;	/* internal control field for setup screen */
+  int cl_first;		// internal control field for setup screen
+  int cl_cursor;	// internal control field for setup screen
 
-  int type;		/* type of tree content */
+  int type;		// type of tree content
 
-  /* fields for "type == TREE_TYPE_LEVEL_DIR" */
+  // fields for "type == TREE_TYPE_LEVEL_DIR"
 
-  char *subdir;		/* tree info sub-directory basename (may be ".") */
-  char *fullpath;	/* complete path relative to tree base directory */
-  char *basepath;	/* absolute base path of tree base directory */
-  char *identifier;	/* identifier string for configuration files */
-  char *name;		/* tree info name, as displayed in selection menues */
-  char *name_sorting;	/* optional sorting name for correct name sorting */
-  char *author;		/* level or artwork author name */
-  char *year;		/* optional year of creation for levels or artwork */
+  char *subdir;		// tree info sub-directory basename (may be ".")
+  char *fullpath;	// complete path relative to tree base directory
+  char *basepath;	// absolute base path of tree base directory
+  char *identifier;	// identifier string for configuration files
+  char *name;		// tree info name, as displayed in selection menues
+  char *name_sorting;	// optional sorting name for correct name sorting
+  char *author;		// level or artwork author name
+  char *year;		// optional year of creation for levels or artwork
 
-  char *program_title;	   /* optional alternative text for program title */
-  char *program_copyright; /* optional alternative text for program copyright */
-  char *program_company;   /* optional alternative text for program company */
+  char *program_title;	   // optional alternative text for program title
+  char *program_copyright; // optional alternative text for program copyright
+  char *program_company;   // optional alternative text for program company
 
-  char *imported_from;	/* optional comment for imported levels or artwork */
-  char *imported_by;	/* optional comment for imported levels or artwork */
-  char *tested_by;	/* optional comment to name people who tested a set */
+  char *imported_from;	// optional comment for imported levels or artwork
+  char *imported_by;	// optional comment for imported levels or artwork
+  char *tested_by;	// optional comment to name people who tested a set
 
-  char *graphics_set_ecs; /* special EMC custom graphics set (ECS graphics) */
-  char *graphics_set_aga; /* special EMC custom graphics set (AGA graphics) */
-  char *graphics_set;	/* optional custom graphics set (level tree only) */
-  char *sounds_set;	/* optional custom sounds set (level tree only) */
-  char *music_set;	/* optional custom music set (level tree only) */
-  char *graphics_path;	/* path to optional custom graphics set (level only) */
-  char *sounds_path;	/* path to optional custom sounds set (level only) */
-  char *music_path;	/* path to optional custom music set (level only) */
+  char *graphics_set_ecs; // special EMC custom graphics set (ECS graphics)
+  char *graphics_set_aga; // special EMC custom graphics set (AGA graphics)
+  char *graphics_set;	// optional custom graphics set (level tree only)
+  char *sounds_set;	// optional custom sounds set (level tree only)
+  char *music_set;	// optional custom music set (level tree only)
+  char *graphics_path;	// path to optional custom graphics set (level only)
+  char *sounds_path;	// path to optional custom sounds set (level only)
+  char *music_path;	// path to optional custom music set (level only)
 
-  char *level_filename;	/* filename of level file (for packed level file) */
-  char *level_filetype;	/* type of levels in level directory or level file */
+  char *level_filename;	// filename of level file (for packed level file)
+  char *level_filetype;	// type of levels in level directory or level file
 
-  char *special_flags;	/* flags for special actions performed on level file */
+  char *special_flags;	// flags for special actions performed on level file
 
-  int levels;		/* number of levels in level series */
-  int first_level;	/* first level number (to allow start with 0 or 1) */
-  int last_level;	/* last level number (automatically calculated) */
-  int sort_priority;	/* sort levels by 'sort_priority' and then by name */
+  int levels;		// number of levels in level series
+  int first_level;	// first level number (to allow start with 0 or 1)
+  int last_level;	// last level number (automatically calculated)
+  int sort_priority;	// sort levels by 'sort_priority' and then by name
 
-  boolean latest_engine;/* force level set to use the latest game engine */
+  boolean latest_engine;// force level set to use the latest game engine
 
-  boolean level_group;	/* directory contains more level series directories */
-  boolean parent_link;	/* entry links back to parent directory */
-  boolean in_user_dir;	/* user defined levels are stored in home directory */
-  boolean user_defined;	/* levels in user directory and marked as "private" */
-  boolean readonly;	/* readonly levels can not be changed with editor */
-  boolean handicap;	/* level set has no handicap when set to "false" */
-  boolean skip_levels;	/* levels can be skipped when set to "true" */
+  boolean level_group;	// directory contains more level series directories
+  boolean parent_link;	// entry links back to parent directory
+  boolean in_user_dir;	// user defined levels are stored in home directory
+  boolean user_defined;	// levels in user directory and marked as "private"
+  boolean readonly;	// readonly levels can not be changed with editor
+  boolean handicap;	// level set has no handicap when set to "false"
+  boolean skip_levels;	// levels can be skipped when set to "true"
 
-  int color;		/* color to use on selection screen for this level */
-  char *class_desc;	/* description of level series class */
-  int handicap_level;	/* number of the lowest unsolved level */
+  int color;		// color to use on selection screen for this level
+  char *class_desc;	// description of level series class
+  int handicap_level;	// number of the lowest unsolved level
 
-  char *infotext;	/* optional text to describe the tree type (headline) */
+  char *infotext;	// optional text to describe the tree type (headline)
 };
 
 typedef struct TreeInfo TreeInfo;
@@ -1452,8 +1452,8 @@ struct FileInfo
   char *default_filename;
   char *filename;
 
-  char **default_parameter;			/* array of file parameters */
-  char **parameter;				/* array of file parameters */
+  char **default_parameter;			// array of file parameters
+  char **parameter;				// array of file parameters
 
   boolean redefined;
   boolean fallback_to_default;
@@ -1470,7 +1470,7 @@ struct SetupFileList
 
 struct ListNodeInfo
 {
-  char *source_filename;			/* primary key for node list */
+  char *source_filename;			// primary key for node list
   int num_references;
 };
 
@@ -1486,39 +1486,39 @@ struct PropertyMapping
 
 struct ArtworkListInfo
 {
-  int type;					/* type of artwork */
+  int type;					// type of artwork
 
   int num_file_list_entries;
   int num_dynamic_file_list_entries;
-  struct FileInfo *file_list;			/* static artwork file array */
-  struct FileInfo *dynamic_file_list;		/* dynamic artwrk file array */
+  struct FileInfo *file_list;			// static artwork file array
+  struct FileInfo *dynamic_file_list;		// dynamic artwrk file array
 
   int num_suffix_list_entries;
-  struct ConfigTypeInfo *suffix_list;		/* parameter suffixes array */
+  struct ConfigTypeInfo *suffix_list;		// parameter suffixes array
 
   int num_base_prefixes;
   int num_ext1_suffixes;
   int num_ext2_suffixes;
   int num_ext3_suffixes;
-  char **base_prefixes;				/* base token prefixes array */
-  char **ext1_suffixes;				/* property suffixes array 1 */
-  char **ext2_suffixes;				/* property suffixes array 2 */
-  char **ext3_suffixes;				/* property suffixes array 3 */
+  char **base_prefixes;				// base token prefixes array
+  char **ext1_suffixes;				// property suffixes array 1
+  char **ext2_suffixes;				// property suffixes array 2
+  char **ext3_suffixes;				// property suffixes array 3
 
   int num_ignore_tokens;
-  char **ignore_tokens;				/* file tokens to be ignored */
+  char **ignore_tokens;				// file tokens to be ignored
 
   int num_property_mapping_entries;
-  struct PropertyMapping *property_mapping;	/* mapping token -> artwork */
+  struct PropertyMapping *property_mapping;	// mapping token -> artwork
 
   int sizeof_artwork_list_entry;
 
-  struct ListNodeInfo **artwork_list;		/* static artwork node array */
-  struct ListNodeInfo **dynamic_artwork_list;	/* dynamic artwrk node array */
-  struct ListNode *content_list;		/* dynamic artwork node list */
+  struct ListNodeInfo **artwork_list;		// static artwork node array
+  struct ListNodeInfo **dynamic_artwork_list;	// dynamic artwrk node array
+  struct ListNode *content_list;		// dynamic artwork node list
 
-  void *(*load_artwork)(char *);		/* constructor function */
-  void (*free_artwork)(void *);			/* destructor function */
+  void *(*load_artwork)(char *);		// constructor function
+  void (*free_artwork)(void *);			// destructor function
 };
 
 struct XY
@@ -1568,25 +1568,25 @@ struct DoorPartPosInfo
 struct TextPosInfo
 {
   int x, y;
-  int xoffset;			/* special case for tape date and time */
-  int xoffset2;			/* special case for tape date */
-  int yoffset;			/* special case for list of preview players */
+  int xoffset;			// special case for tape date and time
+  int xoffset2;			// special case for tape date
+  int yoffset;			// special case for list of preview players
   int width, height;
   int align, valign;
-  int size;			/* also used for suffix ".digits" */
+  int size;			// also used for suffix ".digits"
   int font, font_alt;
   boolean draw_masked;
-  boolean draw_player;		/* special case for network player buttons */
-  int sort_priority;		/* also used for suffix ".draw_order" */
+  boolean draw_player;		// special case for network player buttons
+  int sort_priority;		// also used for suffix ".draw_order"
   int id;
 
-  int direction;		/* needed for panel time/health graphics */
-  int class;			/* needed for panel time/health graphics */
-  int style;			/* needed for panel time/health graphics */
+  int direction;		// needed for panel time/health graphics
+  int class;			// needed for panel time/health graphics
+  int style;			// needed for panel time/health graphics
 
-  int tile_size;		/* special case for list of network players */
-  int border_size;		/* special case for list of preview players */
-  int vertical;			/* special case for list of preview players */
+  int tile_size;		// special case for list of network players
+  int border_size;		// special case for list of preview players
+  int vertical;			// special case for list of preview players
 };
 
 struct MouseActionInfo
@@ -1611,9 +1611,9 @@ struct LevelStats
 };
 
 
-/* ========================================================================= */
-/* exported variables                                                        */
-/* ========================================================================= */
+// ============================================================================
+// exported variables
+// ============================================================================
 
 extern struct ProgramInfo	program;
 extern struct NetworkInfo	network;
@@ -1652,7 +1652,7 @@ extern int			redraw_mask;
 extern int			FrameCounter;
 
 
-/* function definitions */
+// function definitions
 
 void InitProgramInfo(char *, char *, char *, char *, char *, char *, char *,
 		     char *, int);
@@ -1774,4 +1774,4 @@ boolean ReadJoystick(int, int *, int *, boolean *, boolean *);
 boolean CheckJoystickOpened(int);
 void ClearJoystickState(void);
 
-#endif /* SYSTEM_H */
+#endif // SYSTEM_H

@@ -27,10 +27,10 @@
 #include "text.h"
 
 
-/* expiration time (in milliseconds) for sound loops */
+// expiration time (in milliseconds) for sound loops
 #define SOUND_LOOP_EXPIRATION_TIME	200
 
-/* one second fading interval == 1000 ticks (milliseconds) */
+// one second fading interval == 1000 ticks (milliseconds)
 #define SOUND_FADING_INTERVAL		1000
 
 #define SND_TYPE_NONE			0
@@ -67,10 +67,10 @@
 
 struct AudioFormatInfo
 {
-  boolean stereo;		/* availability of stereo sound */
-  int format;			/* size and endianess of sample data */
-  int sample_rate;		/* sample frequency */
-  int fragment_size;		/* audio device fragment size in bytes */
+  boolean stereo;		// availability of stereo sound
+  int format;			// size and endianess of sample data
+  int sample_rate;		// sample frequency
+  int fragment_size;		// audio device fragment size in bytes
 };
 
 struct SampleInfo
@@ -80,9 +80,9 @@ struct SampleInfo
 
   int type;
   int format;
-  void *data_ptr;		/* pointer to first sample (8 or 16 bit) */
-  int data_len;			/* number of samples, NOT number of bytes */
-  int num_channels;		/* mono: 1 channel, stereo: 2 channels */
+  void *data_ptr;		// pointer to first sample (8 or 16 bit)
+  int data_len;			// number of samples, NOT number of bytes
+  int num_channels;		// mono: 1 channel, stereo: 2 channels
 };
 typedef struct SampleInfo SoundInfo;
 typedef struct SampleInfo MusicInfo;
@@ -102,9 +102,9 @@ struct SoundControl
 
   int type;
   int format;
-  void *data_ptr;		/* pointer to first sample (8 or 16 bit) */
-  int data_len;		/* number of samples, NOT number of bytes */
-  int num_channels;		/* mono: 1 channel, stereo: 2 channels */
+  void *data_ptr;		// pointer to first sample (8 or 16 bit)
+  int data_len;		// number of samples, NOT number of bytes
+  int num_channels;		// mono: 1 channel, stereo: 2 channels
 };
 typedef struct SoundControl SoundControl;
 
@@ -119,8 +119,8 @@ static int stereo_volume[SOUND_MAX_LEFT2RIGHT + 1];
 static char *currently_playing_music_filename = NULL;
 
 
-/* ========================================================================= */
-/* THE STUFF BELOW IS ONLY USED BY THE SOUND SERVER CHILD PROCESS            */
+// ============================================================================
+// THE STUFF BELOW IS ONLY USED BY THE SOUND SERVER CHILD PROCESS
 
 static struct SoundControl mixer[NUM_MIXER_CHANNELS];
 static int mixer_active_channels = 0;
@@ -136,9 +136,9 @@ static SoundInfo *getSoundInfoEntryFromSoundID(int);
 static MusicInfo *getMusicInfoEntryFromMusicID(int);
 
 
-/* ------------------------------------------------------------------------- */
-/* mixer functions                                                           */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// mixer functions
+// ----------------------------------------------------------------------------
 
 void Mixer_InitChannels(void)
 {
@@ -196,7 +196,7 @@ static void Mixer_StartChannel(int channel)
 
 static void Mixer_PlayChannel(int channel)
 {
-  /* start with inactive channel in case something goes wrong */
+  // start with inactive channel in case something goes wrong
   mixer[channel].active = FALSE;
 
   if (mixer[channel].type != MUS_TYPE_WAV)
@@ -314,14 +314,14 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
   if (snd_info == NULL)
     return;
 
-  /* copy sound sample and format information */
+  // copy sound sample and format information
   snd_ctrl.type         = snd_info->type;
   snd_ctrl.format       = snd_info->format;
   snd_ctrl.data_ptr     = snd_info->data_ptr;
   snd_ctrl.data_len     = snd_info->data_len;
   snd_ctrl.num_channels = snd_info->num_channels;
 
-  /* play music samples on a dedicated music channel */
+  // play music samples on a dedicated music channel
   if (IS_MUSIC(snd_ctrl))
   {
     Mixer_StopMusicChannel();
@@ -335,12 +335,12 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
     return;
   }
 
-  /* check if (and how often) this sound sample is already playing */
+  // check if (and how often) this sound sample is already playing
   for (k = 0, i = audio.first_sound_channel; i < audio.num_channels; i++)
     if (mixer[i].active && SAME_SOUND_DATA(mixer[i], snd_ctrl))
       k++;
 
-  /* reset expiration delay for already playing loop sounds */
+  // reset expiration delay for already playing loop sounds
   if (k > 0 && IS_LOOP(snd_ctrl))
   {
     for (i = audio.first_sound_channel; i < audio.num_channels; i++)
@@ -350,7 +350,7 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
 	if (IS_FADING(mixer[i]))
 	  Mixer_UnFadeChannel(i);
 
-	/* restore settings like volume and stereo position */
+	// restore settings like volume and stereo position
 	mixer[i].volume = snd_ctrl.volume;
 	mixer[i].stereo_position = snd_ctrl.stereo_position;
 
@@ -362,13 +362,13 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
     return;
   }
 
-  /* don't play sound more than n times simultaneously (with n == 2 for now) */
+  // don't play sound more than n times simultaneously (with n == 2 for now)
   if (k >= 2)
   {
     unsigned int playing_current = Counter();
     int longest = 0, longest_nr = audio.first_sound_channel;
 
-    /* look for oldest equal sound */
+    // look for oldest equal sound
     for (i = audio.first_sound_channel; i < audio.num_channels; i++)
     {
       int playing_time = playing_current - mixer[i].playing_starttime;
@@ -396,7 +396,7 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
      library, we use the current playing time (in milliseconds) instead. */
 
 #if DEBUG
-  /* channel allocation sanity check -- should not be needed */
+  // channel allocation sanity check -- should not be needed
   if (mixer_active_channels ==
       audio.num_channels - (mixer[audio.music_channel].active ? 0 : 1))
   {
@@ -434,7 +434,7 @@ static void Mixer_InsertSound(SoundControl snd_ctrl)
     Mixer_StopChannel(longest_nr);
   }
 
-  /* add the new sound to the mixer */
+  // add the new sound to the mixer
   for (i = audio.first_sound_channel; i < audio.num_channels; i++)
   {
     if (!mixer[i].active)
@@ -451,12 +451,12 @@ static void HandleSoundRequest(SoundControl snd_ctrl)
 {
   int i;
 
-  /* deactivate channels that have expired since the last request */
+  // deactivate channels that have expired since the last request
   for (i = 0; i < audio.num_channels; i++)
     if (mixer[i].active && Mixer_ChannelExpired(i))
       Mixer_StopChannel(i);
 
-  if (IS_RELOADING(snd_ctrl))		/* load new sound or music files */
+  if (IS_RELOADING(snd_ctrl))		// load new sound or music files
   {
     Mixer_StopMusicChannel();
     for (i = audio.first_sound_channel; i < audio.num_channels; i++)
@@ -467,7 +467,7 @@ static void HandleSoundRequest(SoundControl snd_ctrl)
     else
       ReloadCustomMusic();
   }
-  else if (IS_FADING(snd_ctrl))		/* fade out existing sound or music */
+  else if (IS_FADING(snd_ctrl))		// fade out existing sound or music
   {
     if (IS_MUSIC(snd_ctrl))
     {
@@ -479,7 +479,7 @@ static void HandleSoundRequest(SoundControl snd_ctrl)
       if (SAME_SOUND_NR(mixer[i], snd_ctrl) || ALL_SOUNDS(snd_ctrl))
 	Mixer_FadeChannel(i);
   }
-  else if (IS_STOPPING(snd_ctrl))	/* stop existing sound or music */
+  else if (IS_STOPPING(snd_ctrl))	// stop existing sound or music
   {
     if (IS_MUSIC(snd_ctrl))
     {
@@ -491,11 +491,11 @@ static void HandleSoundRequest(SoundControl snd_ctrl)
       if (SAME_SOUND_NR(mixer[i], snd_ctrl) || ALL_SOUNDS(snd_ctrl))
 	Mixer_StopChannel(i);
   }
-  else if (SET_EXPIRE_LOOPS(snd_ctrl))	/* set loop expiration on or off */
+  else if (SET_EXPIRE_LOOPS(snd_ctrl))	// set loop expiration on or off
   {
     expire_loop_sounds = snd_ctrl.active;
   }
-  else if (snd_ctrl.active)		/* add new sound to mixer */
+  else if (snd_ctrl.active)		// add new sound to mixer
   {
     Mixer_InsertSound(snd_ctrl);
   }
@@ -508,19 +508,19 @@ void StartMixer(void)
   if (!audio.sound_available)
     return;
 
-  /* initialize stereo position conversion information */
+  // initialize stereo position conversion information
   for (i = 0; i <= SOUND_MAX_LEFT2RIGHT; i++)
     stereo_volume[i] =
       (int)sqrt((float)(SOUND_MAX_LEFT2RIGHT * SOUND_MAX_LEFT2RIGHT - i * i));
 }
 
 
-/* THE STUFF ABOVE IS ONLY USED BY THE SOUND SERVER CHILD PROCESS            */
-/* ========================================================================= */
-/* THE STUFF BELOW IS ONLY USED BY THE MAIN PROCESS                          */
+// THE STUFF ABOVE IS ONLY USED BY THE SOUND SERVER CHILD PROCESS
+// ============================================================================
+// THE STUFF BELOW IS ONLY USED BY THE MAIN PROCESS
 
-#define CHUNK_ID_LEN            4       /* IFF style chunk id length */
-#define WAV_HEADER_SIZE		16	/* size of WAV file header */
+#define CHUNK_ID_LEN            4       // IFF style chunk id length
+#define WAV_HEADER_SIZE		16	// size of WAV file header
 
 static void *Load_WAV(char *filename)
 {
@@ -580,7 +580,7 @@ static void *Load_WAV_or_MOD(char *filename)
 
 static void LoadCustomMusic_NoConf(void)
 {
-  static boolean draw_init_text = TRUE;		/* only draw at startup */
+  static boolean draw_init_text = TRUE;		// only draw at startup
   static char *last_music_directory = NULL;
   char *music_directory = getCustomMusicDirectory();
   Directory *dir;
@@ -592,7 +592,7 @@ static void LoadCustomMusic_NoConf(void)
 
   if (last_music_directory != NULL &&
       strEqual(last_music_directory, music_directory))
-    return;	/* old and new music directory are the same */
+    return;	// old and new music directory are the same
 
   if (last_music_directory != NULL)
     free(last_music_directory);
@@ -612,14 +612,14 @@ static void LoadCustomMusic_NoConf(void)
   if (draw_init_text)
     DrawInitText("Loading music", 120, FC_GREEN);
 
-  while ((dir_entry = readDirectory(dir)) != NULL)	/* loop all entries */
+  while ((dir_entry = readDirectory(dir)) != NULL)	// loop all entries
   {
     char *basename = dir_entry->basename;
     MusicInfo *mus_info = NULL;
     boolean music_already_used = FALSE;
     int i;
 
-    /* skip all music files that are configured in music config file */
+    // skip all music files that are configured in music config file
     for (i = 0; i < num_music; i++)
     {
       struct FileInfo *music = getMusicListEntry(i);
@@ -672,7 +672,7 @@ struct FileInfo *getSoundListEntry(int pos)
   int num_list_entries = sound_info->num_file_list_entries;
   int list_pos = (pos < num_list_entries ? pos : pos - num_list_entries);
 
-  if (pos < 0 || pos >= num_sounds)	/* invalid sound */
+  if (pos < 0 || pos >= num_sounds)	// invalid sound
     return NULL;
 
   return (pos < num_list_entries ? &sound_info->file_list[list_pos] :
@@ -685,7 +685,7 @@ struct FileInfo *getMusicListEntry(int pos)
   int num_list_entries = music_info->num_file_list_entries;
   int list_pos = (pos < num_list_entries ? pos : pos - num_list_entries);
 
-  if (pos < 0 || pos >= num_music)	/* invalid music */
+  if (pos < 0 || pos >= num_music)	// invalid music
     return NULL;
 
   return (pos < num_list_entries ? &music_info->file_list[list_pos] :
@@ -701,7 +701,7 @@ static SoundInfo *getSoundInfoEntryFromSoundID(int pos)
     (SoundInfo **)(pos < num_list_entries ? sound_info->artwork_list :
 		   sound_info->dynamic_artwork_list);
 
-  if (pos < 0 || pos >= num_sounds)	/* invalid sound */
+  if (pos < 0 || pos >= num_sounds)	// invalid sound
     return NULL;
 
   return snd_info[list_pos];
@@ -716,12 +716,12 @@ static MusicInfo *getMusicInfoEntryFromMusicID(int pos)
     (MusicInfo **)(pos < num_list_entries ? music_info->artwork_list :
 		   music_info->dynamic_artwork_list);
 
-  if (pos >= num_music)			/* invalid music */
+  if (pos >= num_music)			// invalid music
     return NULL;
 
-  if (pos < 0)				/* undefined music */
+  if (pos < 0)				// undefined music
   {
-    if (num_music_noconf == 0)		/* no fallback music available */
+    if (num_music_noconf == 0)		// no fallback music available
       return NULL;
 
     pos = UNMAP_NOCONF_MUSIC(pos) % num_music_noconf;
@@ -778,7 +778,7 @@ void InitSoundList(struct ConfigInfo *config_list, int num_file_list_entries,
   sound_info = checked_calloc(sizeof(struct ArtworkListInfo));
   sound_info->type = ARTWORK_TYPE_SOUNDS;
 
-  /* ---------- initialize file list and suffix lists ---------- */
+  // ---------- initialize file list and suffix lists ----------
 
   sound_info->num_file_list_entries = num_file_list_entries;
   sound_info->num_dynamic_file_list_entries = 0;
@@ -794,7 +794,7 @@ void InitSoundList(struct ConfigInfo *config_list, int num_file_list_entries,
 
   sound_info->suffix_list = config_suffix_list;
 
-  /* ---------- initialize base prefix and suffixes lists ---------- */
+  // ---------- initialize base prefix and suffixes lists ----------
 
   sound_info->num_base_prefixes = 0;
   for (i = 0; base_prefixes[i] != NULL; i++)
@@ -826,7 +826,7 @@ void InitSoundList(struct ConfigInfo *config_list, int num_file_list_entries,
 
   sound_info->property_mapping = NULL;
 
-  /* ---------- initialize artwork reference and content lists ---------- */
+  // ---------- initialize artwork reference and content lists ----------
 
   sound_info->sizeof_artwork_list_entry = sizeof(SoundInfo *);
 
@@ -836,7 +836,7 @@ void InitSoundList(struct ConfigInfo *config_list, int num_file_list_entries,
 
   sound_info->content_list = NULL;
 
-  /* ---------- initialize artwork loading/freeing functions ---------- */
+  // ---------- initialize artwork loading/freeing functions ----------
 
   sound_info->load_artwork = Load_WAV;
   sound_info->free_artwork = FreeSound;
@@ -853,7 +853,7 @@ void InitMusicList(struct ConfigInfo *config_list, int num_file_list_entries,
   music_info = checked_calloc(sizeof(struct ArtworkListInfo));
   music_info->type = ARTWORK_TYPE_MUSIC;
 
-  /* ---------- initialize file list and suffix lists ---------- */
+  // ---------- initialize file list and suffix lists ----------
 
   music_info->num_file_list_entries = num_file_list_entries;
   music_info->num_dynamic_file_list_entries = 0;
@@ -869,7 +869,7 @@ void InitMusicList(struct ConfigInfo *config_list, int num_file_list_entries,
 
   music_info->suffix_list = config_suffix_list;
 
-  /* ---------- initialize base prefix and suffixes lists ---------- */
+  // ---------- initialize base prefix and suffixes lists ----------
 
   music_info->num_base_prefixes = 0;
   for (i = 0; base_prefixes[i] != NULL; i++)
@@ -901,7 +901,7 @@ void InitMusicList(struct ConfigInfo *config_list, int num_file_list_entries,
 
   music_info->property_mapping = NULL;
 
-  /* ---------- initialize artwork reference and content lists ---------- */
+  // ---------- initialize artwork reference and content lists ----------
 
   music_info->sizeof_artwork_list_entry = sizeof(MusicInfo *);
 
@@ -911,7 +911,7 @@ void InitMusicList(struct ConfigInfo *config_list, int num_file_list_entries,
 
   music_info->content_list = NULL;
 
-  /* ---------- initialize artwork loading/freeing functions ---------- */
+  // ---------- initialize artwork loading/freeing functions ----------
 
   music_info->load_artwork = Load_WAV_or_MOD;
   music_info->free_artwork = FreeMusic;
@@ -994,7 +994,7 @@ void PlaySoundExt(int nr, int volume, int stereo_position, int state)
   else if (stereo_position > SOUND_MAX_RIGHT)
     stereo_position = SOUND_MAX_RIGHT;
 
-  clear_mem(&snd_ctrl, sizeof(SoundControl));	/* to make valgrind happy */
+  clear_mem(&snd_ctrl, sizeof(SoundControl));	// to make valgrind happy
 
   snd_ctrl.active = TRUE;
   snd_ctrl.nr = nr;
@@ -1055,7 +1055,7 @@ void StopSoundExt(int nr, int state)
   if (!audio.sound_available)
     return;
 
-  clear_mem(&snd_ctrl, sizeof(SoundControl));	/* to make valgrind happy */
+  clear_mem(&snd_ctrl, sizeof(SoundControl));	// to make valgrind happy
 
   snd_ctrl.active = FALSE;
   snd_ctrl.nr = nr;
@@ -1071,7 +1071,7 @@ void ExpireSoundLoops(boolean active)
   if (!audio.sound_available)
     return;
 
-  clear_mem(&snd_ctrl, sizeof(SoundControl));	/* to make valgrind happy */
+  clear_mem(&snd_ctrl, sizeof(SoundControl));	// to make valgrind happy
 
   snd_ctrl.active = active;
   snd_ctrl.state = SND_CTRL_EXPIRE_LOOPS;
@@ -1090,7 +1090,7 @@ static void ReloadCustomMusic(void)
   LoadArtworkConfig(music_info);
   ReloadCustomArtworkList(music_info);
 
-  /* load all music files from directory not defined in "musicinfo.conf" */
+  // load all music files from directory not defined in "musicinfo.conf"
   LoadCustomMusic_NoConf();
 }
 
@@ -1172,5 +1172,5 @@ void FreeAllMusic(void)
   FreeAllMusic_NoConf();
 }
 
-/* THE STUFF ABOVE IS ONLY USED BY THE MAIN PROCESS                          */
-/* ========================================================================= */
+// THE STUFF ABOVE IS ONLY USED BY THE MAIN PROCESS
+// ============================================================================

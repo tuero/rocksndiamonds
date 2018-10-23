@@ -18,7 +18,7 @@
 
 #define SNAPSHOT_MEMORY_DEFAULT		(512 * 1024 * 1024)
 
-/* needed for comfortably saving engine snapshot buffers */
+// needed for comfortably saving engine snapshot buffers
 #define ARGS_ADDRESS_AND_SIZEOF(x)	(&(x)), (sizeof(x))
 
 struct SnapshotNodeInfo
@@ -42,4 +42,4 @@ boolean CheckSnapshotList(void);
 void FreeSnapshotSingle(void);
 void FreeSnapshotList(void);
 
-#endif	/* SNAPSHOT_H */
+#endif	// SNAPSHOT_H

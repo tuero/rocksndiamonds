@@ -74,4 +74,4 @@ void ScaleImage(int, int);
 
 void FreeAllImages(void);
 
-#endif	/* IMAGE_H */
+#endif	// IMAGE_H

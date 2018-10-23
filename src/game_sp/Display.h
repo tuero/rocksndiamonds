@@ -21,4 +21,4 @@ void ScrollTo(int, int);
 void ScrollTowards(int, int);
 void SoftScrollTo(int, int, int, int);
 
-#endif /* DISPLAY_H */
+#endif // DISPLAY_H

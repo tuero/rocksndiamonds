@@ -9,8 +9,8 @@
 #define Sqr(x)	sqrt(x)
 
 
-/* helper functions for constructs not supported by C */
+// helper functions for constructs not supported by C
 
 int MyGetTickCount(void);
 
-#endif /* VB_LIB_H */
+#endif // VB_LIB_H

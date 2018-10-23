@@ -18,14 +18,14 @@
 
 #include "mm_main.h"
 
-#define CHUNK_ID_LEN		4	/* IFF style chunk id length */
-#define CHUNK_SIZE_UNDEFINED	0	/* undefined chunk size == 0  */
-#define CHUNK_SIZE_NONE		-1	/* do not write chunk size    */
-#define FILE_VERS_CHUNK_SIZE	8	/* size of file version chunk */
-#define LEVEL_HEADER_SIZE	80	/* size of level file header */
-#define LEVEL_HEADER_UNUSED	19	/* unused level header bytes */
+#define CHUNK_ID_LEN		4	// IFF style chunk id length
+#define CHUNK_SIZE_UNDEFINED	0	// undefined chunk size == 0
+#define CHUNK_SIZE_NONE		-1	// do not write chunk size
+#define FILE_VERS_CHUNK_SIZE	8	// size of file version chunk
+#define LEVEL_HEADER_SIZE	80	// size of level file header
+#define LEVEL_HEADER_UNUSED	19	// unused level header bytes
 
-/* file identifier strings */
+// file identifier strings
 #define LEVEL_COOKIE_TMPL	"MIRRORMAGIC_LEVEL_FILE_VERSION_x.x"
 #define SCORE_COOKIE		"MIRRORMAGIC_SCORE_FILE_VERSION_1.4"
 
@@ -40,9 +40,9 @@ int default_score[LEVEL_SCORE_ELEMENTS] =
 };
 
 
-/* ========================================================================= */
-/* level file functions                                                      */
-/* ========================================================================= */
+// ============================================================================
+// level file functions
+// ============================================================================
 
 static void ReadChunk_MM_VERS(File *file, int *file_version, int *game_version)
 {
@@ -52,12 +52,12 @@ static void ReadChunk_MM_VERS(File *file, int *file_version, int *game_version)
   file_version_major = getFile8Bit(file);
   file_version_minor = getFile8Bit(file);
   file_version_patch = getFile8Bit(file);
-  getFile8Bit(file);		/* not used */
+  getFile8Bit(file);		// not used
 
   game_version_major = getFile8Bit(file);
   game_version_minor = getFile8Bit(file);
   game_version_patch = getFile8Bit(file);
-  getFile8Bit(file);		/* not used */
+  getFile8Bit(file);		// not used
 
   *file_version = MM_VERSION_IDENT(file_version_major,
 				   file_version_minor,
@@ -80,12 +80,12 @@ static void WriteChunk_MM_VERS(FILE *file, int file_version, int game_version)
   fputc(file_version_major, file);
   fputc(file_version_minor, file);
   fputc(file_version_patch, file);
-  fputc(0, file);	/* not used */
+  fputc(0, file);	// not used
 
   fputc(game_version_major, file);
   fputc(game_version_minor, file);
   fputc(game_version_patch, file);
-  fputc(0, file);	/* not used */
+  fputc(0, file);	// not used
 }
 
 void setLevelInfoToDefaults_MM(void)
@@ -95,7 +95,7 @@ void setLevelInfoToDefaults_MM(void)
   native_mm_level.file_version = MM_FILE_VERSION_ACTUAL;
   native_mm_level.game_version = MM_GAME_VERSION_ACTUAL;
 
-  native_mm_level.encoding_16bit_field = FALSE;	/* default: only 8-bit elements */
+  native_mm_level.encoding_16bit_field = FALSE;	// default: only 8-bit elements
 
   native_mm_level.fieldx = STD_LEV_FIELDX;
   native_mm_level.fieldy = STD_LEV_FIELDY;
@@ -264,7 +264,7 @@ boolean LoadNativeLevel_MM(char *filename, boolean level_info_only)
     {  NULL,  0,			NULL }
   };
 
-  /* always start with reliable default values */
+  // always start with reliable default values
   setLevelInfoToDefaults_MM();
 
   if (!(file = openFile(filename, MODE_READ)))
@@ -278,7 +278,7 @@ boolean LoadNativeLevel_MM(char *filename, boolean level_info_only)
   getFileChunk(file, chunk_name, NULL, BYTE_ORDER_BIG_ENDIAN);
   if (strcmp(chunk_name, "MMII") == 0)
   {
-    getFile32BitInteger(file, BYTE_ORDER_BIG_ENDIAN);	/* not used */
+    getFile32BitInteger(file, BYTE_ORDER_BIG_ENDIAN);	// not used
 
     getFileChunk(file, chunk_name, NULL, BYTE_ORDER_BIG_ENDIAN);
     if (strcmp(chunk_name, "CAVE") != 0)
@@ -290,7 +290,7 @@ boolean LoadNativeLevel_MM(char *filename, boolean level_info_only)
       return FALSE;
     }
   }
-  else	/* check for pre-2.0 file format with cookie string */
+  else	// check for pre-2.0 file format with cookie string
   {
     strcpy(cookie, chunk_name);
     getStringFromFile(file, &cookie[4], MAX_LINE_LEN - 4);
@@ -342,7 +342,7 @@ boolean LoadNativeLevel_MM(char *filename, boolean level_info_only)
     }
     else
     {
-      /* call function to load this level chunk */
+      // call function to load this level chunk
       int chunk_size_expected =
 	(chunk_info[i].loader)(file, chunk_size, &native_mm_level);
 
@@ -424,7 +424,7 @@ void SaveNativeLevel_MM(char *filename)
     return;
   }
 
-  /* check level field for 16-bit elements */
+  // check level field for 16-bit elements
   native_mm_level.encoding_16bit_field = FALSE;
 
   for (y = 0; y < native_mm_level.fieldy; y++)

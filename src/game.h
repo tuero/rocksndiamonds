@@ -12,8 +12,8 @@
 #ifndef GAME_H
 #define GAME_H
 
-/* (not included here due to collisions with Emerald Mine engine definitions) */
-/* #include "main.h" */
+// (not included here due to collisions with Emerald Mine engine definitions)
+// #include "main.h"
 
 #define MAX_INVENTORY_SIZE		1000
 
@@ -101,7 +101,7 @@ struct GamePanelInfo
   struct TextPosInfo level_name;
   struct TextPosInfo level_author;
 
-  /* value to determine if panel will be updated or not */
+  // value to determine if panel will be updated or not
   boolean active;
 };
 
@@ -144,11 +144,11 @@ struct GameSnapshotInfo
 
 struct GameInfo
 {
-  /* values for control panel */
+  // values for control panel
   struct GamePanelInfo panel;
   struct GameButtonInfo button;
 
-  /* values for graphics engine customization */
+  // values for graphics engine customization
   int graphics_engine_version;
   boolean use_native_emc_graphics_engine;
   boolean use_native_sp_graphics_engine;
@@ -157,25 +157,25 @@ struct GameInfo
   int scroll_delay_value;
   int tile_size;
 
-  /* constant within running game */
+  // constant within running game
   int engine_version;
   int emulation;
   int initial_move_delay[MAX_PLAYERS];
   int initial_move_delay_value[MAX_PLAYERS];
   int initial_push_delay_value;
 
-  /* flag for single or multi-player mode (needed for playing tapes) */
-  /* (when playing/recording games, this is identical to "setup.team_mode" */
+  // flag for single or multi-player mode (needed for playing tapes)
+  // (when playing/recording games, this is identical to "setup.team_mode"
   boolean team_mode;
 
-  /* flags to handle bugs in and changes between different engine versions */
-  /* (for the latest engine version, these flags should always be "FALSE") */
+  // flags to handle bugs in and changes between different engine versions
+  // (for the latest engine version, these flags should always be "FALSE")
   boolean use_change_when_pushing_bug;
   boolean use_block_last_field_bug;
   boolean max_num_changes_per_frame;
   boolean use_reverse_scan_direction;
 
-  /* variable within running game */
+  // variable within running game
   int yamyam_content_nr;
   boolean robot_wheel_active;
   boolean magic_wall_active;
@@ -188,68 +188,68 @@ struct GameInfo
   int wind_direction;
   boolean explosions_delayed;
   boolean envelope_active;
-  boolean no_time_limit;	/* (variable only in very special case) */
+  boolean no_time_limit;	// (variable only in very special case)
 
-  /* values for the new EMC elements */
+  // values for the new EMC elements
   int lenses_time_left;
   int magnify_time_left;
   boolean ball_state;
   int ball_content_nr;
 
-  /* values for player idle animation (no effect on engine) */
+  // values for player idle animation (no effect on engine)
   int player_boring_delay_fixed;
   int player_boring_delay_random;
   int player_sleeping_delay_fixed;
   int player_sleeping_delay_random;
 
-  /* values for special game initialization control */
+  // values for special game initialization control
   boolean restart_level;
 
-  /* trigger message to ask for restarting the game */
+  // trigger message to ask for restarting the game
   char *restart_game_message;
 
-  /* values for special request dialog control */
+  // values for special request dialog control
   boolean request_active;
 
-  /* values for special game control */
+  // values for special game control
   int centered_player_nr;
   int centered_player_nr_next;
   boolean set_centered_player;
 
-  /* values for random number generator initialization after snapshot */
+  // values for random number generator initialization after snapshot
   unsigned int num_random_calls;
 
-  /* values for game engine snapshot control */
+  // values for game engine snapshot control
   struct GameSnapshotInfo snapshot;
 };
 
 struct PlayerInfo
 {
-  boolean present;		/* player present in level playfield */
-  boolean connected_locally;	/* player connected (locally) */
-  boolean connected_network;	/* player connected (network) */
-  boolean connected;		/* player connected (locally or via network) */
-  boolean active;		/* player present and connected */
-  boolean mapped;		/* player already mapped to input device */
+  boolean present;		// player present in level playfield
+  boolean connected_locally;	// player connected (locally)
+  boolean connected_network;	// player connected (network)
+  boolean connected;		// player connected (locally or via network)
+  boolean active;		// player present and connected
+  boolean mapped;		// player already mapped to input device
 
-  boolean killed;		/* player maybe present/active, but killed */
-  boolean reanimated;		/* player maybe killed, but reanimated */
+  boolean killed;		// player maybe present/active, but killed
+  boolean reanimated;		// player maybe killed, but reanimated
 
-  int index_nr;			/* player number (0 to 3) */
-  int index_bit;		/* player number bit (1 << 0 to 1 << 3) */
-  int element_nr;		/* element (EL_PLAYER_1 to EL_PLAYER_4) */
-  int client_nr;		/* network client identifier */
+  int index_nr;			// player number (0 to 3)
+  int index_bit;		// player number bit (1 << 0 to 1 << 3)
+  int element_nr;		// element (EL_PLAYER_1 to EL_PLAYER_4)
+  int client_nr;		// network client identifier
 
-  byte action;			/* action from local input device */
-  byte mapped_action;		/* action mapped from device to player */
+  byte action;			// action from local input device
+  byte mapped_action;		// action mapped from device to player
   byte effective_action;	/* action acknowledged from network server
 				   or summarized over all configured input
 				   devices when in single player mode */
   byte programmed_action;	/* action forced by game itself (like moving
 				   through doors); overrides other actions */
 
-  struct MouseActionInfo mouse_action;		 /* (used by MM engine only) */
-  struct MouseActionInfo effective_mouse_action; /* (used by MM engine only) */
+  struct MouseActionInfo mouse_action;		 // (used by MM engine only)
+  struct MouseActionInfo effective_mouse_action; // (used by MM engine only)
 
   int jx, jy, last_jx, last_jy;
   int MovDir, MovPos, GfxDir, GfxPos;
@@ -257,12 +257,12 @@ struct PlayerInfo
 
   int GfxAction;
 
-  int initial_element;		/* EL_PLAYER_1 to EL_PLAYER_4 or EL_SP_MURPHY */
+  int initial_element;		// EL_PLAYER_1 to EL_PLAYER_4 or EL_SP_MURPHY
   int artwork_element;
   boolean use_murphy;
 
   boolean block_last_field;
-  int block_delay_adjustment;	/* needed for different engine versions */
+  int block_delay_adjustment;	// needed for different engine versions
 
   boolean can_fall_into_acid;
 
@@ -304,7 +304,7 @@ struct PlayerInfo
 
   boolean cannot_move;
 
-  boolean force_dropping;	/* needed for single step mode */
+  boolean force_dropping;	// needed for single step mode
 
   int frame_counter_bored;
   int frame_counter_sleeping;

@@ -28,7 +28,7 @@ struct ConfigTypeInfo sound_config_suffix[] =
 
 struct ConfigInfo sound_config[] =
 {
-  /* some default sounds */
+  // some default sounds
   { "[default].digging",		"schlurf.wav"			},
   { "[default].collecting",		"pong.wav"			},
   { "[default].snapping",		"pong.wav"			},
@@ -42,7 +42,7 @@ struct ConfigInfo sound_config[] =
   { "[sp_default].exploding",		"booom.wav"			},
   { "[mm_default].exploding",		"kabumm.wav"			},
 
-  /* sounds for Boulder Dash style elements and actions */
+  // sounds for Boulder Dash style elements and actions
   { "bd_diamond.collecting",		"pong.wav"			},
   { "bd_diamond.impact",		"pling.wav"			},
   { "bd_rock.pushing",			"pusch.wav"			},
@@ -59,7 +59,7 @@ struct ConfigInfo sound_config[] =
   { "bd_firefly.moving",		"roehr.wav"			},
   { "bd_firefly.waiting",		"roehr.wav"			},
 
-  /* sounds for Supaplex style elements and actions */
+  // sounds for Supaplex style elements and actions
   { "sp_base.digging",			"base.wav"			},
   { "sp_buggy_base.digging",		"base.wav"			},
   { "sp_buggy_base.active",		"bug.wav"			},
@@ -81,12 +81,12 @@ struct ConfigInfo sound_config[] =
   { "sp_terminal.activating",		UNDEFINED_FILENAME		},
   { "sp_terminal.active",		UNDEFINED_FILENAME		},
 
-  /* sounds for Sokoban style elements and actions */
+  // sounds for Sokoban style elements and actions
   { "[sokoban].pushing",		"pusch.wav"			},
   { "[sokoban].filling",		"deng.wav"			},
   { "[sokoban].emptying",		UNDEFINED_FILENAME		},
 
-  /* sounds for Emerald Mine style elements and actions */
+  // sounds for Emerald Mine style elements and actions
   { "[player].moving",			"empty.wav"			},
   { "[player].moving.mode_loop",	"false"				},
   { "sand.digging",			"schlurf.wav"			},
@@ -144,7 +144,7 @@ struct ConfigInfo sound_config[] =
   { "[em_steel_exit].passing",		"buing.wav"			},
   { "penguin.passing",			"buing.wav"			},
 
-  /* sounds for Emerald Mine Club style elements and actions */
+  // sounds for Emerald Mine Club style elements and actions
   { "balloon.moving",			UNDEFINED_FILENAME		},
   { "balloon.waiting",			UNDEFINED_FILENAME		},
   { "balloon.pushing",			"schlurf.wav"			},
@@ -159,7 +159,7 @@ struct ConfigInfo sound_config[] =
   { "emc_android.dropping",		"deng.wav"			},
   { "emc_magic_ball.dropping",		"deng.wav"			},
 
-  /* sounds for Diamond Caves style elements and actions */
+  // sounds for Diamond Caves style elements and actions
   { "pearl.collecting",			"pong.wav"			},
   { "pearl.breaking",			"knack.wav"			},
   { "pearl.impact",			"pling.wav"			},
@@ -194,13 +194,13 @@ struct ConfigInfo sound_config[] =
   { "light_switch.activating",		UNDEFINED_FILENAME		},
   { "light_switch.deactivating",	UNDEFINED_FILENAME		},
 
-  /* sounds for DX Boulderdash style elements and actions */
+  // sounds for DX Boulderdash style elements and actions
   { "dx_supabomb.pushing",		"pusch.wav"			},
   { "trap.digging",			"schlurf.wav"			},
   { "trap.activating",			UNDEFINED_FILENAME		},
   { "[tube].walking",			UNDEFINED_FILENAME		},
 
-  /* sounds for Rocks'n'Diamonds style elements and actions */
+  // sounds for Rocks'n'Diamonds style elements and actions
   { "amoeba.turning_to_gem",		"pling.wav"			},
   { "amoeba.turning_to_rock",		"klopf.wav"			},
   { "speed_pill.collecting",		"pong.wav"			},
@@ -237,7 +237,7 @@ struct ConfigInfo sound_config[] =
   { "dragon.waiting",			UNDEFINED_FILENAME		},
   { "dragon.attacking",			UNDEFINED_FILENAME		},
 
-  /* sounds for Mirror Magic style elements and actions */
+  // sounds for Mirror Magic style elements and actions
   { "[mm_mcduffin].hitting",		"autsch.wav"			},
   { "[mm_mirror].hitting",		"laser.wav"			},
   { "[mm_mirror_fixed].hitting",	"laser.wav"			},
@@ -280,10 +280,10 @@ struct ConfigInfo sound_config[] =
   { "[mm_steel_lock].exploding",	"whoosh.wav"			},
   { "[mm_wooden_lock].exploding",	"whoosh.wav"			},
 
-  /* sounds not associated to game elements (used for menu screens etc.) */
-  /* keyword to stop parser: "NO_MORE_ELEMENT_SOUNDS" <-- do not change! */
+  // sounds not associated to game elements (used for menu screens etc.)
+  // keyword to stop parser: "NO_MORE_ELEMENT_SOUNDS" <-- do not change!
 
-  /* sounds for other game actions */
+  // sounds for other game actions
   { "game.starting",			UNDEFINED_FILENAME		},
   { "game.leveltime_charging",		"fuel.wav"			},
   { "game.health_charging",		"warnton.wav"			},
@@ -294,7 +294,7 @@ struct ConfigInfo sound_config[] =
   { "game.winning",			UNDEFINED_FILENAME		},
   { "game.sokoban_solving",		"buing.wav"			},
 
-  /* sounds for other non-game actions */
+  // sounds for other non-game actions
   { "door.opening",			"door.wav"			},
   { "door.closing",			"door.wav"			},
   { "door_1.opening",			UNDEFINED_FILENAME		},
@@ -305,7 +305,7 @@ struct ConfigInfo sound_config[] =
   { "request.opening",			UNDEFINED_FILENAME		},
   { "request.closing",			UNDEFINED_FILENAME		},
 
-  /* sounds for menu actions */
+  // sounds for menu actions
   { "menu.item.activating",		"empty.wav"			},
   { "menu.item.selecting",		"base.wav"			},
 

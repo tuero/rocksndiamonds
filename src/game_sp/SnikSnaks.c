@@ -33,7 +33,7 @@ void subAnimateSnikSnaks(int si)
   if (SnikSnaksElectronsFrozen == 1)
     return;
 
-  /* (not sure why this was removed -- this broke several level solutions) */
+  // (not sure why this was removed -- this broke several level solutions)
   if (LowByte(PlayField16[si]) != fiSnikSnak)
     return;
 

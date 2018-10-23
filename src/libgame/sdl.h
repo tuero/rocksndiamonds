@@ -21,7 +21,7 @@
 #include <SDL_syswm.h>
 #endif
 
-/* definitions needed for "system.c" */
+// definitions needed for "system.c"
 
 #if defined(TARGET_SDL2)
 #define SURFACE_FLAGS		(0)
@@ -37,7 +37,7 @@
 #define UNSET_TRANSPARENT_PIXEL	(0)
 #endif
 
-/* system dependent definitions */
+// system dependent definitions
 
 #if defined(TARGET_SDL2)
 #define TARGET_STRING		"SDL2"
@@ -60,7 +60,7 @@
 #define CURSOR_MAX_HEIGHT	32
 
 
-/* SDL type definitions */
+// SDL type definitions
 
 typedef struct SDLSurfaceInfo	Bitmap;
 typedef struct SDLSurfaceInfo	DrawBuffer;
@@ -92,7 +92,7 @@ typedef SDL_Event		FocusChangeEvent;
 typedef SDL_Event		ClientMessageEvent;
 
 
-/* structure definitions */
+// structure definitions
 
 struct SDLSurfaceInfo
 {
@@ -117,7 +117,7 @@ struct MouseCursorInfo
 };
 
 
-/* SDL symbol definitions */
+// SDL symbol definitions
 
 #define None			0L
 
@@ -218,7 +218,7 @@ struct MouseCursorInfo
 #if defined(TARGET_SDL2)
 #define KSYM_percent		SDLK_PERCENT
 #else
-#define KSYM_percent		37			/* undefined in SDL */
+#define KSYM_percent		37			// undefined in SDL
 #endif
 
 #define KSYM_ampersand		SDLK_AMPERSAND
@@ -247,11 +247,11 @@ struct MouseCursorInfo
 #define KSYM_underscore		SDLK_UNDERSCORE
 #define KSYM_grave		SDLK_BACKQUOTE
 
-#define KSYM_quoteleft		KSYM_UNDEFINED		/* undefined */
-#define KSYM_braceleft		KSYM_UNDEFINED		/* undefined */
-#define KSYM_bar		KSYM_UNDEFINED		/* undefined */
-#define KSYM_braceright		KSYM_UNDEFINED		/* undefined */
-#define KSYM_asciitilde		KSYM_UNDEFINED		/* undefined */
+#define KSYM_quoteleft		KSYM_UNDEFINED		// undefined
+#define KSYM_braceleft		KSYM_UNDEFINED		// undefined
+#define KSYM_bar		KSYM_UNDEFINED		// undefined
+#define KSYM_braceright		KSYM_UNDEFINED		// undefined
+#define KSYM_asciitilde		KSYM_UNDEFINED		// undefined
 
 #if defined(TARGET_SDL2)
 #define KSYM_degree		176
@@ -430,7 +430,7 @@ struct MouseCursorInfo
 #define KMOD_Meta		(KMOD_Meta_L    | KMOD_Meta_R)
 #define KMOD_Alt		(KMOD_Alt_L     | KMOD_Alt_R)
 
-/* this only contains "valid" key modifiers (and ignores keys like "NumLock") */
+// this only contains "valid" key modifiers (and ignores keys like "NumLock")
 #define KMOD_Valid		(KMOD_Shift   |	\
 				 KMOD_Control |	\
 				 KMOD_Meta    |	\
@@ -440,7 +440,7 @@ struct MouseCursorInfo
 #define KMOD_TextInput		(KMOD_Shift | KMOD_Alt_R)
 #endif
 
-/* SDL function definitions */
+// SDL function definitions
 
 boolean SDLSetNativeSurface(SDL_Surface **);
 SDL_Surface *SDLGetNativeSurface(SDL_Surface *);
@@ -506,4 +506,4 @@ void PrepareFadeBitmap(int);
 
 void Delay_WithScreenUpdates(unsigned int);
 
-#endif /* SDL_H */
+#endif // SDL_H

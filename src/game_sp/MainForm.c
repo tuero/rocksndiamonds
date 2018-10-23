@@ -16,7 +16,7 @@ void DrawFrameIfNeeded(void)
 {
   DrawFrame(0);
 
-  /* !!! CHECK THIS !!! */
+  // !!! CHECK THIS !!!
   if (! menBorder)
     DrawFrame(1);
 }
@@ -173,19 +173,19 @@ void SetScrollEdges(void)
   int border1_offset = (menBorder ? 1 : 2);
   int border2_offset = (menBorder ? 0 : TILESIZE / 2);
 
-  /* scroll correction for border frame (1 tile) or border element (2 tiles) */
+  // scroll correction for border frame (1 tile) or border element (2 tiles)
   ScrollMinX = 0;
   ScrollMinY = 0;
   ScrollMaxX = (DisplayMaxX + border1_offset - SCR_FIELDX) * TILEX;
   ScrollMaxY = (DisplayMaxY + border1_offset - SCR_FIELDY) * TILEY;
 
-  /* scroll correction for border element (half tile on left and right side) */
+  // scroll correction for border element (half tile on left and right side)
   ScrollMinX += border2_offset;
   ScrollMinY += border2_offset;
   ScrollMaxX -= border2_offset;
   ScrollMaxY -= border2_offset;
 
-  /* scroll correction for even number of visible tiles (half tile shifted) */
+  // scroll correction for even number of visible tiles (half tile shifted)
   ScrollMinX -= game_sp.scroll_xoffset;
   ScrollMaxX -= game_sp.scroll_xoffset;
   ScrollMinY -= game_sp.scroll_yoffset;

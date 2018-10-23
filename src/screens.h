@@ -14,7 +14,7 @@
 
 #include "main.h"
 
-/* (arbitrary, but unique) values for HandleChooseTree() */
+// (arbitrary, but unique) values for HandleChooseTree()
 #define SCROLL_LINE	(1 * SCR_FIELDY)
 #define SCROLL_PAGE	(2 * SCR_FIELDY)
 
@@ -45,4 +45,4 @@ void setHideRelatedSetupEntries(void);
 void DumpScreenIdentifiers(void);
 boolean DoScreenAction(int);
 
-#endif	/* SCREENS_H */
+#endif	// SCREENS_H

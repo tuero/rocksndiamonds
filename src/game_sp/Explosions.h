@@ -14,4 +14,4 @@ void subClearFieldDueToExplosion(int);
 void subFollowUpExplosions(void);
 void subRedDiskReleaseExplosion(void);
 
-#endif /* EXPLOSIONS_H */
+#endif // EXPLOSIONS_H

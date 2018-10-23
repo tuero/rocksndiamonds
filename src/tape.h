@@ -13,21 +13,21 @@
 #define TAPE_H
 
 
-/* values for TapeTogglePause() */
+// values for TapeTogglePause()
 #define	TAPE_TOGGLE_AUTOMATIC	0
 #define	TAPE_TOGGLE_MANUAL	(1 << 0)
 #define	TAPE_TOGGLE_PLAY_PAUSE	(1 << 1)
 
-/* values for tape properties */
-#define MAX_TAPE_LEN		(1000 * FRAMES_PER_SECOND) /* max.time x fps */
+// values for tape properties
+#define MAX_TAPE_LEN		(1000 * FRAMES_PER_SECOND) // max.time x fps
 
-/* values for tape mouse actions */
+// values for tape mouse actions
 #define TAPE_ACTION_LX		0
 #define TAPE_ACTION_LY		1
 #define TAPE_ACTION_BUTTON	2
 #define TAPE_ACTION_UNUSED	3
 
-/* some positions in the video tape control window */
+// some positions in the video tape control window
 #define VIDEO_DISPLAY1_XPOS	5
 #define VIDEO_DISPLAY1_YPOS	5
 #define VIDEO_DISPLAY2_XPOS	5
@@ -41,7 +41,7 @@
 #define VIDEO_CONTROL_XSIZE	VIDEO_DISPLAY_XSIZE
 #define VIDEO_CONTROL_YSIZE	VIDEO_BUTTON_YSIZE
 
-/* values for video tape control */
+// values for video tape control
 #define VIDEO_STATE_PLAY_OFF	(1 << 0)
 #define VIDEO_STATE_PLAY_ON	(1 << 1)
 #define VIDEO_STATE_REC_OFF	(1 << 2)
@@ -94,7 +94,7 @@
 #define VIDEO_PRESS_STOP(x)  ((x) ? VIDEO_PRESS_STOP_ON : VIDEO_PRESS_STOP_OFF)
 #define VIDEO_PRESS_EJECT(x) ((x) ? VIDEO_PRESS_EJECT_ON: VIDEO_PRESS_EJECT_OFF)
 
-/* tags to draw video display labels or symbols only */
+// tags to draw video display labels or symbols only
 /* (negative values to prevent misinterpretation in DrawVideoDisplay(), where
    the variable "value" is also used for tape length -- better fix this) */
 #define VIDEO_DISPLAY_DEFAULT		0
@@ -162,9 +162,9 @@ struct TapeTextInfo
 
 struct TapeInfo
 {
-  int file_version;	/* file format version the tape is stored with    */
-  int game_version;	/* game release version the tape was created with */
-  int engine_version;	/* game engine version the tape was recorded with */
+  int file_version;	// file format version the tape is stored with
+  int game_version;	// game release version the tape was created with
+  int engine_version;	// game engine version the tape was recorded with
 
   char *level_identifier;
   int level_nr;
@@ -203,9 +203,9 @@ struct TapeInfo
   struct TapeLabelInfo label;
   struct TapeTextInfo text;
 
-  boolean show_game_buttons;	/* show game buttons in tape viewport */
+  boolean show_game_buttons;	// show game buttons in tape viewport
 
-  boolean no_valid_file;	/* set when tape file missing or invalid */
+  boolean no_valid_file;	// set when tape file missing or invalid
 };
 
 

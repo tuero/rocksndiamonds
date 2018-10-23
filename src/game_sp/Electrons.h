@@ -23,4 +23,4 @@ void subElectronFromRight(int, int);
 void subElectronTurnLeft(int, int);
 void subElectronTurnRight(int, int);
 
-#endif /* ELECTRONS_H */
+#endif // ELECTRONS_H

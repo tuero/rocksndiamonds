@@ -186,20 +186,20 @@ SetupFileHash	       *font_token_hash = NULL;
 SetupFileHash	       *hide_setup_hash = NULL;
 
 
-/* ------------------------------------------------------------------------- */
-/* element definitions                                                       */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// element definitions
+// ----------------------------------------------------------------------------
 
 struct ElementInfo element_info[MAX_NUM_ELEMENTS + 1];
 
-/* this contains predefined structure elements to initialize "element_info" */
+// this contains predefined structure elements to initialize "element_info"
 struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
 {
-  /* keyword to start parser: "ELEMENT_INFO_START" <-- do not change! */
+  // keyword to start parser: "ELEMENT_INFO_START" <-- do not change!
 
-  /* ----------------------------------------------------------------------- */
-  /* "real" level file elements                                              */
-  /* ----------------------------------------------------------------------- */
+  // --------------------------------------------------------------------------
+  // "real" level file elements
+  // --------------------------------------------------------------------------
 
   {
     "empty_space",
@@ -6271,9 +6271,9 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "wooden wall (DF style)",
   },
 
-  /* ----------------------------------------------------------------------- */
-  /* "real" (and therefore drawable) runtime elements                        */
-  /* ----------------------------------------------------------------------- */
+  // --------------------------------------------------------------------------
+  // "real" (and therefore drawable) runtime elements
+  // --------------------------------------------------------------------------
 
   {
     "dynabomb_player_1.active",
@@ -6682,9 +6682,9 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "pac man (eating down)"
   },
 
-  /* ----------------------------------------------------------------------- */
-  /* "unreal" (and therefore not drawable) runtime elements                  */
-  /* ----------------------------------------------------------------------- */
+  // --------------------------------------------------------------------------
+  // "unreal" (and therefore not drawable) runtime elements
+  // --------------------------------------------------------------------------
 
   {
     "blocked",
@@ -6807,9 +6807,9 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "-"
   },
 
-  /* ----------------------------------------------------------------------- */
-  /* dummy elements (never used as game elements, only used as graphics)     */
-  /* ----------------------------------------------------------------------- */
+  // --------------------------------------------------------------------------
+  // dummy elements (never used as game elements, only used as graphics)
+  // --------------------------------------------------------------------------
 
   {
     "steelwall_topleft",
@@ -7237,7 +7237,7 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "hide elements used in this level"
   },
 
-  /* keyword to stop parser: "ELEMENT_INFO_END" <-- do not change! */
+  // keyword to stop parser: "ELEMENT_INFO_END" <-- do not change!
 
   {
     NULL,
@@ -7247,9 +7247,9 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
 };
 
 
-/* ------------------------------------------------------------------------- */
-/* element action and direction definitions                                  */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// element action and direction definitions
+// ----------------------------------------------------------------------------
 
 struct ElementActionInfo element_action_info[NUM_ACTIONS + 1 + 1] =
 {
@@ -7372,7 +7372,7 @@ struct ElementActionInfo element_action_info[NUM_ACTIONS + 1 + 1] =
   { ".part_32",			ACTION_PART_32,			FALSE	},
   { ".other",			ACTION_OTHER,			FALSE	},
 
-  /* empty suffix always matches -- check as last entry in InitSoundInfo() */
+  // empty suffix always matches -- check as last entry in InitSoundInfo()
   { "",				ACTION_DEFAULT,			TRUE	},
 
   { NULL,			0,				0	}
@@ -7431,18 +7431,18 @@ struct SpecialSuffixInfo special_suffix_info[NUM_SPECIAL_GFX_ARGS + 1 + 1] =
   { ".FADING",			GFX_SPECIAL_ARG_FADING,			},
   { ".QUIT",			GFX_SPECIAL_ARG_QUIT,			},
 
-  /* empty suffix always matches -- check as last entry in InitMusicInfo() */
+  // empty suffix always matches -- check as last entry in InitMusicInfo()
   { "",				GFX_SPECIAL_ARG_DEFAULT,		},
 
   { NULL,			0,					}
 };
 
-#include "conf_var.c"	/* include auto-generated data structure definitions */
+#include "conf_var.c"	// include auto-generated data structure definitions
 
 
-/* ------------------------------------------------------------------------- */
-/* font definitions                                                          */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// font definitions
+// ----------------------------------------------------------------------------
 
 /* Important: When one entry is a prefix of another entry, the longer entry
    must come first, because the dynamic configuration does prefix matching!
@@ -7499,10 +7499,10 @@ struct FontInfo font_info[NUM_FONTS + 1] =
 
 struct GlobalAnimInfo global_anim_info[NUM_GLOBAL_ANIM_TOKENS + 1];
 
-/* this contains predefined structure elements to init "global_anim_info" */
+// this contains predefined structure elements to init "global_anim_info"
 struct GlobalAnimNameInfo global_anim_name_info[NUM_GLOBAL_ANIM_TOKENS + 1] =
 {
-  /* (real) graphic definitions used to define animation graphics */
+  // (real) graphic definitions used to define animation graphics
   { "gfx.global.anim_1",	},
   { "gfx.global.anim_2",	},
   { "gfx.global.anim_3",	},
@@ -7536,7 +7536,7 @@ struct GlobalAnimNameInfo global_anim_name_info[NUM_GLOBAL_ANIM_TOKENS + 1] =
   { "gfx.global.anim_31",	},
   { "gfx.global.anim_32",	},
 
-  /* (dummy) graphic definitions used to define animation controls */
+  // (dummy) graphic definitions used to define animation controls
   { "global.anim_1",		},
   { "global.anim_2",		},
   { "global.anim_3",		},
@@ -7574,9 +7574,9 @@ struct GlobalAnimNameInfo global_anim_name_info[NUM_GLOBAL_ANIM_TOKENS + 1] =
 };
 
 
-/* ------------------------------------------------------------------------- */
-/* music token prefix definitions                                            */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// music token prefix definitions
+// ----------------------------------------------------------------------------
 
 struct MusicPrefixInfo music_prefix_info[NUM_MUSIC_PREFIXES + 1] =
 {
@@ -7586,9 +7586,9 @@ struct MusicPrefixInfo music_prefix_info[NUM_MUSIC_PREFIXES + 1] =
 };
 
 
-/* ========================================================================= */
-/* main()                                                                    */
-/* ========================================================================= */
+// ============================================================================
+// main()
+// ============================================================================
 
 static void print_usage(void)
 {
@@ -7762,5 +7762,5 @@ int main(int argc, char *argv[])
   EventLoop();
   CloseAllAndExit(0);
 
-  return 0;	/* to keep compilers happy */
+  return 0;	// to keep compilers happy
 }

@@ -12,13 +12,13 @@
 #ifndef WINDOWS_H
 #define WINDOWS_H
 
-/* prevent including lots of conflicting macros */
+// prevent including lots of conflicting macros
 #define WIN32_LEAN_AND_MEAN
 
 #include <shlobj.h>
 
 
-/* some symbols are already defined on Windows */
+// some symbols are already defined on Windows
 typedef int boolean_internal;
 #define boolean boolean_internal
 
@@ -42,4 +42,4 @@ typedef int boolean_internal;
 #define DrawText DrawText_internal
 #endif
 
-#endif /* WINDOWS_H */
+#endif // WINDOWS_H

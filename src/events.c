@@ -40,7 +40,7 @@ static unsigned int special_cursor_delay = 0;
 static unsigned int special_cursor_delay_value = 1000;
 
 
-/* forward declarations for internal use */
+// forward declarations for internal use
 static void HandleNoEvent(void);
 static void HandleEventActions(void);
 
@@ -57,7 +57,7 @@ static int FilterEvents(const Event *event)
   MotionEvent *motion;
 
 #if defined(TARGET_SDL2)
-  /* skip repeated key press events if keyboard auto-repeat is disabled */
+  // skip repeated key press events if keyboard auto-repeat is disabled
   if (event->type == EVENT_KEYPRESS &&
       event->key.repeat &&
       !keyrepeat_status)
@@ -76,7 +76,7 @@ static int FilterEvents(const Event *event)
     ((MotionEvent *)event)->y -= video.screen_yoffset;
   }
 
-  /* non-motion events are directly passed to event handler functions */
+  // non-motion events are directly passed to event handler functions
   if (event->type != EVENT_MOTIONNOTIFY)
     return 1;
 
@@ -84,7 +84,7 @@ static int FilterEvents(const Event *event)
   cursor_inside_playfield = (motion->x >= SX && motion->x < SX + SXSIZE &&
 			     motion->y >= SY && motion->y < SY + SYSIZE);
 
-  /* do no reset mouse cursor before all pending events have been processed */
+  // do no reset mouse cursor before all pending events have been processed
   if (gfx.cursor_mode == cursor_mode_last &&
       ((game_status == GAME_MODE_TITLE &&
 	gfx.cursor_mode == CURSOR_NONE) ||
@@ -98,7 +98,7 @@ static int FilterEvents(const Event *event)
     cursor_mode_last = CURSOR_DEFAULT;
   }
 
-  /* skip mouse motion events without pressed button outside level editor */
+  // skip mouse motion events without pressed button outside level editor
   if (button_status == MB_RELEASED &&
       game_status != GAME_MODE_EDITOR && game_status != GAME_MODE_PLAYING)
     return 0;
@@ -112,11 +112,11 @@ static int FilterEvents(const Event *event)
 
 static boolean SkipPressedMouseMotionEvent(const Event *event)
 {
-  /* nothing to do if the current event is not a mouse motion event */
+  // nothing to do if the current event is not a mouse motion event
   if (event->type != EVENT_MOTIONNOTIFY)
     return FALSE;
 
-  /* only skip motion events with pressed button outside the game */
+  // only skip motion events with pressed button outside the game
   if (button_status == MB_RELEASED || game_status == GAME_MODE_PLAYING)
     return FALSE;
 
@@ -126,7 +126,7 @@ static boolean SkipPressedMouseMotionEvent(const Event *event)
 
     PeekEvent(&next_event);
 
-    /* if next event is also a mouse motion event, skip the current one */
+    // if next event is also a mouse motion event, skip the current one
     if (next_event.type == EVENT_MOTIONNOTIFY)
       return TRUE;
   }
@@ -262,7 +262,7 @@ void HandleOtherEvents(Event *event)
 
       HandleSpecialGameControllerButtons(event);
 
-      /* FALL THROUGH */
+      // FALL THROUGH
     case SDL_CONTROLLERDEVICEADDED:
     case SDL_CONTROLLERDEVICEREMOVED:
     case SDL_CONTROLLERAXISMOTION:
@@ -287,7 +287,7 @@ static void HandleMouseCursor(void)
 {
   if (game_status == GAME_MODE_TITLE)
   {
-    /* when showing title screens, hide mouse pointer (if not moved) */
+    // when showing title screens, hide mouse pointer (if not moved)
 
     if (gfx.cursor_mode != CURSOR_NONE &&
 	DelayReached(&special_cursor_delay, special_cursor_delay_value))
@@ -298,7 +298,7 @@ static void HandleMouseCursor(void)
   else if (game_status == GAME_MODE_PLAYING && (!tape.pausing ||
 						tape.single_step))
   {
-    /* when playing, display a special mouse pointer inside the playfield */
+    // when playing, display a special mouse pointer inside the playfield
 
     if (gfx.cursor_mode != CURSOR_PLAYFIELD &&
 	cursor_inside_playfield &&
@@ -314,7 +314,7 @@ static void HandleMouseCursor(void)
     SetMouseCursor(CURSOR_DEFAULT);
   }
 
-  /* this is set after all pending events have been processed */
+  // this is set after all pending events have been processed
   cursor_mode_last = gfx.cursor_mode;
 }
 
@@ -327,7 +327,7 @@ void EventLoop(void)
     else
       HandleNoEvent();
 
-    /* execute event related actions after pending events have been processed */
+    // execute event related actions after pending events have been processed
     HandleEventActions();
 
     /* don't use all CPU time when idle; the main loop while playing
@@ -336,10 +336,10 @@ void EventLoop(void)
     if (game_status == GAME_MODE_PLAYING)
       HandleGameActions();
 
-    /* always copy backbuffer to visible screen for every video frame */
+    // always copy backbuffer to visible screen for every video frame
     BackToFront();
 
-    /* reset video frame delay to default (may change again while playing) */
+    // reset video frame delay to default (may change again while playing)
     SetVideoFrameDelay(MenuFrameDelay);
 
     if (game_status == GAME_MODE_QUIT)
@@ -356,7 +356,7 @@ void ClearAutoRepeatKeyEvents(void)
 
     PeekEvent(&next_event);
 
-    /* if event is repeated key press event, remove it from event queue */
+    // if event is repeated key press event, remove it from event queue
     if (next_event.type == EVENT_KEYPRESS &&
 	next_event.key.repeat)
       WaitEvent(&next_event);
@@ -407,7 +407,7 @@ void ClearPlayerAction(void)
 {
   int i;
 
-  /* simulate key release events for still pressed keys */
+  // simulate key release events for still pressed keys
   key_joystick_mapping = 0;
   for (i = 0; i < MAX_PLAYERS; i++)
     stored_player[i].action = 0;
@@ -436,7 +436,7 @@ static void SetPlayerMouseAction(int mx, int my, int button)
 
   if (tape.recording && tape.pausing && tape.use_mouse)
   {
-    /* un-pause a paused game only if mouse button was newly pressed down */
+    // un-pause a paused game only if mouse button was newly pressed down
     if (new_button)
       TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
   }
@@ -1390,7 +1390,7 @@ static void HandleButtonOrFinger(int mx, int my, int button)
     else if (strEqual(setup.touch.control_type, TOUCH_CONTROL_FOLLOW_FINGER))
       HandleButtonOrFinger_FollowFinger_MM(mx, my, button);
     else if (strEqual(setup.touch.control_type, TOUCH_CONTROL_VIRTUAL_BUTTONS))
-      SetPlayerMouseAction(mx, my, button);	/* special case */
+      SetPlayerMouseAction(mx, my, button);	// special case
   }
   else
   {
@@ -1577,20 +1577,20 @@ void HandleButton(int mx, int my, int button, int button_nr)
 
   if (HandleGlobalAnimClicks(mx, my, button))
   {
-    /* do not handle this button event anymore */
-    return;		/* force mouse event not to be handled at all */
+    // do not handle this button event anymore
+    return;		// force mouse event not to be handled at all
   }
 
   if (handle_gadgets && HandleGadgets(mx, my, button))
   {
-    /* do not handle this button event anymore */
-    mx = my = -32;	/* force mouse event to be outside screen tiles */
+    // do not handle this button event anymore
+    mx = my = -32;	// force mouse event to be outside screen tiles
   }
 
   if (button_hold && game_status == GAME_MODE_PLAYING && tape.pausing)
     return;
 
-  /* do not use scroll wheel button events for anything other than gadgets */
+  // do not use scroll wheel button events for anything other than gadgets
   if (IS_WHEEL_BUTTON(button_nr))
     return;
 
@@ -1745,7 +1745,7 @@ static void HandleKeysSpecial(Key key)
 	 in playing levels with more than one player in multi-player mode,
 	 even though the tape was originally recorded in single-player mode */
 
-      /* remove player input actions for all players but the first one */
+      // remove player input actions for all players but the first one
       for (i = 1; i < MAX_PLAYERS; i++)
 	tape.player_participates[i] = FALSE;
 
@@ -1782,7 +1782,7 @@ static void HandleKeysSpecial(Key key)
     }
   }
 
-  /* special key shortcuts for all game modes */
+  // special key shortcuts for all game modes
   if (is_string_suffix(cheat_input, ":dump-event-actions") ||
       is_string_suffix(cheat_input, ":dea") ||
       is_string_suffix(cheat_input, ":DEA"))
@@ -1871,7 +1871,7 @@ void HandleKey(Key key, int key_status)
   int i;
 
 #if defined(TARGET_SDL2)
-  /* map special keys (media keys / remote control buttons) to default keys */
+  // map special keys (media keys / remote control buttons) to default keys
   if (key == KSYM_PlayPause)
     key = KSYM_space;
   else if (key == KSYM_Select)
@@ -1882,7 +1882,7 @@ void HandleKey(Key key, int key_status)
 
   if (game_status == GAME_MODE_PLAYING)
   {
-    /* only needed for single-step tape recording mode */
+    // only needed for single-step tape recording mode
     static boolean has_snapped[MAX_PLAYERS] = { FALSE, FALSE, FALSE, FALSE };
     int pnr;
 
@@ -1899,7 +1899,7 @@ void HandleKey(Key key, int key_status)
 	if (key == *key_info[i].key_custom)
 	  key_action |= key_info[i].action;
 
-      /* use combined snap+direction keys for the first player only */
+      // use combined snap+direction keys for the first player only
       if (pnr == 0)
       {
 	ssi = setup.shortcut;
@@ -1920,7 +1920,7 @@ void HandleKey(Key key, int key_status)
 	{
 	  TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
 
-	  /* if snap key already pressed, keep pause mode when releasing */
+	  // if snap key already pressed, keep pause mode when releasing
 	  if (stored_player[pnr].action & KEY_BUTTON_SNAP)
 	    has_snapped[pnr] = TRUE;
 	}
@@ -1931,14 +1931,14 @@ void HandleKey(Key key, int key_status)
 	  if (level.game_engine_type == GAME_ENGINE_TYPE_SP &&
 	      getRedDiskReleaseFlag_SP() == 0)
 	  {
-	    /* add a single inactive frame before dropping starts */
+	    // add a single inactive frame before dropping starts
 	    stored_player[pnr].action &= ~KEY_BUTTON_DROP;
 	    stored_player[pnr].force_dropping = TRUE;
 	  }
 	}
 	else if (key_status == KEY_RELEASED && key_action & KEY_BUTTON_SNAP)
 	{
-	  /* if snap key was pressed without direction, leave pause mode */
+	  // if snap key was pressed without direction, leave pause mode
 	  if (!has_snapped[pnr])
 	    TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
 
@@ -1947,7 +1947,7 @@ void HandleKey(Key key, int key_status)
       }
       else if (tape.recording && tape.pausing && !tape.use_mouse)
       {
-	/* prevent key release events from un-pausing a paused game */
+	// prevent key release events from un-pausing a paused game
 	if (key_status == KEY_PRESSED && key_action & KEY_ACTION)
 	  TapeTogglePause(TAPE_TOGGLE_MANUAL);
       }
@@ -2036,8 +2036,8 @@ void HandleKey(Key key, int key_status)
 				      key == KSYM_Return ||
 				      key == KSYM_Escape)))
   {
-    /* do not handle this key event anymore */
-    if (key != KSYM_Escape)	/* always allow ESC key to be handled */
+    // do not handle this key event anymore
+    if (key != KSYM_Escape)	// always allow ESC key to be handled
       return;
   }
 
@@ -2098,7 +2098,7 @@ void HandleKey(Key key, int key_status)
 
   if (HandleGadgetsKeyInput(key))
   {
-    if (key != KSYM_Escape)	/* always allow ESC key to be handled */
+    if (key != KSYM_Escape)	// always allow ESC key to be handled
       key = KSYM_UNDEFINED;
   }
 
@@ -2308,7 +2308,7 @@ static int HandleJoystickForAllPlayers(void)
     if (setup.input[i].use_joystick)
       no_joysticks_configured = FALSE;
 
-  /* if no joysticks configured, map connected joysticks to players */
+  // if no joysticks configured, map connected joysticks to players
   if (no_joysticks_configured)
     use_as_joystick_nr = TRUE;
 
@@ -2352,7 +2352,7 @@ void HandleJoystick(void)
 
   if (HandleGlobalAnimClicks(-1, -1, newbutton))
   {
-    /* do not handle this button event anymore */
+    // do not handle this button event anymore
     return;
   }
 
@@ -2377,12 +2377,12 @@ void HandleJoystick(void)
 
   if (joytest && !button && !DelayReached(&joytest_delay, joytest_delay_value))
   {
-    /* delay joystick/keyboard actions if axes/keys continually pressed */
+    // delay joystick/keyboard actions if axes/keys continually pressed
     newbutton = dx = dy = 0;
   }
   else
   {
-    /* first start with longer delay, then continue with shorter delay */
+    // first start with longer delay, then continue with shorter delay
     joytest_delay_value =
       (use_delay_value_first ? delay_value_first : delay_value);
   }
@@ -2499,7 +2499,7 @@ void HandleSpecialGameControllerKeys(Key key, int key_status)
 #if defined(KSYM_Rewind) && defined(KSYM_FastForward)
   int button = SDL_CONTROLLER_BUTTON_INVALID;
 
-  /* map keys to joystick buttons (special hack for Amazon Fire TV remote) */
+  // map keys to joystick buttons (special hack for Amazon Fire TV remote)
   if (key == KSYM_Rewind)
     button = SDL_CONTROLLER_BUTTON_A;
   else if (key == KSYM_FastForward || key == KSYM_Menu)
@@ -2512,7 +2512,7 @@ void HandleSpecialGameControllerKeys(Key key, int key_status)
     event.type = (key_status == KEY_PRESSED ? SDL_CONTROLLERBUTTONDOWN :
 		  SDL_CONTROLLERBUTTONUP);
 
-    event.cbutton.which = 0;	/* first joystick (Amazon Fire TV remote) */
+    event.cbutton.which = 0;	// first joystick (Amazon Fire TV remote)
     event.cbutton.button = button;
     event.cbutton.state = (key_status == KEY_PRESSED ? SDL_PRESSED :
 			   SDL_RELEASED);

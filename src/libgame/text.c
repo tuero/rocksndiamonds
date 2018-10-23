@@ -16,9 +16,9 @@
 #include "misc.h"
 
 
-/* ========================================================================= */
-/* font functions                                                            */
-/* ========================================================================= */
+// ============================================================================
+// font functions
+// ============================================================================
 
 void InitFontInfo(struct FontBitmapInfo *font_bitmap_info, int num_fonts,
 		  int (*select_font_function)(int),
@@ -85,11 +85,11 @@ static int getFontCharPosition(int font_nr, char c)
   boolean default_font = (font->num_chars == DEFAULT_NUM_CHARS_PER_FONT);
   int font_pos = (unsigned char)c - 32;
 
-  /* map some special characters to their ascii values in default font */
+  // map some special characters to their ascii values in default font
   if (default_font)
     font_pos = MAP_FONT_ASCII(c) - 32;
 
-  /* this allows dynamic special characters together with special font */
+  // this allows dynamic special characters together with special font
   if (font_pos < 0 || font_pos >= font->num_chars)
     font_pos = 0;
 
@@ -110,9 +110,9 @@ void getFontCharSource(int font_nr, char c, Bitmap **bitmap, int *x, int *y)
 }
 
 
-/* ========================================================================= */
-/* text string helper functions                                              */
-/* ========================================================================= */
+// ============================================================================
+// text string helper functions
+// ============================================================================
 
 int maxWordLengthInRequestString(char *text)
 {
@@ -132,9 +132,9 @@ int maxWordLengthInRequestString(char *text)
 }
 
 
-/* ========================================================================= */
-/* simple text drawing functions                                             */
-/* ========================================================================= */
+// ============================================================================
+// simple text drawing functions
+// ============================================================================
 
 void DrawInitText(char *text, int ypos, int font_nr)
 {
@@ -247,11 +247,11 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
   if (font->bitmap == NULL)
     return;
 
-  /* skip text to be printed outside the window (left/right will be clipped) */
+  // skip text to be printed outside the window (left/right will be clipped)
   if (dst_y < 0 || dst_y + font_height > video.height)
     return;
 
-  /* add offset for drawing font characters */
+  // add offset for drawing font characters
   dst_x += font->draw_xoffset;
   dst_y += font->draw_yoffset;
 
@@ -260,11 +260,11 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
     char c = *text_ptr++;
 
     if (c == '\n')
-      c = ' ';		/* print space instead of newline */
+      c = ' ';		// print space instead of newline
 
     getFontCharSource(font_nr, c, &src_bitmap, &src_x, &src_y);
 
-    /* clip text at the left side of the window */
+    // clip text at the left side of the window
     if (dst_x < 0)
     {
       dst_x += font_width;
@@ -272,14 +272,14 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
       continue;
     }
 
-    /* clip text at the right side of the window */
+    // clip text at the right side of the window
     if (dst_x + font_width > video.width)
       break;
 
-    if (mask_mode == BLIT_INVERSE)	/* special mode for text gadgets */
+    if (mask_mode == BLIT_INVERSE)	// special mode for text gadgets
     {
-      /* first step: draw solid colored rectangle (use "cursor" character) */
-      if (strlen(text) == 1)	/* only one char inverted => draw cursor */
+      // first step: draw solid colored rectangle (use "cursor" character)
+      if (strlen(text) == 1)	// only one char inverted => draw cursor
       {
 	Bitmap *cursor_bitmap;
 	int cursor_x, cursor_y;
@@ -291,7 +291,7 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
 		   font_width, font_height, dst_x, dst_y);
       }
 
-      /* second step: draw masked inverted character */
+      // second step: draw masked inverted character
       SDLCopyInverseMasked(src_bitmap, dst_bitmap, src_x, src_y,
 			   font_width, font_height, dst_x, dst_y);
     }
@@ -299,7 +299,7 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
     {
       if (mask_mode == BLIT_ON_BACKGROUND)
       {
-	/* clear font character background */
+	// clear font character background
 	ClearRectangleOnBackground(dst_bitmap, dst_x, dst_y,
 				   font_width, font_height);
       }
@@ -307,7 +307,7 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
       BlitBitmapMasked(src_bitmap, dst_bitmap, src_x, src_y,
 		       font_width, font_height, dst_x, dst_y);
     }
-    else	/* normal, non-masked font blitting */
+    else	// normal, non-masked font blitting
     {
       BlitBitmap(src_bitmap, dst_bitmap, src_x, src_y,
 		 font_width, font_height, dst_x, dst_y);
@@ -318,9 +318,9 @@ void DrawTextExt(DrawBuffer *dst_bitmap, int dst_x, int dst_y, char *text,
 }
 
 
-/* ========================================================================= */
-/* text buffer drawing functions                                             */
-/* ========================================================================= */
+// ============================================================================
+// text buffer drawing functions
+// ============================================================================
 
 #define MAX_LINES_FROM_FILE		1024
 
@@ -336,13 +336,13 @@ char *GetTextBufferFromFile(char *filename, int max_lines)
   if (!(file = openFile(filename, MODE_READ)))
     return NULL;
 
-  buffer = checked_calloc(1);	/* start with valid, but empty text buffer */
+  buffer = checked_calloc(1);	// start with valid, but empty text buffer
 
   while (!checkEndOfFile(file) && num_lines < max_lines)
   {
     char line[MAX_LINE_LEN];
 
-    /* read next line of input file */
+    // read next line of input file
     if (!getStringFromFile(file, line, MAX_LINE_LEN))
       break;
 
@@ -372,14 +372,14 @@ static boolean RenderLineToBuffer(char **src_buffer_ptr, char *dst_buffer,
     char *word_ptr;
     int word_len;
 
-    /* skip leading whitespaces */
+    // skip leading whitespaces
     while (*text_ptr == ' ' || *text_ptr == '\t')
       text_ptr++;
 
     word_ptr = text_ptr;
     word_len = 0;
 
-    /* look for end of next word */
+    // look for end of next word
     while (*word_ptr != ' ' && *word_ptr != '\t' && *word_ptr != '\0')
     {
       word_ptr++;
@@ -390,18 +390,18 @@ static boolean RenderLineToBuffer(char **src_buffer_ptr, char *dst_buffer,
     {
       continue;
     }
-    else if (*text_ptr == '\n')		/* special case: force empty line */
+    else if (*text_ptr == '\n')		// special case: force empty line
     {
       if (buffer_len == 0)
 	text_ptr++;
 
-      /* prevent printing of multiple empty lines */
+      // prevent printing of multiple empty lines
       if (buffer_len > 0 || !last_line_was_empty)
 	buffer_filled = TRUE;
     }
     else if (word_len < line_length - buffer_len)
     {
-      /* word fits into text buffer -- add word */
+      // word fits into text buffer -- add word
 
       if (buffer_len > 0)
 	buffer[buffer_len++] = ' ';
@@ -413,13 +413,13 @@ static boolean RenderLineToBuffer(char **src_buffer_ptr, char *dst_buffer,
     }
     else if (buffer_len > 0)
     {
-      /* not enough space left for word in text buffer -- print buffer */
+      // not enough space left for word in text buffer -- print buffer
 
       buffer_filled = TRUE;
     }
     else
     {
-      /* word does not fit at all into empty text buffer -- cut word */
+      // word does not fit at all into empty text buffer -- cut word
 
       strncpy(buffer, text_ptr, line_length);
       buffer[line_length] = '\0';
@@ -445,14 +445,14 @@ static boolean getCheckedTokenValueFromString(char *string, char **token,
   if (!getTokenValueFromString(string, token, value))
     return FALSE;
 
-  if (**token != '.')			/* token should begin with dot */
+  if (**token != '.')			// token should begin with dot
     return FALSE;
 
-  for (ptr = *token; *ptr; ptr++)	/* token should contain no whitespace */
+  for (ptr = *token; *ptr; ptr++)	// token should contain no whitespace
     if (*ptr == ' ' || *ptr == '\t')
       return FALSE;
 
-  for (ptr = *value; *ptr; ptr++)	/* value should contain no whitespace */
+  for (ptr = *value; *ptr; ptr++)	// value should contain no whitespace
     if (*ptr == ' ' || *ptr == '\t')
       return FALSE;
 
@@ -514,25 +514,25 @@ int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
     int num_line_chars = MAX_LINE_LEN;
     int i;
 
-    /* copy next line from text buffer to line buffer (nearly fgets() style) */
+    // copy next line from text buffer to line buffer (nearly fgets() style)
     for (i = 0; i < num_line_chars && *text_buffer; i++)
       if ((line[i] = *text_buffer++) == '\n')
 	break;
     line[i] = '\0';
 
-    /* prevent 'num_line_chars' sized lines to cause additional empty line */
+    // prevent 'num_line_chars' sized lines to cause additional empty line
     if (i == num_line_chars && *text_buffer == '\n')
       text_buffer++;
 
-    /* skip comments (lines directly beginning with '#') */
+    // skip comments (lines directly beginning with '#')
     if (line[0] == '#' && parse_comments)
     {
       char *token, *value;
 
-      /* try to read generic token/value pair definition after comment sign */
+      // try to read generic token/value pair definition after comment sign
       if (getCheckedTokenValueFromString(line + 1, &token, &value))
       {
-	/* if found, flush the current buffer, if non-empty */
+	// if found, flush the current buffer, if non-empty
 	if (buffer_len > 0 && current_ypos < max_ysize)
 	{
 	  DrawTextBuffer_Flush(x, y, buffer, font_nr, line_length, cut_length,
@@ -561,7 +561,7 @@ int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
       continue;
     }
 
-    /* cut trailing newline and carriage return from input line */
+    // cut trailing newline and carriage return from input line
     for (line_ptr = line; *line_ptr; line_ptr++)
     {
       if (*line_ptr == '\n' || *line_ptr == '\r')
@@ -571,7 +571,7 @@ int DrawTextBuffer(int x, int y, char *text_buffer, int font_nr,
       }
     }
 
-    if (strlen(line) == 0)		/* special case: force empty line */
+    if (strlen(line) == 0)		// special case: force empty line
       strcpy(line, "\n");
 
     line_ptr = line;

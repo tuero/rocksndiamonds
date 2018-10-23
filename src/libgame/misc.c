@@ -33,13 +33,13 @@
 #include "image.h"
 
 
-/* ========================================================================= */
-/* some generic helper functions                                             */
-/* ========================================================================= */
+// ============================================================================
+// some generic helper functions
+// ============================================================================
 
-/* ------------------------------------------------------------------------- */
-/* logging functions                                                         */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// logging functions
+// ----------------------------------------------------------------------------
 
 #define DUPLICATE_LOG_OUT_TO_STDOUT		TRUE
 #define DUPLICATE_LOG_ERR_TO_STDERR		TRUE
@@ -163,9 +163,9 @@ static void printf_log_line(char *line_chars, int line_length)
 }
 
 
-/* ------------------------------------------------------------------------- */
-/* platform independent wrappers for printf() et al.                         */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// platform independent wrappers for printf() et al.
+// ----------------------------------------------------------------------------
 
 void fprintf_line(FILE *file, char *line_chars, int line_length)
 {
@@ -251,9 +251,9 @@ void PrintLineWithPrefix(char *prefix, char *line_chars, int line_length)
 }
 
 
-/* ------------------------------------------------------------------------- */
-/* string functions                                                          */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// string functions
+// ----------------------------------------------------------------------------
 
 /* int2str() returns a number converted to a string;
    the used memory is static, but will be overwritten by later calls,
@@ -296,7 +296,7 @@ char *i_to_a(unsigned int i)
 
   checked_free(a);
 
-  if (i > 2147483647)	/* yes, this is a kludge */
+  if (i > 2147483647)	// yes, this is a kludge
     i = 2147483647;
 
   a = checked_malloc(10 + 1);
@@ -316,7 +316,7 @@ int log_2(unsigned int x)
 
   while ((1 << e) < x)
   {
-    x -= (1 << e);	/* for rounding down (rounding up: remove this line) */
+    x -= (1 << e);	// for rounding down (rounding up: remove this line)
     e++;
   }
 
@@ -329,11 +329,11 @@ boolean getTokenValueFromString(char *string, char **token, char **value)
 }
 
 
-/* ------------------------------------------------------------------------- */
-/* counter functions                                                         */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// counter functions
+// ----------------------------------------------------------------------------
 
-/* maximal allowed length of a command line option */
+// maximal allowed length of a command line option
 #define MAX_OPTION_LEN		256
 
 static unsigned int getCurrentMS(void)
@@ -346,23 +346,23 @@ static unsigned int mainCounter(int mode)
   static unsigned int base_ms = 0;
   unsigned int current_ms;
 
-  /* get current system milliseconds */
+  // get current system milliseconds
   current_ms = getCurrentMS();
 
-  /* reset base timestamp in case of counter reset or wrap-around */
+  // reset base timestamp in case of counter reset or wrap-around
   if (mode == INIT_COUNTER || current_ms < base_ms)
     base_ms = current_ms;
 
-  /* return milliseconds since last counter reset */
+  // return milliseconds since last counter reset
   return current_ms - base_ms;
 }
 
-void InitCounter()		/* set counter back to zero */
+void InitCounter()		// set counter back to zero
 {
   mainCounter(INIT_COUNTER);
 }
 
-unsigned int Counter()	/* get milliseconds since last call of InitCounter() */
+unsigned int Counter()	// get milliseconds since last call of InitCounter()
 {
   return mainCounter(READ_COUNTER);
 }
@@ -372,7 +372,7 @@ static void sleep_milliseconds(unsigned int milliseconds_delay)
   SDL_Delay(milliseconds_delay);
 }
 
-void Delay(unsigned int delay)	/* Sleep specified number of milliseconds */
+void Delay(unsigned int delay)	// Sleep specified number of milliseconds
 {
   sleep_milliseconds(delay);
 }
@@ -483,19 +483,19 @@ void SkipUntilDelayReached(unsigned int *counter_var, unsigned int delay,
 }
 
 
-/* ------------------------------------------------------------------------- */
-/* random generator functions                                                */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// random generator functions
+// ----------------------------------------------------------------------------
 
 unsigned int init_random_number(int nr, int seed)
 {
   if (seed == NEW_RANDOMIZE)
   {
-    /* default random seed */
+    // default random seed
     seed = (int)time(NULL);			// seconds since the epoch
 
 #if !defined(PLATFORM_WIN32)
-    /* add some more randomness */
+    // add some more randomness
     struct timeval current_time;
 
     gettimeofday(&current_time, NULL);
@@ -503,10 +503,10 @@ unsigned int init_random_number(int nr, int seed)
     seed += (int)current_time.tv_usec;		// microseconds since the epoch
 #endif
 
-    /* add some more randomness */
+    // add some more randomness
     seed += (int)SDL_GetTicks();		// milliseconds since SDL init
 
-    /* add some more randomness */
+    // add some more randomness
     seed += GetSimpleRandom(1000000);
   }
 
@@ -521,9 +521,9 @@ unsigned int get_random_number(int nr, int max)
 }
 
 
-/* ------------------------------------------------------------------------- */
-/* system info functions                                                     */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// system info functions
+// ----------------------------------------------------------------------------
 
 #if !defined(PLATFORM_ANDROID)
 static char *get_corrected_real_name(char *real_name)
@@ -532,7 +532,7 @@ static char *get_corrected_real_name(char *real_name)
   char *from_ptr = real_name;
   char *to_ptr   = real_name_new;
 
-  /* copy the name string, but not more than MAX_USERNAME_LEN characters */
+  // copy the name string, but not more than MAX_USERNAME_LEN characters
   while (*from_ptr && (int)(to_ptr - real_name_new) < MAX_USERNAME_LEN - 1)
   {
     /* the name field read from "passwd" file may also contain additional
@@ -624,22 +624,22 @@ time_t getFileTimestampEpochSeconds(char *filename)
 {
   struct stat file_status;
 
-  if (stat(filename, &file_status) != 0)	/* cannot stat file */
+  if (stat(filename, &file_status) != 0)	// cannot stat file
     return 0;
 
   return file_status.st_mtime;
 }
 
 
-/* ------------------------------------------------------------------------- */
-/* path manipulation functions                                               */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// path manipulation functions
+// ----------------------------------------------------------------------------
 
 static char *getLastPathSeparatorPtr(char *filename)
 {
   char *last_separator = strrchr(filename, CHAR_PATH_SEPARATOR_UNIX);
 
-  if (last_separator == NULL)	/* also try DOS/Windows variant */
+  if (last_separator == NULL)	// also try DOS/Windows variant
     last_separator = strrchr(filename, CHAR_PATH_SEPARATOR_DOS);
 
   return last_separator;
@@ -650,9 +650,9 @@ char *getBaseNamePtr(char *filename)
   char *last_separator = getLastPathSeparatorPtr(filename);
 
   if (last_separator != NULL)
-    return last_separator + 1;	/* separator found: strip base path */
+    return last_separator + 1;	// separator found: strip base path
   else
-    return filename;		/* no separator found: filename has no path */
+    return filename;		// no separator found: filename has no path
 }
 
 char *getBaseName(char *filename)
@@ -682,7 +682,7 @@ char *getBasePath(char *filename)
   char *basepath = getStringCopy(filename);
   char *last_separator = getLastPathSeparatorPtr(basepath);
 
-  /* if no separator was found, use current directory */
+  // if no separator was found, use current directory
   if (last_separator == NULL)
   {
     free(basepath);
@@ -690,16 +690,16 @@ char *getBasePath(char *filename)
     return getStringCopy(".");
   }
 
-  /* separator found: strip basename */
+  // separator found: strip basename
   *last_separator = '\0';
 
   return basepath;
 }
 
 
-/* ------------------------------------------------------------------------- */
-/* various string functions                                                  */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// various string functions
+// ----------------------------------------------------------------------------
 
 char *getStringCat2WithSeparator(char *s1, char *s2, char *sep)
 {
@@ -901,9 +901,9 @@ boolean strSuffixLower(char *s, char *suffix)
 }
 
 
-/* ------------------------------------------------------------------------- */
-/* command line option handling functions                                    */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// command line option handling functions
+// ----------------------------------------------------------------------------
 
 void GetOptions(int argc, char *argv[],
 		void (*print_usage_function)(void),
@@ -914,11 +914,11 @@ void GetOptions(int argc, char *argv[],
   char **argvplus = checked_calloc((argc + 1) * sizeof(char **));
   char **options_left = &argvplus[1];
 
-  /* replace original "argv" with null-terminated array of string pointers */
+  // replace original "argv" with null-terminated array of string pointers
   while (argc--)
     argvplus[argc] = argv[argc];
 
-  /* initialize global program options */
+  // initialize global program options
   options.server_host = NULL;
   options.server_port = 0;
 
@@ -944,7 +944,7 @@ void GetOptions(int argc, char *argv[],
   options.verbose = TRUE;
 #else
 #if !defined(PLATFORM_UNIX)
-  if (*options_left == NULL)	/* no options given -- enable verbose mode */
+  if (*options_left == NULL)	// no options given -- enable verbose mode
     options.verbose = TRUE;
 #endif
 #endif
@@ -966,22 +966,22 @@ void GetOptions(int argc, char *argv[],
     if (option_len >= MAX_OPTION_LEN)
       Error(ERR_EXIT_HELP, "unrecognized option '%s'", option);
 
-    strcpy(option_str, option);			/* copy argument into buffer */
+    strcpy(option_str, option);			// copy argument into buffer
     option = option_str;
 
-    if (strEqual(option, "--"))			/* stop scanning arguments */
+    if (strEqual(option, "--"))			// stop scanning arguments
       break;
 
-    if (strPrefix(option, "--"))		/* treat '--' like '-' */
+    if (strPrefix(option, "--"))		// treat '--' like '-'
       option++;
 
     option_arg = strchr(option, '=');
-    if (option_arg == NULL)			/* no '=' in option */
+    if (option_arg == NULL)			// no '=' in option
       option_arg = next_option;
     else
     {
-      *option_arg++ = '\0';			/* cut argument from option */
-      if (*option_arg == '\0')			/* no argument after '=' */
+      *option_arg++ = '\0';			// cut argument from option
+      if (*option_arg == '\0')			// no argument after '='
 	Error(ERR_EXIT_HELP, "option '%s' has invalid argument", option_str);
     }
 
@@ -1002,13 +1002,13 @@ void GetOptions(int argc, char *argv[],
       if (option_arg == NULL)
 	Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
 
-      /* this should be extended to separate options for ro and rw data */
+      // this should be extended to separate options for ro and rw data
       options.ro_base_directory = ro_base_path = option_arg;
       options.rw_base_directory = rw_base_path = option_arg;
       if (option_arg == next_option)
 	options_left++;
 
-      /* adjust paths for sub-directories in base directory accordingly */
+      // adjust paths for sub-directories in base directory accordingly
       options.level_directory    = getPath2(ro_base_path, LEVELS_DIRECTORY);
       options.graphics_directory = getPath2(ro_base_path, GRAPHICS_DIRECTORY);
       options.sounds_directory   = getPath2(ro_base_path, SOUNDS_DIRECTORY);
@@ -1092,13 +1092,13 @@ void GetOptions(int argc, char *argv[],
       if (option_arg == next_option)
 	options_left++;
 
-      /* when doing batch processing, always enable verbose mode (warnings) */
+      // when doing batch processing, always enable verbose mode (warnings)
       options.verbose = TRUE;
     }
 #if defined(PLATFORM_MACOSX)
     else if (strPrefix(option, "-psn"))
     {
-      /* ignore process serial number when launched via GUI on Mac OS X */
+      // ignore process serial number when launched via GUI on Mac OS X
     }
 #endif
     else if (*option == '-')
@@ -1123,13 +1123,13 @@ void GetOptions(int argc, char *argv[],
 }
 
 
-/* ------------------------------------------------------------------------- */
-/* error handling functions                                                  */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// error handling functions
+// ----------------------------------------------------------------------------
 
 #define MAX_INTERNAL_ERROR_SIZE		1024
 
-/* used by SetError() and GetError() to store internal error messages */
+// used by SetError() and GetError() to store internal error messages
 static char internal_error[MAX_INTERNAL_ERROR_SIZE];
 
 void SetError(char *format, ...)
@@ -1162,11 +1162,11 @@ void Error(int mode, char *format, ...)
 		      ANDROID_LOG_UNKNOWN);
 #endif
 
-  /* display debug messages only when running in debug mode */
+  // display debug messages only when running in debug mode
   if (mode & ERR_DEBUG && !options.debug)
     return;
 
-  /* display warnings only when running in verbose mode */
+  // display warnings only when running in verbose mode
   if (mode & ERR_WARN && !options.verbose)
     return;
 
@@ -1225,16 +1225,16 @@ void Error(int mode, char *format, ...)
   if (mode & ERR_EXIT)
   {
     if (mode & ERR_FROM_SERVER)
-      exit(1);				/* child process: normal exit */
+      exit(1);				// child process: normal exit
     else
-      program.exit_function(1);		/* main process: clean up stuff */
+      program.exit_function(1);		// main process: clean up stuff
   }
 }
 
 
-/* ------------------------------------------------------------------------- */
-/* checked memory allocation and freeing functions                           */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// checked memory allocation and freeing functions
+// ----------------------------------------------------------------------------
 
 void *checked_malloc(unsigned int size)
 {
@@ -1272,14 +1272,14 @@ void *checked_realloc(void *ptr, unsigned int size)
 
 void checked_free(void *ptr)
 {
-  if (ptr != NULL)	/* this check should be done by free() anyway */
+  if (ptr != NULL)	// this check should be done by free() anyway
     free(ptr);
 }
 
 void clear_mem(void *ptr, unsigned int size)
 {
 #if defined(PLATFORM_WIN32)
-  /* for unknown reason, memset() sometimes crashes when compiled with MinGW */
+  // for unknown reason, memset() sometimes crashes when compiled with MinGW
   char *cptr = (char *)ptr;
 
   while (size--)
@@ -1290,9 +1290,9 @@ void clear_mem(void *ptr, unsigned int size)
 }
 
 
-/* ------------------------------------------------------------------------- */
-/* various helper functions                                                  */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// various helper functions
+// ----------------------------------------------------------------------------
 
 void swap_numbers(int *i1, int *i2)
 {
@@ -1338,7 +1338,7 @@ int getFile16BitInteger(File *file, int byte_order)
   if (byte_order == BYTE_ORDER_BIG_ENDIAN)
     return ((getByteFromFile(file) << 8) |
 	    (getByteFromFile(file) << 0));
-  else		 /* BYTE_ORDER_LITTLE_ENDIAN */
+  else		 // BYTE_ORDER_LITTLE_ENDIAN
     return ((getByteFromFile(file) << 0) |
 	    (getByteFromFile(file) << 8));
 }
@@ -1352,7 +1352,7 @@ int putFile16BitInteger(FILE *file, int value, int byte_order)
       fputc((value >> 8) & 0xff, file);
       fputc((value >> 0) & 0xff, file);
     }
-    else	   /* BYTE_ORDER_LITTLE_ENDIAN */
+    else	   // BYTE_ORDER_LITTLE_ENDIAN
     {
       fputc((value >> 0) & 0xff, file);
       fputc((value >> 8) & 0xff, file);
@@ -1369,7 +1369,7 @@ int getFile32BitInteger(File *file, int byte_order)
 	    (getByteFromFile(file) << 16) |
 	    (getByteFromFile(file) <<  8) |
 	    (getByteFromFile(file) <<  0));
-  else		 /* BYTE_ORDER_LITTLE_ENDIAN */
+  else		 // BYTE_ORDER_LITTLE_ENDIAN
     return ((getByteFromFile(file) <<  0) |
 	    (getByteFromFile(file) <<  8) |
 	    (getByteFromFile(file) << 16) |
@@ -1387,7 +1387,7 @@ int putFile32BitInteger(FILE *file, int value, int byte_order)
       fputc((value >>  8) & 0xff, file);
       fputc((value >>  0) & 0xff, file);
     }
-    else	   /* BYTE_ORDER_LITTLE_ENDIAN */
+    else	   // BYTE_ORDER_LITTLE_ENDIAN
     {
       fputc((value >>  0) & 0xff, file);
       fputc((value >>  8) & 0xff, file);
@@ -1404,13 +1404,13 @@ boolean getFileChunk(File *file, char *chunk_name, int *chunk_size,
 {
   const int chunk_name_length = 4;
 
-  /* read chunk name */
+  // read chunk name
   if (getStringFromFile(file, chunk_name, chunk_name_length + 1) == NULL)
     return FALSE;
 
   if (chunk_size != NULL)
   {
-    /* read chunk size */
+    // read chunk size
     *chunk_size = getFile32BitInteger(file, byte_order);
   }
 
@@ -1422,7 +1422,7 @@ int putFileChunk(FILE *file, char *chunk_name, int chunk_size,
 {
   int num_bytes = 0;
 
-  /* write chunk name */
+  // write chunk name
   if (file != NULL)
     fputs(chunk_name, file);
 
@@ -1430,7 +1430,7 @@ int putFileChunk(FILE *file, char *chunk_name, int chunk_size,
 
   if (chunk_size >= 0)
   {
-    /* write chunk size */
+    // write chunk size
     if (file != NULL)
       putFile32BitInteger(file, chunk_size, byte_order);
 
@@ -1498,9 +1498,9 @@ void WriteUnusedBytesToFile(FILE *file, unsigned int bytes)
 }
 
 
-/* ------------------------------------------------------------------------- */
-/* functions to translate key identifiers between different format           */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// functions to translate key identifiers between different format
+// ----------------------------------------------------------------------------
 
 #define TRANSLATE_KEYSYM_TO_KEYNAME	0
 #define TRANSLATE_KEYSYM_TO_X11KEYNAME	1
@@ -1516,17 +1516,17 @@ static void translate_keyname(Key *keysym, char **x11name, char **name, int mode
     char *name;
   } translate_key[] =
   {
-    /* return and escape keys */
+    // return and escape keys
     { KSYM_Return,	"XK_Return",		"return" },
     { KSYM_Escape,	"XK_Escape",		"escape" },
 
-    /* normal cursor keys */
+    // normal cursor keys
     { KSYM_Left,	"XK_Left",		"cursor left" },
     { KSYM_Right,	"XK_Right",		"cursor right" },
     { KSYM_Up,		"XK_Up",		"cursor up" },
     { KSYM_Down,	"XK_Down",		"cursor down" },
 
-    /* keypad cursor keys */
+    // keypad cursor keys
 #ifdef KSYM_KP_Left
     { KSYM_KP_Left,	"XK_KP_Left",		"keypad left" },
     { KSYM_KP_Right,	"XK_KP_Right",		"keypad right" },
@@ -1534,7 +1534,7 @@ static void translate_keyname(Key *keysym, char **x11name, char **name, int mode
     { KSYM_KP_Down,	"XK_KP_Down",		"keypad down" },
 #endif
 
-    /* other keypad keys */
+    // other keypad keys
 #ifdef KSYM_KP_Enter
     { KSYM_KP_Enter,	"XK_KP_Enter",		"keypad enter" },
     { KSYM_KP_Add,	"XK_KP_Add",		"keypad +" },
@@ -1544,7 +1544,7 @@ static void translate_keyname(Key *keysym, char **x11name, char **name, int mode
     { KSYM_KP_Separator,"XK_KP_Separator",	"keypad ," },
 #endif
 
-    /* modifier keys */
+    // modifier keys
     { KSYM_Shift_L,	"XK_Shift_L",		"left shift" },
     { KSYM_Shift_R,	"XK_Shift_R",		"right shift" },
     { KSYM_Control_L,	"XK_Control_L",		"left control" },
@@ -1554,13 +1554,13 @@ static void translate_keyname(Key *keysym, char **x11name, char **name, int mode
     { KSYM_Alt_L,	"XK_Alt_L",		"left alt" },
     { KSYM_Alt_R,	"XK_Alt_R",		"right alt" },
 #if !defined(TARGET_SDL2)
-    { KSYM_Super_L,	"XK_Super_L",		"left super" },	 /* Win-L */
-    { KSYM_Super_R,	"XK_Super_R",		"right super" }, /* Win-R */
+    { KSYM_Super_L,	"XK_Super_L",		"left super" },	 // Win-L
+    { KSYM_Super_R,	"XK_Super_R",		"right super" }, // Win-R
 #endif
-    { KSYM_Mode_switch,	"XK_Mode_switch",	"mode switch" }, /* Alt-R */
-    { KSYM_Multi_key,	"XK_Multi_key",		"multi key" },	 /* Ctrl-R */
+    { KSYM_Mode_switch,	"XK_Mode_switch",	"mode switch" }, // Alt-R
+    { KSYM_Multi_key,	"XK_Multi_key",		"multi key" },	 // Ctrl-R
 
-    /* some special keys */
+    // some special keys
     { KSYM_BackSpace,	"XK_BackSpace",		"backspace" },
     { KSYM_Delete,	"XK_Delete",		"delete" },
     { KSYM_Insert,	"XK_Insert",		"insert" },
@@ -1572,8 +1572,8 @@ static void translate_keyname(Key *keysym, char **x11name, char **name, int mode
 
 #if defined(TARGET_SDL2)
     { KSYM_Select,	"XK_Select",		"select" },
-    { KSYM_Menu,	"XK_Menu",		"menu" },	 /* menu key */
-    { KSYM_Back,	"XK_Back",		"back" },	 /* back key */
+    { KSYM_Menu,	"XK_Menu",		"menu" },	 // menu key
+    { KSYM_Back,	"XK_Back",		"back" },	 // back key
     { KSYM_PlayPause,	"XK_PlayPause",		"play/pause" },
 #if defined(PLATFORM_ANDROID)
     { KSYM_Rewind,	"XK_Rewind",		"rewind" },
@@ -1581,7 +1581,7 @@ static void translate_keyname(Key *keysym, char **x11name, char **name, int mode
 #endif
 #endif
 
-    /* ASCII 0x20 to 0x40 keys (except numbers) */
+    // ASCII 0x20 to 0x40 keys (except numbers)
     { KSYM_space,	"XK_space",		"space" },
     { KSYM_exclam,	"XK_exclam",		"!" },
     { KSYM_quotedbl,	"XK_quotedbl",		"\"" },
@@ -1606,7 +1606,7 @@ static void translate_keyname(Key *keysym, char **x11name, char **name, int mode
     { KSYM_question,	"XK_question",		"?" },
     { KSYM_at,		"XK_at",		"@" },
 
-    /* more ASCII keys */
+    // more ASCII keys
     { KSYM_bracketleft,	"XK_bracketleft",	"[" },
     { KSYM_backslash,	"XK_backslash",		"\\" },
     { KSYM_bracketright,"XK_bracketright",	"]" },
@@ -1619,7 +1619,7 @@ static void translate_keyname(Key *keysym, char **x11name, char **name, int mode
     { KSYM_braceright,	"XK_braceright",	"brace right" },
     { KSYM_asciitilde,	"XK_asciitilde",	"~" },
 
-    /* special (non-ASCII) keys */
+    // special (non-ASCII) keys
     { KSYM_degree,	"XK_degree",		"degree" },
     { KSYM_Adiaeresis,	"XK_Adiaeresis",	"A umlaut" },
     { KSYM_Odiaeresis,	"XK_Odiaeresis",	"O umlaut" },
@@ -1630,7 +1630,7 @@ static void translate_keyname(Key *keysym, char **x11name, char **name, int mode
     { KSYM_ssharp,	"XK_ssharp",		"sharp s" },
 
 #if defined(TARGET_SDL2)
-    /* special (non-ASCII) keys (UTF-8, for reverse mapping only) */
+    // special (non-ASCII) keys (UTF-8, for reverse mapping only)
     { KSYM_degree,	"XK_degree",		"\xc2\xb0" },
     { KSYM_Adiaeresis,	"XK_Adiaeresis",	"\xc3\x84" },
     { KSYM_Odiaeresis,	"XK_Odiaeresis",	"\xc3\x96" },
@@ -1640,12 +1640,12 @@ static void translate_keyname(Key *keysym, char **x11name, char **name, int mode
     { KSYM_udiaeresis,	"XK_udiaeresis",	"\xc3\xbc" },
     { KSYM_ssharp,	"XK_ssharp",		"\xc3\x9f" },
 
-    /* other keys (for reverse mapping only) */
+    // other keys (for reverse mapping only)
     { KSYM_space,	"XK_space",		" " },
 #endif
 
 #if defined(TARGET_SDL2)
-    /* keypad keys are not in numerical order in SDL2 */
+    // keypad keys are not in numerical order in SDL2
     { KSYM_KP_0,	"XK_KP_0",		"keypad 0" },
     { KSYM_KP_1,	"XK_KP_1",		"keypad 1" },
     { KSYM_KP_2,	"XK_KP_2",		"keypad 2" },
@@ -1658,7 +1658,7 @@ static void translate_keyname(Key *keysym, char **x11name, char **name, int mode
     { KSYM_KP_9,	"XK_KP_9",		"keypad 9" },
 #endif
 
-    /* end-of-array identifier */
+    // end-of-array identifier
     { 0,                NULL,			NULL }
   };
 
@@ -1906,7 +1906,7 @@ char getCharFromKey(Key key)
     byte key_char;
   } translate_key_char[] =
   {
-    /* special (non-ASCII) keys (ISO-8859-1) */
+    // special (non-ASCII) keys (ISO-8859-1)
     { KSYM_degree,	CHAR_BYTE_DEGREE	},
     { KSYM_Adiaeresis,	CHAR_BYTE_UMLAUT_A	},
     { KSYM_Odiaeresis,	CHAR_BYTE_UMLAUT_O	},
@@ -1916,7 +1916,7 @@ char getCharFromKey(Key key)
     { KSYM_udiaeresis,	CHAR_BYTE_UMLAUT_u	},
     { KSYM_ssharp,	CHAR_BYTE_SHARP_S	},
 
-    /* end-of-array identifier */
+    // end-of-array identifier
     { 0,                0			}
   };
 
@@ -1948,17 +1948,17 @@ char getCharFromKey(Key key)
 
 char getValidConfigValueChar(char c)
 {
-  if (c == '#' ||	/* used to mark comments */
-      c == '\\')	/* used to mark continued lines */
+  if (c == '#' ||	// used to mark comments
+      c == '\\')	// used to mark continued lines
     c = 0;
 
   return c;
 }
 
 
-/* ------------------------------------------------------------------------- */
-/* functions to translate string identifiers to integer or boolean value     */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// functions to translate string identifiers to integer or boolean value
+// ----------------------------------------------------------------------------
 
 int get_integer_from_string(char *s)
 {
@@ -2069,9 +2069,9 @@ int get_player_nr_from_string(char *s)
 }
 
 
-/* ------------------------------------------------------------------------- */
-/* functions for generic lists                                               */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// functions for generic lists
+// ----------------------------------------------------------------------------
 
 ListNode *newListNode(void)
 {
@@ -2162,9 +2162,9 @@ static void dumpList(ListNode *node_first)
 #endif
 
 
-/* ------------------------------------------------------------------------- */
-/* functions for file handling                                               */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// functions for file handling
+// ----------------------------------------------------------------------------
 
 #define MAX_BUFFER_SIZE			4096
 
@@ -2355,9 +2355,9 @@ int copyFile(char *filename_from, char *filename_to)
 }
 
 
-/* ------------------------------------------------------------------------- */
-/* functions for directory handling                                          */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// functions for directory handling
+// ----------------------------------------------------------------------------
 
 Directory *openDirectory(char *dir_name)
 {
@@ -2491,9 +2491,9 @@ void freeDirectoryEntry(DirectoryEntry *dir_entry)
 }
 
 
-/* ------------------------------------------------------------------------- */
-/* functions for checking files and filenames                                */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// functions for checking files and filenames
+// ----------------------------------------------------------------------------
 
 boolean directoryExists(char *dir_name)
 {
@@ -2628,13 +2628,13 @@ boolean FileIsArtworkType(char *filename, int type)
   return FALSE;
 }
 
-/* ------------------------------------------------------------------------- */
-/* functions for loading artwork configuration information                   */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// functions for loading artwork configuration information
+// ----------------------------------------------------------------------------
 
 char *get_mapped_token(char *token)
 {
-  /* !!! make this dynamically configurable (init.c:InitArtworkConfig) !!! */
+  // !!! make this dynamically configurable (init.c:InitArtworkConfig) !!!
   static char *map_token_prefix[][2] =
   {
     { "char_procent",		"char_percent"	},
@@ -2677,7 +2677,7 @@ char *get_mapped_token(char *token)
 static char *get_special_base_token(struct ArtworkListInfo *artwork_info,
 				    char *token)
 {
-  /* !!! make this dynamically configurable (init.c:InitArtworkConfig) !!! */
+  // !!! make this dynamically configurable (init.c:InitArtworkConfig) !!!
   static struct ConfigTypeInfo prefix_list[] =
   {
     { "global.anim_1"	},
@@ -2720,7 +2720,7 @@ static char *get_special_base_token(struct ArtworkListInfo *artwork_info,
   int len_suffix = 0;
   int i;
 
-  /* search for prefix to check if base token has to be created */
+  // search for prefix to check if base token has to be created
   for (i = 0; prefix_list[i].token != NULL; i++)
     if (strPrefix(token, prefix_list[i].token))
       prefix_found = TRUE;
@@ -2728,7 +2728,7 @@ static char *get_special_base_token(struct ArtworkListInfo *artwork_info,
   if (!prefix_found)
     return NULL;
 
-  /* search for suffix (parameter) to determine base token length */
+  // search for suffix (parameter) to determine base token length
   for (i = 0; suffix_list[i].token != NULL; i++)
     if (strSuffix(token, suffix_list[i].token))
       len_suffix = strlen(suffix_list[i].token);
@@ -2753,20 +2753,20 @@ static boolean string_has_parameter(char *s, char *s_contained)
   {
     char next_char = s[strlen(s_contained)];
 
-    /* check if next character is delimiter or whitespace */
+    // check if next character is delimiter or whitespace
     return (next_char == ',' || next_char == '\0' ||
 	    next_char == ' ' || next_char == '\t' ? TRUE : FALSE);
   }
 
-  /* check if string contains another parameter string after a comma */
+  // check if string contains another parameter string after a comma
   substring = strchr(s, ',');
-  if (substring == NULL)	/* string does not contain a comma */
+  if (substring == NULL)	// string does not contain a comma
     return FALSE;
 
-  /* advance string pointer to next character after the comma */
+  // advance string pointer to next character after the comma
   substring++;
 
-  /* skip potential whitespaces after the comma */
+  // skip potential whitespaces after the comma
   while (*substring == ' ' || *substring == '\t')
     substring++;
 
@@ -2832,7 +2832,7 @@ static int get_anim_parameter_value(char *s)
     }
   }
 
-  /* discard result if next character is neither delimiter nor whitespace */
+  // discard result if next character is neither delimiter nor whitespace
   if (!(*s_ptr == ',' || *s_ptr == '\0' ||
 	*s_ptr == ' ' || *s_ptr == '\t'))
     return ANIM_EVENT_NONE;
@@ -2870,7 +2870,7 @@ static int get_anim_action_parameter_value(char *token)
 int get_parameter_value(char *value_raw, char *suffix, int type)
 {
   char *value = getStringToLower(value_raw);
-  int result = 0;	/* probably a save default value */
+  int result = 0;	// probably a save default value
 
   if (strEqual(suffix, ".direction"))
   {
@@ -2986,11 +2986,11 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
 	      string_has_parameter(value, "curtain")	? FADE_MODE_CURTAIN :
 	      FADE_MODE_DEFAULT);
   }
-  else if (strPrefix(suffix, ".font"))		/* (may also be ".font_xyz") */
+  else if (strPrefix(suffix, ".font"))		// (may also be ".font_xyz")
   {
     result = gfx.get_font_from_token_function(value);
   }
-  else		/* generic parameter of type integer or boolean */
+  else		// generic parameter of type integer or boolean
   {
     result = (strEqual(value, ARG_UNDEFINED) ? ARG_UNDEFINED_VALUE :
 	      type == TYPE_INTEGER ? get_integer_from_string(value) :
@@ -3018,7 +3018,7 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
   int list_pos;
   int i, j;
 
-  /* create hash from list of tokens to be ignored (for quick access) */
+  // create hash from list of tokens to be ignored (for quick access)
   ignore_tokens_hash = newSetupFileHash();
   for (i = 0; ignore_tokens[i] != NULL; i++)
     setHashEntry(ignore_tokens_hash, ignore_tokens[i], "");
@@ -3028,7 +3028,7 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
   for (i = 0; suffix_list[i].token != NULL; i++)
     num_suffix_list_entries++;
 
-  /* always start with reliable default values */
+  // always start with reliable default values
   for (i = 0; i < num_file_list_entries; i++)
   {
     file_list[i].token = NULL;
@@ -3079,7 +3079,7 @@ struct FileInfo *getFileListFromConfigList(struct ConfigInfo *config_list,
       }
     }
 
-    /* the following tokens are no file definitions, but other config tokens */
+    // the following tokens are no file definitions, but other config tokens
     if (getHashEntry(ignore_tokens_hash, config_list[i].token) != NULL)
       is_file_entry = FALSE;
 
@@ -3121,7 +3121,7 @@ static boolean token_suffix_match(char *token, char *suffix, int start_pos)
   int len_token = strlen(token);
   int len_suffix = strlen(suffix);
 
-  if (start_pos < 0)	/* compare suffix from end of string */
+  if (start_pos < 0)	// compare suffix from end of string
     start_pos += len_token;
 
   if (start_pos < 0 || start_pos + len_suffix > len_token)
@@ -3145,7 +3145,7 @@ static void read_token_parameters(SetupFileHash *setup_file_hash,
 				  struct ConfigTypeInfo *suffix_list,
 				  struct FileInfo *file_list_entry)
 {
-  /* check for config token that is the base token without any suffixes */
+  // check for config token that is the base token without any suffixes
   char *filename = getHashEntry(setup_file_hash, file_list_entry->token);
   char *known_token_value = KNOWN_TOKEN_VALUE;
   int i;
@@ -3154,17 +3154,17 @@ static void read_token_parameters(SetupFileHash *setup_file_hash,
   {
     setString(&file_list_entry->filename, filename);
 
-    /* when file definition found, set all parameters to default values */
+    // when file definition found, set all parameters to default values
     for (i = 0; suffix_list[i].token != NULL; i++)
       setString(&file_list_entry->parameter[i], suffix_list[i].value);
 
     file_list_entry->redefined = TRUE;
 
-    /* mark config file token as well known from default config */
+    // mark config file token as well known from default config
     setHashEntry(setup_file_hash, file_list_entry->token, known_token_value);
   }
 
-  /* check for config tokens that can be build by base token and suffixes */
+  // check for config tokens that can be build by base token and suffixes
   for (i = 0; suffix_list[i].token != NULL; i++)
   {
     char *token = getStringCat2(file_list_entry->token, suffix_list[i].token);
@@ -3174,7 +3174,7 @@ static void read_token_parameters(SetupFileHash *setup_file_hash,
     {
       setString(&file_list_entry->parameter[i], value);
 
-      /* mark config file token as well known from default config */
+      // mark config file token as well known from default config
       setHashEntry(setup_file_hash, token, known_token_value);
     }
 
@@ -3258,7 +3258,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
   if ((setup_file_hash = loadSetupFileHash(filename)) == NULL)
     return;
 
-  /* separate valid (defined) from empty (undefined) config token values */
+  // separate valid (defined) from empty (undefined) config token values
   valid_file_hash = newSetupFileHash();
   empty_file_hash = newSetupFileHash();
   BEGIN_HASH_ITERATION(setup_file_hash, itr)
@@ -3270,10 +3270,10 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
   }
   END_HASH_ITERATION(setup_file_hash, itr)
 
-  /* at this point, we do not need the setup file hash anymore -- free it */
+  // at this point, we do not need the setup file hash anymore -- free it
   freeSetupFileHash(setup_file_hash);
 
-  /* prevent changing hash while iterating over it by using a temporary copy */
+  // prevent changing hash while iterating over it by using a temporary copy
   valid_file_hash_tmp = newSetupFileHash();
   BEGIN_HASH_ITERATION(valid_file_hash, itr)
   {
@@ -3283,9 +3283,9 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
   }
   END_HASH_ITERATION(valid_file_hash, itr)
 
-  /* (iterate over same temporary hash, as modifications are independent) */
+  // (iterate over same temporary hash, as modifications are independent)
 
-  /* map deprecated to current tokens (using prefix match and replace) */
+  // map deprecated to current tokens (using prefix match and replace)
   BEGIN_HASH_ITERATION(valid_file_hash_tmp, itr)
   {
     char *token = HASH_ITERATION_TOKEN(itr);
@@ -3295,10 +3295,10 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
     {
       char *value = HASH_ITERATION_VALUE(itr);
 
-      /* add mapped token */
+      // add mapped token
       setHashEntry(valid_file_hash, mapped_token, value);
 
-      /* ignore old token (by setting it to "known" keyword) */
+      // ignore old token (by setting it to "known" keyword)
       setHashEntry(valid_file_hash, token, known_token_value);
 
       free(mapped_token);
@@ -3306,7 +3306,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
   }
   END_HASH_ITERATION(valid_file_hash_tmp, itr)
 
-  /* add special base tokens (using prefix match and replace) */
+  // add special base tokens (using prefix match and replace)
   BEGIN_HASH_ITERATION(valid_file_hash_tmp, itr)
   {
     char *token = HASH_ITERATION_TOKEN(itr);
@@ -3314,7 +3314,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
 
     if (base_token != NULL)
     {
-      /* add base token only if it does not already exist */
+      // add base token only if it does not already exist
       if (getHashEntry(valid_file_hash, base_token) == NULL)
 	setHashEntry(valid_file_hash, base_token, base_token_value);
 
@@ -3323,18 +3323,18 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
   }
   END_HASH_ITERATION(valid_file_hash_tmp, itr)
 
-  /* free temporary hash used for iteration */
+  // free temporary hash used for iteration
   freeSetupFileHash(valid_file_hash_tmp);
 
-  /* read parameters for all known config file tokens */
+  // read parameters for all known config file tokens
   for (i = 0; i < num_file_list_entries; i++)
     read_token_parameters(valid_file_hash, suffix_list, &file_list[i]);
 
-  /* set all tokens that can be ignored here to "known" keyword */
+  // set all tokens that can be ignored here to "known" keyword
   for (i = 0; i < num_ignore_tokens; i++)
     setHashEntry(valid_file_hash, ignore_tokens[i], known_token_value);
 
-  /* copy all unknown config file tokens to extra config hash */
+  // copy all unknown config file tokens to extra config hash
   extra_file_hash = newSetupFileHash();
   BEGIN_HASH_ITERATION(valid_file_hash, itr)
   {
@@ -3345,10 +3345,10 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
   }
   END_HASH_ITERATION(valid_file_hash, itr)
 
-  /* at this point, we do not need the valid file hash anymore -- free it */
+  // at this point, we do not need the valid file hash anymore -- free it
   freeSetupFileHash(valid_file_hash);
 
-  /* now try to determine valid, dynamically defined config tokens */
+  // now try to determine valid, dynamically defined config tokens
 
   BEGIN_HASH_ITERATION(extra_file_hash, itr)
   {
@@ -3369,7 +3369,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
     boolean base_prefix_found = FALSE;
     boolean parameter_suffix_found = FALSE;
 
-    /* skip all parameter definitions (handled by read_token_parameters()) */
+    // skip all parameter definitions (handled by read_token_parameters())
     for (i = 0; i < num_suffix_list_entries && !parameter_suffix_found; i++)
     {
       int len_suffix = strlen(suffix_list[i].token);
@@ -3381,7 +3381,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
     if (parameter_suffix_found)
       continue;
 
-    /* ---------- step 0: search for matching base prefix ---------- */
+    // ---------- step 0: search for matching base prefix ----------
 
     start_pos = 0;
     for (i = 0; i < num_base_prefixes && !base_prefix_found; i++)
@@ -3404,7 +3404,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
 
       base_index = i;
 
-      if (start_pos + len_base_prefix == len_token)	/* exact match */
+      if (start_pos + len_base_prefix == len_token)	// exact match
       {
 	exact_match = TRUE;
 
@@ -3421,7 +3421,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
 	continue;
       }
 
-      /* ---------- step 1: search for matching first suffix ---------- */
+      // ---------- step 1: search for matching first suffix ----------
 
       start_pos += len_base_prefix;
       for (j = 0; j < num_ext1_suffixes && !ext1_suffix_found; j++)
@@ -3436,7 +3436,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
 
 	ext1_index = j;
 
-	if (start_pos + len_ext1_suffix == len_token)	/* exact match */
+	if (start_pos + len_ext1_suffix == len_token)	// exact match
 	{
 	  exact_match = TRUE;
 
@@ -3459,7 +3459,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
       if (exact_match)
 	break;
 
-      /* ---------- step 2: search for matching second suffix ---------- */
+      // ---------- step 2: search for matching second suffix ----------
 
       for (k = 0; k < num_ext2_suffixes && !ext2_suffix_found; k++)
       {
@@ -3473,7 +3473,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
 
 	ext2_index = k;
 
-	if (start_pos + len_ext2_suffix == len_token)	/* exact match */
+	if (start_pos + len_ext2_suffix == len_token)	// exact match
 	{
 	  exact_match = TRUE;
 
@@ -3496,7 +3496,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
       if (exact_match)
 	break;
 
-      /* ---------- step 3: search for matching third suffix ---------- */
+      // ---------- step 3: search for matching third suffix ----------
 
       for (l = 0; l < num_ext3_suffixes && !ext3_suffix_found; l++)
       {
@@ -3510,7 +3510,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
 
 	ext3_index = l;
 
-	if (start_pos + len_ext3_suffix == len_token) /* exact match */
+	if (start_pos + len_ext3_suffix == len_token) // exact match
 	{
 	  exact_match = TRUE;
 
@@ -3545,7 +3545,7 @@ static void LoadArtworkConfigFromFilename(struct ArtworkListInfo *artwork_info,
     boolean unknown_tokens_found = FALSE;
     boolean undefined_values_found = (hashtable_count(empty_file_hash) != 0);
 
-    /* list may be NULL for empty artwork config files */
+    // list may be NULL for empty artwork config files
     setup_file_list = loadSetupFileList(filename);
 
     BEGIN_HASH_ITERATION(extra_file_hash, itr)
@@ -3626,7 +3626,7 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
   DrawInitText("Loading artwork config", 120, FC_GREEN);
   DrawInitText(ARTWORKINFO_FILENAME(artwork_info->type), 150, FC_YELLOW);
 
-  /* always start with reliable default values */
+  // always start with reliable default values
   for (i = 0; i < num_file_list_entries; i++)
   {
     setString(&file_list[i].filename, file_list[i].default_filename);
@@ -3638,7 +3638,7 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
     file_list[i].fallback_to_default = FALSE;
   }
 
-  /* free previous dynamic artwork file array */
+  // free previous dynamic artwork file array
   if (artwork_info->dynamic_file_list != NULL)
   {
     for (i = 0; i < artwork_info->num_dynamic_file_list_entries; i++)
@@ -3655,7 +3655,7 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 			  &artwork_info->num_dynamic_file_list_entries);
   }
 
-  /* free previous property mapping */
+  // free previous property mapping
   if (artwork_info->property_mapping != NULL)
   {
     free(artwork_info->property_mapping);
@@ -3666,7 +3666,7 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
 
   if (!GFX_OVERRIDE_ARTWORK(artwork_info->type))
   {
-    /* first look for special artwork configured in level series config */
+    // first look for special artwork configured in level series config
     filename_base = getCustomArtworkLevelConfigFilename(artwork_info->type);
 
     if (fileExists(filename_base))
@@ -3715,13 +3715,13 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
 
     basename = file_list_entry->default_filename;
 
-    /* fail for cloned default artwork that has no default filename defined */
+    // fail for cloned default artwork that has no default filename defined
     if (file_list_entry->default_is_cloned &&
 	strEqual(basename, UNDEFINED_FILENAME))
     {
       int error_mode = ERR_WARN;
 
-      /* we can get away without sounds and music, but not without graphics */
+      // we can get away without sounds and music, but not without graphics
       if (*listnode == NULL && artwork_info->type == ARTWORK_TYPE_GRAPHICS)
 	error_mode = ERR_EXIT;
 
@@ -3731,7 +3731,7 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
       return;
     }
 
-    /* dynamic artwork has no default filename / skip empty default artwork */
+    // dynamic artwork has no default filename / skip empty default artwork
     if (basename == NULL || strEqual(basename, UNDEFINED_FILENAME))
       return;
 
@@ -3745,7 +3745,7 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
     {
       int error_mode = ERR_WARN;
 
-      /* we can get away without sounds and music, but not without graphics */
+      // we can get away without sounds and music, but not without graphics
       if (*listnode == NULL && artwork_info->type == ARTWORK_TYPE_GRAPHICS)
 	error_mode = ERR_EXIT;
 
@@ -3755,7 +3755,7 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
     }
   }
 
-  /* check if the old and the new artwork file are the same */
+  // check if the old and the new artwork file are the same
   if (*listnode && strEqual((*listnode)->source_filename, filename))
   {
     /* The old and new artwork are the same (have the same filename and path).
@@ -3765,10 +3765,10 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
     return;
   }
 
-  /* delete existing artwork file entry */
+  // delete existing artwork file entry
   deleteArtworkListEntry(artwork_info, listnode);
 
-  /* check if the new artwork file already exists in the list of artwork */
+  // check if the new artwork file already exists in the list of artwork
   if ((node = getNodeFromKey(artwork_info->content_list, filename)) != NULL)
   {
       *listnode = (struct ListNodeInfo *)node->content;
@@ -3782,7 +3782,7 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
 
   if ((*listnode = artwork_info->load_artwork(filename)) != NULL)
   {
-    /* add new artwork file entry to the list of artwork files */
+    // add new artwork file entry to the list of artwork files
     (*listnode)->num_references = 1;
     addNodeToList(&artwork_info->content_list, (*listnode)->source_filename,
 		  *listnode);
@@ -3791,7 +3791,7 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
   {
     int error_mode = ERR_WARN;
 
-    /* we can get away without sounds and music, but not without graphics */
+    // we can get away without sounds and music, but not without graphics
     if (artwork_info->type == ARTWORK_TYPE_GRAPHICS)
       error_mode = ERR_EXIT;
 
@@ -3871,11 +3871,11 @@ void FreeCustomArtworkLists(struct ArtworkListInfo *artwork_info)
 }
 
 
-/* ------------------------------------------------------------------------- */
-/* functions only needed for non-Unix (non-command-line) systems             */
-/* (MS-DOS only; SDL/Windows creates files "stdout.txt" and "stderr.txt")    */
-/* (now also added for Windows, to create files in user data directory)      */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// functions only needed for non-Unix (non-command-line) systems
+// (MS-DOS only; SDL/Windows creates files "stdout.txt" and "stderr.txt")
+// (now also added for Windows, to create files in user data directory)
+// ----------------------------------------------------------------------------
 
 char *getLogFilename(char *basename)
 {
@@ -3899,7 +3899,7 @@ void OpenLogFiles(void)
 	    program.log_filename[i], strerror(errno));
     }
 
-    /* output should be unbuffered so it is not truncated in a crash */
+    // output should be unbuffered so it is not truncated in a crash
     setbuf(program.log_file[i], NULL);
   }
 }
@@ -3940,9 +3940,9 @@ void NotifyUserAboutErrorFile(void)
 }
 
 
-/* ------------------------------------------------------------------------- */
-/* the following is only for debugging purpose and normally not used         */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// the following is only for debugging purpose and normally not used
+// ----------------------------------------------------------------------------
 
 #if DEBUG
 
@@ -3961,7 +3961,7 @@ static double Counter_Microseconds(void)
 
   gettimeofday(&current_time, NULL);
 
-  /* reset base time in case of wrap-around */
+  // reset base time in case of wrap-around
   if (current_time.tv_sec < base_time.tv_sec)
     base_time = current_time;
 
@@ -3969,7 +3969,7 @@ static double Counter_Microseconds(void)
     ((double)(current_time.tv_sec  - base_time.tv_sec)) * 1000000 +
     ((double)(current_time.tv_usec - base_time.tv_usec));
 
-  return counter;		/* return microseconds since last init */
+  return counter;		// return microseconds since last init
 }
 #endif
 
@@ -4041,7 +4041,7 @@ static void debug_print_parent_only(char *format, ...)
 }
 #endif
 
-#endif	/* DEBUG */
+#endif	// DEBUG
 
 static void print_timestamp_ext(char *message, char *mode)
 {

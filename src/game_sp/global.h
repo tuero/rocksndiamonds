@@ -29,4 +29,4 @@
 #include "Sound.h"
 #include "Zonk.h"
 
-#endif /* GAME_SP_GLOBAL_H */
+#endif // GAME_SP_GLOBAL_H

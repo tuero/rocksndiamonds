@@ -17,19 +17,19 @@
 #include "mm_game.h"
 #include "mm_tools.h"
 
-/* graphic position values for game controls */
+// graphic position values for game controls
 #define ENERGY_XSIZE		32
 #define ENERGY_YSIZE		MAX_LASER_ENERGY
 #define OVERLOAD_XSIZE		ENERGY_XSIZE
 #define OVERLOAD_YSIZE		MAX_LASER_OVERLOAD
 
-/* values for Explode_MM() */
+// values for Explode_MM()
 #define EX_PHASE_START		0
 #define EX_NORMAL		0
 #define EX_KETTLE		1
 #define EX_SHORT		2
 
-/* special positions in the game control window (relative to control window) */
+// special positions in the game control window (relative to control window)
 #define XX_LEVEL		36
 #define YY_LEVEL		23
 #define XX_KETTLES		29
@@ -41,7 +41,7 @@
 #define XX_OVERLOAD		60
 #define YY_OVERLOAD		YY_ENERGY
 
-/* special positions in the game control window (relative to main window) */
+// special positions in the game control window (relative to main window)
 #define DX_LEVEL		(DX + XX_LEVEL)
 #define DY_LEVEL		(DY + YY_LEVEL)
 #define DX_KETTLES		(DX + XX_KETTLES)
@@ -56,20 +56,20 @@
 #define IS_LOOP_SOUND(s)	((s) == SND_FUEL)
 #define IS_MUSIC_SOUND(s)	((s) == SND_TYGER || (s) == SND_VOYAGER)
 
-/* game button identifiers */
+// game button identifiers
 #define GAME_CTRL_ID_LEFT	0
 #define GAME_CTRL_ID_MIDDLE	1
 #define GAME_CTRL_ID_RIGHT	2
 
 #define NUM_GAME_BUTTONS	3
 
-/* values for DrawLaser() */
+// values for DrawLaser()
 #define DL_LASER_DISABLED	0
 #define DL_LASER_ENABLED	1
 
-/* values for 'click_delay_value' in ClickElement() */
-#define CLICK_DELAY_FIRST	12	/* delay (frames) after first click */
-#define CLICK_DELAY		6	/* delay (frames) for pressed butten */
+// values for 'click_delay_value' in ClickElement()
+#define CLICK_DELAY_FIRST	12	// delay (frames) after first click
+#define CLICK_DELAY		6	// delay (frames) for pressed butten
 
 #define AUTO_ROTATE_DELAY	CLICK_DELAY
 #define INIT_GAME_ACTIONS_DELAY	(ONE_SECOND_DELAY / GAME_FRAME_DELAY)
@@ -90,7 +90,7 @@
     program.headless = last_headless;		\
   }						\
 
-/* forward declaration for internal use */
+// forward declaration for internal use
 static int MovingOrBlocked2Element_MM(int, int);
 static void Bang_MM(int, int);
 static void RaiseScore_MM(int);
@@ -100,23 +100,23 @@ static void InitMovingField_MM(int, int, int);
 static void ContinueMoving_MM(int, int);
 static void Moving2Blocked_MM(int, int, int *, int *);
 
-/* bitmap for laser beam detection */
+// bitmap for laser beam detection
 static Bitmap *laser_bitmap = NULL;
 
-/* variables for laser control */
+// variables for laser control
 static int last_LX = 0, last_LY = 0, last_hit_mask = 0;
 static int hold_x = -1, hold_y = -1;
 
-/* variables for pacman control */
+// variables for pacman control
 static int pacman_nr = -1;
 
-/* various game engine delay counters */
+// various game engine delay counters
 static unsigned int rotate_delay = 0;
 static unsigned int pacman_delay = 0;
 static unsigned int energy_delay = 0;
 static unsigned int overload_delay = 0;
 
-/* element masks for scanning pixels of MM elements */
+// element masks for scanning pixels of MM elements
 static const char mm_masks[10][16][16 + 1] =
 {
   {
@@ -318,7 +318,7 @@ static int get_opposite_angle(int angle)
 {
   int opposite_angle = angle + ANG_RAY_180;
 
-  /* make sure "opposite_angle" is in valid interval [0, 15] */
+  // make sure "opposite_angle" is in valid interval [0, 15]
   return (opposite_angle + 16) % 16;
 }
 
@@ -326,7 +326,7 @@ static int get_mirrored_angle(int laser_angle, int mirror_angle)
 {
   int reflected_angle = 16 - laser_angle + mirror_angle;
 
-  /* make sure "reflected_angle" is in valid interval [0, 15] */
+  // make sure "reflected_angle" is in valid interval [0, 15]
   return (reflected_angle + 16) % 16;
 }
 
@@ -377,7 +377,7 @@ static void CheckExitMM(void)
     {
       if (Feld[x][y] == EL_EXIT_CLOSED)
       {
-	/* initiate opening animation of exit door */
+	// initiate opening animation of exit door
 	Feld[x][y] = EL_EXIT_OPENING;
 
 	exit_element = EL_EXIT_OPEN;
@@ -386,7 +386,7 @@ static void CheckExitMM(void)
       }
       else if (IS_RECEIVER(Feld[x][y]))
       {
-	/* remove field that blocks receiver */
+	// remove field that blocks receiver
 	int phase = Feld[x][y] - EL_RECEIVER_START;
 	int blocking_x, blocking_y;
 
@@ -478,7 +478,7 @@ static void InitField(int x, int y, boolean init_game)
 	{
 	  static int steps_grid_auto = 0;
 
-	  if (game_mm.num_cycle == 0)	/* initialize cycle steps for grids */
+	  if (game_mm.num_cycle == 0)	// initialize cycle steps for grids
 	    steps_grid_auto = RND(16) * (RND(2) ? -1 : +1);
 
 	  if (IS_GRID_STEEL_AUTO(element) ||
@@ -521,7 +521,7 @@ static void InitCycleElements_RotateSingleStep(void)
 {
   int i;
 
-  if (game_mm.num_cycle == 0)	/* no elements to cycle */
+  if (game_mm.num_cycle == 0)	// no elements to cycle
     return;
 
   for (i = 0; i < game_mm.num_cycle; i++)
@@ -572,7 +572,7 @@ static void InitLaser(void)
   laser.dest_element = EL_EMPTY;
   laser.wall_mask = 0;
 
-  AddLaserEdge(LX, LY);		/* set laser starting edge */
+  AddLaserEdge(LX, LY);		// set laser starting edge
 
   pen_ray = GetPixelFromRGB(window,
 			    native_mm_level.laser_red   * 0xFF,
@@ -586,13 +586,13 @@ void InitGameEngine_MM(void)
 
   BEGIN_NO_HEADLESS
   {
-    /* initialize laser bitmap to current playfield (screen) size */
+    // initialize laser bitmap to current playfield (screen) size
     ReCreateBitmap(&laser_bitmap, drawto->width, drawto->height);
     ClearRectangle(laser_bitmap, 0, 0, drawto->width, drawto->height);
   }
   END_NO_HEADLESS
 
-  /* set global game control values */
+  // set global game control values
   game_mm.num_cycle = 0;
   game_mm.num_pacman = 0;
 
@@ -610,7 +610,7 @@ void InitGameEngine_MM(void)
   game_mm.laser_overload_value = 0;
   game_mm.laser_enabled = FALSE;
 
-  /* set global laser control values (must be set before "InitLaser()") */
+  // set global laser control values (must be set before "InitLaser()")
   laser.start_edge.x = 0;
   laser.start_edge.y = 0;
   laser.start_angle = 0;
@@ -676,7 +676,7 @@ void InitGameActions_MM(void)
   InitLaser();
 
 #if 0
-  /* copy default game door content to main double buffer */
+  // copy default game door content to main double buffer
   BlitBitmap(pix[PIX_DOOR], drawto,
 	     DOOR_GFX_PAGEX5, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE, DX, DY);
 #endif
@@ -696,7 +696,7 @@ void InitGameActions_MM(void)
 #endif
 
 #if 0
-  /* copy actual game door content to door double buffer for OpenDoor() */
+  // copy actual game door content to door double buffer for OpenDoor()
   BlitBitmap(drawto, pix[PIX_DB_DOOR],
 	     DX, DY, DXSIZE, DYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
 #endif
@@ -814,13 +814,13 @@ static int ScanPixel(void)
 	 LX, LY, LX / TILEX, LY / TILEY, LX % TILEX, LY % TILEY);
 #endif
 
-  /* follow laser beam until it hits something (at least the screen border) */
+  // follow laser beam until it hits something (at least the screen border)
   while (hit_mask == HIT_MASK_NO_HIT)
   {
     int i;
 
 #if 0
-    /* for safety */
+    // for safety
     if (SX + LX < REAL_SX || SX + LX >= REAL_SX + FULL_SXSIZE ||
 	SY + LY < REAL_SY || SY + LY >= REAL_SY + FULL_SYSIZE)
     {
@@ -836,8 +836,8 @@ static int ScanPixel(void)
       int py = LY + (i / 2) * 2;
       int dx = px % TILEX;
       int dy = py % TILEY;
-      int lx = (px + TILEX) / TILEX - 1;  /* ...+TILEX...-1 to get correct */
-      int ly = (py + TILEY) / TILEY - 1;  /* negative values!              */
+      int lx = (px + TILEX) / TILEX - 1;  // ...+TILEX...-1 to get correct
+      int ly = (py + TILEY) / TILEY - 1;  // negative values!
       Pixel pixel;
 
       if (IN_LEV_FIELD(lx, ly))
@@ -873,7 +873,7 @@ static int ScanPixel(void)
 
     if (hit_mask == HIT_MASK_NO_HIT)
     {
-      /* hit nothing -- go on with another step */
+      // hit nothing -- go on with another step
       LX += XS;
       LY += YS;
     }
@@ -887,7 +887,7 @@ void ScanLaser(void)
   int element;
   int end = 0, rf = laser.num_edges;
 
-  /* do not scan laser again after the game was lost for whatever reason */
+  // do not scan laser again after the game was lost for whatever reason
   if (game_mm.game_over)
     return;
 
@@ -920,7 +920,7 @@ void ScanLaser(void)
 	   LX, LY, XS, YS);
 #endif
 
-    /* hit something -- check out what it was */
+    // hit something -- check out what it was
     ELX = (LX + XS) / TILEX;
     ELY = (LY + YS) / TILEY;
 
@@ -952,7 +952,7 @@ void ScanLaser(void)
     {
       /* we have hit the top-left and bottom-right element --
 	 choose the top-left one */
-      /* !!! SEE ABOVE !!! */
+      // !!! SEE ABOVE !!!
       ELX = (LX - 2) / TILEX;
       ELY = (LY - 2) / TILEY;
     }
@@ -1100,7 +1100,7 @@ static void DrawLaserExt(int start_edge, int num_edges, int mode)
   }
 #endif
 
-  /* now draw the laser to the backbuffer and (if enabled) to the screen */
+  // now draw the laser to the backbuffer and (if enabled) to the screen
   DrawLaserLines(&laser.edge[start_edge], num_edges, mode);
 
   redraw_mask |= REDRAW_FIELD;
@@ -1108,13 +1108,13 @@ static void DrawLaserExt(int start_edge, int num_edges, int mode)
   if (mode == DL_LASER_ENABLED)
     return;
 
-  /* after the laser was deleted, the "damaged" graphics must be restored */
+  // after the laser was deleted, the "damaged" graphics must be restored
   if (laser.num_damages)
   {
     int damage_start = 0;
     int i;
 
-    /* determine the starting edge, from which graphics need to be restored */
+    // determine the starting edge, from which graphics need to be restored
     if (start_edge > 0)
     {
       for (i = 0; i < laser.num_damages; i++)
@@ -1128,7 +1128,7 @@ static void DrawLaserExt(int start_edge, int num_edges, int mode)
       }
     }
 
-    /* restore graphics from this starting edge to the end of damage list */
+    // restore graphics from this starting edge to the end of damage list
     for (i = damage_start; i < laser.num_damages; i++)
     {
       int lx = laser.damage[i].x;
@@ -1168,7 +1168,7 @@ static void DrawLaserExt(int start_edge, int num_edges, int mode)
 	laser.num_beamers > 0 &&
 	start_edge == laser.beamer_edge[laser.num_beamers - 1])
     {
-      /* element is outgoing beamer */
+      // element is outgoing beamer
       laser.num_damages = damage_start + 1;
 
       if (IS_BEAMER(element))
@@ -1176,14 +1176,14 @@ static void DrawLaserExt(int start_edge, int num_edges, int mode)
     }
     else
     {
-      /* element is incoming beamer or other element */
+      // element is incoming beamer or other element
       laser.num_damages = damage_start;
       laser.current_angle = laser.damage[laser.num_damages].angle;
     }
   }
   else
   {
-    /* no damages but McDuffin himself (who needs to be redrawn anyway) */
+    // no damages but McDuffin himself (who needs to be redrawn anyway)
 
     elx = laser.start_edge.x;
     ely = laser.start_edge.y;
@@ -1219,7 +1219,7 @@ static void DrawLaserExt(int start_edge, int num_edges, int mode)
       printf("element == %d\n", element);
 #endif
 
-      if (IS_22_5_ANGLE(laser.current_angle))	/* neither 90° nor 45° angle */
+      if (IS_22_5_ANGLE(laser.current_angle))	// neither 90° nor 45° angle
 	step_size = ((IS_BEAMER(element) || IS_FIBRE_OPTIC(element)) ? 4 : 3);
       else
 	step_size = 8;
@@ -1229,7 +1229,7 @@ static void DrawLaserExt(int start_edge, int num_edges, int mode)
 	   (laser.num_beamers == 0 ||
 	    start_edge != laser.beamer_edge[laser.num_beamers - 1])))
       {
-	/* element is incoming beamer or other element */
+	// element is incoming beamer or other element
 	step_size = -step_size;
 	laser.num_edges--;
       }
@@ -1268,7 +1268,7 @@ void DrawLaser(int start_edge, int mode)
     return;
   }
 
-  /* check if laser is interrupted by beamer element */
+  // check if laser is interrupted by beamer element
   if (laser.num_beamers > 0 &&
       start_edge < laser.beamer_edge[laser.num_beamers - 1])
   {
@@ -1277,7 +1277,7 @@ void DrawLaser(int start_edge, int mode)
       int i;
       int tmp_start_edge = start_edge;
 
-      /* draw laser segments forward from the start to the last beamer */
+      // draw laser segments forward from the start to the last beamer
       for (i = 0; i < laser.num_beamers; i++)
       {
 	int tmp_num_edges = laser.beamer_edge[i] - tmp_start_edge;
@@ -1295,7 +1295,7 @@ void DrawLaser(int start_edge, int mode)
 	tmp_start_edge = laser.beamer_edge[i];
       }
 
-      /* draw last segment from last beamer to the end */
+      // draw last segment from last beamer to the end
       DrawLaserExt(tmp_start_edge, laser.num_edges - tmp_start_edge,
 		   DL_LASER_ENABLED);
     }
@@ -1305,7 +1305,7 @@ void DrawLaser(int start_edge, int mode)
       int last_num_edges = laser.num_edges;
       int num_beamers = laser.num_beamers;
 
-      /* delete laser segments backward from the end to the first beamer */
+      // delete laser segments backward from the end to the first beamer
       for (i = num_beamers - 1; i >= 0; i--)
       {
 	int tmp_num_edges = last_num_edges - laser.beamer_edge[i];
@@ -1330,7 +1330,7 @@ void DrawLaser(int start_edge, int mode)
       if (last_num_edges - start_edge == 1 && start_edge > 0)
 	DrawLaserLines(&laser.edge[start_edge - 1], 2, DL_LASER_DISABLED);
 
-      /* delete first segment from start to the first beamer */
+      // delete first segment from start to the first beamer
       DrawLaserExt(start_edge, last_num_edges - start_edge, DL_LASER_DISABLED);
     }
   }
@@ -1368,10 +1368,10 @@ boolean HitElement(int element, int hit_mask)
 
   AddDamagedField(ELX, ELY);
 
-  /* this is more precise: check if laser would go through the center */
+  // this is more precise: check if laser would go through the center
   if ((ELX * TILEX + 14 - LX) * YS != (ELY * TILEY + 14 - LY) * XS)
   {
-    /* skip the whole element before continuing the scan */
+    // skip the whole element before continuing the scan
     do
     {
       LX += XS;
@@ -1483,7 +1483,7 @@ boolean HitElement(int element, int hit_mask)
     XS = 2 * Step[laser.current_angle].x;
     YS = 2 * Step[laser.current_angle].y;
 
-    if (!IS_22_5_ANGLE(laser.current_angle))	/* 90° or 45° angle */
+    if (!IS_22_5_ANGLE(laser.current_angle))	// 90° or 45° angle
       step_size = 8;
     else
       step_size = 4;
@@ -1492,7 +1492,7 @@ boolean HitElement(int element, int hit_mask)
     LY += step_size * YS;
 
 #if 0
-    /* draw sparkles on mirror */
+    // draw sparkles on mirror
     if ((IS_MIRROR(element) || IS_MIRROR_FIXED(element)) &&
 	current_angle != laser.current_angle)
     {
@@ -1672,7 +1672,7 @@ boolean HitElement(int element, int hit_mask)
 
 boolean HitOnlyAnEdge(int element, int hit_mask)
 {
-  /* check if the laser hit only the edge of an element and, if so, go on */
+  // check if the laser hit only the edge of an element and, if so, go on
 
 #if 0
   printf("LX, LY, hit_mask == %d, %d, %d\n", LX, LY, hit_mask);
@@ -1682,7 +1682,7 @@ boolean HitOnlyAnEdge(int element, int hit_mask)
        hit_mask == HIT_MASK_TOPRIGHT ||
        hit_mask == HIT_MASK_BOTTOMLEFT ||
        hit_mask == HIT_MASK_BOTTOMRIGHT) &&
-      laser.current_angle % 4)			/* angle is not 90° */
+      laser.current_angle % 4)			// angle is not 90°
   {
     int dx, dy;
 
@@ -1701,7 +1701,7 @@ boolean HitOnlyAnEdge(int element, int hit_mask)
       dx = -1;
       dy = +1;
     }
-    else /* (hit_mask == HIT_MASK_BOTTOMRIGHT) */
+    else // (hit_mask == HIT_MASK_BOTTOMRIGHT)
     {
       dx = +1;
       dy = +1;
@@ -1749,7 +1749,7 @@ boolean HitPolarizer(int element, int hit_mask)
     if (laser.current_angle == grid_angle ||
 	laser.current_angle == get_opposite_angle(grid_angle))
     {
-      /* skip the whole element before continuing the scan */
+      // skip the whole element before continuing the scan
       do
       {
 	LX += XS;
@@ -1795,7 +1795,7 @@ boolean HitPolarizer(int element, int hit_mask)
   {
     return HitReflectingWalls(element, hit_mask);
   }
-  else	/* IS_GRID_WOOD */
+  else	// IS_GRID_WOOD
   {
     return HitAbsorbingWalls(element, hit_mask);
   }
@@ -1984,7 +1984,7 @@ boolean HitLaserDestination(int element, int hit_mask)
 
 boolean HitReflectingWalls(int element, int hit_mask)
 {
-  /* check if laser hits side of a wall with an angle that is not 90° */
+  // check if laser hits side of a wall with an angle that is not 90°
   if (!IS_90_ANGLE(laser.current_angle) && (hit_mask == HIT_MASK_TOP ||
 					    hit_mask == HIT_MASK_LEFT ||
 					    hit_mask == HIT_MASK_RIGHT ||
@@ -1998,7 +1998,7 @@ boolean HitReflectingWalls(int element, int hit_mask)
     if (!IS_DF_GRID(element))
       AddLaserEdge(LX, LY);
 
-    /* check if laser hits wall with an angle of 45° */
+    // check if laser hits wall with an angle of 45°
     if (!IS_22_5_ANGLE(laser.current_angle))
     {
       if (hit_mask == HIT_MASK_TOP || hit_mask == HIT_MASK_BOTTOM)
@@ -2007,7 +2007,7 @@ boolean HitReflectingWalls(int element, int hit_mask)
 	laser.current_angle = get_mirrored_angle(laser.current_angle,
 						 ANG_MIRROR_0);
       }
-      else	/* hit_mask == HIT_MASK_LEFT || hit_mask == HIT_MASK_RIGHT */
+      else	// hit_mask == HIT_MASK_LEFT || hit_mask == HIT_MASK_RIGHT
       {
 	LY += 2 * YS;
 	laser.current_angle = get_mirrored_angle(laser.current_angle,
@@ -2046,7 +2046,7 @@ boolean HitReflectingWalls(int element, int hit_mask)
 
       return FALSE;
     }
-    else	/* hit_mask == HIT_MASK_LEFT || hit_mask == HIT_MASK_RIGHT */
+    else	// hit_mask == HIT_MASK_LEFT || hit_mask == HIT_MASK_RIGHT
     {
       laser.current_angle = get_mirrored_angle(laser.current_angle,
 					       ANG_MIRROR_90);
@@ -2073,7 +2073,7 @@ boolean HitReflectingWalls(int element, int hit_mask)
     }
   }
 
-  /* reflection at the edge of reflecting DF style wall */
+  // reflection at the edge of reflecting DF style wall
   if (IS_DF_WALL_STEEL(element) && IS_22_5_ANGLE(laser.current_angle))
   {
     if (((laser.current_angle == 1 || laser.current_angle == 3) &&
@@ -2108,7 +2108,7 @@ boolean HitReflectingWalls(int element, int hit_mask)
     }
   }
 
-  /* reflection inside an edge of reflecting DF style wall */
+  // reflection inside an edge of reflecting DF style wall
   if (IS_DF_WALL_STEEL(element) && IS_22_5_ANGLE(laser.current_angle))
   {
     if (((laser.current_angle == 1 || laser.current_angle == 3) &&
@@ -2149,7 +2149,7 @@ boolean HitReflectingWalls(int element, int hit_mask)
     }
   }
 
-  /* check if laser hits DF style wall with an angle of 90° */
+  // check if laser hits DF style wall with an angle of 90°
   if (IS_DF_WALL(element) && IS_90_ANGLE(laser.current_angle))
   {
     if ((IS_HORIZ_ANGLE(laser.current_angle) &&
@@ -2157,7 +2157,7 @@ boolean HitReflectingWalls(int element, int hit_mask)
 	(IS_VERT_ANGLE(laser.current_angle) &&
 	 (!(hit_mask & HIT_MASK_LEFT) || !(hit_mask & HIT_MASK_RIGHT))))
     {
-      /* laser at last step touched nothing or the same side of the wall */
+      // laser at last step touched nothing or the same side of the wall
       if (LX != last_LX || LY != last_LY || hit_mask == last_hit_mask)
       {
 	AddDamagedField(ELX, ELY);
@@ -2225,10 +2225,10 @@ boolean HitAbsorbingWalls(int element, int hit_mask)
   {
     int mask;
 
-    mask = (LX + XS) / MINI_TILEX - ELX * 2 + 1;    /* Quadrant (horizontal) */
-    mask <<= (((LY + YS) / MINI_TILEY - ELY * 2) > 0) * 2;  /* || (vertical) */
+    mask = (LX + XS) / MINI_TILEX - ELX * 2 + 1;    // Quadrant (horizontal)
+    mask <<= (((LY + YS) / MINI_TILEY - ELY * 2) > 0) * 2;  // || (vertical)
 
-    /* check if laser hits wall with an angle of 90° */
+    // check if laser hits wall with an angle of 90°
     if (IS_90_ANGLE(laser.current_angle))
       mask += mask * (2 + IS_HORIZ_ANGLE(laser.current_angle) * 2);
 
@@ -2290,10 +2290,10 @@ static void OpenExit(int x, int y)
 {
   int delay = 6;
 
-  if (!MovDelay[x][y])		/* next animation frame */
+  if (!MovDelay[x][y])		// next animation frame
     MovDelay[x][y] = 4 * delay;
 
-  if (MovDelay[x][y])		/* wait some time before next frame */
+  if (MovDelay[x][y])		// wait some time before next frame
   {
     int phase;
 
@@ -2315,10 +2315,10 @@ static void OpenSurpriseBall(int x, int y)
 {
   int delay = 2;
 
-  if (!MovDelay[x][y])		/* next animation frame */
+  if (!MovDelay[x][y])		// next animation frame
     MovDelay[x][y] = 50 * delay;
 
-  if (MovDelay[x][y])		/* wait some time before next frame */
+  if (MovDelay[x][y])		// wait some time before next frame
   {
     MovDelay[x][y]--;
 
@@ -2353,10 +2353,10 @@ static void MeltIce(int x, int y)
   int frames = 5;
   int delay = 5;
 
-  if (!MovDelay[x][y])		/* next animation frame */
+  if (!MovDelay[x][y])		// next animation frame
     MovDelay[x][y] = frames * delay;
 
-  if (MovDelay[x][y])		/* wait some time before next frame */
+  if (MovDelay[x][y])		// wait some time before next frame
   {
     int phase;
     int wall_mask = Store2[x][y];
@@ -2402,10 +2402,10 @@ static void GrowAmoeba(int x, int y)
   int frames = 5;
   int delay = 1;
 
-  if (!MovDelay[x][y])		/* next animation frame */
+  if (!MovDelay[x][y])		// next animation frame
     MovDelay[x][y] = frames * delay;
 
-  if (MovDelay[x][y])		/* wait some time before next frame */
+  if (MovDelay[x][y])		// wait some time before next frame
   {
     int phase;
     int wall_mask = Store2[x][y];
@@ -2437,13 +2437,13 @@ static void Explode_MM(int x, int y, int phase, int mode)
 
   laser.redraw = TRUE;
 
-  if (phase == EX_PHASE_START)		/* initialize 'Store[][]' field */
+  if (phase == EX_PHASE_START)		// initialize 'Store[][]' field
   {
     int center_element = Feld[x][y];
 
     if (IS_MOVING(x, y) || IS_BLOCKED(x, y))
     {
-      /* put moving element to center field (and let it explode there) */
+      // put moving element to center field (and let it explode there)
       center_element = MovingOrBlocked2Element_MM(x, y);
       RemoveMovingField_MM(x, y);
 
@@ -2650,7 +2650,7 @@ static void StartMoving_MM(int x, int y)
   {
     int newx, newy;
 
-    if (MovDelay[x][y])		/* wait some time before next movement */
+    if (MovDelay[x][y])		// wait some time before next movement
     {
       MovDelay[x][y]--;
 
@@ -2658,9 +2658,9 @@ static void StartMoving_MM(int x, int y)
 	return;
     }
 
-    /* now make next step */
+    // now make next step
 
-    Moving2Blocked_MM(x, y, &newx, &newy);	/* get next screen position */
+    Moving2Blocked_MM(x, y, &newx, &newy);	// get next screen position
 
     if (element == EL_PACMAN &&
 	IN_LEV_FIELD(newx, newy) && IS_EATABLE4PACMAN(Feld[newx][newy]) &&
@@ -2674,7 +2674,7 @@ static void StartMoving_MM(int x, int y)
     else if (!IN_LEV_FIELD(newx, newy) || !IS_FREE(newx, newy) ||
 	     ObjHit(newx, newy, HIT_POS_CENTER))
     {
-      /* object was running against a wall */
+      // object was running against a wall
 
       TurnRound(x, y);
 
@@ -2700,7 +2700,7 @@ static void ContinueMoving_MM(int x, int y)
 
   MovPos[x][y] += step;
 
-  if (ABS(MovPos[x][y]) >= TILEX)	/* object reached its destination */
+  if (ABS(MovPos[x][y]) >= TILEX)	// object reached its destination
   {
     Feld[x][y] = EL_EMPTY;
     Feld[newx][newy] = element;
@@ -2730,7 +2730,7 @@ static void ContinueMoving_MM(int x, int y)
       }
     }
   }
-  else				/* still moving on */
+  else				// still moving on
   {
     DrawField_MM(x, y);
   }
@@ -2748,7 +2748,7 @@ boolean ClickElement(int x, int y, int button)
 
   if (button == -1)
   {
-    /* initialize static variables */
+    // initialize static variables
     click_delay = 0;
     click_delay_value = CLICK_DELAY;
     new_button = TRUE;
@@ -2756,7 +2756,7 @@ boolean ClickElement(int x, int y, int button)
     return FALSE;
   }
 
-  /* do not rotate objects hit by the laser after the game was solved */
+  // do not rotate objects hit by the laser after the game was solved
   if (game_mm.level_solved && Hit[x][y])
     return FALSE;
 
@@ -2765,7 +2765,7 @@ boolean ClickElement(int x, int y, int button)
     new_button = TRUE;
     click_delay_value = CLICK_DELAY;
 
-    /* release eventually hold auto-rotating mirror */
+    // release eventually hold auto-rotating mirror
     RotateMirror(x, y, MB_RELEASED);
 
     return FALSE;
@@ -2774,7 +2774,7 @@ boolean ClickElement(int x, int y, int button)
   if (!FrameReached(&click_delay, click_delay_value) && !new_button)
     return FALSE;
 
-  if (button == MB_MIDDLEBUTTON)	/* middle button has no function */
+  if (button == MB_MIDDLEBUTTON)	// middle button has no function
     return FALSE;
 
   if (!IN_LEV_FIELD(x, y))
@@ -2868,7 +2868,7 @@ void RotateMirror(int x, int y, int button)
 {
   if (button == MB_RELEASED)
   {
-    /* release eventually hold auto-rotating mirror */
+    // release eventually hold auto-rotating mirror
     hold_x = -1;
     hold_y = -1;
 
@@ -2972,7 +2972,7 @@ static void AutoRotateMirrors(void)
     {
       int element = Feld[x][y];
 
-      /* do not rotate objects hit by the laser after the game was solved */
+      // do not rotate objects hit by the laser after the game was solved
       if (game_mm.level_solved && Hit[x][y])
 	continue;
 
@@ -3121,9 +3121,9 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
   AutoRotateMirrors();
 
 #if 1
-  /* !!! CHANGE THIS: REDRAW ONLY WHEN NEEDED !!! */
+  // !!! CHANGE THIS: REDRAW ONLY WHEN NEEDED !!!
 
-  /* redraw after Explode_MM() ... */
+  // redraw after Explode_MM() ...
   if (laser.redraw)
     DrawLaser(0, DL_LASER_ENABLED);
   laser.redraw = FALSE;
@@ -3411,7 +3411,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
     Store[ELX][ELY] = new_element + RND(get_num_elements(new_element));
     Feld[ELX][ELY] = EL_GRAY_BALL_OPENING;
 
-    /* !!! CHECK AGAIN: Laser on Polarizer !!! */
+    // !!! CHECK AGAIN: Laser on Polarizer !!!
     ScanLaser();
 
     return;
@@ -3473,7 +3473,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
     printf("NEW ELEMENT: (%d, %d)\n", ELX, ELY);
 #endif
 
-    /* above stuff: GRAY BALL -> PRISM !!! */
+    // above stuff: GRAY BALL -> PRISM !!!
 /*
     LX = ELX * TILEX + 14;
     LY = ELY * TILEY + 14;
@@ -3930,7 +3930,7 @@ void GameWon_MM(void)
     if (setup.sound_loops)
       StopSound(SND_SIRR);
   }
-  else if (native_mm_level.time == 0)		/* level without time limit */
+  else if (native_mm_level.time == 0)		// level without time limit
   {
     if (setup.sound_loops)
       PlaySoundExt(SND_SIRR, SOUND_MAX_VOLUME, SOUND_MAX_RIGHT,
@@ -3974,9 +3974,9 @@ void GameWon_MM(void)
   }
 
   if (level_editor_test_game)
-    game_mm.score = -1;		/* no highscore when playing from editor */
+    game_mm.score = -1;		// no highscore when playing from editor
   else if (level_nr < leveldir_current->last_level)
-    raise_level = TRUE;		/* advance to next level */
+    raise_level = TRUE;		// advance to next level
 
   if ((hi_pos = NewHiScore_MM()) >= 0)
   {
@@ -4015,7 +4015,7 @@ int NewHiScore_MM(void)
   {
     if (game_mm.score > highscore[k].Score)
     {
-      /* player has made it to the hall of fame */
+      // player has made it to the hall of fame
 
       if (k < MAX_SCORE_ENTRIES - 1)
       {
@@ -4025,7 +4025,7 @@ int NewHiScore_MM(void)
 	for (l = k; l < MAX_SCORE_ENTRIES; l++)
 	  if (!strcmp(setup.player_name, highscore[l].Name))
 	    m = l;
-	if (m == k)	/* player's new highscore overwrites his old one */
+	if (m == k)	// player's new highscore overwrites his old one
 	  goto put_into_list;
 #endif
 
@@ -4050,7 +4050,7 @@ int NewHiScore_MM(void)
 #ifdef ONE_PER_NAME
     else if (!strncmp(setup.player_name, highscore[k].Name,
 		      MAX_PLAYER_NAME_LEN))
-      break;	/* player already there with a higher score */
+      break;	// player already there with a higher score
 #endif
 
   }
@@ -4236,9 +4236,9 @@ void RaiseScoreElement_MM(int element)
 }
 
 
-/* ------------------------------------------------------------------------- */
-/* Mirror Magic game engine snapshot handling functions                      */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// Mirror Magic game engine snapshot handling functions
+// ----------------------------------------------------------------------------
 
 void SaveEngineSnapshotValues_MM(ListNode **buffers)
 {
@@ -4285,7 +4285,7 @@ void LoadEngineSnapshotValues_MM(void)
 {
   int x, y;
 
-  /* stored engine snapshot buffers already restored at this point */
+  // stored engine snapshot buffers already restored at this point
 
   game_mm = engine_snapshot_mm.game_mm;
   laser   = engine_snapshot_mm.laser;

@@ -27,4 +27,4 @@
 #include "setup.h"
 #include "misc.h"
 
-#endif /* LIBGAME_H */
+#endif // LIBGAME_H

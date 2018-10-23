@@ -27,7 +27,7 @@
 #define DEBUG_JOYSTICKS		0
 
 
-/* screens on the info screen */
+// screens on the info screen
 #define INFO_MODE_MAIN			0
 #define INFO_MODE_TITLE			1
 #define INFO_MODE_ELEMENTS		2
@@ -39,9 +39,9 @@
 
 #define MAX_INFO_MODES			8
 
-/* screens on the setup screen */
-/* (must match GFX_SPECIAL_ARG_SETUP_* values as defined in src/main.h) */
-/* (should also match corresponding entries in src/conf_gfx.c) */
+// screens on the setup screen
+// (must match GFX_SPECIAL_ARG_SETUP_* values as defined in src/main.h)
+// (should also match corresponding entries in src/conf_gfx.c)
 #define SETUP_MODE_MAIN			0
 #define SETUP_MODE_GAME			1
 #define SETUP_MODE_EDITOR		2
@@ -57,11 +57,11 @@
 #define SETUP_MODE_SHORTCUTS_4		12
 #define SETUP_MODE_SHORTCUTS_5		13
 
-/* sub-screens on the setup screen (generic) */
+// sub-screens on the setup screen (generic)
 #define SETUP_MODE_CHOOSE_ARTWORK	14
 #define SETUP_MODE_CHOOSE_OTHER		15
 
-/* sub-screens on the setup screen (specific) */
+// sub-screens on the setup screen (specific)
 #define SETUP_MODE_CHOOSE_GAME_SPEED	16
 #define SETUP_MODE_CHOOSE_SCROLL_DELAY	17
 #define SETUP_MODE_CHOOSE_SNAPSHOT_MODE	18
@@ -89,7 +89,7 @@
 
 #define MAX_MENU_MODES			MAX(MAX_INFO_MODES, MAX_SETUP_MODES)
 
-/* setup screen titles */
+// setup screen titles
 #define STR_SETUP_MAIN			"Setup"
 #define STR_SETUP_GAME			"Game & Menu"
 #define STR_SETUP_EDITOR		"Editor"
@@ -121,7 +121,7 @@
 #define STR_SETUP_CHOOSE_GRID_XSIZE_1	"Horiz. Buttons"
 #define STR_SETUP_CHOOSE_GRID_YSIZE_1	"Vert. Buttons"
 
-/* for input setup functions */
+// for input setup functions
 #define SETUPINPUT_SCREEN_POS_START	0
 #define SETUPINPUT_SCREEN_POS_EMPTY1	3
 #define SETUPINPUT_SCREEN_POS_EMPTY2	12
@@ -132,7 +132,7 @@
 
 #define MAX_SETUP_TEXT_INPUT_LEN	28
 
-/* for various menu stuff  */
+// for various menu stuff
 #define MENU_SCREEN_START_XPOS		1
 #define MENU_SCREEN_START_YPOS		2
 #define MENU_SCREEN_VALUE_XPOS		(SCR_FIELDX - 3)
@@ -171,7 +171,7 @@
 #define MAX_MENU_TEXT_LENGTH_BIG	13
 #define MAX_MENU_TEXT_LENGTH_MEDIUM	(MAX_MENU_TEXT_LENGTH_BIG * 2)
 
-/* screen gadget identifiers */
+// screen gadget identifiers
 #define SCREEN_CTRL_ID_PREV_LEVEL	0
 #define SCREEN_CTRL_ID_NEXT_LEVEL	1
 #define SCREEN_CTRL_ID_PREV_PLAYER	2
@@ -194,7 +194,7 @@
 #define SCREEN_MASK_MAIN_HAS_SOLUTION	(1 << 1)
 #define SCREEN_MASK_INPUT		(1 << 2)
 
-/* graphic position and size values for buttons and scrollbars */
+// graphic position and size values for buttons and scrollbars
 #define SC_MENUBUTTON_XSIZE		TILEX
 #define SC_MENUBUTTON_YSIZE		TILEY
 
@@ -221,7 +221,7 @@
 #define SC_BORDER_SIZE			14
 
 
-/* forward declarations of internal functions */
+// forward declarations of internal functions
 static void HandleScreenGadgets(struct GadgetInfo *);
 static void HandleSetupScreen_Generic(int, int, int, int, int);
 static void HandleSetupScreen_Input(int, int, int, int, int);
@@ -525,7 +525,7 @@ static struct ValueTextInfo grid_sizes_list[] =
 				 (s) == GAME_MODE_PSEUDO_TYPENAME ?	\
 				 GAME_MODE_MAIN : GAME_MODE_DEFAULT)
 
-/* (there are no draw offset definitions needed for INFO_MODE_TITLE) */
+// (there are no draw offset definitions needed for INFO_MODE_TITLE)
 #define DRAW_MODE_INFO(i)	((i) >= INFO_MODE_TITLE &&		\
 				 (i) <= INFO_MODE_LEVELSET ? (i) :	\
 				 INFO_MODE_MAIN)
@@ -584,7 +584,7 @@ static struct ValueTextInfo grid_sizes_list[] =
 					 NUM_MENU_ENTRIES_ON_SCREEN)
 
 
-/* title display and control definitions */
+// title display and control definitions
 
 #define MAX_NUM_TITLE_SCREENS	(2 * MAX_NUM_TITLE_IMAGES +		\
 				 2 * MAX_NUM_TITLE_MESSAGES)
@@ -605,7 +605,7 @@ struct TitleControlInfo
 
 struct TitleControlInfo title_controls[MAX_NUM_TITLE_SCREENS];
 
-/* main menu display and control definitions */
+// main menu display and control definitions
 
 #define MAIN_CONTROL_NAME			0
 #define MAIN_CONTROL_LEVELS			1
@@ -725,7 +725,7 @@ static struct MainControlInfo main_controls[] =
     NULL,				NULL,
   },
 #if 0
-  /* (these two buttons are real gadgets) */
+  // (these two buttons are real gadgets)
   {
     MAIN_CONTROL_PREV_LEVEL,
     &menu.main.button.prev_level,	IMG_MENU_BUTTON_PREV_LEVEL,
@@ -1013,7 +1013,7 @@ static void InitializeTitleControlsExt_AddTitleInfo(boolean is_image,
   title_controls[num_title_screens].local_nr = nr;
   title_controls[num_title_screens].sort_priority = sort_priority;
 
-  title_controls[num_title_screens].first = FALSE;	/* will be set later */
+  title_controls[num_title_screens].first = FALSE;	// will be set later
 
   num_title_screens++;
 }
@@ -1047,18 +1047,18 @@ static void InitializeTitleControls(boolean show_title_initial)
 {
   num_title_screens = 0;
 
-  /* 1st step: initialize title screens for game start (only when starting) */
+  // 1st step: initialize title screens for game start (only when starting)
   if (show_title_initial)
     InitializeTitleControls_CheckTitleInfo(TRUE);
 
-  /* 2nd step: initialize title screens for current level set */
+  // 2nd step: initialize title screens for current level set
   InitializeTitleControls_CheckTitleInfo(FALSE);
 
-  /* sort title screens according to sort_priority and title number */
+  // sort title screens according to sort_priority and title number
   qsort(title_controls, num_title_screens, sizeof(struct TitleControlInfo),
 	compareTitleControlInfo);
 
-  /* mark first title screen */
+  // mark first title screen
   title_controls[0].first = TRUE;
 }
 
@@ -1077,7 +1077,7 @@ static void InitializeMainControls(void)
   boolean local_team_mode = (!network.enabled && setup.team_mode);
   int i;
 
-  /* set main control text values to dynamically determined values */
+  // set main control text values to dynamically determined values
   sprintf(main_text_name,         "%s",   local_team_mode ? "Team:" : "Name:");
 
   strcpy(main_text_first_level,  int2str(leveldir_current->first_level,
@@ -1096,7 +1096,7 @@ static void InitializeMainControls(void)
   main_text_title_2 = getConfigProgramCopyrightString();
   main_text_title_3 = getConfigProgramCompanyString();
 
-  /* set main control screen positions to dynamically determined values */
+  // set main control screen positions to dynamically determined values
   for (i = 0; main_controls[i].nr != -1; i++)
   {
     struct MainControlInfo *mci = &main_controls[i];
@@ -1132,15 +1132,15 @@ static void InitializeMainControls(void)
       menu.main.input.name.height = input_height;
     }
 
-    if (pos_button != NULL)		/* (x/y may be -1/-1 here) */
+    if (pos_button != NULL)		// (x/y may be -1/-1 here)
     {
       pos_button->width  = button_width;
       pos_button->height = button_height;
     }
 
-    if (pos_text != NULL)		/* (x/y may be -1/-1 here) */
+    if (pos_text != NULL)		// (x/y may be -1/-1 here)
     {
-      /* calculate text size -- needed for text alignment */
+      // calculate text size -- needed for text alignment
       boolean calculate_text_size = (text != NULL);
 
       if (pos_text->width == -1 || calculate_text_size)
@@ -1158,7 +1158,7 @@ static void InitializeMainControls(void)
       }
     }
 
-    if (pos_input != NULL)		/* (x/y may be -1/-1 here) */
+    if (pos_input != NULL)		// (x/y may be -1/-1 here)
     {
       if (visibleTextPos(pos_text))
       {
@@ -1240,7 +1240,7 @@ static void DrawCursorAndText_Main_Ext(int nr, boolean active_text,
 	int y = mSY + ALIGNED_TEXT_YPOS(pos);
 
 #if 1
-	/* (check why/if this is needed) */
+	// (check why/if this is needed)
 	DrawBackgroundForFont(x, y, pos->width, pos->height, font_text);
 #endif
 	DrawText(x, y, text, font_text);
@@ -1253,7 +1253,7 @@ static void DrawCursorAndText_Main_Ext(int nr, boolean active_text,
 	int y = mSY + ALIGNED_TEXT_YPOS(pos);
 
 #if 1
-	/* (check why/if this is needed) */
+	// (check why/if this is needed)
 	DrawBackgroundForFont(x, y, pos->width, pos->height, font_input);
 #endif
 	DrawText(x, y, input, font_input);
@@ -1352,11 +1352,11 @@ static void clearMenuListArea(void)
 {
   int scrollbar_xpos = mSX + SC_SCROLLBAR_XPOS + menu.scrollbar_xoffset;
 
-  /* correct scrollbar position if placed outside menu (playfield) area */
+  // correct scrollbar position if placed outside menu (playfield) area
   if (scrollbar_xpos > SX + SC_SCROLLBAR_XPOS)
     scrollbar_xpos = SX + SC_SCROLLBAR_XPOS;
 
-  /* clear menu list area, but not title or scrollbar */
+  // clear menu list area, but not title or scrollbar
   DrawBackground(mSX, mSY + MENU_SCREEN_START_YPOS * 32,
                  scrollbar_xpos - mSX, NUM_MENU_ENTRIES_ON_SCREEN * 32);
 }
@@ -1423,19 +1423,19 @@ static void DrawTitleScreenImage(int nr, boolean initial)
 
   if (width > WIN_XSIZE)
   {
-    /* image width too large for window => center image horizontally */
+    // image width too large for window => center image horizontally
     src_x = (width - WIN_XSIZE) / 2;
     width = WIN_XSIZE;
   }
 
   if (height > WIN_YSIZE)
   {
-    /* image height too large for window => center image vertically */
+    // image height too large for window => center image vertically
     src_y = (height - WIN_YSIZE) / 2;
     height = WIN_YSIZE;
   }
 
-  /* always display title screens centered */
+  // always display title screens centered
   dst_x = (WIN_XSIZE - width) / 2;
   dst_y = (WIN_YSIZE - height) / 2;
 
@@ -1460,34 +1460,34 @@ static void DrawTitleScreenMessage(int nr, boolean initial)
   if (filename == NULL)
     return;
 
-  /* force TITLE font on title message screen */
+  // force TITLE font on title message screen
   SetFontStatus(getTitleMessageGameMode(initial));
 
-  /* if chars *and* width set to "-1", automatically determine width */
+  // if chars *and* width set to "-1", automatically determine width
   if (tmi->chars == -1 && tmi->width == -1)
     tmi->width = viewport.window[game_status].width;
 
-  /* if lines *and* height set to "-1", automatically determine height */
+  // if lines *and* height set to "-1", automatically determine height
   if (tmi->lines == -1 && tmi->height == -1)
     tmi->height = viewport.window[game_status].height;
 
-  /* if chars set to "-1", automatically determine by text and font width */
+  // if chars set to "-1", automatically determine by text and font width
   if (tmi->chars == -1)
     tmi->chars = tmi->width / getFontWidth(tmi->font);
   else
     tmi->width = tmi->chars * getFontWidth(tmi->font);
 
-  /* if lines set to "-1", automatically determine by text and font height */
+  // if lines set to "-1", automatically determine by text and font height
   if (tmi->lines == -1)
     tmi->lines = tmi->height / getFontHeight(tmi->font);
   else
     tmi->height = tmi->lines * getFontHeight(tmi->font);
 
-  /* if x set to "-1", automatically determine by width and alignment */
+  // if x set to "-1", automatically determine by width and alignment
   if (tmi->x == -1)
     tmi->x = -1 * ALIGNED_XPOS(0, tmi->width, tmi->align);
 
-  /* if y set to "-1", automatically determine by height and alignment */
+  // if y set to "-1", automatically determine by height and alignment
   if (tmi->y == -1)
     tmi->y = -1 * ALIGNED_YPOS(0, tmi->height, tmi->valign);
 
@@ -1515,13 +1515,13 @@ static boolean CheckTitleScreen(boolean levelset_has_changed)
   static boolean show_title_initial = TRUE;
   boolean show_titlescreen = FALSE;
 
-  /* needed to be able to skip title screen, if no image or message defined */
+  // needed to be able to skip title screen, if no image or message defined
   InitializeTitleControls(show_title_initial);
 
   if (setup.show_titlescreen && (show_title_initial || levelset_has_changed))
     show_titlescreen = TRUE;
 
-  /* show initial title images and messages only once at program start */
+  // show initial title images and messages only once at program start
   show_title_initial = FALSE;
 
   return (show_titlescreen && num_title_screens > 0);
@@ -1537,7 +1537,7 @@ void DrawMainMenu(void)
 
   FadeSetLeaveScreen();
 
-  /* do not fade out here -- function may continue and fade on editor screen */
+  // do not fade out here -- function may continue and fade on editor screen
 
   UnmapAllGadgets();
   FadeMenuSoundsAndMusic();
@@ -1550,7 +1550,7 @@ void DrawMainMenu(void)
 
   GetPlayerConfig();
 
-  /* needed if last screen was the playing screen, invoked from level editor */
+  // needed if last screen was the playing screen, invoked from level editor
   if (level_editor_test_game)
   {
     CloseDoor(DOOR_CLOSE_ALL);
@@ -1562,23 +1562,23 @@ void DrawMainMenu(void)
     return;
   }
 
-  /* needed if last screen was the setup screen and fullscreen state changed */
+  // needed if last screen was the setup screen and fullscreen state changed
   // (moved to "execSetupGraphics()" to change fullscreen state directly)
   // ToggleFullscreenOrChangeWindowScalingIfNeeded();
 
-  /* leveldir_current may be invalid (level group, parent link) */
+  // leveldir_current may be invalid (level group, parent link)
   if (!validLevelSeries(leveldir_current))
     leveldir_current = getFirstValidTreeInfoEntry(leveldir_last_valid);
 
   if (leveldir_current != leveldir_last_valid)
     levelset_has_changed = TRUE;
 
-  /* store valid level series information */
+  // store valid level series information
   leveldir_last_valid = leveldir_current;
 
-  init_last = init;			/* switch to new busy animation */
+  init_last = init;			// switch to new busy animation
 
-  /* needed if last screen (level choice) changed graphics, sounds or music */
+  // needed if last screen (level choice) changed graphics, sounds or music
   ReloadCustomArtwork(0);
 
   if (CheckTitleScreen(levelset_has_changed))
@@ -1598,12 +1598,12 @@ void DrawMainMenu(void)
 
   FadeOut(fade_mask);
 
-  /* needed if different viewport properties defined for menues */
+  // needed if different viewport properties defined for menues
   ChangeViewportPropertiesIfNeeded();
 
   SetDrawtoField(DRAW_TO_BACKBUFFER);
 
-  /* level_nr may have been set to value over handicap with level editor */
+  // level_nr may have been set to value over handicap with level editor
   if (setup.handicap && level_nr > leveldir_current->handicap_level)
     level_nr = leveldir_current->handicap_level;
 
@@ -1640,20 +1640,20 @@ void DrawMainMenu(void)
 
   PlayMenuSoundsAndMusic();
 
-  /* create gadgets for main menu screen */
+  // create gadgets for main menu screen
   FreeScreenGadgets();
   CreateScreenGadgets();
 
-  /* may be required if audio buttons shown on tape and changed in setup menu */
+  // may be required if audio buttons shown on tape and changed in setup menu
   FreeGameButtons();
   CreateGameButtons();
 
-  /* map gadgets for main menu screen */
+  // map gadgets for main menu screen
   MapTapeButtons();
   MapScreenMenuGadgets(SCREEN_MASK_MAIN);
   UpdateScreenMenuGadgets(SCREEN_MASK_MAIN_HAS_SOLUTION, hasSolutionTape());
 
-  /* copy actual game door content to door double buffer for OpenDoor() */
+  // copy actual game door content to door double buffer for OpenDoor()
   BlitBitmap(drawto, bitmap_db_door_1, DX, DY, DXSIZE, DYSIZE, 0, 0);
   BlitBitmap(drawto, bitmap_db_door_2, VX, VY, VXSIZE, VYSIZE, 0, 0);
 
@@ -1664,7 +1664,7 @@ void DrawMainMenu(void)
   FadeIn(fade_mask);
   FadeSetEnterMenu();
 
-  /* update screen area with special editor door */
+  // update screen area with special editor door
   redraw_mask |= REDRAW_ALL;
   BackToFront();
 
@@ -1675,11 +1675,11 @@ void DrawMainMenu(void)
 
 static void gotoTopLevelDir(void)
 {
-  /* move upwards until inside (but not above) top level directory */
+  // move upwards until inside (but not above) top level directory
   while (leveldir_current->node_parent &&
 	 !strEqual(leveldir_current->node_parent->subdir, STRING_TOP_DIRECTORY))
   {
-    /* write a "path" into level tree for easy navigation to last level */
+    // write a "path" into level tree for easy navigation to last level
     if (leveldir_current->node_parent->node_group->cl_first == -1)
     {
       int num_leveldirs = numTreeInfoInGroup(leveldir_current);
@@ -1727,7 +1727,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     {
       FadeSetEnterScreen();
 
-      /* use individual title fading instead of global "enter screen" fading */
+      // use individual title fading instead of global "enter screen" fading
       fading = getTitleFading(tci);
     }
 
@@ -1735,10 +1735,10 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
     {
       if (num_title_screens == 0)
       {
-	/* switch game mode from title screen mode back to info screen mode */
+	// switch game mode from title screen mode back to info screen mode
 	SetGameStatus(GAME_MODE_INFO);
 
-	/* store that last screen was info screen, not main menu screen */
+	// store that last screen was info screen, not main menu screen
 	game_status_last_screen = GAME_MODE_INFO;
 
 	DrawInfoScreen_NotAvailable("Title screen information:",
@@ -1751,10 +1751,10 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 
     FadeOut(REDRAW_ALL);
 
-    /* title screens may have different window size */
+    // title screens may have different window size
     ChangeViewportPropertiesIfNeeded();
 
-    /* only required to update logic for redrawing global border */
+    // only required to update logic for redrawing global border
     ClearField();
 
     if (tci->is_image)
@@ -1777,7 +1777,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 
     FadeIn(REDRAW_ALL);
 
-    DelayReached(&title_delay, 0);	/* reset delay counter */
+    DelayReached(&title_delay, 0);	// reset delay counter
 
     return;
   }
@@ -1840,7 +1840,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 
       FadeIn(REDRAW_ALL);
 
-      DelayReached(&title_delay, 0);	/* reset delay counter */
+      DelayReached(&title_delay, 0);	// reset delay counter
     }
     else
     {
@@ -1854,7 +1854,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
   {
     SetMouseCursor(CURSOR_DEFAULT);
 
-    /* force full menu screen redraw after displaying title screens */
+    // force full menu screen redraw after displaying title screens
     redraw_mask = REDRAW_ALL;
 
     if (game_status_last_screen == GAME_MODE_INFO)
@@ -1865,7 +1865,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 
       DrawInfoScreen();
     }
-    else	/* default: return to main menu */
+    else	// default: return to main menu
     {
       SetGameStatus(GAME_MODE_MAIN);
 
@@ -1892,7 +1892,7 @@ static void HandleMainMenu_SelectLevel(int step, int direction,
 
   if (setup.handicap && new_level_nr > leveldir_current->handicap_level)
   {
-    /* skipping levels is only allowed when trying to skip single level */
+    // skipping levels is only allowed when trying to skip single level
     if (setup.skip_levels && new_level_nr == old_level_nr + 1 &&
 	Request("Level still unsolved! Skip despite handicap?", REQ_ASK))
     {
@@ -1926,9 +1926,9 @@ static void HandleMainMenu_SelectLevel(int step, int direction,
 
     UpdateScreenMenuGadgets(SCREEN_MASK_MAIN_HAS_SOLUTION, hasSolutionTape());
 
-    /* needed because DrawPreviewLevelInitial() takes some time */
+    // needed because DrawPreviewLevelInitial() takes some time
     BackToFront();
-    /* SyncDisplay(); */
+    // SyncDisplay();
   }
 }
 
@@ -1947,7 +1947,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
     return;
   }
 
-  if (mx || my)		/* mouse input */
+  if (mx || my)		// mouse input
   {
     pos = -1;
 
@@ -1963,7 +1963,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       }
     }
 
-    /* check if level preview was clicked */
+    // check if level preview was clicked
     if (insidePreviewRect(&preview, mx - SX, my - SY))
       pos = MAIN_CONTROL_GAME;
 
@@ -1984,7 +1984,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	PlaySound(SND_MENU_BUTTON_RELEASING);
     }
   }
-  else if (dx || dy)	/* keyboard input */
+  else if (dx || dy)	// keyboard input
   {
     if (dx > 0 && (choice == MAIN_CONTROL_INFO ||
 		   choice == MAIN_CONTROL_SETUP))
@@ -2117,13 +2117,13 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 }
 
 
-/* ========================================================================= */
-/* info screen functions                                                     */
-/* ========================================================================= */
+// ============================================================================
+// info screen functions
+// ============================================================================
 
 static struct TokenInfo *info_info;
-static int num_info_info;	/* number of info entries shown on screen */
-static int max_info_info;	/* total number of info entries in list */
+static int num_info_info;	// number of info entries shown on screen
+static int max_info_info;	// total number of info entries in list
 
 static void execInfoTitleScreen(void)
 {
@@ -2273,7 +2273,7 @@ static void drawMenuInfoList(int first_entry, int num_page_entries,
     struct TokenInfo *si = &menu_info[menu_info_pos];
     void *value_ptr = si->value;
 
-    /* set some entries to "unchangeable" according to other variables */
+    // set some entries to "unchangeable" according to other variables
     if ((value_ptr == &setup.sound_simple && !audio.sound_available) ||
 	(value_ptr == &setup.sound_loops  && !audio.loops_available) ||
 	(value_ptr == &setup.sound_music  && !audio.music_available) ||
@@ -2333,14 +2333,14 @@ static void DrawInfoScreen_Main(void)
   FreeScreenGadgets();
   CreateScreenGadgets();
 
-  /* (needed after displaying title screens which disable auto repeat) */
+  // (needed after displaying title screens which disable auto repeat)
   KeyboardAutoRepeatOn();
 
   FadeSetLeaveScreen();
 
   FadeOut(fade_mask);
 
-  /* needed if different viewport properties defined for info screen */
+  // needed if different viewport properties defined for info screen
   ChangeViewportPropertiesIfNeeded();
 
   SetMainBackgroundImage(IMG_BACKGROUND_INFO);
@@ -2386,8 +2386,8 @@ static void HandleMenuScreen(int mx, int my, int dx, int dy, int button,
   int *num_page_entries_last = num_page_entries_all_last[game_status];
   int *choice_store = choice_stores[game_status];
   int *first_entry_store = first_entry_stores[game_status];
-  int choice = choice_store[mode];		/* starts with 0 */
-  int first_entry = first_entry_store[mode];	/* starts with 0 */
+  int choice = choice_store[mode];		// starts with 0
+  int first_entry = first_entry_store[mode];	// starts with 0
   int x = 0;
   int y = choice - first_entry;
   int y_old = y;
@@ -2410,7 +2410,7 @@ static void HandleMenuScreen(int mx, int my, int dx, int dy, int button,
       num_page_entries_last[mode] = num_page_entries;
     }
 
-    /* advance to first valid menu entry */
+    // advance to first valid menu entry
     while (choice < num_page_entries &&
 	   menu_info[choice].type & TYPE_SKIP_ENTRY)
       choice++;
@@ -2458,28 +2458,28 @@ static void HandleMenuScreen(int mx, int my, int dx, int dy, int button,
 
 	menu_callback_function();
 
-	break;	/* absolutely needed because function changes 'menu_info'! */
+	break;	// absolutely needed because function changes 'menu_info'!
       }
     }
 
     return;
   }
 
-  if (mx || my)		/* mouse input */
+  if (mx || my)		// mouse input
   {
     x = (mx - mSX) / 32;
     y = (my - mSY) / 32 - MENU_SCREEN_START_YPOS;
   }
-  else if (dx || dy)	/* keyboard or scrollbar/scrollbutton input */
+  else if (dx || dy)	// keyboard or scrollbar/scrollbutton input
   {
-    /* move cursor instead of scrolling when already at start/end of list */
+    // move cursor instead of scrolling when already at start/end of list
     if (dy == -1 * SCROLL_LINE && first_entry == 0)
       dy = -1;
     else if (dy == +1 * SCROLL_LINE &&
 	     first_entry + num_page_entries == max_page_entries)
       dy = 1;
 
-    /* handle scrolling screen one line or page */
+    // handle scrolling screen one line or page
     if (y + dy < 0 ||
 	y + dy > num_page_entries - 1)
     {
@@ -2490,7 +2490,7 @@ static void HandleMenuScreen(int mx, int my, int dx, int dy, int button,
 
       if (dy < 0 && first_entry > 0)
       {
-	/* scroll page/line up */
+	// scroll page/line up
 
 	first_entry -= step;
 	if (first_entry < 0)
@@ -2500,7 +2500,7 @@ static void HandleMenuScreen(int mx, int my, int dx, int dy, int button,
       }
       else if (dy > 0 && first_entry + num_page_entries < max_page_entries)
       {
-	/* scroll page/line down */
+	// scroll page/line down
 
 	first_entry += step;
 	if (first_entry + num_page_entries > max_page_entries)
@@ -2563,7 +2563,7 @@ static void HandleMenuScreen(int mx, int my, int dx, int dy, int button,
     else if (dy)
       y += dy;
 
-    /* jump to next non-empty menu entry (up or down) */
+    // jump to next non-empty menu entry (up or down)
     while (first_entry + y > 0 &&
 	   first_entry + y < max_page_entries - 1 &&
 	   menu_info[first_entry + y].type & TYPE_SKIP_ENTRY)
@@ -2633,7 +2633,7 @@ static void HandleMenuScreen(int mx, int my, int dx, int dy, int button,
 
 	    menu_callback_function();
 
-	    /* absolutely needed because function changes 'menu_info'! */
+	    // absolutely needed because function changes 'menu_info'!
 	    break;
 	  }
 	}
@@ -2645,17 +2645,17 @@ static void HandleMenuScreen(int mx, int my, int dx, int dy, int button,
     {
       PlaySound(SND_MENU_ITEM_SELECTING);
 
-      /* when selecting key headline, execute function for key value change */
+      // when selecting key headline, execute function for key value change
       if (menu_info[first_entry + y].type & TYPE_KEYTEXT &&
 	  menu_info[first_entry + y + 1].type & TYPE_KEY)
 	y++;
 
-      /* when selecting string value, execute function for list selection */
+      // when selecting string value, execute function for list selection
       if (menu_info[first_entry + y].type & TYPE_STRING && y > 0 &&
 	  menu_info[first_entry + y - 1].type & TYPE_ENTER_LIST)
 	y--;
 
-      /* when selecting string value, execute function for text input gadget */
+      // when selecting string value, execute function for text input gadget
       if (menu_info[first_entry + y].type & TYPE_STRING && y > 0 &&
 	  menu_info[first_entry + y - 1].type & TYPE_TEXT_INPUT)
 	y--;
@@ -2884,22 +2884,22 @@ void DrawInfoScreen_HelpText(int element, int action, int direction, int ypos)
   int max_lines_per_text = 2;    
   char *text = NULL;
 
-  if (action != -1 && direction != -1)		/* element.action.direction */
+  if (action != -1 && direction != -1)		// element.action.direction
     text = getHelpText(element, action, direction);
 
-  if (text == NULL && action != -1)		/* element.action */
+  if (text == NULL && action != -1)		// element.action
     text = getHelpText(element, action, -1);
 
-  if (text == NULL && direction != -1)		/* element.direction */
+  if (text == NULL && direction != -1)		// element.direction
     text = getHelpText(element, -1, direction);
 
-  if (text == NULL)				/* base element */
+  if (text == NULL)				// base element
     text = getHelpText(element, -1, -1);
 
-  if (text == NULL)				/* not found */
+  if (text == NULL)				// not found
     text = "No description available";
 
-  if (strlen(text) <= max_chars_per_line)	/* only one line of text */
+  if (strlen(text) <= max_chars_per_line)	// only one line of text
     ystart += getFontHeight(font_nr) / 2;
 
   DrawTextBuffer(xstart, ystart + ypos * ystep, text, font_nr,
@@ -3799,29 +3799,29 @@ static void DrawInfoScreen_LevelSet(void)
 
   DrawTextSCentered(ystart, FONT_TEXT_1, title);
 
-  /* if x position set to "-1", automatically determine by playfield width */
+  // if x position set to "-1", automatically determine by playfield width
   if (tmi->x == -1)
     tmi->x = SXSIZE / 2;
 
-  /* if y position set to "-1", use static default value */
+  // if y position set to "-1", use static default value
   if (tmi->y == -1)
     tmi->y = 150;
 
-  /* if width set to "-1", automatically determine by playfield width */
+  // if width set to "-1", automatically determine by playfield width
   if (tmi->width == -1)
     tmi->width = SXSIZE - 2 * TILEX;
 
-  /* if height set to "-1", automatically determine by playfield height */
+  // if height set to "-1", automatically determine by playfield height
   if (tmi->height == -1)
     tmi->height = MENU_SCREEN_INFO_YBOTTOM - tmi->y - 10;
 
-  /* if chars set to "-1", automatically determine by text and font width */
+  // if chars set to "-1", automatically determine by text and font width
   if (tmi->chars == -1)
     tmi->chars = tmi->width / getFontWidth(tmi->font);
   else
     tmi->width = tmi->chars * getFontWidth(tmi->font);
 
-  /* if lines set to "-1", automatically determine by text and font height */
+  // if lines set to "-1", automatically determine by text and font height
   if (tmi->lines == -1)
     tmi->lines = tmi->height / getFontHeight(tmi->font);
   else
@@ -3909,9 +3909,9 @@ void HandleInfoScreen(int mx, int my, int dx, int dy, int button)
 }
 
 
-/* ========================================================================= */
-/* type name functions                                                       */
-/* ========================================================================= */
+// ============================================================================
+// type name functions
+// ============================================================================
 
 void HandleTypeName(int newxpos, Key key)
 {
@@ -3988,9 +3988,9 @@ void HandleTypeName(int newxpos, Key key)
 }
 
 
-/* ========================================================================= */
-/* tree menu functions                                                       */
-/* ========================================================================= */
+// ============================================================================
+// tree menu functions
+// ============================================================================
 
 static void DrawChooseTree(TreeInfo **ti_ptr)
 {
@@ -4015,7 +4015,7 @@ static void DrawChooseTree(TreeInfo **ti_ptr)
 
   FadeOut(fade_mask);
 
-  /* needed if different viewport properties defined for choosing level (set) */
+  // needed if different viewport properties defined for choosing level (set)
   ChangeViewportPropertiesIfNeeded();
 
   if (game_status == GAME_MODE_LEVELNR)
@@ -4115,7 +4115,7 @@ static void drawChooseTreeInfo(int entry_pos, TreeInfo *ti)
 		      node->levels, (node->levels > 1 ? "levels" : "level"),
 		      node->class_desc);
 
-  /* let BackToFront() redraw only what is needed */
+  // let BackToFront() redraw only what is needed
   redraw_mask = last_redraw_mask;
   for (x = 0; x < SCR_FIELDX; x++)
     MarkTileDirty(x, 1);
@@ -4144,7 +4144,7 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 
     if (ti->cl_first == -1)
     {
-      /* only on initialization */
+      // only on initialization
       ti->cl_first = MAX(0, entry_pos - num_page_entries + 1);
       ti->cl_cursor = entry_pos - ti->cl_first;
     }
@@ -4152,7 +4152,7 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 	     (num_entries > num_page_entries &&
 	      num_entries - ti->cl_first < num_page_entries))
     {
-      /* only after change of list size (by custom graphic configuration) */
+      // only after change of list size (by custom graphic configuration)
       ti->cl_first = MAX(0, entry_pos - num_page_entries + 1);
       ti->cl_cursor = entry_pos - ti->cl_first;
     }
@@ -4224,21 +4224,21 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
     return;
   }
 
-  if (mx || my)		/* mouse input */
+  if (mx || my)		// mouse input
   {
     x = (mx - mSX) / 32;
     y = (my - mSY) / 32 - MENU_SCREEN_START_YPOS;
   }
-  else if (dx || dy)	/* keyboard or scrollbar/scrollbutton input */
+  else if (dx || dy)	// keyboard or scrollbar/scrollbutton input
   {
-    /* move cursor instead of scrolling when already at start/end of list */
+    // move cursor instead of scrolling when already at start/end of list
     if (dy == -1 * SCROLL_LINE && ti->cl_first == 0)
       dy = -1;
     else if (dy == +1 * SCROLL_LINE &&
 	     ti->cl_first + num_page_entries == num_entries)
       dy = 1;
 
-    /* handle scrolling screen one line or page */
+    // handle scrolling screen one line or page
     if (ti->cl_cursor + dy < 0 ||
 	ti->cl_cursor + dy > num_page_entries - 1)
     {
@@ -4249,7 +4249,7 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 
       if (dy < 0 && ti->cl_first > 0)
       {
-	/* scroll page/line up */
+	// scroll page/line up
 
 	ti->cl_first -= step;
 	if (ti->cl_first < 0)
@@ -4259,7 +4259,7 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
       }
       else if (dy > 0 && ti->cl_first + num_page_entries < num_entries)
       {
-	/* scroll page/line down */
+	// scroll page/line down
 
 	ti->cl_first += step;
 	if (ti->cl_first + num_page_entries > num_entries)
@@ -4281,7 +4281,7 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
       return;
     }
 
-    /* handle moving cursor one line */
+    // handle moving cursor one line
     y = ti->cl_cursor + dy;
   }
 
@@ -4488,7 +4488,7 @@ void DrawChooseLevelNr(void)
     char identifier[32], name[32];
     int value = i;
 
-    /* temporarily load level info to get level name */
+    // temporarily load level info to get level name
     LoadLevelInfoOnly(i);
 
     ti->node_top = &level_number;
@@ -4508,14 +4508,14 @@ void DrawChooseLevelNr(void)
     pushTreeInfo(&level_number, ti);
   }
 
-  /* sort level number values to start with lowest level number */
+  // sort level number values to start with lowest level number
   sortTreeInfo(&level_number);
 
-  /* set current level number to current level number */
+  // set current level number to current level number
   level_number_current =
     getTreeInfoFromIdentifier(level_number, i_to_a(level_nr));
 
-  /* if that also fails, set current level number to first available level */
+  // if that also fails, set current level number to first available level
   if (level_number_current == NULL)
     level_number_current = level_number;
 
@@ -4539,10 +4539,10 @@ void DrawHallOfFame(int level_nr, int highlight_position)
   UnmapAllGadgets();
   FadeMenuSoundsAndMusic();
 
-  /* (this is needed when called from GameEnd() after winning a game) */
+  // (this is needed when called from GameEnd() after winning a game)
   KeyboardAutoRepeatOn();
 
-  /* (this is needed when called from GameEnd() after winning a game) */
+  // (this is needed when called from GameEnd() after winning a game)
   SetDrawDeactivationMask(REDRAW_NONE);
   SetDrawBackgroundMask(REDRAW_FIELD);
 
@@ -4555,7 +4555,7 @@ void DrawHallOfFame(int level_nr, int highlight_position)
 
   FadeOut(fade_mask);
 
-  /* needed if different viewport properties defined for scores */
+  // needed if different viewport properties defined for scores
   ChangeViewportPropertiesIfNeeded();
 
   PlayMenuSoundsAndMusic();
@@ -4629,7 +4629,7 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
     return;
   }
 
-  if (ABS(dy) == SCROLL_PAGE)		/* handle scrolling one page */
+  if (ABS(dy) == SCROLL_PAGE)		// handle scrolling one page
     step = NUM_MENU_ENTRIES_ON_SCREEN - 1;
 
   if (dy < 0)
@@ -4680,13 +4680,13 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
 }
 
 
-/* ========================================================================= */
-/* setup screen functions                                                    */
-/* ========================================================================= */
+// ============================================================================
+// setup screen functions
+// ============================================================================
 
 static struct TokenInfo *setup_info;
-static int num_setup_info;	/* number of setup entries shown on screen */
-static int max_setup_info;	/* total number of setup entries in list */
+static int num_setup_info;	// number of setup entries shown on screen
+static int max_setup_info;	// total number of setup entries in list
 
 static char *window_size_text;
 static char *scaling_type_text;
@@ -4753,7 +4753,7 @@ static void execSetupGame_setGameSpeeds(boolean update_value)
       pushTreeInfo(&game_speeds, ti);
     }
 
-    /* sort game speed values to start with slowest game speed */
+    // sort game speed values to start with slowest game speed
     sortTreeInfo(&game_speeds);
 
     update_value = TRUE;
@@ -4761,16 +4761,16 @@ static void execSetupGame_setGameSpeeds(boolean update_value)
 
   if (update_value)
   {
-    /* set current game speed to configured game speed value */
+    // set current game speed to configured game speed value
     game_speed_current =
       getTreeInfoFromIdentifier(game_speeds, i_to_a(setup.game_frame_delay));
 
-    /* if that fails, set current game speed to reliable default value */
+    // if that fails, set current game speed to reliable default value
     if (game_speed_current == NULL)
       game_speed_current =
 	getTreeInfoFromIdentifier(game_speeds, i_to_a(GAME_FRAME_DELAY));
 
-    /* if that also fails, set current game speed to first available speed */
+    // if that also fails, set current game speed to first available speed
     if (game_speed_current == NULL)
       game_speed_current = game_speeds;
 
@@ -4782,7 +4782,7 @@ static void execSetupGame_setGameSpeeds(boolean update_value)
 
   setup.game_frame_delay = atoi(game_speed_current->identifier);
 
-  /* needed for displaying game speed text instead of identifier */
+  // needed for displaying game speed text instead of identifier
   game_speed_text = game_speed_current->name;
 }
 
@@ -4813,26 +4813,26 @@ static void execSetupGame_setScrollDelays(void)
       pushTreeInfo(&scroll_delays, ti);
     }
 
-    /* sort scroll delay values to start with lowest scroll delay value */
+    // sort scroll delay values to start with lowest scroll delay value
     sortTreeInfo(&scroll_delays);
 
-    /* set current scroll delay value to configured scroll delay value */
+    // set current scroll delay value to configured scroll delay value
     scroll_delay_current =
       getTreeInfoFromIdentifier(scroll_delays,i_to_a(setup.scroll_delay_value));
 
-    /* if that fails, set current scroll delay to reliable default value */
+    // if that fails, set current scroll delay to reliable default value
     if (scroll_delay_current == NULL)
       scroll_delay_current =
 	getTreeInfoFromIdentifier(scroll_delays, i_to_a(STD_SCROLL_DELAY));
 
-    /* if that also fails, set current scroll delay to first available value */
+    // if that also fails, set current scroll delay to first available value
     if (scroll_delay_current == NULL)
       scroll_delay_current = scroll_delays;
   }
 
   setup.scroll_delay_value = atoi(scroll_delay_current->identifier);
 
-  /* needed for displaying scroll delay text instead of identifier */
+  // needed for displaying scroll delay text instead of identifier
   scroll_delay_text = scroll_delay_current->name;
 }
 
@@ -4863,26 +4863,26 @@ static void execSetupGame_setSnapshotModes(void)
       pushTreeInfo(&snapshot_modes, ti);
     }
 
-    /* sort snapshot mode values to start with lowest snapshot mode value */
+    // sort snapshot mode values to start with lowest snapshot mode value
     sortTreeInfo(&snapshot_modes);
 
-    /* set current snapshot mode value to configured snapshot mode value */
+    // set current snapshot mode value to configured snapshot mode value
     snapshot_mode_current =
       getTreeInfoFromIdentifier(snapshot_modes, setup.engine_snapshot_mode);
 
-    /* if that fails, set current snapshot mode to reliable default value */
+    // if that fails, set current snapshot mode to reliable default value
     if (snapshot_mode_current == NULL)
       snapshot_mode_current =
 	getTreeInfoFromIdentifier(snapshot_modes, STR_SNAPSHOT_MODE_DEFAULT);
 
-    /* if that also fails, set current snapshot mode to first available value */
+    // if that also fails, set current snapshot mode to first available value
     if (snapshot_mode_current == NULL)
       snapshot_mode_current = snapshot_modes;
   }
 
   setup.engine_snapshot_mode = snapshot_mode_current->identifier;
 
-  /* needed for displaying snapshot mode text instead of identifier */
+  // needed for displaying snapshot mode text instead of identifier
   snapshot_mode_text = snapshot_mode_current->name;
 }
 
@@ -4899,7 +4899,7 @@ static void execSetupGame_setNetworkServerText(void)
     network_server_hostname[MAX_SETUP_TEXT_INPUT_LEN] = '\0';
   }
 
-  /* needed for displaying network server text instead of identifier */
+  // needed for displaying network server text instead of identifier
   network_server_text = network_server_hostname;
 }
 
@@ -5010,28 +5010,28 @@ static void execSetupGraphics_setWindowSizes(boolean update_list)
       pushTreeInfo(&window_sizes, ti);
     }
 
-    /* sort window size values to start with lowest window size value */
+    // sort window size values to start with lowest window size value
     sortTreeInfo(&window_sizes);
 
-    /* set current window size value to configured window size value */
+    // set current window size value to configured window size value
     window_size_current =
       getTreeInfoFromIdentifier(window_sizes,
 				i_to_a(setup.window_scaling_percent));
 
-    /* if that fails, set current window size to reliable default value */
+    // if that fails, set current window size to reliable default value
     if (window_size_current == NULL)
       window_size_current =
 	getTreeInfoFromIdentifier(window_sizes,
 				  i_to_a(STD_WINDOW_SCALING_PERCENT));
 
-    /* if that also fails, set current window size to first available value */
+    // if that also fails, set current window size to first available value
     if (window_size_current == NULL)
       window_size_current = window_sizes;
   }
 
   setup.window_scaling_percent = atoi(window_size_current->identifier);
 
-  /* needed for displaying window size text instead of identifier */
+  // needed for displaying window size text instead of identifier
   window_size_text = window_size_current->name;
 }
 
@@ -5062,26 +5062,26 @@ static void execSetupGraphics_setScalingTypes(void)
       pushTreeInfo(&scaling_types, ti);
     }
 
-    /* sort scaling type values to start with lowest scaling type value */
+    // sort scaling type values to start with lowest scaling type value
     sortTreeInfo(&scaling_types);
 
-    /* set current scaling type value to configured scaling type value */
+    // set current scaling type value to configured scaling type value
     scaling_type_current =
       getTreeInfoFromIdentifier(scaling_types, setup.window_scaling_quality);
 
-    /* if that fails, set current scaling type to reliable default value */
+    // if that fails, set current scaling type to reliable default value
     if (scaling_type_current == NULL)
       scaling_type_current =
 	getTreeInfoFromIdentifier(scaling_types, SCALING_QUALITY_DEFAULT);
 
-    /* if that also fails, set current scaling type to first available value */
+    // if that also fails, set current scaling type to first available value
     if (scaling_type_current == NULL)
       scaling_type_current = scaling_types;
   }
 
   setup.window_scaling_quality = scaling_type_current->identifier;
 
-  /* needed for displaying scaling type text instead of identifier */
+  // needed for displaying scaling type text instead of identifier
   scaling_type_text = scaling_type_current->name;
 }
 
@@ -5112,27 +5112,27 @@ static void execSetupGraphics_setRenderingModes(void)
       pushTreeInfo(&rendering_modes, ti);
     }
 
-    /* sort rendering mode values to start with lowest rendering mode value */
+    // sort rendering mode values to start with lowest rendering mode value
     sortTreeInfo(&rendering_modes);
 
-    /* set current rendering mode value to configured rendering mode value */
+    // set current rendering mode value to configured rendering mode value
     rendering_mode_current =
       getTreeInfoFromIdentifier(rendering_modes, setup.screen_rendering_mode);
 
-    /* if that fails, set current rendering mode to reliable default value */
+    // if that fails, set current rendering mode to reliable default value
     if (rendering_mode_current == NULL)
       rendering_mode_current =
 	getTreeInfoFromIdentifier(rendering_modes,
 				  STR_SPECIAL_RENDERING_DEFAULT);
 
-    /* if that also fails, set current rendering mode to first available one */
+    // if that also fails, set current rendering mode to first available one
     if (rendering_mode_current == NULL)
       rendering_mode_current = rendering_modes;
   }
 
   setup.screen_rendering_mode = rendering_mode_current->identifier;
 
-  /* needed for displaying rendering mode text instead of identifier */
+  // needed for displaying rendering mode text instead of identifier
   rendering_mode_text = rendering_mode_current->name;
 }
 
@@ -5163,7 +5163,7 @@ static void execSetupGraphics_setVsyncModes(boolean update_value)
       pushTreeInfo(&vsync_modes, ti);
     }
 
-    /* sort vsync mode values to start with lowest vsync mode value */
+    // sort vsync mode values to start with lowest vsync mode value
     sortTreeInfo(&vsync_modes);
 
     update_value = TRUE;
@@ -5171,23 +5171,23 @@ static void execSetupGraphics_setVsyncModes(boolean update_value)
 
   if (update_value)
   {
-    /* set current vsync mode value to configured vsync mode value */
+    // set current vsync mode value to configured vsync mode value
     vsync_mode_current =
       getTreeInfoFromIdentifier(vsync_modes, setup.vsync_mode);
 
-    /* if that fails, set current vsync mode to reliable default value */
+    // if that fails, set current vsync mode to reliable default value
     if (vsync_mode_current == NULL)
       vsync_mode_current =
 	getTreeInfoFromIdentifier(vsync_modes, STR_VSYNC_MODE_DEFAULT);
 
-    /* if that also fails, set current vsync mode to first available one */
+    // if that also fails, set current vsync mode to first available one
     if (vsync_mode_current == NULL)
       vsync_mode_current = vsync_modes;
   }
 
   setup.vsync_mode = vsync_mode_current->identifier;
 
-  /* needed for displaying vsync mode text instead of identifier */
+  // needed for displaying vsync mode text instead of identifier
   vsync_mode_text = vsync_mode_current->name;
 }
 
@@ -5334,19 +5334,19 @@ static void execSetupSound(void)
       pushTreeInfo(&volumes_simple, ti);
     }
 
-    /* sort volume values to start with lowest volume value */
+    // sort volume values to start with lowest volume value
     sortTreeInfo(&volumes_simple);
 
-    /* set current volume value to configured volume value */
+    // set current volume value to configured volume value
     volume_simple_current =
       getTreeInfoFromIdentifier(volumes_simple,i_to_a(setup.volume_simple));
 
-    /* if that fails, set current volume to reliable default value */
+    // if that fails, set current volume to reliable default value
     if (volume_simple_current == NULL)
       volume_simple_current =
 	getTreeInfoFromIdentifier(volumes_simple, i_to_a(100));
 
-    /* if that also fails, set current volume to first available value */
+    // if that also fails, set current volume to first available value
     if (volume_simple_current == NULL)
       volume_simple_current = volumes_simple;
   }
@@ -5402,19 +5402,19 @@ static void execSetupSound(void)
       pushTreeInfo(&volumes_loops, ti);
     }
 
-    /* sort volume values to start with lowest volume value */
+    // sort volume values to start with lowest volume value
     sortTreeInfo(&volumes_loops);
 
-    /* set current volume value to configured volume value */
+    // set current volume value to configured volume value
     volume_loops_current =
       getTreeInfoFromIdentifier(volumes_loops,i_to_a(setup.volume_loops));
 
-    /* if that fails, set current volume to reliable default value */
+    // if that fails, set current volume to reliable default value
     if (volume_loops_current == NULL)
       volume_loops_current =
 	getTreeInfoFromIdentifier(volumes_loops, i_to_a(100));
 
-    /* if that also fails, set current volume to first available value */
+    // if that also fails, set current volume to first available value
     if (volume_loops_current == NULL)
       volume_loops_current = volumes_loops;
   }
@@ -5470,19 +5470,19 @@ static void execSetupSound(void)
       pushTreeInfo(&volumes_music, ti);
     }
 
-    /* sort volume values to start with lowest volume value */
+    // sort volume values to start with lowest volume value
     sortTreeInfo(&volumes_music);
 
-    /* set current volume value to configured volume value */
+    // set current volume value to configured volume value
     volume_music_current =
       getTreeInfoFromIdentifier(volumes_music,i_to_a(setup.volume_music));
 
-    /* if that fails, set current volume to reliable default value */
+    // if that fails, set current volume to reliable default value
     if (volume_music_current == NULL)
       volume_music_current =
 	getTreeInfoFromIdentifier(volumes_music, i_to_a(100));
 
-    /* if that also fails, set current volume to first available value */
+    // if that also fails, set current volume to first available value
     if (volume_music_current == NULL)
       volume_music_current = volumes_music;
   }
@@ -5491,7 +5491,7 @@ static void execSetupSound(void)
   setup.volume_loops  = atoi(volume_loops_current->identifier);
   setup.volume_music  = atoi(volume_music_current->identifier);
 
-  /* needed for displaying volume text instead of identifier */
+  // needed for displaying volume text instead of identifier
   volume_simple_text = volume_simple_current->name;
   volume_loops_text = volume_loops_current->name;
   volume_music_text = volume_music_current->name;
@@ -5595,19 +5595,19 @@ static void execSetupTouch(void)
       pushTreeInfo(&touch_controls, ti);
     }
 
-    /* sort touch control values to start with lowest touch control value */
+    // sort touch control values to start with lowest touch control value
     sortTreeInfo(&touch_controls);
 
-    /* set current touch control value to configured touch control value */
+    // set current touch control value to configured touch control value
     touch_control_current =
       getTreeInfoFromIdentifier(touch_controls, setup.touch.control_type);
 
-    /* if that fails, set current touch control to reliable default value */
+    // if that fails, set current touch control to reliable default value
     if (touch_control_current == NULL)
       touch_control_current =
 	getTreeInfoFromIdentifier(touch_controls, TOUCH_CONTROL_DEFAULT);
 
-    /* if that also fails, set current touch control to first available value */
+    // if that also fails, set current touch control to first available value
     if (touch_control_current == NULL)
       touch_control_current = touch_controls;
   }
@@ -5635,21 +5635,21 @@ static void execSetupTouch(void)
       pushTreeInfo(&move_distances, ti);
     }
 
-    /* sort distance values to start with lowest distance value */
+    // sort distance values to start with lowest distance value
     sortTreeInfo(&move_distances);
 
-    /* set current distance value to configured distance value */
+    // set current distance value to configured distance value
     move_distance_current =
       getTreeInfoFromIdentifier(move_distances,
 				i_to_a(setup.touch.move_distance));
 
-    /* if that fails, set current distance to reliable default value */
+    // if that fails, set current distance to reliable default value
     if (move_distance_current == NULL)
       move_distance_current =
 	getTreeInfoFromIdentifier(move_distances,
 				  i_to_a(TOUCH_MOVE_DISTANCE_DEFAULT));
 
-    /* if that also fails, set current distance to first available value */
+    // if that also fails, set current distance to first available value
     if (move_distance_current == NULL)
       move_distance_current = move_distances;
   }
@@ -5677,21 +5677,21 @@ static void execSetupTouch(void)
       pushTreeInfo(&drop_distances, ti);
     }
 
-    /* sort distance values to start with lowest distance value */
+    // sort distance values to start with lowest distance value
     sortTreeInfo(&drop_distances);
 
-    /* set current distance value to configured distance value */
+    // set current distance value to configured distance value
     drop_distance_current =
       getTreeInfoFromIdentifier(drop_distances,
 				i_to_a(setup.touch.drop_distance));
 
-    /* if that fails, set current distance to reliable default value */
+    // if that fails, set current distance to reliable default value
     if (drop_distance_current == NULL)
       drop_distance_current =
 	getTreeInfoFromIdentifier(drop_distances,
 				  i_to_a(TOUCH_DROP_DISTANCE_DEFAULT));
 
-    /* if that also fails, set current distance to first available value */
+    // if that also fails, set current distance to first available value
     if (drop_distance_current == NULL)
       drop_distance_current = drop_distances;
   }
@@ -5719,21 +5719,21 @@ static void execSetupTouch(void)
       pushTreeInfo(&transparencies, ti);
     }
 
-    /* sort transparency values to start with lowest transparency value */
+    // sort transparency values to start with lowest transparency value
     sortTreeInfo(&transparencies);
 
-    /* set current transparency value to configured transparency value */
+    // set current transparency value to configured transparency value
     transparency_current =
       getTreeInfoFromIdentifier(transparencies,
 				i_to_a(setup.touch.transparency));
 
-    /* if that fails, set current transparency to reliable default value */
+    // if that fails, set current transparency to reliable default value
     if (transparency_current == NULL)
       transparency_current =
 	getTreeInfoFromIdentifier(transparencies,
 				  i_to_a(TOUCH_TRANSPARENCY_DEFAULT));
 
-    /* if that also fails, set current transparency to first available value */
+    // if that also fails, set current transparency to first available value
     if (transparency_current == NULL)
       transparency_current = transparencies;
   }
@@ -5772,17 +5772,17 @@ static void execSetupTouch(void)
 	  pushTreeInfo(&grid_sizes[i][j], ti);
 	}
 
-	/* sort grid size values to start with lowest grid size value */
+	// sort grid size values to start with lowest grid size value
 	sortTreeInfo(&grid_sizes[i][j]);
 
-	/* set current grid size value to configured grid size value */
+	// set current grid size value to configured grid size value
 	grid_size_current[i][j] =
 	  getTreeInfoFromIdentifier(grid_sizes[i][j],
 				    i_to_a(j == 0 ?
 					   setup.touch.grid_xsize[i] :
 					   setup.touch.grid_ysize[i]));
 
-	/* if that fails, set current grid size to reliable default value */
+	// if that fails, set current grid size to reliable default value
 	if (grid_size_current[i][j] == NULL)
 	  grid_size_current[i][j] =
 	    getTreeInfoFromIdentifier(grid_sizes[i][j],
@@ -5790,7 +5790,7 @@ static void execSetupTouch(void)
 					     DEFAULT_GRID_XSIZE(i) :
 					     DEFAULT_GRID_YSIZE(i)));
 
-	/* if that also fails, set current grid size to first available value */
+	// if that also fails, set current grid size to first available value
 	if (grid_size_current[i][j] == NULL)
 	  grid_size_current[i][j] = grid_sizes[i][j];
       }
@@ -5814,7 +5814,7 @@ static void execSetupTouch(void)
     }
   }
 
-  /* needed for displaying value text instead of identifier */
+  // needed for displaying value text instead of identifier
   touch_controls_text = touch_control_current->name;
   move_distance_text = move_distance_current->name;
   drop_distance_text = drop_distance_current->name;
@@ -5842,10 +5842,10 @@ static void execSetupArtwork(void)
   setup.sounds_set = artwork.snd_current->identifier;
   setup.music_set = artwork.mus_current->identifier;
 
-  /* needed if last screen (setup choice) changed graphics, sounds or music */
+  // needed if last screen (setup choice) changed graphics, sounds or music
   ReloadCustomArtwork(0);
 
-  /* needed for displaying artwork name instead of artwork identifier */
+  // needed for displaying artwork name instead of artwork identifier
   graphics_set_name = artwork.gfx_current->name;
   sounds_set_name = artwork.snd_current->name;
   music_set_name = artwork.mus_current->name;
@@ -5994,7 +5994,7 @@ static void ToggleGameSpeedsListIfNeeded(void)
   if (setup.game_speed_extended == using_game_speeds_extended)
     return;
 
-  /* try to match similar values when changing game speeds list */
+  // try to match similar values when changing game speeds list
   if (setup.game_speed_extended)
     setup.game_frame_delay = (setup.game_frame_delay == 15 ? 16 :
 			      setup.game_frame_delay == 30 ? 29 :
@@ -6029,7 +6029,7 @@ static void ModifyGameSpeedIfNeeded(void)
 
   sprintf(message, "Game speed set to %s for VSync to work!", game_speed_text);
 
-  /* set game speed to existing list value that is fast enough for vsync */
+  // set game speed to existing list value that is fast enough for vsync
   setup.game_frame_delay = game_speed_value;
 
   execSetupGame_setGameSpeeds(TRUE);
@@ -6044,7 +6044,7 @@ static void DisableVsyncIfNeeded(void)
        setup.game_frame_delay <= MAX_VSYNC_FRAME_DELAY))
     return;
 
-  /* disable vsync for the selected game speed to work */
+  // disable vsync for the selected game speed to work
   setup.vsync_mode = STR_VSYNC_MODE_OFF;
 
   execSetupGraphics_setVsyncModes(TRUE);
@@ -6491,9 +6491,9 @@ static Key getSetupKey(void)
 	  {
 	    key = GetEventKey((KeyEvent *)&event, TRUE);
 
-	    /* press 'Escape' or 'Enter' to keep the existing key binding */
+	    // press 'Escape' or 'Enter' to keep the existing key binding
 	    if (key == KSYM_Escape || key == KSYM_Return)
-	      key = KSYM_UNDEFINED;	/* keep old value */
+	      key = KSYM_UNDEFINED;	// keep old value
 
 	    got_key_event = TRUE;
 	  }
@@ -6618,13 +6618,13 @@ static void drawSetupValue(int screen_pos, int setup_info_pos_raw)
     }
   }
 
-  /* downward compatibility correction for Juergen Bonhagen's menu settings */
+  // downward compatibility correction for Juergen Bonhagen's menu settings
   if (setup_mode != SETUP_MODE_INPUT)
   {
     int max_menu_text_length_big = (menu_screen_value_xpos -
 				    MENU_SCREEN_START_XPOS);
     int max_menu_text_length_medium = max_menu_text_length_big * 2;
-    int check_font_nr = FONT_OPTION_ON; /* known font that needs correction */
+    int check_font_nr = FONT_OPTION_ON; // known font that needs correction
     int font1_xoffset = getFontBitmapInfo(font_nr)->draw_xoffset;
     int font2_xoffset = getFontBitmapInfo(check_font_nr)->draw_xoffset;
     int text_startx = mSX + MENU_SCREEN_START_XPOS * 32;
@@ -6641,8 +6641,8 @@ static void drawSetupValue(int screen_pos, int setup_info_pos_raw)
 	startx + font2_xoffset < text_startx + text_width + text_font_xoffset)
       correct_font_draw_xoffset = TRUE;
 
-    /* check if setup value would overlap with setup text when printed */
-    /* (this can happen for extreme/wrong values for font draw offset) */
+    // check if setup value would overlap with setup text when printed
+    // (this can happen for extreme/wrong values for font draw offset)
     if (correct_font_draw_xoffset)
     {
       font_draw_xoffset_old = getFontBitmapInfo(font_nr)->draw_xoffset;
@@ -6745,21 +6745,21 @@ static struct TokenInfo *getSetupInfoFinal(struct TokenInfo *setup_info_orig)
   int list_pos = 0;
   int i;
 
-  /* determine maximum list size of target list */
+  // determine maximum list size of target list
   while (setup_info_orig[list_size++].type != 0);
 
-  /* free, allocate and clear memory for target list */
+  // free, allocate and clear memory for target list
   checked_free(setup_info_final);
   setup_info_final = checked_calloc(list_size * sizeof(struct TokenInfo));
 
-  /* copy setup info list without setup entries marked as hidden */
+  // copy setup info list without setup entries marked as hidden
   for (i = 0; setup_info_orig[i].type != 0; i++)
   {
-    /* skip setup entries configured to be hidden */
+    // skip setup entries configured to be hidden
     if (hideSetupEntry(setup_info_orig[i].value))
       continue;
 
-    /* skip skippable setup entries if screen is lower than usual */
+    // skip skippable setup entries if screen is lower than usual
     if (SCR_FIELDY < SCR_FIELDY_DEFAULT &&
 	setup_info_orig[i].type == TYPE_SKIPPABLE)
       continue;
@@ -6791,7 +6791,7 @@ static void DrawSetupScreen_Generic(void)
 
   FadeOut(fade_mask);
 
-  /* needed if different viewport properties defined for setup screen */
+  // needed if different viewport properties defined for setup screen
   ChangeViewportPropertiesIfNeeded();
 
   SetMainBackgroundImage(IMG_BACKGROUND_SETUP);
@@ -6871,7 +6871,7 @@ static void DrawSetupScreen_Generic(void)
     title_string = STR_SETUP_SHORTCUTS;
   }
 
-  /* use modified setup info without setup entries marked as hidden */
+  // use modified setup info without setup entries marked as hidden
   setup_info = getSetupInfoFinal(setup_info);
 
   DrawTextSCentered(mSY - SY + 16, FONT_TITLE_1, title_string);
@@ -6930,11 +6930,11 @@ static void DrawSetupScreen_Input(void)
     DrawCursorAndText_Setup(i, -1, FALSE);
   }
 
-  /* create gadgets for setup input menu screen */
+  // create gadgets for setup input menu screen
   FreeScreenGadgets();
   CreateScreenGadgets();
 
-  /* map gadgets for setup input menu screen */
+  // map gadgets for setup input menu screen
   MapScreenMenuGadgets(SCREEN_MASK_INPUT);
 
   HandleSetupScreen_Input(0, 0, 0, 0, MB_MENU_INITIALIZE);
@@ -7095,7 +7095,7 @@ void HandleSetupScreen_Input(int mx, int my, int dx, int dy, int button)
 
     for (i = 0; setup_info_input[i].type != 0; i++)
     {
-      /* adjust menu structure according to skipped setup entries */
+      // adjust menu structure according to skipped setup entries
       if (setup_info_input[i].type == TYPE_SKIPPABLE)
       {
 	pos_empty2--;
@@ -7106,7 +7106,7 @@ void HandleSetupScreen_Input(int mx, int my, int dx, int dy, int button)
 
   if (button == MB_MENU_INITIALIZE)
   {
-    /* input setup menu may have changed size due to graphics configuration */
+    // input setup menu may have changed size due to graphics configuration
     if (choice >= pos_empty1)
       choice = pos_end;
 
@@ -7125,12 +7125,12 @@ void HandleSetupScreen_Input(int mx, int my, int dx, int dy, int button)
     return;
   }
 
-  if (mx || my)		/* mouse input */
+  if (mx || my)		// mouse input
   {
     x = (mx - mSX) / 32;
     y = (my - mSY) / 32 - MENU_SCREEN_START_YPOS;
   }
-  else if (dx || dy)	/* keyboard input */
+  else if (dx || dy)	// keyboard input
   {
     if (dx && choice == 0)
       x = (dx < 0 ? 10 : 12);
@@ -7239,7 +7239,7 @@ static boolean CustomizeKeyboardMain(int player_nr)
     font_nr_new = FONT_VALUE_NARROW;
   }
 
-  /* read existing key bindings from player setup */
+  // read existing key bindings from player setup
   custom_key = setup.input[player_nr].key;
 
   FadeSetEnterMenu();
@@ -7271,7 +7271,7 @@ static boolean CustomizeKeyboardMain(int player_nr)
 	  {
 	    Key key = GetEventKey((KeyEvent *)&event, FALSE);
 
-	    /* press 'Escape' to abort and keep the old key bindings */
+	    // press 'Escape' to abort and keep the old key bindings
 	    if (key == KSYM_Escape)
 	    {
 	      FadeSkipNextFadeIn();
@@ -7281,18 +7281,18 @@ static boolean CustomizeKeyboardMain(int player_nr)
 	      break;
 	    }
 
-	    /* press 'Enter' to keep the existing key binding */
+	    // press 'Enter' to keep the existing key binding
 	    if (key == KSYM_Return)
 	      key = *customize_step[step_nr].key;
 
-	    /* check if key already used */
+	    // check if key already used
 	    for (i = 0; i < step_nr; i++)
 	      if (*customize_step[i].key == key)
 		break;
 	    if (i < step_nr)
 	      break;
 
-	    /* got new key binding */
+	    // got new key binding
 	    *customize_step[step_nr].key = key;
 	    DrawText(mSX + 4 * 32, mSY + (2 + 2 * step_nr + 1) * 32,
 		     "             ", font_nr_new);
@@ -7300,13 +7300,13 @@ static boolean CustomizeKeyboardMain(int player_nr)
 		     getKeyNameFromKey(key), font_nr_new);
 	    step_nr++;
 
-	    /* un-highlight last query */
+	    // un-highlight last query
 	    DrawText(mSX, mSY + (2 + 2 * (step_nr - 1)) * 32,
 		     customize_step[step_nr - 1].text, FONT_MENU_1);
 	    DrawText(mSX, mSY + (2 + 2 * (step_nr - 1) + 1) * 32,
 		     "Key:", FONT_MENU_1);
 
-	    /* all keys configured */
+	    // all keys configured
 	    if (step_nr == 6)
 	    {
 	      finished = TRUE;
@@ -7315,7 +7315,7 @@ static boolean CustomizeKeyboardMain(int player_nr)
 	      break;
 	    }
 
-	    /* query next key binding */
+	    // query next key binding
 	    DrawText(mSX, mSY + (2 + 2 * step_nr) * 32,
 		     customize_step[step_nr].text, FONT_INPUT_1_ACTIVE);
 	    DrawText(mSX, mSY + (2 + 2 * step_nr + 1) * 32,
@@ -7339,7 +7339,7 @@ static boolean CustomizeKeyboardMain(int player_nr)
     BackToFront();
   }
 
-  /* write new key bindings back to player setup, if successfully finished */
+  // write new key bindings back to player setup, if successfully finished
   if (success)
     setup.input[player_nr].key = custom_key;
 
@@ -7375,7 +7375,7 @@ void CustomizeKeyboard(int player_nr)
   DrawSetupScreen_Input();
 }
 
-/* game controller mapping generator by Gabriel Jacobo <gabomdq@gmail.com> */
+// game controller mapping generator by Gabriel Jacobo <gabomdq@gmail.com>
 
 #define MARKER_BUTTON		1
 #define MARKER_AXIS_X		2
@@ -7455,7 +7455,7 @@ static boolean ConfigureJoystickMapButtonsAndAxes(SDL_Joystick *joystick)
   name = getFormattedJoystickName(SDL_JoystickName(joystick));
 
 #if DEBUG_JOYSTICKS
-  /* print info about the joystick we are watching */
+  // print info about the joystick we are watching
   Error(ERR_DEBUG, "watching joystick %d: (%s)\n",
 	SDL_JoystickInstanceID(joystick), name);
   Error(ERR_DEBUG, "joystick has %d axes, %d hats, %d balls, and %d buttons\n",
@@ -7463,16 +7463,16 @@ static boolean ConfigureJoystickMapButtonsAndAxes(SDL_Joystick *joystick)
 	SDL_JoystickNumBalls(joystick), SDL_JoystickNumButtons(joystick));
 #endif
 
-  /* initialize mapping with GUID and name */
+  // initialize mapping with GUID and name
   SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(joystick), temp, sizeof(temp));
 
   snprintf(mapping, sizeof(mapping), "%s,%s,platform:%s,",
 	   temp, name, SDL_GetPlatform());
 
-  /* loop through all steps (buttons and axes), getting joystick events */
+  // loop through all steps (buttons and axes), getting joystick events
   for (i = 0; i < SDL_arraysize(steps) && !done;)
   {
-    Bitmap *marker = button;	/* initialize with reliable default value */
+    Bitmap *marker = button;	// initialize with reliable default value
 
     step = &steps[i];
     strcpy(step->mapping, mapping);
@@ -7649,7 +7649,7 @@ static boolean ConfigureJoystickMapButtonsAndAxes(SDL_Joystick *joystick)
 
 	  case SDL_FINGERDOWN:
 	  case SDL_MOUSEBUTTONDOWN:
-	    /* skip this step */
+	    // skip this step
 	    i++;
 	    next = TRUE;
 
@@ -7661,14 +7661,14 @@ static boolean ConfigureJoystickMapButtonsAndAxes(SDL_Joystick *joystick)
 	    {
 	      if (i == 0)
 	      {
-		/* leave screen */
+		// leave screen
 		success = FALSE;
 		done = TRUE;
 
 		break;
 	      }
 
-	      /* undo this step */
+	      // undo this step
 	      prev_step = &steps[i - 1];
 	      strcpy(mapping, prev_step->mapping);
 	      i--;
@@ -7681,7 +7681,7 @@ static boolean ConfigureJoystickMapButtonsAndAxes(SDL_Joystick *joystick)
 		event.key.keysym.sym == KSYM_Return ||
 		event.key.keysym.sym == KSYM_Menu)
 	    {
-	      /* skip this step */
+	      // skip this step
 	      i++;
 	      next = TRUE;
 
@@ -7690,7 +7690,7 @@ static boolean ConfigureJoystickMapButtonsAndAxes(SDL_Joystick *joystick)
 
 	    if (event.key.keysym.sym == KSYM_Escape)
 	    {
-	      /* leave screen */
+	      // leave screen
 	      success = FALSE;
 	      done = TRUE;
 	    }
@@ -7725,7 +7725,7 @@ static boolean ConfigureJoystickMapButtonsAndAxes(SDL_Joystick *joystick)
     SaveSetup_AddGameControllerMapping(mapping);
   }
 
-  /* wait until the last pending event was removed from event queue */
+  // wait until the last pending event was removed from event queue
   while (NextValidEvent(&event));
 
   return success;
@@ -7879,7 +7879,7 @@ static boolean ConfigureVirtualButtonsMain(void)
 	  {
 	    Key key = GetEventKey((KeyEvent *)&event, FALSE);
 
-	    /* press 'Escape' to abort and keep the old key bindings */
+	    // press 'Escape' to abort and keep the old key bindings
 	    if (key == KSYM_Escape)
 	    {
 	      for (x = 0; x < MAX_GRID_XSIZE; x++)
@@ -7893,7 +7893,7 @@ static boolean ConfigureVirtualButtonsMain(void)
 	      break;
 	    }
 
-	    /* press 'Enter' to keep the existing key binding */
+	    // press 'Enter' to keep the existing key binding
 	    if (key == KSYM_Return ||
 #if defined(TARGET_SDL2)
 		key == KSYM_Menu ||
@@ -7925,7 +7925,7 @@ static boolean ConfigureVirtualButtonsMain(void)
 	      break;
 	    }
 
-	    /* all virtual buttons configured */
+	    // all virtual buttons configured
 	    if (step_nr == 6)
 	    {
 	      finished = TRUE;
@@ -7940,7 +7940,7 @@ static boolean ConfigureVirtualButtonsMain(void)
 
 	    overlay.grid_button_highlight = grid_button[step_nr];
 
-	    /* query next virtual button */
+	    // query next virtual button
 
 	    ClearField();
 
@@ -8225,14 +8225,14 @@ void HandleGameActions(void)
   if (game_status != GAME_MODE_PLAYING)
     return;
 
-  GameActions();	/* main game loop */
+  GameActions();	// main game loop
 
   if (tape.auto_play && !tape.playing)
-    AutoPlayTape();	/* continue automatically playing next tape */
+    AutoPlayTape();	// continue automatically playing next tape
 }
 
 
-/* ---------- new screen button stuff -------------------------------------- */
+// ---------- new screen button stuff --------------------------------------
 
 static void getScreenMenuButtonPos(int *x, int *y, int gadget_id)
 {
@@ -8336,13 +8336,13 @@ static struct
 {
   {
     IMG_MENU_BUTTON_UP, IMG_MENU_BUTTON_UP_ACTIVE,
-    -1, -1,	/* these values are not constant, but can change at runtime */
+    -1, -1,	// these values are not constant, but can change at runtime
     SCREEN_CTRL_ID_SCROLL_UP,
     "scroll up"
   },
   {
     IMG_MENU_BUTTON_DOWN, IMG_MENU_BUTTON_DOWN_ACTIVE,
-    -1, -1,	/* these values are not constant, but can change at runtime */
+    -1, -1,	// these values are not constant, but can change at runtime
     SCREEN_CTRL_ID_SCROLL_DOWN,
     "scroll down"
   }
@@ -8360,8 +8360,8 @@ static struct
 {
   {
     IMG_MENU_SCROLLBAR, IMG_MENU_SCROLLBAR_ACTIVE,
-    -1, -1,	/* these values are not constant, but can change at runtime */
-    -1, -1,	/* these values are not constant, but can change at runtime */
+    -1, -1,	// these values are not constant, but can change at runtime
+    -1, -1,	// these values are not constant, but can change at runtime
     GD_TYPE_SCROLLBAR_VERTICAL,
     SCREEN_CTRL_ID_SCROLL_VERTICAL,
     "scroll level series vertically"
@@ -8381,7 +8381,7 @@ static struct
   {
     IMG_SETUP_INPUT_TEXT,
     SCREEN_CTRL_ID_NETWORK_SERVER,
-    -1, -1,	/* these values are not constant, but can change at runtime */
+    -1, -1,	// these values are not constant, but can change at runtime
     MAX_SETUP_TEXT_INPUT_LEN,
     network_server_hostname,
     "Network Server Hostname / IP"
@@ -8459,7 +8459,7 @@ static void CreateScreenScrollbuttons(void)
   unsigned int event_mask;
   int i;
 
-  /* these values are not constant, but can change at runtime */
+  // these values are not constant, but can change at runtime
   scrollbutton_info[0].x = SC_SCROLL_UP_XPOS;
   scrollbutton_info[0].y = SC_SCROLL_UP_YPOS;
   scrollbutton_info[1].x = SC_SCROLL_DOWN_XPOS;
@@ -8480,7 +8480,7 @@ static void CreateScreenScrollbuttons(void)
     width = SC_SCROLLBUTTON_XSIZE;
     height = SC_SCROLLBUTTON_YSIZE;
 
-    /* correct scrollbar position if placed outside menu (playfield) area */
+    // correct scrollbar position if placed outside menu (playfield) area
     if (x > SX + SC_SCROLL_UP_XPOS)
       x = SX + SC_SCROLL_UP_XPOS;
 
@@ -8525,7 +8525,7 @@ static void CreateScreenScrollbars(void)
 {
   int i;
 
-  /* these values are not constant, but can change at runtime */
+  // these values are not constant, but can change at runtime
   scrollbar_info[0].x = SC_SCROLL_VERTICAL_XPOS;
   scrollbar_info[0].y = SC_SCROLL_VERTICAL_YPOS;
   scrollbar_info[0].width  = SC_SCROLL_VERTICAL_XSIZE;
@@ -8550,7 +8550,7 @@ static void CreateScreenScrollbars(void)
     width  = scrollbar_info[i].width;
     height = scrollbar_info[i].height;
 
-    /* correct scrollbar position if placed outside menu (playfield) area */
+    // correct scrollbar position if placed outside menu (playfield) area
     if (x > SX + SC_SCROLL_VERTICAL_XPOS)
       x = SX + SC_SCROLL_VERTICAL_XPOS;
 

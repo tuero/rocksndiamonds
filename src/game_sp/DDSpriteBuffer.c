@@ -19,7 +19,7 @@ static void Blt(int pX, int pY, Bitmap *bitmap, int SpriteX, int SpriteY)
   if (NoDisplayFlag)
     return;
 
-  /* do not draw fields that are outside the visible screen area */
+  // do not draw fields that are outside the visible screen area
   if (pX < sx1 || pX > sx2 || pY < sy1 || pY > sy2)
     return;
 

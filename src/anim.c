@@ -18,11 +18,11 @@
 #include "screens.h"
 
 
-/* values for global toon animation definition */
+// values for global toon animation definition
 #define NUM_GLOBAL_TOON_ANIMS		1
 #define NUM_GLOBAL_TOON_PARTS		MAX_NUM_TOONS
 
-/* values for global animation definition (including toons) */
+// values for global animation definition (including toons)
 #define NUM_GLOBAL_ANIMS_AND_TOONS	(NUM_GLOBAL_ANIMS +		\
 					 NUM_GLOBAL_TOON_ANIMS)
 #define NUM_GLOBAL_ANIM_PARTS_AND_TOONS	MAX(NUM_GLOBAL_ANIM_PARTS_ALL,	\
@@ -58,13 +58,13 @@
 					 ANIM_CLASS_MENU  |	\
 					 ANIM_CLASS_SUBMENU)
 
-/* values for global animation states */
+// values for global animation states
 #define ANIM_STATE_INACTIVE		0
 #define ANIM_STATE_RESTART		(1 << 0)
 #define ANIM_STATE_WAITING		(1 << 1)
 #define ANIM_STATE_RUNNING		(1 << 2)
 
-/* values for global animation control */
+// values for global animation control
 #define ANIM_NO_ACTION			0
 #define ANIM_START			1
 #define ANIM_CONTINUE			2
@@ -195,7 +195,7 @@ struct AnimClassGameMode
   { -1,					-1				}
 };
 
-/* forward declaration for internal use */
+// forward declaration for internal use
 static void HandleGlobalAnim(int, int);
 static void DoAnimationExt(void);
 static void ResetGlobalAnim_Clickable(void);
@@ -215,9 +215,9 @@ static int anim_classes_last = ANIM_CLASS_NONE;
 static boolean drawing_to_fading_buffer = FALSE;
 
 
-/* ========================================================================= */
-/* generic animation frame calculation                                       */
-/* ========================================================================= */
+// ============================================================================
+// generic animation frame calculation
+// ============================================================================
 
 int getAnimationFrame(int num_frames, int delay, int mode, int start_frame,
 		      int sync_frame)
@@ -226,34 +226,34 @@ int getAnimationFrame(int num_frames, int delay, int mode, int start_frame,
 
   sync_frame += start_frame * delay;
 
-  if (mode & ANIM_LOOP)			/* looping animation */
+  if (mode & ANIM_LOOP)			// looping animation
   {
     frame = (sync_frame % (delay * num_frames)) / delay;
   }
-  else if (mode & ANIM_LINEAR)		/* linear (non-looping) animation */
+  else if (mode & ANIM_LINEAR)		// linear (non-looping) animation
   {
     frame = sync_frame / delay;
 
     if (frame > num_frames - 1)
       frame = num_frames - 1;
   }
-  else if (mode & ANIM_PINGPONG)	/* oscillate (border frames once) */
+  else if (mode & ANIM_PINGPONG)	// oscillate (border frames once)
   {
     int max_anim_frames = (num_frames > 1 ? 2 * num_frames - 2 : 1);
 
     frame = (sync_frame % (delay * max_anim_frames)) / delay;
     frame = (frame < num_frames ? frame : max_anim_frames - frame);
   }
-  else if (mode & ANIM_PINGPONG2)	/* oscillate (border frames twice) */
+  else if (mode & ANIM_PINGPONG2)	// oscillate (border frames twice)
   {
     int max_anim_frames = 2 * num_frames;
 
     frame = (sync_frame % (delay * max_anim_frames)) / delay;
     frame = (frame < num_frames ? frame : max_anim_frames - frame - 1);
   }
-  else if (mode & ANIM_RANDOM)		/* play frames in random order */
+  else if (mode & ANIM_RANDOM)		// play frames in random order
   {
-    /* note: expect different frames for the same delay cycle! */
+    // note: expect different frames for the same delay cycle!
 
     if (gfx.anim_random_frame < 0)
       frame = GetSimpleRandom(num_frames);
@@ -265,16 +265,16 @@ int getAnimationFrame(int num_frames, int delay, int mode, int start_frame,
     frame = sync_frame % num_frames;
   }
 
-  if (mode & ANIM_REVERSE)		/* use reverse animation direction */
+  if (mode & ANIM_REVERSE)		// use reverse animation direction
     frame = num_frames - frame - 1;
 
   return frame;
 }
 
 
-/* ========================================================================= */
-/* global animation functions                                                */
-/* ========================================================================= */
+// ============================================================================
+// global animation functions
+// ============================================================================
 
 static int getGlobalAnimationPart(struct GlobalAnimMainControlInfo *anim)
 {
@@ -530,12 +530,12 @@ static void InitGlobalAnimControls(void)
 
   InitToonControls();
 
-  /* sort all animations according to draw_order and animation number */
+  // sort all animations according to draw_order and animation number
   for (m = 0; m < NUM_GAME_MODES; m++)
   {
     struct GlobalAnimControlInfo *ctrl = &global_anim_ctrl[m];
 
-    /* sort all main animations for this game mode */
+    // sort all main animations for this game mode
     qsort(ctrl->anim, ctrl->num_anims,
 	  sizeof(struct GlobalAnimMainControlInfo),
 	  compareGlobalAnimMainControlInfo);
@@ -544,7 +544,7 @@ static void InitGlobalAnimControls(void)
     {
       struct GlobalAnimMainControlInfo *anim = &ctrl->anim[a];
 
-      /* sort all animation parts for this main animation */
+      // sort all animation parts for this main animation
       qsort(anim->part, anim->num_parts,
 	    sizeof(struct GlobalAnimPartControlInfo),
 	    compareGlobalAnimPartControlInfo);
@@ -1662,7 +1662,7 @@ boolean HandleGlobalAnimClicks(int mx, int my, int button)
   boolean release_event;
   boolean click_consumed_current = click_consumed;
 
-  /* check if button state has changed since last invocation */
+  // check if button state has changed since last invocation
   press_event   = (button != 0 && last_button == 0);
   release_event = (button == 0 && last_button != 0);
   last_button = button;

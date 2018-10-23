@@ -10,4 +10,4 @@
 
 void subProcessKeyboardInput(byte);
 
-#endif /* INPUT_H */
+#endif // INPUT_H

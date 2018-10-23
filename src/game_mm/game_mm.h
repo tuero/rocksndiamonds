@@ -16,4 +16,4 @@
 
 #include "export.h"
 
-#endif	/* GAME_MM_H */
+#endif	// GAME_MM_H

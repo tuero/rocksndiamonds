@@ -23,11 +23,11 @@
 #include "screens.h"
 
 
-/* select level set with EMC X11 graphics before activating EM GFX debugging */
+// select level set with EMC X11 graphics before activating EM GFX debugging
 #define DEBUG_EM_GFX		FALSE
 #define DEBUG_FRAME_TIME	FALSE
 
-/* tool button identifiers */
+// tool button identifiers
 #define TOOL_CTRL_ID_YES	0
 #define TOOL_CTRL_ID_NO		1
 #define TOOL_CTRL_ID_CONFIRM	2
@@ -38,7 +38,7 @@
 
 #define NUM_TOOL_BUTTONS	7
 
-/* constants for number of doors and door parts */
+// constants for number of doors and door parts
 #define NUM_DOORS		2
 #define NUM_PANELS		NUM_DOORS
 // #define NUM_PANELS		0
@@ -165,7 +165,7 @@ static struct DoorPartControlInfo door_part_controls[] =
 };
 
 
-/* forward declaration for internal use */
+// forward declaration for internal use
 static void UnmapToolButtons(void);
 static void HandleToolButtons(struct GadgetInfo *);
 static int el_act_dir2crm(int, int, int);
@@ -466,7 +466,7 @@ void SetDrawtoField(int mode)
 
     drawto_field = fieldbuffer;
   }
-  else	/* DRAW_TO_BACKBUFFER */
+  else	// DRAW_TO_BACKBUFFER
   {
     FX = SX;
     FY = SY;
@@ -559,7 +559,7 @@ static void DrawMaskedBorderExt_DOOR_2(int draw_target)
 
 static void DrawMaskedBorderExt_DOOR_3(int draw_target)
 {
-  /* currently not available */
+  // currently not available
 }
 
 static void DrawMaskedBorderExt_ALL(int draw_target)
@@ -572,7 +572,7 @@ static void DrawMaskedBorderExt_ALL(int draw_target)
 
 static void DrawMaskedBorderExt(int redraw_mask, int draw_target)
 {
-  /* never draw masked screen borders on borderless screens */
+  // never draw masked screen borders on borderless screens
   if (global.border_status == GAME_MODE_LOADING ||
       global.border_status == GAME_MODE_TITLE)
     return;
@@ -719,20 +719,20 @@ static void DrawFramesPerSecond(void)
   int draw_deactivation_mask = GetDrawDeactivationMask();
   boolean draw_masked = (draw_deactivation_mask == REDRAW_NONE);
 
-  /* draw FPS with leading space (needed if field buffer deactivated) */
+  // draw FPS with leading space (needed if field buffer deactivated)
   sprintf(text, " %04.1f fps", global.frames_per_second);
 
-  /* override draw deactivation mask (required for invisible warp mode) */
+  // override draw deactivation mask (required for invisible warp mode)
   SetDrawDeactivationMask(REDRAW_NONE);
 
-  /* draw opaque FPS if field buffer deactivated, else draw masked FPS */
+  // draw opaque FPS if field buffer deactivated, else draw masked FPS
   DrawTextExt(backbuffer, SX + SXSIZE - font_width * strlen(text), SY, text,
 	      font_nr, (draw_masked ? BLIT_MASKED : BLIT_OPAQUE));
 
-  /* set draw deactivation mask to previous value */
+  // set draw deactivation mask to previous value
   SetDrawDeactivationMask(draw_deactivation_mask);
 
-  /* force full-screen redraw in this frame */
+  // force full-screen redraw in this frame
   redraw_mask = REDRAW_ALL;
 }
 
@@ -906,7 +906,7 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
   {
     if (fade_type_skip != FADE_TYPE_NONE)
     {
-      /* skip all fade operations until specified fade operation */
+      // skip all fade operations until specified fade operation
       if (fade_type & fade_type_skip)
 	fade_type_skip = FADE_TYPE_NONE;
 
@@ -931,7 +931,7 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
 
   if (fade_type_skip != FADE_TYPE_NONE)
   {
-    /* skip all fade operations until specified fade operation */
+    // skip all fade operations until specified fade operation
     if (fade_type & fade_type_skip)
       fade_type_skip = FADE_TYPE_NONE;
 
@@ -951,11 +951,11 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
     height = FADE_SYSIZE;
 
     if (border.draw_masked_when_fading)
-      draw_border_function = DrawMaskedBorder_FIELD;	/* update when fading */
+      draw_border_function = DrawMaskedBorder_FIELD;	// update when fading
     else
-      DrawMaskedBorder_FIELD();				/* draw once */
+      DrawMaskedBorder_FIELD();				// draw once
   }
-  else		/* REDRAW_ALL */
+  else		// REDRAW_ALL
   {
     x = 0;
     y = 0;
@@ -1090,21 +1090,21 @@ void FadeSetEnterMenu(void)
 {
   fading = menu.enter_menu;
 
-  FadeSetLeaveNext(fading, TRUE);	/* (keep same fade mode) */
+  FadeSetLeaveNext(fading, TRUE);	// (keep same fade mode)
 }
 
 void FadeSetLeaveMenu(void)
 {
   fading = menu.leave_menu;
 
-  FadeSetLeaveNext(fading, TRUE);	/* (keep same fade mode) */
+  FadeSetLeaveNext(fading, TRUE);	// (keep same fade mode)
 }
 
 void FadeSetEnterScreen(void)
 {
   fading = menu.enter_screen[game_status];
 
-  FadeSetLeaveNext(menu.leave_screen[game_status], TRUE);	/* store */
+  FadeSetLeaveNext(menu.leave_screen[game_status], TRUE);	// store
 }
 
 void FadeSetNextScreen(void)
@@ -1112,12 +1112,12 @@ void FadeSetNextScreen(void)
   fading = menu.next_screen[game_status];
 
   // (do not overwrite fade mode set by FadeSetEnterScreen)
-  // FadeSetLeaveNext(fading, TRUE);	/* (keep same fade mode) */
+  // FadeSetLeaveNext(fading, TRUE);	// (keep same fade mode)
 }
 
 void FadeSetLeaveScreen(void)
 {
-  FadeSetLeaveNext(menu.leave_screen[game_status], FALSE);	/* recall */
+  FadeSetLeaveNext(menu.leave_screen[game_status], FALSE);	// recall
 }
 
 void FadeSetFromType(int type)
@@ -1225,7 +1225,7 @@ void SetPanelBackground(void)
 
 void DrawBackground(int x, int y, int width, int height)
 {
-  /* "drawto" might still point to playfield buffer here (hall of fame) */
+  // "drawto" might still point to playfield buffer here (hall of fame)
   ClearRectangleOnBackground(backbuffer, x, y, width, height);
 
   if (IN_GFX_FIELD_FULL(x, y))
@@ -1423,11 +1423,11 @@ void ClearField(void)
 {
   RedrawGlobalBorderIfNeeded();
 
-  /* !!! "drawto" might still point to playfield buffer here (see above) !!! */
-  /* (when entering hall of fame after playing) */
+  // !!! "drawto" might still point to playfield buffer here (see above) !!!
+  // (when entering hall of fame after playing)
   DrawBackground(REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE);
 
-  /* !!! maybe this should be done before clearing the background !!! */
+  // !!! maybe this should be done before clearing the background !!!
   if (game_status == GAME_MODE_PLAYING)
   {
     ClearRectangle(fieldbuffer, 0, 0, FXSIZE, FYSIZE);
@@ -1450,7 +1450,7 @@ void SetBorderElement(void)
 
   BorderElement = EL_EMPTY;
 
-  /* the MM game engine does not use a visible border element */
+  // the MM game engine does not use a visible border element
   if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
     return;
 
@@ -1477,7 +1477,7 @@ void FloodFillLevelExt(int from_x, int from_y, int fill_element,
   static int check[4][2] = { { -1, 0 }, { 0, -1 }, { 1, 0 }, { 0, 1 } };
   static int safety = 0;
 
-  /* check if starting field still has the desired content */
+  // check if starting field still has the desired content
   if (field[from_x][from_y] == fill_element)
     return;
 
@@ -1518,7 +1518,7 @@ void SetRandomAnimationValue(int x, int y)
 
 int getGraphicAnimationFrame(int graphic, int sync_frame)
 {
-  /* animation synchronized with global frame counter, not move position */
+  // animation synchronized with global frame counter, not move position
   if (graphic_info[graphic].anim_global_sync || sync_frame < 0)
     sync_frame = FrameCounter;
 
@@ -1549,7 +1549,7 @@ void getGraphicSourceXY(int graphic, int frame, int *x, int *y,
   int src_x = g->src_x + (get_backside ? g->offset2_x : 0);
   int src_y = g->src_y + (get_backside ? g->offset2_y : 0);
 
-  if (g->offset_y == 0)		/* frames are ordered horizontally */
+  if (g->offset_y == 0)		// frames are ordered horizontally
   {
     int max_width = g->anim_frames_per_line * g->width;
     int pos = (src_y / g->height) * max_width + src_x + frame * g->offset_x;
@@ -1557,7 +1557,7 @@ void getGraphicSourceXY(int graphic, int frame, int *x, int *y,
     *x = pos % max_width;
     *y = src_y % g->height + pos / max_width * g->height;
   }
-  else if (g->offset_x == 0)	/* frames are ordered vertically */
+  else if (g->offset_x == 0)	// frames are ordered vertically
   {
     int max_height = g->anim_frames_per_line * g->height;
     int pos = (src_x / g->width) * max_height + src_y + frame * g->offset_y;
@@ -1565,7 +1565,7 @@ void getGraphicSourceXY(int graphic, int frame, int *x, int *y,
     *x = src_x % g->width + pos / max_height * g->width;
     *y = pos % max_height;
   }
-  else				/* frames are ordered diagonally */
+  else				// frames are ordered diagonally
   {
     *x = src_x + frame * g->offset_x;
     *y = src_y + frame * g->offset_y;
@@ -1793,35 +1793,35 @@ static void DrawGraphicShiftedNormal(int x, int y, int dx, int dy,
   int width = TILEX, height = TILEY;
   int cx = 0, cy = 0;
 
-  if (dx || dy)			/* shifted graphic */
+  if (dx || dy)			// shifted graphic
   {
-    if (x < BX1)		/* object enters playfield from the left */
+    if (x < BX1)		// object enters playfield from the left
     {
       x = BX1;
       width = dx;
       cx = TILEX - dx;
       dx = 0;
     }
-    else if (x > BX2)		/* object enters playfield from the right */
+    else if (x > BX2)		// object enters playfield from the right
     {
       x = BX2;
       width = -dx;
       dx = TILEX + dx;
     }
-    else if (x == BX1 && dx < 0) /* object leaves playfield to the left */
+    else if (x == BX1 && dx < 0) // object leaves playfield to the left
     {
       width += dx;
       cx = -dx;
       dx = 0;
     }
-    else if (x == BX2 && dx > 0) /* object leaves playfield to the right */
+    else if (x == BX2 && dx > 0) // object leaves playfield to the right
       width -= dx;
-    else if (dx)		/* general horizontal movement */
+    else if (dx)		// general horizontal movement
       MarkTileDirty(x + SIGN(dx), y);
 
-    if (y < BY1)		/* object enters playfield from the top */
+    if (y < BY1)		// object enters playfield from the top
     {
-      if (cut_mode == CUT_BELOW) /* object completely above top border */
+      if (cut_mode == CUT_BELOW) // object completely above top border
 	return;
 
       y = BY1;
@@ -1829,13 +1829,13 @@ static void DrawGraphicShiftedNormal(int x, int y, int dx, int dy,
       cy = TILEY - dy;
       dy = 0;
     }
-    else if (y > BY2)		/* object enters playfield from the bottom */
+    else if (y > BY2)		// object enters playfield from the bottom
     {
       y = BY2;
       height = -dy;
       dy = TILEY + dy;
     }
-    else if (y == BY1 && dy < 0) /* object leaves playfield to the top */
+    else if (y == BY1 && dy < 0) // object leaves playfield to the top
     {
       height += dy;
       cy = -dy;
@@ -1843,17 +1843,17 @@ static void DrawGraphicShiftedNormal(int x, int y, int dx, int dy,
     }
     else if (dy > 0 && cut_mode == CUT_ABOVE)
     {
-      if (y == BY2)		/* object completely above bottom border */
+      if (y == BY2)		// object completely above bottom border
 	return;
 
       height = dy;
       cy = TILEY - dy;
       dy = TILEY;
       MarkTileDirty(x, y + 1);
-    }				/* object leaves playfield to the bottom */
+    }				// object leaves playfield to the bottom
     else if (dy > 0 && (y == BY2 || cut_mode == CUT_BELOW))
       height -= dy;
-    else if (dy)		/* general vertical movement */
+    else if (dy)		// general vertical movement
       MarkTileDirty(x, y + SIGN(dy));
   }
 
@@ -1912,17 +1912,17 @@ static void DrawGraphicShiftedDouble(int x, int y, int dx, int dy,
   int anim_pos = (dx ? ABS(dx) : ABS(dy));
   int anim_frames = graphic_info[graphic].anim_frames;
 
-  /* (we also need anim_delay here for movement animations with less frames) */
+  // (we also need anim_delay here for movement animations with less frames)
   int anim_delay = graphic_info[graphic].anim_delay;
   int sync_frame = anim_pos * anim_frames * anim_delay / TILESIZE;
 
-  boolean draw_start_tile = (cut_mode != CUT_ABOVE);	/* only for falling! */
-  boolean draw_end_tile   = (cut_mode != CUT_BELOW);	/* only for falling! */
+  boolean draw_start_tile = (cut_mode != CUT_ABOVE);	// only for falling!
+  boolean draw_end_tile   = (cut_mode != CUT_BELOW);	// only for falling!
 
-  /* re-calculate animation frame for two-tile movement animation */
+  // re-calculate animation frame for two-tile movement animation
   frame = getGraphicAnimationFrame(graphic, sync_frame);
 
-  /* check if movement start graphic inside screen area and should be drawn */
+  // check if movement start graphic inside screen area and should be drawn
   if (draw_start_tile && IN_SCR_FIELD(x1, y1))
   {
     getGraphicSourceExt(graphic, frame, &src_bitmap, &src_x, &src_y, TRUE);
@@ -1940,7 +1940,7 @@ static void DrawGraphicShiftedDouble(int x, int y, int dx, int dy,
     MarkTileDirty(x1, y1);
   }
 
-  /* check if movement end graphic inside screen area and should be drawn */
+  // check if movement end graphic inside screen area and should be drawn
   if (draw_end_tile && IN_SCR_FIELD(x2, y2))
   {
     getGraphicSourceExt(graphic, frame, &src_bitmap, &src_x, &src_y, FALSE);
@@ -1970,7 +1970,7 @@ static void DrawGraphicShifted(int x, int y, int dx, int dy,
     return;
   }
 
-  if (graphic_info[graphic].double_movement)	/* EM style movement images */
+  if (graphic_info[graphic].double_movement)	// EM style movement images
     DrawGraphicShiftedDouble(x, y, dx, dy, graphic, frame, cut_mode,mask_mode);
   else
     DrawGraphicShiftedNormal(x, y, dx, dy, graphic, frame, cut_mode,mask_mode);
@@ -1996,14 +1996,14 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
     graphic = el_act_dir2img(element, GfxAction[lx][ly], GfxDir[lx][ly]);
     frame = getGraphicAnimationFrame(graphic, GfxFrame[lx][ly]);
 
-    /* do not use double (EM style) movement graphic when not moving */
+    // do not use double (EM style) movement graphic when not moving
     if (graphic_info[graphic].double_movement && !dx && !dy)
     {
       graphic = el_act_dir2img(element, ACTION_DEFAULT, GfxDir[lx][ly]);
       frame = getGraphicAnimationFrame(graphic, GfxFrame[lx][ly]);
     }
   }
-  else	/* border element */
+  else	// border element
   {
     graphic = el2img(element);
     frame = getGraphicAnimationFrame(graphic, -1);
@@ -2070,7 +2070,7 @@ void DrawLevelFieldThruMask(int x, int y)
   DrawLevelElementExt(x, y, 0, 0, Feld[x][y], NO_CUTTING, USE_MASKING);
 }
 
-/* !!! implementation of quicksand is totally broken !!! */
+// !!! implementation of quicksand is totally broken !!!
 #define IS_CRUMBLED_TILE(x, y, e)					\
 	(GFX_CRUMBLED(e) && (!IN_LEV_FIELD(x, y) ||			\
 			     !IS_MOVING(x, y) ||			\
@@ -2101,17 +2101,17 @@ static void DrawLevelFieldCrumbledInnerCorners(int x, int y, int dx, int dy,
     int element = (IN_LEV_FIELD(xx, yy) ? TILE_GFX_ELEMENT(xx, yy) :
 		   BorderElement);
 
-    /* check if neighbour field is of same crumble type */
+    // check if neighbour field is of same crumble type
     boolean same = (IS_CRUMBLED_TILE(xx, yy, element) &&
 		    graphic_info[graphic].class ==
 		    graphic_info[el_act2crm(element, ACTION_DEFAULT)].class);
 
-    /* return if check prevents inner corner */
+    // return if check prevents inner corner
     if (same == (dxx == dx && dyy == dy))
       return;
   }
 
-  /* if we reach this point, we have an inner corner */
+  // if we reach this point, we have an inner corner
 
   getGraphicSource(graphic, 1, &src_bitmap, &src_x, &src_y);
 
@@ -2140,7 +2140,7 @@ static void DrawLevelFieldCrumbledBorders(int x, int y, int graphic, int frame,
 
   getGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
 
-  /* draw simple, sloppy, non-corner-accurate crumbled border */
+  // draw simple, sloppy, non-corner-accurate crumbled border
 
   width  = (dir == 1 || dir == 2 ? crumbled_border_size_var : TILESIZE_VAR);
   height = (dir == 0 || dir == 3 ? crumbled_border_size_var : TILESIZE_VAR);
@@ -2151,12 +2151,12 @@ static void DrawLevelFieldCrumbledBorders(int x, int y, int graphic, int frame,
 	     FX + sx * TILEX_VAR + cx,
 	     FY + sy * TILEY_VAR + cy);
 
-  /* (remaining middle border part must be at least as big as corner part) */
+  // (remaining middle border part must be at least as big as corner part)
   if (!(graphic_info[graphic].style & STYLE_ACCURATE_BORDERS) ||
       crumbled_border_size_var >= TILESIZE_VAR / 3)
     return;
 
-  /* correct corners of crumbled border, if needed */
+  // correct corners of crumbled border, if needed
 
   for (i = -1; i <= 1; i += 2)
   {
@@ -2165,12 +2165,12 @@ static void DrawLevelFieldCrumbledBorders(int x, int y, int graphic, int frame,
     int element = (IN_LEV_FIELD(xx, yy) ? TILE_GFX_ELEMENT(xx, yy) :
 		   BorderElement);
 
-    /* check if neighbour field is of same crumble type */
+    // check if neighbour field is of same crumble type
     if (IS_CRUMBLED_TILE(xx, yy, element) &&
 	graphic_info[graphic].class ==
 	graphic_info[el_act2crm(element, ACTION_DEFAULT)].class)
     {
-      /* no crumbled corner, but continued crumbled border */
+      // no crumbled corner, but continued crumbled border
 
       int c1 = (dir == 2 || dir == 3 ? crumbled_border_pos_var : 0);
       int c2 = (i == 1 ? crumbled_border_pos_var : 0);
@@ -2221,12 +2221,12 @@ static void DrawLevelFieldCrumbledExt(int x, int y, int graphic, int frame)
 
   element = TILE_GFX_ELEMENT(x, y);
 
-  if (IS_CRUMBLED_TILE(x, y, element))		/* crumble field itself */
+  if (IS_CRUMBLED_TILE(x, y, element))		// crumble field itself
   {
     if (!IN_SCR_FIELD(sx, sy))
       return;
 
-    /* crumble field borders towards direct neighbour fields */
+    // crumble field borders towards direct neighbour fields
     for (i = 0; i < 4; i++)
     {
       int xx = x + xy[i][0];
@@ -2235,7 +2235,7 @@ static void DrawLevelFieldCrumbledExt(int x, int y, int graphic, int frame)
       element = (IN_LEV_FIELD(xx, yy) ? TILE_GFX_ELEMENT(xx, yy) :
 		 BorderElement);
 
-      /* check if neighbour field is of same crumble type */
+      // check if neighbour field is of same crumble type
       if (IS_CRUMBLED_TILE(xx, yy, element) &&
 	  graphic_info[graphic].class ==
 	  graphic_info[el_act2crm(element, ACTION_DEFAULT)].class)
@@ -2244,7 +2244,7 @@ static void DrawLevelFieldCrumbledExt(int x, int y, int graphic, int frame)
       DrawLevelFieldCrumbledBorders(x, y, graphic, frame, i);
     }
 
-    /* crumble inner field corners towards corner neighbour fields */
+    // crumble inner field corners towards corner neighbour fields
     if ((graphic_info[graphic].style & STYLE_INNER_CORNERS) &&
 	graphic_info[graphic].anim_frames == 2)
     {
@@ -2259,9 +2259,9 @@ static void DrawLevelFieldCrumbledExt(int x, int y, int graphic, int frame)
 
     MarkTileDirty(sx, sy);
   }
-  else		/* center field is not crumbled -- crumble neighbour fields */
+  else		// center field is not crumbled -- crumble neighbour fields
   {
-    /* crumble field borders of direct neighbour fields */
+    // crumble field borders of direct neighbour fields
     for (i = 0; i < 4; i++)
     {
       int xx = x + xy[i][0];
@@ -2288,7 +2288,7 @@ static void DrawLevelFieldCrumbledExt(int x, int y, int graphic, int frame)
       MarkTileDirty(sxx, syy);
     }
 
-    /* crumble inner field corners of corner neighbour fields */
+    // crumble inner field corners of corner neighbour fields
     for (i = 0; i < 4; i++)
     {
       int dx = (i & 1 ? +1 : -1);
@@ -2367,7 +2367,7 @@ void DrawLevelFieldCrumbledNeighbours(int x, int y)
   };
   int i;
 
-  /* crumble direct neighbour fields (required for field borders) */
+  // crumble direct neighbour fields (required for field borders)
   for (i = 0; i < 4; i++)
   {
     int xx = x + xy[i][0];
@@ -2384,7 +2384,7 @@ void DrawLevelFieldCrumbledNeighbours(int x, int y)
     DrawLevelField(xx, yy);
   }
 
-  /* crumble corner neighbour fields (required for inner field corners) */
+  // crumble corner neighbour fields (required for inner field corners)
   for (i = 0; i < 4; i++)
   {
     int dx = (i & 1 ? +1 : -1);
@@ -2823,7 +2823,7 @@ void ShowEnvelope(int envelope_nr)
   int main_anim_mode = (anim_mode == ANIM_NONE ? ANIM_VERTICAL|ANIM_HORIZONTAL:
 			anim_mode == ANIM_DEFAULT ? ANIM_VERTICAL : anim_mode);
 
-  game.envelope_active = TRUE;	/* needed for RedrawPlayfield() events */
+  game.envelope_active = TRUE;	// needed for RedrawPlayfield() events
 
   PlayMenuSoundStereo(sound_opening, SOUND_MIDDLE);
 
@@ -2988,7 +2988,7 @@ static void DrawEnvelopeRequest(char *text)
 				  x, y, x_steps, y_steps,
 				  tile_size, tile_size);
 
-  /* force DOOR font inside door area */
+  // force DOOR font inside door area
   SetFontStatus(GAME_MODE_PSEUDO_DOOR);
 
   DrawTextBuffer(sx + sx_offset, sy + sy_offset, text_final, font_nr,
@@ -3099,8 +3099,8 @@ static void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
   int graphic = IMG_BACKGROUND_REQUEST;
   int sound_opening = SND_REQUEST_OPENING;
   int sound_closing = SND_REQUEST_CLOSING;
-  int anim_mode_1 = request.anim_mode;			/* (higher priority) */
-  int anim_mode_2 = graphic_info[graphic].anim_mode;	/* (lower priority) */
+  int anim_mode_1 = request.anim_mode;			// (higher priority)
+  int anim_mode_2 = graphic_info[graphic].anim_mode;	// (lower priority)
   int anim_mode = (anim_mode_1 != ANIM_DEFAULT ? anim_mode_1 : anim_mode_2);
   int main_anim_mode = (anim_mode == ANIM_NONE ? ANIM_VERTICAL|ANIM_HORIZONTAL:
 			anim_mode == ANIM_DEFAULT ? ANIM_VERTICAL : anim_mode);
@@ -3136,7 +3136,7 @@ static void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
     DrawEnvelopeRequest(text);
   }
 
-  game.envelope_active = TRUE;	/* needed for RedrawPlayfield() events */
+  game.envelope_active = TRUE;	// needed for RedrawPlayfield() events
 
   if (action == ACTION_OPENING)
   {
@@ -3391,7 +3391,7 @@ static void DrawPreviewLevelExt(boolean restart)
     DrawPreviewLevelInfo(MICROLABEL_LEVEL_NAME);
     DrawPreviewLevelInfo(MICROLABEL_LEVEL_AUTHOR);
 
-    /* initialize delay counters */
+    // initialize delay counters
     DelayReached(&scroll_delay, 0);
     DelayReached(&label_delay, 0);
 
@@ -3415,7 +3415,7 @@ static void DrawPreviewLevelExt(boolean restart)
     return;
   }
 
-  /* scroll preview level, if needed */
+  // scroll preview level, if needed
   if (preview.anim_mode != ANIM_NONE &&
       (level_xsize > preview.xsize || level_ysize > preview.ysize) &&
       DelayReached(&scroll_delay, scroll_delay_value))
@@ -3471,8 +3471,8 @@ static void DrawPreviewLevelExt(boolean restart)
     DrawPreviewLevelPlayfield(from_x, from_y);
   }
 
-  /* !!! THIS ALL SUCKS -- SHOULD BE CLEANLY REWRITTEN !!! */
-  /* redraw micro level label, if needed */
+  // !!! THIS ALL SUCKS -- SHOULD BE CLEANLY REWRITTEN !!!
+  // redraw micro level label, if needed
   if (!strEqual(level.name, NAMELESS_LEVEL_NAME) &&
       !strEqual(level.author, ANONYMOUS_NAME) &&
       !strEqual(level.author, leveldir_current->name) &&
@@ -3528,7 +3528,7 @@ static void DrawPreviewPlayers(void)
   for (i = 0; i < MAX_PLAYERS; i++)
     player_found[i] = FALSE;
 
-  /* check which players can be found in the level (simple approach) */
+  // check which players can be found in the level (simple approach)
   for (x = 0; x < lev_fieldx; x++)
   {
     for (y = 0; y < lev_fieldy; y++)
@@ -3565,15 +3565,15 @@ static void DrawPreviewPlayers(void)
   int xpos = SX + ALIGNED_XPOS(pos->x, all_players_width,  pos->align);
   int ypos = SY + ALIGNED_YPOS(pos->y, all_players_height, pos->valign);
 
-  /* clear area in which the players will be drawn */
+  // clear area in which the players will be drawn
   ClearRectangleOnBackground(drawto, max_xpos, max_ypos,
 			     max_players_width, max_players_height);
 
-  /* only draw players if level is suited for team mode */
+  // only draw players if level is suited for team mode
   if (num_players < 2)
     return;
 
-  /* draw all players that were found in the level */
+  // draw all players that were found in the level
   for (i = 0; i < MAX_PLAYERS; i++)
   {
     if (player_found[i])
@@ -3649,7 +3649,7 @@ static void DrawNetworkPlayersExt(boolean force)
   ClearRectangleOnBackground(drawto, max_xpos, max_ypos,
 			     max_players_width, max_players_height);
 
-  /* first draw local network player ... */
+  // first draw local network player ...
   for (i = 0; i < MAX_PLAYERS; i++)
   {
     if (stored_player[i].connected_network &&
@@ -3665,7 +3665,7 @@ static void DrawNetworkPlayersExt(boolean force)
     }
   }
 
-  /* ... then draw all other network players */
+  // ... then draw all other network players
   for (i = 0; i < MAX_PLAYERS; i++)
   {
     if (stored_player[i].connected_network &&
@@ -3796,14 +3796,14 @@ static int getPlayerGraphic(struct PlayerInfo *player, int move_dir)
 {
   if (player->use_murphy)
   {
-    /* this works only because currently only one player can be "murphy" ... */
+    // this works only because currently only one player can be "murphy" ...
     static int last_horizontal_dir = MV_LEFT;
     int graphic = el_act_dir2img(EL_SP_MURPHY, player->GfxAction, move_dir);
 
     if (move_dir == MV_LEFT || move_dir == MV_RIGHT)
       last_horizontal_dir = move_dir;
 
-    if (graphic == IMG_SP_MURPHY)	/* undefined => use special graphic */
+    if (graphic == IMG_SP_MURPHY)	// undefined => use special graphic
     {
       int direction = (player->is_snapping ? move_dir : last_horizontal_dir);
 
@@ -3904,9 +3904,9 @@ void DrawPlayer(struct PlayerInfo *player)
 
   InitPlayerGfxAnimation(player, action, move_dir);
 
-  /* ----------------------------------------------------------------------- */
-  /* draw things in the field the player is leaving, if needed               */
-  /* ----------------------------------------------------------------------- */
+  // --------------------------------------------------------------------------
+  // draw things in the field the player is leaving, if needed
+  // --------------------------------------------------------------------------
 
   if (player->is_moving)
   {
@@ -3944,9 +3944,9 @@ void DrawPlayer(struct PlayerInfo *player)
   if (!IN_SCR_FIELD(sx, sy))
     return;
 
-  /* ----------------------------------------------------------------------- */
-  /* draw things behind the player, if needed                                */
-  /* ----------------------------------------------------------------------- */
+  // --------------------------------------------------------------------------
+  // draw things behind the player, if needed
+  // --------------------------------------------------------------------------
 
   if (Back[jx][jy])
     DrawLevelElement(jx, jy, Back[jx][jy]);
@@ -3972,7 +3972,7 @@ void DrawPlayer(struct PlayerInfo *player)
     {
       GfxElement[jx][jy] = EL_UNDEFINED;
 
-      /* make sure that pushed elements are drawn with correct frame rate */
+      // make sure that pushed elements are drawn with correct frame rate
       graphic = el_act_dir2img(element, ACTION_PUSHING, move_dir);
 
       if (player->is_pushing && player->is_moving && !IS_ANIM_MODE_CE(graphic))
@@ -3983,9 +3983,9 @@ void DrawPlayer(struct PlayerInfo *player)
   }
 
 #if !DRAW_PLAYER_OVER_PUSHED_ELEMENT
-  /* ----------------------------------------------------------------------- */
-  /* draw player himself                                                     */
-  /* ----------------------------------------------------------------------- */
+  // -----------------------------------------------------------------------
+  // draw player himself
+  // -----------------------------------------------------------------------
 
   graphic = getPlayerGraphic(player, move_dir);
 
@@ -4029,9 +4029,9 @@ void DrawPlayer(struct PlayerInfo *player)
   }
 #endif
 
-  /* ----------------------------------------------------------------------- */
-  /* draw things the player is pushing, if needed                            */
-  /* ----------------------------------------------------------------------- */
+  // --------------------------------------------------------------------------
+  // draw things the player is pushing, if needed
+  // --------------------------------------------------------------------------
 
   if (player->is_pushing && player->is_moving)
   {
@@ -4044,7 +4044,7 @@ void DrawPlayer(struct PlayerInfo *player)
     int sync_frame;
     int frame;
 
-    if (!IS_MOVING(jx, jy))		/* push movement already finished */
+    if (!IS_MOVING(jx, jy))		// push movement already finished
     {
       element = Feld[next_jx][next_jy];
       gfx_frame = GfxFrame[next_jx][next_jy];
@@ -4055,10 +4055,10 @@ void DrawPlayer(struct PlayerInfo *player)
     sync_frame = (IS_ANIM_MODE_CE(graphic) ? gfx_frame : player->StepFrame);
     frame = getGraphicAnimationFrame(graphic, sync_frame);
 
-    /* draw background element under pushed element (like the Sokoban field) */
+    // draw background element under pushed element (like the Sokoban field)
     if (game.use_masked_pushing && IS_MOVING(jx, jy))
     {
-      /* this allows transparent pushing animation over non-black background */
+      // this allows transparent pushing animation over non-black background
 
       if (Back[jx][jy])
 	DrawLevelElement(jx, jy, Back[jx][jy]);
@@ -4074,23 +4074,23 @@ void DrawPlayer(struct PlayerInfo *player)
       DrawLevelElement(next_jx, next_jy, Back[next_jx][next_jy]);
 
 #if 1
-    /* do not draw (EM style) pushing animation when pushing is finished */
-    /* (two-tile animations usually do not contain start and end frame) */
+    // do not draw (EM style) pushing animation when pushing is finished
+    // (two-tile animations usually do not contain start and end frame)
     if (graphic_info[graphic].double_movement && !IS_MOVING(jx, jy))
       DrawLevelElement(next_jx, next_jy, Feld[next_jx][next_jy]);
     else
       DrawGraphicShiftedThruMask(px, py, pxx, pyy, graphic, frame, NO_CUTTING);
 #else
-    /* masked drawing is needed for EMC style (double) movement graphics */
-    /* !!! (ONLY WHEN DRAWING PUSHED ELEMENT OVER THE PLAYER) !!! */
+    // masked drawing is needed for EMC style (double) movement graphics
+    // !!! (ONLY WHEN DRAWING PUSHED ELEMENT OVER THE PLAYER) !!!
     DrawGraphicShiftedThruMask(px, py, pxx, pyy, graphic, frame, NO_CUTTING);
 #endif
   }
 
 #if DRAW_PLAYER_OVER_PUSHED_ELEMENT
-  /* ----------------------------------------------------------------------- */
-  /* draw player himself                                                     */
-  /* ----------------------------------------------------------------------- */
+  // -----------------------------------------------------------------------
+  // draw player himself
+  // -----------------------------------------------------------------------
 
   graphic = getPlayerGraphic(player, move_dir);
 
@@ -4124,9 +4124,9 @@ void DrawPlayer(struct PlayerInfo *player)
   }
 #endif
 
-  /* ----------------------------------------------------------------------- */
-  /* draw things in front of player (active dynamite or dynabombs)           */
-  /* ----------------------------------------------------------------------- */
+  // --------------------------------------------------------------------------
+  // draw things in front of player (active dynamite or dynabombs)
+  // --------------------------------------------------------------------------
 
   if (IS_ACTIVE_BOMB(element))
   {
@@ -4152,23 +4152,23 @@ void DrawPlayer(struct PlayerInfo *player)
       DrawGraphicThruMask(SCREENX(last_jx), SCREENY(last_jy), graphic, frame);
   }
 
-  /* ----------------------------------------------------------------------- */
-  /* draw elements the player is just walking/passing through/under          */
-  /* ----------------------------------------------------------------------- */
+  // --------------------------------------------------------------------------
+  // draw elements the player is just walking/passing through/under
+  // --------------------------------------------------------------------------
 
   if (player_is_moving)
   {
-    /* handle the field the player is leaving ... */
+    // handle the field the player is leaving ...
     if (IS_ACCESSIBLE_INSIDE(last_element))
       DrawLevelField(last_jx, last_jy);
     else if (IS_ACCESSIBLE_UNDER(last_element))
       DrawLevelFieldThruMask(last_jx, last_jy);
   }
 
-  /* do not redraw accessible elements if the player is just pushing them */
+  // do not redraw accessible elements if the player is just pushing them
   if (!player_is_moving || !player->is_pushing)
   {
-    /* ... and the field the player is entering */
+    // ... and the field the player is entering
     if (IS_ACCESSIBLE_INSIDE(element))
       DrawLevelField(jx, jy);
     else if (IS_ACCESSIBLE_UNDER(element))
@@ -4178,7 +4178,7 @@ void DrawPlayer(struct PlayerInfo *player)
   MarkTileDirty(sx, sy);
 }
 
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
 
 void WaitForEventToContinue(void)
 {
@@ -4187,7 +4187,7 @@ void WaitForEventToContinue(void)
   if (program.headless)
     return;
 
-  /* simulate releasing mouse button over last gadget, if still pressed */
+  // simulate releasing mouse button over last gadget, if still pressed
   if (button_status)
     HandleGadgets(-1, -1, 0);
 
@@ -4243,7 +4243,7 @@ static int RequestHandleEvents(unsigned int req_state)
   int sx, sy;
   int result;
 
-  /* when showing request dialog after game ended, deactivate game panel */
+  // when showing request dialog after game ended, deactivate game panel
   if (game_just_ended)
     game.panel.active = FALSE;
 
@@ -4260,7 +4260,7 @@ static int RequestHandleEvents(unsigned int req_state)
   {
     if (game_just_ended)
     {
-      /* the MM game engine does not use a special (scrollable) field buffer */
+      // the MM game engine does not use a special (scrollable) field buffer
       if (level.game_engine_type != GAME_ENGINE_TYPE_MM)
 	SetDrawtoField(DRAW_TO_FIELDBUFFER);
 
@@ -4270,7 +4270,7 @@ static int RequestHandleEvents(unsigned int req_state)
 
       if (global.use_envelope_request)
       {
-	/* copy current state of request area to middle of playfield area */
+	// copy current state of request area to middle of playfield area
 	BlitBitmap(bitmap_db_store_2, drawto, sx, sy, width, height, sx, sy);
       }
     }
@@ -4309,7 +4309,7 @@ static int RequestHandleEvents(unsigned int req_state)
 		button_status = MB_RELEASED;
 	    }
 
-	    /* this sets 'request_gadget_id' */
+	    // this sets 'request_gadget_id'
 	    HandleGadgets(mx, my, button_status);
 
 	    switch (request_gadget_id)
@@ -4375,7 +4375,7 @@ static int RequestHandleEvents(unsigned int req_state)
 	      case KSYM_Select:
 	      case KSYM_Menu:
 #if defined(KSYM_Rewind)
-	      case KSYM_Rewind:		/* for Amazon Fire TV remote */
+	      case KSYM_Rewind:		// for Amazon Fire TV remote
 #endif
 #endif
 		result = 1;
@@ -4387,7 +4387,7 @@ static int RequestHandleEvents(unsigned int req_state)
 	      case KSYM_N:
 	      case KSYM_Back:
 #if defined(KSYM_FastForward)
-	      case KSYM_FastForward:	/* for Amazon Fire TV remote */
+	      case KSYM_FastForward:	// for Amazon Fire TV remote
 #endif
 #endif
 		result = 0;
@@ -4541,7 +4541,7 @@ static int RequestHandleEvents(unsigned int req_state)
     {
       if (global.use_envelope_request)
       {
-	/* copy back current state of pressed buttons inside request area */
+	// copy back current state of pressed buttons inside request area
 	BlitBitmap(drawto, bitmap_db_store_2, sx, sy, width, height, sx, sy);
       }
     }
@@ -4572,13 +4572,13 @@ static boolean RequestDoor(char *text, unsigned int req_state)
   if (game_status == GAME_MODE_PLAYING)
     BlitScreenToBitmap(backbuffer);
 
-  /* disable deactivated drawing when quick-loading level tape recording */
+  // disable deactivated drawing when quick-loading level tape recording
   if (tape.playing && tape.deactivate_display)
     TapeDeactivateDisplayOff(TRUE);
 
   SetMouseCursor(CURSOR_DEFAULT);
 
-  /* pause network game while waiting for request to answer */
+  // pause network game while waiting for request to answer
   if (network.enabled &&
       game_status == GAME_MODE_PLAYING &&
       !AllPlayersGone &&
@@ -4587,20 +4587,20 @@ static boolean RequestDoor(char *text, unsigned int req_state)
 
   old_door_state = GetDoorState();
 
-  /* simulate releasing mouse button over last gadget, if still pressed */
+  // simulate releasing mouse button over last gadget, if still pressed
   if (button_status)
     HandleGadgets(-1, -1, 0);
 
   UnmapAllGadgets();
 
-  /* draw released gadget before proceeding */
+  // draw released gadget before proceeding
   // BackToFront();
 
   if (old_door_state & DOOR_OPEN_1)
   {
     CloseDoor(DOOR_CLOSE_1);
 
-    /* save old door content */
+    // save old door content
     BlitBitmap(bitmap_db_door_1, bitmap_db_door_1,
 	       0 * DXSIZE, 0, DXSIZE, DYSIZE, 1 * DXSIZE, 0);
   }
@@ -4608,13 +4608,13 @@ static boolean RequestDoor(char *text, unsigned int req_state)
   SetDoorBackgroundImage(IMG_BACKGROUND_DOOR);
   SetDrawBackgroundMask(REDRAW_FIELD | REDRAW_DOOR_1);
 
-  /* clear door drawing field */
+  // clear door drawing field
   DrawBackground(DX, DY, DXSIZE, DYSIZE);
 
-  /* force DOOR font inside door area */
+  // force DOOR font inside door area
   SetFontStatus(GAME_MODE_PSEUDO_DOOR);
 
-  /* write text for request */
+  // write text for request
   for (text_ptr = text, ty = 0; ty < MAX_REQUEST_LINES; ty++)
   {
     char text_line[max_request_line_len + 1];
@@ -4671,7 +4671,7 @@ static boolean RequestDoor(char *text, unsigned int req_state)
     MapGadget(tool_gadget[TOOL_CTRL_ID_PLAYER_4]);
   }
 
-  /* copy request gadgets to door backbuffer */
+  // copy request gadgets to door backbuffer
   BlitBitmap(drawto, bitmap_db_door_1, DX, DY, DXSIZE, DYSIZE, 0, 0);
 
   OpenDoor(DOOR_OPEN_1);
@@ -4719,14 +4719,14 @@ static boolean RequestDoor(char *text, unsigned int req_state)
     SetDrawBackgroundMask(REDRAW_FIELD);
   }
 
-  /* continue network game after request */
+  // continue network game after request
   if (network.enabled &&
       game_status == GAME_MODE_PLAYING &&
       !AllPlayersGone &&
       req_state & REQUEST_WAIT_FOR_INPUT)
     SendToServer_ContinuePlaying();
 
-  /* restore deactivated drawing when quick-loading level tape recording */
+  // restore deactivated drawing when quick-loading level tape recording
   if (tape.playing && tape.deactivate_display)
     TapeDeactivateDisplayOn();
 
@@ -4740,20 +4740,20 @@ static boolean RequestEnvelope(char *text, unsigned int req_state)
   if (game_status == GAME_MODE_PLAYING)
     BlitScreenToBitmap(backbuffer);
 
-  /* disable deactivated drawing when quick-loading level tape recording */
+  // disable deactivated drawing when quick-loading level tape recording
   if (tape.playing && tape.deactivate_display)
     TapeDeactivateDisplayOff(TRUE);
 
   SetMouseCursor(CURSOR_DEFAULT);
 
-  /* pause network game while waiting for request to answer */
+  // pause network game while waiting for request to answer
   if (network.enabled &&
       game_status == GAME_MODE_PLAYING &&
       !AllPlayersGone &&
       req_state & REQUEST_WAIT_FOR_INPUT)
     SendToServer_PausePlaying();
 
-  /* simulate releasing mouse button over last gadget, if still pressed */
+  // simulate releasing mouse button over last gadget, if still pressed
   if (button_status)
     HandleGadgets(-1, -1, 0);
 
@@ -4763,7 +4763,7 @@ static boolean RequestEnvelope(char *text, unsigned int req_state)
   // SetDoorBackgroundImage(IMG_BACKGROUND_DOOR);
   // SetDrawBackgroundMask(REDRAW_FIELD | REDRAW_DOOR_1);
 
-  /* clear door drawing field */
+  // clear door drawing field
   // DrawBackground(DX, DY, DXSIZE, DYSIZE);
 
   ShowEnvelopeRequest(text, req_state, ACTION_OPENING);
@@ -4804,14 +4804,14 @@ static boolean RequestEnvelope(char *text, unsigned int req_state)
     SetDrawBackgroundMask(REDRAW_FIELD);
   }
 
-  /* continue network game after request */
+  // continue network game after request
   if (network.enabled &&
       game_status == GAME_MODE_PLAYING &&
       !AllPlayersGone &&
       req_state & REQUEST_WAIT_FOR_INPUT)
     SendToServer_ContinuePlaying();
 
-  /* restore deactivated drawing when quick-loading level tape recording */
+  // restore deactivated drawing when quick-loading level tape recording
   if (tape.playing && tape.deactivate_display)
     TapeDeactivateDisplayOn();
 
@@ -4883,7 +4883,7 @@ void InitGraphicCompatibilityInfo_Doors(void)
     struct Rect *door_rect = &door_rect_list[door_index];
     boolean door_gfx_redefined = FALSE;
 
-    /* check if any door part graphic definitions have been redefined */
+    // check if any door part graphic definitions have been redefined
 
     for (j = 0; door_part_controls[j].door_token != -1; j++)
     {
@@ -4894,7 +4894,7 @@ void InitGraphicCompatibilityInfo_Doors(void)
 	door_gfx_redefined = TRUE;
     }
 
-    /* check for old-style door graphic/animation modifications */
+    // check for old-style door graphic/animation modifications
 
     if (!door_gfx_redefined)
     {
@@ -4910,7 +4910,7 @@ void InitGraphicCompatibilityInfo_Doors(void)
 	struct GraphicInfo *g_part_2 = &graphic_info[part_2];
 	int num_door_steps, num_panel_steps;
 
-	/* remove door part graphics other than the two default wings */
+	// remove door part graphics other than the two default wings
 
 	for (j = 0; door_part_controls[j].door_token != -1; j++)
 	{
@@ -4922,7 +4922,7 @@ void InitGraphicCompatibilityInfo_Doors(void)
 	    g->bitmap = NULL;
 	}
 
-	/* set graphics and screen positions of the default wings */
+	// set graphics and screen positions of the default wings
 
 	g_part_1->width  = door_rect->width;
 	g_part_1->height = door_rect->height;
@@ -4954,18 +4954,18 @@ void InitGraphicCompatibilityInfo_Doors(void)
 	  door->part_2.y  += door_rect->height - door->height;
 	}
 
-	/* set animation delays for the default wings and panels */
+	// set animation delays for the default wings and panels
 
 	door->part_1.step_delay = door->step_delay;
 	door->part_2.step_delay = door->step_delay;
 	door->panel.step_delay  = door->step_delay;
 
-	/* set animation draw order for the default wings */
+	// set animation draw order for the default wings
 
-	door->part_1.sort_priority = 2;	/* draw left wing over ... */
-	door->part_2.sort_priority = 1;	/*          ... right wing */
+	door->part_1.sort_priority = 2;	// draw left wing over ...
+	door->part_2.sort_priority = 1;	//          ... right wing
 
-	/* set animation draw offset for the default wings */
+	// set animation draw offset for the default wings
 
 	if (door->anim_mode & ANIM_HORIZONTAL)
 	{
@@ -4986,7 +4986,7 @@ void InitGraphicCompatibilityInfo_Doors(void)
 	  num_door_steps = g_part_1->height / door->step_offset;
 	}
 
-	/* set animation draw offset for the default panels */
+	// set animation draw offset for the default panels
 
 	if (door->step_offset > 1)
 	{
@@ -5015,7 +5015,7 @@ void InitDoors(void)
     struct DoorPartControlInfo *dpc = &door_part_controls[i];
     struct DoorPartOrderInfo *dpo = &door_part_order[i];
 
-    /* initialize "start_step_opening" and "start_step_closing", if needed */
+    // initialize "start_step_opening" and "start_step_closing", if needed
     if (dpc->pos->start_step_opening == 0 &&
 	dpc->pos->start_step_closing == 0)
     {
@@ -5023,12 +5023,12 @@ void InitDoors(void)
       dpc->pos->start_step_closing = dpc->pos->start_step;
     }
 
-    /* fill structure for door part draw order (sorted below) */
+    // fill structure for door part draw order (sorted below)
     dpo->nr = i;
     dpo->sort_priority = dpc->pos->sort_priority;
   }
 
-  /* sort door part controls according to sort_priority and graphic number */
+  // sort door part controls according to sort_priority and graphic number
   qsort(door_part_order, MAX_DOOR_PARTS,
         sizeof(struct DoorPartOrderInfo), compareDoorPartOrderInfo);
 }
@@ -5220,7 +5220,7 @@ unsigned int MoveDoor(unsigned int door_state)
     }
     else
     {
-      /* opening door sound has priority over simultaneously closing door */
+      // opening door sound has priority over simultaneously closing door
       if (door_state & (DOOR_OPEN_1 | DOOR_OPEN_2))
       {
         PlayMenuSoundStereo(SND_DOOR_OPENING, SOUND_MIDDLE);
@@ -5408,7 +5408,7 @@ unsigned int MoveDoor(unsigned int door_state)
 
 	current_move_delay += max_step_delay;
 
-	/* prevent OS (Windows) from complaining about program not responding */
+	// prevent OS (Windows) from complaining about program not responding
 	CheckQuitEvent();
       }
 
@@ -5418,7 +5418,7 @@ unsigned int MoveDoor(unsigned int door_state)
 
     if (!(door_state & DOOR_NO_DELAY))
     {
-      /* wait for specified door action post delay */
+      // wait for specified door action post delay
       if (door_state & DOOR_ACTION_1 && door_state & DOOR_ACTION_2)
 	door_delay_value = MAX(door_1.post_delay, door_2.post_delay);
       else if (door_state & DOOR_ACTION_1)
@@ -5482,7 +5482,7 @@ void DrawSpecialEditorDoor(void)
   if (!useSpecialEditorDoor())
     return;
 
-  /* draw bigger level editor toolbox window */
+  // draw bigger level editor toolbox window
   BlitBitmap(gfx1->bitmap, drawto, gfx1->src_x, gfx1->src_y,
 	     top_border_width, top_border_height, ex, ey - top_border_height);
   BlitBitmap(graphic_info[IMG_GLOBAL_BORDER].bitmap, drawto, ex, vy,
@@ -5506,7 +5506,7 @@ void UndrawSpecialEditorDoor(void)
   if (!useSpecialEditorDoor())
     return;
 
-  /* draw normal tape recorder window */
+  // draw normal tape recorder window
   if (graphic_info[IMG_GLOBAL_BORDER].bitmap)
   {
     BlitBitmap(graphic_info[IMG_GLOBAL_BORDER].bitmap, drawto,
@@ -5526,7 +5526,7 @@ void UndrawSpecialEditorDoor(void)
 }
 
 
-/* ---------- new tool button stuff ---------------------------------------- */
+// ---------- new tool button stuff -------------------------------------------
 
 static struct
 {
@@ -5686,8 +5686,8 @@ static void HandleToolButtons(struct GadgetInfo *gi)
 static struct Mapping_EM_to_RND_object
 {
   int element_em;
-  boolean is_rnd_to_em_mapping;		/* unique mapping EM <-> RND */
-  boolean is_backside;			/* backside of moving element */
+  boolean is_rnd_to_em_mapping;		// unique mapping EM <-> RND
+  boolean is_backside;			// backside of moving element
 
   int element_rnd;
   int action;
@@ -5757,7 +5757,7 @@ em_object_mapping_list[] =
     Xbomb_force_w,			FALSE,	FALSE,
     EL_BOMB,				-1, MV_BIT_LEFT
   },
-#endif	/* EM_ENGINE_BAD_ROLL */
+#endif	// EM_ENGINE_BAD_ROLL
 
   {
     Xstone,				TRUE,	FALSE,
@@ -7610,7 +7610,7 @@ int map_element_RND_to_EM(int element_rnd)
   {
     int i;
 
-    /* return "Xalpha_quest" for all undefined elements in mapping array */
+    // return "Xalpha_quest" for all undefined elements in mapping array
     for (i = 0; i < NUM_FILE_ELEMENTS; i++)
       mapping_RND_to_EM[i] = Xalpha_quest;
 
@@ -7639,7 +7639,7 @@ int map_element_EM_to_RND(int element_em)
   {
     int i;
 
-    /* return "EL_UNKNOWN" for all undefined elements in mapping array */
+    // return "EL_UNKNOWN" for all undefined elements in mapping array
     for (i = 0; i < TILE_MAX; i++)
       mapping_EM_to_RND[i] = EL_UNKNOWN;
 
@@ -7738,7 +7738,7 @@ int map_direction_EM_to_RND(int direction)
 
 int map_element_RND_to_SP(int element_rnd)
 {
-  int element_sp = 0x20;	/* map unknown elements to yellow "hardware" */
+  int element_sp = 0x20;	// map unknown elements to yellow "hardware"
 
   if (element_rnd >= EL_SP_START &&
       element_rnd <= EL_SP_END)
@@ -7838,7 +7838,7 @@ int map_element_MM_to_RND(int element_mm)
 
 int map_action_MM_to_RND(int action_mm)
 {
-  /* all MM actions are defined to exactly match their RND counterparts */
+  // all MM actions are defined to exactly match their RND counterparts
   return action_mm;
 }
 
@@ -7929,18 +7929,18 @@ int el2img_mm(int element_mm)
 int el_act_dir2img(int element, int action, int direction)
 {
   element = GFX_ELEMENT(element);
-  direction = MV_DIR_TO_BIT(direction);	/* default: MV_NONE => MV_DOWN */
+  direction = MV_DIR_TO_BIT(direction);	// default: MV_NONE => MV_DOWN
 
-  /* direction_graphic[][] == graphic[] for undefined direction graphics */
+  // direction_graphic[][] == graphic[] for undefined direction graphics
   return element_info[element].direction_graphic[action][direction];
 }
 
 static int el_act_dir2crm(int element, int action, int direction)
 {
   element = GFX_ELEMENT(element);
-  direction = MV_DIR_TO_BIT(direction);	/* default: MV_NONE => MV_DOWN */
+  direction = MV_DIR_TO_BIT(direction);	// default: MV_NONE => MV_DOWN
 
-  /* direction_graphic[][] == graphic[] for undefined direction graphics */
+  // direction_graphic[][] == graphic[] for undefined direction graphics
   return element_info[element].direction_crumbled[action][direction];
 }
 
@@ -8180,7 +8180,7 @@ static int get_effective_element_EM(int tile, int frame_em)
 	return element;
     }
   }
-  else	/* frame_em == 7 */
+  else	// frame_em == 7
   {
     switch (tile)
     {
@@ -8337,7 +8337,7 @@ void SetGfxAnimation_EM(struct GraphicInfo_EM *g_em,
      for last (8th) frame which ends the movement animation */
   if (g->double_movement && g->anim_frames < 8 && frame_em == 7)
   {
-    action = ACTION_DEFAULT;	/* (keep action_* unchanged for now) */
+    action = ACTION_DEFAULT;	// (keep action_* unchanged for now)
     graphic = (direction == MV_NONE ?
 	       el_act2img(effective_element, action) :
 	       el_act_dir2img(effective_element, action, direction));
@@ -8361,7 +8361,7 @@ void SetGfxAnimation_EM(struct GraphicInfo_EM *g_em,
       GfxFrame[x][y]++;
 
 #if 1
-      /* !!! TEST !!! NEW !!! DOES NOT WORK RIGHT YET !!! */
+      // !!! TEST !!! NEW !!! DOES NOT WORK RIGHT YET !!!
       if (g->double_movement && frame_em == 0)
 	GfxFrame[x][y] = 0;
 #endif
@@ -8380,7 +8380,7 @@ void SetGfxAnimation_EM(struct GraphicInfo_EM *g_em,
   {
     GfxFrame[x][y]++;
 
-    /* special case: animation for Xsand_stonesand_quickout_1/2 twice as fast */
+    // special case: animation for Xsand_stonesand_quickout_1/2 twice as fast
     if (tile == Xsand_stonesand_quickout_1 ||
 	tile == Xsand_stonesand_quickout_2)
       GfxFrame[x][y]++;
@@ -8391,7 +8391,7 @@ void SetGfxAnimation_EM(struct GraphicInfo_EM *g_em,
   else if (IN_FIELD(x, y, MAX_LEV_FIELDX, MAX_LEV_FIELDY))
     sync_frame = GfxFrame[x][y];
   else
-    sync_frame = 0;	/* playfield border (pseudo steel) */
+    sync_frame = 0;	// playfield border (pseudo steel)
 
   SetRandomAnimationValue(x, y);
 
@@ -8450,7 +8450,7 @@ void getGraphicSourceObjectExt_EM(struct GraphicInfo_EM *g_em,
   else if (IN_FIELD(x, y, MAX_LEV_FIELDX, MAX_LEV_FIELDY))
     sync_frame = GfxFrame[x][y];
   else
-    sync_frame = 0;	/* playfield border (pseudo steel) */
+    sync_frame = 0;	// playfield border (pseudo steel)
 
   SetRandomAnimationValue(x, y);
 
@@ -8506,7 +8506,7 @@ void InitGraphicInfo_EM(void)
 
   if (graphic_info_em_object[0][0].bitmap == NULL)
   {
-    /* EM graphics not yet initialized in em_open_all() */
+    // EM graphics not yet initialized in em_open_all()
 
     return;
   }
@@ -8514,7 +8514,7 @@ void InitGraphicInfo_EM(void)
   printf("::: [4 errors can be ignored (1 x 'bomb', 3 x 'em_dynamite']\n");
 #endif
 
-  /* always start with reliable default values */
+  // always start with reliable default values
   for (i = 0; i < TILE_MAX; i++)
   {
     object_mapping[i].element_rnd = EL_UNKNOWN;
@@ -8523,7 +8523,7 @@ void InitGraphicInfo_EM(void)
     object_mapping[i].direction = MV_NONE;
   }
 
-  /* always start with reliable default values */
+  // always start with reliable default values
   for (p = 0; p < MAX_PLAYERS; p++)
   {
     for (i = 0; i < SPR_MAX; i++)
@@ -8624,7 +8624,7 @@ void InitGraphicInfo_EM(void)
       struct GraphicInfo_EM *g_em = &graphic_info_em_object[i][7 - j];
       Bitmap *src_bitmap;
       int src_x, src_y;
-      /* ensure to get symmetric 3-frame, 2-delay animations as used in EM */
+      // ensure to get symmetric 3-frame, 2-delay animations as used in EM
       boolean special_animation = (action != ACTION_DEFAULT &&
 				   g->anim_frames == 3 &&
 				   g->anim_delay == 2 &&
@@ -8795,7 +8795,7 @@ void InitGraphicInfo_EM(void)
 			  i == Xsand_stoneout_2 ? j + 8 : j) + 1;
 	int step = (is_backside ? step_frame : num_steps - step_frame);
 
-	if (is_backside)	/* tile where movement starts */
+	if (is_backside)	// tile where movement starts
 	{
 	  if (dx < 0 || dy < 0)
 	  {
@@ -8808,7 +8808,7 @@ void InitGraphicInfo_EM(void)
 	    g_em->dst_offset_y = cy * step;
 	  }
 	}
-	else			/* tile where movement ends */
+	else			// tile where movement ends
 	{
 	  if (dx < 0 || dy < 0)
 	  {
@@ -8826,7 +8826,7 @@ void InitGraphicInfo_EM(void)
 	g_em->height = TILEY - cy * step;
       }
 
-      /* create unique graphic identifier to decide if tile must be redrawn */
+      // create unique graphic identifier to decide if tile must be redrawn
       /* bit 31 - 16 (16 bit): EM style graphic
 	 bit 15 - 12 ( 4 bit): EM style frame
 	 bit 11 -  6 ( 6 bit): graphic width
@@ -8836,7 +8836,7 @@ void InitGraphicInfo_EM(void)
 
 #if DEBUG_EM_GFX
 
-      /* skip check for EMC elements not contained in original EMC artwork */
+      // skip check for EMC elements not contained in original EMC artwork
       if (element == EL_EMC_FAKE_ACID)
 	continue;
 
@@ -8926,7 +8926,7 @@ void InitGraphicInfo_EM(void)
 		 direction == MV_RIGHT ? (is_backside? Yspring_eB: Yspring_e) :
 		 Xspring);
 
-	/* no separate animation for "smashed by rock" -- use rock instead */
+	// no separate animation for "smashed by rock" -- use rock instead
 	struct GraphicInfo_EM *g_em = &graphic_info_em_object[i][7 - j];
 	struct GraphicInfo_EM *g_xx = &graphic_info_em_object[e][7 - j];
 
@@ -8995,7 +8995,7 @@ void InitGraphicInfo_EM(void)
 
 #if DEBUG_EM_GFX
 
-	/* skip check for EMC elements not contained in original EMC artwork */
+	// skip check for EMC elements not contained in original EMC artwork
 	if (element == EL_PLAYER_3 ||
 	    element == EL_PLAYER_4)
 	  continue;
@@ -9308,7 +9308,7 @@ void ToggleFullscreenOrChangeWindowScalingIfNeeded(void)
   {
     SDLSetWindowFullscreen(setup.fullscreen);
 
-    /* set setup value according to successfully changed fullscreen mode */
+    // set setup value according to successfully changed fullscreen mode
     setup.fullscreen = video.fullscreen_enabled;
 
     return;
@@ -9320,27 +9320,27 @@ void ToggleFullscreenOrChangeWindowScalingIfNeeded(void)
   {
     Bitmap *tmp_backbuffer = CreateBitmap(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH);
 
-    /* save backbuffer content which gets lost when toggling fullscreen mode */
+    // save backbuffer content which gets lost when toggling fullscreen mode
     BlitBitmap(backbuffer, tmp_backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
 
     if (change_window_scaling_percent)
     {
-      /* keep window mode, but change window scaling */
-      video.fullscreen_enabled = TRUE;		/* force new window scaling */
+      // keep window mode, but change window scaling
+      video.fullscreen_enabled = TRUE;		// force new window scaling
     }
 
-    /* toggle fullscreen */
+    // toggle fullscreen
     ChangeVideoModeIfNeeded(setup.fullscreen);
 
-    /* set setup value according to successfully changed fullscreen mode */
+    // set setup value according to successfully changed fullscreen mode
     setup.fullscreen = video.fullscreen_enabled;
 
-    /* restore backbuffer content from temporary backbuffer backup bitmap */
+    // restore backbuffer content from temporary backbuffer backup bitmap
     BlitBitmap(tmp_backbuffer, backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
 
     FreeBitmap(tmp_backbuffer);
 
-    /* update visible window/screen */
+    // update visible window/screen
     BlitBitmap(backbuffer, window, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
   }
 }
@@ -9502,7 +9502,7 @@ void ChangeViewportPropertiesIfNeeded(void)
   if (new_scr_fieldx != SCR_FIELDX ||
       new_scr_fieldy != SCR_FIELDY)
   {
-    /* this always toggles between MAIN and GAME when using small tile size */
+    // this always toggles between MAIN and GAME when using small tile size
 
     SCR_FIELDX = new_scr_fieldx;
     SCR_FIELDY = new_scr_fieldy;

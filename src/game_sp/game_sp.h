@@ -16,4 +16,4 @@
 
 #include "export.h"
 
-#endif	/* GAME_SP_H */
+#endif	// GAME_SP_H

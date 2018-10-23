@@ -21,9 +21,9 @@
 #include "game.h"
 
 
-/* ========================================================================= */
-/* functions and definitions exported from main program to game_em           */
-/* ========================================================================= */
+// ============================================================================
+// functions and definitions exported from main program to game_em
+// ============================================================================
 
 void SetBitmaps_EM(Bitmap **);
 void UpdateEngineValues(int, int, int, int);
@@ -40,9 +40,9 @@ void getGraphicSourceObjectExt_EM(struct GraphicInfo_EM *, int, int, int, int);
 void getGraphicSourcePlayerExt_EM(struct GraphicInfo_EM *, int, int, int);
 
 
-/* ========================================================================= */
-/* functions and definitions exported from main program to game_sp           */
-/* ========================================================================= */
+// ============================================================================
+// functions and definitions exported from main program to game_sp
+// ============================================================================
 
 void CheckSingleStepMode_SP(boolean, boolean);
 
@@ -51,9 +51,9 @@ int getGraphicInfo_Delay(int);
 boolean isNextAnimationFrame_SP(int, int);
 
 
-/* ========================================================================= */
-/* functions and definitions exported from main program to game_mm           */
-/* ========================================================================= */
+// ============================================================================
+// functions and definitions exported from main program to game_mm
+// ============================================================================
 
 void SetDrawtoField(int);
 
@@ -66,4 +66,4 @@ void getMiniGraphicSource(int, Bitmap **, int *, int *);
 void getSizedGraphicSource(int, int, int, Bitmap **, int *, int *);
 
 
-#endif	/* ENGINES_H */
+#endif	// ENGINES_H

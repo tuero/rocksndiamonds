@@ -17,4 +17,4 @@ void subCopyAnimToScreen(int, int, int);
 void subExplodeSnikSnaksBelow(int);
 void subSpPortTest(int);
 
-#endif /* MURPHY_H */
+#endif // MURPHY_H

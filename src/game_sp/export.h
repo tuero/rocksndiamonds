@@ -1,13 +1,13 @@
 #ifndef GAME_SP_EXPORT_H
 #define GAME_SP_EXPORT_H
 
-/* ========================================================================= */
-/* functions and definitions exported from game_sp to main program           */
-/* ========================================================================= */
+// ============================================================================
+// functions and definitions exported from game_sp to main program
+// ============================================================================
 
-/* ------------------------------------------------------------------------- */
-/* constant definitions                                                      */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// constant definitions
+// ----------------------------------------------------------------------------
 
 #define SP_MAX_PLAYFIELD_WIDTH		MAX_PLAYFIELD_WIDTH
 #define SP_MAX_PLAYFIELD_HEIGHT		MAX_PLAYFIELD_HEIGHT
@@ -31,10 +31,10 @@
 // use a much higher value to be able to load ultra-long MPX demo files
 // (like for level collection 78, level 88 ("WAITING FOR GODOT AGAIN"))
 // #define SP_MAX_TAPE_LEN			500000
-#define SP_MAX_TAPE_LEN			64010	/* (see "spfix63.doc") */
+#define SP_MAX_TAPE_LEN			64010	// (see "spfix63.doc")
 
 
-/* sound actions */
+// sound actions
 
 #define actActive			0
 #define actImpact			1
@@ -47,14 +47,14 @@
 #define actDropping			8
 
 
-/* ------------------------------------------------------------------------- */
-/* data structure definitions                                                */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// data structure definitions
+// ----------------------------------------------------------------------------
 
 #ifndef HAS_SpecialPortType
 typedef struct
 {
-  short PortLocation; // = 2*(x+(y*60))		/* big endian format */
+  short PortLocation; // = 2*(x+(y*60))		// big endian format
   byte Gravity; // 1 = turn on, anything else (0) = turn off
   byte FreezeZonks; // 2 = turn on, anything else (0) = turn off  (1=off!)
   byte FreezeEnemies; // 1 = turn on, anything else (0) = turn off
@@ -80,7 +80,7 @@ typedef struct
   SpecialPortType SpecialPort[10];
   byte SpeedByte; // = Speed XOR Highbyte(RandomSeed)
   byte CheckSumByte; // = CheckSum XOR SpeedByte
-  short DemoRandomSeed;				/* little endian format */
+  short DemoRandomSeed;				// little endian format
 } LevelInfoType;
 #define HAS_LevelInfoType
 #endif
@@ -94,13 +94,13 @@ struct GameInfo_SP
   boolean LevelSolved;
   boolean GameOver;
 
-  /* needed for updating panel */
+  // needed for updating panel
   int time_played;
   int infotrons_still_needed;
   int red_disk_count;
   int score;
 
-  /* needed for engine snapshots */
+  // needed for engine snapshots
   char **preceding_buffer;
   int preceding_buffer_size;
 
@@ -109,12 +109,12 @@ struct GameInfo_SP
 
 struct DemoInfo_SP
 {
-  boolean is_available;		/* structure contains valid demo */
+  boolean is_available;		// structure contains valid demo
 
-  int level_nr;			/* number of corresponding level */
+  int level_nr;			// number of corresponding level
 
-  int length;			/* number of demo entries */
-  byte data[SP_MAX_TAPE_LEN];	/* array of demo entries */
+  int length;			// number of demo entries
+  byte data[SP_MAX_TAPE_LEN];	// array of demo entries
 };
 
 struct LevelInfo_SP
@@ -128,7 +128,7 @@ struct LevelInfo_SP
 
   struct DemoInfo_SP demo;
 
-  /* used for runtime values */
+  // used for runtime values
   struct GameInfo_SP *game_sp;
 };
 
@@ -147,7 +147,7 @@ struct GraphicInfo_SP
   boolean has_crumbled_graphics;
   boolean preserve_background;
 
-  int unique_identifier;	/* used to identify needed screen updates */
+  int unique_identifier;	// used to identify needed screen updates
 };
 
 struct EngineSnapshotInfo_SP
@@ -164,9 +164,9 @@ struct EngineSnapshotInfo_SP
 };
 
 
-/* ------------------------------------------------------------------------- */
-/* exported functions                                                        */
-/* ------------------------------------------------------------------------- */
+// ----------------------------------------------------------------------------
+// exported functions
+// ----------------------------------------------------------------------------
 
 extern struct GlobalInfo_SP global_sp_info;
 extern struct GameInfo_SP game_sp;
@@ -205,4 +205,4 @@ int map_key_SP_to_RND(int);
 
 int getRedDiskReleaseFlag_SP(void);
 
-#endif	/* GAME_SP_EXPORT_H */
+#endif	// GAME_SP_EXPORT_H

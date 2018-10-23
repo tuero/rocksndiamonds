@@ -24,4 +24,4 @@ void menPlay_Click(void);
 
 void Form_Load(void);
 
-#endif /* MAINFORM_H */
+#endif // MAINFORM_H

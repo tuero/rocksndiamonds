@@ -16,7 +16,7 @@
 #include "hash.h"
 
 
-/* values for setup file handling */
+// values for setup file handling
 #define TYPE_BOOLEAN			(1 << 0)
 #define TYPE_SWITCH			(1 << 1)
 #define TYPE_SWITCH3			(1 << 2)
@@ -31,7 +31,7 @@
 #define TYPE_ELEMENT			(1 << 11)
 #define TYPE_GRAPHIC			(1 << 12)
 
-/* additional values for setup screen */
+// additional values for setup screen
 #define TYPE_ENTER_SCREEN		(1 << 13)
 #define TYPE_LEAVE_SCREEN		(1 << 14)
 #define TYPE_ENTER_MENU			(1 << 15)
@@ -46,19 +46,19 @@
 #define TYPE_GHOSTED			(1 << 23)
 #define TYPE_QUERY			(1 << 24)
 
-/* additional values for internal purposes */
+// additional values for internal purposes
 #define TYPE_BITFIELD			(1 << 25)
 #define TYPE_CONTENT			(1 << 26)
 #define TYPE_ELEMENT_LIST		(1 << 27)
 #define TYPE_CONTENT_LIST		(1 << 28)
 
-/* derived values for setup file handling */
+// derived values for setup file handling
 #define TYPE_BOOLEAN_STYLE		(TYPE_BOOLEAN | \
 					 TYPE_SWITCH  | \
 					 TYPE_YES_NO  | \
 					 TYPE_ECS_AGA )
 
-/* derived values for setup screen */
+// derived values for setup screen
 #define TYPE_VALUE			(TYPE_BOOLEAN_STYLE	| \
 					 TYPE_SWITCH3		| \
 					 TYPE_YES_NO_AUTO	| \
@@ -93,7 +93,7 @@ struct TokenInfo
   char *text;
 };
 
-/* some definitions for list and hash handling */
+// some definitions for list and hash handling
 typedef struct SetupFileList SetupFileList;
 typedef struct hashtable     SetupFileHash;
 
@@ -112,7 +112,7 @@ typedef struct hashtable     SetupFileHash;
   }								\
 
 
-/* sort priorities of level series (also used as level series classes) */
+// sort priorities of level series (also used as level series classes)
 #define LEVELCLASS_TUTORIAL_START	10
 #define LEVELCLASS_TUTORIAL_END		99
 #define LEVELCLASS_CLASSICS_START	100
@@ -189,7 +189,7 @@ typedef struct hashtable     SetupFileHash;
 			 IS_LEVELCLASS_SB(n) ? LEVELCLASS_SB :		   \
 			 LEVELCLASS_UNDEFINED)
 
-/* sort priorities of artwork */
+// sort priorities of artwork
 #define ARTWORKCLASS_CLASSICS_START	100
 #define ARTWORKCLASS_CLASSICS_END	199
 #define ARTWORKCLASS_CONTRIB_START	200
@@ -340,4 +340,4 @@ void LevelStats_setSolved(int, int);
 void LevelStats_incPlayed(int);
 void LevelStats_incSolved(int);
 
-#endif /* MISC_H */
+#endif // MISC_H

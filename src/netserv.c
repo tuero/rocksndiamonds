@@ -40,10 +40,10 @@ static struct NetworkServerPlayerInfo *first_player = NULL;
 
 #define NEXT(player) ((player)->next ? (player)->next : first_player)
 
-/* TODO: peer address */
-static TCPsocket lfd;		/* listening TCP socket */
-static UDPsocket udp;		/* listening UDP socket */
-static SDLNet_SocketSet fds;	/* socket set */
+// TODO: peer address
+static TCPsocket lfd;		// listening TCP socket
+static UDPsocket udp;		// listening UDP socket
+static SDLNet_SocketSet fds;	// socket set
 
 static struct NetworkBuffer *read_buffer = NULL;
 static struct NetworkBuffer *write_buffer = NULL;
@@ -140,7 +140,7 @@ void initNetworkBufferForReading(struct NetworkBuffer *nb)
 {
   resetNetworkBufferForReading(nb);
 
-  /* skip message length header */
+  // skip message length header
   getNetworkBuffer32BitInteger(nb);
 }
 
@@ -149,7 +149,7 @@ void initNetworkBufferForWriting(struct NetworkBuffer *nb, int message_type,
 {
   resetNetworkBufferForWriting(nb);
 
-  /* will be replaced with message length before sending */
+  // will be replaced with message length before sending
   putNetworkBuffer32BitInteger(nb, 0);
 
   putNetworkBuffer8BitInteger(nb, message_type);
@@ -164,7 +164,7 @@ static void copyNetworkBufferForWriting(struct NetworkBuffer *nb_from,
 
   int message_type = getNetworkBuffer8BitInteger(nb_from);
 
-  /* skip player number */
+  // skip player number
   getNetworkBuffer8BitInteger(nb_from);
 
   initNetworkBufferForWriting(nb_to, message_type, player_nr);
@@ -179,7 +179,7 @@ static void copyNetworkBufferForWriting(struct NetworkBuffer *nb_from,
 
 static void increaseNetworkBuffer(struct NetworkBuffer *nb, int additional_size)
 {
-  /* add some more buffer size than is really required this time */
+  // add some more buffer size than is really required this time
   nb->max_size += additional_size + MAX_BUFFER_SIZE;
   nb->buffer = checked_realloc(nb->buffer, nb->max_size);
 }
@@ -351,7 +351,7 @@ int putNetworkBufferFile(struct NetworkBuffer *nb, char *filename)
   int filesize_pos = nb->pos;
   int num_bytes = 0;
 
-  /* will be replaced with file size */
+  // will be replaced with file size
   putNetworkBuffer32BitInteger(nb, 0);
 
   if (!(file = openFile(filename, MODE_READ)))
@@ -375,7 +375,7 @@ int putNetworkBufferFile(struct NetworkBuffer *nb, char *filename)
 
   closeFile(file);
 
-  /* set file size */
+  // set file size
   putNetwork32BitInteger(&nb->buffer[filesize_pos], num_bytes);
 
   return num_bytes;
@@ -405,14 +405,14 @@ static void SendNetworkBufferToAllButOne(struct NetworkBuffer *nb,
 {
   struct NetworkServerPlayerInfo *player;
 
-  /* set message length header */
+  // set message length header
   putNetwork32BitInteger(nb->buffer, nb->size - 4);
 
   for (player = first_player; player != NULL; player = player->next)
   {
     if (player != except && player->introduced)
     {
-      /* directly send the buffer to the network client */
+      // directly send the buffer to the network client
       SDLNet_TCP_Send(player->fd, nb->buffer, nb->size);
     }
   }
@@ -426,10 +426,10 @@ static void SendNetworkBufferToAll(struct NetworkBuffer *nb)
 static void SendNetworkBufferToClient(struct NetworkBuffer *nb,
 				      struct NetworkServerPlayerInfo *player)
 {
-  /* set message length header */
+  // set message length header
   putNetwork32BitInteger(nb->buffer, nb->size - 4);
 
-  /* directly send the buffer to the network client */
+  // directly send the buffer to the network client
   SDLNet_TCP_Send(player->fd, nb->buffer, nb->size);
 }
 
@@ -472,7 +472,7 @@ static void RemovePlayer(struct NetworkServerPlayerInfo *player)
   free(player);
   num_clients--;
 
-#if 0	/* do not terminate network server if last player disconnected */
+#if 0	// do not terminate network server if last player disconnected
   if (run_server_only_once && num_clients == 0)
   {
     if (options.verbose)
@@ -695,12 +695,12 @@ static void Handle_OP_START_PLAYING(struct NetworkServerPlayerInfo *player)
 
   struct NetworkServerPlayerInfo *p;
 
-  /* reset frame counter */
+  // reset frame counter
   ServerFrameCounter = 0;
 
   Error(ERR_NETWORK_SERVER, "resetting ServerFrameCounter to 0");
 
-  /* reset player actions */
+  // reset player actions
   for (p = first_player; p != NULL; p = p->next)
   {
     p->action = 0;
@@ -757,7 +757,7 @@ static void Handle_OP_MOVE_PLAYER(struct NetworkServerPlayerInfo *player)
   struct NetworkServerPlayerInfo *p;
   int i;
 
-  /* store player action */
+  // store player action
   for (p = first_player; p != NULL; p = p->next)
   {
     if (p->number == player->number)
@@ -767,7 +767,7 @@ static void Handle_OP_MOVE_PLAYER(struct NetworkServerPlayerInfo *player)
     }
   }
 
-  /* check if server received action from each player */
+  // check if server received action from each player
   for (p = first_player; p != NULL; p = p->next)
   {
     if (!p->action_received)
@@ -779,11 +779,11 @@ static void Handle_OP_MOVE_PLAYER(struct NetworkServerPlayerInfo *player)
 
   int player_action_all[last_client_nr];
 
-  /* initialize all player actions to zero */
+  // initialize all player actions to zero
   for (i = 0; i < last_client_nr; i++)
     player_action_all[i] = 0;
 
-  /* broadcast actions of all players to all players */
+  // broadcast actions of all players to all players
   for (p = first_player; p != NULL; p = p->next)
   {
     player_action_all[p->number - 1] = p->action;
@@ -837,7 +837,7 @@ int NetworkServerThread(void *ptr)
 {
   NetworkServer(*((int *) ptr), 0);
 
-  /* should never be reached */
+  // should never be reached
   return 0;
 }
 
@@ -916,7 +916,7 @@ void NetworkServer(int port, int serveronly)
     if (SDLNet_CheckSockets(fds, 100) < 1)
       continue;
 
-    /* accept incoming TCP connections */
+    // accept incoming TCP connections
     if (SDLNet_SocketReady(lfd))
     {
       Error(ERR_DEBUG, "got TCP packet");
@@ -929,7 +929,7 @@ void NetworkServer(int port, int serveronly)
 	AddPlayer(newsock);
     }
 
-    /* accept incoming UDP packets */
+    // accept incoming UDP packets
     if (SDLNet_SocketReady(udp))
     {
       Error(ERR_DEBUG, "got UDP packet");
@@ -969,7 +969,7 @@ void NetworkServer(int port, int serveronly)
 
       int message_type = getNetworkBuffer8BitInteger(read_buffer);
 
-      /* skip player number */
+      // skip player number
       getNetworkBuffer8BitInteger(read_buffer);
 
       if (!player->introduced &&
