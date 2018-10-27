@@ -2278,10 +2278,11 @@
 #define GFX_SPECIAL_ARG_TOONS		31
 #define GFX_SPECIAL_ARG_SCORESOLD	32
 #define GFX_SPECIAL_ARG_SCORESNEW	33
-#define GFX_SPECIAL_ARG_FADING		34
-#define GFX_SPECIAL_ARG_QUIT		35
+#define GFX_SPECIAL_ARG_NO_TITLE	34
+#define GFX_SPECIAL_ARG_FADING		35
+#define GFX_SPECIAL_ARG_QUIT		36
 
-#define NUM_SPECIAL_GFX_ARGS		36
+#define NUM_SPECIAL_GFX_ARGS		37
 
 // these additional definitions are currently only used for draw offsets
 #define GFX_SPECIAL_ARG_INFO_MAIN	0
@@ -2504,10 +2505,11 @@
 #define GAME_MODE_PSEUDO_TOONS		31
 #define GAME_MODE_PSEUDO_SCORESOLD	32
 #define GAME_MODE_PSEUDO_SCORESNEW	33
-#define GAME_MODE_PSEUDO_FADING		34
-#define GAME_MODE_QUIT			35
+#define GAME_MODE_PSEUDO_NO_TITLE	34
+#define GAME_MODE_PSEUDO_FADING		35
+#define GAME_MODE_QUIT			36
 
-#define NUM_GAME_MODES			36
+#define NUM_GAME_MODES			37
 
 // special definitions currently only used for custom artwork configuration
 #define MUSIC_PREFIX_BACKGROUND		0

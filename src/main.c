@@ -7428,6 +7428,7 @@ struct SpecialSuffixInfo special_suffix_info[NUM_SPECIAL_GFX_ARGS + 1 + 1] =
   { ".TOONS",			GFX_SPECIAL_ARG_TOONS,			},
   { ".SCORESOLD",		GFX_SPECIAL_ARG_SCORESOLD,		},
   { ".SCORESNEW",		GFX_SPECIAL_ARG_SCORESNEW,		},
+  { ".NO_TITLE",		GFX_SPECIAL_ARG_NO_TITLE,		},
   { ".FADING",			GFX_SPECIAL_ARG_FADING,			},
   { ".QUIT",			GFX_SPECIAL_ARG_QUIT,			},
 
