@@ -13961,7 +13961,7 @@ static int DigField(struct PlayerInfo *player,
       {
 	local_player->players_still_needed = 0;
 
-	PlayerWins(player);
+	PlayerWins(local_player);
 
 	PlayLevelSound(x, y, SND_GAME_SOKOBAN_SOLVING);
       }
