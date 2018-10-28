@@ -1792,7 +1792,11 @@ static void InitField(int x, int y, boolean init_game)
       break;
 
     case EL_SOKOBAN_FIELD_EMPTY:
-      local_player->sokobanfields_still_needed++;
+      local_player->sokoban_fields_still_needed++;
+      break;
+
+    case EL_SOKOBAN_OBJECT:
+      local_player->sokoban_objects_still_needed++;
       break;
 
     case EL_STONEBLOCK:
@@ -2212,7 +2216,8 @@ static void UpdateGameControlValues(void)
 		     game_mm.kettles_still_needed > 0 ||
 		     game_mm.lights_still_needed > 0 :
 		     local_player->gems_still_needed > 0 ||
-		     local_player->sokobanfields_still_needed > 0 ||
+		     local_player->sokoban_fields_still_needed > 0 ||
+		     local_player->sokoban_objects_still_needed > 0 ||
 		     local_player->lights_still_needed > 0);
   int health = (local_player->LevelSolved ?
 		local_player->LevelSolved_CountingHealth :
@@ -2381,9 +2386,9 @@ static void UpdateGameControlValues(void)
     local_player->friends_still_needed;
 
   game_panel_controls[GAME_PANEL_SOKOBAN_OBJECTS].value =
-    local_player->sokobanfields_still_needed;
+    local_player->sokoban_objects_still_needed;
   game_panel_controls[GAME_PANEL_SOKOBAN_FIELDS].value =
-    local_player->sokobanfields_still_needed;
+    local_player->sokoban_fields_still_needed;
 
   game_panel_controls[GAME_PANEL_ROBOT_WHEEL].value =
     (game.robot_wheel_active ? EL_ROBOT_WHEEL_ACTIVE : EL_ROBOT_WHEEL);
@@ -3389,7 +3394,8 @@ void InitGame(void)
     player->health_final = MAX_HEALTH;
 
     player->gems_still_needed = level.gems_needed;
-    player->sokobanfields_still_needed = 0;
+    player->sokoban_fields_still_needed = 0;
+    player->sokoban_objects_still_needed = 0;
     player->lights_still_needed = 0;
     player->players_still_needed = 0;
     player->friends_still_needed = 0;
@@ -9053,7 +9059,8 @@ static void ActivateMagicBall(int bx, int by)
 static void CheckExit(int x, int y)
 {
   if (local_player->gems_still_needed > 0 ||
-      local_player->sokobanfields_still_needed > 0 ||
+      local_player->sokoban_fields_still_needed > 0 ||
+      local_player->sokoban_objects_still_needed > 0 ||
       local_player->lights_still_needed > 0)
   {
     int element = Feld[x][y];
@@ -9076,7 +9083,8 @@ static void CheckExit(int x, int y)
 static void CheckExitEM(int x, int y)
 {
   if (local_player->gems_still_needed > 0 ||
-      local_player->sokobanfields_still_needed > 0 ||
+      local_player->sokoban_fields_still_needed > 0 ||
+      local_player->sokoban_objects_still_needed > 0 ||
       local_player->lights_still_needed > 0)
   {
     int element = Feld[x][y];
@@ -9099,7 +9107,8 @@ static void CheckExitEM(int x, int y)
 static void CheckExitSteel(int x, int y)
 {
   if (local_player->gems_still_needed > 0 ||
-      local_player->sokobanfields_still_needed > 0 ||
+      local_player->sokoban_fields_still_needed > 0 ||
+      local_player->sokoban_objects_still_needed > 0 ||
       local_player->lights_still_needed > 0)
   {
     int element = Feld[x][y];
@@ -9122,7 +9131,8 @@ static void CheckExitSteel(int x, int y)
 static void CheckExitSteelEM(int x, int y)
 {
   if (local_player->gems_still_needed > 0 ||
-      local_player->sokobanfields_still_needed > 0 ||
+      local_player->sokoban_fields_still_needed > 0 ||
+      local_player->sokoban_objects_still_needed > 0 ||
       local_player->lights_still_needed > 0)
   {
     int element = Feld[x][y];
@@ -13933,16 +13943,24 @@ static int DigField(struct PlayerInfo *player,
 
     if (IS_SB_ELEMENT(element))
     {
+      boolean sokoban_task_solved = FALSE;
+
       if (element == EL_SOKOBAN_FIELD_FULL)
       {
 	Back[x][y] = EL_SOKOBAN_FIELD_EMPTY;
-	local_player->sokobanfields_still_needed++;
+	local_player->sokoban_fields_still_needed++;
+	local_player->sokoban_objects_still_needed++;
       }
 
       if (Feld[nextx][nexty] == EL_SOKOBAN_FIELD_EMPTY)
       {
 	Back[nextx][nexty] = EL_SOKOBAN_FIELD_EMPTY;
-	local_player->sokobanfields_still_needed--;
+	local_player->sokoban_fields_still_needed--;
+	local_player->sokoban_objects_still_needed--;
+
+	// sokoban object was pushed from empty field to sokoban field
+	if (Back[x][y] == EL_EMPTY)
+	  sokoban_task_solved = TRUE;
       }
 
       Feld[x][y] = EL_SOKOBAN_OBJECT;
@@ -13956,7 +13974,9 @@ static int DigField(struct PlayerInfo *player,
 	PlayLevelSoundElementAction(nextx, nexty, EL_SOKOBAN_FIELD_EMPTY,
 				    ACTION_FILLING);
 
-      if (local_player->sokobanfields_still_needed == 0 &&
+      if (sokoban_task_solved &&
+	  local_player->sokoban_fields_still_needed == 0 &&
+	  local_player->sokoban_objects_still_needed == 0 &&
 	  (game.emulation == EMU_SOKOBAN || level.auto_exit_sokoban))
       {
 	local_player->players_still_needed = 0;

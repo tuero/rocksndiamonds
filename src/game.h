@@ -347,7 +347,8 @@ struct PlayerInfo
   int health_final;
 
   int gems_still_needed;
-  int sokobanfields_still_needed;
+  int sokoban_fields_still_needed;
+  int sokoban_objects_still_needed;
   int lights_still_needed;
   int players_still_needed;
   int friends_still_needed;

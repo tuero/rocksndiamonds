@@ -3071,7 +3071,7 @@ static struct
     GADGET_ID_AUTO_EXIT_SOKOBAN,	GADGET_ID_NONE,
     &level.auto_exit_sokoban,
     NULL, NULL,
-    "exit level if all fields solved",	"automatically finish Sokoban levels"
+    "exit level if all tasks solved",	"automatically finish Sokoban levels"
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(14),
