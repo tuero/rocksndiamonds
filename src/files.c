@@ -6326,14 +6326,6 @@ static void LoadLevel_InitVersion(struct LevelInfo *level)
     level->extra_time_score = level->score[SC_TIME_BONUS];
   }
 
-  // game logic of "game of life" and "biomaze" was buggy before 4.1.1.1
-  if (level->game_version < VERSION_IDENT(4,1,1,1))
-    level->use_life_bugs = TRUE;
-
-  // only Sokoban fields (but not objects) had to be solved before 4.1.1.1
-  if (level->game_version < VERSION_IDENT(4,1,1,1))
-    level->sb_objects_needed = FALSE;
-
   if (level->game_version < VERSION_IDENT(3,2,0,7))
   {
     // default behaviour for snapping was "not continuous" before 3.2.0-7
@@ -6431,6 +6423,14 @@ static void LoadLevel_InitVersion(struct LevelInfo *level)
   // levels were solved by the first player entering an exit up to 4.1.0.0
   if (level->game_version <= VERSION_IDENT(4,1,0,0))
     level->solved_by_one_player = TRUE;
+
+  // game logic of "game of life" and "biomaze" was buggy before 4.1.1.1
+  if (level->game_version < VERSION_IDENT(4,1,1,1))
+    level->use_life_bugs = TRUE;
+
+  // only Sokoban fields (but not objects) had to be solved before 4.1.1.1
+  if (level->game_version < VERSION_IDENT(4,1,1,1))
+    level->sb_objects_needed = FALSE;
 }
 
 static void LoadLevel_InitStandardElements(struct LevelInfo *level)
