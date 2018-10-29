@@ -6330,6 +6330,10 @@ static void LoadLevel_InitVersion(struct LevelInfo *level)
   if (level->game_version < VERSION_IDENT(4,1,1,1))
     level->use_life_bugs = TRUE;
 
+  // only Sokoban fields (but not objects) had to be solved before 4.1.1.1
+  if (level->game_version < VERSION_IDENT(4,1,1,1))
+    level->sb_objects_needed = FALSE;
+
   if (level->game_version < VERSION_IDENT(3,2,0,7))
   {
     // default behaviour for snapping was "not continuous" before 3.2.0-7
