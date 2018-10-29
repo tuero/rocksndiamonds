@@ -2636,8 +2636,19 @@ char *get_mapped_token(char *token)
   // !!! make this dynamically configurable (init.c:InitArtworkConfig) !!!
   static char *map_token_prefix[][2] =
   {
-    { "char_procent",		"char_percent"	},
-    { NULL,					}
+    { "char_procent",		"char_percent"			},
+    { "bd_magic_wall_filling",	"bd_magic_wall.filling"		},
+    { "bd_magic_wall_emptying",	"bd_magic_wall.emptying"	},
+    { "bd_butterfly_left",	"bd_butterfly.left"		},
+    { "bd_butterfly_right",	"bd_butterfly.right"		},
+    { "bd_butterfly_up",	"bd_butterfly.up"		},
+    { "bd_butterfly_down",	"bd_butterfly.down"		},
+    { "bd_firefly_left",	"bd_firefly.left"		},
+    { "bd_firefly_right",	"bd_firefly.right"		},
+    { "bd_firefly_up",		"bd_firefly.up"			},
+    { "bd_firefly_down",	"bd_firefly.down"		},
+
+    { NULL,							}
   };
   int i;
 
