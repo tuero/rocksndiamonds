@@ -1683,6 +1683,30 @@ int GetElementFromGroupElement(int element)
   return element;
 }
 
+static void IncrementPlayerSokobanFieldsNeeded(struct PlayerInfo *player)
+{
+  if (level.sb_fields_needed)
+    player->sokoban_fields_still_needed++;
+}
+
+static void IncrementPlayerSokobanObjectsNeeded(struct PlayerInfo *player)
+{
+  if (level.sb_objects_needed)
+    player->sokoban_objects_still_needed++;
+}
+
+static void DecrementPlayerSokobanFieldsNeeded(struct PlayerInfo *player)
+{
+  if (player->sokoban_fields_still_needed > 0)
+    player->sokoban_fields_still_needed--;
+}
+
+static void DecrementPlayerSokobanObjectsNeeded(struct PlayerInfo *player)
+{
+  if (player->sokoban_objects_still_needed > 0)
+    player->sokoban_objects_still_needed--;
+}
+
 static void InitPlayerField(int x, int y, int element, boolean init_game)
 {
   if (element == EL_SP_MURPHY)
@@ -1792,11 +1816,11 @@ static void InitField(int x, int y, boolean init_game)
       break;
 
     case EL_SOKOBAN_FIELD_EMPTY:
-      local_player->sokoban_fields_still_needed++;
+      IncrementPlayerSokobanFieldsNeeded(local_player);
       break;
 
     case EL_SOKOBAN_OBJECT:
-      local_player->sokoban_objects_still_needed++;
+      IncrementPlayerSokobanObjectsNeeded(local_player);
       break;
 
     case EL_STONEBLOCK:
@@ -13948,15 +13972,17 @@ static int DigField(struct PlayerInfo *player,
       if (element == EL_SOKOBAN_FIELD_FULL)
       {
 	Back[x][y] = EL_SOKOBAN_FIELD_EMPTY;
-	local_player->sokoban_fields_still_needed++;
-	local_player->sokoban_objects_still_needed++;
+
+	IncrementPlayerSokobanFieldsNeeded(local_player);
+	IncrementPlayerSokobanObjectsNeeded(local_player);
       }
 
       if (Feld[nextx][nexty] == EL_SOKOBAN_FIELD_EMPTY)
       {
 	Back[nextx][nexty] = EL_SOKOBAN_FIELD_EMPTY;
-	local_player->sokoban_fields_still_needed--;
-	local_player->sokoban_objects_still_needed--;
+
+	DecrementPlayerSokobanFieldsNeeded(local_player);
+	DecrementPlayerSokobanObjectsNeeded(local_player);
 
 	// sokoban object was pushed from empty field to sokoban field
 	if (Back[x][y] == EL_EMPTY)

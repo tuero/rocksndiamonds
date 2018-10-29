@@ -3097,6 +3097,8 @@ struct LevelInfo
   boolean lazy_relocation;	// only redraw off-screen player relocation
   boolean can_pass_to_walkable;	// player can pass to empty or walkable tile
   boolean grow_into_diggable;	// amoeba can grow into anything diggable
+  boolean sb_fields_needed;	// all Sokoban fields must be solved
+  boolean sb_objects_needed;	// all Sokoban objects must be solved
   boolean auto_exit_sokoban;	// automatically finish solved Sokoban levels
   boolean solved_by_one_player;	// level is solved if one player enters exit
 

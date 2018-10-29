@@ -819,6 +819,18 @@ static struct LevelFileConfigInfo chunk_config_ELEM[] =
   },
 
   {
+    EL_SOKOBAN_FIELD_EMPTY,		-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(1),
+    &li.sb_fields_needed,		TRUE
+  },
+
+  {
+    EL_SOKOBAN_OBJECT,			-1,
+    TYPE_BOOLEAN,			CONF_VALUE_8_BIT(1),
+    &li.sb_objects_needed,		TRUE
+  },
+
+  {
     EL_MM_MCDUFFIN,			-1,
     TYPE_BOOLEAN,			CONF_VALUE_8_BIT(1),
     &li.mm_laser_red,			FALSE

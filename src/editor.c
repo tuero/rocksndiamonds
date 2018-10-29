@@ -642,6 +642,8 @@ enum
   GADGET_ID_RANDOM_BALL_CONTENT,
   GADGET_ID_INITIAL_BALL_STATE,
   GADGET_ID_GROW_INTO_DIGGABLE,
+  GADGET_ID_SB_FIELDS_NEEDED,
+  GADGET_ID_SB_OBJECTS_NEEDED,
   GADGET_ID_AUTO_EXIT_SOKOBAN,
   GADGET_ID_SOLVED_BY_ONE_PLAYER,
   GADGET_ID_CONTINUOUS_SNAPPING,
@@ -945,6 +947,8 @@ enum
   ED_CHECKBUTTON_ID_RANDOM_BALL_CONTENT,
   ED_CHECKBUTTON_ID_INITIAL_BALL_STATE,
   ED_CHECKBUTTON_ID_GROW_INTO_DIGGABLE,
+  ED_CHECKBUTTON_ID_SB_FIELDS_NEEDED,
+  ED_CHECKBUTTON_ID_SB_OBJECTS_NEEDED,
   ED_CHECKBUTTON_ID_AUTO_EXIT_SOKOBAN,
   ED_CHECKBUTTON_ID_SOLVED_BY_ONE_PLAYER,
   ED_CHECKBUTTON_ID_CONTINUOUS_SNAPPING,
@@ -3068,6 +3072,20 @@ static struct
   },
   {
     ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(0),
+    GADGET_ID_SB_FIELDS_NEEDED,		GADGET_ID_NONE,
+    &level.sb_fields_needed,
+    NULL, NULL,
+    "all fields need to be filled",	"require all SB fields to be solved"
+  },
+  {
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(0),
+    GADGET_ID_SB_OBJECTS_NEEDED,	GADGET_ID_NONE,
+    &level.sb_objects_needed,
+    NULL, NULL,
+    "all objects need to be placed",	"require all SB objects to be solved"
+  },
+  {
+    ED_ELEMENT_SETTINGS_XPOS(0),	ED_ELEMENT_SETTINGS_YPOS(1),
     GADGET_ID_AUTO_EXIT_SOKOBAN,	GADGET_ID_NONE,
     &level.auto_exit_sokoban,
     NULL, NULL,
@@ -9931,10 +9949,22 @@ static void DrawPropertiesConfig(void)
     MapCheckbuttonGadget(ED_CHECKBUTTON_ID_GROW_INTO_DIGGABLE);
   }
 
+  if (properties_element == EL_SOKOBAN_FIELD_EMPTY)
+    MapCheckbuttonGadget(ED_CHECKBUTTON_ID_SB_FIELDS_NEEDED);
+
+  if (properties_element == EL_SOKOBAN_OBJECT)
+    MapCheckbuttonGadget(ED_CHECKBUTTON_ID_SB_OBJECTS_NEEDED);
+
   if (properties_element == EL_SOKOBAN_OBJECT ||
       properties_element == EL_SOKOBAN_FIELD_EMPTY ||
       properties_element == EL_SOKOBAN_FIELD_FULL)
+  {
+    checkbutton_info[ED_CHECKBUTTON_ID_AUTO_EXIT_SOKOBAN].y =
+      ED_ELEMENT_SETTINGS_XPOS(properties_element == EL_SOKOBAN_FIELD_FULL ?
+			       0 : 1);
+
     MapCheckbuttonGadget(ED_CHECKBUTTON_ID_AUTO_EXIT_SOKOBAN);
+  }
 
   if (IS_BALLOON_ELEMENT(properties_element))
     MapSelectboxGadget(ED_SELECTBOX_ID_WIND_DIRECTION);
