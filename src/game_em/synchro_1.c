@@ -1069,6 +1069,9 @@ static boolean player_digfield(struct PLAYER *ply, int dx, int dy)
       case Xexit_3:
 	lev.home--;
 
+	if (lev.home == 0)
+	  game_em.level_solved = TRUE;
+
 	ply->anim = SPR_walk + anim;
 	ply->x = x;
 	ply->y = y;

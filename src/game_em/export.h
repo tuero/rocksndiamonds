@@ -664,6 +664,9 @@ struct GlobalInfo_EM
 
 struct GameInfo_EM
 {
+  boolean level_solved;
+  boolean game_over;
+
   boolean any_player_moving;
   boolean any_player_snapping;
 

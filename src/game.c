@@ -11117,19 +11117,17 @@ static void CheckLevelSolved(void)
 {
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
   {
-    if (level.native_em_level->lev->home == 0)	// all players at home
+    if (game_em.level_solved &&
+	!game_em.game_over)				// game won
     {
       PlayerWins(local_player);
 
-      AllPlayersGone = TRUE;
+      game_em.game_over = TRUE;
 
-      level.native_em_level->lev->home = -1;
+      AllPlayersGone = TRUE;
     }
 
-    if (level.native_em_level->ply[0]->alive == 0 &&
-	level.native_em_level->ply[1]->alive == 0 &&
-	level.native_em_level->ply[2]->alive == 0 &&
-	level.native_em_level->ply[3]->alive == 0)	// all dead
+    if (game_em.game_over)				// game lost
       AllPlayersGone = TRUE;
   }
   else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
@@ -15041,7 +15039,7 @@ boolean checkGameFailed(void)
     return FALSE;
 
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
-    return (level.native_em_level->lev->home > 0);
+    return (game_em.game_over && !game_em.level_solved);
   else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
     return (game_sp.game_over && !game_sp.level_solved);
   else if (level.game_engine_type == GAME_ENGINE_TYPE_MM)

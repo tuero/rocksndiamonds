@@ -4867,6 +4867,8 @@ void synchro_2(void)
 
   if (ply[0].alive || ply[1].alive || ply[2].alive || ply[3].alive)
     lev.score += score;		/* only add a score if someone is alive */
+  else
+    game_em.game_over = TRUE;
 
   RandomEM = random;
 
