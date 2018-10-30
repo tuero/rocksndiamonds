@@ -4457,7 +4457,7 @@ void InitAmoebaNr(int x, int y)
   AmoebaCnt2[group_nr]++;
 }
 
-static void PlayerWins(void)
+static void LevelSolved(void)
 {
   if (level.game_engine_type == GAME_ENGINE_TYPE_RND &&
       local_player->players_still_needed > 0)
@@ -7952,7 +7952,7 @@ static void StartMoving(int x, int y)
 	local_player->friends_still_needed--;
 	if (!local_player->friends_still_needed &&
 	    !local_player->GameOver && AllPlayersGone)
-	  PlayerWins();
+	  LevelSolved();
 
 	return;
       }
@@ -9849,7 +9849,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 	  ExitPlayer(&stored_player[i]);
 
       if (AllPlayersGone)
-	PlayerWins();
+	LevelSolved();
 
       break;
     }
@@ -11121,7 +11121,7 @@ static void CheckLevelSolved(void)
     if (game_em.level_solved &&
 	!game_em.game_over)				// game won
     {
-      PlayerWins();
+      LevelSolved();
 
       game_em.game_over = TRUE;
 
@@ -11136,7 +11136,7 @@ static void CheckLevelSolved(void)
     if (game_sp.level_solved &&
 	!game_sp.game_over)				// game won
     {
-      PlayerWins();
+      LevelSolved();
 
       game_sp.game_over = TRUE;
 
@@ -11151,7 +11151,7 @@ static void CheckLevelSolved(void)
     if (game_mm.level_solved &&
 	!game_mm.game_over)				// game won
     {
-      PlayerWins();
+      LevelSolved();
 
       game_mm.game_over = TRUE;
 
@@ -12678,7 +12678,7 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
       if ((local_player->friends_still_needed == 0 ||
 	   IS_SP_ELEMENT(Feld[jx][jy])) &&
 	  AllPlayersGone)
-	PlayerWins();
+	LevelSolved();
     }
 
     // this breaks one level: "machine", level 000
@@ -14006,7 +14006,7 @@ static int DigField(struct PlayerInfo *player,
       {
 	local_player->players_still_needed = 0;
 
-	PlayerWins();
+	LevelSolved();
 
 	PlayLevelSound(x, y, SND_GAME_SOKOBAN_SOLVING);
       }
