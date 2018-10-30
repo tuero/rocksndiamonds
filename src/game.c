@@ -4457,7 +4457,7 @@ void InitAmoebaNr(int x, int y)
   AmoebaCnt2[group_nr]++;
 }
 
-static void PlayerWins(struct PlayerInfo *player)
+static void PlayerWins(void)
 {
   if (level.game_engine_type == GAME_ENGINE_TYPE_RND &&
       local_player->players_still_needed > 0)
@@ -4465,20 +4465,20 @@ static void PlayerWins(struct PlayerInfo *player)
 
   game.LevelSolved = TRUE;
 
-  player->GameOver = TRUE;
+  local_player->GameOver = TRUE;
 
-  player->score_final = (level.game_engine_type == GAME_ENGINE_TYPE_EM ?
-			 level.native_em_level->lev->score :
-			 level.game_engine_type == GAME_ENGINE_TYPE_MM ?
-			 game_mm.score :
-			 player->score);
-  player->health_final = (level.game_engine_type == GAME_ENGINE_TYPE_MM ?
-			  MM_HEALTH(game_mm.laser_overload_value) :
-			  player->health);
+  local_player->score_final = (level.game_engine_type == GAME_ENGINE_TYPE_EM ?
+			       level.native_em_level->lev->score :
+			       level.game_engine_type == GAME_ENGINE_TYPE_MM ?
+			       game_mm.score :
+			       local_player->score);
+  local_player->health_final = (level.game_engine_type == GAME_ENGINE_TYPE_MM ?
+				MM_HEALTH(game_mm.laser_overload_value) :
+				local_player->health);
 
   game.LevelSolved_CountingTime = (game.no_time_limit ? TimePlayed : TimeLeft);
-  game.LevelSolved_CountingScore = player->score_final;
-  game.LevelSolved_CountingHealth = player->health_final;
+  game.LevelSolved_CountingScore = local_player->score_final;
+  game.LevelSolved_CountingHealth = local_player->health_final;
 }
 
 void GameWon(void)
@@ -7952,7 +7952,7 @@ static void StartMoving(int x, int y)
 	local_player->friends_still_needed--;
 	if (!local_player->friends_still_needed &&
 	    !local_player->GameOver && AllPlayersGone)
-	  PlayerWins(local_player);
+	  PlayerWins();
 
 	return;
       }
@@ -9849,7 +9849,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 	  ExitPlayer(&stored_player[i]);
 
       if (AllPlayersGone)
-	PlayerWins(local_player);
+	PlayerWins();
 
       break;
     }
@@ -11121,7 +11121,7 @@ static void CheckLevelSolved(void)
     if (game_em.level_solved &&
 	!game_em.game_over)				// game won
     {
-      PlayerWins(local_player);
+      PlayerWins();
 
       game_em.game_over = TRUE;
 
@@ -11136,7 +11136,7 @@ static void CheckLevelSolved(void)
     if (game_sp.level_solved &&
 	!game_sp.game_over)				// game won
     {
-      PlayerWins(local_player);
+      PlayerWins();
 
       game_sp.game_over = TRUE;
 
@@ -11151,7 +11151,7 @@ static void CheckLevelSolved(void)
     if (game_mm.level_solved &&
 	!game_mm.game_over)				// game won
     {
-      PlayerWins(local_player);
+      PlayerWins();
 
       game_mm.game_over = TRUE;
 
@@ -12678,7 +12678,7 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
       if ((local_player->friends_still_needed == 0 ||
 	   IS_SP_ELEMENT(Feld[jx][jy])) &&
 	  AllPlayersGone)
-	PlayerWins(local_player);
+	PlayerWins();
     }
 
     // this breaks one level: "machine", level 000
@@ -14006,7 +14006,7 @@ static int DigField(struct PlayerInfo *player,
       {
 	local_player->players_still_needed = 0;
 
-	PlayerWins(local_player);
+	PlayerWins();
 
 	PlayLevelSound(x, y, SND_GAME_SOKOBAN_SOLVING);
       }
