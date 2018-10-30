@@ -190,6 +190,13 @@ struct GameInfo
   boolean envelope_active;
   boolean no_time_limit;	// (variable only in very special case)
 
+  int gems_still_needed;
+  int sokoban_fields_still_needed;
+  int sokoban_objects_still_needed;
+  int lights_still_needed;
+  int players_still_needed;
+  int friends_still_needed;
+
   // values for the new EMC elements
   int lenses_time_left;
   int magnify_time_left;
@@ -349,12 +356,6 @@ struct PlayerInfo
   int health;
   int health_final;
 
-  int gems_still_needed;
-  int sokoban_fields_still_needed;
-  int sokoban_objects_still_needed;
-  int lights_still_needed;
-  int players_still_needed;
-  int friends_still_needed;
   int key[MAX_NUM_KEYS];
   int num_white_keys;
   int dynabomb_count, dynabomb_size, dynabombs_left, dynabomb_xl;

@@ -1686,25 +1686,25 @@ int GetElementFromGroupElement(int element)
 static void IncrementSokobanFieldsNeeded(void)
 {
   if (level.sb_fields_needed)
-    local_player->sokoban_fields_still_needed++;
+    game.sokoban_fields_still_needed++;
 }
 
 static void IncrementSokobanObjectsNeeded(void)
 {
   if (level.sb_objects_needed)
-    local_player->sokoban_objects_still_needed++;
+    game.sokoban_objects_still_needed++;
 }
 
 static void DecrementSokobanFieldsNeeded(void)
 {
-  if (local_player->sokoban_fields_still_needed > 0)
-    local_player->sokoban_fields_still_needed--;
+  if (game.sokoban_fields_still_needed > 0)
+    game.sokoban_fields_still_needed--;
 }
 
 static void DecrementSokobanObjectsNeeded(void)
 {
-  if (local_player->sokoban_objects_still_needed > 0)
-    local_player->sokoban_objects_still_needed--;
+  if (game.sokoban_objects_still_needed > 0)
+    game.sokoban_objects_still_needed--;
 }
 
 static void InitPlayerField(int x, int y, int element, boolean init_game)
@@ -1905,11 +1905,11 @@ static void InitField(int x, int y, boolean init_game)
       break;
 
     case EL_LAMP:
-      local_player->lights_still_needed++;
+      game.lights_still_needed++;
       break;
 
     case EL_PENGUIN:
-      local_player->friends_still_needed++;
+      game.friends_still_needed++;
       break;
 
     case EL_PIG:
@@ -2231,7 +2231,7 @@ static void UpdateGameControlValues(void)
 	      level.native_sp_level->game_sp->infotrons_still_needed :
 	      level.game_engine_type == GAME_ENGINE_TYPE_MM ?
 	      game_mm.kettles_still_needed :
-	      local_player->gems_still_needed);
+	      game.gems_still_needed);
   int exit_closed = (level.game_engine_type == GAME_ENGINE_TYPE_EM ?
 		     level.native_em_level->lev->required > 0 :
 		     level.game_engine_type == GAME_ENGINE_TYPE_SP ?
@@ -2239,10 +2239,10 @@ static void UpdateGameControlValues(void)
 		     level.game_engine_type == GAME_ENGINE_TYPE_MM ?
 		     game_mm.kettles_still_needed > 0 ||
 		     game_mm.lights_still_needed > 0 :
-		     local_player->gems_still_needed > 0 ||
-		     local_player->sokoban_fields_still_needed > 0 ||
-		     local_player->sokoban_objects_still_needed > 0 ||
-		     local_player->lights_still_needed > 0);
+		     game.gems_still_needed > 0 ||
+		     game.sokoban_fields_still_needed > 0 ||
+		     game.sokoban_objects_still_needed > 0 ||
+		     game.lights_still_needed > 0);
   int health = (game.LevelSolved ?
 		game.LevelSolved_CountingHealth :
 		level.game_engine_type == GAME_ENGINE_TYPE_MM ?
@@ -2407,12 +2407,12 @@ static void UpdateGameControlValues(void)
     (local_player->dynabomb_xl ? EL_DYNABOMB_INCREASE_POWER : EL_EMPTY);
 
   game_panel_controls[GAME_PANEL_PENGUINS].value =
-    local_player->friends_still_needed;
+    game.friends_still_needed;
 
   game_panel_controls[GAME_PANEL_SOKOBAN_OBJECTS].value =
-    local_player->sokoban_objects_still_needed;
+    game.sokoban_objects_still_needed;
   game_panel_controls[GAME_PANEL_SOKOBAN_FIELDS].value =
-    local_player->sokoban_fields_still_needed;
+    game.sokoban_fields_still_needed;
 
   game_panel_controls[GAME_PANEL_ROBOT_WHEEL].value =
     (game.robot_wheel_active ? EL_ROBOT_WHEEL_ACTIVE : EL_ROBOT_WHEEL);
@@ -3417,13 +3417,6 @@ void InitGame(void)
     player->health = MAX_HEALTH;
     player->health_final = MAX_HEALTH;
 
-    player->gems_still_needed = level.gems_needed;
-    player->sokoban_fields_still_needed = 0;
-    player->sokoban_objects_still_needed = 0;
-    player->lights_still_needed = 0;
-    player->players_still_needed = 0;
-    player->friends_still_needed = 0;
-
     for (j = 0; j < MAX_NUM_KEYS; j++)
       player->key[j] = FALSE;
 
@@ -3597,6 +3590,13 @@ void InitGame(void)
   game.timegate_time_left = 0;
   game.switchgate_pos = 0;
   game.wind_direction = level.wind_direction_initial;
+
+  game.gems_still_needed = level.gems_needed;
+  game.sokoban_fields_still_needed = 0;
+  game.sokoban_objects_still_needed = 0;
+  game.lights_still_needed = 0;
+  game.players_still_needed = 0;
+  game.friends_still_needed = 0;
 
   game.lenses_time_left = 0;
   game.magnify_time_left = 0;
@@ -3985,10 +3985,10 @@ void InitGame(void)
 
   for (i = 0; i < MAX_PLAYERS; i++)
     if (stored_player[i].active)
-      local_player->players_still_needed++;
+      game.players_still_needed++;
 
   if (level.solved_by_one_player)
-    local_player->players_still_needed = 1;
+    game.players_still_needed = 1;
 
   // when recording the game, store which players take part in the game
   if (tape.recording)
@@ -4460,7 +4460,7 @@ void InitAmoebaNr(int x, int y)
 static void LevelSolved(void)
 {
   if (level.game_engine_type == GAME_ENGINE_TYPE_RND &&
-      local_player->players_still_needed > 0)
+      game.players_still_needed > 0)
     return;
 
   game.LevelSolved = TRUE;
@@ -7949,8 +7949,8 @@ static void StartMoving(int x, int y)
 	if (IN_SCR_FIELD(SCREENX(newx), SCREENY(newy)))
 	  DrawGraphicThruMask(SCREENX(newx),SCREENY(newy), el2img(element), 0);
 
-	local_player->friends_still_needed--;
-	if (!local_player->friends_still_needed &&
+	game.friends_still_needed--;
+	if (!game.friends_still_needed &&
 	    !local_player->GameOver && AllPlayersGone)
 	  LevelSolved();
 
@@ -9083,10 +9083,10 @@ static void ActivateMagicBall(int bx, int by)
 
 static void CheckExit(int x, int y)
 {
-  if (local_player->gems_still_needed > 0 ||
-      local_player->sokoban_fields_still_needed > 0 ||
-      local_player->sokoban_objects_still_needed > 0 ||
-      local_player->lights_still_needed > 0)
+  if (game.gems_still_needed > 0 ||
+      game.sokoban_fields_still_needed > 0 ||
+      game.sokoban_objects_still_needed > 0 ||
+      game.lights_still_needed > 0)
   {
     int element = Feld[x][y];
     int graphic = el2img(element);
@@ -9107,10 +9107,10 @@ static void CheckExit(int x, int y)
 
 static void CheckExitEM(int x, int y)
 {
-  if (local_player->gems_still_needed > 0 ||
-      local_player->sokoban_fields_still_needed > 0 ||
-      local_player->sokoban_objects_still_needed > 0 ||
-      local_player->lights_still_needed > 0)
+  if (game.gems_still_needed > 0 ||
+      game.sokoban_fields_still_needed > 0 ||
+      game.sokoban_objects_still_needed > 0 ||
+      game.lights_still_needed > 0)
   {
     int element = Feld[x][y];
     int graphic = el2img(element);
@@ -9131,10 +9131,10 @@ static void CheckExitEM(int x, int y)
 
 static void CheckExitSteel(int x, int y)
 {
-  if (local_player->gems_still_needed > 0 ||
-      local_player->sokoban_fields_still_needed > 0 ||
-      local_player->sokoban_objects_still_needed > 0 ||
-      local_player->lights_still_needed > 0)
+  if (game.gems_still_needed > 0 ||
+      game.sokoban_fields_still_needed > 0 ||
+      game.sokoban_objects_still_needed > 0 ||
+      game.lights_still_needed > 0)
   {
     int element = Feld[x][y];
     int graphic = el2img(element);
@@ -9155,10 +9155,10 @@ static void CheckExitSteel(int x, int y)
 
 static void CheckExitSteelEM(int x, int y)
 {
-  if (local_player->gems_still_needed > 0 ||
-      local_player->sokoban_fields_still_needed > 0 ||
-      local_player->sokoban_objects_still_needed > 0 ||
-      local_player->lights_still_needed > 0)
+  if (game.gems_still_needed > 0 ||
+      game.sokoban_fields_still_needed > 0 ||
+      game.sokoban_objects_still_needed > 0 ||
+      game.lights_still_needed > 0)
   {
     int element = Feld[x][y];
     int graphic = el2img(element);
@@ -9179,7 +9179,7 @@ static void CheckExitSteelEM(int x, int y)
 
 static void CheckExitSP(int x, int y)
 {
-  if (local_player->gems_still_needed > 0)
+  if (game.gems_still_needed > 0)
   {
     int element = Feld[x][y];
     int graphic = el2img(element);
@@ -9706,7 +9706,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
      action_arg == CA_ARG_NUMBER_CE_SCORE ? ei->collect_score :
      action_arg == CA_ARG_NUMBER_CE_DELAY ? GET_CE_DELAY_VALUE(change) :
      action_arg == CA_ARG_NUMBER_LEVEL_TIME ? level_time_value :
-     action_arg == CA_ARG_NUMBER_LEVEL_GEMS ? local_player->gems_still_needed :
+     action_arg == CA_ARG_NUMBER_LEVEL_GEMS ? game.gems_still_needed :
      action_arg == CA_ARG_NUMBER_LEVEL_SCORE ? local_player->score :
      action_arg == CA_ARG_ELEMENT_CV_TARGET ? GET_NEW_CE_VALUE(target_element):
      action_arg == CA_ARG_ELEMENT_CV_TRIGGER ? change->actual_trigger_ce_value:
@@ -9720,7 +9720,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
      -1);
 
   int action_arg_number_old =
-    (action_type == CA_SET_LEVEL_GEMS ? local_player->gems_still_needed :
+    (action_type == CA_SET_LEVEL_GEMS ? game.gems_still_needed :
      action_type == CA_SET_LEVEL_TIME ? TimeLeft :
      action_type == CA_SET_LEVEL_SCORE ? local_player->score :
      action_type == CA_SET_CE_VALUE ? CustomValue[x][y] :
@@ -9803,12 +9803,11 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 
     case CA_SET_LEVEL_GEMS:
     {
-      local_player->gems_still_needed = action_arg_number_new;
+      game.gems_still_needed = action_arg_number_new;
 
       game.snapshot.collected_item = TRUE;
 
-      game_panel_controls[GAME_PANEL_GEMS].value =
-	local_player->gems_still_needed;
+      game_panel_controls[GAME_PANEL_GEMS].value = game.gems_still_needed;
 
       DisplayGameControlValues();
 
@@ -12675,7 +12674,7 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
     {
       ExitPlayer(player);
 
-      if ((local_player->friends_still_needed == 0 ||
+      if ((game.friends_still_needed == 0 ||
 	   IS_SP_ELEMENT(Feld[jx][jy])) &&
 	  AllPlayersGone)
 	LevelSolved();
@@ -13439,11 +13438,11 @@ void ExitPlayer(struct PlayerInfo *player)
   DrawPlayer(player);	// needed here only to cleanup last field
   RemovePlayer(player);
 
-  if (local_player->players_still_needed > 0)
-    local_player->players_still_needed--;
+  if (game.players_still_needed > 0)
+    game.players_still_needed--;
 
   // also set if some players not yet gone, but not needed to solve level
-  if (local_player->players_still_needed == 0)
+  if (game.players_still_needed == 0)
     AllPlayersGone = TRUE;
 }
 
@@ -13854,13 +13853,13 @@ static int DigField(struct PlayerInfo *player,
     }
     else if (collect_count > 0)
     {
-      local_player->gems_still_needed -= collect_count;
-      if (local_player->gems_still_needed < 0)
-	local_player->gems_still_needed = 0;
+      game.gems_still_needed -= collect_count;
+      if (game.gems_still_needed < 0)
+	game.gems_still_needed = 0;
 
       game.snapshot.collected_item = TRUE;
 
-      game_panel_controls[GAME_PANEL_GEMS].value = local_player->gems_still_needed;
+      game_panel_controls[GAME_PANEL_GEMS].value = game.gems_still_needed;
 
       DisplayGameControlValues();
     }
@@ -14000,11 +13999,11 @@ static int DigField(struct PlayerInfo *player,
 				    ACTION_FILLING);
 
       if (sokoban_task_solved &&
-	  local_player->sokoban_fields_still_needed == 0 &&
-	  local_player->sokoban_objects_still_needed == 0 &&
+	  game.sokoban_fields_still_needed == 0 &&
+	  game.sokoban_objects_still_needed == 0 &&
 	  (game.emulation == EMU_SOKOBAN || level.auto_exit_sokoban))
       {
-	local_player->players_still_needed = 0;
+	game.players_still_needed = 0;
 
 	LevelSolved();
 
@@ -14122,7 +14121,7 @@ static int DigField(struct PlayerInfo *player,
     else if (element == EL_LAMP)
     {
       Feld[x][y] = EL_LAMP_ACTIVE;
-      local_player->lights_still_needed--;
+      game.lights_still_needed--;
 
       ResetGfxAnimation(x, y);
       TEST_DrawLevelField(x, y);
