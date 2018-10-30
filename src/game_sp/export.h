@@ -91,8 +91,8 @@ struct GlobalInfo_SP
 
 struct GameInfo_SP
 {
-  boolean LevelSolved;
-  boolean GameOver;
+  boolean level_solved;
+  boolean game_over;
 
   // needed for updating panel
   int time_played;

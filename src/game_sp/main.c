@@ -18,8 +18,8 @@ void InitGameEngine_SP(void)
 
   gfx.anim_random_frame = -1;	// (use simple, ad-hoc random numbers)
 
-  game_sp.LevelSolved = FALSE;
-  game_sp.GameOver = FALSE;
+  game_sp.level_solved = FALSE;
+  game_sp.game_over = FALSE;
 
   game_sp.time_played = 0;
   game_sp.infotrons_still_needed = native_sp_level.header.InfotronsNeeded;

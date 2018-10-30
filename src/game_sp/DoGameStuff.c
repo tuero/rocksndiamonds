@@ -71,8 +71,8 @@ void subDoGameStuff(void)
   if (KillMurphyFlag == 1 || MurphyMoveCounter == 0)
   {
     if (LeadOutCounter == 0 &&
-	!game_sp.LevelSolved &&
-	!game_sp.GameOver)
+	!game_sp.level_solved &&
+	!game_sp.game_over)
     {
       KillMurphyFlag = 0;			// no more "kill Murphy"
       ExplodeFieldSP(MurphyExplodePos);		// Explode

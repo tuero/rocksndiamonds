@@ -75,8 +75,8 @@ void subMainGameLoop_Main(byte action, boolean warp_mode)
   // ---------------------- END OF GAME-BUSY LOOP (including lead-out) ---------
 
   // if the game is not won when reaching this point, then it is lost
-  if (!game_sp.LevelSolved)
-    game_sp.GameOver = TRUE;
+  if (!game_sp.level_solved)
+    game_sp.game_over = TRUE;
 }
 
 void subCalculateScreenScrollPos(void)

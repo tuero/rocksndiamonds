@@ -962,7 +962,7 @@ loc_g_6756:
   if (LowByte(InfotronsNeeded) != 0)
     return;
 
-  game_sp.LevelSolved = TRUE;
+  game_sp.level_solved = TRUE;
 
   subSoundFX(*si, fiExit, actPassing);
 

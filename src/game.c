@@ -11134,17 +11134,17 @@ static void CheckLevelSolved(void)
   }
   else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
   {
-    if (game_sp.LevelSolved &&
-	!game_sp.GameOver)				// game won
+    if (game_sp.level_solved &&
+	!game_sp.game_over)				// game won
     {
       PlayerWins(local_player);
 
-      game_sp.GameOver = TRUE;
+      game_sp.game_over = TRUE;
 
       AllPlayersGone = TRUE;
     }
 
-    if (game_sp.GameOver)				// game lost
+    if (game_sp.game_over)				// game lost
       AllPlayersGone = TRUE;
   }
   else if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
@@ -15043,7 +15043,7 @@ boolean checkGameFailed(void)
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
     return (level.native_em_level->lev->home > 0);
   else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
-    return (game_sp.GameOver && !game_sp.LevelSolved);
+    return (game_sp.game_over && !game_sp.level_solved);
   else if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
     return (game_mm.game_over && !game_mm.level_solved);
   else				// GAME_ENGINE_TYPE_RND
