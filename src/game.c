@@ -1683,28 +1683,28 @@ int GetElementFromGroupElement(int element)
   return element;
 }
 
-static void IncrementPlayerSokobanFieldsNeeded(struct PlayerInfo *player)
+static void IncrementPlayerSokobanFieldsNeeded(void)
 {
   if (level.sb_fields_needed)
-    player->sokoban_fields_still_needed++;
+    local_player->sokoban_fields_still_needed++;
 }
 
-static void IncrementPlayerSokobanObjectsNeeded(struct PlayerInfo *player)
+static void IncrementPlayerSokobanObjectsNeeded(void)
 {
   if (level.sb_objects_needed)
-    player->sokoban_objects_still_needed++;
+    local_player->sokoban_objects_still_needed++;
 }
 
-static void DecrementPlayerSokobanFieldsNeeded(struct PlayerInfo *player)
+static void DecrementPlayerSokobanFieldsNeeded(void)
 {
-  if (player->sokoban_fields_still_needed > 0)
-    player->sokoban_fields_still_needed--;
+  if (local_player->sokoban_fields_still_needed > 0)
+    local_player->sokoban_fields_still_needed--;
 }
 
-static void DecrementPlayerSokobanObjectsNeeded(struct PlayerInfo *player)
+static void DecrementPlayerSokobanObjectsNeeded(void)
 {
-  if (player->sokoban_objects_still_needed > 0)
-    player->sokoban_objects_still_needed--;
+  if (local_player->sokoban_objects_still_needed > 0)
+    local_player->sokoban_objects_still_needed--;
 }
 
 static void InitPlayerField(int x, int y, int element, boolean init_game)
@@ -1816,11 +1816,11 @@ static void InitField(int x, int y, boolean init_game)
       break;
 
     case EL_SOKOBAN_FIELD_EMPTY:
-      IncrementPlayerSokobanFieldsNeeded(local_player);
+      IncrementPlayerSokobanFieldsNeeded();
       break;
 
     case EL_SOKOBAN_OBJECT:
-      IncrementPlayerSokobanObjectsNeeded(local_player);
+      IncrementPlayerSokobanObjectsNeeded();
       break;
 
     case EL_STONEBLOCK:
@@ -13972,16 +13972,16 @@ static int DigField(struct PlayerInfo *player,
       {
 	Back[x][y] = EL_SOKOBAN_FIELD_EMPTY;
 
-	IncrementPlayerSokobanFieldsNeeded(local_player);
-	IncrementPlayerSokobanObjectsNeeded(local_player);
+	IncrementPlayerSokobanFieldsNeeded();
+	IncrementPlayerSokobanObjectsNeeded();
       }
 
       if (Feld[nextx][nexty] == EL_SOKOBAN_FIELD_EMPTY)
       {
 	Back[nextx][nexty] = EL_SOKOBAN_FIELD_EMPTY;
 
-	DecrementPlayerSokobanFieldsNeeded(local_player);
-	DecrementPlayerSokobanObjectsNeeded(local_player);
+	DecrementPlayerSokobanFieldsNeeded();
+	DecrementPlayerSokobanObjectsNeeded();
 
 	// sokoban object was pushed from empty field to sokoban field
 	if (Back[x][y] == EL_EMPTY)
