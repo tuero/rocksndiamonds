@@ -2207,8 +2207,8 @@ static void UpdatePlayfieldElementCount(void)
 static void UpdateGameControlValues(void)
 {
   int i, k;
-  int time = (local_player->LevelSolved ?
-	      local_player->LevelSolved_CountingTime :
+  int time = (game.LevelSolved ?
+	      game.LevelSolved_CountingTime :
 	      level.game_engine_type == GAME_ENGINE_TYPE_EM ?
 	      level.native_em_level->lev->time :
 	      level.game_engine_type == GAME_ENGINE_TYPE_SP ?
@@ -2216,8 +2216,8 @@ static void UpdateGameControlValues(void)
 	      level.game_engine_type == GAME_ENGINE_TYPE_MM ?
 	      game_mm.energy_left :
 	      game.no_time_limit ? TimePlayed : TimeLeft);
-  int score = (local_player->LevelSolved ?
-	       local_player->LevelSolved_CountingScore :
+  int score = (game.LevelSolved ?
+	       game.LevelSolved_CountingScore :
 	       level.game_engine_type == GAME_ENGINE_TYPE_EM ?
 	       level.native_em_level->lev->score :
 	       level.game_engine_type == GAME_ENGINE_TYPE_SP ?
@@ -2243,8 +2243,8 @@ static void UpdateGameControlValues(void)
 		     local_player->sokoban_fields_still_needed > 0 ||
 		     local_player->sokoban_objects_still_needed > 0 ||
 		     local_player->lights_still_needed > 0);
-  int health = (local_player->LevelSolved ?
-		local_player->LevelSolved_CountingHealth :
+  int health = (game.LevelSolved ?
+		game.LevelSolved_CountingHealth :
 		level.game_engine_type == GAME_ENGINE_TYPE_MM ?
 		MM_HEALTH(game_mm.laser_overload_value) :
 		local_player->health);
@@ -3546,17 +3546,7 @@ void InitGame(void)
     DigField(player, 0, 0, 0, 0, 0, 0, DF_NO_PUSH);
     SnapField(player, 0, 0);
 
-    player->LevelSolved = FALSE;
     player->GameOver = FALSE;
-
-    player->LevelSolved_GameWon = FALSE;
-    player->LevelSolved_GameEnd = FALSE;
-    player->LevelSolved_SaveTape = FALSE;
-    player->LevelSolved_SaveScore = FALSE;
-
-    player->LevelSolved_CountingTime = 0;
-    player->LevelSolved_CountingScore = 0;
-    player->LevelSolved_CountingHealth = 0;
 
     map_player_action[i] = i;
   }
@@ -3583,6 +3573,17 @@ void InitGame(void)
   ScrollStepSize = 0;	// will be correctly initialized by ScrollScreen()
 
   AllPlayersGone = FALSE;
+
+  game.LevelSolved = FALSE;
+
+  game.LevelSolved_GameWon = FALSE;
+  game.LevelSolved_GameEnd = FALSE;
+  game.LevelSolved_SaveTape = FALSE;
+  game.LevelSolved_SaveScore = FALSE;
+
+  game.LevelSolved_CountingTime = 0;
+  game.LevelSolved_CountingScore = 0;
+  game.LevelSolved_CountingHealth = 0;
 
   game.panel.active = TRUE;
 
@@ -4462,7 +4463,8 @@ static void PlayerWins(struct PlayerInfo *player)
       local_player->players_still_needed > 0)
     return;
 
-  player->LevelSolved = TRUE;
+  game.LevelSolved = TRUE;
+
   player->GameOver = TRUE;
 
   player->score_final = (level.game_engine_type == GAME_ENGINE_TYPE_EM ?
@@ -4474,10 +4476,9 @@ static void PlayerWins(struct PlayerInfo *player)
 			  MM_HEALTH(game_mm.laser_overload_value) :
 			  player->health);
 
-  player->LevelSolved_CountingTime = (game.no_time_limit ? TimePlayed :
-				      TimeLeft);
-  player->LevelSolved_CountingScore = player->score_final;
-  player->LevelSolved_CountingHealth = player->health_final;
+  game.LevelSolved_CountingTime = (game.no_time_limit ? TimePlayed : TimeLeft);
+  game.LevelSolved_CountingScore = player->score_final;
+  game.LevelSolved_CountingHealth = player->health_final;
 }
 
 void GameWon(void)
@@ -4493,7 +4494,7 @@ void GameWon(void)
   int game_over_delay_value_2 = 25;
   int game_over_delay_value_3 = 50;
 
-  if (!local_player->LevelSolved_GameWon)
+  if (!game.LevelSolved_GameWon)
   {
     int i;
 
@@ -4501,9 +4502,9 @@ void GameWon(void)
     if (local_player->MovPos)
       return;
 
-    local_player->LevelSolved_GameWon = TRUE;
-    local_player->LevelSolved_SaveTape = tape.recording;
-    local_player->LevelSolved_SaveScore = !tape.playing;
+    game.LevelSolved_GameWon = TRUE;
+    game.LevelSolved_SaveTape = tape.recording;
+    game.LevelSolved_SaveScore = !tape.playing;
 
     if (!tape.playing)
     {
@@ -4559,8 +4560,8 @@ void GameWon(void)
       time = time_final;
       score = score_final;
 
-      local_player->LevelSolved_CountingTime = time;
-      local_player->LevelSolved_CountingScore = score;
+      game.LevelSolved_CountingTime = time;
+      game.LevelSolved_CountingScore = score;
 
       game_panel_controls[GAME_PANEL_TIME].value = time;
       game_panel_controls[GAME_PANEL_SCORE].value = score;
@@ -4631,8 +4632,8 @@ void GameWon(void)
     time  += time_count_steps * time_count_dir;
     score += time_count_steps * level.score[SC_TIME_BONUS];
 
-    local_player->LevelSolved_CountingTime = time;
-    local_player->LevelSolved_CountingScore = score;
+    game.LevelSolved_CountingTime = time;
+    game.LevelSolved_CountingScore = score;
 
     game_panel_controls[GAME_PANEL_TIME].value = time;
     game_panel_controls[GAME_PANEL_SCORE].value = score;
@@ -4663,8 +4664,8 @@ void GameWon(void)
     health += health_count_dir;
     score  += level.score[SC_TIME_BONUS];
 
-    local_player->LevelSolved_CountingHealth = health;
-    local_player->LevelSolved_CountingScore = score;
+    game.LevelSolved_CountingHealth = health;
+    game.LevelSolved_CountingScore = score;
 
     game_panel_controls[GAME_PANEL_HEALTH].value = health;
     game_panel_controls[GAME_PANEL_SCORE].value = score;
@@ -4699,9 +4700,9 @@ void GameEnd(void)
   int last_level_nr = levelset.level_nr;
   int hi_pos;
 
-  local_player->LevelSolved_GameEnd = TRUE;
+  game.LevelSolved_GameEnd = TRUE;
 
-  if (local_player->LevelSolved_SaveTape)
+  if (game.LevelSolved_SaveTape)
   {
     // make sure that request dialog to save tape does not open door again
     if (!global.use_envelope_request)
@@ -4722,7 +4723,7 @@ void GameEnd(void)
     return;
   }
 
-  if (!local_player->LevelSolved_SaveScore)
+  if (!game.LevelSolved_SaveScore)
   {
     SetGameStatus(GAME_MODE_MAIN);
 
@@ -11184,7 +11185,7 @@ static void CheckLevelTime(void)
       }
     }
 
-    if (!local_player->LevelSolved && !level.use_step_counter)
+    if (!game.LevelSolved && !level.use_step_counter)
     {
       TimePlayed++;
 
@@ -11331,7 +11332,7 @@ static void GameActionsExt(void)
 
   CheckLevelSolved();
 
-  if (local_player->LevelSolved && !local_player->LevelSolved_GameEnd)
+  if (game.LevelSolved && !game.LevelSolved_GameEnd)
     GameWon();
 
   if (AllPlayersGone && !TAPE_IS_STOPPED(tape))
@@ -12725,7 +12726,7 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
 	RemovePlayer(player);
     }
 
-    if (!local_player->LevelSolved && level.use_step_counter)
+    if (!game.LevelSolved && level.use_step_counter)
     {
       int i;
 
@@ -15030,7 +15031,7 @@ void CheckGameOver(void)
 boolean checkGameSolved(void)
 {
   // set for all game engines if level was solved
-  return local_player->LevelSolved_GameEnd;
+  return game.LevelSolved_GameEnd;
 }
 
 boolean checkGameFailed(void)
@@ -15045,7 +15046,7 @@ boolean checkGameFailed(void)
   else if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
     return (game_mm.game_over && !game_mm.level_solved);
   else				// GAME_ENGINE_TYPE_RND
-    return (local_player->GameOver && !local_player->LevelSolved);
+    return (local_player->GameOver && !game.LevelSolved);
 }
 
 boolean checkGameEnded(void)

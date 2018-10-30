@@ -221,6 +221,18 @@ struct GameInfo
 
   // values for game engine snapshot control
   struct GameSnapshotInfo snapshot;
+
+  // values for handling states for solved level
+  boolean LevelSolved;
+
+  boolean LevelSolved_GameWon;
+  boolean LevelSolved_GameEnd;
+  boolean LevelSolved_SaveTape;
+  boolean LevelSolved_SaveScore;
+
+  int LevelSolved_CountingTime;
+  int LevelSolved_CountingScore;
+  int LevelSolved_CountingHealth;
 };
 
 struct PlayerInfo
@@ -268,16 +280,7 @@ struct PlayerInfo
 
   boolean gravity;
 
-  boolean LevelSolved, GameOver;
-
-  boolean LevelSolved_GameWon;
-  boolean LevelSolved_GameEnd;
-  boolean LevelSolved_SaveTape;
-  boolean LevelSolved_SaveScore;
-
-  int LevelSolved_CountingTime;
-  int LevelSolved_CountingScore;
-  int LevelSolved_CountingHealth;
+  boolean GameOver;
 
   int last_move_dir;
 
