@@ -3396,6 +3396,7 @@ void InitGame(void)
 
     player->killed = FALSE;
     player->reanimated = FALSE;
+    player->buried = FALSE;
 
     player->action = 0;
     player->effective_action = 0;
@@ -3539,8 +3540,6 @@ void InitGame(void)
     DigField(player, 0, 0, 0, 0, 0, 0, DF_NO_PUSH);
     SnapField(player, 0, 0);
 
-    player->GameOver = FALSE;
-
     map_player_action[i] = i;
   }
 
@@ -3568,6 +3567,7 @@ void InitGame(void)
   AllPlayersGone = FALSE;
 
   game.LevelSolved = FALSE;
+  game.GameOver = FALSE;
 
   game.LevelSolved_GameWon = FALSE;
   game.LevelSolved_GameEnd = FALSE;
@@ -4464,8 +4464,7 @@ static void LevelSolved(void)
     return;
 
   game.LevelSolved = TRUE;
-
-  local_player->GameOver = TRUE;
+  game.GameOver = TRUE;
 
   local_player->score_final = (level.game_engine_type == GAME_ENGINE_TYPE_EM ?
 			       level.native_em_level->lev->score :
@@ -5304,7 +5303,7 @@ static void RelocatePlayer(int jx, int jy, int el_player_raw)
   int enter_side = enter_side_horiz | enter_side_vert;
   int leave_side = leave_side_horiz | leave_side_vert;
 
-  if (player->GameOver)		// do not reanimate dead player
+  if (player->buried)		// do not reanimate dead player
     return;
 
   if (!player_relocated)	// no need to relocate the player
@@ -7951,7 +7950,7 @@ static void StartMoving(int x, int y)
 
 	game.friends_still_needed--;
 	if (!game.friends_still_needed &&
-	    !local_player->GameOver && AllPlayersGone)
+	    !game.GameOver && AllPlayersGone)
 	  LevelSolved();
 
 	return;
@@ -13404,8 +13403,10 @@ void BuryPlayer(struct PlayerInfo *player)
   PlayLevelSoundElementAction(jx, jy, player->artwork_element, ACTION_DYING);
   PlayLevelSound(jx, jy, SND_GAME_LOSING);
 
-  player->GameOver = TRUE;
   RemovePlayer(player);
+
+  player->buried = TRUE;
+  game.GameOver = TRUE;
 }
 
 void RemovePlayer(struct PlayerInfo *player)
@@ -15045,7 +15046,7 @@ boolean checkGameFailed(void)
   else if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
     return (game_mm.game_over && !game_mm.level_solved);
   else				// GAME_ENGINE_TYPE_RND
-    return (local_player->GameOver && !game.LevelSolved);
+    return (game.GameOver && !game.LevelSolved);
 }
 
 boolean checkGameEnded(void)

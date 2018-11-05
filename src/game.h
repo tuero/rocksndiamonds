@@ -186,6 +186,7 @@ struct GameInfo
   int belt_dir_nr[4];
   int switchgate_pos;
   int wind_direction;
+
   boolean explosions_delayed;
   boolean envelope_active;
   boolean no_time_limit;	// (variable only in very special case)
@@ -229,8 +230,9 @@ struct GameInfo
   // values for game engine snapshot control
   struct GameSnapshotInfo snapshot;
 
-  // values for handling states for solved level
+  // values for handling states for solved level and game over
   boolean LevelSolved;
+  boolean GameOver;
 
   boolean LevelSolved_GameWon;
   boolean LevelSolved_GameEnd;
@@ -253,6 +255,7 @@ struct PlayerInfo
 
   boolean killed;		// player maybe present/active, but killed
   boolean reanimated;		// player maybe killed, but reanimated
+  boolean buried;		// player finally killed and removed
 
   int index_nr;			// player number (0 to 3)
   int index_bit;		// player number bit (1 << 0 to 1 << 3)
@@ -286,8 +289,6 @@ struct PlayerInfo
   boolean can_fall_into_acid;
 
   boolean gravity;
-
-  boolean GameOver;
 
   int last_move_dir;
 
