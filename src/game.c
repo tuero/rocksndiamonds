@@ -2224,7 +2224,7 @@ static void UpdateGameControlValues(void)
 	       level.native_sp_level->game_sp->score :
 	       level.game_engine_type == GAME_ENGINE_TYPE_MM ?
 	       game_mm.score :
-	       local_player->score);
+	       game.score);
   int gems = (level.game_engine_type == GAME_ENGINE_TYPE_EM ?
 	      level.native_em_level->lev->required :
 	      level.game_engine_type == GAME_ENGINE_TYPE_SP ?
@@ -2247,7 +2247,7 @@ static void UpdateGameControlValues(void)
 		game.LevelSolved_CountingHealth :
 		level.game_engine_type == GAME_ENGINE_TYPE_MM ?
 		MM_HEALTH(game_mm.laser_overload_value) :
-		local_player->health);
+		game.health);
 
   UpdatePlayfieldElementCount();
 
@@ -3412,12 +3412,6 @@ void InitGame(void)
     player->effective_mouse_action.button = 0;
     player->effective_mouse_action.button_hint = 0;
 
-    player->score = 0;
-    player->score_final = 0;
-
-    player->health = MAX_HEALTH;
-    player->health_final = MAX_HEALTH;
-
     for (j = 0; j < MAX_NUM_KEYS; j++)
       player->key[j] = FALSE;
 
@@ -3590,6 +3584,12 @@ void InitGame(void)
   game.timegate_time_left = 0;
   game.switchgate_pos = 0;
   game.wind_direction = level.wind_direction_initial;
+
+  game.score = 0;
+  game.score_final = 0;
+
+  game.health = MAX_HEALTH;
+  game.health_final = MAX_HEALTH;
 
   game.gems_still_needed = level.gems_needed;
   game.sokoban_fields_still_needed = 0;
@@ -4466,18 +4466,18 @@ static void LevelSolved(void)
   game.LevelSolved = TRUE;
   game.GameOver = TRUE;
 
-  local_player->score_final = (level.game_engine_type == GAME_ENGINE_TYPE_EM ?
-			       level.native_em_level->lev->score :
-			       level.game_engine_type == GAME_ENGINE_TYPE_MM ?
-			       game_mm.score :
-			       local_player->score);
-  local_player->health_final = (level.game_engine_type == GAME_ENGINE_TYPE_MM ?
-				MM_HEALTH(game_mm.laser_overload_value) :
-				local_player->health);
+  game.score_final = (level.game_engine_type == GAME_ENGINE_TYPE_EM ?
+		      level.native_em_level->lev->score :
+		      level.game_engine_type == GAME_ENGINE_TYPE_MM ?
+		      game_mm.score :
+		      game.score);
+  game.health_final = (level.game_engine_type == GAME_ENGINE_TYPE_MM ?
+		       MM_HEALTH(game_mm.laser_overload_value) :
+		       game.health);
 
   game.LevelSolved_CountingTime = (game.no_time_limit ? TimePlayed : TimeLeft);
-  game.LevelSolved_CountingScore = local_player->score_final;
-  game.LevelSolved_CountingHealth = local_player->health_final;
+  game.LevelSolved_CountingScore = game.score_final;
+  game.LevelSolved_CountingHealth = game.health_final;
 }
 
 void GameWon(void)
@@ -4522,8 +4522,8 @@ void GameWon(void)
     game_over_delay_3 = game_over_delay_value_3;
 
     time = time_final = (game.no_time_limit ? TimePlayed : TimeLeft);
-    score = score_final = local_player->score_final;
-    health = health_final = local_player->health_final;
+    score = score_final = game.score_final;
+    health = health_final = game.health_final;
 
     if (level.score[SC_TIME_BONUS] > 0)
     {
@@ -4550,8 +4550,8 @@ void GameWon(void)
 	game_over_delay_2 = game_over_delay_value_2;
       }
 
-      local_player->score_final = score_final;
-      local_player->health_final = health_final;
+      game.score_final = score_final;
+      game.health_final = health_final;
     }
 
     if (level_editor_test_game)
@@ -4784,12 +4784,12 @@ int NewHiScore(int level_nr)
   LoadScore(level_nr);
 
   if (strEqual(setup.player_name, EMPTY_PLAYER_NAME) ||
-      local_player->score_final < highscore[MAX_SCORE_ENTRIES - 1].Score) 
+      game.score_final < highscore[MAX_SCORE_ENTRIES - 1].Score)
     return -1;
 
-  for (k = 0; k < MAX_SCORE_ENTRIES; k++) 
+  for (k = 0; k < MAX_SCORE_ENTRIES; k++)
   {
-    if (local_player->score_final > highscore[k].Score)
+    if (game.score_final > highscore[k].Score)
     {
       // player has made it to the hall of fame
 
@@ -4818,7 +4818,7 @@ int NewHiScore(int level_nr)
 
       strncpy(highscore[k].Name, setup.player_name, MAX_PLAYER_NAME_LEN);
       highscore[k].Name[MAX_PLAYER_NAME_LEN] = '\0';
-      highscore[k].Score = local_player->score_final; 
+      highscore[k].Score = game.score_final;
       position = k;
 
       break;
@@ -9706,7 +9706,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
      action_arg == CA_ARG_NUMBER_CE_DELAY ? GET_CE_DELAY_VALUE(change) :
      action_arg == CA_ARG_NUMBER_LEVEL_TIME ? level_time_value :
      action_arg == CA_ARG_NUMBER_LEVEL_GEMS ? game.gems_still_needed :
-     action_arg == CA_ARG_NUMBER_LEVEL_SCORE ? local_player->score :
+     action_arg == CA_ARG_NUMBER_LEVEL_SCORE ? game.score :
      action_arg == CA_ARG_ELEMENT_CV_TARGET ? GET_NEW_CE_VALUE(target_element):
      action_arg == CA_ARG_ELEMENT_CV_TRIGGER ? change->actual_trigger_ce_value:
      action_arg == CA_ARG_ELEMENT_CV_ACTION ? GET_NEW_CE_VALUE(action_element):
@@ -9721,7 +9721,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
   int action_arg_number_old =
     (action_type == CA_SET_LEVEL_GEMS ? game.gems_still_needed :
      action_type == CA_SET_LEVEL_TIME ? TimeLeft :
-     action_type == CA_SET_LEVEL_SCORE ? local_player->score :
+     action_type == CA_SET_LEVEL_SCORE ? game.score :
      action_type == CA_SET_CE_VALUE ? CustomValue[x][y] :
      action_type == CA_SET_CE_SCORE ? ei->collect_score :
      0);
@@ -9791,9 +9791,9 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 
     case CA_SET_LEVEL_SCORE:
     {
-      local_player->score = action_arg_number_new;
+      game.score = action_arg_number_new;
 
-      game_panel_controls[GAME_PANEL_SCORE].value = local_player->score;
+      game_panel_controls[GAME_PANEL_SCORE].value = game.score;
 
       DisplayGameControlValues();
 
@@ -14847,9 +14847,9 @@ void StopSound_MM(int sound_mm)
 
 void RaiseScore(int value)
 {
-  local_player->score += value;
+  game.score += value;
 
-  game_panel_controls[GAME_PANEL_SCORE].value = local_player->score;
+  game_panel_controls[GAME_PANEL_SCORE].value = game.score;
 
   DisplayGameControlValues();
 }

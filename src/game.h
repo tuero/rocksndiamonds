@@ -191,6 +191,12 @@ struct GameInfo
   boolean envelope_active;
   boolean no_time_limit;	// (variable only in very special case)
 
+  int score;
+  int score_final;
+
+  int health;
+  int health_final;
+
   int gems_still_needed;
   int sokoban_fields_still_needed;
   int sokoban_objects_still_needed;
@@ -350,12 +356,6 @@ struct PlayerInfo
   int drop_pressed_delay;
 
   int step_counter;
-
-  int score;
-  int score_final;
-
-  int health;
-  int health_final;
 
   int key[MAX_NUM_KEYS];
   int num_white_keys;
