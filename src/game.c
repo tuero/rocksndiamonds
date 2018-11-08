@@ -9846,7 +9846,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 	if (action_arg_player_bits & (1 << i))
 	  ExitPlayer(&stored_player[i]);
 
-      if (AllPlayersGone)
+      if (game.players_still_needed == 0)
 	LevelSolved();
 
       break;
@@ -12673,9 +12673,9 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
     {
       ExitPlayer(player);
 
-      if ((game.friends_still_needed == 0 ||
-	   IS_SP_ELEMENT(Feld[jx][jy])) &&
-	  AllPlayersGone)
+      if (game.players_still_needed == 0 &&
+	  (game.friends_still_needed == 0 ||
+	   IS_SP_ELEMENT(Feld[jx][jy])))
 	LevelSolved();
     }
 
@@ -13406,7 +13406,9 @@ void BuryPlayer(struct PlayerInfo *player)
   RemovePlayer(player);
 
   player->buried = TRUE;
-  game.GameOver = TRUE;
+
+  if (AllPlayersGone)
+    game.GameOver = TRUE;
 }
 
 void RemovePlayer(struct PlayerInfo *player)
@@ -13428,7 +13430,10 @@ void RemovePlayer(struct PlayerInfo *player)
       found = TRUE;
 
   if (!found)
+  {
     AllPlayersGone = TRUE;
+    game.GameOver = TRUE;
+  }
 
   ExitX = ZX = jx;
   ExitY = ZY = jy;
@@ -13441,10 +13446,6 @@ void ExitPlayer(struct PlayerInfo *player)
 
   if (game.players_still_needed > 0)
     game.players_still_needed--;
-
-  // also set if some players not yet gone, but not needed to solve level
-  if (game.players_still_needed == 0)
-    AllPlayersGone = TRUE;
 }
 
 static void setFieldForSnapping(int x, int y, int element, int direction)
@@ -15036,9 +15037,6 @@ boolean checkGameSolved(void)
 
 boolean checkGameFailed(void)
 {
-  if (!AllPlayersGone)
-    return FALSE;
-
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
     return (game_em.game_over && !game_em.level_solved);
   else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
