@@ -204,6 +204,8 @@ struct GameInfo
   int players_still_needed;
   int friends_still_needed;
 
+  boolean all_players_gone;
+
   // values for the new EMC elements
   int lenses_time_left;
   int magnify_time_left;

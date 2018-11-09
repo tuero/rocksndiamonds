@@ -3558,7 +3558,7 @@ void InitGame(void)
 
   ScrollStepSize = 0;	// will be correctly initialized by ScrollScreen()
 
-  AllPlayersGone = FALSE;
+  game.all_players_gone = FALSE;
 
   game.LevelSolved = FALSE;
   game.GameOver = FALSE;
@@ -4573,7 +4573,7 @@ void GameWon(void)
       if (ExitX >= 0 && ExitY >= 0)	// local player has left the level
       {
 	// close exit door after last player
-	if ((AllPlayersGone &&
+	if ((game.all_players_gone &&
 	     (Feld[ExitX][ExitY] == EL_EXIT_OPEN ||
 	      Feld[ExitX][ExitY] == EL_SP_EXIT_OPEN ||
 	      Feld[ExitX][ExitY] == EL_STEEL_EXIT_OPEN)) ||
@@ -6813,7 +6813,7 @@ static void TurnRoundExt(int x, int y)
   {
     int attr_x = -1, attr_y = -1;
 
-    if (AllPlayersGone)
+    if (game.all_players_gone)
     {
       attr_x = ExitX;
       attr_y = ExitY;
@@ -6877,13 +6877,13 @@ static void TurnRoundExt(int x, int y)
 
     MovDir[x][y] = MV_NONE;
     if (attr_x < x)
-      MovDir[x][y] |= (AllPlayersGone ? MV_RIGHT : MV_LEFT);
+      MovDir[x][y] |= (game.all_players_gone ? MV_RIGHT : MV_LEFT);
     else if (attr_x > x)
-      MovDir[x][y] |= (AllPlayersGone ? MV_LEFT : MV_RIGHT);
+      MovDir[x][y] |= (game.all_players_gone ? MV_LEFT : MV_RIGHT);
     if (attr_y < y)
-      MovDir[x][y] |= (AllPlayersGone ? MV_DOWN : MV_UP);
+      MovDir[x][y] |= (game.all_players_gone ? MV_DOWN : MV_UP);
     else if (attr_y > y)
-      MovDir[x][y] |= (AllPlayersGone ? MV_UP : MV_DOWN);
+      MovDir[x][y] |= (game.all_players_gone ? MV_UP : MV_DOWN);
 
     if (element == EL_ROBOT)
     {
@@ -7182,7 +7182,7 @@ static void TurnRoundExt(int x, int y)
     int newx, newy;
     boolean move_away = (move_pattern == MV_AWAY_FROM_PLAYER);
 
-    if (AllPlayersGone)
+    if (game.all_players_gone)
     {
       attr_x = ExitX;
       attr_y = ExitY;
@@ -7950,7 +7950,8 @@ static void StartMoving(int x, int y)
 
 	game.friends_still_needed--;
 	if (!game.friends_still_needed &&
-	    !game.GameOver && AllPlayersGone)
+	    !game.GameOver &&
+	    game.all_players_gone)
 	  LevelSolved();
 
 	return;
@@ -9096,7 +9097,8 @@ static void CheckExit(int x, int y)
     return;
   }
 
-  if (AllPlayersGone)	// do not re-open exit door closed after last player
+  // do not re-open exit door closed after last player
+  if (game.all_players_gone)
     return;
 
   Feld[x][y] = EL_EXIT_OPENING;
@@ -9120,7 +9122,8 @@ static void CheckExitEM(int x, int y)
     return;
   }
 
-  if (AllPlayersGone)	// do not re-open exit door closed after last player
+  // do not re-open exit door closed after last player
+  if (game.all_players_gone)
     return;
 
   Feld[x][y] = EL_EM_EXIT_OPENING;
@@ -9144,7 +9147,8 @@ static void CheckExitSteel(int x, int y)
     return;
   }
 
-  if (AllPlayersGone)	// do not re-open exit door closed after last player
+  // do not re-open exit door closed after last player
+  if (game.all_players_gone)
     return;
 
   Feld[x][y] = EL_STEEL_EXIT_OPENING;
@@ -9168,7 +9172,8 @@ static void CheckExitSteelEM(int x, int y)
     return;
   }
 
-  if (AllPlayersGone)	// do not re-open exit door closed after last player
+  // do not re-open exit door closed after last player
+  if (game.all_players_gone)
     return;
 
   Feld[x][y] = EL_EM_STEEL_EXIT_OPENING;
@@ -9189,7 +9194,8 @@ static void CheckExitSP(int x, int y)
     return;
   }
 
-  if (AllPlayersGone)	// do not re-open exit door closed after last player
+  // do not re-open exit door closed after last player
+  if (game.all_players_gone)
     return;
 
   Feld[x][y] = EL_SP_EXIT_OPENING;
@@ -11123,11 +11129,11 @@ static void CheckLevelSolved(void)
 
       game_em.game_over = TRUE;
 
-      AllPlayersGone = TRUE;
+      game.all_players_gone = TRUE;
     }
 
     if (game_em.game_over)				// game lost
-      AllPlayersGone = TRUE;
+      game.all_players_gone = TRUE;
   }
   else if (level.game_engine_type == GAME_ENGINE_TYPE_SP)
   {
@@ -11138,11 +11144,11 @@ static void CheckLevelSolved(void)
 
       game_sp.game_over = TRUE;
 
-      AllPlayersGone = TRUE;
+      game.all_players_gone = TRUE;
     }
 
     if (game_sp.game_over)				// game lost
-      AllPlayersGone = TRUE;
+      game.all_players_gone = TRUE;
   }
   else if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
   {
@@ -11153,11 +11159,11 @@ static void CheckLevelSolved(void)
 
       game_mm.game_over = TRUE;
 
-      AllPlayersGone = TRUE;
+      game.all_players_gone = TRUE;
     }
 
     if (game_mm.game_over)				// game lost
-      AllPlayersGone = TRUE;
+      game.all_players_gone = TRUE;
   }
 }
 
@@ -11208,7 +11214,7 @@ static void CheckLevelTime(void)
 	      KillPlayer(&stored_player[i]);
 	}
       }
-      else if (game.no_time_limit && !AllPlayersGone) // level w/o time limit
+      else if (game.no_time_limit && !game.all_players_gone)
       {
 	game_panel_controls[GAME_PANEL_TIME].value = TimePlayed;
       }
@@ -11333,7 +11339,7 @@ static void GameActionsExt(void)
   if (game.LevelSolved && !game.LevelSolved_GameEnd)
     GameWon();
 
-  if (AllPlayersGone && !TAPE_IS_STOPPED(tape))
+  if (game.all_players_gone && !TAPE_IS_STOPPED(tape))
     TapeStop();
 
   if (game_status != GAME_MODE_PLAYING)		// status might have changed
@@ -12745,7 +12751,7 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
 	  for (i = 0; i < MAX_PLAYERS; i++)
 	    KillPlayer(&stored_player[i]);
       }
-      else if (game.no_time_limit && !AllPlayersGone) // level w/o time limit
+      else if (game.no_time_limit && !game.all_players_gone)
       {
 	game_panel_controls[GAME_PANEL_TIME].value = TimePlayed;
 
@@ -13407,7 +13413,7 @@ void BuryPlayer(struct PlayerInfo *player)
 
   player->buried = TRUE;
 
-  if (AllPlayersGone)
+  if (game.all_players_gone)
     game.GameOver = TRUE;
 }
 
@@ -13431,7 +13437,7 @@ void RemovePlayer(struct PlayerInfo *player)
 
   if (!found)
   {
-    AllPlayersGone = TRUE;
+    game.all_players_gone = TRUE;
     game.GameOver = TRUE;
   }
 
@@ -14970,7 +14976,7 @@ void RequestQuitGameExt(boolean skip_request, boolean quick_quit, char *message)
 void RequestQuitGame(boolean ask_if_really_quit)
 {
   boolean quick_quit = (!ask_if_really_quit || level_editor_test_game);
-  boolean skip_request = AllPlayersGone || quick_quit;
+  boolean skip_request = game.all_players_gone || quick_quit;
 
   RequestQuitGameExt(skip_request, quick_quit,
 		     "Do you really want to quit the game?");
@@ -15244,8 +15250,6 @@ static ListNode *SaveEngineSnapshotBuffers(void)
   SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(ScreenGfxPos));
 
   SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(ScrollStepSize));
-
-  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(AllPlayersGone));
 
   SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(AmoebaCnt));
   SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(AmoebaCnt2));

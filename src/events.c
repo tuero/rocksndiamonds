@@ -2039,7 +2039,7 @@ void HandleKey(Key key, int key_status)
       return;
   }
 
-  if (game_status == GAME_MODE_PLAYING && AllPlayersGone &&
+  if (game_status == GAME_MODE_PLAYING && game.all_players_gone &&
       (key == KSYM_Return || key == setup.shortcut.toggle_pause))
   {
     GameEnd();
@@ -2425,7 +2425,7 @@ void HandleJoystick(void)
 	newbutton = ((joy & JOY_BUTTON) != 0);
 #endif
 
-      if (newbutton && AllPlayersGone)
+      if (newbutton && game.all_players_gone)
       {
 	GameEnd();
 

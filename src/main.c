@@ -128,7 +128,6 @@ int			SBX_Left, SBX_Right;
 int			SBY_Upper, SBY_Lower;
 int			ZX, ZY;
 int			ExitX, ExitY;
-int			AllPlayersGone;
 
 int			TimeFrames, TimePlayed, TimeLeft, TapeTime;
 

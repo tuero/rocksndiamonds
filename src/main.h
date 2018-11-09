@@ -3630,7 +3630,6 @@ extern int			SBX_Left, SBX_Right;
 extern int			SBY_Upper, SBY_Lower;
 extern int			ZX, ZY;
 extern int			ExitX, ExitY;
-extern int			AllPlayersGone;
 
 extern int			TimeFrames, TimePlayed, TimeLeft, TapeTime;
 
