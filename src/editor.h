@@ -27,4 +27,8 @@ void PrintEditorElementList(void);
 void DumpBrush(void);
 void DumpBrush_Small(void);
 
+void CopyClipboardToBrush(void);
+void CopyBrushToClipboard(void);
+void CopyBrushToClipboard_Small(void);
+
 #endif

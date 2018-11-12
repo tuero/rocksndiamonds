@@ -1778,6 +1778,22 @@ static void HandleKeysSpecial(Key key)
     {
       DumpBrush_Small();
     }
+
+    if (GetKeyModState() & (KMOD_Control | KMOD_Meta))
+    {
+      if (letter == 'x')	// copy brush to clipboard (small size)
+      {
+	CopyBrushToClipboard_Small();
+      }
+      else if (letter == 'c')	// copy brush to clipboard (normal size)
+      {
+	CopyBrushToClipboard();
+      }
+      else if (letter == 'v')	// paste brush from Clipboard
+      {
+	CopyClipboardToBrush();
+      }
+    }
   }
 
   // special key shortcuts for all game modes

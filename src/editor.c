@@ -3796,6 +3796,8 @@ static int use_permanent_palette = TRUE;
 #define PYSIZE		(use_permanent_palette ? DYSIZE : SYSIZE)
 
 // forward declaration for internal use
+static void CopyBrushToCursor(int, int);
+static void DeleteBrushFromCursor(void);
 static void ModifyEditorCounterValue(int, int);
 static void ModifyEditorCounterLimits(int, int, int);
 static void ModifyEditorSelectboxValue(int, int);
@@ -11895,12 +11897,23 @@ static void SelectArea(int from_x, int from_y, int to_x, int to_y,
 }
 
 // values for CopyBrushExt()
-#define CB_AREA_TO_BRUSH	0
-#define CB_BRUSH_TO_CURSOR	1
-#define CB_BRUSH_TO_LEVEL	2
-#define CB_DELETE_OLD_CURSOR	3
-#define CB_DUMP_BRUSH		4
-#define CB_DUMP_BRUSH_SMALL	5
+#define CB_AREA_TO_BRUSH		0
+#define CB_BRUSH_TO_CURSOR		1
+#define CB_BRUSH_TO_LEVEL		2
+#define CB_DELETE_OLD_CURSOR		3
+#define CB_DUMP_BRUSH			4
+#define CB_DUMP_BRUSH_SMALL		5
+#define CB_CLIPBOARD_TO_BRUSH		6
+#define CB_BRUSH_TO_CLIPBOARD		7
+#define CB_BRUSH_TO_CLIPBOARD_SMALL	8
+#define CB_UPDATE_BRUSH_POSITION	9
+
+#define MAX_CB_PART_SIZE	10
+#define MAX_CB_LINE_SIZE	(MAX_LEV_FIELDX + 1)	// text plus newline
+#define MAX_CB_NUM_LINES	(MAX_LEV_FIELDY)
+#define MAX_CB_TEXT_SIZE	(MAX_CB_LINE_SIZE *	\
+				 MAX_CB_NUM_LINES *	\
+				 MAX_CB_PART_SIZE)
 
 static void DrawBrushElement(int sx, int sy, int element, boolean change_level)
 {
@@ -11913,26 +11926,31 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
   static short brush_buffer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
   static int brush_width, brush_height;
   static int last_cursor_x = -1, last_cursor_y = -1;
-  static boolean delete_old_brush;
+  static boolean delete_old_brush = FALSE;
   int new_element = BUTTON_ELEMENT(button);
   int x, y;
 
   if (mode == CB_DUMP_BRUSH ||
-      mode == CB_DUMP_BRUSH_SMALL)
+      mode == CB_DUMP_BRUSH_SMALL ||
+      mode == CB_BRUSH_TO_CLIPBOARD ||
+      mode == CB_BRUSH_TO_CLIPBOARD_SMALL)
   {
-    if (!draw_with_brush)
-    {
-      Error(ERR_WARN, "no brush selected");
-
+    if (edit_mode != ED_MODE_DRAWING)
       return;
-    }
 
-    for (y = 0; y < brush_height; y++)
+    char part[MAX_CB_PART_SIZE + 1] = "";
+    char text[MAX_CB_TEXT_SIZE + 1] = "";
+    int width  = (draw_with_brush ? brush_width  : lev_fieldx);
+    int height = (draw_with_brush ? brush_height : lev_fieldy);
+
+    for (y = 0; y < height; y++)
     {
-      for (x = 0; x < brush_width; x++)
+      for (x = 0; x < width; x++)
       {
-	int element = brush_buffer[x][y];
+	int element = (draw_with_brush ? brush_buffer[x][y] : Feld[x][y]);
 	int element_mapped = element;
+	char *prefix = (mode == CB_DUMP_BRUSH ||
+			mode == CB_BRUSH_TO_CLIPBOARD ? "`" : "¸");
 
 	if (IS_CUSTOM_ELEMENT(element))
 	  element_mapped = EL_CUSTOM_START;
@@ -11941,13 +11959,176 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
 	else if (element >= NUM_FILE_ELEMENTS)
 	  element_mapped = EL_UNKNOWN;
 
-	// dump brush as level sketch text for the R'n'D forum:
+	// copy brush to level sketch text buffer for the R'n'D forum:
 	// - large tiles: `xxx (0x60 ASCII)
 	// - small tiles: ¸xxx (0xb8 ISO-8859-1, 0xc2b8 UTF-8)
-	printf("%s%03d", (mode == CB_DUMP_BRUSH ? "`" : "¸"), element_mapped);
+	snprintf(part, MAX_CB_PART_SIZE + 1, "%s%03d", prefix, element_mapped);
+	strcat(text, part);
       }
 
-      printf("\n");
+      strcat(text, "\n");
+    }
+
+    if (mode == CB_BRUSH_TO_CLIPBOARD ||
+	mode == CB_BRUSH_TO_CLIPBOARD_SMALL)
+      SDL_SetClipboardText(text);
+    else
+      printf("%s", text);
+
+    return;
+  }
+
+  if (mode == CB_CLIPBOARD_TO_BRUSH)
+  {
+    if (edit_mode != ED_MODE_DRAWING)
+      return;
+
+    if (!SDL_HasClipboardText())
+    {
+      Request("Clipboard is empty!", REQ_CONFIRM);
+
+      return;
+    }
+
+    boolean copy_to_brush = (draw_with_brush ||
+			     drawing_function == GADGET_ID_GRAB_BRUSH);
+
+    // this will delete the old brush, if already drawing with a brush
+    if (copy_to_brush)
+      ClickOnGadget(level_editor_gadget[GADGET_ID_SINGLE_ITEMS], MB_LEFTBUTTON);
+
+    // initialization is required for "odd" (incomplete) clipboard content
+    for (x = 0; x < MAX_LEV_FIELDX; x++)
+      for (y = 0; y < MAX_LEV_FIELDY; y++)
+	brush_buffer[x][y] = EL_EMPTY;
+
+    brush_width  = 0;
+    brush_height = 0;
+    x = 0;
+    y = 0;
+
+    char *clipboard_text = SDL_GetClipboardText();
+    char *ptr = clipboard_text;
+    boolean stop = FALSE;
+
+    while (*ptr && !stop)
+    {
+      boolean prefix_found = FALSE;
+
+      // level sketch element number prefixes (may be multi-byte characters)
+      char *prefix_list[] = { "`", "¸" };
+      int i;
+
+      for (i = 0; i < ARRAY_SIZE(prefix_list); i++)
+      {
+	char *prefix = prefix_list[i];
+
+	// check if string is large enough for prefix
+	if (strlen(ptr) < strlen(prefix))
+	{
+	  stop = TRUE;
+
+	  break;
+	}
+
+	// check if string starts with prefix
+	if (strPrefix(ptr, prefix))
+	{
+	  ptr += strlen(prefix);
+
+	  prefix_found = TRUE;
+
+	  break;
+	}
+      }
+
+      // continue with next character if prefix not found
+      if (!prefix_found)
+      {
+	ptr++;		// !!! FIX THIS for real UTF-8 handling !!!
+
+	continue;
+      }
+
+      // continue with next character if prefix not found
+      if (strlen(ptr) < 3)
+	break;
+
+      if (ptr[0] >= '0' && ptr[0] <= '9' &&
+	  ptr[1] >= '0' && ptr[1] <= '9' &&
+	  ptr[2] >= '0' && ptr[2] <= '9')
+      {
+	int element = ((ptr[0] - '0') * 100 +
+		       (ptr[1] - '0') * 10 +
+		       (ptr[2] - '0'));
+
+	ptr += 3;
+
+	if (element >= NUM_FILE_ELEMENTS)
+	  element = EL_UNKNOWN;
+
+	brush_buffer[x][y] = element;
+
+	brush_width  = MAX(x + 1, brush_width);
+	brush_height = MAX(y + 1, brush_height);
+
+	x++;
+
+	if (x >= MAX_LEV_FIELDX || *ptr == '\n')
+	{
+	  x = 0;
+	  y++;
+
+	  if (y >= MAX_LEV_FIELDY)
+	    stop = TRUE;
+	}
+      }
+    }
+
+    SDL_free(clipboard_text);
+
+    if (brush_width == 0 || brush_height == 0)
+    {
+      Request("No level sketch found in clipboard!", REQ_CONFIRM);
+
+      return;
+    }
+
+    if (copy_to_brush)
+    {
+      struct GadgetInfo *gi = level_editor_gadget[GADGET_ID_DRAWING_LEVEL];
+      int mx, my;
+
+      SDL_GetMouseState(&mx, &my);
+
+      // if inside drawing area, activate and draw brush at last mouse position
+      if (mx >= gi->x && mx < gi->x + gi->width &&
+	  my >= gi->y && my < gi->y + gi->height)
+	CopyBrushToCursor(last_cursor_x, last_cursor_y);
+
+      draw_with_brush = TRUE;
+    }
+    else
+    {
+      char request[100];
+
+      sprintf(request, "Replace level with %dx%d level sketch from clipboard?",
+	      brush_width, brush_height);
+
+      if (!Request(request, REQ_ASK))
+	return;
+
+      for (x = 0; x < MAX_LEV_FIELDX; x++)
+	for (y = 0; y < MAX_LEV_FIELDY; y++)
+	  Feld[x][y] = brush_buffer[x][y];
+
+      lev_fieldx = level.fieldx = brush_width;
+      lev_fieldy = level.fieldy = brush_height;
+
+      SetBorderElement();
+
+      DrawEditModeWindow();
+      CopyLevelToUndoBuffer(UNDO_IMMEDIATE);
     }
 
     return;
@@ -12005,6 +12186,7 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
 	!IN_LEV_FIELD(cursor_x + level_xpos, cursor_y + level_ypos))
     {
       delete_old_brush = FALSE;
+
       return;
     }
 
@@ -12042,7 +12224,14 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
 
     last_cursor_x = cursor_x;
     last_cursor_y = cursor_y;
+
     delete_old_brush = TRUE;
+  }
+
+  if (mode == CB_UPDATE_BRUSH_POSITION)
+  {
+    last_cursor_x = from_x;
+    last_cursor_y = from_y;
   }
 }
 
@@ -12062,6 +12251,11 @@ static void CopyBrushToCursor(int x, int y)
   CopyBrushExt(x, y, 0, 0, 0, CB_BRUSH_TO_CURSOR);
 }
 
+static void UpdateBrushPosition(int x, int y)
+{
+  CopyBrushExt(x, y, 0, 0, 0, CB_UPDATE_BRUSH_POSITION);
+}
+
 static void DeleteBrushFromCursor(void)
 {
   CopyBrushExt(0, 0, 0, 0, 0, CB_DELETE_OLD_CURSOR);
@@ -12075,6 +12269,21 @@ void DumpBrush(void)
 void DumpBrush_Small(void)
 {
   CopyBrushExt(0, 0, 0, 0, 0, CB_DUMP_BRUSH_SMALL);
+}
+
+void CopyClipboardToBrush(void)
+{
+  CopyBrushExt(0, 0, 0, 0, 0, CB_CLIPBOARD_TO_BRUSH);
+}
+
+void CopyBrushToClipboard(void)
+{
+  CopyBrushExt(0, 0, 0, 0, 0, CB_BRUSH_TO_CLIPBOARD);
+}
+
+void CopyBrushToClipboard_Small(void)
+{
+  CopyBrushExt(0, 0, 0, 0, 0, CB_BRUSH_TO_CLIPBOARD_SMALL);
 }
 
 static void FloodFill(int from_x, int from_y, int fill_element)
@@ -14131,6 +14340,9 @@ static void HandleDrawingAreaInfo(struct GadgetInfo *gi)
       else
 	DeleteBrushFromCursor();
     }
+
+    if (!draw_with_brush)
+      UpdateBrushPosition(sx, sy);
   }
   else if (actual_drawing_function == GADGET_ID_PICK_ELEMENT)
   {
