@@ -23,36 +23,20 @@
 
 // definitions needed for "system.c"
 
-#if defined(TARGET_SDL2)
 #define SURFACE_FLAGS		(0)
-#else
-#define SURFACE_FLAGS		(SDL_SWSURFACE)
-#endif
 
-#if defined(TARGET_SDL2)
 #define SET_TRANSPARENT_PIXEL	(SDL_TRUE)
 #define UNSET_TRANSPARENT_PIXEL	(SDL_FALSE)
-#else
-#define SET_TRANSPARENT_PIXEL	(SDL_SRCCOLORKEY)
-#define UNSET_TRANSPARENT_PIXEL	(0)
-#endif
 
 // system dependent definitions
 
-#if defined(TARGET_SDL2)
 #define TARGET_STRING		"SDL2"
-#else
-#define TARGET_STRING		"SDL"
-#endif
 
 #if defined(PLATFORM_ANDROID)
 #define WINDOW_SCALING_STATUS	WINDOW_SCALING_NOT_AVAILABLE
 #define FULLSCREEN_STATUS	FULLSCREEN_AVAILABLE
-#elif defined(TARGET_SDL2)
+#else
 #define WINDOW_SCALING_STATUS	WINDOW_SCALING_AVAILABLE
-#define FULLSCREEN_STATUS	FULLSCREEN_AVAILABLE
-#else	// SDL 1.2
-#define WINDOW_SCALING_STATUS	WINDOW_SCALING_NOT_AVAILABLE
 #define FULLSCREEN_STATUS	FULLSCREEN_AVAILABLE
 #endif
 
@@ -68,24 +52,17 @@ typedef struct SDLSurfaceInfo	DrawWindow;
 typedef Uint32			Pixel;
 typedef SDL_Cursor	       *Cursor;
 
-#if defined(TARGET_SDL2)
 typedef SDL_Keycode		Key;
 typedef SDL_Keymod		KeyMod;
-#else
-typedef SDLKey			Key;
-typedef unsigned int		KeyMod;
-#endif
 
 typedef SDL_Event		Event;
 typedef SDL_MouseButtonEvent	ButtonEvent;
 typedef SDL_MouseMotionEvent	MotionEvent;
-#if defined(TARGET_SDL2)
 typedef SDL_MouseWheelEvent	WheelEvent;
 typedef SDL_TouchFingerEvent	FingerEvent;
 typedef SDL_TextInputEvent	TextEvent;
 typedef SDL_Event		PauseResumeEvent;
 typedef SDL_WindowEvent		WindowEvent;
-#endif
 typedef SDL_KeyboardEvent	KeyEvent;
 typedef SDL_Event		ExposeEvent;
 typedef SDL_Event		FocusChangeEvent;
@@ -101,10 +78,8 @@ struct SDLSurfaceInfo
   int width, height;
   SDL_Surface *surface;
   SDL_Surface *surface_masked;
-#if defined(TARGET_SDL2)
   SDL_Texture *texture;
   SDL_Texture *texture_masked;
-#endif
 };
 
 struct MouseCursorInfo
@@ -127,13 +102,11 @@ struct MouseCursorInfo
 #define EVENT_BUTTONPRESS	SDL_MOUSEBUTTONDOWN
 #define EVENT_BUTTONRELEASE	SDL_MOUSEBUTTONUP
 #define EVENT_MOTIONNOTIFY	SDL_MOUSEMOTION
-#if defined(TARGET_SDL2)
 #define	EVENT_WHEELMOTION	SDL_MOUSEWHEEL
 #define	EVENT_FINGERPRESS	SDL_FINGERDOWN
 #define EVENT_FINGERRELEASE	SDL_FINGERUP
 #define EVENT_FINGERMOTION	SDL_FINGERMOTION
 #define EVENT_TEXTINPUT		SDL_TEXTINPUT
-#endif
 #define EVENT_KEYPRESS		SDL_KEYDOWN
 #define EVENT_KEYRELEASE	SDL_KEYUP
 #define EVENT_EXPOSE		SDL_USEREVENT + 0
@@ -172,20 +145,11 @@ struct MouseCursorInfo
 #define KSYM_Control_L		SDLK_LCTRL
 #define KSYM_Control_R		SDLK_RCTRL
 
-#if defined(TARGET_SDL2)
 #define KSYM_Meta_L		SDLK_LGUI
 #define KSYM_Meta_R		SDLK_RGUI
-#else
-#define KSYM_Meta_L		SDLK_LMETA
-#define KSYM_Meta_R		SDLK_RMETA
-#endif
 
 #define KSYM_Alt_L		SDLK_LALT
 #define KSYM_Alt_R		SDLK_RALT
-#if !defined(TARGET_SDL2)
-#define KSYM_Super_L		SDLK_LSUPER
-#define KSYM_Super_R		SDLK_RSUPER
-#endif
 #define KSYM_Mode_switch	SDLK_MODE
 #define KSYM_Multi_key		SDLK_RCTRL
 
@@ -198,7 +162,6 @@ struct MouseCursorInfo
 #define KSYM_Page_Up		SDLK_PAGEUP
 #define KSYM_Page_Down		SDLK_PAGEDOWN
 
-#if defined(TARGET_SDL2)
 #define KSYM_Select		SDLK_SELECT
 #define KSYM_Menu		SDLK_MENU
 #define KSYM_Back		SDLK_AC_BACK
@@ -207,20 +170,13 @@ struct MouseCursorInfo
 #define KSYM_Rewind		SDLK_AUDIOREWIND
 #define KSYM_FastForward	SDLK_AUDIOFASTFORWARD
 #endif
-#endif
 
 #define KSYM_space		SDLK_SPACE
 #define KSYM_exclam		SDLK_EXCLAIM
 #define KSYM_quotedbl		SDLK_QUOTEDBL
 #define KSYM_numbersign		SDLK_HASH
 #define KSYM_dollar		SDLK_DOLLAR
-
-#if defined(TARGET_SDL2)
 #define KSYM_percent		SDLK_PERCENT
-#else
-#define KSYM_percent		37			// undefined in SDL
-#endif
-
 #define KSYM_ampersand		SDLK_AMPERSAND
 #define KSYM_apostrophe		SDLK_QUOTE
 #define KSYM_parenleft		SDLK_LEFTPAREN
@@ -253,7 +209,6 @@ struct MouseCursorInfo
 #define KSYM_braceright		KSYM_UNDEFINED		// undefined
 #define KSYM_asciitilde		KSYM_UNDEFINED		// undefined
 
-#if defined(TARGET_SDL2)
 #define KSYM_degree		176
 #define KSYM_Adiaeresis		196
 #define KSYM_Odiaeresis		214
@@ -262,16 +217,6 @@ struct MouseCursorInfo
 #define KSYM_odiaeresis		246
 #define KSYM_udiaeresis		252
 #define KSYM_ssharp		223
-#else
-#define KSYM_degree		SDLK_WORLD_16
-#define KSYM_Adiaeresis		SDLK_WORLD_36
-#define KSYM_Odiaeresis		SDLK_WORLD_54
-#define KSYM_Udiaeresis		SDLK_WORLD_60
-#define KSYM_adiaeresis		SDLK_WORLD_68
-#define KSYM_odiaeresis		SDLK_WORLD_86
-#define KSYM_udiaeresis		SDLK_WORLD_92
-#define KSYM_ssharp		SDLK_WORLD_63
-#endif
 
 #ifndef SDLK_A
 #define SDLK_A			65
@@ -367,7 +312,6 @@ struct MouseCursorInfo
 #define KSYM_8			SDLK_8
 #define KSYM_9			SDLK_9
 
-#if defined(TARGET_SDL2)
 #define KSYM_KP_0		SDLK_KP_0
 #define KSYM_KP_1		SDLK_KP_1
 #define KSYM_KP_2		SDLK_KP_2
@@ -378,18 +322,6 @@ struct MouseCursorInfo
 #define KSYM_KP_7		SDLK_KP_7
 #define KSYM_KP_8		SDLK_KP_8
 #define KSYM_KP_9		SDLK_KP_9
-#else
-#define KSYM_KP_0		SDLK_KP0
-#define KSYM_KP_1		SDLK_KP1
-#define KSYM_KP_2		SDLK_KP2
-#define KSYM_KP_3		SDLK_KP3
-#define KSYM_KP_4		SDLK_KP4
-#define KSYM_KP_5		SDLK_KP5
-#define KSYM_KP_6		SDLK_KP6
-#define KSYM_KP_7		SDLK_KP7
-#define KSYM_KP_8		SDLK_KP8
-#define KSYM_KP_9		SDLK_KP9
-#endif
 
 #define KSYM_F1			SDLK_F1
 #define KSYM_F2			SDLK_F2
@@ -413,15 +345,8 @@ struct MouseCursorInfo
 #define KMOD_Shift_R		KMOD_RSHIFT
 #define KMOD_Control_L		KMOD_LCTRL
 #define KMOD_Control_R		KMOD_RCTRL
-
-#if defined(TARGET_SDL2)
 #define KMOD_Meta_L		KMOD_LGUI
 #define KMOD_Meta_R		KMOD_RGUI
-#else
-#define KMOD_Meta_L		KMOD_LMETA
-#define KMOD_Meta_R		KMOD_RMETA
-#endif
-
 #define KMOD_Alt_L		KMOD_LALT
 #define KMOD_Alt_R		KMOD_RALT
 
@@ -436,9 +361,7 @@ struct MouseCursorInfo
 				 KMOD_Meta    |	\
 				 KMOD_Alt)
 
-#if defined(TARGET_SDL2)
 #define KMOD_TextInput		(KMOD_Shift | KMOD_Alt_R)
-#endif
 
 // SDL function definitions
 
@@ -447,7 +370,6 @@ SDL_Surface *SDLGetNativeSurface(SDL_Surface *);
 void SDLCreateBitmapTextures(Bitmap *);
 void SDLFreeBitmapTextures(Bitmap *);
 
-#if defined(TARGET_SDL2)
 SDL_Surface *SDL_DisplayFormat(SDL_Surface *);
 void SDLSetWindowScaling(int);
 void SDLSetWindowScalingQuality(char *);
@@ -456,7 +378,6 @@ void SDLSetDisplaySize(void);
 void SDLSetScreenSizeAndOffsets(int, int);
 void SDLSetScreenSizeForRenderer(int, int);
 void SDLSetScreenProperties(void);
-#endif
 
 void SDLSetScreenRenderingMode(char *);
 void SDLSetScreenVsyncMode(char *);

@@ -6194,16 +6194,13 @@ void CloseAllAndExit(int exit_value)
 
   FreeAllImages();
 
-#if defined(TARGET_SDL)
-#if defined(TARGET_SDL2)
   // !!! TODO !!!
   // set a flag to tell the network server thread to quit and wait for it
   // using SDL_WaitThread()
-#else
-  if (network_server)	// terminate network server
-    SDL_KillThread(server_thread);
-#endif
-#endif
+  //
+  // Code used with SDL 1.2:
+  // if (network_server)	// terminate network server
+  //   SDL_KillThread(server_thread);
 
   CloseVideoDisplay();
   ClosePlatformDependentStuff();

@@ -25,14 +25,11 @@
 // ============================================================================
 
 // SDL internal variables
-#if defined(TARGET_SDL2)
 static SDL_Window *sdl_window = NULL;
 static SDL_Renderer *sdl_renderer = NULL;
 static SDL_Texture *sdl_texture_stream = NULL;
 static SDL_Texture *sdl_texture_target = NULL;
 static boolean fullscreen_enabled = FALSE;
-#endif
-
 static boolean limit_screen_updates = FALSE;
 
 
@@ -114,7 +111,6 @@ static void UpdateScreenExt(SDL_Rect *rect, boolean with_frame_delay)
     rect = NULL;
   }
 
-#if defined(TARGET_SDL2)
   SDL_Texture *sdl_texture = sdl_texture_stream;
 
   // deactivate use of target texture if render targets are not supported
@@ -218,21 +214,12 @@ static void UpdateScreenExt(SDL_Rect *rect, boolean with_frame_delay)
   DrawTouchInputOverlay();
 #endif
 
-#endif
-
   // global synchronization point of the game to align video frame delay
   if (with_frame_delay)
     WaitUntilDelayReached(&video.frame_delay, video.frame_delay_value);
 
-#if defined(TARGET_SDL2)
- // show render target buffer on screen
+  // show render target buffer on screen
   SDL_RenderPresent(sdl_renderer);
-#else	// TARGET_SDL
-  if (rect)
-    SDL_UpdateRects(screen, 1, rect);
-  else
-    SDL_UpdateRect(screen, 0, 0, 0, 0);
-#endif
 }
 
 static void UpdateScreen_WithFrameDelay(SDL_Rect *rect)
@@ -286,15 +273,9 @@ static void SDLSetWindowIcon(char *basename)
   SDL_SetColorKey(surface, SET_TRANSPARENT_PIXEL,
 		  SDL_MapRGB(surface->format, 0x00, 0x00, 0x00));
 
-#if defined(TARGET_SDL2)
   SDL_SetWindowIcon(sdl_window, surface);
-#else
-  SDL_WM_SetIcon(surface, NULL);
-#endif
 #endif
 }
-
-#if defined(TARGET_SDL2)
 
 static boolean equalSDLPixelFormat(SDL_PixelFormat *format1,
 				   SDL_PixelFormat *format2)
@@ -389,74 +370,6 @@ boolean SDLSetNativeSurface(SDL_Surface **surface)
   return TRUE;
 }
 
-#else
-
-static Pixel SDLGetColorKey(SDL_Surface *surface)
-{
-  if ((surface->flags & SDL_SRCCOLORKEY) == 0)
-    return -1;
-
-  return surface->format->colorkey;
-}
-
-static boolean SDLHasColorKey(SDL_Surface *surface)
-{
-  return (SDLGetColorKey(surface) != -1);
-}
-
-static boolean SDLHasAlpha(SDL_Surface *surface)
-{
-  return ((surface->flags & SDL_SRCALPHA) != 0);
-}
-
-static void SDLSetAlpha(SDL_Surface *surface, boolean set, int alpha)
-{
-  SDL_SetAlpha(surface, (set ? SDL_SRCALPHA : 0), alpha);
-}
-
-SDL_Surface *SDLGetNativeSurface(SDL_Surface *surface)
-{
-  SDL_Surface *new_surface;
-
-  if (surface == NULL)
-    return NULL;
-
-  if (!video.initialized)
-    new_surface = SDL_ConvertSurface(surface, surface->format, SURFACE_FLAGS);
-  else if (SDLHasAlpha(surface))
-    new_surface = SDL_DisplayFormatAlpha(surface);
-  else
-    new_surface = SDL_DisplayFormat(surface);
-
-  if (new_surface == NULL)
-    Error(ERR_EXIT, "%s() failed: %s",
-	  (video.initialized ? "SDL_DisplayFormat" : "SDL_ConvertSurface"),
-	  SDL_GetError());
-
-  return new_surface;
-}
-
-boolean SDLSetNativeSurface(SDL_Surface **surface)
-{
-  SDL_Surface *new_surface;
-
-  if (surface == NULL ||
-      *surface == NULL ||
-      !video.initialized)
-    return FALSE;
-
-  new_surface = SDLGetNativeSurface(*surface);
-
-  SDL_FreeSurface(*surface);
-
-  *surface = new_surface;
-
-  return TRUE;
-}
-
-#endif
-
-#if defined(TARGET_SDL2)
 static SDL_Texture *SDLCreateTextureFromSurface(SDL_Surface *surface)
 {
   if (program.headless)
@@ -470,11 +383,9 @@ static SDL_Texture *SDLCreateTextureFromSurface(SDL_Surface *surface)
 
   return texture;
 }
-#endif
 
 void SDLCreateBitmapTextures(Bitmap *bitmap)
 {
-#if defined(TARGET_SDL2)
   if (bitmap == NULL)
     return;
 
@@ -485,12 +396,10 @@ void SDLCreateBitmapTextures(Bitmap *bitmap)
 
   bitmap->texture        = SDLCreateTextureFromSurface(bitmap->surface);
   bitmap->texture_masked = SDLCreateTextureFromSurface(bitmap->surface_masked);
-#endif
 }
 
 void SDLFreeBitmapTextures(Bitmap *bitmap)
 {
-#if defined(TARGET_SDL2)
   if (bitmap == NULL)
     return;
 
@@ -501,28 +410,19 @@ void SDLFreeBitmapTextures(Bitmap *bitmap)
 
   bitmap->texture = NULL;
   bitmap->texture_masked = NULL;
-#endif
 }
 
 void SDLInitVideoDisplay(void)
 {
-#if !defined(TARGET_SDL2)
-  if (!strEqual(setup.system.sdl_videodriver, ARG_DEFAULT))
-    SDL_putenv(getStringCat2("SDL_VIDEODRIVER=", setup.system.sdl_videodriver));
-
-  SDL_putenv("SDL_VIDEO_CENTERED=1");
-#endif
-
   // initialize SDL video
   if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
     Error(ERR_EXIT, "SDL_InitSubSystem() failed: %s", SDL_GetError());
 
   // set default SDL depth
-#if !defined(TARGET_SDL2)
-  video.default_depth = SDL_GetVideoInfo()->vfmt->BitsPerPixel;
-#else
   video.default_depth = 32;	// (how to determine video depth in SDL2?)
-#endif
+  //
+  // Code used with SDL 1.2:
+  // video.default_depth = SDL_GetVideoInfo()->vfmt->BitsPerPixel;
 }
 
 static void SDLInitVideoBuffer_VideoBuffer(boolean fullscreen)
@@ -535,13 +435,8 @@ static void SDLInitVideoBuffer_VideoBuffer(boolean fullscreen)
 
   SDLSetScreenRenderingMode(setup.screen_rendering_mode);
 
-#if defined(TARGET_SDL2)
   // SDL 2.0: support for (desktop) fullscreen mode available
   video.fullscreen_available = TRUE;
-#else
-  // SDL 1.2: no support for fullscreen mode in R'n'D anymore
-  video.fullscreen_available = FALSE;
-#endif
 
   // open SDL video output device (window or fullscreen mode)
   if (!SDLSetVideoMode(fullscreen))
@@ -588,15 +483,9 @@ static boolean SDLCreateScreen(boolean fullscreen)
 {
   SDL_Surface *new_surface = NULL;
 
-#if defined(TARGET_SDL2)
   int surface_flags_window     = SURFACE_FLAGS | SDL_WINDOW_RESIZABLE;
   int surface_flags_fullscreen = SURFACE_FLAGS | SDL_WINDOW_FULLSCREEN_DESKTOP;
-#else
-  int surface_flags_window     = SURFACE_FLAGS;
-  int surface_flags_fullscreen = SURFACE_FLAGS;	// (no fullscreen in SDL 1.2)
-#endif
 
-#if defined(TARGET_SDL2)
 #if 1
   int renderer_flags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE;
 #else
@@ -608,7 +497,6 @@ static boolean SDLCreateScreen(boolean fullscreen)
 #endif
 
   SDLSetScreenSizeAndOffsets(video.width, video.height);
-#endif
 
   int width  = video.width;
   int height = video.height;
@@ -620,8 +508,6 @@ static boolean SDLCreateScreen(boolean fullscreen)
   // default window size is unscaled
   video.window_width  = screen_width;
   video.window_height = screen_height;
-
-#if defined(TARGET_SDL2)
 
   // store if initial screen mode is fullscreen mode when changing screen size
   video.fullscreen_initial = fullscreen;
@@ -713,42 +599,9 @@ static boolean SDLCreateScreen(boolean fullscreen)
     Error(ERR_WARN, "SDL_CreateWindow() failed: %s", SDL_GetError());
   }
 
-#else	// TARGET_SDL
-
-  if (gfx.final_screen_bitmap == NULL)
-    gfx.final_screen_bitmap = CreateBitmapStruct();
-
-  gfx.final_screen_bitmap->width = width;
-  gfx.final_screen_bitmap->height = height;
-
-  gfx.final_screen_bitmap->surface =
-    SDL_SetVideoMode(width, height, video.depth, surface_flags);
-
-  if (gfx.final_screen_bitmap->surface != NULL)
-  {
-    new_surface =
-      SDL_CreateRGBSurface(surface_flags, width, height, video.depth, 0,0,0, 0);
-
-    if (new_surface == NULL)
-      Error(ERR_WARN, "SDL_CreateRGBSurface() failed: %s", SDL_GetError());
-
-#if 0
-    new_surface = gfx.final_screen_bitmap->surface;
-    gfx.final_screen_bitmap = NULL;
-#endif
-
-  }
-  else
-  {
-    Error(ERR_WARN, "SDL_SetVideoMode() failed: %s", SDL_GetError());
-  }
-#endif
-
-#if defined(TARGET_SDL2)
   // store fullscreen state ("video.fullscreen_enabled" may not reflect this!)
   if (new_surface != NULL)
     fullscreen_enabled = fullscreen;
-#endif
 
   if (backbuffer == NULL)
     backbuffer = CreateBitmapStruct();
@@ -805,9 +658,7 @@ boolean SDLSetVideoMode(boolean fullscreen)
     }
   }
 
-#if defined(TARGET_SDL2)
   SDLRedrawWindow();			// map window
-#endif
 
 #ifdef DEBUG
 #if defined(PLATFORM_WIN32)
@@ -821,20 +672,13 @@ boolean SDLSetVideoMode(boolean fullscreen)
     boolean wminfo_success = FALSE;
 
     SDL_VERSION(&wminfo.version);
-#if defined(TARGET_SDL2)
+
     if (sdl_window)
       wminfo_success = SDL_GetWindowWMInfo(sdl_window, &wminfo);
-#else
-    wminfo_success = (SDL_GetWMInfo(&wminfo) == 1);
-#endif
 
     if (wminfo_success)
     {
-#if defined(TARGET_SDL2)
       hwnd = wminfo.info.win.window;
-#else
-      hwnd = wminfo.window;
-#endif
 
       DragAcceptFiles(hwnd, TRUE);
     }
@@ -847,17 +691,12 @@ boolean SDLSetVideoMode(boolean fullscreen)
 
 void SDLSetWindowTitle(void)
 {
-#if defined(TARGET_SDL2)
   if (sdl_window == NULL)
     return;
 
   SDL_SetWindowTitle(sdl_window, program.window_title);
-#else
-  SDL_WM_SetCaption(program.window_title, program.window_title);
-#endif
 }
 
-#if defined(TARGET_SDL2)
 void SDLSetWindowScaling(int window_scaling_percent)
 {
   if (sdl_window == NULL)
@@ -998,11 +837,8 @@ void SDLSetScreenProperties(void)
   SDLSetScreenSizeForRenderer(video.screen_width, video.screen_height);
 }
 
-#endif
-
 void SDLSetScreenRenderingMode(char *screen_rendering_mode)
 {
-#if defined(TARGET_SDL2)
   video.screen_rendering_mode =
     (strEqual(screen_rendering_mode, STR_SPECIAL_RENDERING_BITMAP) ?
      SPECIAL_RENDERING_BITMAP :
@@ -1010,14 +846,10 @@ void SDLSetScreenRenderingMode(char *screen_rendering_mode)
      SPECIAL_RENDERING_TARGET:
      strEqual(screen_rendering_mode, STR_SPECIAL_RENDERING_DOUBLE) ?
      SPECIAL_RENDERING_DOUBLE : SPECIAL_RENDERING_OFF);
-#else
-  video.screen_rendering_mode = SPECIAL_RENDERING_BITMAP;
-#endif
 }
 
 void SDLSetScreenVsyncMode(char *vsync_mode)
 {
-#if defined(TARGET_SDL2)
   int interval =
     (strEqual(vsync_mode, STR_VSYNC_MODE_NORMAL)   ? VSYNC_MODE_NORMAL :
      strEqual(vsync_mode, STR_VSYNC_MODE_ADAPTIVE) ? VSYNC_MODE_ADAPTIVE :
@@ -1027,7 +859,6 @@ void SDLSetScreenVsyncMode(char *vsync_mode)
   // if adaptive vsync requested, but not supported, retry with normal vsync
   if (result == -1 && interval == VSYNC_MODE_ADAPTIVE)
     SDL_GL_SetSwapInterval(VSYNC_MODE_NORMAL);
-#endif
 }
 
 void SDLRedrawWindow(void)
@@ -1062,7 +893,6 @@ void SDLFreeBitmapPointers(Bitmap *bitmap)
   bitmap->surface = NULL;
   bitmap->surface_masked = NULL;
 
-#if defined(TARGET_SDL2)
   if (bitmap->texture)
     SDL_DestroyTexture(bitmap->texture);
   if (bitmap->texture_masked)
@@ -1070,7 +900,6 @@ void SDLFreeBitmapPointers(Bitmap *bitmap)
 
   bitmap->texture = NULL;
   bitmap->texture_masked = NULL;
-#endif
 }
 
 void SDLCopyArea(Bitmap *src_bitmap, Bitmap *dst_bitmap,
@@ -1104,7 +933,6 @@ void SDLBlitTexture(Bitmap *bitmap,
 		    int src_x, int src_y, int width, int height,
 		    int dst_x, int dst_y, int mask_mode)
 {
-#if defined(TARGET_SDL2)
   SDL_Texture *texture;
   SDL_Rect src_rect;
   SDL_Rect dst_rect;
@@ -1126,7 +954,6 @@ void SDLBlitTexture(Bitmap *bitmap,
   dst_rect.h = height;
 
   SDL_RenderCopy(sdl_renderer, texture, &src_rect, &dst_rect);
-#endif
 }
 
 void SDLFillRectangle(Bitmap *dst_bitmap, int x, int y, int width, int height,
@@ -2515,11 +2342,6 @@ void SDLOpenAudio(void)
   if (program.headless)
     return;
 
-#if !defined(TARGET_SDL2)
-  if (!strEqual(setup.system.sdl_audiodriver, ARG_DEFAULT))
-    SDL_putenv(getStringCat2("SDL_AUDIODRIVER=", setup.system.sdl_audiodriver));
-#endif
-
   if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
   {
     Error(ERR_WARN, "SDL_InitSubSystem() failed: %s", SDL_GetError());
@@ -2575,17 +2397,9 @@ void SDLHandleWindowManagerEvent(Event *event)
   SDL_SysWMEvent *syswmevent = (SDL_SysWMEvent *)event;
   SDL_SysWMmsg *syswmmsg = (SDL_SysWMmsg *)(syswmevent->msg);
 
-#if defined(TARGET_SDL2)
   if (syswmmsg->msg.win.msg == WM_DROPFILES)
-#else
-  if (syswmmsg->msg == WM_DROPFILES)
-#endif
   {
-#if defined(TARGET_SDL2)
     HDROP hdrop = (HDROP)syswmmsg->msg.win.wParam;
-#else
-    HDROP hdrop = (HDROP)syswmmsg->wParam;
-#endif
     int i, num_files;
 
     printf("::: SDL_SYSWMEVENT:\n");
@@ -2602,11 +2416,7 @@ void SDLHandleWindowManagerEvent(Event *event)
       printf("::: - '%s'\n", buffer);
     }
 
-#if defined(TARGET_SDL2)
     DragFinish((HDROP)syswmmsg->msg.win.wParam);
-#else
-    DragFinish((HDROP)syswmmsg->wParam);
-#endif
   }
 #endif
 #endif
@@ -2617,11 +2427,7 @@ void SDLHandleWindowManagerEvent(Event *event)
 // joystick functions
 // ============================================================================
 
-#if defined(TARGET_SDL2)
 static void *sdl_joystick[MAX_PLAYERS];		// game controller or joystick
-#else
-static SDL_Joystick *sdl_joystick[MAX_PLAYERS];	// only joysticks supported
-#endif
 static int sdl_js_axis_raw[MAX_PLAYERS][2];
 static int sdl_js_axis[MAX_PLAYERS][2];
 static int sdl_js_button[MAX_PLAYERS][2];
@@ -2647,25 +2453,17 @@ boolean SDLOpenJoystick(int nr)
   if (nr < 0 || nr >= MAX_PLAYERS)
     return FALSE;
 
-#if defined(TARGET_SDL2)
   sdl_is_controller[nr] = SDL_IsGameController(nr);
-#else
-  sdl_is_controller[nr] = FALSE;
-#endif
 
 #if DEBUG_JOYSTICKS
   Error(ERR_DEBUG, "opening joystick %d (%s)",
 	nr, (sdl_is_controller[nr] ? "game controller" : "joystick"));
 #endif
 
-#if defined(TARGET_SDL2)
   if (sdl_is_controller[nr])
     sdl_joystick[nr] = SDL_GameControllerOpen(nr);
   else
     sdl_joystick[nr] = SDL_JoystickOpen(nr);
-#else
-  sdl_joystick[nr] = SDL_JoystickOpen(nr);
-#endif
 
   return (sdl_joystick[nr] != NULL);
 }
@@ -2679,14 +2477,10 @@ void SDLCloseJoystick(int nr)
   Error(ERR_DEBUG, "closing joystick %d", nr);
 #endif
 
-#if defined(TARGET_SDL2)
   if (sdl_is_controller[nr])
     SDL_GameControllerClose(sdl_joystick[nr]);
   else
     SDL_JoystickClose(sdl_joystick[nr]);
-#else
-  SDL_JoystickClose(sdl_joystick[nr]);
-#endif
 
   sdl_joystick[nr] = NULL;
 }
@@ -2696,23 +2490,15 @@ boolean SDLCheckJoystickOpened(int nr)
   if (nr < 0 || nr >= MAX_PLAYERS)
     return FALSE;
 
-#if defined(TARGET_SDL2)
   return (sdl_joystick[nr] != NULL ? TRUE : FALSE);
-#else
-  return (SDL_JoystickOpened(nr) ? TRUE : FALSE);
-#endif
 }
 
 static void setJoystickAxis(int nr, int axis_id_raw, int axis_value)
 {
-#if defined(TARGET_SDL2)
   int axis_id = (axis_id_raw == SDL_CONTROLLER_AXIS_LEFTX ||
 		 axis_id_raw == SDL_CONTROLLER_AXIS_RIGHTX ? 0 :
 		 axis_id_raw == SDL_CONTROLLER_AXIS_LEFTY ||
 		 axis_id_raw == SDL_CONTROLLER_AXIS_RIGHTY ? 1 : -1);
-#else
-  int axis_id = axis_id_raw % 2;
-#endif
 
   if (nr < 0 || nr >= MAX_PLAYERS)
     return;
@@ -2731,7 +2517,6 @@ static void setJoystickAxis(int nr, int axis_id_raw, int axis_value)
 
 static void setJoystickButton(int nr, int button_id_raw, int button_state)
 {
-#if defined(TARGET_SDL2)
   int button_id = (button_id_raw == SDL_CONTROLLER_BUTTON_A ||
 		   button_id_raw == SDL_CONTROLLER_BUTTON_X ||
 		   button_id_raw == SDL_CONTROLLER_BUTTON_LEFTSHOULDER ||
@@ -2756,9 +2541,6 @@ static void setJoystickButton(int nr, int button_id_raw, int button_state)
       button_id_raw == SDL_CONTROLLER_BUTTON_DPAD_UP ||
       button_id_raw == SDL_CONTROLLER_BUTTON_DPAD_DOWN)
     sdl_js_axis_raw[nr][0] = sdl_js_axis_raw[nr][1] = -1;
-#else
-  int button_id = button_id_raw % 2;
-#endif
 
   if (nr < 0 || nr >= MAX_PLAYERS)
     return;
@@ -2773,7 +2555,6 @@ void HandleJoystickEvent(Event *event)
 {
   switch(event->type)
   {
-#if defined(TARGET_SDL2)
     case SDL_CONTROLLERDEVICEADDED:
 #if DEBUG_JOYSTICKS
       Error(ERR_DEBUG, "SDL_CONTROLLERDEVICEADDED: device %d added",
@@ -2819,7 +2600,6 @@ void HandleJoystickEvent(Event *event)
 			event->cbutton.button,
 			FALSE);
       break;
-#endif
 
     case SDL_JOYAXISMOTION:
       if (sdl_is_controller[event->jaxis.which])
@@ -2872,32 +2652,25 @@ void SDLInitJoysticks(void)
 {
   static boolean sdl_joystick_subsystem_initialized = FALSE;
   boolean print_warning = !sdl_joystick_subsystem_initialized;
-#if defined(TARGET_SDL2)
   char *mappings_file_base = getPath2(options.conf_directory,
 				      GAMECONTROLLER_BASENAME);
   char *mappings_file_user = getPath2(getUserGameDataDir(),
 				      GAMECONTROLLER_BASENAME);
   int num_mappings;
-#endif
   int i;
 
   if (!sdl_joystick_subsystem_initialized)
   {
     sdl_joystick_subsystem_initialized = TRUE;
 
-#if defined(TARGET_SDL2)
     SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
 
     if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) < 0)
-#else
-    if (SDL_InitSubSystem(SDL_INIT_JOYSTICK) < 0)
-#endif
     {
       Error(ERR_EXIT, "SDL_Init() failed: %s", SDL_GetError());
       return;
     }
 
-#if defined(TARGET_SDL2)
     num_mappings = SDL_GameControllerAddMappingsFromFile(mappings_file_base);
 
     // the included game controller base mappings should always be found
@@ -2942,7 +2715,6 @@ void SDLInitJoysticks(void)
       Error(ERR_INFO, "- joystick %d (%s): '%s'",
 	    i, type, (name ? name : "(Unknown)"));
     }
-#endif
 #endif
   }
 

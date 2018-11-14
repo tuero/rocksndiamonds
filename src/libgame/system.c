@@ -55,9 +55,7 @@ DrawBuffer	       *drawto = NULL;
 int			button_status = MB_NOT_PRESSED;
 boolean			motion_status = FALSE;
 int			wheel_steps = DEFAULT_WHEEL_STEPS;
-#if defined(TARGET_SDL2)
 boolean			keyrepeat_status = TRUE;
-#endif
 
 int			redraw_mask = REDRAW_NONE;
 
@@ -179,11 +177,7 @@ void InitPlatformDependentStuff(void)
 
   OpenLogFiles();
 
-#if defined(TARGET_SDL2)
-  int sdl_init_flags = SDL_INIT_EVENTS      | SDL_INIT_NOPARACHUTE;
-#else
-  int sdl_init_flags = SDL_INIT_EVENTTHREAD | SDL_INIT_NOPARACHUTE;
-#endif
+  int sdl_init_flags = SDL_INIT_EVENTS | SDL_INIT_NOPARACHUTE;
 
   if (SDL_Init(sdl_init_flags) < 0)
     Error(ERR_EXIT, "SDL_Init() failed: %s", SDL_GetError());
@@ -252,9 +246,7 @@ void InitGfxWindowInfo(int win_xsize, int win_ysize)
   {
     ReCreateBitmap(&gfx.background_bitmap, win_xsize, win_ysize);
 
-#if defined(TARGET_SDL2)
     ReCreateBitmap(&gfx.final_screen_bitmap, win_xsize, win_ysize);
-#endif
 
     ReCreateBitmap(&gfx.fade_bitmap_backup, win_xsize, win_ysize);
     ReCreateBitmap(&gfx.fade_bitmap_source, win_xsize, win_ysize);
@@ -536,9 +528,7 @@ void InitVideoDisplay(void)
     return;
 
   SDLInitVideoDisplay();
-#if defined(TARGET_SDL2)
   SDLSetDisplaySize();
-#endif
 }
 
 void CloseVideoDisplay(void)
@@ -810,7 +800,6 @@ void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
   src_x += dst_x - dst_x_unclipped;
   src_y += dst_y - dst_y_unclipped;
 
-#if defined(TARGET_SDL2)
   // !!! 2013-12-11: An "old friend" is back. Same bug in SDL2 2.0.1 !!!
   // !!! 2009-03-30: Fixed by using self-compiled, patched SDL.dll !!!
   /* (This bug still exists in the actual (as of 2009-06-15) version 1.2.13,
@@ -857,7 +846,6 @@ void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 
     return;
   }
-#endif
 
   sysCopyArea(src_bitmap, dst_bitmap,
 	      src_x, src_y, width, height, dst_x, dst_y, BLIT_OPAQUE);
@@ -1093,23 +1081,12 @@ Pixel GetPixelFromRGBcompact(Bitmap *bitmap, unsigned int color)
 
 void KeyboardAutoRepeatOn(void)
 {
-#if defined(TARGET_SDL2)
   keyrepeat_status = TRUE;
-#else
-  SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY / 2,
-		      SDL_DEFAULT_REPEAT_INTERVAL / 2);
-  SDL_EnableUNICODE(1);
-#endif
 }
 
 void KeyboardAutoRepeatOff(void)
 {
-#if defined(TARGET_SDL2)
   keyrepeat_status = FALSE;
-#else
-  SDL_EnableKeyRepeat(0, SDL_DEFAULT_REPEAT_INTERVAL);
-  SDL_EnableUNICODE(0);
-#endif
 }
 
 boolean SetVideoMode(boolean fullscreen)
@@ -1637,11 +1614,7 @@ void WaitEvent(Event *event)
 
 void PeekEvent(Event *event)
 {
-#if defined(TARGET_SDL2)
   SDL_PeepEvents(event, 1, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT);
-#else
-  SDL_PeepEvents(event, 1, SDL_PEEKEVENT, SDL_ALLEVENTS);
-#endif
 }
 
 void CheckQuitEvent(void)
@@ -1652,26 +1625,8 @@ void CheckQuitEvent(void)
 
 Key GetEventKey(KeyEvent *event, boolean with_modifiers)
 {
-#if defined(TARGET_SDL2)
   // key up/down events in SDL2 do not return text characters anymore
   return event->keysym.sym;
-#else
-
-#if ENABLE_UNUSED_CODE
-  printf("unicode == '%d', sym == '%d', mod == '0x%04x'\n",
-	 (int)event->keysym.unicode,
-	 (int)event->keysym.sym,
-	 (int)SDL_GetModState());
-#endif
-
-  if (with_modifiers &&
-      event->keysym.unicode > 0x0000 &&
-      event->keysym.unicode < 0x2000)
-    return event->keysym.unicode;
-  else
-    return event->keysym.sym;
-
-#endif
 }
 
 KeyMod HandleKeyModState(Key key, int key_status)
@@ -1739,7 +1694,6 @@ KeyMod GetKeyModStateFromEvents(void)
 
 void StartTextInput(int x, int y, int width, int height)
 {
-#if defined(TARGET_SDL2)
 #if defined(HAS_SCREEN_KEYBOARD)
   SDL_StartTextInput();
 
@@ -1750,12 +1704,10 @@ void StartTextInput(int x, int y, int width, int height)
     video.shifted_up = TRUE;
   }
 #endif
-#endif
 }
 
 void StopTextInput(void)
 {
-#if defined(TARGET_SDL2)
 #if defined(HAS_SCREEN_KEYBOARD)
   SDL_StopTextInput();
 
@@ -1765,7 +1717,6 @@ void StopTextInput(void)
     video.shifted_up_delay = SDL_GetTicks();
     video.shifted_up = FALSE;
   }
-#endif
 #endif
 }
 

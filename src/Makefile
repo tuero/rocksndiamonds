@@ -58,26 +58,19 @@ endif
 # configuring target
 # -----------------------------------------------------------------------------
 
-ifndef TARGET				# auto-detect compiling for SDL or SDL2
+ifndef TARGET				# auto-detect compiling for SDL2
   SDL_VERSION := $(shell sdl2-config --version 2> /dev/null)
   ifdef SDL_VERSION
     TARGET = sdl2
   else
-    SDL_VERSION := $(shell sdl-config --version 2> /dev/null)
-    ifdef SDL_VERSION
-      TARGET = sdl
-    else
-      $(error SDL/SDL2 library not found)
-    endif
+    $(error SDL2 library not found)
   endif
 endif
 
 # $(info Using SDL version $(SDL_VERSION) [TARGET == $(TARGET)])
 
 ifeq ($(TARGET),sdl)			# compiling for SDL target
-SYS_CFLAGS = -DTARGET_SDL $(shell sdl-config --cflags)
-SDL_LIBS = -lSDL_image -lSDL_mixer -lSDL_net
-SYS_LDFLAGS = $(SDL_LIBS) $(shell sdl-config --libs)
+  $(error SDL library version 1.2 not supported anymore)
 endif
 
 ifeq ($(TARGET),sdl2)			# compiling for SDL2 target

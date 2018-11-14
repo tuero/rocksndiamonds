@@ -1552,10 +1552,6 @@ static void translate_keyname(Key *keysym, char **x11name, char **name, int mode
     { KSYM_Meta_R,	"XK_Meta_R",		"right meta" },
     { KSYM_Alt_L,	"XK_Alt_L",		"left alt" },
     { KSYM_Alt_R,	"XK_Alt_R",		"right alt" },
-#if !defined(TARGET_SDL2)
-    { KSYM_Super_L,	"XK_Super_L",		"left super" },	 // Win-L
-    { KSYM_Super_R,	"XK_Super_R",		"right super" }, // Win-R
-#endif
     { KSYM_Mode_switch,	"XK_Mode_switch",	"mode switch" }, // Alt-R
     { KSYM_Multi_key,	"XK_Multi_key",		"multi key" },	 // Ctrl-R
 
@@ -1569,7 +1565,6 @@ static void translate_keyname(Key *keysym, char **x11name, char **name, int mode
     { KSYM_Page_Up,	"XK_Page_Up",		"page up" },
     { KSYM_Page_Down,	"XK_Page_Down",		"page down" },
 
-#if defined(TARGET_SDL2)
     { KSYM_Select,	"XK_Select",		"select" },
     { KSYM_Menu,	"XK_Menu",		"menu" },	 // menu key
     { KSYM_Back,	"XK_Back",		"back" },	 // back key
@@ -1577,7 +1572,6 @@ static void translate_keyname(Key *keysym, char **x11name, char **name, int mode
 #if defined(PLATFORM_ANDROID)
     { KSYM_Rewind,	"XK_Rewind",		"rewind" },
     { KSYM_FastForward,	"XK_FastForward",	"fast forward" },
-#endif
 #endif
 
     // ASCII 0x20 to 0x40 keys (except numbers)
@@ -1628,7 +1622,6 @@ static void translate_keyname(Key *keysym, char **x11name, char **name, int mode
     { KSYM_udiaeresis,	"XK_udiaeresis",	"u umlaut" },
     { KSYM_ssharp,	"XK_ssharp",		"sharp s" },
 
-#if defined(TARGET_SDL2)
     // special (non-ASCII) keys (UTF-8, for reverse mapping only)
     { KSYM_degree,	"XK_degree",		"\xc2\xb0" },
     { KSYM_Adiaeresis,	"XK_Adiaeresis",	"\xc3\x84" },
@@ -1641,9 +1634,7 @@ static void translate_keyname(Key *keysym, char **x11name, char **name, int mode
 
     // other keys (for reverse mapping only)
     { KSYM_space,	"XK_space",		" " },
-#endif
 
-#if defined(TARGET_SDL2)
     // keypad keys are not in numerical order in SDL2
     { KSYM_KP_0,	"XK_KP_0",		"keypad 0" },
     { KSYM_KP_1,	"XK_KP_1",		"keypad 1" },
@@ -1655,7 +1646,6 @@ static void translate_keyname(Key *keysym, char **x11name, char **name, int mode
     { KSYM_KP_7,	"XK_KP_7",		"keypad 7" },
     { KSYM_KP_8,	"XK_KP_8",		"keypad 8" },
     { KSYM_KP_9,	"XK_KP_9",		"keypad 9" },
-#endif
 
     // end-of-array identifier
     { 0,                NULL,			NULL }
@@ -1674,10 +1664,6 @@ static void translate_keyname(Key *keysym, char **x11name, char **name, int mode
       sprintf(name_buffer, "%c", 'a' + (char)(key - KSYM_a));
     else if (key >= KSYM_0 && key <= KSYM_9)
       sprintf(name_buffer, "%c", '0' + (char)(key - KSYM_0));
-#if !defined(TARGET_SDL2)
-    else if (key >= KSYM_KP_0 && key <= KSYM_KP_9)
-      sprintf(name_buffer, "keypad %c", '0' + (char)(key - KSYM_KP_0));
-#endif
     else if (key >= KSYM_FKEY_FIRST && key <= KSYM_FKEY_LAST)
       sprintf(name_buffer, "F%d", (int)(key - KSYM_FKEY_FIRST + 1));
     else if (key == KSYM_UNDEFINED)
@@ -1713,10 +1699,6 @@ static void translate_keyname(Key *keysym, char **x11name, char **name, int mode
       sprintf(name_buffer, "XK_%c", 'a' + (char)(key - KSYM_a));
     else if (key >= KSYM_0 && key <= KSYM_9)
       sprintf(name_buffer, "XK_%c", '0' + (char)(key - KSYM_0));
-#if !defined(TARGET_SDL2)
-    else if (key >= KSYM_KP_0 && key <= KSYM_KP_9)
-      sprintf(name_buffer, "XK_KP_%c", '0' + (char)(key - KSYM_KP_0));
-#endif
     else if (key >= KSYM_FKEY_FIRST && key <= KSYM_FKEY_LAST)
       sprintf(name_buffer, "XK_F%d", (int)(key - KSYM_FKEY_FIRST + 1));
     else if (key == KSYM_UNDEFINED)
@@ -1794,15 +1776,6 @@ static void translate_keyname(Key *keysym, char **x11name, char **name, int mode
       else if (c >= '0' && c <= '9')
 	key = KSYM_0 + (Key)(c - '0');
     }
-#if !defined(TARGET_SDL2)
-    else if (strPrefix(name_ptr, "XK_KP_") && strlen(name_ptr) == 7)
-    {
-      char c = name_ptr[6];
-
-      if (c >= '0' && c <= '9')
-	key = KSYM_KP_0 + (Key)(c - '0');
-    }
-#endif
     else if (strPrefix(name_ptr, "XK_F") && strlen(name_ptr) <= 6)
     {
       char c1 = name_ptr[4];

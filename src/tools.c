@@ -4205,9 +4205,7 @@ void WaitForEventToContinue(void)
       {
 	case EVENT_BUTTONRELEASE:
 	case EVENT_KEYPRESS:
-#if defined(TARGET_SDL2)
         case SDL_CONTROLLERBUTTONDOWN:
-#endif
         case SDL_JOYBUTTONDOWN:
 	  still_wait = FALSE;
 	  break;
@@ -4344,7 +4342,6 @@ static int RequestHandleEvents(unsigned int req_state)
 	    break;
 	  }
 
-#if defined(TARGET_SDL2)
 	  case SDL_WINDOWEVENT:
 	    HandleWindowEvent((WindowEvent *) &event);
 	    break;
@@ -4355,7 +4352,6 @@ static int RequestHandleEvents(unsigned int req_state)
 	  case SDL_APP_DIDENTERFOREGROUND:
 	    HandlePauseResumeEvent((PauseResumeEvent *) &event);
 	    break;
-#endif
 
 	  case EVENT_KEYPRESS:
 	  {
@@ -4370,25 +4366,21 @@ static int RequestHandleEvents(unsigned int req_state)
 
 	      case KSYM_Return:
 	      case KSYM_y:
-#if defined(TARGET_SDL2)
 	      case KSYM_Y:
 	      case KSYM_Select:
 	      case KSYM_Menu:
 #if defined(KSYM_Rewind)
 	      case KSYM_Rewind:		// for Amazon Fire TV remote
 #endif
-#endif
 		result = 1;
 		break;
 
 	      case KSYM_Escape:
 	      case KSYM_n:
-#if defined(TARGET_SDL2)
 	      case KSYM_N:
 	      case KSYM_Back:
 #if defined(KSYM_FastForward)
 	      case KSYM_FastForward:	// for Amazon Fire TV remote
-#endif
 #endif
 		result = 0;
 		break;
@@ -4443,7 +4435,6 @@ static int RequestHandleEvents(unsigned int req_state)
 	    ClearPlayerAction();
 	    break;
 
-#if defined(TARGET_SDL2)
 	  case SDL_CONTROLLERBUTTONDOWN:
 	    switch (event.cbutton.button)
 	    {
@@ -4503,7 +4494,6 @@ static int RequestHandleEvents(unsigned int req_state)
 	    HandleJoystickEvent(&event);
 	    ClearPlayerAction();
 	    break;
-#endif
 
 	  default:
 	    HandleOtherEvents(&event);
@@ -9297,7 +9287,6 @@ void ToggleFullscreenOrChangeWindowScalingIfNeeded(void)
   if (!change_window_scaling_percent && !video.fullscreen_available)
     return;
 
-#if defined(TARGET_SDL2)
   if (change_window_scaling_percent)
   {
     SDLSetWindowScaling(setup.window_scaling_percent);
@@ -9313,7 +9302,6 @@ void ToggleFullscreenOrChangeWindowScalingIfNeeded(void)
 
     return;
   }
-#endif
 
   if (change_fullscreen ||
       change_window_scaling_percent)

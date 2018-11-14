@@ -3548,11 +3548,8 @@ extern int			game_status;
 extern boolean			game_status_last_screen;
 extern boolean			level_editor_test_game;
 extern boolean			network_playing;
-
-#if defined(TARGET_SDL)
 extern boolean			network_server;
 extern SDL_Thread	       *server_thread;
-#endif
 
 extern int			key_joystick_mapping;
 

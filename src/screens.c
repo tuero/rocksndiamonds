@@ -3601,12 +3601,8 @@ static void DrawInfoScreen_Version(void)
   SDL_version sdl_version_compiled;
   const SDL_version *sdl_version_linked;
   int driver_name_len = 10;
-#if defined(TARGET_SDL2)
   SDL_version sdl_version_linked_ext;
   const char *driver_name = NULL;
-#else
-  char driver_name[driver_name_len];
-#endif
 
   SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_VERSION);
 
@@ -3657,12 +3653,8 @@ static void DrawInfoScreen_Version(void)
   ystart += ystep_head;
 
   SDL_VERSION(&sdl_version_compiled);
-#if defined(TARGET_SDL2)
   SDL_GetVersion(&sdl_version_linked_ext);
   sdl_version_linked = &sdl_version_linked_ext;
-#else
-  sdl_version_linked = SDL_Linked_Version();
-#endif
 
   DrawTextF(xstart1, ystart, font_text, "SDL");
   DrawTextF(xstart2, ystart, font_text, "%d.%d.%d",
@@ -3722,22 +3714,14 @@ static void DrawInfoScreen_Version(void)
   DrawTextF(xstart3, ystart, font_head, "Used");
   ystart += ystep_head;
 
-#if defined(TARGET_SDL2)
   driver_name = getStringCopyNStatic(SDL_GetVideoDriver(0), driver_name_len);
-#else
-  SDL_VideoDriverName(driver_name, driver_name_len);
-#endif
 
   DrawTextF(xstart1, ystart, font_text, "SDL_VideoDriver");
   DrawTextF(xstart2, ystart, font_text, "%s", setup.system.sdl_videodriver);
   DrawTextF(xstart3, ystart, font_text, "%s", driver_name);
   ystart += ystep_line;
 
-#if defined(TARGET_SDL2)
   driver_name = getStringCopyNStatic(SDL_GetAudioDriver(0), driver_name_len);
-#else
-  SDL_AudioDriverName(driver_name, driver_name_len);
-#endif
 
   DrawTextF(xstart1, ystart, font_text, "SDL_AudioDriver");
   DrawTextF(xstart2, ystart, font_text, "%s", setup.system.sdl_audiodriver);
@@ -5216,7 +5200,6 @@ static void execSetupGraphics(void)
   if (check_game_speed)
     ModifyGameSpeedIfNeeded();
 
-#if defined(TARGET_SDL2)
   // window scaling may have changed at this point
   ToggleFullscreenOrChangeWindowScalingIfNeeded();
 
@@ -5229,7 +5212,6 @@ static void execSetupGraphics(void)
 
   // screen vsync mode may have changed at this point
   SDLSetScreenVsyncMode(setup.vsync_mode);
-#endif
 }
 
 static void execSetupChooseWindowSize(void)
@@ -6218,7 +6200,7 @@ static struct TokenInfo setup_info_editor[] =
 
 static struct TokenInfo setup_info_graphics[] =
 {
-#if defined(TARGET_SDL2) && !defined(PLATFORM_ANDROID)
+#if !defined(PLATFORM_ANDROID)
   { TYPE_SWITCH,	&setup.fullscreen,	"Fullscreen:"		},
   { TYPE_ENTER_LIST,	execSetupChooseWindowSize, "Window Scaling:"	},
   { TYPE_STRING,	&window_size_text,	""			},
@@ -7383,7 +7365,6 @@ void CustomizeKeyboard(int player_nr)
 
 static boolean ConfigureJoystickMapButtonsAndAxes(SDL_Joystick *joystick)
 {
-#if defined(TARGET_SDL2)
   static boolean bitmaps_initialized = FALSE;
   boolean screen_initialized = FALSE;
   static Bitmap *controller, *button, *axis_x, *axis_y;
@@ -7729,9 +7710,6 @@ static boolean ConfigureJoystickMapButtonsAndAxes(SDL_Joystick *joystick)
   while (NextValidEvent(&event));
 
   return success;
-#else
-  return TRUE;
-#endif
 }
 
 static int ConfigureJoystickMain(int player_nr)
@@ -7895,19 +7873,13 @@ static boolean ConfigureVirtualButtonsMain(void)
 
 	    // press 'Enter' to keep the existing key binding
 	    if (key == KSYM_Return ||
-#if defined(TARGET_SDL2)
 		key == KSYM_Menu ||
-#endif
 		key == KSYM_space)
 	    {
 	      step_nr++;
 	    }
-	    else if (key == KSYM_BackSpace
-#if defined(TARGET_SDL2)
-		     ||
-		     key == KSYM_Back
-#endif
-		     )
+	    else if (key == KSYM_BackSpace ||
+		     key == KSYM_Back)
 	    {
 	      if (step_nr == 0)
 	      {
@@ -7996,7 +7968,6 @@ static boolean ConfigureVirtualButtonsMain(void)
 	  }
 	  break;
 
-#if defined(TARGET_SDL2)
 	case SDL_WINDOWEVENT:
 	  HandleWindowEvent((WindowEvent *) &event);
 
@@ -8019,7 +7990,6 @@ static boolean ConfigureVirtualButtonsMain(void)
 	case SDL_APP_DIDENTERFOREGROUND:
 	  HandlePauseResumeEvent((PauseResumeEvent *) &event);
 	  break;
-#endif
 
         default:
 	  HandleOtherEvents(&event);

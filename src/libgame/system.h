@@ -65,22 +65,14 @@
 #define STR_SPECIAL_RENDERING_TARGET	"target_texture_only"
 #define STR_SPECIAL_RENDERING_DOUBLE	"stream_and_target_texture"
 
-#if defined(TARGET_SDL2)
 #define STR_SPECIAL_RENDERING_DEFAULT	STR_SPECIAL_RENDERING_DOUBLE
-#else
-#define STR_SPECIAL_RENDERING_DEFAULT	STR_SPECIAL_RENDERING_BITMAP
-#endif
 
 #define SPECIAL_RENDERING_OFF		0
 #define SPECIAL_RENDERING_BITMAP	1
 #define SPECIAL_RENDERING_TARGET	2
 #define SPECIAL_RENDERING_DOUBLE	3
 
-#if defined(TARGET_SDL2)
 #define SPECIAL_RENDERING_DEFAULT	SPECIAL_RENDERING_DOUBLE
-#else
-#define SPECIAL_RENDERING_DEFAULT	SPECIAL_RENDERING_BITMAP
-#endif
 
 // values for vertical screen retrace synchronization (vsync)
 #define STR_VSYNC_MODE_OFF		"off"
@@ -1642,9 +1634,7 @@ extern DrawBuffer	       *drawto;
 extern int			button_status;
 extern boolean			motion_status;
 extern int			wheel_steps;
-#if defined(TARGET_SDL2)
 extern boolean			keyrepeat_status;
-#endif
 
 extern int			redraw_mask;
 

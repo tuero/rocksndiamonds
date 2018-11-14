@@ -56,13 +56,11 @@ static int FilterEvents(const Event *event)
 {
   MotionEvent *motion;
 
-#if defined(TARGET_SDL2)
   // skip repeated key press events if keyboard auto-repeat is disabled
   if (event->type == EVENT_KEYPRESS &&
       event->key.repeat &&
       !keyrepeat_status)
     return 0;
-#endif
 
   if (event->type == EVENT_BUTTONPRESS ||
       event->type == EVENT_BUTTONRELEASE)
@@ -185,7 +183,6 @@ static void HandleEvents(void)
 	HandleMotionEvent((MotionEvent *) &event);
 	break;
 
-#if defined(TARGET_SDL2)
       case EVENT_WHEELMOTION:
 	HandleWheelEvent((WheelEvent *) &event);
 	break;
@@ -210,7 +207,6 @@ static void HandleEvents(void)
       case SDL_APP_DIDENTERFOREGROUND:
 	HandlePauseResumeEvent((PauseResumeEvent *) &event);
 	break;
-#endif
 
       case EVENT_KEYPRESS:
       case EVENT_KEYRELEASE:
@@ -253,8 +249,6 @@ void HandleOtherEvents(Event *event)
       HandleClientMessageEvent((ClientMessageEvent *) event);
       break;
 
-#if defined(TARGET_SDL)
-#if defined(TARGET_SDL2)
     case SDL_CONTROLLERBUTTONDOWN:
     case SDL_CONTROLLERBUTTONUP:
       // for any game controller button event, disable overlay buttons
@@ -266,7 +260,6 @@ void HandleOtherEvents(Event *event)
     case SDL_CONTROLLERDEVICEADDED:
     case SDL_CONTROLLERDEVICEREMOVED:
     case SDL_CONTROLLERAXISMOTION:
-#endif
     case SDL_JOYAXISMOTION:
     case SDL_JOYBUTTONDOWN:
     case SDL_JOYBUTTONUP:
@@ -276,7 +269,6 @@ void HandleOtherEvents(Event *event)
     case SDL_SYSWMEVENT:
       HandleWindowManagerEvent(event);
       break;
-#endif
 
     default:
       break;
@@ -349,7 +341,6 @@ void EventLoop(void)
 
 void ClearAutoRepeatKeyEvents(void)
 {
-#if defined(TARGET_SDL2)
   while (PendingEvent())
   {
     Event next_event;
@@ -363,7 +354,6 @@ void ClearAutoRepeatKeyEvents(void)
     else
       break;
   }
-#endif
 }
 
 void ClearEventQueue(void)
@@ -382,12 +372,10 @@ void ClearEventQueue(void)
 	ClearPlayerAction();
 	break;
 
-#if defined(TARGET_SDL2)
       case SDL_CONTROLLERBUTTONUP:
 	HandleJoystickEvent(&event);
 	ClearPlayerAction();
 	break;
-#endif
 
       default:
 	HandleOtherEvents(&event);
@@ -467,12 +455,10 @@ void SleepWhileUnmapped(void)
 	key_joystick_mapping = 0;
 	break;
 
-#if defined(TARGET_SDL2)
       case SDL_CONTROLLERBUTTONUP:
 	HandleJoystickEvent(&event);
 	key_joystick_mapping = 0;
 	break;
-#endif
 
       case EVENT_MAPNOTIFY:
 	window_unmapped = FALSE;
@@ -539,8 +525,6 @@ void HandleMotionEvent(MotionEvent *event)
 
   HandleButton(event->x, event->y, button_status, button_status);
 }
-
-#if defined(TARGET_SDL2)
 
 void HandleWheelEvent(WheelEvent *event)
 {
@@ -1037,8 +1021,6 @@ void HandleFingerEvent(FingerEvent *event)
     HandleFingerEvent_WipeGestures(event);
 }
 
-#endif
-
 static void HandleButtonOrFinger_WipeGestures_MM(int mx, int my, int button)
 {
   static int old_mx = 0, old_my = 0;
@@ -1398,8 +1380,6 @@ static void HandleButtonOrFinger(int mx, int my, int button)
   }
 }
 
-#if defined(TARGET_SDL2)
-
 static boolean checkTextInputKeyModState(void)
 {
   // when playing, only handle raw key events and ignore text input
@@ -1448,8 +1428,6 @@ void HandlePauseResumeEvent(PauseResumeEvent *event)
   }
 }
 
-#endif
-
 void HandleKeyEvent(KeyEvent *event)
 {
   int key_status = (event->type == EVENT_KEYPRESS ? KEY_PRESSED : KEY_RELEASED);
@@ -1483,13 +1461,9 @@ void HandleKeyEvent(KeyEvent *event)
 
   HandleKeyModState(keymod, key_status);
 
-#if defined(TARGET_SDL2)
   // only handle raw key input without text modifier keys pressed
   if (!checkTextInputKeyModState())
     HandleKey(key, key_status);
-#else
-  HandleKey(key, key_status);
-#endif
 }
 
 void HandleFocusEvent(FocusChangeEvent *event)
@@ -1540,9 +1514,7 @@ void HandleClientMessageEvent(ClientMessageEvent *event)
 
 void HandleWindowManagerEvent(Event *event)
 {
-#if defined(TARGET_SDL)
   SDLHandleWindowManagerEvent(event);
-#endif
 }
 
 void HandleButton(int mx, int my, int button, int button_nr)
@@ -1884,13 +1856,11 @@ void HandleKey(Key key, int key_status)
   int joy = 0;
   int i;
 
-#if defined(TARGET_SDL2)
   // map special keys (media keys / remote control buttons) to default keys
   if (key == KSYM_PlayPause)
     key = KSYM_space;
   else if (key == KSYM_Select)
     key = KSYM_Return;
-#endif
 
   HandleSpecialGameControllerKeys(key, key_status);
 
@@ -2471,7 +2441,6 @@ void HandleJoystick(void)
 
 void HandleSpecialGameControllerButtons(Event *event)
 {
-#if defined(TARGET_SDL2)
   int key_status;
   Key key;
 
@@ -2504,12 +2473,10 @@ void HandleSpecialGameControllerButtons(Event *event)
   }
 
   HandleKey(key, key_status);
-#endif
 }
 
 void HandleSpecialGameControllerKeys(Key key, int key_status)
 {
-#if defined(TARGET_SDL2)
 #if defined(KSYM_Rewind) && defined(KSYM_FastForward)
   int button = SDL_CONTROLLER_BUTTON_INVALID;
 
@@ -2533,7 +2500,6 @@ void HandleSpecialGameControllerKeys(Key key, int key_status)
 
     HandleJoystickEvent(&event);
   }
-#endif
 #endif
 }
 

@@ -33,11 +33,8 @@ int			game_status = -1;
 boolean			game_status_last_screen = -1;
 boolean			level_editor_test_game = FALSE;
 boolean			network_playing = FALSE;
-
-#if defined(TARGET_SDL)
 boolean			network_server = FALSE;
 SDL_Thread	       *server_thread;
-#endif
 
 int			key_joystick_mapping = 0;
 

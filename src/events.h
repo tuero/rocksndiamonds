@@ -26,13 +26,11 @@ void SleepWhileUnmapped(void);
 void HandleExposeEvent(ExposeEvent *);
 void HandleButtonEvent(ButtonEvent *);
 void HandleMotionEvent(MotionEvent *);
-#if defined(TARGET_SDL2)
 void HandleWheelEvent(WheelEvent *);
 void HandleWindowEvent(WindowEvent *);
 void HandleFingerEvent(FingerEvent *);
 void HandleTextEvent(TextEvent *);
 void HandlePauseResumeEvent(PauseResumeEvent *);
-#endif
 void HandleKeysDebug(Key);
 void HandleKeyEvent(KeyEvent *);
 void HandleFocusEvent(FocusChangeEvent *);

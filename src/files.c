@@ -11043,7 +11043,6 @@ void ConvertLevels(void)
 
 void CreateLevelSketchImages(void)
 {
-#if defined(TARGET_SDL)
   Bitmap *bitmap1;
   Bitmap *bitmap2;
   int i;
@@ -11099,7 +11098,6 @@ void CreateLevelSketchImages(void)
   Error(ERR_INFO, "%d normal and small images created", NUM_FILE_ELEMENTS);
 
   CloseAllAndExit(0);
-#endif
 }
 
 
@@ -11109,7 +11107,6 @@ void CreateLevelSketchImages(void)
 
 void CreateCustomElementImages(char *directory)
 {
-#if defined(TARGET_SDL)
   char *src_basename = "RocksCE-template.ilbm";
   char *dst_basename = "RocksCE.bmp";
   char *src_filename = getPath2(directory, src_basename);
@@ -11201,5 +11198,4 @@ void CreateCustomElementImages(char *directory)
   FreeBitmap(bitmap);
 
   CloseAllAndExit(0);
-#endif
 }

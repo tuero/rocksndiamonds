@@ -99,8 +99,6 @@ char *getWindowTitleString(void)
 
   checked_free(window_title_string);
 
-#if defined(TARGET_SDL2)
-
 #ifdef DEBUG
   window_title_string = checked_malloc(strlen(getProgramInitString()) + 20 +
 				       strlen(getSourceDateString()) + 2 + 1);
@@ -122,23 +120,6 @@ char *getWindowTitleString(void)
   else
     sprintf(window_title_string, "%s",
 	    getProgramInitString());
-#endif
-
-#else
-
-#ifdef DEBUG
-  window_title_string = checked_malloc(strlen(getProgramInitString()) + 1 +
-				       strlen(getSourceDateString()) + 2 + 1);
-
-  sprintf(window_title_string, "%s [%s]",
-	  getProgramInitString(), getSourceDateString());
-#else
-  window_title_string = checked_malloc(strlen(getProgramInitString()) + 1);
-
-  sprintf(window_title_string, "%s",
-	  getProgramInitString());
-#endif
-
 #endif
 
   return window_title_string;
