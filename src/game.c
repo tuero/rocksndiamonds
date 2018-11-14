@@ -3543,8 +3543,6 @@ void InitGame(void)
   if (network_playing)
     SendToServer_MovePlayer(MV_NONE);
 
-  ZX = ZY = -1;
-
   FrameCounter = 0;
   TimeFrames = 0;
   TimePlayed = 0;
@@ -3556,6 +3554,9 @@ void InitGame(void)
   ScreenGfxPos = 0;
 
   ScrollStepSize = 0;	// will be correctly initialized by ScrollScreen()
+
+  game.robot_wheel_x = -1;
+  game.robot_wheel_y = -1;
 
   game.exit_x = -1;
   game.exit_y = -1;
@@ -6846,12 +6847,14 @@ static void TurnRoundExt(int x, int y)
       }
     }
 
-    if (element == EL_ROBOT && ZX >= 0 && ZY >= 0 &&
-	(Feld[ZX][ZY] == EL_ROBOT_WHEEL_ACTIVE ||
+    if (element == EL_ROBOT &&
+	game.robot_wheel_x >= 0 &&
+	game.robot_wheel_y >= 0 &&
+	(Feld[game.robot_wheel_x][game.robot_wheel_y] == EL_ROBOT_WHEEL_ACTIVE ||
 	 game.engine_version < VERSION_IDENT(3,1,0,0)))
     {
-      attr_x = ZX;
-      attr_y = ZY;
+      attr_x = game.robot_wheel_x;
+      attr_y = game.robot_wheel_y;
     }
 
     if (element == EL_PENGUIN)
@@ -9033,10 +9036,11 @@ static void RunRobotWheel(int x, int y)
 
 static void StopRobotWheel(int x, int y)
 {
-  if (ZX == x && ZY == y)
+  if (game.robot_wheel_x == x &&
+      game.robot_wheel_y == y)
   {
-    ZX = ZY = -1;
-
+    game.robot_wheel_x = -1;
+    game.robot_wheel_y = -1;
     game.robot_wheel_active = FALSE;
   }
 }
@@ -13448,8 +13452,8 @@ void RemovePlayer(struct PlayerInfo *player)
     game.GameOver = TRUE;
   }
 
-  game.exit_x = ZX = jx;
-  game.exit_y = ZY = jy;
+  game.exit_x = game.robot_wheel_x = jx;
+  game.exit_y = game.robot_wheel_y = jy;
 }
 
 void ExitPlayer(struct PlayerInfo *player)
@@ -14072,9 +14076,9 @@ static int DigField(struct PlayerInfo *player,
     if (element == EL_ROBOT_WHEEL)
     {
       Feld[x][y] = EL_ROBOT_WHEEL_ACTIVE;
-      ZX = x;
-      ZY = y;
 
+      game.robot_wheel_x = x;
+      game.robot_wheel_y = y;
       game.robot_wheel_active = TRUE;
 
       TEST_DrawLevelField(x, y);
@@ -15240,9 +15244,6 @@ static ListNode *SaveEngineSnapshotBuffers(void)
   SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(stored_player));
   SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(game));
   SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(tape));
-
-  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(ZX));
-  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(ZY));
 
   SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(FrameCounter));
   SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(TimeFrames));

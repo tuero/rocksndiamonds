@@ -204,6 +204,7 @@ struct GameInfo
   int players_still_needed;
   int friends_still_needed;
 
+  int robot_wheel_x, robot_wheel_y;
   int exit_x, exit_y;
 
   boolean all_players_gone;

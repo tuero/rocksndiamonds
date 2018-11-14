@@ -3628,7 +3628,6 @@ extern int			BX1, BY1;
 extern int			BX2, BY2;
 extern int			SBX_Left, SBX_Right;
 extern int			SBY_Upper, SBY_Lower;
-extern int			ZX, ZY;
 
 extern int			TimeFrames, TimePlayed, TimeLeft, TapeTime;
 
