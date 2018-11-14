@@ -3544,7 +3544,6 @@ void InitGame(void)
     SendToServer_MovePlayer(MV_NONE);
 
   ZX = ZY = -1;
-  ExitX = ExitY = -1;
 
   FrameCounter = 0;
   TimeFrames = 0;
@@ -3557,6 +3556,9 @@ void InitGame(void)
   ScreenGfxPos = 0;
 
   ScrollStepSize = 0;	// will be correctly initialized by ScrollScreen()
+
+  game.exit_x = -1;
+  game.exit_y = -1;
 
   game.all_players_gone = FALSE;
 
@@ -4570,30 +4572,35 @@ void GameWon(void)
 
     if (level.game_engine_type == GAME_ENGINE_TYPE_RND)
     {
-      if (ExitX >= 0 && ExitY >= 0)	// local player has left the level
+      // check if last player has left the level
+      if (game.exit_x >= 0 &&
+	  game.exit_y >= 0)
       {
+	int x = game.exit_x;
+	int y = game.exit_y;
+	int element = Feld[x][y];
+
 	// close exit door after last player
 	if ((game.all_players_gone &&
-	     (Feld[ExitX][ExitY] == EL_EXIT_OPEN ||
-	      Feld[ExitX][ExitY] == EL_SP_EXIT_OPEN ||
-	      Feld[ExitX][ExitY] == EL_STEEL_EXIT_OPEN)) ||
-	    Feld[ExitX][ExitY] == EL_EM_EXIT_OPEN ||
-	    Feld[ExitX][ExitY] == EL_EM_STEEL_EXIT_OPEN)
+	     (element == EL_EXIT_OPEN ||
+	      element == EL_SP_EXIT_OPEN ||
+	      element == EL_STEEL_EXIT_OPEN)) ||
+	    element == EL_EM_EXIT_OPEN ||
+	    element == EL_EM_STEEL_EXIT_OPEN)
 	{
-	  int element = Feld[ExitX][ExitY];
 
-	  Feld[ExitX][ExitY] =
+	  Feld[x][y] =
 	    (element == EL_EXIT_OPEN		? EL_EXIT_CLOSING :
 	     element == EL_EM_EXIT_OPEN		? EL_EM_EXIT_CLOSING :
 	     element == EL_SP_EXIT_OPEN		? EL_SP_EXIT_CLOSING:
 	     element == EL_STEEL_EXIT_OPEN	? EL_STEEL_EXIT_CLOSING:
 	     EL_EM_STEEL_EXIT_CLOSING);
 
-	  PlayLevelSoundElementAction(ExitX, ExitY, element, ACTION_CLOSING);
+	  PlayLevelSoundElementAction(x, y, element, ACTION_CLOSING);
 	}
 
 	// player disappears
-	DrawLevelField(ExitX, ExitY);
+	DrawLevelField(x, y);
       }
 
       for (i = 0; i < MAX_PLAYERS; i++)
@@ -6815,8 +6822,8 @@ static void TurnRoundExt(int x, int y)
 
     if (game.all_players_gone)
     {
-      attr_x = ExitX;
-      attr_y = ExitY;
+      attr_x = game.exit_x;
+      attr_y = game.exit_y;
     }
     else
     {
@@ -7184,8 +7191,8 @@ static void TurnRoundExt(int x, int y)
 
     if (game.all_players_gone)
     {
-      attr_x = ExitX;
-      attr_y = ExitY;
+      attr_x = game.exit_x;
+      attr_y = game.exit_y;
     }
     else
     {
@@ -13441,8 +13448,8 @@ void RemovePlayer(struct PlayerInfo *player)
     game.GameOver = TRUE;
   }
 
-  ExitX = ZX = jx;
-  ExitY = ZY = jy;
+  game.exit_x = ZX = jx;
+  game.exit_y = ZY = jy;
 }
 
 void ExitPlayer(struct PlayerInfo *player)
@@ -15236,8 +15243,6 @@ static ListNode *SaveEngineSnapshotBuffers(void)
 
   SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(ZX));
   SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(ZY));
-  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(ExitX));
-  SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(ExitY));
 
   SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(FrameCounter));
   SaveSnapshotBuffer(&buffers, ARGS_ADDRESS_AND_SIZEOF(TimeFrames));

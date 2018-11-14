@@ -127,7 +127,6 @@ int			BX2, BY2;
 int			SBX_Left, SBX_Right;
 int			SBY_Upper, SBY_Lower;
 int			ZX, ZY;
-int			ExitX, ExitY;
 
 int			TimeFrames, TimePlayed, TimeLeft, TapeTime;
 
