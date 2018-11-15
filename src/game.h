@@ -243,6 +243,7 @@ struct GameInfo
 
   // values for handling states for solved level and game over
   boolean LevelSolved;
+  boolean GamePlayed;
   boolean GameOver;
 
   boolean LevelSolved_GameWon;

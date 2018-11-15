@@ -3566,6 +3566,8 @@ void InitGame(void)
   game.LevelSolved = FALSE;
   game.GameOver = FALSE;
 
+  game.GamePlayed = !tape.playing;
+
   game.LevelSolved_GameWon = FALSE;
   game.LevelSolved_GameEnd = FALSE;
   game.LevelSolved_SaveTape = FALSE;
@@ -11483,6 +11485,10 @@ static void GameActionsExt(void)
   if (tape.recording)
     TapeRecordAction(tape_action);
 
+  // remember if game was played (especially after tape stopped playing)
+  if (!tape.playing && summarized_player_action)
+    game.GamePlayed = TRUE;
+
 #if USE_NEW_PLAYER_ASSIGNMENTS
   // !!! also map player actions in single player mode !!!
   // if (game.team_mode)
@@ -15030,6 +15036,10 @@ void CheckGameOver(void)
 
   // do not handle game over if request dialog is already active
   if (game.request_active)
+    return;
+
+  // do not ask to play again if game was never actually played
+  if (!game.GamePlayed)
     return;
 
   if (!game_over)
