@@ -1042,8 +1042,9 @@ void FadeIn(int fade_mask)
   FADE_SXSIZE = FULL_SXSIZE;
   FADE_SYSIZE = FULL_SYSIZE;
 
-  if (game_status == GAME_MODE_PLAYING &&
-      strEqual(setup.touch.control_type, TOUCH_CONTROL_VIRTUAL_BUTTONS))
+  // activate virtual buttons depending on upcoming game status
+  if (strEqual(setup.touch.control_type, TOUCH_CONTROL_VIRTUAL_BUTTONS) &&
+      game_status == GAME_MODE_PLAYING && !tape.playing)
     SetOverlayActive(TRUE);
 
   SetScreenStates_AfterFadingIn();

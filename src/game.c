@@ -11364,6 +11364,15 @@ static void GameActionsExt(void)
 
   SetVideoFrameDelay(game_frame_delay_value);
 
+  // (de)activate virtual buttons depending on current game status
+  if (strEqual(setup.touch.control_type, TOUCH_CONTROL_VIRTUAL_BUTTONS))
+  {
+    if (game.all_players_gone)	// if no players there to be controlled anymore
+      SetOverlayActive(FALSE);
+    else if (!tape.playing)	// if game continues after tape stopped playing
+      SetOverlayActive(TRUE);
+  }
+
 #if 0
 #if 0
   // ---------- main game synchronization point ----------
