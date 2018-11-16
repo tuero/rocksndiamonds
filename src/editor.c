@@ -12376,6 +12376,8 @@ static int DrawLevelText(int sx, int sy, char letter, int mode)
     case TEXT_SETCURSOR:
       DrawEditorElement(last_sx, last_sy, Feld[lx][ly]);
       DrawAreaBorder(sx, sy, sx, sy);
+      StartTextInput(SX + sx * ed_tilesize, SY + sy * ed_tilesize,
+		     ed_tilesize, ed_tilesize);
       last_sx = sx;
       last_sy = sy;
       break;
@@ -12420,6 +12422,7 @@ static int DrawLevelText(int sx, int sy, char letter, int mode)
     case TEXT_END:
       CopyLevelToUndoBuffer(UNDO_IMMEDIATE);
       DrawEditorElement(sx, sy, Feld[lx][ly]);
+      StopTextInput();
       typing = FALSE;
       break;
 
