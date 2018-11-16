@@ -1778,10 +1778,13 @@ static void HandleKeysSpecial(Key key)
   }
 }
 
-void HandleKeysDebug(Key key)
+boolean HandleKeysDebug(Key key, int key_status)
 {
 #ifdef DEBUG
   int i;
+
+  if (key_status != KEY_PRESSED)
+    return FALSE;
 
   if (game_status == GAME_MODE_PLAYING || !setup.debug.frame_delay_game_only)
   {
@@ -1809,7 +1812,7 @@ void HandleKeysDebug(Key key)
 	else
 	  Error(ERR_DEBUG, "frame delay == 0 ms (maximum speed)");
 
-	break;
+	return TRUE;
       }
     }
   }
@@ -1822,13 +1825,19 @@ void HandleKeysDebug(Key key)
 
       Error(ERR_DEBUG, "debug mode %s",
 	    (options.debug ? "enabled" : "disabled"));
+
+      return TRUE;
     }
     else if (key == KSYM_v)
     {
       Error(ERR_DEBUG, "currently using game engine version %d",
 	    game.engine_version);
+
+      return TRUE;
     }
   }
+
+  return FALSE;
 #endif
 }
 
@@ -1855,6 +1864,9 @@ void HandleKey(Key key, int key_status)
   };
   int joy = 0;
   int i;
+
+  if (HandleKeysDebug(key, key_status))
+    return;		// do not handle already processed keys again
 
   // map special keys (media keys / remote control buttons) to default keys
   if (key == KSYM_PlayPause)
@@ -2198,8 +2210,6 @@ void HandleKey(Key key, int key_status)
 	return;
       }
   }
-
-  HandleKeysDebug(key);
 }
 
 void HandleNoEvent(void)

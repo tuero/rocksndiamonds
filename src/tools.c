@@ -4387,7 +4387,7 @@ static int RequestHandleEvents(unsigned int req_state)
 		break;
 
 	      default:
-		HandleKeysDebug(key);
+		HandleKeysDebug(key, KEY_PRESSED);
 		break;
 	    }
 

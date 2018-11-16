@@ -31,7 +31,7 @@ void HandleWindowEvent(WindowEvent *);
 void HandleFingerEvent(FingerEvent *);
 void HandleTextEvent(TextEvent *);
 void HandlePauseResumeEvent(PauseResumeEvent *);
-void HandleKeysDebug(Key);
+boolean HandleKeysDebug(Key, int);
 void HandleKeyEvent(KeyEvent *);
 void HandleFocusEvent(FocusChangeEvent *);
 void HandleClientMessageEvent(ClientMessageEvent *);
