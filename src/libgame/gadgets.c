@@ -2117,7 +2117,18 @@ boolean HandleGadgetsKeyInput(Key key)
 
   if (key == KSYM_Escape)
   {
-    StopTextInput();
+    if (anyTextGadgetActive())
+    {
+      // restore previous text (before activating text gadget)
+      if (gi->type & GD_TYPE_TEXT_INPUT)
+	strcpy(gi->textinput.value, gi->textinput.last_value);
+
+      DrawGadget(gi, DG_UNPRESSED, gi->direct_draw);
+
+      last_gi = NULL;
+
+      StopTextInput();
+    }
   }
   else if (key == KSYM_Return)	// valid for both text input and selectbox
   {
