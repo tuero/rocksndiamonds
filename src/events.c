@@ -2081,10 +2081,7 @@ void HandleKey(Key key, int key_status)
   HandleKeysSpecial(key);
 
   if (HandleGadgetsKeyInput(key))
-  {
-    if (key != KSYM_Escape)	// always allow ESC key to be handled
-      key = KSYM_UNDEFINED;
-  }
+    return;		// do not handle already processed keys again
 
   switch (game_status)
   {
