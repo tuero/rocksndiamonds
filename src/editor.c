@@ -12411,7 +12411,7 @@ static int DrawLevelText(int sx, int sy, char letter, int mode)
       break;
 
     case TEXT_NEWLINE:
-      if (sy + 1 < ed_fieldy - 1 && ly + 1 < lev_fieldy - 1)
+      if (sy + 1 < ed_fieldy && ly + 1 < lev_fieldy)
 	DrawLevelText(start_sx, sy + 1, 0, TEXT_SETCURSOR);
       else
 	DrawLevelText(0, 0, 0, TEXT_END);
