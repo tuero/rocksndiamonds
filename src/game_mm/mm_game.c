@@ -660,10 +660,6 @@ void InitGameEngine_MM(void)
     }
   }
 
-#if 0
-  CloseDoor(DOOR_CLOSE_1);
-#endif
-
   DrawLevel_MM();
 }
 
@@ -674,36 +670,6 @@ void InitGameActions_MM(void)
   int i;
 
   InitLaser();
-
-#if 0
-  // copy default game door content to main double buffer
-  BlitBitmap(pix[PIX_DOOR], drawto,
-	     DOOR_GFX_PAGEX5, DOOR_GFX_PAGEY1, DXSIZE, DYSIZE, DX, DY);
-#endif
-
-#if 0
-  DrawText(DX_LEVEL, DY_LEVEL,
-	   int2str(level_nr, 2), FONT_TEXT_2);
-  DrawText(DX_KETTLES, DY_KETTLES,
-	   int2str(game_mm.kettles_still_needed, 3), FONT_TEXT_2);
-  DrawText(DX_SCORE, DY_SCORE,
-	   int2str(game_mm.score, 4), FONT_TEXT_2);
-#endif
-
-#if 0
-  UnmapGameButtons();
-  MapGameButtons();
-#endif
-
-#if 0
-  // copy actual game door content to door double buffer for OpenDoor()
-  BlitBitmap(drawto, pix[PIX_DB_DOOR],
-	     DX, DY, DXSIZE, DYSIZE, DOOR_GFX_PAGEX1, DOOR_GFX_PAGEY1);
-#endif
-
-#if 0
-  OpenDoor(DOOR_OPEN_ALL);
-#endif
 
   for (i = 0; i <= num_init_game_frames; i++)
   {
@@ -734,11 +700,6 @@ void InitGameActions_MM(void)
       continue;
 #endif
   }
-
-#if 0
-  if (setup.sound_music && num_bg_loops)
-    PlayMusic(level_nr % num_bg_loops);
-#endif
 
   ScanLaser();
 
@@ -3148,12 +3109,6 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
     {
       game_mm.energy_left--;
 
-#if 0
-      BlitBitmap(pix[PIX_DOOR], drawto,
-		 DOOR_GFX_PAGEX5 + XX_ENERGY, DOOR_GFX_PAGEY1 + YY_ENERGY,
-		 ENERGY_XSIZE, ENERGY_YSIZE - game_mm.energy_left,
-		 DX_ENERGY, DY_ENERGY);
-#endif
       redraw_mask |= REDRAW_DOOR_1;
     }
     else if (setup.time_limit && !game_mm.game_over)
@@ -3260,9 +3215,6 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
 			(native_mm_level.laser_blue  ? color_down : 0x00));
 
       DrawLaser(0, DL_LASER_ENABLED);
-#if 0
-      BackToFront();
-#endif
     }
 
     if (!laser.overloaded)
@@ -3959,10 +3911,6 @@ void GameWon_MM(void)
       StopSound(SND_SIRR);
   }
 
-#if 0
-  FadeSounds();
-#endif
-
   CloseDoor(DOOR_CLOSE_1);
 
   Request("Level solved!", REQ_CONFIRM);
@@ -4198,11 +4146,6 @@ void PlaySoundLevel(int x, int y, int sound_nr)
 static void RaiseScore_MM(int value)
 {
   game_mm.score += value;
-
-#if 0
-  DrawText(DX_SCORE, DY_SCORE, int2str(game_mm.score, 4),
-	   FONT_TEXT_2);
-#endif
 }
 
 void RaiseScoreElement_MM(int element)

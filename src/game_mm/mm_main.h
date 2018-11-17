@@ -186,21 +186,10 @@ struct HiScore_MM
   int Score;
 };
 
-extern Bitmap	       *pix[];
-extern DrawBuffer      *fieldbuffer;
 extern DrawBuffer      *drawto_field;
-
-extern int		joystick_device;
-extern char	       *joystick_device_name[];
 
 extern int		game_status;
 extern boolean		level_editor_test_game;
-extern boolean		network_playing;
-
-extern int		key_joystick_mapping;
-extern int	    	global_joystick_status, joystick_status;
-extern int		sound_status;
-extern boolean		sound_loops_allowed;
 
 extern boolean		redraw[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int		redraw_x1, redraw_y1;
@@ -219,7 +208,6 @@ extern short		Store2[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short		StorePlayer[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short		Frame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern boolean		Stop[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern short		JustStopped[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short		AmoebaNr[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short		AmoebaCnt[MAX_NUM_AMOEBA], AmoebaCnt2[MAX_NUM_AMOEBA];
 extern unsigned int	Elementeigenschaften[MAX_ELEMENTS];
@@ -235,8 +223,6 @@ extern int		BX1, BY1, BX2, BY2;
 extern int		SBX_Left, SBX_Right;
 extern int		SBY_Upper, SBY_Lower;
 extern int		TimeFrames, TimePlayed, TimeLeft;
-extern boolean		SiebAktiv;
-extern int		SiebCount;
 
 extern struct LevelInfo_MM	native_mm_level;
 extern struct HiScore_MM	highscore[];
@@ -260,9 +246,6 @@ extern int		color_status;
 extern struct XY	Step[];
 extern short		Sign[16];
 
-extern char	       *sound_name[];
-extern int		background_loop[];
-extern int		num_bg_loops;
 extern char	       *element_info[];
 extern int		num_element_info;
 

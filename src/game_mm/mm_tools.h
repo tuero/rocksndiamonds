@@ -48,13 +48,6 @@
 #define REQ_STAY_CLOSED		(1 << 4)
 #define REQ_STAY_OPEN		(1 << 5)
 
-#define REQUEST_WAIT_FOR	(REQ_ASK | REQ_CONFIRM)
-
-// font types
-#define FS_SMALL		0
-#define FS_BIG			1
-#define FS_MEDIUM		2
-
 
 void SetDrawtoField_MM(int);
 void BackToFront(void);
