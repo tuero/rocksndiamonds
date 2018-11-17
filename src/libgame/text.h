@@ -16,16 +16,16 @@
 
 
 // default fonts
-#define FONT_INITIAL_1		0
-#define FONT_INITIAL_2		1
-#define FONT_INITIAL_3		2
-#define FONT_INITIAL_4		3
+#define MAIN_FONT_INITIAL_1	0
+#define MAIN_FONT_INITIAL_2	1
+#define MAIN_FONT_INITIAL_3	2
+#define MAIN_FONT_INITIAL_4	3
 
 // font colors
-#define FC_RED			FONT_INITIAL_1
-#define FC_BLUE			FONT_INITIAL_2
-#define FC_GREEN		FONT_INITIAL_3
-#define FC_YELLOW		FONT_INITIAL_4
+#define FC_RED			MAIN_FONT_INITIAL_1
+#define FC_BLUE			MAIN_FONT_INITIAL_2
+#define FC_GREEN		MAIN_FONT_INITIAL_3
+#define FC_YELLOW		MAIN_FONT_INITIAL_4
 
 // text output definitions
 #define MAX_OUTPUT_LINESIZE	1024

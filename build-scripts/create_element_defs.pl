@@ -1074,7 +1074,7 @@ sub get_known_action_definitions
 	chomp;				# cut trailing newline
 
 	# process line with action definition
-	if (/^\#define ACTION_([A-Z0-9_]+)\s/)
+	if (/^  ACTION_([A-Z0-9_]+)[, ]/)
 	{
 	    $known_action{$1} = 1;
 
@@ -1101,7 +1101,7 @@ sub get_known_special_arg_definitions
 	chomp;				# cut trailing newline
 
 	# process line with special arg definition
-	if (/^\#define GFX_SPECIAL_ARG_([A-Z0-9_]+)\s/)
+	if (/^  GFX_SPECIAL_ARG_([A-Z0-9_]+)[, ]/)
 	{
 	    if ($1 eq 'CRUMBLED')
 	    {
@@ -1160,7 +1160,7 @@ sub get_known_font_definitions
 	chomp;				# cut trailing newline
 
 	# process line with font definition
-	if (/^\#define (FONT_[A-Z0-9_]+)\s/)
+	if (/^  (FONT_[A-Z0-9_]+)[, ]/)
 	{
 	    $known_font{$1} = 1;
 
