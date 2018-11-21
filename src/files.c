@@ -10003,36 +10003,41 @@ static void LoadMenuDesignSettingsFromFilename(char *filename)
   // (e.g., init "menu.draw_xoffset.INFO" from "menu.draw_xoffset")
   for (i = 0; i < NUM_SPECIAL_GFX_ARGS; i++)
   {
-    char *value_1 = getHashEntry(setup_file_hash, "menu.draw_xoffset");
-    char *value_2 = getHashEntry(setup_file_hash, "menu.draw_yoffset");
-    char *value_3 = getHashEntry(setup_file_hash, "menu.list_size");
+    struct TokenIntPtrInfo menu_config[] =
+    {
+      { "menu.draw_xoffset",	&menu.draw_xoffset[i]	},
+      { "menu.draw_yoffset",	&menu.draw_yoffset[i]	},
+      { "menu.list_size",	&menu.list_size[i]	}
+    };
 
-    if (value_1 != NULL)
-      menu.draw_xoffset[i] = get_integer_from_string(value_1);
-    if (value_2 != NULL)
-      menu.draw_yoffset[i] = get_integer_from_string(value_2);
-    if (value_3 != NULL)
-      menu.list_size[i] = get_integer_from_string(value_3);
+    for (j = 0; j < ARRAY_SIZE(menu_config); j++)
+    {
+      char *token = menu_config[j].token;
+      char *value = getHashEntry(setup_file_hash, token);
+
+      if (value != NULL)
+        *menu_config[j].value = get_integer_from_string(value);
+    }
   }
 
   // special case: initialize with default values that may be overwritten
   // (eg, init "menu.draw_xoffset.INFO[XXX]" from "menu.draw_xoffset.INFO")
   for (i = 0; i < NUM_SPECIAL_GFX_INFO_ARGS; i++)
   {
-    char *value_1 = getHashEntry(setup_file_hash, "menu.draw_xoffset.INFO");
-    char *value_2 = getHashEntry(setup_file_hash, "menu.draw_yoffset.INFO");
-
-    if (value_1 != NULL)
-      menu.draw_xoffset_info[i] = get_integer_from_string(value_1);
-    if (value_2 != NULL)
-      menu.draw_yoffset_info[i] = get_integer_from_string(value_2);
-
-    if (i == GFX_SPECIAL_ARG_INFO_ELEMENTS)
+    struct TokenIntPtrInfo menu_config[] =
     {
-      char *value_1 = getHashEntry(setup_file_hash, "menu.list_size.INFO");
+      { "menu.draw_xoffset.INFO",	&menu.draw_xoffset_info[i]	},
+      { "menu.draw_yoffset.INFO",	&menu.draw_yoffset_info[i]	},
+      { "menu.list_size.INFO",		&menu.list_size_info[i]		}
+    };
 
-      if (value_1 != NULL)
-	menu.list_size_info[i] = get_integer_from_string(value_1);
+    for (j = 0; j < ARRAY_SIZE(menu_config); j++)
+    {
+      char *token = menu_config[j].token;
+      char *value = getHashEntry(setup_file_hash, token);
+
+      if (value != NULL)
+        *menu_config[j].value = get_integer_from_string(value);
     }
   }
 
@@ -10040,179 +10045,116 @@ static void LoadMenuDesignSettingsFromFilename(char *filename)
   // (eg, init "menu.draw_xoffset.SETUP[XXX]" from "menu.draw_xoffset.SETUP")
   for (i = 0; i < NUM_SPECIAL_GFX_SETUP_ARGS; i++)
   {
-    char *value_1 = getHashEntry(setup_file_hash, "menu.draw_xoffset.SETUP");
-    char *value_2 = getHashEntry(setup_file_hash, "menu.draw_yoffset.SETUP");
+    struct TokenIntPtrInfo menu_config[] =
+    {
+      { "menu.draw_xoffset.SETUP",	&menu.draw_xoffset_setup[i]	},
+      { "menu.draw_yoffset.SETUP",	&menu.draw_yoffset_setup[i]	}
+    };
 
-    if (value_1 != NULL)
-      menu.draw_xoffset_setup[i] = get_integer_from_string(value_1);
-    if (value_2 != NULL)
-      menu.draw_yoffset_setup[i] = get_integer_from_string(value_2);
+    for (j = 0; j < ARRAY_SIZE(menu_config); j++)
+    {
+      char *token = menu_config[j].token;
+      char *value = getHashEntry(setup_file_hash, token);
+
+      if (value != NULL)
+        *menu_config[j].value = get_integer_from_string(value);
+    }
   }
 
   // special case: initialize with default values that may be overwritten
   // (eg, init "menu.line_spacing.INFO[XXX]" from "menu.line_spacing.INFO")
   for (i = 0; i < NUM_SPECIAL_GFX_INFO_ARGS; i++)
   {
-    char *value_1 = getHashEntry(setup_file_hash,"menu.left_spacing.INFO");
-    char *value_2 = getHashEntry(setup_file_hash,"menu.right_spacing.INFO");
-    char *value_3 = getHashEntry(setup_file_hash,"menu.top_spacing.INFO");
-    char *value_4 = getHashEntry(setup_file_hash,"menu.bottom_spacing.INFO");
-    char *value_5 = getHashEntry(setup_file_hash,"menu.paragraph_spacing.INFO");
-    char *value_6 = getHashEntry(setup_file_hash,"menu.headline1_spacing.INFO");
-    char *value_7 = getHashEntry(setup_file_hash,"menu.headline2_spacing.INFO");
-    char *value_8 = getHashEntry(setup_file_hash,"menu.line_spacing.INFO");
-    char *value_9 = getHashEntry(setup_file_hash,"menu.extra_spacing.INFO");
+    struct TokenIntPtrInfo menu_config[] =
+    {
+      { "menu.left_spacing.INFO",	&menu.left_spacing_info[i]	},
+      { "menu.right_spacing.INFO",	&menu.right_spacing_info[i]	},
+      { "menu.top_spacing.INFO",	&menu.top_spacing_info[i]	},
+      { "menu.bottom_spacing.INFO",	&menu.bottom_spacing_info[i]	},
+      { "menu.paragraph_spacing.INFO",	&menu.paragraph_spacing_info[i]	},
+      { "menu.headline1_spacing.INFO",	&menu.headline1_spacing_info[i]	},
+      { "menu.headline2_spacing.INFO",	&menu.headline2_spacing_info[i]	},
+      { "menu.line_spacing.INFO",	&menu.line_spacing_info[i]	},
+      { "menu.extra_spacing.INFO",	&menu.extra_spacing_info[i]	},
+    };
 
-    if (value_1 != NULL)
-      menu.left_spacing_info[i]      = get_integer_from_string(value_1);
-    if (value_2 != NULL)
-      menu.right_spacing_info[i]     = get_integer_from_string(value_2);
-    if (value_3 != NULL)
-      menu.top_spacing_info[i]       = get_integer_from_string(value_3);
-    if (value_4 != NULL)
-      menu.bottom_spacing_info[i]    = get_integer_from_string(value_4);
-    if (value_5 != NULL)
-      menu.paragraph_spacing_info[i] = get_integer_from_string(value_5);
-    if (value_6 != NULL)
-      menu.headline1_spacing_info[i] = get_integer_from_string(value_6);
-    if (value_7 != NULL)
-      menu.headline2_spacing_info[i] = get_integer_from_string(value_7);
-    if (value_8 != NULL)
-      menu.line_spacing_info[i]      = get_integer_from_string(value_8);
-    if (value_9 != NULL)
-      menu.extra_spacing_info[i]     = get_integer_from_string(value_9);
+    for (j = 0; j < ARRAY_SIZE(menu_config); j++)
+    {
+      char *token = menu_config[j].token;
+      char *value = getHashEntry(setup_file_hash, token);
+
+      if (value != NULL)
+        *menu_config[j].value = get_integer_from_string(value);
+    }
   }
 
   // special case: initialize with default values that may be overwritten
   // (eg, init "menu.enter_screen.SCORES.xyz" from "menu.enter_screen.xyz")
   for (i = 0; i < NUM_SPECIAL_GFX_ARGS; i++)
   {
-    char *token_1 = "menu.enter_screen.fade_mode";
-    char *token_2 = "menu.enter_screen.fade_delay";
-    char *token_3 = "menu.enter_screen.post_delay";
-    char *token_4 = "menu.leave_screen.fade_mode";
-    char *token_5 = "menu.leave_screen.fade_delay";
-    char *token_6 = "menu.leave_screen.post_delay";
-    char *token_7 = "menu.next_screen.fade_mode";
-    char *token_8 = "menu.next_screen.fade_delay";
-    char *token_9 = "menu.next_screen.post_delay";
-    char *value_1 = getHashEntry(setup_file_hash, token_1);
-    char *value_2 = getHashEntry(setup_file_hash, token_2);
-    char *value_3 = getHashEntry(setup_file_hash, token_3);
-    char *value_4 = getHashEntry(setup_file_hash, token_4);
-    char *value_5 = getHashEntry(setup_file_hash, token_5);
-    char *value_6 = getHashEntry(setup_file_hash, token_6);
-    char *value_7 = getHashEntry(setup_file_hash, token_7);
-    char *value_8 = getHashEntry(setup_file_hash, token_8);
-    char *value_9 = getHashEntry(setup_file_hash, token_9);
+    struct TokenIntPtrInfo menu_config[] =
+    {
+      { "menu.enter_screen.fade_mode",	&menu.enter_screen[i].fade_mode	 },
+      { "menu.enter_screen.fade_delay",	&menu.enter_screen[i].fade_delay },
+      { "menu.enter_screen.post_delay",	&menu.enter_screen[i].post_delay },
+      { "menu.leave_screen.fade_mode",	&menu.leave_screen[i].fade_mode	 },
+      { "menu.leave_screen.fade_delay",	&menu.leave_screen[i].fade_delay },
+      { "menu.leave_screen.post_delay",	&menu.leave_screen[i].post_delay },
+      { "menu.next_screen.fade_mode",	&menu.next_screen[i].fade_mode	 },
+      { "menu.next_screen.fade_delay",	&menu.next_screen[i].fade_delay	 },
+      { "menu.next_screen.post_delay",	&menu.next_screen[i].post_delay	 }
+    };
 
-    if (value_1 != NULL)
-      menu.enter_screen[i].fade_mode = get_token_parameter_value(token_1,
-								 value_1);
-    if (value_2 != NULL)
-      menu.enter_screen[i].fade_delay = get_token_parameter_value(token_2,
-								  value_2);
-    if (value_3 != NULL)
-      menu.enter_screen[i].post_delay = get_token_parameter_value(token_3,
-								  value_3);
-    if (value_4 != NULL)
-      menu.leave_screen[i].fade_mode = get_token_parameter_value(token_4,
-								 value_4);
-    if (value_5 != NULL)
-      menu.leave_screen[i].fade_delay = get_token_parameter_value(token_5,
-								  value_5);
-    if (value_6 != NULL)
-      menu.leave_screen[i].post_delay = get_token_parameter_value(token_6,
-								  value_6);
-    if (value_7 != NULL)
-      menu.next_screen[i].fade_mode = get_token_parameter_value(token_7,
-								value_7);
-    if (value_8 != NULL)
-      menu.next_screen[i].fade_delay = get_token_parameter_value(token_8,
-								 value_8);
-    if (value_9 != NULL)
-      menu.next_screen[i].post_delay = get_token_parameter_value(token_9,
-								 value_9);
+    for (j = 0; j < ARRAY_SIZE(menu_config); j++)
+    {
+      char *token = menu_config[j].token;
+      char *value = getHashEntry(setup_file_hash, token);
+
+      if (value != NULL)
+        *menu_config[j].value = get_token_parameter_value(token, value);
+    }
   }
 
   // special case: initialize with default values that may be overwritten
   // (eg, init "viewport.door_1.MAIN.xyz" from "viewport.door_1.xyz")
   for (i = 0; i < NUM_SPECIAL_GFX_ARGS; i++)
   {
-    char *token_w1 = "viewport.window.width";
-    char *token_w2 = "viewport.window.height";
-    char *token_01 = "viewport.playfield.x";
-    char *token_02 = "viewport.playfield.y";
-    char *token_03 = "viewport.playfield.width";
-    char *token_04 = "viewport.playfield.height";
-    char *token_05 = "viewport.playfield.border_size";
-    char *token_06 = "viewport.door_1.x";
-    char *token_07 = "viewport.door_1.y";
-    char *token_08 = "viewport.door_1.width";
-    char *token_09 = "viewport.door_1.height";
-    char *token_10 = "viewport.door_1.border_size";
-    char *token_11 = "viewport.door_2.x";
-    char *token_12 = "viewport.door_2.y";
-    char *token_13 = "viewport.door_2.width";
-    char *token_14 = "viewport.door_2.height";
-    char *token_15 = "viewport.door_2.border_size";
-    char *value_w1 = getHashEntry(setup_file_hash, token_w1);
-    char *value_w2 = getHashEntry(setup_file_hash, token_w2);
-    char *value_01 = getHashEntry(setup_file_hash, token_01);
-    char *value_02 = getHashEntry(setup_file_hash, token_02);
-    char *value_03 = getHashEntry(setup_file_hash, token_03);
-    char *value_04 = getHashEntry(setup_file_hash, token_04);
-    char *value_05 = getHashEntry(setup_file_hash, token_05);
-    char *value_06 = getHashEntry(setup_file_hash, token_06);
-    char *value_07 = getHashEntry(setup_file_hash, token_07);
-    char *value_08 = getHashEntry(setup_file_hash, token_08);
-    char *value_09 = getHashEntry(setup_file_hash, token_09);
-    char *value_10 = getHashEntry(setup_file_hash, token_10);
-    char *value_11 = getHashEntry(setup_file_hash, token_11);
-    char *value_12 = getHashEntry(setup_file_hash, token_12);
-    char *value_13 = getHashEntry(setup_file_hash, token_13);
-    char *value_14 = getHashEntry(setup_file_hash, token_14);
-    char *value_15 = getHashEntry(setup_file_hash, token_15);
+    struct
+    {
+      char *token_prefix;
+      struct RectWithBorder *struct_ptr;
+    }
+    vp_struct[] =
+    {
+      { "viewport.window",	&viewport.window[i]	},
+      { "viewport.playfield",	&viewport.playfield[i]	},
+      { "viewport.door_1",	&viewport.door_1[i]	},
+      { "viewport.door_2",	&viewport.door_2[i]	}
+    };
 
-    if (value_w1 != NULL)
-      viewport.window[i].width = get_token_parameter_value(token_w1, value_w1);
-    if (value_w2 != NULL)
-      viewport.window[i].height = get_token_parameter_value(token_w2, value_w2);
-    if (value_01 != NULL)
-      viewport.playfield[i].x = get_token_parameter_value(token_01, value_01);
-    if (value_02 != NULL)
-      viewport.playfield[i].y = get_token_parameter_value(token_02, value_02);
-    if (value_03 != NULL)
-      viewport.playfield[i].width = get_token_parameter_value(token_03,
-							      value_03);
-    if (value_04 != NULL)
-      viewport.playfield[i].height = get_token_parameter_value(token_04,
-							       value_04);
-    if (value_05 != NULL)
-      viewport.playfield[i].border_size = get_token_parameter_value(token_05,
-								    value_05);
-    if (value_06 != NULL)
-      viewport.door_1[i].x = get_token_parameter_value(token_06, value_06);
-    if (value_07 != NULL)
-      viewport.door_1[i].y = get_token_parameter_value(token_07, value_07);
-    if (value_08 != NULL)
-      viewport.door_1[i].width = get_token_parameter_value(token_08, value_08);
-    if (value_09 != NULL)
-      viewport.door_1[i].height = get_token_parameter_value(token_09, value_09);
-    if (value_10 != NULL)
-      viewport.door_1[i].border_size = get_token_parameter_value(token_10,
-								 value_10);
-    if (value_11 != NULL)
-      viewport.door_2[i].x = get_token_parameter_value(token_11, value_11);
-    if (value_12 != NULL)
-      viewport.door_2[i].y = get_token_parameter_value(token_12, value_12);
-    if (value_13 != NULL)
-      viewport.door_2[i].width = get_token_parameter_value(token_13, value_13);
-    if (value_14 != NULL)
-      viewport.door_2[i].height = get_token_parameter_value(token_14, value_14);
-    if (value_15 != NULL)
-      viewport.door_1[i].border_size = get_token_parameter_value(token_15,
-								 value_15);
+    for (j = 0; j < ARRAY_SIZE(vp_struct); j++)
+    {
+      struct TokenIntPtrInfo vp_config[] =
+      {
+        { ".x",			&vp_struct[j].struct_ptr->x		},
+        { ".y",			&vp_struct[j].struct_ptr->y		},
+        { ".width",		&vp_struct[j].struct_ptr->width		},
+        { ".height",		&vp_struct[j].struct_ptr->height	},
+        { ".border_size",	&vp_struct[j].struct_ptr->border_size	}
+      };
+
+      for (k = 0; k < ARRAY_SIZE(vp_config); k++)
+      {
+        char *token = getStringCat2(vp_struct[j].token_prefix,
+                                    vp_config[k].token);
+        char *value = getHashEntry(setup_file_hash, token);
+
+        if (value != NULL)
+          *vp_config[k].value = get_token_parameter_value(token, value);
+
+        free(token);
+      }
+    }
   }
 
   // special case: initialize with default values that may be overwritten
