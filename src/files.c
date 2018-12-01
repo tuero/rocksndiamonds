@@ -9894,6 +9894,40 @@ static void InitMenuDesignSettings_SpecialPostProcessing_AfterGraphics(void)
       *editor_buttons_xy[i].dst = *editor_buttons_xy[i].src;
     }
   }
+
+  // adjust editor palette rows and columns if specified to be dynamic
+
+  if (editor.palette.cols == -1)
+  {
+    int vp_width = viewport.playfield[GFX_SPECIAL_ARG_EDITOR].width;
+    int bt_width = graphic_info[IMG_EDITOR_PALETTE_BUTTON].width;
+    int sc_width = graphic_info[IMG_EDITOR_PALETTE_SCROLLBAR].width;
+
+    editor.palette.cols = (vp_width - sc_width) / bt_width;
+
+    if (editor.palette.x == -1)
+    {
+      int palette_width = editor.palette.cols * bt_width + sc_width;
+
+      editor.palette.x = (vp_width - palette_width) / 2;
+    }
+  }
+
+  if (editor.palette.rows == -1)
+  {
+    int vp_height = viewport.playfield[GFX_SPECIAL_ARG_EDITOR].height;
+    int bt_height = graphic_info[IMG_EDITOR_PALETTE_BUTTON].height;
+    int tx_height = getFontHeight(FONT_TEXT_2);
+
+    editor.palette.rows = (vp_height - tx_height) / bt_height;
+
+    if (editor.palette.y == -1)
+    {
+      int palette_height = editor.palette.rows * bt_height + tx_height;
+
+      editor.palette.y = (vp_height - palette_height) / 2;
+    }
+  }
 }
 
 static void LoadMenuDesignSettingsFromFilename(char *filename)
