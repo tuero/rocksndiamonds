@@ -9842,7 +9842,7 @@ static void InitMenuDesignSettings_SpecialPostProcessing(void)
 
     { NULL,			NULL			}
   };
-  int i;
+  int i, j;
 
   // special case: initialize later added SETUP list size from LEVELS value
   if (menu.list_size[GAME_MODE_SETUP] == -1)
@@ -9853,6 +9853,237 @@ static void InitMenuDesignSettings_SpecialPostProcessing(void)
     if ((*game_buttons_xy[i].dst).x == -1 &&
 	(*game_buttons_xy[i].dst).y == -1)
       *game_buttons_xy[i].dst = *game_buttons_xy[i].src;
+
+  // --------------------------------------------------------------------------
+  // dynamic viewports (including playfield margins, borders and alignments)
+  // --------------------------------------------------------------------------
+
+  // dynamic viewports currently only supported for landscape mode
+  int display_width  = MAX(video.display_width, video.display_height);
+  int display_height = MIN(video.display_width, video.display_height);
+
+  for (i = 0; i < NUM_SPECIAL_GFX_ARGS; i++)
+  {
+    struct RectWithBorder *vp_window    = &viewport.window[i];
+    struct RectWithBorder *vp_playfield = &viewport.playfield[i];
+    struct RectWithBorder *vp_door_1    = &viewport.door_1[i];
+    struct RectWithBorder *vp_door_2    = &viewport.door_2[i];
+    boolean dynamic_window_width     = (vp_window->min_width     != -1);
+    boolean dynamic_window_height    = (vp_window->min_height    != -1);
+    boolean dynamic_playfield_width  = (vp_playfield->min_width  != -1);
+    boolean dynamic_playfield_height = (vp_playfield->min_height != -1);
+
+    // adjust window size if min/max width/height is specified
+
+    if (vp_window->min_width != -1)
+    {
+      int window_width = display_width;
+
+      // when using static window height, use aspect ratio of display
+      if (vp_window->min_height == -1)
+	window_width = vp_window->height * display_width / display_height;
+
+      vp_window->width = MAX(vp_window->min_width, window_width);
+    }
+
+    if (vp_window->min_height != -1)
+    {
+      int window_height = display_height;
+
+      // when using static window width, use aspect ratio of display
+      if (vp_window->min_width == -1)
+	window_height = vp_window->width * display_height / display_width;
+
+      vp_window->height = MAX(vp_window->min_height, window_height);
+    }
+
+    if (vp_window->max_width != -1)
+      vp_window->width = MIN(vp_window->width, vp_window->max_width);
+
+    if (vp_window->max_height != -1)
+      vp_window->height = MIN(vp_window->height, vp_window->max_height);
+
+    int playfield_width  = vp_window->width;
+    int playfield_height = vp_window->height;
+
+    // adjust playfield size and position according to specified margins
+
+    playfield_width  -= vp_playfield->margin_left;
+    playfield_width  -= vp_playfield->margin_right;
+
+    playfield_height -= vp_playfield->margin_top;
+    playfield_height -= vp_playfield->margin_bottom;
+
+    // adjust playfield size if min/max width/height is specified
+
+    if (vp_playfield->min_width != -1)
+      vp_playfield->width = MAX(vp_playfield->min_width, playfield_width);
+
+    if (vp_playfield->min_height != -1)
+      vp_playfield->height = MAX(vp_playfield->min_height, playfield_height);
+
+    if (vp_playfield->max_width != -1)
+      vp_playfield->width = MIN(vp_playfield->width, vp_playfield->max_width);
+
+    if (vp_playfield->max_height != -1)
+      vp_playfield->height = MIN(vp_playfield->height,vp_playfield->max_height);
+
+    // adjust playfield position according to specified alignment
+
+    if (vp_playfield->align == ALIGN_LEFT || vp_playfield->x > 0)
+      vp_playfield->x = ALIGNED_VP_XPOS(vp_playfield);
+    else if (vp_playfield->align == ALIGN_CENTER)
+      vp_playfield->x = playfield_width / 2 - vp_playfield->width / 2;
+    else if (vp_playfield->align == ALIGN_RIGHT)
+      vp_playfield->x += playfield_width - vp_playfield->width;
+
+    if (vp_playfield->valign == VALIGN_TOP || vp_playfield->y > 0)
+      vp_playfield->y = ALIGNED_VP_YPOS(vp_playfield);
+    else if (vp_playfield->valign == VALIGN_MIDDLE)
+      vp_playfield->y = playfield_height / 2 - vp_playfield->height / 2;
+    else if (vp_playfield->valign == VALIGN_BOTTOM)
+      vp_playfield->y += playfield_height - vp_playfield->height;
+
+    vp_playfield->x += vp_playfield->margin_left;
+    vp_playfield->y += vp_playfield->margin_top;
+
+    // adjust individual playfield borders if only default border is specified
+
+    if (vp_playfield->border_left == -1)
+      vp_playfield->border_left = vp_playfield->border_size;
+    if (vp_playfield->border_right == -1)
+      vp_playfield->border_right = vp_playfield->border_size;
+    if (vp_playfield->border_top == -1)
+      vp_playfield->border_top = vp_playfield->border_size;
+    if (vp_playfield->border_bottom == -1)
+      vp_playfield->border_bottom = vp_playfield->border_size;
+
+    // set dynamic playfield borders if borders are specified as undefined
+    // (but only if window size was dynamic and playfield size was static)
+
+    if (dynamic_window_width && !dynamic_playfield_width)
+    {
+      if (vp_playfield->border_left == -1)
+      {
+	vp_playfield->border_left = (vp_playfield->x -
+				     vp_playfield->margin_left);
+	vp_playfield->x     -= vp_playfield->border_left;
+	vp_playfield->width += vp_playfield->border_left;
+      }
+
+      if (vp_playfield->border_right == -1)
+      {
+	vp_playfield->border_right = (vp_window->width -
+				      vp_playfield->x -
+				      vp_playfield->width -
+				      vp_playfield->margin_right);
+	vp_playfield->width += vp_playfield->border_right;
+      }
+    }
+
+    if (dynamic_window_height && !dynamic_playfield_height)
+    {
+      if (vp_playfield->border_top == -1)
+      {
+	vp_playfield->border_top = (vp_playfield->y -
+				    vp_playfield->margin_top);
+	vp_playfield->y      -= vp_playfield->border_top;
+	vp_playfield->height += vp_playfield->border_top;
+      }
+
+      if (vp_playfield->border_bottom == -1)
+      {
+	vp_playfield->border_bottom = (vp_window->height -
+				       vp_playfield->y -
+				       vp_playfield->height -
+				       vp_playfield->margin_bottom);
+	vp_playfield->height += vp_playfield->border_bottom;
+      }
+    }
+
+    // adjust playfield size to be a multiple of a defined alignment tile size
+
+    int align_size = vp_playfield->align_size;
+    int playfield_xtiles = vp_playfield->width  / align_size;
+    int playfield_ytiles = vp_playfield->height / align_size;
+    int playfield_width_corrected  = playfield_xtiles * align_size;
+    int playfield_height_corrected = playfield_ytiles * align_size;
+    boolean is_playfield_mode = (i == GFX_SPECIAL_ARG_PLAYING ||
+				 i == GFX_SPECIAL_ARG_EDITOR);
+
+    if (is_playfield_mode &&
+	dynamic_playfield_width &&
+	vp_playfield->width != playfield_width_corrected)
+    {
+      int playfield_xdiff = vp_playfield->width - playfield_width_corrected;
+
+      vp_playfield->width = playfield_width_corrected;
+
+      if (vp_playfield->align == ALIGN_LEFT)
+      {
+	vp_playfield->border_left += playfield_xdiff;
+      }
+      else if (vp_playfield->align == ALIGN_RIGHT)
+      {
+	vp_playfield->border_right += playfield_xdiff;
+      }
+      else if (vp_playfield->align == ALIGN_CENTER)
+      {
+	int border_left_diff  = playfield_xdiff / 2;
+	int border_right_diff = playfield_xdiff - border_left_diff;
+
+	vp_playfield->border_left  += border_left_diff;
+	vp_playfield->border_right += border_right_diff;
+      }
+    }
+
+    if (is_playfield_mode &&
+	dynamic_playfield_height &&
+	vp_playfield->height != playfield_height_corrected)
+    {
+      int playfield_ydiff = vp_playfield->height - playfield_height_corrected;
+
+      vp_playfield->height = playfield_height_corrected;
+
+      if (vp_playfield->valign == VALIGN_TOP)
+      {
+	vp_playfield->border_top += playfield_ydiff;
+      }
+      else if (vp_playfield->align == VALIGN_BOTTOM)
+      {
+	vp_playfield->border_right += playfield_ydiff;
+      }
+      else if (vp_playfield->align == VALIGN_MIDDLE)
+      {
+	int border_top_diff    = playfield_ydiff / 2;
+	int border_bottom_diff = playfield_ydiff - border_top_diff;
+
+	vp_playfield->border_top    += border_top_diff;
+	vp_playfield->border_bottom += border_bottom_diff;
+      }
+    }
+
+    // adjust door positions according to specified alignment
+
+    for (j = 0; j < 2; j++)
+    {
+      struct RectWithBorder *vp_door = (j == 0 ? vp_door_1 : vp_door_2);
+
+      if (vp_door->align == ALIGN_LEFT || vp_door->x > 0)
+	vp_door->x = ALIGNED_VP_XPOS(vp_door);
+      else if (vp_door->align == ALIGN_CENTER)
+	vp_door->x = vp_window->width / 2 - vp_door->width / 2;
+      else if (vp_door->align == ALIGN_RIGHT)
+	vp_door->x += vp_window->width - vp_door->width;
+
+      if (vp_door->valign == VALIGN_TOP || vp_door->y > 0)
+	vp_door->y = ALIGNED_VP_YPOS(vp_door);
+      else if (vp_door->valign == VALIGN_MIDDLE)
+	vp_door->y = vp_window->height / 2 - vp_door->height / 2;
+      else if (vp_door->valign == VALIGN_BOTTOM)
+	vp_door->y += vp_window->height - vp_door->height;
+    }
+  }
 }
 
 static void InitMenuDesignSettings_SpecialPostProcessing_AfterGraphics(void)
@@ -10174,7 +10405,22 @@ static void LoadMenuDesignSettingsFromFilename(char *filename)
         { ".y",			&vp_struct[j].struct_ptr->y		},
         { ".width",		&vp_struct[j].struct_ptr->width		},
         { ".height",		&vp_struct[j].struct_ptr->height	},
-        { ".border_size",	&vp_struct[j].struct_ptr->border_size	}
+        { ".min_width",		&vp_struct[j].struct_ptr->min_width	},
+        { ".min_height",	&vp_struct[j].struct_ptr->min_height	},
+        { ".max_width",		&vp_struct[j].struct_ptr->max_width	},
+        { ".max_height",	&vp_struct[j].struct_ptr->max_height	},
+        { ".margin_left",	&vp_struct[j].struct_ptr->margin_left	},
+        { ".margin_right",	&vp_struct[j].struct_ptr->margin_right	},
+        { ".margin_top",	&vp_struct[j].struct_ptr->margin_top	},
+        { ".margin_bottom",	&vp_struct[j].struct_ptr->margin_bottom	},
+        { ".border_left",	&vp_struct[j].struct_ptr->border_left	},
+        { ".border_right",	&vp_struct[j].struct_ptr->border_right	},
+        { ".border_top",	&vp_struct[j].struct_ptr->border_top	},
+        { ".border_bottom",	&vp_struct[j].struct_ptr->border_bottom	},
+        { ".border_size",	&vp_struct[j].struct_ptr->border_size	},
+        { ".align_size",	&vp_struct[j].struct_ptr->align_size	},
+        { ".align",		&vp_struct[j].struct_ptr->align		},
+        { ".valign",		&vp_struct[j].struct_ptr->valign	}
       };
 
       for (k = 0; k < ARRAY_SIZE(vp_config); k++)

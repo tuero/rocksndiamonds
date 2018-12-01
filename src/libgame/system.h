@@ -413,6 +413,8 @@
 				 (v) == VALIGN_BOTTOM ? (y) - (h) : (y))
 #define ALIGNED_TEXT_XPOS(p)	ALIGNED_XPOS((p)->x, (p)->width,  (p)->align)
 #define ALIGNED_TEXT_YPOS(p)	ALIGNED_YPOS((p)->y, (p)->height, (p)->valign)
+#define ALIGNED_VP_XPOS(p)	ALIGNED_TEXT_XPOS(p)
+#define ALIGNED_VP_YPOS(p)	ALIGNED_TEXT_YPOS(p)
 
 // values for redraw_mask
 #define REDRAW_NONE		(0)
@@ -1533,7 +1535,19 @@ struct RectWithBorder
 {
   int x, y;
   int width, height;
+  int min_width, min_height;
+  int max_width, max_height;
+  int margin_left;
+  int margin_right;
+  int margin_top;
+  int margin_bottom;
+  int border_left;
+  int border_right;
+  int border_top;
+  int border_bottom;
   int border_size;
+  int align_size;
+  int align, valign;
 };
 
 struct MenuPosInfo
