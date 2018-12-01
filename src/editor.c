@@ -7146,7 +7146,10 @@ void CreateLevelEditorGadgets(void)
   right_gadget_border =
     checked_calloc(num_editor_gadgets * sizeof(int));
 
-  editor_el_empty = checked_calloc(ED_NUM_ELEMENTLIST_BUTTONS * sizeof(int));
+  // set number of empty (padding) element buttons to maximum number of buttons
+  num_editor_el_empty = ED_NUM_ELEMENTLIST_BUTTONS;
+
+  editor_el_empty = checked_calloc(num_editor_el_empty * sizeof(int));
   editor_el_empty_ptr = editor_el_empty;
 
   use_permanent_palette = !editor.palette.show_as_separate_screen;
