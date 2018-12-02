@@ -8503,29 +8503,31 @@ static boolean useEditorDoorAnimation(void)
   return (door_1_viewport_unchanged && door_1_contains_toolbox);
 }
 
+static void DrawEditorDoorBackground(int graphic, int x, int y,
+				     int width, int height)
+{
+  struct GraphicInfo *g = &graphic_info[graphic];
+
+  if (g->bitmap != NULL)
+    BlitBitmap(g->bitmap, drawto, g->src_x, g->src_y,
+	       MIN(width, g->width), MIN(height, g->height), x, y);
+  else
+    ClearRectangle(drawto, x, y, width, height);
+}
+
 static void DrawEditorDoorContent(void)
 {
   // needed for gadgets drawn on background (like palette scrollbar)
   SetDoorBackgroundImage(IMG_UNDEFINED);
 
   // copy default editor door content to main double buffer
-  BlitBitmap(graphic_info[IMG_BACKGROUND_PALETTE].bitmap, drawto,
-	     graphic_info[IMG_BACKGROUND_PALETTE].src_x,
-	     graphic_info[IMG_BACKGROUND_PALETTE].src_y,
-	     MIN(DXSIZE, graphic_info[IMG_BACKGROUND_PALETTE].width),
-	     MIN(DYSIZE, graphic_info[IMG_BACKGROUND_PALETTE].height),
-	     DX, DY);
+  DrawEditorDoorBackground(IMG_BACKGROUND_PALETTE, DX, DY, DXSIZE, DYSIZE);
 
   // draw bigger door
   DrawSpecialEditorDoor();
 
   // draw new control window
-  BlitBitmap(graphic_info[IMG_BACKGROUND_TOOLBOX].bitmap, drawto,
-	     graphic_info[IMG_BACKGROUND_TOOLBOX].src_x,
-	     graphic_info[IMG_BACKGROUND_TOOLBOX].src_y,
-	     MIN(EXSIZE, graphic_info[IMG_BACKGROUND_TOOLBOX].width),
-	     MIN(EYSIZE, graphic_info[IMG_BACKGROUND_TOOLBOX].height),
-	     EX, EY);
+  DrawEditorDoorBackground(IMG_BACKGROUND_TOOLBOX, EX, EY, EXSIZE, EYSIZE);
 
   // draw all toolbox gadgets to editor doors
   MapControlButtons();
