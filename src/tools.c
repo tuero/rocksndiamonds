@@ -9554,8 +9554,8 @@ void ChangeViewportPropertiesIfNeeded(void)
     }
 
     // add current and new door 2 area if position or size has changed
-    if (new_dx != VX || new_dy != VY ||
-	new_dxsize != VXSIZE || new_dysize != VYSIZE)
+    if (new_vx != VX || new_vy != VY ||
+	new_vxsize != VXSIZE || new_vysize != VYSIZE)
     {
       JoinRectangles(&FADE_SX, &FADE_SY, &FADE_SXSIZE, &FADE_SYSIZE,
 		     VX, VY, VXSIZE, VYSIZE);
