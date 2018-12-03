@@ -284,6 +284,6 @@ void ToggleFullscreenOrChangeWindowScalingIfNeeded(void);
 void ChangeViewportPropertiesIfNeeded(void);
 
 boolean CheckIfPlayfieldViewportHasChanged(void);
-boolean CheckIfGlobalBorderOrPlayfieldViewportHasChanged(void);
+boolean CheckFadeAll(void);
 
 #endif	// TOOLS_H

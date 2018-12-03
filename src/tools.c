@@ -9422,7 +9422,7 @@ boolean CheckIfPlayfieldViewportHasChanged(void)
 	  new_full_sysize != FULL_SYSIZE);
 }
 
-boolean CheckIfGlobalBorderOrPlayfieldViewportHasChanged(void)
+boolean CheckFadeAll(void)
 {
   return (CheckIfGlobalBorderHasChanged() ||
 	  CheckIfPlayfieldViewportHasChanged());
