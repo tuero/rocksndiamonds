@@ -283,7 +283,7 @@ void SetLevelSetInfo(char *, int);
 void ToggleFullscreenOrChangeWindowScalingIfNeeded(void);
 void ChangeViewportPropertiesIfNeeded(void);
 
-boolean CheckIfPlayfieldViewportHasChanged(void);
+boolean CheckIfAllViewportsHaveChanged(void);
 boolean CheckFadeAll(void);
 
 #endif	// TOOLS_H

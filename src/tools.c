@@ -9403,29 +9403,58 @@ void SetLevelSetInfo(char *identifier, int level_nr)
   levelset.level_nr = level_nr;
 }
 
-boolean CheckIfPlayfieldViewportHasChanged(void)
+boolean CheckIfAllViewportsHaveChanged(void)
 {
-  // if game status has not changed, playfield viewport has not changed either
+  // if game status has not changed, viewports have not changed either
   if (game_status == game_status_last)
     return FALSE;
 
-  // check if playfield viewport has changed with current game status
+  // check if all viewports have changed with current game status
+
   struct RectWithBorder *vp_playfield = &viewport.playfield[game_status];
+  struct RectWithBorder *vp_door_1    = &viewport.door_1[game_status];
+  struct RectWithBorder *vp_door_2    = &viewport.door_2[game_status];
   int new_real_sx	= vp_playfield->x;
   int new_real_sy	= vp_playfield->y;
   int new_full_sxsize	= vp_playfield->width;
   int new_full_sysize	= vp_playfield->height;
+  int new_dx		= vp_door_1->x;
+  int new_dy		= vp_door_1->y;
+  int new_dxsize	= vp_door_1->width;
+  int new_dysize	= vp_door_1->height;
+  int new_vx		= vp_door_2->x;
+  int new_vy		= vp_door_2->y;
+  int new_vxsize	= vp_door_2->width;
+  int new_vysize	= vp_door_2->height;
 
-  return (new_real_sx != REAL_SX ||
-	  new_real_sy != REAL_SY ||
-	  new_full_sxsize != FULL_SXSIZE ||
-	  new_full_sysize != FULL_SYSIZE);
+  boolean playfield_viewport_has_changed =
+    (new_real_sx != REAL_SX ||
+     new_real_sy != REAL_SY ||
+     new_full_sxsize != FULL_SXSIZE ||
+     new_full_sysize != FULL_SYSIZE);
+
+  boolean door_1_viewport_has_changed =
+    (new_dx != DX ||
+     new_dy != DY ||
+     new_dxsize != DXSIZE ||
+     new_dysize != DYSIZE);
+
+  boolean door_2_viewport_has_changed =
+    (new_vx != VX ||
+     new_vy != VY ||
+     new_vxsize != VXSIZE ||
+     new_vysize != VYSIZE ||
+     game_status_last == GAME_MODE_EDITOR);
+
+  return (playfield_viewport_has_changed &&
+	  door_1_viewport_has_changed &&
+	  door_2_viewport_has_changed);
 }
 
 boolean CheckFadeAll(void)
 {
   return (CheckIfGlobalBorderHasChanged() ||
-	  CheckIfPlayfieldViewportHasChanged());
+	  CheckIfAllViewportsHaveChanged());
 }
 
 void ChangeViewportPropertiesIfNeeded(void)
