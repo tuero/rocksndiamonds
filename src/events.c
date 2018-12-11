@@ -39,6 +39,8 @@ static int cursor_mode_last = CURSOR_DEFAULT;
 static unsigned int special_cursor_delay = 0;
 static unsigned int special_cursor_delay_value = 1000;
 
+static boolean virtual_button_pressed = FALSE;
+
 
 // forward declarations for internal use
 static void HandleNoEvent(void);
@@ -721,6 +723,8 @@ static void HandleFingerEvent_VirtualButtons(FingerEvent *event)
   char *key_status_name = (key_status == KEY_RELEASED ? "KEY_RELEASED" :
 			   "KEY_PRESSED");
   int i;
+
+  virtual_button_pressed = (key_status == KEY_PRESSED && key != KSYM_UNDEFINED);
 
   // for any touch input event, enable overlay buttons (if activated)
   SetOverlayEnabled(TRUE);
@@ -1545,10 +1549,13 @@ void HandleButton(int mx, int my, int button, int button_nr)
 #if defined(PLATFORM_ANDROID)
   // when playing, only handle gadgets when using "follow finger" controls
   // or when using touch controls in combination with the MM game engine
+  // or when using gadgets that do not overlap with virtual buttons
   handle_gadgets =
     (game_status != GAME_MODE_PLAYING ||
      level.game_engine_type == GAME_ENGINE_TYPE_MM ||
-     strEqual(setup.touch.control_type, TOUCH_CONTROL_FOLLOW_FINGER));
+     strEqual(setup.touch.control_type, TOUCH_CONTROL_FOLLOW_FINGER) ||
+     (strEqual(setup.touch.control_type, TOUCH_CONTROL_VIRTUAL_BUTTONS) &&
+      !virtual_button_pressed));
 #endif
 
   if (HandleGlobalAnimClicks(mx, my, button))
