@@ -4811,17 +4811,17 @@ static boolean RequestEnvelope(char *text, unsigned int req_state)
 
 boolean Request(char *text, unsigned int req_state)
 {
-  boolean overlay_active = GetOverlayActive();
+  boolean overlay_enabled = GetOverlayEnabled();
   boolean result;
 
-  SetOverlayActive(FALSE);
+  SetOverlayEnabled(FALSE);
 
   if (global.use_envelope_request)
     result = RequestEnvelope(text, req_state);
   else
     result = RequestDoor(text, req_state);
 
-  SetOverlayActive(overlay_active);
+  SetOverlayEnabled(overlay_enabled);
 
   return result;
 }

@@ -1694,6 +1694,7 @@ void SetTileCursorSXSY(int, int);
 void SetOverlayEnabled(boolean);
 void SetOverlayActive(boolean);
 void SetOverlayShowGrid(boolean);
+boolean GetOverlayEnabled(void);
 boolean GetOverlayActive(void);
 void SetDrawDeactivationMask(int);
 int GetDrawDeactivationMask(void);

@@ -417,6 +417,11 @@ void SetOverlayShowGrid(boolean show_grid)
     SetOverlayEnabled(TRUE);
 }
 
+boolean GetOverlayEnabled(void)
+{
+  return overlay.enabled;
+}
+
 boolean GetOverlayActive(void)
 {
   return overlay.active;
