@@ -38,7 +38,7 @@ void sge_Line(SDL_Surface *, Sint16, Sint16, Sint16, Sint16, Uint32);
 
 #if defined(USE_TOUCH_INPUT_OVERLAY)
 // functions to draw overlay graphics for touch device input
-static void DrawTouchInputOverlay();
+static void DrawTouchInputOverlay(void);
 #endif
 
 void SDLLimitScreenUpdates(boolean enable)
