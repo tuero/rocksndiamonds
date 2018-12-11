@@ -14973,7 +14973,12 @@ void RequestQuitGameExt(boolean skip_request, boolean quick_quit, char *message)
   {
     // closing door required in case of envelope style request dialogs
     if (!skip_request)
+    {
+      // prevent short reactivation of overlay buttons while closing door
+      SetOverlayActive(FALSE);
+
       CloseDoor(DOOR_CLOSE_1);
+    }
 
     if (network.enabled)
       SendToServer_StopPlaying(NETWORK_STOP_BY_PLAYER);
