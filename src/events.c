@@ -1452,9 +1452,15 @@ void HandleKeyEvent(KeyEvent *event)
     // always map the "back" button to the "escape" key on Android devices
     key = KSYM_Escape;
   }
+  else if (key == KSYM_Menu)
+  {
+    // the "menu" button can be used to toggle displaying virtual buttons
+    if (key_status == KEY_PRESSED)
+      SetOverlayEnabled(!GetOverlayEnabled());
+  }
   else
   {
-    // for any key event other than "back" button, disable overlay buttons
+    // for any other "real" key event, disable virtual buttons
     SetOverlayEnabled(FALSE);
   }
 #endif
