@@ -1849,9 +1849,9 @@ boolean HandleKeysDebug(Key key, int key_status)
       return TRUE;
     }
   }
+#endif
 
   return FALSE;
-#endif
 }
 
 void HandleKey(Key key, int key_status)
