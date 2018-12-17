@@ -4503,7 +4503,7 @@ void GameWon(void)
     int i;
 
     // do not start end game actions before the player stops moving (to exit)
-    if (local_player->MovPos)
+    if (local_player->active && local_player->MovPos)
       return;
 
     game.LevelSolved_GameWon = TRUE;
@@ -12164,7 +12164,8 @@ void GameActions_RND(void)
   DrawAllPlayers();
   PlayAllPlayersSound();
 
-  if (local_player->show_envelope != 0 && local_player->MovPos == 0)
+  if (local_player->show_envelope != 0 && (!local_player->active ||
+					   local_player->MovPos == 0))
   {
     ShowEnvelope(local_player->show_envelope - EL_ENVELOPE_1);
 
@@ -13450,6 +13451,9 @@ void RemovePlayer(struct PlayerInfo *player)
 
   player->present = FALSE;
   player->active = FALSE;
+
+  // required for some CE actions (even if the player is not active anymore)
+  player->MovPos = 0;
 
   if (!ExplodeField[jx][jy])
     StorePlayer[jx][jy] = 0;
