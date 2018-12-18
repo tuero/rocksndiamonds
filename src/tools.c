@@ -2274,7 +2274,9 @@ static void DrawLevelFieldCrumbledExt(int x, int y, int graphic, int frame)
 	  !IN_SCR_FIELD(sxx, syy))
 	continue;
 
-      if (Feld[xx][yy] == EL_ELEMENT_SNAPPING)
+      // do not crumble fields that are being digged or snapped
+      if (Feld[xx][yy] == EL_EMPTY ||
+	  Feld[xx][yy] == EL_ELEMENT_SNAPPING)
 	continue;
 
       element = TILE_GFX_ELEMENT(xx, yy);
