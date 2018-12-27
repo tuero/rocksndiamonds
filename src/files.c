@@ -8437,28 +8437,6 @@ enum
   NUM_EDITOR_SETUP_TOKENS
 };
 
-// editor cascade setup
-enum
-{
-  SETUP_TOKEN_EDITOR_CASCADE_BD = 0,
-  SETUP_TOKEN_EDITOR_CASCADE_EM,
-  SETUP_TOKEN_EDITOR_CASCADE_EMC,
-  SETUP_TOKEN_EDITOR_CASCADE_RND,
-  SETUP_TOKEN_EDITOR_CASCADE_SB,
-  SETUP_TOKEN_EDITOR_CASCADE_SP,
-  SETUP_TOKEN_EDITOR_CASCADE_DC,
-  SETUP_TOKEN_EDITOR_CASCADE_DX,
-  SETUP_TOKEN_EDITOR_CASCADE_TEXT,
-  SETUP_TOKEN_EDITOR_CASCADE_STEELTEXT,
-  SETUP_TOKEN_EDITOR_CASCADE_CE,
-  SETUP_TOKEN_EDITOR_CASCADE_GE,
-  SETUP_TOKEN_EDITOR_CASCADE_REF,
-  SETUP_TOKEN_EDITOR_CASCADE_USER,
-  SETUP_TOKEN_EDITOR_CASCADE_DYNAMIC,
-
-  NUM_EDITOR_CASCADE_SETUP_TOKENS
-};
-
 // shortcut setup
 enum
 {
@@ -9293,7 +9271,7 @@ static void decodeSetupFileHash_EditorCascade(SetupFileHash *setup_file_hash)
 
   // editor cascade setup
   seci = setup.editor_cascade;
-  for (i = 0; i < NUM_EDITOR_CASCADE_SETUP_TOKENS; i++)
+  for (i = 0; i < ARRAY_SIZE(editor_cascade_setup_tokens); i++)
     setSetupInfo(editor_cascade_setup_tokens, i,
 		 getHashEntry(setup_file_hash,
 			      editor_cascade_setup_tokens[i].text));
@@ -9606,7 +9584,7 @@ void SaveSetup_EditorCascade(void)
   fprintFileHeader(file, EDITORCASCADE_FILENAME);
 
   seci = setup.editor_cascade;
-  for (i = 0; i < NUM_EDITOR_CASCADE_SETUP_TOKENS; i++)
+  for (i = 0; i < ARRAY_SIZE(editor_cascade_setup_tokens); i++)
     fprintf(file, "%s\n", getSetupLine(editor_cascade_setup_tokens, "", i));
 
   fclose(file);
