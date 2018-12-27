@@ -8350,218 +8350,6 @@ void SaveScore(int nr)
 
 #define TOKEN_STR_PLAYER_PREFIX			"player_"
 
-// global setup
-enum
-{
-  SETUP_TOKEN_PLAYER_NAME = 0,
-  SETUP_TOKEN_SOUND,
-  SETUP_TOKEN_SOUND_LOOPS,
-  SETUP_TOKEN_SOUND_MUSIC,
-  SETUP_TOKEN_SOUND_SIMPLE,
-  SETUP_TOKEN_TOONS,
-  SETUP_TOKEN_SCROLL_DELAY,
-  SETUP_TOKEN_SCROLL_DELAY_VALUE,
-  SETUP_TOKEN_ENGINE_SNAPSHOT_MODE,
-  SETUP_TOKEN_ENGINE_SNAPSHOT_MEMORY,
-  SETUP_TOKEN_FADE_SCREENS,
-  SETUP_TOKEN_AUTORECORD,
-  SETUP_TOKEN_SHOW_TITLESCREEN,
-  SETUP_TOKEN_QUICK_DOORS,
-  SETUP_TOKEN_TEAM_MODE,
-  SETUP_TOKEN_HANDICAP,
-  SETUP_TOKEN_SKIP_LEVELS,
-  SETUP_TOKEN_INCREMENT_LEVELS,
-  SETUP_TOKEN_AUTO_PLAY_NEXT_LEVEL,
-  SETUP_TOKEN_SKIP_SCORES_AFTER_GAME,
-  SETUP_TOKEN_TIME_LIMIT,
-  SETUP_TOKEN_FULLSCREEN,
-  SETUP_TOKEN_WINDOW_SCALING_PERCENT,
-  SETUP_TOKEN_WINDOW_SCALING_QUALITY,
-  SETUP_TOKEN_SCREEN_RENDERING_MODE,
-  SETUP_TOKEN_VSYNC_MODE,
-  SETUP_TOKEN_ASK_ON_ESCAPE,
-  SETUP_TOKEN_ASK_ON_ESCAPE_EDITOR,
-  SETUP_TOKEN_ASK_ON_GAME_OVER,
-  SETUP_TOKEN_QUICK_SWITCH,
-  SETUP_TOKEN_INPUT_ON_FOCUS,
-  SETUP_TOKEN_PREFER_AGA_GRAPHICS,
-  SETUP_TOKEN_GAME_SPEED_EXTENDED,
-  SETUP_TOKEN_GAME_FRAME_DELAY,
-  SETUP_TOKEN_SP_SHOW_BORDER_ELEMENTS,
-  SETUP_TOKEN_SMALL_GAME_GRAPHICS,
-  SETUP_TOKEN_SHOW_SNAPSHOT_BUTTONS,
-  SETUP_TOKEN_GRAPHICS_SET,
-  SETUP_TOKEN_SOUNDS_SET,
-  SETUP_TOKEN_MUSIC_SET,
-  SETUP_TOKEN_OVERRIDE_LEVEL_GRAPHICS,
-  SETUP_TOKEN_OVERRIDE_LEVEL_SOUNDS,
-  SETUP_TOKEN_OVERRIDE_LEVEL_MUSIC,
-  SETUP_TOKEN_VOLUME_SIMPLE,
-  SETUP_TOKEN_VOLUME_LOOPS,
-  SETUP_TOKEN_VOLUME_MUSIC,
-  SETUP_TOKEN_NETWORK_MODE,
-  SETUP_TOKEN_NETWORK_PLAYER_NR,
-  SETUP_TOKEN_NETWORK_SERVER_HOSTNAME,
-  SETUP_TOKEN_TOUCH_CONTROL_TYPE,
-  SETUP_TOKEN_TOUCH_MOVE_DISTANCE,
-  SETUP_TOKEN_TOUCH_DROP_DISTANCE,
-  SETUP_TOKEN_TOUCH_TRANSPARENCY,
-  SETUP_TOKEN_TOUCH_DRAW_OUTLINED,
-  SETUP_TOKEN_TOUCH_DRAW_PRESSED,
-  SETUP_TOKEN_TOUCH_GRID_XSIZE_0,
-  SETUP_TOKEN_TOUCH_GRID_YSIZE_0,
-  SETUP_TOKEN_TOUCH_GRID_XSIZE_1,
-  SETUP_TOKEN_TOUCH_GRID_YSIZE_1,
-
-  NUM_GLOBAL_SETUP_TOKENS
-};
-
-// auto setup
-enum
-{
-  SETUP_TOKEN_AUTO_EDITOR_ZOOM_TILESIZE = 0,
-
-  NUM_AUTO_SETUP_TOKENS
-};
-
-// editor setup
-enum
-{
-  SETUP_TOKEN_EDITOR_EL_CLASSIC = 0,
-  SETUP_TOKEN_EDITOR_EL_CUSTOM,
-  SETUP_TOKEN_EDITOR_EL_USER_DEFINED,
-  SETUP_TOKEN_EDITOR_EL_DYNAMIC,
-  SETUP_TOKEN_EDITOR_EL_HEADLINES,
-  SETUP_TOKEN_EDITOR_SHOW_ELEMENT_TOKEN,
-
-  NUM_EDITOR_SETUP_TOKENS
-};
-
-// shortcut setup
-enum
-{
-  SETUP_TOKEN_SHORTCUT_SAVE_GAME = 0,
-  SETUP_TOKEN_SHORTCUT_LOAD_GAME,
-  SETUP_TOKEN_SHORTCUT_TOGGLE_PAUSE,
-  SETUP_TOKEN_SHORTCUT_FOCUS_PLAYER_1,
-  SETUP_TOKEN_SHORTCUT_FOCUS_PLAYER_2,
-  SETUP_TOKEN_SHORTCUT_FOCUS_PLAYER_3,
-  SETUP_TOKEN_SHORTCUT_FOCUS_PLAYER_4,
-  SETUP_TOKEN_SHORTCUT_FOCUS_PLAYER_ALL,
-  SETUP_TOKEN_SHORTCUT_TAPE_EJECT,
-  SETUP_TOKEN_SHORTCUT_TAPE_EXTRA,
-  SETUP_TOKEN_SHORTCUT_TAPE_STOP,
-  SETUP_TOKEN_SHORTCUT_TAPE_PAUSE,
-  SETUP_TOKEN_SHORTCUT_TAPE_RECORD,
-  SETUP_TOKEN_SHORTCUT_TAPE_PLAY,
-  SETUP_TOKEN_SHORTCUT_SOUND_SIMPLE,
-  SETUP_TOKEN_SHORTCUT_SOUND_LOOPS,
-  SETUP_TOKEN_SHORTCUT_SOUND_MUSIC,
-  SETUP_TOKEN_SHORTCUT_SNAP_LEFT,
-  SETUP_TOKEN_SHORTCUT_SNAP_RIGHT,
-  SETUP_TOKEN_SHORTCUT_SNAP_UP,
-  SETUP_TOKEN_SHORTCUT_SNAP_DOWN,
-
-  NUM_SHORTCUT_SETUP_TOKENS
-};
-
-// player setup
-enum
-{
-  SETUP_TOKEN_PLAYER_USE_JOYSTICK = 0,
-  SETUP_TOKEN_PLAYER_JOY_DEVICE_NAME,
-  SETUP_TOKEN_PLAYER_JOY_XLEFT,
-  SETUP_TOKEN_PLAYER_JOY_XMIDDLE,
-  SETUP_TOKEN_PLAYER_JOY_XRIGHT,
-  SETUP_TOKEN_PLAYER_JOY_YUPPER,
-  SETUP_TOKEN_PLAYER_JOY_YMIDDLE,
-  SETUP_TOKEN_PLAYER_JOY_YLOWER,
-  SETUP_TOKEN_PLAYER_JOY_SNAP,
-  SETUP_TOKEN_PLAYER_JOY_DROP,
-  SETUP_TOKEN_PLAYER_KEY_LEFT,
-  SETUP_TOKEN_PLAYER_KEY_RIGHT,
-  SETUP_TOKEN_PLAYER_KEY_UP,
-  SETUP_TOKEN_PLAYER_KEY_DOWN,
-  SETUP_TOKEN_PLAYER_KEY_SNAP,
-  SETUP_TOKEN_PLAYER_KEY_DROP,
-
-  NUM_PLAYER_SETUP_TOKENS
-};
-
-// system setup
-enum
-{
-  SETUP_TOKEN_SYSTEM_SDL_VIDEODRIVER = 0,
-  SETUP_TOKEN_SYSTEM_SDL_AUDIODRIVER,
-  SETUP_TOKEN_SYSTEM_AUDIO_FRAGMENT_SIZE,
-
-  NUM_SYSTEM_SETUP_TOKENS
-};
-
-// internal setup
-enum
-{
-  SETUP_TOKEN_INT_PROGRAM_TITLE = 0,
-  SETUP_TOKEN_INT_PROGRAM_VERSION,
-  SETUP_TOKEN_INT_PROGRAM_AUTHOR,
-  SETUP_TOKEN_INT_PROGRAM_EMAIL,
-  SETUP_TOKEN_INT_PROGRAM_WEBSITE,
-  SETUP_TOKEN_INT_PROGRAM_COPYRIGHT,
-  SETUP_TOKEN_INT_PROGRAM_COMPANY,
-  SETUP_TOKEN_INT_PROGRAM_ICON_FILE,
-  SETUP_TOKEN_INT_DEFAULT_GRAPHICS_SET,
-  SETUP_TOKEN_INT_DEFAULT_SOUNDS_SET,
-  SETUP_TOKEN_INT_DEFAULT_MUSIC_SET,
-  SETUP_TOKEN_INT_FALLBACK_GRAPHICS_FILE,
-  SETUP_TOKEN_INT_FALLBACK_SOUNDS_FILE,
-  SETUP_TOKEN_INT_FALLBACK_MUSIC_FILE,
-  SETUP_TOKEN_INT_DEFAULT_LEVEL_SERIES,
-  SETUP_TOKEN_INT_CHOOSE_FROM_TOP_LEVELDIR,
-  SETUP_TOKEN_INT_SHOW_SCALING_IN_TITLE,
-  SETUP_TOKEN_INT_DEFAULT_WINDOW_WIDTH,
-  SETUP_TOKEN_INT_DEFAULT_WINDOW_HEIGHT,
-
-  NUM_INTERNAL_SETUP_TOKENS
-};
-
-// debug setup
-enum
-{
-  SETUP_TOKEN_DEBUG_FRAME_DELAY_0 = 0,
-  SETUP_TOKEN_DEBUG_FRAME_DELAY_1,
-  SETUP_TOKEN_DEBUG_FRAME_DELAY_2,
-  SETUP_TOKEN_DEBUG_FRAME_DELAY_3,
-  SETUP_TOKEN_DEBUG_FRAME_DELAY_4,
-  SETUP_TOKEN_DEBUG_FRAME_DELAY_5,
-  SETUP_TOKEN_DEBUG_FRAME_DELAY_6,
-  SETUP_TOKEN_DEBUG_FRAME_DELAY_7,
-  SETUP_TOKEN_DEBUG_FRAME_DELAY_8,
-  SETUP_TOKEN_DEBUG_FRAME_DELAY_9,
-  SETUP_TOKEN_DEBUG_FRAME_DELAY_KEY_0,
-  SETUP_TOKEN_DEBUG_FRAME_DELAY_KEY_1,
-  SETUP_TOKEN_DEBUG_FRAME_DELAY_KEY_2,
-  SETUP_TOKEN_DEBUG_FRAME_DELAY_KEY_3,
-  SETUP_TOKEN_DEBUG_FRAME_DELAY_KEY_4,
-  SETUP_TOKEN_DEBUG_FRAME_DELAY_KEY_5,
-  SETUP_TOKEN_DEBUG_FRAME_DELAY_KEY_6,
-  SETUP_TOKEN_DEBUG_FRAME_DELAY_KEY_7,
-  SETUP_TOKEN_DEBUG_FRAME_DELAY_KEY_8,
-  SETUP_TOKEN_DEBUG_FRAME_DELAY_KEY_9,
-  SETUP_TOKEN_DEBUG_FRAME_DELAY_USE_MOD_KEY,
-  SETUP_TOKEN_DEBUG_FRAME_DELAY_GAME_ONLY,
-  SETUP_TOKEN_DEBUG_SHOW_FRAMES_PER_SECOND,
-
-  NUM_DEBUG_SETUP_TOKENS
-};
-
-// options setup
-enum
-{
-  SETUP_TOKEN_OPTIONS_VERBOSE = 0,
-
-  NUM_OPTIONS_SETUP_TOKENS
-};
-
 
 static struct SetupInfo si;
 static struct SetupAutoSetupInfo sasi;
@@ -9145,7 +8933,7 @@ static void decodeSetupFileHash(SetupFileHash *setup_file_hash)
 
   // global setup
   si = setup;
-  for (i = 0; i < NUM_GLOBAL_SETUP_TOKENS; i++)
+  for (i = 0; i < ARRAY_SIZE(global_setup_tokens); i++)
     setSetupInfoFromTokenInfo(setup_file_hash, global_setup_tokens, i);
   setup = si;
 
@@ -9190,13 +8978,13 @@ static void decodeSetupFileHash(SetupFileHash *setup_file_hash)
 
   // editor setup
   sei = setup.editor;
-  for (i = 0; i < NUM_EDITOR_SETUP_TOKENS; i++)
+  for (i = 0; i < ARRAY_SIZE(editor_setup_tokens); i++)
     setSetupInfoFromTokenInfo(setup_file_hash, editor_setup_tokens, i);
   setup.editor = sei;
 
   // shortcut setup
   ssi = setup.shortcut;
-  for (i = 0; i < NUM_SHORTCUT_SETUP_TOKENS; i++)
+  for (i = 0; i < ARRAY_SIZE(shortcut_setup_tokens); i++)
     setSetupInfoFromTokenInfo(setup_file_hash, shortcut_setup_tokens, i);
   setup.shortcut = ssi;
 
@@ -9208,7 +8996,7 @@ static void decodeSetupFileHash(SetupFileHash *setup_file_hash)
     sprintf(prefix, "%s%d", TOKEN_STR_PLAYER_PREFIX, pnr + 1);
 
     sii = setup.input[pnr];
-    for (i = 0; i < NUM_PLAYER_SETUP_TOKENS; i++)
+    for (i = 0; i < ARRAY_SIZE(player_setup_tokens); i++)
     {
       char full_token[100];
 
@@ -9221,25 +9009,25 @@ static void decodeSetupFileHash(SetupFileHash *setup_file_hash)
 
   // system setup
   syi = setup.system;
-  for (i = 0; i < NUM_SYSTEM_SETUP_TOKENS; i++)
+  for (i = 0; i < ARRAY_SIZE(system_setup_tokens); i++)
     setSetupInfoFromTokenInfo(setup_file_hash, system_setup_tokens, i);
   setup.system = syi;
 
   // internal setup
   sxi = setup.internal;
-  for (i = 0; i < NUM_INTERNAL_SETUP_TOKENS; i++)
+  for (i = 0; i < ARRAY_SIZE(internal_setup_tokens); i++)
     setSetupInfoFromTokenInfo(setup_file_hash, internal_setup_tokens, i);
   setup.internal = sxi;
 
   // debug setup
   sdi = setup.debug;
-  for (i = 0; i < NUM_DEBUG_SETUP_TOKENS; i++)
+  for (i = 0; i < ARRAY_SIZE(debug_setup_tokens); i++)
     setSetupInfoFromTokenInfo(setup_file_hash, debug_setup_tokens, i);
   setup.debug = sdi;
 
   // options setup
   soi = setup.options;
-  for (i = 0; i < NUM_OPTIONS_SETUP_TOKENS; i++)
+  for (i = 0; i < ARRAY_SIZE(options_setup_tokens); i++)
     setSetupInfoFromTokenInfo(setup_file_hash, options_setup_tokens, i);
   setup.options = soi;
 
@@ -9255,7 +9043,7 @@ static void decodeSetupFileHash_AutoSetup(SetupFileHash *setup_file_hash)
 
   // auto setup
   sasi = setup.auto_setup;
-  for (i = 0; i < NUM_AUTO_SETUP_TOKENS; i++)
+  for (i = 0; i < ARRAY_SIZE(auto_setup_tokens); i++)
     setSetupInfo(auto_setup_tokens, i,
 		 getHashEntry(setup_file_hash,
 			      auto_setup_tokens[i].text));
@@ -9443,16 +9231,16 @@ void SaveSetup(void)
 
   // global setup
   si = setup;
-  for (i = 0; i < NUM_GLOBAL_SETUP_TOKENS; i++)
+  for (i = 0; i < ARRAY_SIZE(global_setup_tokens); i++)
   {
     // just to make things nicer :)
-    if (i == SETUP_TOKEN_PLAYER_NAME + 1 ||
-	i == SETUP_TOKEN_GRAPHICS_SET ||
-	i == SETUP_TOKEN_VOLUME_SIMPLE ||
-	i == SETUP_TOKEN_NETWORK_MODE ||
-	i == SETUP_TOKEN_TOUCH_CONTROL_TYPE ||
-	i == SETUP_TOKEN_TOUCH_GRID_XSIZE_0 ||
-	i == SETUP_TOKEN_TOUCH_GRID_XSIZE_1)
+    if (global_setup_tokens[i].value == &si.sound		||
+	global_setup_tokens[i].value == &si.graphics_set	||
+	global_setup_tokens[i].value == &si.volume_simple	||
+	global_setup_tokens[i].value == &si.network_mode	||
+	global_setup_tokens[i].value == &si.touch.control_type	||
+	global_setup_tokens[i].value == &si.touch.grid_xsize[0]	||
+	global_setup_tokens[i].value == &si.touch.grid_xsize[1])
       fprintf(file, "\n");
 
     fprintf(file, "%s\n", getSetupLine(global_setup_tokens, "", i));
@@ -9490,13 +9278,13 @@ void SaveSetup(void)
   // editor setup
   sei = setup.editor;
   fprintf(file, "\n");
-  for (i = 0; i < NUM_EDITOR_SETUP_TOKENS; i++)
+  for (i = 0; i < ARRAY_SIZE(editor_setup_tokens); i++)
     fprintf(file, "%s\n", getSetupLine(editor_setup_tokens, "", i));
 
   // shortcut setup
   ssi = setup.shortcut;
   fprintf(file, "\n");
-  for (i = 0; i < NUM_SHORTCUT_SETUP_TOKENS; i++)
+  for (i = 0; i < ARRAY_SIZE(shortcut_setup_tokens); i++)
     fprintf(file, "%s\n", getSetupLine(shortcut_setup_tokens, "", i));
 
   // player setup
@@ -9508,14 +9296,14 @@ void SaveSetup(void)
     fprintf(file, "\n");
 
     sii = setup.input[pnr];
-    for (i = 0; i < NUM_PLAYER_SETUP_TOKENS; i++)
+    for (i = 0; i < ARRAY_SIZE(player_setup_tokens); i++)
       fprintf(file, "%s\n", getSetupLine(player_setup_tokens, prefix, i));
   }
 
   // system setup
   syi = setup.system;
   fprintf(file, "\n");
-  for (i = 0; i < NUM_SYSTEM_SETUP_TOKENS; i++)
+  for (i = 0; i < ARRAY_SIZE(system_setup_tokens); i++)
     fprintf(file, "%s\n", getSetupLine(system_setup_tokens, "", i));
 
   // internal setup
@@ -9524,13 +9312,13 @@ void SaveSetup(void)
   // debug setup
   sdi = setup.debug;
   fprintf(file, "\n");
-  for (i = 0; i < NUM_DEBUG_SETUP_TOKENS; i++)
+  for (i = 0; i < ARRAY_SIZE(debug_setup_tokens); i++)
     fprintf(file, "%s\n", getSetupLine(debug_setup_tokens, "", i));
 
   // options setup
   soi = setup.options;
   fprintf(file, "\n");
-  for (i = 0; i < NUM_OPTIONS_SETUP_TOKENS; i++)
+  for (i = 0; i < ARRAY_SIZE(options_setup_tokens); i++)
     fprintf(file, "%s\n", getSetupLine(options_setup_tokens, "", i));
 
   fclose(file);
@@ -9556,7 +9344,7 @@ void SaveSetup_AutoSetup(void)
   fprintFileHeader(file, AUTOSETUP_FILENAME);
 
   sasi = setup.auto_setup;
-  for (i = 0; i < NUM_AUTO_SETUP_TOKENS; i++)
+  for (i = 0; i < ARRAY_SIZE(auto_setup_tokens); i++)
     fprintf(file, "%s\n", getSetupLine(auto_setup_tokens, "", i));
 
   fclose(file);
