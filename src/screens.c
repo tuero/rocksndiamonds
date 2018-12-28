@@ -174,18 +174,21 @@
 // screen gadget identifiers
 #define SCREEN_CTRL_ID_PREV_LEVEL	0
 #define SCREEN_CTRL_ID_NEXT_LEVEL	1
-#define SCREEN_CTRL_ID_PREV_PLAYER	2
-#define SCREEN_CTRL_ID_NEXT_PLAYER	3
-#define SCREEN_CTRL_ID_INSERT_SOLUTION	4
-#define SCREEN_CTRL_ID_PLAY_SOLUTION	5
-#define SCREEN_CTRL_ID_SCROLL_UP	6
-#define SCREEN_CTRL_ID_SCROLL_DOWN	7
-#define SCREEN_CTRL_ID_SCROLL_VERTICAL	8
-#define SCREEN_CTRL_ID_NETWORK_SERVER	9
+#define SCREEN_CTRL_ID_FIRST_LEVEL	2
+#define SCREEN_CTRL_ID_LAST_LEVEL	3
+#define SCREEN_CTRL_ID_LEVEL_NUMBER	4
+#define SCREEN_CTRL_ID_PREV_PLAYER	5
+#define SCREEN_CTRL_ID_NEXT_PLAYER	6
+#define SCREEN_CTRL_ID_INSERT_SOLUTION	7
+#define SCREEN_CTRL_ID_PLAY_SOLUTION	8
+#define SCREEN_CTRL_ID_SCROLL_UP	9
+#define SCREEN_CTRL_ID_SCROLL_DOWN	10
+#define SCREEN_CTRL_ID_SCROLL_VERTICAL	11
+#define SCREEN_CTRL_ID_NETWORK_SERVER	12
 
-#define NUM_SCREEN_GADGETS		10
+#define NUM_SCREEN_GADGETS		13
 
-#define NUM_SCREEN_MENUBUTTONS		6
+#define NUM_SCREEN_MENUBUTTONS		9
 #define NUM_SCREEN_SCROLLBUTTONS	2
 #define NUM_SCREEN_SCROLLBARS		1
 #define NUM_SCREEN_TEXTINPUT		1
@@ -724,36 +727,33 @@ static struct MainControlInfo main_controls[] =
     &menu.main.text.quit,		&main_text_quit,
     NULL,				NULL,
   },
-#if 0
-  // (these two buttons are real gadgets)
   {
     MAIN_CONTROL_PREV_LEVEL,
-    &menu.main.button.prev_level,	IMG_MENU_BUTTON_PREV_LEVEL,
+    NULL,				-1,
     NULL,				NULL,
     NULL,				NULL,
   },
   {
     MAIN_CONTROL_NEXT_LEVEL,
-    &menu.main.button.next_level,	IMG_MENU_BUTTON_NEXT_LEVEL,
+    NULL,				-1,
     NULL,				NULL,
     NULL,				NULL,
   },
-#endif
   {
     MAIN_CONTROL_FIRST_LEVEL,
-    &menu.main.button.first_level,	IMG_MENU_BUTTON_FIRST_LEVEL,
+    NULL,				-1,
     &menu.main.text.first_level,	&main_text_first_level,
     NULL,				NULL,
   },
   {
     MAIN_CONTROL_LAST_LEVEL,
-    &menu.main.button.last_level,	IMG_MENU_BUTTON_LAST_LEVEL,
+    NULL,				-1,
     &menu.main.text.last_level,		&main_text_last_level,
     NULL,				NULL,
   },
   {
     MAIN_CONTROL_LEVEL_NUMBER,
-    &menu.main.button.level_number,	IMG_MENU_BUTTON_LEVEL_NUMBER,
+    NULL,				-1,
     &menu.main.text.level_number,	&main_text_level_number,
     NULL,				NULL,
   },
@@ -8218,6 +8218,21 @@ static void getScreenMenuButtonPos(int *x, int *y, int gadget_id)
       *y = mSY + GDI_ACTIVE_POS(menu.main.button.next_level.y);
       break;
 
+    case SCREEN_CTRL_ID_FIRST_LEVEL:
+      *x = mSX + GDI_ACTIVE_POS(menu.main.button.first_level.x);
+      *y = mSY + GDI_ACTIVE_POS(menu.main.button.first_level.y);
+      break;
+
+    case SCREEN_CTRL_ID_LAST_LEVEL:
+      *x = mSX + GDI_ACTIVE_POS(menu.main.button.last_level.x);
+      *y = mSY + GDI_ACTIVE_POS(menu.main.button.last_level.y);
+      break;
+
+    case SCREEN_CTRL_ID_LEVEL_NUMBER:
+      *x = mSX + GDI_ACTIVE_POS(menu.main.button.level_number.x);
+      *y = mSY + GDI_ACTIVE_POS(menu.main.button.level_number.y);
+      break;
+
     case SCREEN_CTRL_ID_PREV_PLAYER:
       *x = mSX + TILEX * 10;
       *y = mSY + TILEY * MENU_SCREEN_START_YPOS;
@@ -8249,6 +8264,7 @@ static struct
   void (*get_gadget_position)(int *, int *, int);
   int gadget_id;
   int screen_mask;
+  unsigned int event_mask;
   char *infotext;
 } menubutton_info[NUM_SCREEN_MENUBUTTONS] =
 {
@@ -8257,27 +8273,55 @@ static struct
     getScreenMenuButtonPos,
     SCREEN_CTRL_ID_PREV_LEVEL,
     SCREEN_MASK_MAIN,
-    "last level"
+    GD_EVENT_PRESSED | GD_EVENT_REPEATED,
+    "previous level"
   },
   {
     IMG_MENU_BUTTON_NEXT_LEVEL, IMG_MENU_BUTTON_NEXT_LEVEL_ACTIVE,
     getScreenMenuButtonPos,
     SCREEN_CTRL_ID_NEXT_LEVEL,
     SCREEN_MASK_MAIN,
+    GD_EVENT_PRESSED | GD_EVENT_REPEATED,
     "next level"
+  },
+  {
+    IMG_MENU_BUTTON_FIRST_LEVEL, IMG_MENU_BUTTON_FIRST_LEVEL_ACTIVE,
+    getScreenMenuButtonPos,
+    SCREEN_CTRL_ID_FIRST_LEVEL,
+    SCREEN_MASK_MAIN,
+    GD_EVENT_RELEASED,
+    "first level"
+  },
+  {
+    IMG_MENU_BUTTON_LAST_LEVEL, IMG_MENU_BUTTON_LAST_LEVEL_ACTIVE,
+    getScreenMenuButtonPos,
+    SCREEN_CTRL_ID_LAST_LEVEL,
+    SCREEN_MASK_MAIN,
+    GD_EVENT_RELEASED,
+    "last level"
+  },
+  {
+    IMG_MENU_BUTTON_LEVEL_NUMBER, IMG_MENU_BUTTON_LEVEL_NUMBER_ACTIVE,
+    getScreenMenuButtonPos,
+    SCREEN_CTRL_ID_LEVEL_NUMBER,
+    SCREEN_MASK_MAIN,
+    GD_EVENT_RELEASED,
+    "level number"
   },
   {
     IMG_MENU_BUTTON_LEFT, IMG_MENU_BUTTON_LEFT_ACTIVE,
     getScreenMenuButtonPos,
     SCREEN_CTRL_ID_PREV_PLAYER,
     SCREEN_MASK_INPUT,
-    "last player"
+    GD_EVENT_PRESSED | GD_EVENT_REPEATED,
+    "previous player"
   },
   {
     IMG_MENU_BUTTON_RIGHT, IMG_MENU_BUTTON_RIGHT_ACTIVE,
     getScreenMenuButtonPos,
     SCREEN_CTRL_ID_NEXT_PLAYER,
     SCREEN_MASK_INPUT,
+    GD_EVENT_PRESSED | GD_EVENT_REPEATED,
     "next player"
   },
   {
@@ -8285,6 +8329,7 @@ static struct
     getScreenMenuButtonPos,
     SCREEN_CTRL_ID_INSERT_SOLUTION,
     SCREEN_MASK_MAIN_HAS_SOLUTION,
+    GD_EVENT_RELEASED,
     "insert solution tape"
   },
   {
@@ -8292,6 +8337,7 @@ static struct
     getScreenMenuButtonPos,
     SCREEN_CTRL_ID_PLAY_SOLUTION,
     SCREEN_MASK_MAIN_HAS_SOLUTION,
+    GD_EVENT_RELEASED,
     "play solution tape"
   },
 };
@@ -8372,10 +8418,7 @@ static void CreateScreenMenubuttons(void)
     int gd_x1, gd_x2, gd_y1, gd_y2;
     int id = menubutton_info[i].gadget_id;
 
-    if (menubutton_info[i].screen_mask == SCREEN_MASK_MAIN_HAS_SOLUTION)
-      event_mask = GD_EVENT_RELEASED;
-    else
-      event_mask = GD_EVENT_PRESSED | GD_EVENT_REPEATED;
+    event_mask = menubutton_info[i].event_mask;
 
     menubutton_info[i].get_gadget_position(&x, &y, id);
 
@@ -8707,6 +8750,20 @@ static void HandleScreenGadgets(struct GadgetInfo *gi)
 
     case SCREEN_CTRL_ID_NEXT_LEVEL:
       HandleMainMenu_SelectLevel(step, +1, NO_DIRECT_LEVEL_SELECT);
+      break;
+
+    case SCREEN_CTRL_ID_FIRST_LEVEL:
+      HandleMainMenu_SelectLevel(MAX_LEVELS, -1, NO_DIRECT_LEVEL_SELECT);
+      break;
+
+    case SCREEN_CTRL_ID_LAST_LEVEL:
+      HandleMainMenu_SelectLevel(MAX_LEVELS, +1, NO_DIRECT_LEVEL_SELECT);
+      break;
+
+    case SCREEN_CTRL_ID_LEVEL_NUMBER:
+      CloseDoor(DOOR_CLOSE_2);
+      SetGameStatus(GAME_MODE_LEVELNR);
+      DrawChooseLevelNr();
       break;
 
     case SCREEN_CTRL_ID_PREV_PLAYER:
