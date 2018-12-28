@@ -3252,6 +3252,8 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
     {
       int i;
 
+      UpdateAndDisplayGameControlValues();
+
       for (i = 15; i >= 0; i--)
       {
 #if 0
