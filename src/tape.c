@@ -596,6 +596,10 @@ void TapeStartRecording(int random_seed)
 
   SetDrawDeactivationMask(REDRAW_NONE);
   audio.sound_deactivated = FALSE;
+
+  // required here to update video display if tape door is closed
+  if (GetDoorState() & DOOR_CLOSE_2)
+    OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
 }
 
 static void TapeStartGameRecording(void)
