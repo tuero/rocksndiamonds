@@ -2360,6 +2360,16 @@ void HandleJoystick(void)
     return;
   }
 
+  if (newbutton && (game_status == GAME_MODE_PSEUDO_TYPENAME ||
+		    anyTextGadgetActive()))
+  {
+    // leave name input in main menu or text input gadget
+    HandleKey(KSYM_Escape, KEY_PRESSED);
+    HandleKey(KSYM_Escape, KEY_RELEASED);
+
+    return;
+  }
+
   if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
   {
     if (game_status == GAME_MODE_PLAYING)
