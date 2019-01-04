@@ -2035,9 +2035,23 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 
       if (pos == MAIN_CONTROL_NAME)
       {
-	SetGameStatus(GAME_MODE_PSEUDO_TYPENAME);
+	if ((mx || my) &&
+	    insideTextPosRect(main_controls[i].pos_text, mx - mSX, my - mSY))
+	{
+	  // special case: menu text "name/team" clicked -- toggle team mode
+	  setup.team_mode = !setup.team_mode;
 
-	HandleTypeName(strlen(setup.player_name), 0);
+	  InitializeMainControls();
+	  DrawCursorAndText_Main(choice, TRUE, FALSE);
+
+	  DrawPreviewPlayers();
+	}
+	else
+	{
+	  SetGameStatus(GAME_MODE_PSEUDO_TYPENAME);
+
+	  HandleTypeName(strlen(setup.player_name), 0);
+	}
       }
       else if (pos == MAIN_CONTROL_LEVELS)
       {

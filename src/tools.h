@@ -194,6 +194,7 @@ void ShowEnvelopeDoor(char *text, int);
 void DrawLevel(int);
 void DrawSizedLevel(int, int, int, int, int);
 void DrawMiniLevel(int, int, int, int);
+void DrawPreviewPlayers(void);
 void DrawPreviewLevelInitial(void);
 void DrawPreviewLevelAnimation(void);
 

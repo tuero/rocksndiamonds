@@ -3516,12 +3516,9 @@ static void DrawPreviewLevelExt(boolean restart)
   }
 }
 
-static void DrawPreviewPlayers(void)
+void DrawPreviewPlayers(void)
 {
   if (game_status != GAME_MODE_MAIN)
-    return;
-
-  if (!network.enabled && !setup.team_mode)
     return;
 
   boolean player_found[MAX_PLAYERS];
@@ -3571,6 +3568,9 @@ static void DrawPreviewPlayers(void)
   // clear area in which the players will be drawn
   ClearRectangleOnBackground(drawto, max_xpos, max_ypos,
 			     max_players_width, max_players_height);
+
+  if (!network.enabled && !setup.team_mode)
+    return;
 
   // only draw players if level is suited for team mode
   if (num_players < 2)
