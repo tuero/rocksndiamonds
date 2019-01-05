@@ -870,7 +870,11 @@ static void Handle_OP_LEVEL_FILE(void)
   if (hasPathSeparator(file_info->basename))
     Error(ERR_EXIT, "protocol error: invalid filename from network client");
 
-  getNetworkBufferFile(read_buffer, file_info->filename);
+  int num_bytes = getNetworkBufferFile(read_buffer, file_info->filename);
+
+  // if received level file is empty, remove it (as being non-existent)
+  if (num_bytes == 0)
+    remove(file_info->filename);
 
   use_custom_template = getNetworkBuffer8BitInteger(read_buffer);
   if (use_custom_template)
@@ -884,6 +888,10 @@ static void Handle_OP_LEVEL_FILE(void)
       Error(ERR_EXIT, "protocol error: invalid filename from network client");
 
     getNetworkBufferFile(read_buffer, tmpl_info->filename);
+
+    // if received level file is empty, use level template file instead
+    if (num_bytes == 0)
+      setString(&file_info->filename,  tmpl_info->filename);
   }
 
   network_level.leveldir_identifier = leveldir_identifier;
