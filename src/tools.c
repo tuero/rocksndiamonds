@@ -1150,10 +1150,12 @@ void FadeSkipNextFadeOut(void)
 
 static Bitmap *getBitmapFromGraphicOrDefault(int graphic, int default_graphic)
 {
+  if (graphic == IMG_UNDEFINED)
+    return NULL;
+
   boolean redefined = getImageListEntryFromImageID(graphic)->redefined;
 
-  return (graphic == IMG_UNDEFINED ? NULL :
-	  graphic_info[graphic].bitmap != NULL || redefined ?
+  return (graphic_info[graphic].bitmap != NULL || redefined ?
 	  graphic_info[graphic].bitmap :
 	  graphic_info[default_graphic].bitmap);
 }
