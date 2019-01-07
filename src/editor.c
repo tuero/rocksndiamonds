@@ -9752,10 +9752,43 @@ static void SetAutomaticNumberOfGemsNeeded(void)
     {
       int element = Feld[x][y];
 
-      if (IS_GEM(element) ||
-	  element == EL_MM_KETTLE ||
-	  element == EL_DF_CELL)
-	level.gems_needed++;
+      switch (element)
+      {
+	case EL_EMERALD:
+	case EL_EMERALD_YELLOW:
+	case EL_EMERALD_RED:
+	case EL_EMERALD_PURPLE:
+	case EL_BD_DIAMOND:
+	case EL_WALL_EMERALD:
+	case EL_WALL_EMERALD_YELLOW:
+	case EL_WALL_EMERALD_RED:
+	case EL_WALL_EMERALD_PURPLE:
+	case EL_WALL_BD_DIAMOND:
+	case EL_NUT:
+	case EL_SP_INFOTRON:
+	case EL_MM_KETTLE:
+	case EL_DF_CELL:
+	  level.gems_needed++;
+	  break;
+
+	case EL_DIAMOND:
+	case EL_WALL_DIAMOND:
+	  level.gems_needed += 3;
+	  break;
+
+	case EL_PEARL:
+	case EL_WALL_PEARL:
+	  level.gems_needed += 5;
+	  break;
+
+	case EL_CRYSTAL:
+	case EL_WALL_CRYSTAL:
+	  level.gems_needed += 8;
+	  break;
+
+	default:
+	  break;
+      }
     }
   }
 
