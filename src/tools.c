@@ -9658,6 +9658,8 @@ void ChangeViewportPropertiesIfNeeded(void)
   {
     // printf("::: init_video_buffer\n");
 
+    FreeAllImageTextures();	// needs old renderer to free the textures
+
     InitVideoBuffer(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH, setup.fullscreen);
     InitImageTextures();
   }
