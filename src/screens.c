@@ -1745,9 +1745,9 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 				    "No title screen for this level set.");
 	return;
       }
-
-      FadeMenuSoundsAndMusic();
     }
+
+    FadeMenuSoundsAndMusic();
 
     FadeOut(REDRAW_ALL);
 
