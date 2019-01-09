@@ -28,6 +28,7 @@
 #include "text.h"
 #include "misc.h"
 #include "hash.h"
+#include "zip/miniunz.h"
 
 
 #define ENABLE_UNUSED_CODE	FALSE	// for currently unused functions
@@ -2981,6 +2982,148 @@ static void setArtworkInfoCacheEntry(TreeInfo *artwork_info,
 // functions for loading level info and custom artwork info
 // ----------------------------------------------------------------------------
 
+static boolean CheckZipFileForDirectory(char *zip_filename, char *directory,
+					int tree_type)
+{
+  static char *top_dir_path = NULL;
+  static char *top_dir_conf_filename = NULL;
+
+  checked_free(top_dir_path);
+  checked_free(top_dir_conf_filename);
+
+  top_dir_path = NULL;
+  top_dir_conf_filename = NULL;
+
+  char *conf_basename = (tree_type == TREE_TYPE_LEVEL_DIR ? LEVELINFO_FILENAME :
+			 ARTWORKINFO_FILENAME(tree_type));
+
+  // check if valid configuration filename determined
+  if (conf_basename == NULL || strEqual(conf_basename, ""))
+    return FALSE;
+
+  char **zip_entries = zip_list(zip_filename);
+
+  // check if zip file successfully opened
+  if (zip_entries == NULL || zip_entries[0] == NULL)
+    return FALSE;
+
+  // first zip file entry is expected to be top level directory
+  char *top_dir = zip_entries[0];
+
+  // check if valid top level directory found in zip file
+  if (!strSuffix(top_dir, "/"))
+    return FALSE;
+
+  // get path of extracted top level directory
+  top_dir_path = getPath2(directory, top_dir);
+
+  // remove trailing directory separator from top level directory path
+  // (required to be able to check for file and directory in next step)
+  top_dir_path[strlen(top_dir_path) - 1] = '\0';
+
+  // check if zip file's top level directory already exists in target directory
+  if (fileExists(top_dir_path))		// (checks for file and directory)
+    return FALSE;
+
+  // get filename of configuration file in top level directory
+  top_dir_conf_filename = getStringCat2(top_dir, conf_basename);
+
+  boolean found_top_dir_conf_filename = FALSE;
+  int i = 0;
+
+  while (zip_entries[i] != NULL)
+  {
+    // check if every zip file entry is below top level directory
+    if (!strPrefix(zip_entries[i], top_dir))
+      return FALSE;
+
+    // check if this zip file entry is the configuration filename
+    if (strEqual(zip_entries[i], top_dir_conf_filename))
+      found_top_dir_conf_filename = TRUE;
+
+    i++;
+  }
+
+  // check if valid configuration filename was found in zip file
+  if (!found_top_dir_conf_filename)
+    return FALSE;
+
+  return TRUE;
+}
+
+static boolean ExtractZipFileIntoDirectory(char *zip_filename, char *directory,
+					   int tree_type)
+{
+  boolean zip_file_valid = CheckZipFileForDirectory(zip_filename, directory,
+						    tree_type);
+
+  Error(ERR_DEBUG, "zip file '%s': %s", zip_filename,
+	(zip_file_valid ? "EXTRACT" : "REJECT"));
+
+  if (!zip_file_valid)
+    return FALSE;
+
+  char **zip_entries = zip_extract(zip_filename, directory);
+
+  boolean zip_file_extracted = (zip_entries != NULL);
+
+  if (zip_file_extracted)
+    Error(ERR_DEBUG, "zip file successfully extracted!");
+  else
+    Error(ERR_DEBUG, "zip file could not be extracted!");
+
+  return zip_file_extracted;
+}
+
+static void ProcessZipFilesInDirectory(char *directory, int tree_type)
+{
+  Directory *dir;
+  DirectoryEntry *dir_entry;
+
+  if ((dir = openDirectory(directory)) == NULL)
+  {
+    // display error if directory is main "options.graphics_directory" etc.
+    if (tree_type == TREE_TYPE_LEVEL_DIR ||
+	directory == OPTIONS_ARTWORK_DIRECTORY(tree_type))
+      Error(ERR_WARN, "cannot read directory '%s'", directory);
+
+    return;
+  }
+
+  while ((dir_entry = readDirectory(dir)) != NULL)	// loop all entries
+  {
+    // skip non-zip files (and also directories with zip extension)
+    if (!strSuffixLower(dir_entry->basename, ".zip") || dir_entry->is_directory)
+      continue;
+
+    char *zip_filename = getPath2(directory, dir_entry->basename);
+    char *zip_filename_extracted = getStringCat2(zip_filename, ".extracted");
+    char *zip_filename_rejected  = getStringCat2(zip_filename, ".rejected");
+
+    // check if zip file hasn't already been extracted or rejected
+    if (!fileExists(zip_filename_extracted) &&
+	!fileExists(zip_filename_rejected))
+    {
+      boolean zip_file_extracted = ExtractZipFileIntoDirectory(zip_filename,
+							       directory,
+							       tree_type);
+      char *marker_filename = (zip_file_extracted ? zip_filename_extracted :
+			       zip_filename_rejected);
+      FILE *marker_file;
+
+      // create empty file to mark zip file as extracted or rejected
+      if ((marker_file = fopen(marker_filename, MODE_WRITE)))
+	fclose(marker_file);
+
+      free(zip_filename);
+      free(zip_filename_extracted);
+      free(zip_filename_rejected);
+    }
+  }
+
+  closeDirectory(dir);
+}
+
 // forward declaration for recursive call by "LoadLevelInfoFromLevelDir()"
 static void LoadLevelInfoFromLevelDir(TreeInfo **, TreeInfo *, char *);
 
@@ -3108,6 +3251,12 @@ static void LoadLevelInfoFromLevelDir(TreeInfo **node_first,
 				      TreeInfo *node_parent,
 				      char *level_directory)
 {
+  // ---------- 1st stage: process any level set zip files ----------
+
+  ProcessZipFilesInDirectory(level_directory, TREE_TYPE_LEVEL_DIR);
+
+  // ---------- 2nd stage: check for level set directories ----------
+
   Directory *dir;
   DirectoryEntry *dir_entry;
   boolean valid_entry_found = FALSE;
@@ -3351,6 +3500,12 @@ static void LoadArtworkInfoFromArtworkDir(TreeInfo **node_first,
 					  TreeInfo *node_parent,
 					  char *base_directory, int type)
 {
+  // ---------- 1st stage: process any artwork set zip files ----------
+
+  ProcessZipFilesInDirectory(base_directory, type);
+
+  // ---------- 2nd stage: check for artwork set directories ----------
+
   Directory *dir;
   DirectoryEntry *dir_entry;
   boolean valid_entry_found = FALSE;
