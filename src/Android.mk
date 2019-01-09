@@ -47,6 +47,10 @@ LOCAL_SRC_FILES := $(SDL_PATH)/src/main/android/SDL_android_main.c \
 	libgame/setup.c			\
 	libgame/misc.c			\
 	libgame/sdl.c			\
+	libgame/zip/ioapi.c		\
+	libgame/zip/iowin32.c		\
+	libgame/zip/unzip.c		\
+	libgame/zip/miniunz.c		\
 	game_em/cave.c			\
 	game_em/convert.c		\
 	game_em/graphics.c		\
@@ -107,6 +111,6 @@ LOCAL_SRC_FILES := $(SDL_PATH)/src/main/android/SDL_android_main.c \
 
 LOCAL_SHARED_LIBRARIES := SDL2 SDL2_image SDL2_mixer SDL2_net smpeg2
 
-LOCAL_LDLIBS := -lGLESv1_CM -lGLESv2 -llog
+LOCAL_LDLIBS := -lGLESv1_CM -lGLESv2 -llog -lz
 
 include $(BUILD_SHARED_LIBRARY)

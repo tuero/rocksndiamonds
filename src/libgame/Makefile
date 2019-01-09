@@ -24,7 +24,11 @@ SRCS =	system.c	\
 	hash.c		\
 	setup.c		\
 	misc.c		\
-	sdl.c
+	sdl.c		\
+	zip/ioapi.c	\
+	zip/iowin32.c	\
+	zip/unzip.c	\
+	zip/miniunz.c
 
 OBJS =	system.o	\
 	gadgets.o	\
@@ -37,7 +41,11 @@ OBJS =	system.o	\
 	hash.o		\
 	setup.o		\
 	misc.o		\
-	sdl.o
+	sdl.o		\
+	zip/ioapi.o	\
+	zip/iowin32.o	\
+	zip/unzip.o	\
+	zip/miniunz.o
 
 LIBGAME = libgame.a
 
@@ -53,7 +61,7 @@ $(LIBGAME): $(OBJS)
 	$(RANLIB) $(LIBGAME)
 
 .c.o:
-	$(CC) $(PROFILING) $(CFLAGS) -c $*.c
+	$(CC) $(PROFILING) $(CFLAGS) -c $*.c -o $*.o
 
 clean:
 	$(RM) $(OBJS)

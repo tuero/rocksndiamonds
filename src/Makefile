@@ -114,7 +114,7 @@ OPTIONS = -O3 -Wall
 endif
 
 CFLAGS = $(OPTIONS) $(SYS_CFLAGS)  $(EXTRA_CFLAGS) $(CONFIG)
-LDFLAGS =           $(SYS_LDFLAGS) $(EXTRA_LDFLAGS) -lm
+LDFLAGS =           $(SYS_LDFLAGS) $(EXTRA_LDFLAGS) -lm -lz
 
 
 SRCS =	main.c		\
