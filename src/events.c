@@ -268,6 +268,14 @@ void HandleOtherEvents(Event *event)
       HandleJoystickEvent(event);
       break;
 
+    case SDL_DROPFILE:
+      HandleDropFileEvent(event);
+      break;
+
+    case SDL_DROPTEXT:
+      HandleDropTextEvent(event);
+      break;
+
     default:
       break;
   }
@@ -1516,6 +1524,30 @@ void HandleClientMessageEvent(ClientMessageEvent *event)
 {
   if (CheckCloseWindowEvent(event))
     CloseAllAndExit(0);
+}
+
+static void HandleDropFileEventExt(char *filename)
+{
+  Error(ERR_DEBUG, "DROP FILE EVENT: '%s'", filename);
+}
+
+static void HandleDropTextEventExt(char *text)
+{
+  Error(ERR_DEBUG, "DROP TEXT EVENT: '%s'", text);
+}
+
+void HandleDropFileEvent(Event *event)
+{
+  HandleDropFileEventExt(event->drop.file);
+
+  SDL_free(event->drop.file);
+}
+
+void HandleDropTextEvent(Event *event)
+{
+  HandleDropTextEventExt(event->drop.file);
+
+  SDL_free(event->drop.file);
 }
 
 void HandleButton(int mx, int my, int button, int button_nr)
