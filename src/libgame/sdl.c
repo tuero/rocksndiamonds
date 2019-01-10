@@ -660,32 +660,6 @@ boolean SDLSetVideoMode(boolean fullscreen)
 
   SDLRedrawWindow();			// map window
 
-#ifdef DEBUG
-#if defined(PLATFORM_WIN32)
-  // experimental drag and drop code
-
-  SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);
-
-  {
-    SDL_SysWMinfo wminfo;
-    HWND hwnd;
-    boolean wminfo_success = FALSE;
-
-    SDL_VERSION(&wminfo.version);
-
-    if (sdl_window)
-      wminfo_success = SDL_GetWindowWMInfo(sdl_window, &wminfo);
-
-    if (wminfo_success)
-    {
-      hwnd = wminfo.info.win.window;
-
-      DragAcceptFiles(hwnd, TRUE);
-    }
-  }
-#endif
-#endif
-
   return success;
 }
 
@@ -2386,40 +2360,6 @@ void SDLCloseAudio(void)
 void SDLWaitEvent(Event *event)
 {
   SDL_WaitEvent(event);
-}
-
-void SDLHandleWindowManagerEvent(Event *event)
-{
-#ifdef DEBUG
-#if defined(PLATFORM_WIN32)
-  // experimental drag and drop code
-
-  SDL_SysWMEvent *syswmevent = (SDL_SysWMEvent *)event;
-  SDL_SysWMmsg *syswmmsg = (SDL_SysWMmsg *)(syswmevent->msg);
-
-  if (syswmmsg->msg.win.msg == WM_DROPFILES)
-  {
-    HDROP hdrop = (HDROP)syswmmsg->msg.win.wParam;
-    int i, num_files;
-
-    printf("::: SDL_SYSWMEVENT:\n");
-
-    num_files = DragQueryFile(hdrop, 0xffffffff, NULL, 0);
-
-    for (i = 0; i < num_files; i++)
-    {
-      int buffer_len = DragQueryFile(hdrop, i, NULL, 0);
-      char buffer[buffer_len + 1];
-
-      DragQueryFile(hdrop, i, buffer, buffer_len + 1);
-
-      printf("::: - '%s'\n", buffer);
-    }
-
-    DragFinish((HDROP)syswmmsg->msg.win.wParam);
-  }
-#endif
-#endif
 }
 
 

@@ -413,7 +413,6 @@ void SDLOpenAudio(void);
 void SDLCloseAudio(void);
 
 void SDLWaitEvent(Event *);
-void SDLHandleWindowManagerEvent(Event *);
 
 void HandleJoystickEvent(Event *);
 void SDLInitJoysticks(void);

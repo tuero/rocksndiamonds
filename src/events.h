@@ -35,7 +35,6 @@ boolean HandleKeysDebug(Key, int);
 void HandleKeyEvent(KeyEvent *);
 void HandleFocusEvent(FocusChangeEvent *);
 void HandleClientMessageEvent(ClientMessageEvent *);
-void HandleWindowManagerEvent(Event *);
 
 void HandleToonAnimations(void);
 

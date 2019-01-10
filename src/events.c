@@ -268,10 +268,6 @@ void HandleOtherEvents(Event *event)
       HandleJoystickEvent(event);
       break;
 
-    case SDL_SYSWMEVENT:
-      HandleWindowManagerEvent(event);
-      break;
-
     default:
       break;
   }
@@ -1520,11 +1516,6 @@ void HandleClientMessageEvent(ClientMessageEvent *event)
 {
   if (CheckCloseWindowEvent(event))
     CloseAllAndExit(0);
-}
-
-void HandleWindowManagerEvent(Event *event)
-{
-  SDLHandleWindowManagerEvent(event);
 }
 
 void HandleButton(int mx, int my, int button, int button_nr)
