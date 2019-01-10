@@ -711,6 +711,7 @@
 #define TREE_TYPE_LEVEL_DIR	3
 #define TREE_TYPE_LEVEL_NR	4
 
+#define NUM_BASE_TREE_TYPES	4
 #define NUM_TREE_TYPES		5
 
 #define INFOTEXT_UNDEFINED	""
@@ -731,6 +732,16 @@
 				 (t) == TREE_TYPE_MUSIC_DIR ?		\
 				 INFOTEXT_MUSIC_DIR :			\
 				 INFOTEXT_UNDEFINED)
+
+#define TREE_USERDIR(t)		((t) == TREE_TYPE_LEVEL_DIR ?		\
+				 getUserLevelDir(NULL) :		\
+				 (t) == TREE_TYPE_GRAPHICS_DIR ?	\
+				 getUserGraphicsDir() :			\
+				 (t) == TREE_TYPE_SOUNDS_DIR ?		\
+				 getUserSoundsDir() :			\
+				 (t) == TREE_TYPE_MUSIC_DIR ?		\
+				 getUserMusicDir() :			\
+				 NULL)
 
 // values for artwork handling
 #define LEVELDIR_ARTWORK_SET_PTR(leveldir, type)			\

@@ -226,6 +226,9 @@ typedef struct hashtable     SetupFileHash;
 			 ARTWORKCLASS_UNDEFINED)
 
 
+char *getUserGraphicsDir(void);
+char *getUserSoundsDir(void);
+char *getUserMusicDir(void);
 char *setLevelArtworkDir(TreeInfo *);
 char *getProgramMainDataPath(char *, char *);
 char *getProgramConfigFilename(char *);
@@ -313,6 +316,9 @@ char *getSetupValue(int, void *);
 char *getSetupLine(struct TokenInfo *, char *, int);
 
 unsigned int get_hash_from_key(void *);
+
+int GetZipFileTreeType(char *);
+boolean ExtractZipFileIntoDirectory(char *, char *, int);
 
 boolean AdjustGraphicsForEMC(void);
 

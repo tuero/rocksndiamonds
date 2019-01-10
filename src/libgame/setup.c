@@ -340,7 +340,7 @@ static char *getClassicArtworkDir(int type)
 	  getDefaultMusicDir(MUS_CLASSIC_SUBDIR) : "");
 }
 
-static char *getUserGraphicsDir(void)
+char *getUserGraphicsDir(void)
 {
   static char *usergraphics_dir = NULL;
 
@@ -350,7 +350,7 @@ static char *getUserGraphicsDir(void)
   return usergraphics_dir;
 }
 
-static char *getUserSoundsDir(void)
+char *getUserSoundsDir(void)
 {
   static char *usersounds_dir = NULL;
 
@@ -360,7 +360,7 @@ static char *getUserSoundsDir(void)
   return usersounds_dir;
 }
 
-static char *getUserMusicDir(void)
+char *getUserMusicDir(void)
 {
   static char *usermusic_dir = NULL;
 
@@ -2982,6 +2982,73 @@ static void setArtworkInfoCacheEntry(TreeInfo *artwork_info,
 // functions for loading level info and custom artwork info
 // ----------------------------------------------------------------------------
 
+int GetZipFileTreeType(char *zip_filename)
+{
+  static char *top_dir_path = NULL;
+  static char *top_dir_conf_filename[NUM_BASE_TREE_TYPES] = { NULL };
+  static char *conf_basename[NUM_BASE_TREE_TYPES] =
+  {
+    GRAPHICSINFO_FILENAME,
+    SOUNDSINFO_FILENAME,
+    MUSICINFO_FILENAME,
+    LEVELINFO_FILENAME
+  };
+  int j;
+
+  checked_free(top_dir_path);
+  top_dir_path = NULL;
+
+  for (j = 0; j < NUM_BASE_TREE_TYPES; j++)
+  {
+    checked_free(top_dir_conf_filename[j]);
+    top_dir_conf_filename[j] = NULL;
+  }
+
+  char **zip_entries = zip_list(zip_filename);
+
+  // check if zip file successfully opened
+  if (zip_entries == NULL || zip_entries[0] == NULL)
+    return TREE_TYPE_UNDEFINED;
+
+  // first zip file entry is expected to be top level directory
+  char *top_dir = zip_entries[0];
+
+  // check if valid top level directory found in zip file
+  if (!strSuffix(top_dir, "/"))
+    return TREE_TYPE_UNDEFINED;
+
+  // get filenames of valid configuration files in top level directory
+  for (j = 0; j < NUM_BASE_TREE_TYPES; j++)
+    top_dir_conf_filename[j] = getStringCat2(top_dir, conf_basename[j]);
+
+  int tree_type = TREE_TYPE_UNDEFINED;
+  int e = 0;
+
+  while (zip_entries[e] != NULL)
+  {
+    // check if every zip file entry is below top level directory
+    if (!strPrefix(zip_entries[e], top_dir))
+      return TREE_TYPE_UNDEFINED;
+
+    // check if this zip file entry is a valid configuration filename
+    for (j = 0; j < NUM_BASE_TREE_TYPES; j++)
+    {
+      if (strEqual(zip_entries[e], top_dir_conf_filename[j]))
+      {
+	// only exactly one valid configuration file allowed
+	if (tree_type != TREE_TYPE_UNDEFINED)
+	  return TREE_TYPE_UNDEFINED;
+
+	tree_type = j;
+      }
+    }
+
+    e++;
+  }
+
+  return tree_type;
+}
+
 static boolean CheckZipFileForDirectory(char *zip_filename, char *directory,
 					int tree_type)
 {
@@ -3051,8 +3118,8 @@ static boolean CheckZipFileForDirectory(char *zip_filename, char *directory,
   return TRUE;
 }
 
-static boolean ExtractZipFileIntoDirectory(char *zip_filename, char *directory,
-					   int tree_type)
+boolean ExtractZipFileIntoDirectory(char *zip_filename, char *directory,
+				    int tree_type)
 {
   boolean zip_file_valid = CheckZipFileForDirectory(zip_filename, directory,
 						    tree_type);

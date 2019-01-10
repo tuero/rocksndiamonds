@@ -1529,6 +1529,21 @@ void HandleClientMessageEvent(ClientMessageEvent *event)
 static void HandleDropFileEventExt(char *filename)
 {
   Error(ERR_DEBUG, "DROP FILE EVENT: '%s'", filename);
+
+  // check and extract dropped zip files into correct user data directory
+  if (strSuffixLower(filename, ".zip"))
+  {
+    int tree_type = GetZipFileTreeType(filename);
+    char *directory = TREE_USERDIR(tree_type);
+
+    if (directory == NULL)
+    {
+      Error(ERR_WARN, "zip file '%s' has invalid content!", filename);
+
+      return;
+    }
+
+    ExtractZipFileIntoDirectory(filename, directory, tree_type);
 }
 
 static void HandleDropTextEventExt(char *text)
