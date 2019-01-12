@@ -318,7 +318,7 @@ char *getSetupLine(struct TokenInfo *, char *, int);
 unsigned int get_hash_from_key(void *);
 
 int GetZipFileTreeType(char *);
-boolean ExtractZipFileIntoDirectory(char *, char *, int);
+char *ExtractZipFileIntoDirectory(char *, char *, int);
 
 boolean AdjustGraphicsForEMC(void);
 
@@ -330,6 +330,7 @@ char *getArtworkIdentifierForUserLevelSet(int);
 TreeInfo *getArtworkTreeInfoForUserLevelSet(int);
 boolean checkIfCustomArtworkExistsForCurrentLevelSet(void);
 void AddUserLevelSetToLevelInfo(char *);
+void AddUserArtworkSetToArtworkInfo(char *, int);
 boolean UpdateUserLevelSet(char *, char *, char *, int);
 boolean CreateUserLevelSet(char *, char *, char *, int, boolean);
 

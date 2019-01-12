@@ -1543,7 +1543,16 @@ static void HandleDropFileEventExt(char *filename)
       return;
     }
 
-    ExtractZipFileIntoDirectory(filename, directory, tree_type);
+    char *top_dir = ExtractZipFileIntoDirectory(filename, directory, tree_type);
+
+    if (top_dir != NULL)
+    {
+      if (tree_type == TREE_TYPE_LEVEL_DIR)
+	AddUserLevelSetToLevelInfo(top_dir);
+      else
+	AddUserArtworkSetToArtworkInfo(top_dir, tree_type);
+    }
+  }
 }
 
 static void HandleDropTextEventExt(char *text)

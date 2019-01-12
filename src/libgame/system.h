@@ -838,6 +838,14 @@
 				 (type) == ARTWORK_TYPE_MUSIC ?		\
 				 options.music_directory : "")
 
+#define USER_ARTWORK_DIRECTORY(type)					\
+				((type) == ARTWORK_TYPE_GRAPHICS ?	\
+				 getUserGraphicsDir() :			\
+				 (type) == ARTWORK_TYPE_SOUNDS ?	\
+				 getUserSoundsDir() :			\
+				 (type) == ARTWORK_TYPE_MUSIC ?		\
+				 getUserMusicDir() : "")
+
 #define UPDATE_BUSY_STATE()			\
 {						\
   if (gfx.draw_busy_anim_function != NULL)	\

@@ -3118,28 +3118,37 @@ static boolean CheckZipFileForDirectory(char *zip_filename, char *directory,
   return TRUE;
 }
 
-boolean ExtractZipFileIntoDirectory(char *zip_filename, char *directory,
-				    int tree_type)
+char *ExtractZipFileIntoDirectory(char *zip_filename, char *directory,
+				  int tree_type)
 {
   boolean zip_file_valid = CheckZipFileForDirectory(zip_filename, directory,
 						    tree_type);
 
-  Error(ERR_DEBUG, "zip file '%s': %s", zip_filename,
-	(zip_file_valid ? "EXTRACT" : "REJECT"));
-
   if (!zip_file_valid)
-    return FALSE;
+  {
+    Error(ERR_WARN, "zip file '%s' rejected!", zip_filename);
+
+    return NULL;
+  }
 
   char **zip_entries = zip_extract(zip_filename, directory);
 
-  boolean zip_file_extracted = (zip_entries != NULL);
+  if (zip_entries == NULL)
+  {
+    Error(ERR_WARN, "zip file '%s' could not be extracted!", zip_filename);
 
-  if (zip_file_extracted)
-    Error(ERR_DEBUG, "zip file successfully extracted!");
-  else
-    Error(ERR_DEBUG, "zip file could not be extracted!");
+    return NULL;
+  }
 
-  return zip_file_extracted;
+  Error(ERR_INFO, "zip file '%s' successfully extracted!", zip_filename);
+
+  // first zip file entry contains top level directory
+  char *top_dir = zip_entries[0];
+
+  // remove trailing directory separator from top level directory
+  top_dir[strlen(top_dir) - 1] = '\0';
+
+  return top_dir;
 }
 
 static void ProcessZipFilesInDirectory(char *directory, int tree_type)
@@ -3171,10 +3180,9 @@ static void ProcessZipFilesInDirectory(char *directory, int tree_type)
     if (!fileExists(zip_filename_extracted) &&
 	!fileExists(zip_filename_rejected))
     {
-      boolean zip_file_extracted = ExtractZipFileIntoDirectory(zip_filename,
-							       directory,
-							       tree_type);
-      char *marker_filename = (zip_file_extracted ? zip_filename_extracted :
+      char *top_dir = ExtractZipFileIntoDirectory(zip_filename, directory,
+						  tree_type);
+      char *marker_filename = (top_dir != NULL ? zip_filename_extracted :
 			       zip_filename_rejected);
       FILE *marker_file;
 
@@ -3893,6 +3901,47 @@ void AddUserLevelSetToLevelInfo(char *level_subdir_new)
 {
   if (!AddUserLevelSetToLevelInfoExt(level_subdir_new))
     Error(ERR_EXIT, "internal level set structure corrupted -- aborting");
+}
+
+static boolean AddUserArtworkSetToArtworkInfoExt(char *artwork_subdir_new,
+						 int type)
+{
+  // get artwork info tree node of first artwork set
+  TreeInfo *artwork_first_node = ARTWORK_FIRST_NODE(artwork, type);
+  char *artwork_user_dir = USER_ARTWORK_DIRECTORY(type);
+
+  int draw_deactivation_mask = GetDrawDeactivationMask();
+
+  // override draw deactivation mask (temporarily disable drawing)
+  SetDrawDeactivationMask(REDRAW_ALL);
+
+  // load new artwork set config and add it next to first artwork set
+  LoadArtworkInfoFromArtworkConf(&artwork_first_node->next, NULL,
+				 artwork_user_dir, artwork_subdir_new, type);
+
+  // set draw deactivation mask to previous value
+  SetDrawDeactivationMask(draw_deactivation_mask);
+
+  // get artwork info tree node of newly added artwork set
+  LevelDirTree *artwork_new = getTreeInfoFromIdentifier(artwork_first_node,
+							artwork_subdir_new);
+  if (artwork_new == NULL)		// should not happen
+    return FALSE;
+
+  // correct top link and parent node link of newly created tree node
+  artwork_new->node_top    = artwork_first_node->node_top;
+  artwork_new->node_parent = artwork_first_node->node_parent;
+
+  // sort artwork info tree to adjust position of newly added artwork set
+  sortTreeInfo(&artwork_first_node);
+
+  return TRUE;
+}
+
+void AddUserArtworkSetToArtworkInfo(char *artwork_subdir_new, int type)
+{
+  if (!AddUserArtworkSetToArtworkInfoExt(artwork_subdir_new, type))
+    Error(ERR_EXIT, "internal artwork set structure corrupted -- aborting");
 }
 
 char *getArtworkIdentifierForUserLevelSet(int type)
