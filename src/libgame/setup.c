@@ -3860,90 +3860,6 @@ void LoadLevelArtworkInfo(void)
   print_timestamp_done("LoadLevelArtworkInfo");
 }
 
-static boolean AddUserLevelSetToLevelInfoExt(char *level_subdir_new)
-{
-  // get level info tree node of first (original) user level set
-  char *level_subdir_old = getLoginName();
-  LevelDirTree *leveldir_old = getTreeInfoFromIdentifier(leveldir_first,
-							 level_subdir_old);
-  if (leveldir_old == NULL)		// should not happen
-    return FALSE;
-
-  int draw_deactivation_mask = GetDrawDeactivationMask();
-
-  // override draw deactivation mask (temporarily disable drawing)
-  SetDrawDeactivationMask(REDRAW_ALL);
-
-  // load new level set config and add it next to first user level set
-  LoadLevelInfoFromLevelConf(&leveldir_old->next, NULL,
-			     leveldir_old->basepath, level_subdir_new);
-
-  // set draw deactivation mask to previous value
-  SetDrawDeactivationMask(draw_deactivation_mask);
-
-  // get level info tree node of newly added user level set
-  LevelDirTree *leveldir_new = getTreeInfoFromIdentifier(leveldir_first,
-							 level_subdir_new);
-  if (leveldir_new == NULL)		// should not happen
-    return FALSE;
-
-  // correct top link and parent node link of newly created tree node
-  leveldir_new->node_top    = leveldir_old->node_top;
-  leveldir_new->node_parent = leveldir_old->node_parent;
-
-  // sort level info tree to adjust position of newly added level set
-  sortTreeInfo(&leveldir_first);
-
-  return TRUE;
-}
-
-void AddUserLevelSetToLevelInfo(char *level_subdir_new)
-{
-  if (!AddUserLevelSetToLevelInfoExt(level_subdir_new))
-    Error(ERR_EXIT, "internal level set structure corrupted -- aborting");
-}
-
-static boolean AddUserArtworkSetToArtworkInfoExt(char *artwork_subdir_new,
-						 int type)
-{
-  // get artwork info tree node of first artwork set
-  TreeInfo *artwork_first_node = ARTWORK_FIRST_NODE(artwork, type);
-  char *artwork_user_dir = USER_ARTWORK_DIRECTORY(type);
-
-  int draw_deactivation_mask = GetDrawDeactivationMask();
-
-  // override draw deactivation mask (temporarily disable drawing)
-  SetDrawDeactivationMask(REDRAW_ALL);
-
-  // load new artwork set config and add it next to first artwork set
-  LoadArtworkInfoFromArtworkConf(&artwork_first_node->next, NULL,
-				 artwork_user_dir, artwork_subdir_new, type);
-
-  // set draw deactivation mask to previous value
-  SetDrawDeactivationMask(draw_deactivation_mask);
-
-  // get artwork info tree node of newly added artwork set
-  LevelDirTree *artwork_new = getTreeInfoFromIdentifier(artwork_first_node,
-							artwork_subdir_new);
-  if (artwork_new == NULL)		// should not happen
-    return FALSE;
-
-  // correct top link and parent node link of newly created tree node
-  artwork_new->node_top    = artwork_first_node->node_top;
-  artwork_new->node_parent = artwork_first_node->node_parent;
-
-  // sort artwork info tree to adjust position of newly added artwork set
-  sortTreeInfo(&artwork_first_node);
-
-  return TRUE;
-}
-
-void AddUserArtworkSetToArtworkInfo(char *artwork_subdir_new, int type)
-{
-  if (!AddUserArtworkSetToArtworkInfoExt(artwork_subdir_new, type))
-    Error(ERR_EXIT, "internal artwork set structure corrupted -- aborting");
-}
-
 static boolean AddUserTreeSetToTreeInfoExt(char *tree_subdir_new, int type)
 {
   TreeInfo **tree_node_first, *tree_node_old, *tree_node_new;
@@ -4013,6 +3929,11 @@ void AddUserTreeSetToTreeInfo(char *tree_subdir_new, int type)
 {
   if (!AddUserTreeSetToTreeInfoExt(tree_subdir_new, type))
     Error(ERR_EXIT, "internal tree set structure corrupted -- aborting");
+}
+
+void AddUserLevelSetToLevelInfo(char *level_subdir_new)
+{
+  AddUserTreeSetToTreeInfo(level_subdir_new, TREE_TYPE_LEVEL_DIR);
 }
 
 char *getArtworkIdentifierForUserLevelSet(int type)
