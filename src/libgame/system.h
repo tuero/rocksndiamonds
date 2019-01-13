@@ -743,6 +743,16 @@
 				 getUserMusicDir() :			\
 				 NULL)
 
+#define TREE_FIRST_NODE_PTR(t)	((t) == TREE_TYPE_LEVEL_DIR ?		\
+				 &leveldir_first :			\
+				 (t) == TREE_TYPE_GRAPHICS_DIR ?	\
+				 &artwork.gfx_first :			\
+				 (t) == TREE_TYPE_SOUNDS_DIR ?		\
+				 &artwork.snd_first :			\
+				 (t) == TREE_TYPE_MUSIC_DIR ?		\
+				 &artwork.mus_first :			\
+				 NULL)
+
 // values for artwork handling
 #define LEVELDIR_ARTWORK_SET_PTR(leveldir, type)			\
 				((type) == ARTWORK_TYPE_GRAPHICS ?	\

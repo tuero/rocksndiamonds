@@ -331,6 +331,7 @@ TreeInfo *getArtworkTreeInfoForUserLevelSet(int);
 boolean checkIfCustomArtworkExistsForCurrentLevelSet(void);
 void AddUserLevelSetToLevelInfo(char *);
 void AddUserArtworkSetToArtworkInfo(char *, int);
+void AddUserTreeSetToTreeInfo(char *, int);
 boolean UpdateUserLevelSet(char *, char *, char *, int);
 boolean CreateUserLevelSet(char *, char *, char *, int, boolean);
 
