@@ -4336,6 +4336,8 @@ static void checkSeriesInfo(void)
   DirectoryEntry *dir_entry;
 #endif
 
+  checked_free(level_directory);
+
   // check for more levels besides the 'levels' field of 'levelinfo.conf'
 
   level_directory = getPath2((leveldir_current->in_user_dir ?
