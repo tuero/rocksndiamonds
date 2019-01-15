@@ -57,7 +57,7 @@ LIBGAME = libgame.a
 all: $(LIBGAME)
 
 $(LIBGAME): $(OBJS)
-	$(AR) cru $(LIBGAME) $(OBJS)
+	$(AR) cr $(LIBGAME) $(OBJS)
 	$(RANLIB) $(LIBGAME)
 
 .c.o:

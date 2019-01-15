@@ -39,7 +39,7 @@ GAME_MM = game_mm.a
 all: $(GAME_MM)
 
 $(GAME_MM): $(OBJS)
-	$(AR) cru $(GAME_MM) $(OBJS)
+	$(AR) cr $(GAME_MM) $(OBJS)
 	$(RANLIB) $(GAME_MM)
 
 .c.o:

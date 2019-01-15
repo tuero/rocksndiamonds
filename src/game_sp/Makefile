@@ -78,7 +78,7 @@ GAME_SP = game_sp.a
 all: $(GAME_SP)
 
 $(GAME_SP): $(OBJS)
-	$(AR) cru $(GAME_SP) $(OBJS)
+	$(AR) cr $(GAME_SP) $(OBJS)
 	$(RANLIB) $(GAME_SP)
 
 .c.o:

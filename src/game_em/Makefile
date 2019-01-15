@@ -52,7 +52,7 @@ GAME_EM = game_em.a
 all: $(GAME_EM)
 
 $(GAME_EM): $(OBJS)
-	$(AR) cru $(GAME_EM) $(OBJS)
+	$(AR) cr $(GAME_EM) $(OBJS)
 	$(RANLIB) $(GAME_EM)
 
 .c.o:
