@@ -4332,6 +4332,9 @@ static void checkSeriesInfo(void)
 {
   static char *level_directory = NULL;
   Directory *dir;
+#if 0
+  DirectoryEntry *dir_entry;
+#endif
 
   // check for more levels besides the 'levels' field of 'levelinfo.conf'
 
@@ -4346,6 +4349,35 @@ static void checkSeriesInfo(void)
 
     return;
   }
+
+#if 0
+  while ((dir_entry = readDirectory(dir)) != NULL)	// loop all entries
+  {
+    if (strlen(dir_entry->basename) > 4 &&
+	dir_entry->basename[3] == '.' &&
+	strEqual(&dir_entry->basename[4], LEVELFILE_EXTENSION))
+    {
+      char levelnum_str[4];
+      int levelnum_value;
+
+      strncpy(levelnum_str, dir_entry->basename, 3);
+      levelnum_str[3] = '\0';
+
+      levelnum_value = atoi(levelnum_str);
+
+      if (levelnum_value < leveldir_current->first_level)
+      {
+	Error(ERR_WARN, "additional level %d found", levelnum_value);
+	leveldir_current->first_level = levelnum_value;
+      }
+      else if (levelnum_value > leveldir_current->last_level)
+      {
+	Error(ERR_WARN, "additional level %d found", levelnum_value);
+	leveldir_current->last_level = levelnum_value;
+      }
+    }
+  }
+#endif
 
   closeDirectory(dir);
 }
