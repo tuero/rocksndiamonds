@@ -11058,10 +11058,7 @@ static void CheckSingleStepMode(struct PlayerInfo *player)
     if (!player->is_moving &&
 	!player->is_pushing &&
 	!player->is_dropping_pressed)
-    {
       TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
-      SnapField(player, 0, 0);			// stop snapping
-    }
   }
 
   CheckSaveEngineSnapshot(player);
