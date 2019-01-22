@@ -1546,7 +1546,23 @@ static void HandleDropFileEventExt(char *filename)
     char *top_dir = ExtractZipFileIntoDirectory(filename, directory, tree_type);
 
     if (top_dir != NULL)
+    {
       AddUserTreeSetToTreeInfo(top_dir, tree_type);
+
+      // when adding new level set, select it as the new current level set
+      if (tree_type == TREE_TYPE_LEVEL_DIR)
+      {
+	// change current level set to newly added level set from zip file
+	leveldir_current = getTreeInfoFromIdentifier(leveldir_first, top_dir);
+
+	// change current level number to first level of newly added level set
+	level_nr = leveldir_current->first_level;
+
+	// when in main menu, redraw screen to reflect changed level set
+	if (game_status == GAME_MODE_MAIN)
+	  DrawMainMenu();
+      }
+    }
   }
 }
 
