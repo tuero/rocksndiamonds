@@ -268,12 +268,11 @@ void HandleOtherEvents(Event *event)
       HandleJoystickEvent(event);
       break;
 
+    case SDL_DROPBEGIN:
+    case SDL_DROPCOMPLETE:
     case SDL_DROPFILE:
-      HandleDropFileEvent(event);
-      break;
-
     case SDL_DROPTEXT:
-      HandleDropTextEvent(event);
+      HandleDropEvent(event);
       break;
 
     default:
@@ -1526,63 +1525,120 @@ void HandleClientMessageEvent(ClientMessageEvent *event)
     CloseAllAndExit(0);
 }
 
-static void HandleDropFileEventExt(char *filename)
+static boolean HandleDropFileEvent(char *filename)
 {
   Error(ERR_DEBUG, "DROP FILE EVENT: '%s'", filename);
 
   // check and extract dropped zip files into correct user data directory
-  if (strSuffixLower(filename, ".zip"))
+  if (!strSuffixLower(filename, ".zip"))
   {
-    int tree_type = GetZipFileTreeType(filename);
-    char *directory = TREE_USERDIR(tree_type);
+    Error(ERR_WARN, "file '%s' not supported", filename);
 
-    if (directory == NULL)
-    {
-      Error(ERR_WARN, "zip file '%s' has invalid content!", filename);
-
-      return;
-    }
-
-    char *top_dir = ExtractZipFileIntoDirectory(filename, directory, tree_type);
-
-    if (top_dir != NULL)
-    {
-      AddUserTreeSetToTreeInfo(top_dir, tree_type);
-
-      // when adding new level set, select it as the new current level set
-      if (tree_type == TREE_TYPE_LEVEL_DIR)
-      {
-	// change current level set to newly added level set from zip file
-	leveldir_current = getTreeInfoFromIdentifier(leveldir_first, top_dir);
-
-	// change current level number to first level of newly added level set
-	level_nr = leveldir_current->first_level;
-
-	// when in main menu, redraw screen to reflect changed level set
-	if (game_status == GAME_MODE_MAIN)
-	  DrawMainMenu();
-      }
-    }
+    return FALSE;
   }
+
+  int tree_type = GetZipFileTreeType(filename);
+  char *directory = TREE_USERDIR(tree_type);
+
+  if (directory == NULL)
+  {
+    Error(ERR_WARN, "zip file '%s' has invalid content!", filename);
+
+    return FALSE;
+  }
+
+  char *top_dir = ExtractZipFileIntoDirectory(filename, directory, tree_type);
+
+  if (top_dir == NULL)
+  {
+    // error message already issued by "ExtractZipFileIntoDirectory()"
+
+    return FALSE;
+  }
+
+  AddUserTreeSetToTreeInfo(top_dir, tree_type);
+
+  // when adding new level set in main menu, select it as current level set
+  if (tree_type == TREE_TYPE_LEVEL_DIR &&
+      game_status == GAME_MODE_MAIN &&
+      !game.request_active)
+  {
+    // change current level set to newly added level set from zip file
+    leveldir_current = getTreeInfoFromIdentifier(leveldir_first, top_dir);
+
+    // change current level number to first level of newly added level set
+    level_nr = leveldir_current->first_level;
+
+    // redraw screen to reflect changed level set
+    DrawMainMenu();
+
+    // save this level set and level number as last selected level set
+    SaveLevelSetup_LastSeries();
+    SaveLevelSetup_SeriesInfo();
+  }
+
+  return TRUE;
 }
 
-static void HandleDropTextEventExt(char *text)
+static void HandleDropTextEvent(char *text)
 {
   Error(ERR_DEBUG, "DROP TEXT EVENT: '%s'", text);
 }
 
-void HandleDropFileEvent(Event *event)
+void HandleDropEvent(Event *event)
 {
-  HandleDropFileEventExt(event->drop.file);
+  static int files_succeeded = 0;
+  static int files_failed = 0;
 
-  SDL_free(event->drop.file);
-}
+  switch (event->type)
+  {
+    case SDL_DROPBEGIN:
+    {
+      files_succeeded = 0;
+      files_failed = 0;
 
-void HandleDropTextEvent(Event *event)
-{
-  HandleDropTextEventExt(event->drop.file);
+      break;
+    }
 
-  SDL_free(event->drop.file);
+    case SDL_DROPFILE:
+    {
+      boolean success = HandleDropFileEvent(event->drop.file);
+
+      if (success)
+	files_succeeded++;
+      else
+	files_failed++;
+
+      break;
+    }
+
+    case SDL_DROPTEXT:
+    {
+      HandleDropTextEvent(event->drop.file);
+
+      break;
+    }
+
+    case SDL_DROPCOMPLETE:
+    {
+      // only show request dialog if no other request dialog already active
+      if (!game.request_active)
+      {
+	if (files_succeeded > 0 && files_failed > 0)
+	  Request("New level or artwork set(s) added, "
+		  "but some dropped file(s) failed!", REQ_CONFIRM);
+	else if (files_succeeded > 0)
+	  Request("New level or artwork set(s) added!", REQ_CONFIRM);
+	else if (files_failed > 0)
+	  Request("Failed to process dropped file(s)!", REQ_CONFIRM);
+      }
+
+      break;
+    }
+  }
+
+  if (event->drop.file != NULL)
+    SDL_free(event->drop.file);
 }
 
 void HandleButton(int mx, int my, int button, int button_nr)
