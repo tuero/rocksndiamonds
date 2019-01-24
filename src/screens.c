@@ -8905,3 +8905,71 @@ boolean DoScreenAction(int image_id)
 
   return FALSE;
 }
+
+void DrawScreenAfterAddingSet(char *tree_subdir_new, int tree_type)
+{
+  // get tree info node of newly added level or artwork set
+  TreeInfo *tree_node_first = TREE_FIRST_NODE(tree_type);
+  TreeInfo *tree_node_new = getTreeInfoFromIdentifier(tree_node_first,
+						      tree_subdir_new);
+  if (tree_node_new == NULL)	// should not happen
+    return;
+
+  // if request dialog is active, do nothing
+  if (game.request_active)
+    return;
+
+  if (game_status == GAME_MODE_MAIN &&
+      tree_type == TREE_TYPE_LEVEL_DIR)
+  {
+    // when adding new level set in main menu, select it as current level set
+
+    // change current level set to newly added level set from zip file
+    leveldir_current = tree_node_new;
+
+    // change current level number to first level of newly added level set
+    level_nr = leveldir_current->first_level;
+
+    // redraw screen to reflect changed level set
+    DrawMainMenu();
+
+    // save this level set and level number as last selected level set
+    SaveLevelSetup_LastSeries();
+    SaveLevelSetup_SeriesInfo();
+  }
+  else if (game_status == GAME_MODE_LEVELS &&
+	   tree_type == TREE_TYPE_LEVEL_DIR)
+  {
+    // when adding new level set in level set menu, set cursor and update screen
+
+    leveldir_current = tree_node_new;
+
+    DrawChooseTree(&leveldir_current);
+  }
+  else if (game_status == GAME_MODE_SETUP)
+  {
+    // when adding new artwork set in setup menu, set cursor and update screen
+
+    if (setup_mode == SETUP_MODE_CHOOSE_GRAPHICS &&
+	tree_type == TREE_TYPE_GRAPHICS_DIR)
+    {
+      artwork.gfx_current = tree_node_new;
+
+      DrawChooseTree(&artwork.gfx_current);
+    }
+    else if (setup_mode == SETUP_MODE_CHOOSE_SOUNDS &&
+	     tree_type == TREE_TYPE_SOUNDS_DIR)
+    {
+      artwork.snd_current = tree_node_new;
+
+      DrawChooseTree(&artwork.snd_current);
+    }
+    else if (setup_mode == SETUP_MODE_CHOOSE_MUSIC &&
+	     tree_type == TREE_TYPE_MUSIC_DIR)
+    {
+      artwork.mus_current = tree_node_new;
+
+      DrawChooseTree(&artwork.mus_current);
+    }
+  }
+}

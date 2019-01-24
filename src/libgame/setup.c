@@ -178,7 +178,7 @@ static char *getNetworkDir(void)
   return network_dir;
 }
 
-static char *getLevelDirFromTreeInfo(TreeInfo *node)
+char *getLevelDirFromTreeInfo(TreeInfo *node)
 {
   static char *level_dir = NULL;
 
@@ -3860,32 +3860,29 @@ void LoadLevelArtworkInfo(void)
   print_timestamp_done("LoadLevelArtworkInfo");
 }
 
-static boolean AddUserTreeSetToTreeInfoExt(char *tree_subdir_new, int type)
+static boolean AddTreeSetToTreeInfoExt(TreeInfo *tree_node_old, char *tree_dir,
+				       char *tree_subdir_new, int type)
 {
-  TreeInfo **tree_node_first, *tree_node_old, *tree_node_new;
-  char *tree_user_dir = TREE_USERDIR(type);
-
-  if (tree_user_dir == NULL)		// should not happen
-    return FALSE;
-
-  // get first node of level or artwork tree
-  tree_node_first = TREE_FIRST_NODE_PTR(type);
-
-  if (tree_node_first == NULL)		// should not happen
-    return FALSE;
-
-  if (type == TREE_TYPE_LEVEL_DIR)
+  if (tree_node_old == NULL)
   {
-    // get level info tree node of personal user level set
-    tree_node_old = getTreeInfoFromIdentifier(*tree_node_first, getLoginName());
-  }
-  else
-  {
-    // get artwork info tree node of first artwork set
-    tree_node_old = *tree_node_first;
+    if (type == TREE_TYPE_LEVEL_DIR)
+    {
+      // get level info tree node of personal user level set
+      tree_node_old = getTreeInfoFromIdentifier(leveldir_first, getLoginName());
+    }
+    else
+    {
+      // get artwork info tree node of first artwork set
+      tree_node_old = ARTWORK_FIRST_NODE(artwork, type);
+    }
   }
 
-  if (tree_node_old == NULL)		// should not happen
+  if (tree_dir == NULL)
+    tree_dir = TREE_USERDIR(type);
+
+  if (tree_node_old   == NULL ||
+      tree_dir        == NULL ||
+      tree_subdir_new == NULL)		// should not happen
     return FALSE;
 
   int draw_deactivation_mask = GetDrawDeactivationMask();
@@ -3896,21 +3893,27 @@ static boolean AddUserTreeSetToTreeInfoExt(char *tree_subdir_new, int type)
   if (type == TREE_TYPE_LEVEL_DIR)
   {
     // load new level set config and add it next to first user level set
-    LoadLevelInfoFromLevelConf(&tree_node_old->next, NULL,
-			       tree_user_dir, tree_subdir_new);
+    LoadLevelInfoFromLevelConf(&tree_node_old->next,
+			       tree_node_old->node_parent,
+			       tree_dir, tree_subdir_new);
   }
   else
   {
     // load new artwork set config and add it next to first artwork set
-    LoadArtworkInfoFromArtworkConf(&tree_node_old->next, NULL,
-				   tree_user_dir, tree_subdir_new, type);
+    LoadArtworkInfoFromArtworkConf(&tree_node_old->next,
+				   tree_node_old->node_parent,
+				   tree_dir, tree_subdir_new, type);
   }
 
   // set draw deactivation mask to previous value
   SetDrawDeactivationMask(draw_deactivation_mask);
 
-  // get tree info tree node of newly added tree set
-  tree_node_new = getTreeInfoFromIdentifier(*tree_node_first, tree_subdir_new);
+  // get first node of level or artwork info tree
+  TreeInfo **tree_node_first = TREE_FIRST_NODE_PTR(type);
+
+  // get tree info node of newly added level or artwork set
+  TreeInfo *tree_node_new = getTreeInfoFromIdentifier(*tree_node_first,
+						      tree_subdir_new);
 
   if (tree_node_new == NULL)		// should not happen
     return FALSE;
@@ -3919,21 +3922,22 @@ static boolean AddUserTreeSetToTreeInfoExt(char *tree_subdir_new, int type)
   tree_node_new->node_top    = tree_node_old->node_top;
   tree_node_new->node_parent = tree_node_old->node_parent;
 
-  // sort tree info tree to adjust position of newly added tree set
+  // sort tree info to adjust position of newly added tree set
   sortTreeInfo(tree_node_first);
 
   return TRUE;
 }
 
-void AddUserTreeSetToTreeInfo(char *tree_subdir_new, int type)
+void AddTreeSetToTreeInfo(TreeInfo *tree_node, char *tree_dir,
+			  char *tree_subdir_new, int type)
 {
-  if (!AddUserTreeSetToTreeInfoExt(tree_subdir_new, type))
-    Error(ERR_EXIT, "internal tree set structure corrupted -- aborting");
+  if (!AddTreeSetToTreeInfoExt(tree_node, tree_dir, tree_subdir_new, type))
+    Error(ERR_EXIT, "internal tree info structure corrupted -- aborting");
 }
 
 void AddUserLevelSetToLevelInfo(char *level_subdir_new)
 {
-  AddUserTreeSetToTreeInfo(level_subdir_new, TREE_TYPE_LEVEL_DIR);
+  AddTreeSetToTreeInfo(NULL, NULL, level_subdir_new, TREE_TYPE_LEVEL_DIR);
 }
 
 char *getArtworkIdentifierForUserLevelSet(int type)

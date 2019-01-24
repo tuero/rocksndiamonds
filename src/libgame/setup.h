@@ -280,6 +280,7 @@ char *getCommonDataDir(void);
 char *getPersonalDataDir(void);
 char *getUserGameDataDir(void);
 char *getSetupDir(void);
+char *getLevelDirFromTreeInfo(TreeInfo *);
 char *getUserLevelDir(char *);
 char *getNetworkLevelDir(char *);
 char *getCurrentLevelDir(void);
@@ -330,7 +331,7 @@ char *getArtworkIdentifierForUserLevelSet(int);
 TreeInfo *getArtworkTreeInfoForUserLevelSet(int);
 boolean checkIfCustomArtworkExistsForCurrentLevelSet(void);
 void AddUserLevelSetToLevelInfo(char *);
-void AddUserTreeSetToTreeInfo(char *, int);
+void AddTreeSetToTreeInfo(TreeInfo *, char *, char *, int);
 boolean UpdateUserLevelSet(char *, char *, char *, int);
 boolean CreateUserLevelSet(char *, char *, char *, int, boolean);
 

@@ -1537,6 +1537,7 @@ static boolean HandleDropFileEvent(char *filename)
     return FALSE;
   }
 
+  TreeInfo *tree_node = NULL;
   int tree_type = GetZipFileTreeType(filename);
   char *directory = TREE_USERDIR(tree_type);
 
@@ -1547,6 +1548,23 @@ static boolean HandleDropFileEvent(char *filename)
     return FALSE;
   }
 
+  if (tree_type == TREE_TYPE_LEVEL_DIR &&
+      game_status == GAME_MODE_LEVELS &&
+      leveldir_current->node_parent != NULL)
+  {
+    // extract new level set next to currently selected level set
+    tree_node = leveldir_current;
+
+    // get parent directory of currently selected level set directory
+    directory = getLevelDirFromTreeInfo(leveldir_current->node_parent);
+
+    // use private level directory instead of top-level package level directory
+    if (strPrefix(directory, options.level_directory) &&
+	strEqual(leveldir_current->node_parent->fullpath, "."))
+      directory = getUserLevelDir(NULL);
+  }
+
+  // extract level or artwork set from zip file to target directory
   char *top_dir = ExtractZipFileIntoDirectory(filename, directory, tree_type);
 
   if (top_dir == NULL)
@@ -1556,26 +1574,11 @@ static boolean HandleDropFileEvent(char *filename)
     return FALSE;
   }
 
-  AddUserTreeSetToTreeInfo(top_dir, tree_type);
+  // add extracted level or artwork set to tree info structure
+  AddTreeSetToTreeInfo(tree_node, directory, top_dir, tree_type);
 
-  // when adding new level set in main menu, select it as current level set
-  if (tree_type == TREE_TYPE_LEVEL_DIR &&
-      game_status == GAME_MODE_MAIN &&
-      !game.request_active)
-  {
-    // change current level set to newly added level set from zip file
-    leveldir_current = getTreeInfoFromIdentifier(leveldir_first, top_dir);
-
-    // change current level number to first level of newly added level set
-    level_nr = leveldir_current->first_level;
-
-    // redraw screen to reflect changed level set
-    DrawMainMenu();
-
-    // save this level set and level number as last selected level set
-    SaveLevelSetup_LastSeries();
-    SaveLevelSetup_SeriesInfo();
-  }
+  // update menu screen (and possibly change current level set)
+  DrawScreenAfterAddingSet(top_dir, tree_type);
 
   return TRUE;
 }
