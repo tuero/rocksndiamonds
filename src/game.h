@@ -275,7 +275,6 @@ struct PlayerInfo
   int client_nr;		// network client identifier
 
   byte action;			// action from local input device
-  byte mapped_action;		// action mapped from device to player
   byte effective_action;	/* action acknowledged from network server
 				   or summarized over all configured input
 				   devices when in single player mode */
