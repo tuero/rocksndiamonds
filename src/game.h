@@ -281,6 +281,7 @@ struct PlayerInfo
 				   devices when in single player mode */
   byte programmed_action;	/* action forced by game itself (like moving
 				   through doors); overrides other actions */
+  byte snap_action;		// action from TAS snap keys
 
   struct MouseActionInfo mouse_action;		 // (used by MM engine only)
   struct MouseActionInfo effective_mouse_action; // (used by MM engine only)

@@ -2015,6 +2015,7 @@ void HandleKey(Key key, int key_status)
     for (pnr = 0; pnr < MAX_PLAYERS; pnr++)
     {
       byte key_action = 0;
+      byte key_snap_action = 0;
 
       if (setup.input[pnr].use_joystick)
 	continue;
@@ -2030,15 +2031,33 @@ void HandleKey(Key key, int key_status)
       {
 	ssi = setup.shortcut;
 
+	// also remember normal snap key when handling snap+direction keys
+	key_snap_action |= key_action & JOY_BUTTON_SNAP;
+
 	for (i = 0; i < NUM_DIRECTIONS; i++)
+	{
 	  if (key == *key_info[i].key_snap)
-	    key_action |= key_info[i].action | JOY_BUTTON_SNAP;
+	  {
+	    key_action      |= key_info[i].action | JOY_BUTTON_SNAP;
+	    key_snap_action |= key_info[i].action;
+	  }
+	}
       }
 
       if (key_status == KEY_PRESSED)
-	stored_player[pnr].action |= key_action;
+      {
+	stored_player[pnr].action      |= key_action;
+	stored_player[pnr].snap_action |= key_snap_action;
+      }
       else
-	stored_player[pnr].action &= ~key_action;
+      {
+	stored_player[pnr].action      &= ~key_action;
+	stored_player[pnr].snap_action &= ~key_snap_action;
+      }
+
+      // restore snap action if one of several pressed snap keys was released
+      if (stored_player[pnr].snap_action)
+	stored_player[pnr].action |= JOY_BUTTON_SNAP;
 
       if (tape.single_step && tape.recording && tape.pausing && !tape.use_mouse)
       {

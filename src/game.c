@@ -3402,6 +3402,7 @@ void InitGame(void)
     player->action = 0;
     player->effective_action = 0;
     player->programmed_action = 0;
+    player->snap_action = 0;
 
     player->mouse_action.lx = 0;
     player->mouse_action.ly = 0;
