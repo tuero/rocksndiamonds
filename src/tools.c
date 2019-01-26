@@ -3834,87 +3834,122 @@ static boolean equalGraphics(int graphic1, int graphic2)
 	  g1->anim_mode   == g2->anim_mode);
 }
 
-void DrawAllPlayers(void)
-{
-  int i;
-
-  for (i = 0; i < MAX_PLAYERS; i++)
-    if (stored_player[i].active)
-      DrawPlayer(&stored_player[i]);
-}
-
-void DrawPlayerField(int x, int y)
-{
-  if (!IS_PLAYER(x, y))
-    return;
-
-  DrawPlayer(PLAYERINFO(x, y));
-}
-
 #define DRAW_PLAYER_OVER_PUSHED_ELEMENT	1
 
-void DrawPlayer(struct PlayerInfo *player)
+enum
 {
+  DRAW_PLAYER_STAGE_INIT = 0,
+  DRAW_PLAYER_STAGE_LAST_FIELD,
+  DRAW_PLAYER_STAGE_FIELD_UNDER_PLAYER,
+#if DRAW_PLAYER_OVER_PUSHED_ELEMENT
+  DRAW_PLAYER_STAGE_ELEMENT_PUSHED,
+  DRAW_PLAYER_STAGE_PLAYER,
+#else
+  DRAW_PLAYER_STAGE_PLAYER,
+  DRAW_PLAYER_STAGE_ELEMENT_PUSHED,
+#endif
+  DRAW_PLAYER_STAGE_ELEMENT_OVER_PLAYER,
+  DRAW_PLAYER_STAGE_FIELD_OVER_PLAYER,
+
+  NUM_DRAW_PLAYER_STAGES
+};
+
+static void DrawPlayerExt(struct PlayerInfo *player, int drawing_stage)
+{
+  static int static_last_player_graphic[MAX_PLAYERS];
+  static int static_last_player_frame[MAX_PLAYERS];
+  static boolean static_player_is_opaque[MAX_PLAYERS];
+  static boolean draw_player[MAX_PLAYERS];
+  int pnr = player->index_nr;
+
+  if (drawing_stage == DRAW_PLAYER_STAGE_INIT)
+  {
+    static_last_player_graphic[pnr] = getPlayerGraphic(player, player->MovDir);
+    static_last_player_frame[pnr] = player->Frame;
+    static_player_is_opaque[pnr] = FALSE;
+
+    draw_player[pnr] = TRUE;
+  }
+
+  if (!draw_player[pnr])
+    return;
+
+#if DEBUG
+  if (!IN_LEV_FIELD(player->jx, player->jy))
+  {
+    printf("DrawPlayerField(): x = %d, y = %d\n", player->jx, player->jy);
+    printf("DrawPlayerField(): This should never happen!\n");
+
+    draw_player[pnr] = FALSE;
+
+    return;
+  }
+#endif
+
+  int last_player_graphic  = static_last_player_graphic[pnr];
+  int last_player_frame    = static_last_player_frame[pnr];
+  boolean player_is_opaque = static_player_is_opaque[pnr];
+
   int jx = player->jx;
   int jy = player->jy;
-  int move_dir = player->MovDir;
+  int move_dir = (player->is_waiting ? player->dir_waiting : player->MovDir);
   int dx = (move_dir == MV_LEFT ? -1 : move_dir == MV_RIGHT ? +1 : 0);
   int dy = (move_dir == MV_UP   ? -1 : move_dir == MV_DOWN  ? +1 : 0);
   int last_jx = (player->is_moving ? jx - dx : jx);
   int last_jy = (player->is_moving ? jy - dy : jy);
   int next_jx = jx + dx;
   int next_jy = jy + dy;
-  boolean player_is_moving = (player->MovPos ? TRUE : FALSE);
-  boolean player_is_opaque = FALSE;
-  int sx = SCREENX(jx), sy = SCREENY(jy);
-  int sxx = 0, syy = 0;
-  int element = Feld[jx][jy], last_element = Feld[last_jx][last_jy];
-  int graphic;
-  int action = ACTION_DEFAULT;
-  int last_player_graphic = getPlayerGraphic(player, move_dir);
-  int last_player_frame = player->Frame;
-  int frame = 0;
+  boolean player_is_moving = (player->MovPos != 0 ? TRUE : FALSE);
+  int sx = SCREENX(jx);
+  int sy = SCREENY(jy);
+  int sxx = (move_dir == MV_LEFT || move_dir == MV_RIGHT ? player->GfxPos : 0);
+  int syy = (move_dir == MV_UP   || move_dir == MV_DOWN  ? player->GfxPos : 0);
+  int element = Feld[jx][jy];
+  int last_element = Feld[last_jx][last_jy];
+  int action = (player->is_pushing    ? ACTION_PUSHING         :
+		player->is_digging    ? ACTION_DIGGING         :
+		player->is_collecting ? ACTION_COLLECTING      :
+		player->is_moving     ? ACTION_MOVING          :
+		player->is_snapping   ? ACTION_SNAPPING        :
+		player->is_dropping   ? ACTION_DROPPING        :
+		player->is_waiting    ? player->action_waiting :
+		ACTION_DEFAULT);
 
-  // GfxElement[][] is set to the element the player is digging or collecting;
-  // remove also for off-screen player if the player is not moving anymore
-  if (IN_LEV_FIELD(jx, jy) && !player_is_moving)
-    GfxElement[jx][jy] = EL_UNDEFINED;
-
-  if (!player->active || !IN_SCR_FIELD(SCREENX(last_jx), SCREENY(last_jy)))
-    return;
-
-#if DEBUG
-  if (!IN_LEV_FIELD(jx, jy))
+  if (drawing_stage == DRAW_PLAYER_STAGE_INIT)
   {
-    printf("DrawPlayerField(): x = %d, y = %d\n",jx,jy);
-    printf("DrawPlayerField(): sx = %d, sy = %d\n",sx,sy);
-    printf("DrawPlayerField(): This should never happen!\n");
-    return;
+    // ------------------------------------------------------------------------
+    // initialize drawing the player
+    // ------------------------------------------------------------------------
+
+    draw_player[pnr] = FALSE;
+
+    // GfxElement[][] is set to the element the player is digging or collecting;
+    // remove also for off-screen player if the player is not moving anymore
+    if (IN_LEV_FIELD(jx, jy) && !player_is_moving)
+      GfxElement[jx][jy] = EL_UNDEFINED;
+
+    if (!player->active || !IN_SCR_FIELD(SCREENX(last_jx), SCREENY(last_jy)))
+      return;
+
+    if (element == EL_EXPLOSION)
+      return;
+
+    InitPlayerGfxAnimation(player, action, move_dir);
+
+    draw_player[pnr] = TRUE;
   }
-#endif
-
-  if (element == EL_EXPLOSION)
-    return;
-
-  action = (player->is_pushing    ? ACTION_PUSHING         :
-	    player->is_digging    ? ACTION_DIGGING         :
-	    player->is_collecting ? ACTION_COLLECTING      :
-	    player->is_moving     ? ACTION_MOVING          :
-	    player->is_snapping   ? ACTION_SNAPPING        :
-	    player->is_dropping   ? ACTION_DROPPING        :
-	    player->is_waiting    ? player->action_waiting : ACTION_DEFAULT);
-
-  if (player->is_waiting)
-    move_dir = player->dir_waiting;
-
-  InitPlayerGfxAnimation(player, action, move_dir);
-
-  // --------------------------------------------------------------------------
-  // draw things in the field the player is leaving, if needed
-  // --------------------------------------------------------------------------
-
-  if (player->is_moving)
+  else if (drawing_stage == DRAW_PLAYER_STAGE_LAST_FIELD)
   {
+    // ------------------------------------------------------------------------
+    // draw things in the field the player is leaving, if needed
+    // ------------------------------------------------------------------------
+
+    if (!IN_SCR_FIELD(sx, sy))
+      draw_player[pnr] = FALSE;
+
+    if (!player->is_moving)
+      return;
+
     if (Back[last_jx][last_jy] && IS_DRAWABLE(last_element))
     {
       DrawLevelElement(last_jx, last_jy, Back[last_jx][last_jy]);
@@ -3930,35 +3965,32 @@ void DrawPlayer(struct PlayerInfo *player)
 	     last_element == EL_EM_DYNAMITE_ACTIVE ||
 	     last_element == EL_SP_DISK_RED_ACTIVE)
       DrawDynamite(last_jx, last_jy);
-#if 0
-    /* !!! this is not enough to prevent flickering of players which are
-       moving next to each others without a free tile between them -- this
-       can only be solved by drawing all players layer by layer (first the
-       background, then the foreground etc.) !!! => TODO */
-    else if (!IS_PLAYER(last_jx, last_jy))
-      DrawLevelField(last_jx, last_jy);
-#else
     else
       DrawLevelField(last_jx, last_jy);
-#endif
 
     if (player->is_pushing && IN_SCR_FIELD(SCREENX(next_jx), SCREENY(next_jy)))
       DrawLevelElement(next_jx, next_jy, EL_EMPTY);
   }
-
-  if (!IN_SCR_FIELD(sx, sy))
-    return;
-
-  // --------------------------------------------------------------------------
-  // draw things behind the player, if needed
-  // --------------------------------------------------------------------------
-
-  if (Back[jx][jy])
-    DrawLevelElement(jx, jy, Back[jx][jy]);
-  else if (IS_ACTIVE_BOMB(element))
-    DrawLevelElement(jx, jy, EL_EMPTY);
-  else
+  else if (drawing_stage == DRAW_PLAYER_STAGE_FIELD_UNDER_PLAYER)
   {
+    // ------------------------------------------------------------------------
+    // draw things behind the player, if needed
+    // ------------------------------------------------------------------------
+
+    if (Back[jx][jy])
+    {
+      DrawLevelElement(jx, jy, Back[jx][jy]);
+
+      return;
+    }
+
+    if (IS_ACTIVE_BOMB(element))
+    {
+      DrawLevelElement(jx, jy, EL_EMPTY);
+
+      return;
+    }
+
     if (player_is_moving && GfxElement[jx][jy] != EL_UNDEFINED)
     {
       int old_element = GfxElement[jx][jy];
@@ -3971,14 +4003,14 @@ void DrawPlayer(struct PlayerInfo *player)
 	DrawGraphic(sx, sy, old_graphic, frame);
 
       if (graphic_info[old_graphic].anim_mode & ANIM_OPAQUE_PLAYER)
-	player_is_opaque = TRUE;
+	static_player_is_opaque[pnr] = TRUE;
     }
     else
     {
       GfxElement[jx][jy] = EL_UNDEFINED;
 
       // make sure that pushed elements are drawn with correct frame rate
-      graphic = el_act_dir2img(element, ACTION_PUSHING, move_dir);
+      int graphic = el_act_dir2img(element, ACTION_PUSHING, move_dir);
 
       if (player->is_pushing && player->is_moving && !IS_ANIM_MODE_CE(graphic))
 	GfxFrame[jx][jy] = player->StepFrame;
@@ -3986,68 +4018,16 @@ void DrawPlayer(struct PlayerInfo *player)
       DrawLevelField(jx, jy);
     }
   }
-
-#if !DRAW_PLAYER_OVER_PUSHED_ELEMENT
-  // -----------------------------------------------------------------------
-  // draw player himself
-  // -----------------------------------------------------------------------
-
-  graphic = getPlayerGraphic(player, move_dir);
-
-  // in the case of changed player action or direction, prevent the current
-  // animation frame from being restarted for identical animations
-  if (player->Frame == 0 && equalGraphics(graphic, last_player_graphic))
-    player->Frame = last_player_frame;
-
-  frame = getGraphicAnimationFrame(graphic, player->Frame);
-
-  if (player->GfxPos)
+  else if (drawing_stage == DRAW_PLAYER_STAGE_ELEMENT_PUSHED)
   {
-    if (move_dir == MV_LEFT || move_dir == MV_RIGHT)
-      sxx = player->GfxPos;
-    else
-      syy = player->GfxPos;
-  }
+    // ------------------------------------------------------------------------
+    // draw things the player is pushing, if needed
+    // ------------------------------------------------------------------------
 
-  if (player_is_opaque)
-    DrawGraphicShifted(sx, sy, sxx, syy, graphic, frame,NO_CUTTING,NO_MASKING);
-  else
-    DrawGraphicShiftedThruMask(sx, sy, sxx, syy, graphic, frame, NO_CUTTING);
+    if (!player->is_pushing || !player->is_moving)
+      return;
 
-  if (SHIELD_ON(player))
-  {
-    int graphic = (player->shield_deadly_time_left ? IMG_SHIELD_DEADLY_ACTIVE :
-		   IMG_SHIELD_NORMAL_ACTIVE);
-    int frame = getGraphicAnimationFrame(graphic, -1);
-
-    DrawGraphicShiftedThruMask(sx, sy, sxx, syy, graphic, frame, NO_CUTTING);
-  }
-#endif
-
-#if DRAW_PLAYER_OVER_PUSHED_ELEMENT
-  if (player->GfxPos)
-  {
-    if (move_dir == MV_LEFT || move_dir == MV_RIGHT)
-      sxx = player->GfxPos;
-    else
-      syy = player->GfxPos;
-  }
-#endif
-
-  // --------------------------------------------------------------------------
-  // draw things the player is pushing, if needed
-  // --------------------------------------------------------------------------
-
-  if (player->is_pushing && player->is_moving)
-  {
-    int px = SCREENX(jx), py = SCREENY(jy);
-    int pxx = (TILEX - ABS(sxx)) * dx;
-    int pyy = (TILEY - ABS(syy)) * dy;
     int gfx_frame = GfxFrame[jx][jy];
-
-    int graphic;
-    int sync_frame;
-    int frame;
 
     if (!IS_MOVING(jx, jy))		// push movement already finished
     {
@@ -4055,10 +4035,9 @@ void DrawPlayer(struct PlayerInfo *player)
       gfx_frame = GfxFrame[next_jx][next_jy];
     }
 
-    graphic = el_act_dir2img(element, ACTION_PUSHING, move_dir);
-
-    sync_frame = (IS_ANIM_MODE_CE(graphic) ? gfx_frame : player->StepFrame);
-    frame = getGraphicAnimationFrame(graphic, sync_frame);
+    int graphic = el_act_dir2img(element, ACTION_PUSHING, move_dir);
+    int sync_frame = (IS_ANIM_MODE_CE(graphic) ? gfx_frame : player->StepFrame);
+    int frame = getGraphicAnimationFrame(graphic, sync_frame);
 
     // draw background element under pushed element (like the Sokoban field)
     if (game.use_masked_pushing && IS_MOVING(jx, jy))
@@ -4078,6 +4057,10 @@ void DrawPlayer(struct PlayerInfo *player)
     else if (Back[next_jx][next_jy])
       DrawLevelElement(next_jx, next_jy, Back[next_jx][next_jy]);
 
+    int px = SCREENX(jx), py = SCREENY(jy);
+    int pxx = (TILEX - ABS(sxx)) * dx;
+    int pyy = (TILEY - ABS(syy)) * dy;
+
 #if 1
     // do not draw (EM style) pushing animation when pushing is finished
     // (two-tile animations usually do not contain start and end frame)
@@ -4091,96 +4074,118 @@ void DrawPlayer(struct PlayerInfo *player)
     DrawGraphicShiftedThruMask(px, py, pxx, pyy, graphic, frame, NO_CUTTING);
 #endif
   }
-
-#if DRAW_PLAYER_OVER_PUSHED_ELEMENT
-  // -----------------------------------------------------------------------
-  // draw player himself
-  // -----------------------------------------------------------------------
-
-  graphic = getPlayerGraphic(player, move_dir);
-
-  // in the case of changed player action or direction, prevent the current
-  // animation frame from being restarted for identical animations
-  if (player->Frame == 0 && equalGraphics(graphic, last_player_graphic))
-    player->Frame = last_player_frame;
-
-  frame = getGraphicAnimationFrame(graphic, player->Frame);
-
-  if (player->GfxPos)
+  else if (drawing_stage == DRAW_PLAYER_STAGE_PLAYER)
   {
-    if (move_dir == MV_LEFT || move_dir == MV_RIGHT)
-      sxx = player->GfxPos;
+    // ------------------------------------------------------------------------
+    // draw player himself
+    // ------------------------------------------------------------------------
+
+    int graphic = getPlayerGraphic(player, move_dir);
+
+    // in the case of changed player action or direction, prevent the current
+    // animation frame from being restarted for identical animations
+    if (player->Frame == 0 && equalGraphics(graphic, last_player_graphic))
+      player->Frame = last_player_frame;
+
+    int frame = getGraphicAnimationFrame(graphic, player->Frame);
+
+    if (player_is_opaque)
+      DrawGraphicShifted(sx,sy, sxx,syy, graphic, frame, NO_CUTTING,NO_MASKING);
     else
-      syy = player->GfxPos;
+      DrawGraphicShiftedThruMask(sx, sy, sxx, syy, graphic, frame, NO_CUTTING);
+
+    if (SHIELD_ON(player))
+    {
+      graphic = (player->shield_deadly_time_left ? IMG_SHIELD_DEADLY_ACTIVE :
+		 IMG_SHIELD_NORMAL_ACTIVE);
+      frame = getGraphicAnimationFrame(graphic, -1);
+
+      DrawGraphicShiftedThruMask(sx, sy, sxx, syy, graphic, frame, NO_CUTTING);
+    }
   }
-
-  if (player_is_opaque)
-    DrawGraphicShifted(sx, sy, sxx, syy, graphic, frame,NO_CUTTING,NO_MASKING);
-  else
-    DrawGraphicShiftedThruMask(sx, sy, sxx, syy, graphic, frame, NO_CUTTING);
-
-  if (SHIELD_ON(player))
+  else if (drawing_stage == DRAW_PLAYER_STAGE_ELEMENT_OVER_PLAYER)
   {
-    int graphic = (player->shield_deadly_time_left ? IMG_SHIELD_DEADLY_ACTIVE :
-		   IMG_SHIELD_NORMAL_ACTIVE);
-    int frame = getGraphicAnimationFrame(graphic, -1);
+    // ------------------------------------------------------------------------
+    // draw things in front of player (active dynamite or dynabombs)
+    // ------------------------------------------------------------------------
 
-    DrawGraphicShiftedThruMask(sx, sy, sxx, syy, graphic, frame, NO_CUTTING);
+    if (IS_ACTIVE_BOMB(element))
+    {
+      int graphic = el2img(element);
+      int frame = getGraphicAnimationFrame(graphic, GfxFrame[jx][jy]);
+
+      if (game.emulation == EMU_SUPAPLEX)
+	DrawGraphic(sx, sy, IMG_SP_DISK_RED, frame);
+      else
+	DrawGraphicThruMask(sx, sy, graphic, frame);
+    }
+
+    if (player_is_moving && last_element == EL_EXPLOSION)
+    {
+      int element = (GfxElement[last_jx][last_jy] != EL_UNDEFINED ?
+		     GfxElement[last_jx][last_jy] :  EL_EMPTY);
+      int graphic = el_act2img(element, ACTION_EXPLODING);
+      int delay = (game.emulation == EMU_SUPAPLEX ? 3 : 2);
+      int phase = ExplodePhase[last_jx][last_jy] - 1;
+      int frame = getGraphicAnimationFrame(graphic, phase - delay);
+
+      if (phase >= delay)
+	DrawGraphicThruMask(SCREENX(last_jx), SCREENY(last_jy), graphic, frame);
+    }
   }
-#endif
-
-  // --------------------------------------------------------------------------
-  // draw things in front of player (active dynamite or dynabombs)
-  // --------------------------------------------------------------------------
-
-  if (IS_ACTIVE_BOMB(element))
+  else if (drawing_stage == DRAW_PLAYER_STAGE_FIELD_OVER_PLAYER)
   {
-    graphic = el2img(element);
-    frame = getGraphicAnimationFrame(graphic, GfxFrame[jx][jy]);
+    // ------------------------------------------------------------------------
+    // draw elements the player is just walking/passing through/under
+    // ------------------------------------------------------------------------
 
-    if (game.emulation == EMU_SUPAPLEX)
-      DrawGraphic(sx, sy, IMG_SP_DISK_RED, frame);
-    else
-      DrawGraphicThruMask(sx, sy, graphic, frame);
+    if (player_is_moving)
+    {
+      // handle the field the player is leaving ...
+      if (IS_ACCESSIBLE_INSIDE(last_element))
+	DrawLevelField(last_jx, last_jy);
+      else if (IS_ACCESSIBLE_UNDER(last_element))
+	DrawLevelFieldThruMask(last_jx, last_jy);
+    }
+
+    // do not redraw accessible elements if the player is just pushing them
+    if (!player_is_moving || !player->is_pushing)
+    {
+      // ... and the field the player is entering
+      if (IS_ACCESSIBLE_INSIDE(element))
+	DrawLevelField(jx, jy);
+      else if (IS_ACCESSIBLE_UNDER(element))
+	DrawLevelFieldThruMask(jx, jy);
+    }
+
+    MarkTileDirty(sx, sy);
   }
+}
 
-  if (player_is_moving && last_element == EL_EXPLOSION)
-  {
-    int element = (GfxElement[last_jx][last_jy] != EL_UNDEFINED ?
-		   GfxElement[last_jx][last_jy] :  EL_EMPTY);
-    int graphic = el_act2img(element, ACTION_EXPLODING);
-    int delay = (game.emulation == EMU_SUPAPLEX ? 3 : 2);
-    int phase = ExplodePhase[last_jx][last_jy] - 1;
-    int frame = getGraphicAnimationFrame(graphic, phase - delay);
+void DrawPlayer(struct PlayerInfo *player)
+{
+  int i;
 
-    if (phase >= delay)
-      DrawGraphicThruMask(SCREENX(last_jx), SCREENY(last_jy), graphic, frame);
-  }
+  for (i = 0; i < NUM_DRAW_PLAYER_STAGES; i++)
+    DrawPlayerExt(player, i);
+}
 
-  // --------------------------------------------------------------------------
-  // draw elements the player is just walking/passing through/under
-  // --------------------------------------------------------------------------
+void DrawAllPlayers(void)
+{
+  int i, j;
 
-  if (player_is_moving)
-  {
-    // handle the field the player is leaving ...
-    if (IS_ACCESSIBLE_INSIDE(last_element))
-      DrawLevelField(last_jx, last_jy);
-    else if (IS_ACCESSIBLE_UNDER(last_element))
-      DrawLevelFieldThruMask(last_jx, last_jy);
-  }
+  for (i = 0; i < NUM_DRAW_PLAYER_STAGES; i++)
+    for (j = 0; j < MAX_PLAYERS; j++)
+      if (stored_player[j].active)
+	DrawPlayerExt(&stored_player[j], i);
+}
 
-  // do not redraw accessible elements if the player is just pushing them
-  if (!player_is_moving || !player->is_pushing)
-  {
-    // ... and the field the player is entering
-    if (IS_ACCESSIBLE_INSIDE(element))
-      DrawLevelField(jx, jy);
-    else if (IS_ACCESSIBLE_UNDER(element))
-      DrawLevelFieldThruMask(jx, jy);
-  }
+void DrawPlayerField(int x, int y)
+{
+  if (!IS_PLAYER(x, y))
+    return;
 
-  MarkTileDirty(sx, sy);
+  DrawPlayer(PLAYERINFO(x, y));
 }
 
 // ----------------------------------------------------------------------------
