@@ -1938,13 +1938,13 @@ boolean HandleKeysDebug(Key key, int key_status)
 	SetVideoFrameDelay(GameFrameDelay);
 
 	if (GameFrameDelay > ONE_SECOND_DELAY)
-	  Error(ERR_DEBUG, "frame delay == %d ms", GameFrameDelay);
+	  Error(ERR_INFO, "frame delay == %d ms", GameFrameDelay);
 	else if (GameFrameDelay != 0)
-	  Error(ERR_DEBUG, "frame delay == %d ms (max. %d fps / %d %%)",
+	  Error(ERR_INFO, "frame delay == %d ms (max. %d fps / %d %%)",
 		GameFrameDelay, ONE_SECOND_DELAY / GameFrameDelay,
 		GAME_FRAME_DELAY * 100 / GameFrameDelay);
 	else
-	  Error(ERR_DEBUG, "frame delay == 0 ms (maximum speed)");
+	  Error(ERR_INFO, "frame delay == 0 ms (maximum speed)");
 
 	return TRUE;
       }
@@ -1957,14 +1957,14 @@ boolean HandleKeysDebug(Key key, int key_status)
     {
       options.debug = !options.debug;
 
-      Error(ERR_DEBUG, "debug mode %s",
+      Error(ERR_INFO, "debug mode %s",
 	    (options.debug ? "enabled" : "disabled"));
 
       return TRUE;
     }
     else if (key == KSYM_v)
     {
-      Error(ERR_DEBUG, "currently using game engine version %d",
+      Error(ERR_INFO, "currently using game engine version %d",
 	    game.engine_version);
 
       return TRUE;
