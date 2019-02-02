@@ -11660,11 +11660,21 @@ static void ResetIntelliDraw(void)
 
 static boolean draw_mode_hires = FALSE;
 
+static boolean isHiresTileElement(int element)
+{
+  return (IS_MM_WALL(element)        || element == EL_EMPTY);
+}
+
+static boolean isHiresDrawElement(int element)
+{
+  return (IS_MM_WALL_EDITOR(element) || element == EL_EMPTY);
+}
+
 static void SetDrawModeHiRes(int element)
 {
   draw_mode_hires =
     (level.game_engine_type == GAME_ENGINE_TYPE_MM &&
-     (IS_MM_WALL_EDITOR(element) || element == EL_EMPTY));
+     isHiresDrawElement(element));
 }
 
 static boolean getDrawModeHiRes(void)
@@ -12705,9 +12715,13 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
   }
   else if (!button_press_event)
   {
+    int old_element = (IN_LEV_FIELD(lx, ly) ? Feld[lx][ly] : EL_UNDEFINED);
+    boolean hires_drawing = (level.game_engine_type == GAME_ENGINE_TYPE_MM &&
+			     isHiresTileElement(old_element) &&
+			     isHiresDrawElement(new_element));
+
     // prevent handling events for every pixel position when moving mouse
-    if ((sx == last_sx && sy == last_sy &&
-	 !IS_MM_WALL_EDITOR(new_element) && new_element != EL_EMPTY) ||
+    if ((sx == last_sx && sy == last_sy && !hires_drawing) ||
 	(sx2 == last_sx2 && sy2 == last_sy2))
       return;
   }
