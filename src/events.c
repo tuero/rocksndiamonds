@@ -268,12 +268,14 @@ void HandleOtherEvents(Event *event)
       HandleJoystickEvent(event);
       break;
 
+#if defined(USE_DRAG_AND_DROP)
     case SDL_DROPBEGIN:
     case SDL_DROPCOMPLETE:
     case SDL_DROPFILE:
     case SDL_DROPTEXT:
       HandleDropEvent(event);
       break;
+#endif
 
     default:
       break;
@@ -1525,6 +1527,7 @@ void HandleClientMessageEvent(ClientMessageEvent *event)
     CloseAllAndExit(0);
 }
 
+#if defined(USE_DRAG_AND_DROP)
 static boolean HandleDropFileEvent(char *filename)
 {
   Error(ERR_DEBUG, "DROP FILE EVENT: '%s'", filename);
@@ -1643,6 +1646,7 @@ void HandleDropEvent(Event *event)
   if (event->drop.file != NULL)
     SDL_free(event->drop.file);
 }
+#endif
 
 void HandleButton(int mx, int my, int button, int button_nr)
 {

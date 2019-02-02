@@ -118,6 +118,11 @@
 #define SCREEN_KEYBOARD_POS(h)		((h) / 2)
 #endif
 
+// values for drag-and-drop support (some parts not added before SDL 2.0.5)
+#if SDL_VERSION_ATLEAST(2,0,5)
+#define USE_DRAG_AND_DROP
+#endif
+
 // default input keys
 #define DEFAULT_KEY_LEFT		KSYM_Left
 #define DEFAULT_KEY_RIGHT		KSYM_Right
