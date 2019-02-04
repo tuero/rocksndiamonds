@@ -4040,6 +4040,8 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
   boolean scrollbar_needed = (num_entries > NUM_MENU_ENTRIES_ON_SCREEN);
   int scrollbar_xpos = SC_SCROLLBAR_XPOS + menu.scrollbar_xoffset;
   int screen_width = (scrollbar_needed ? scrollbar_xpos : SXSIZE);
+  int font_nr = FONT_TEXT_1;
+  int font_xoffset = getFontBitmapInfo(font_nr)->draw_xoffset;
   int i;
   char *title_string = NULL;
   int yoffset_sets = MENU_TITLE1_YPOS;
@@ -4061,8 +4063,6 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
     int ypos = MENU_SCREEN_START_YPOS + i;
     int startx = mSX + xpos * 32;
     int starty = mSY + ypos * 32;
-    int font_nr = FONT_TEXT_1;
-    int font_xoffset = getFontBitmapInfo(font_nr)->draw_xoffset;
     int startx_text = startx + font_xoffset;
     int endx_text = mSX + screen_width;
     int text_size = endx_text - startx_text;
