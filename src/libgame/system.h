@@ -871,6 +871,13 @@
 				 (type) == ARTWORK_TYPE_MUSIC ?		\
 				 getUserMusicDir() : "")
 
+#define ARTWORK_DEFAULT_SUBDIR(type)					\
+				((type) == ARTWORK_TYPE_GRAPHICS ?	\
+				 GFX_DEFAULT_SUBDIR :			\
+				 (type) == ARTWORK_TYPE_SOUNDS ?	\
+				 SND_DEFAULT_SUBDIR :			\
+				 MUS_DEFAULT_SUBDIR)
+
 #define UPDATE_BUSY_STATE()			\
 {						\
   if (gfx.draw_busy_anim_function != NULL)	\

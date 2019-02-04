@@ -3967,8 +3967,17 @@ TreeInfo *getArtworkTreeInfoForUserLevelSet(int type)
 {
   char *artwork_set = getArtworkIdentifierForUserLevelSet(type);
   TreeInfo *artwork_first_node = ARTWORK_FIRST_NODE(artwork, type);
+  TreeInfo *ti = getTreeInfoFromIdentifier(artwork_first_node, artwork_set);
 
-  return getTreeInfoFromIdentifier(artwork_first_node, artwork_set);
+  if (ti == NULL)
+  {
+    ti = getTreeInfoFromIdentifier(artwork_first_node,
+				   ARTWORK_DEFAULT_SUBDIR(type));
+    if (ti == NULL)
+      Error(ERR_EXIT, "cannot find default graphics -- should not happen");
+  }
+
+  return ti;
 }
 
 boolean checkIfCustomArtworkExistsForCurrentLevelSet(void)
