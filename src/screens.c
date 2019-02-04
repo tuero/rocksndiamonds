@@ -4036,6 +4036,10 @@ static void DrawChooseTree(TreeInfo **ti_ptr)
 static void drawChooseTreeList(int first_entry, int num_page_entries,
 			       TreeInfo *ti)
 {
+  int num_entries = numTreeInfoInGroup(ti);
+  boolean scrollbar_needed = (num_entries > NUM_MENU_ENTRIES_ON_SCREEN);
+  int scrollbar_xpos = SC_SCROLLBAR_XPOS + menu.scrollbar_xoffset;
+  int screen_width = (scrollbar_needed ? scrollbar_xpos : SXSIZE);
   int i;
   char *title_string = NULL;
   int yoffset_sets = MENU_TITLE1_YPOS;
@@ -4060,8 +4064,8 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
     int font_nr = FONT_TEXT_1;
     int font_xoffset = getFontBitmapInfo(font_nr)->draw_xoffset;
     int startx_text = startx + font_xoffset;
-    int startx_scrollbar = mSX + SC_SCROLLBAR_XPOS + menu.scrollbar_xoffset;
-    int text_size = startx_scrollbar - startx_text;
+    int endx_text = mSX + screen_width;
+    int text_size = endx_text - startx_text;
     int max_buffer_len = text_size / getFontWidth(font_nr);
     char buffer[max_buffer_len + 1];
 
