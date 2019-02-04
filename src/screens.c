@@ -4065,8 +4065,8 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
     int starty = mSY + ypos * 32;
     int startx_text = startx + font_xoffset;
     int endx_text = mSX + screen_width;
-    int text_size = endx_text - startx_text;
-    int max_buffer_len = text_size / getFontWidth(font_nr);
+    int max_text_size = endx_text - startx_text;
+    int max_buffer_len = max_text_size / getFontWidth(font_nr);
     char buffer[max_buffer_len + 1];
 
     node_first = getTreeInfoFirstGroupEntry(ti);
