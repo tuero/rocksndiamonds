@@ -2757,6 +2757,8 @@ struct MenuInfo
 
   int scrollbar_xoffset;
 
+  struct MenuPosInfo list_setup[NUM_SPECIAL_GFX_SETUP_ARGS];
+
   int list_size[NUM_SPECIAL_GFX_ARGS];
   int list_size_info[NUM_SPECIAL_GFX_INFO_ARGS];
 

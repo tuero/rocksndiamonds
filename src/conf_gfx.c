@@ -7797,6 +7797,9 @@ struct ConfigInfo image_config[] =
 
   { "menu.scrollbar_xoffset",			"0"			},
 
+  { "menu.list.SETUP[CHOOSE_OTHER].align",	"left"			},
+  { "menu.list.SETUP[CHOOSE_OTHER].valign",	"top"			},
+
   { "menu.list_size",				"-1"			},
   { "menu.list_size.LEVELS",			"-1"			},
   { "menu.list_size.LEVELNR",			"-1"			},

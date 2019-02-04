@@ -523,6 +523,9 @@ static struct ValueTextInfo grid_sizes_list[] =
   {	-1,	NULL				},
 };
 
+static int align_xoffset = 0;
+static int align_yoffset = 0;
+
 #define DRAW_MODE(s)		((s) >= GAME_MODE_MAIN &&		\
 				 (s) <= GAME_MODE_SETUP ? (s) :		\
 				 (s) == GAME_MODE_PSEUDO_TYPENAME ?	\
@@ -578,6 +581,9 @@ static struct ValueTextInfo grid_sizes_list[] =
 
 #define mSX			(SX + DRAW_XOFFSET(game_status))
 #define mSY			(SY + DRAW_YOFFSET(game_status))
+
+#define amSX			(mSX + align_xoffset)
+#define amSY			(mSY + align_yoffset)
 
 #define NUM_MENU_ENTRIES_ON_SCREEN (menu.list_size[game_status] > 2 ?	\
 				    menu.list_size[game_status] :	\
@@ -1364,8 +1370,8 @@ static void clearMenuListArea(void)
 static void drawCursorExt(int xpos, int ypos, boolean active, int graphic)
 {
   static int cursor_array[MAX_LEV_FIELDY];
-  int x = mSX + TILEX * xpos;
-  int y = mSY + TILEY * (MENU_SCREEN_START_YPOS + ypos);
+  int x = amSX + TILEX * xpos;
+  int y = amSY + TILEY * (MENU_SCREEN_START_YPOS + ypos);
 
   if (xpos == 0)
   {
@@ -3990,6 +3996,51 @@ void HandleTypeName(int newxpos, Key key)
 // tree menu functions
 // ============================================================================
 
+static int getAlignXOffsetFromTreeInfo(TreeInfo *ti)
+{
+  if (game_status != GAME_MODE_SETUP ||
+      DRAW_MODE_SETUP(setup_mode) != SETUP_MODE_CHOOSE_OTHER)
+    return 0;
+
+  int max_text_size = 0;
+  TreeInfo *node;
+
+  for (node = getTreeInfoFirstGroupEntry(ti); node != NULL; node = node->next)
+    max_text_size = MAX(max_text_size, strlen(node->name));
+
+  int num_entries = numTreeInfoInGroup(ti);
+  boolean scrollbar_needed = (num_entries > NUM_MENU_ENTRIES_ON_SCREEN);
+  int text_width = max_text_size * getFontWidth(FONT_TEXT_1);
+  int button_width = SC_MENUBUTTON_XSIZE;
+  int scrollbar_xpos = SC_SCROLLBAR_XPOS + menu.scrollbar_xoffset;
+  int screen_width = (scrollbar_needed ? scrollbar_xpos : SXSIZE);
+  int align = menu.list_setup[SETUP_MODE_CHOOSE_OTHER].align;
+  int x = ALIGNED_XPOS(0, screen_width, align) * -1;
+  int align_xoffset_raw = ALIGNED_XPOS(x, button_width + text_width, align);
+  int align_xoffset = MAX(0, align_xoffset_raw);
+
+  return align_xoffset;
+}
+
+static int getAlignYOffsetFromTreeInfo(TreeInfo *ti)
+{
+  if (game_status != GAME_MODE_SETUP ||
+      DRAW_MODE_SETUP(setup_mode) != SETUP_MODE_CHOOSE_OTHER)
+    return 0;
+
+  int num_entries = numTreeInfoInGroup(ti);
+  int num_page_entries = MIN(num_entries, NUM_MENU_ENTRIES_ON_SCREEN);
+  int font_height = getFontHeight(FONT_TEXT_1);
+  int text_height = font_height * num_page_entries;
+  int page_height = font_height * NUM_MENU_ENTRIES_ON_SCREEN;
+  int align = menu.list_setup[SETUP_MODE_CHOOSE_OTHER].valign;
+  int y = ALIGNED_YPOS(0, page_height, align) * -1;
+  int align_yoffset_raw = ALIGNED_YPOS(y, text_height, align);
+  int align_yoffset = MAX(0, align_yoffset_raw);
+
+  return align_yoffset;
+}
+
 static void DrawChooseTree(TreeInfo **ti_ptr)
 {
   int fade_mask = REDRAW_FIELD;
@@ -4061,10 +4112,10 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
     int entry_pos = first_entry + i;
     int xpos = MENU_SCREEN_START_XPOS;
     int ypos = MENU_SCREEN_START_YPOS + i;
-    int startx = mSX + xpos * 32;
-    int starty = mSY + ypos * 32;
+    int startx = amSX + xpos * 32;
+    int starty = amSY + ypos * 32;
     int startx_text = startx + font_xoffset;
-    int endx_text = mSX + screen_width;
+    int endx_text = amSX + screen_width;
     int max_text_size = endx_text - startx_text;
     int max_buffer_len = max_text_size / getFontWidth(font_nr);
     char buffer[max_buffer_len + 1];
@@ -4143,6 +4194,9 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
   {
     int num_entries = numTreeInfoInGroup(ti);
     int entry_pos = posTreeInfo(ti);
+
+    align_xoffset = getAlignXOffsetFromTreeInfo(ti);
+    align_yoffset = getAlignYOffsetFromTreeInfo(ti);
 
     if (ti->cl_first == -1)
     {
@@ -4228,8 +4282,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 
   if (mx || my)		// mouse input
   {
-    x = (mx - mSX) / 32;
-    y = (my - mSY) / 32 - MENU_SCREEN_START_YPOS;
+    x = (mx - amSX) / 32;
+    y = (my - amSY) / 32 - MENU_SCREEN_START_YPOS;
   }
   else if (dx || dy)	// keyboard or scrollbar/scrollbutton input
   {
@@ -8068,6 +8122,9 @@ void ConfigureVirtualButtons(void)
 
 void DrawSetupScreen(void)
 {
+  align_xoffset = 0;
+  align_yoffset = 0;
+
   if (setup_mode == SETUP_MODE_INPUT)
     DrawSetupScreen_Input();
   else if (setup_mode == SETUP_MODE_CHOOSE_GAME_SPEED)

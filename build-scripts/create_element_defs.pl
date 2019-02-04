@@ -2406,8 +2406,8 @@ sub print_image_config_vars
 	    $var =~ s/\.draw_order$/.sort_priority/;
 
 	    $var =~ s/\.font_[a-z]+$/.font_alt/;
-	    $var =~ s/\.INFO\[([A-Z]+)\]$/_info\[GFX_SPECIAL_ARG_INFO_$1\]/;
-	    $var =~ s/\.SETUP\[([A-Z0-9_]+)\]$/_setup\[GFX_SPECIAL_ARG_SETUP_$1\]/;
+	    $var =~ s/\.INFO\[([A-Z]+)\](.*)$/_info\[GFX_SPECIAL_ARG_INFO_$1\]$2/;
+	    $var =~ s/\.SETUP\[([A-Z0-9_]+)\](.*)$/_setup\[GFX_SPECIAL_ARG_SETUP_$1\]$2/;
 	    $var =~ s/\.([A-Z]+)$/\[GFX_SPECIAL_ARG_$1\]/;
 	    $var =~ s/\.([A-Z]+)\./\[GFX_SPECIAL_ARG_$1\]./;
 
