@@ -1690,13 +1690,8 @@ static void gotoTopLevelDir(void)
     {
       int num_leveldirs = numTreeInfoInGroup(leveldir_current);
       int leveldir_pos = posTreeInfo(leveldir_current);
-      int num_page_entries;
+      int num_page_entries = MIN(num_leveldirs, NUM_MENU_ENTRIES_ON_SCREEN);
       int cl_first, cl_cursor;
-
-      if (num_leveldirs <= NUM_MENU_ENTRIES_ON_SCREEN)
-	num_page_entries = num_leveldirs;
-      else
-	num_page_entries = NUM_MENU_ENTRIES_ON_SCREEN;
 
       cl_first = MAX(0, leveldir_pos - num_page_entries + 1);
       cl_cursor = leveldir_pos - cl_first;
@@ -4182,13 +4177,8 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
   int y = ti->cl_cursor;
   int step = (button == 1 ? 1 : button == 2 ? 5 : 10);
   int num_entries = numTreeInfoInGroup(ti);
-  int num_page_entries;
+  int num_page_entries = MIN(num_entries, NUM_MENU_ENTRIES_ON_SCREEN);
   boolean position_set_by_scrollbar = (dx == 999);
-
-  if (num_entries <= NUM_MENU_ENTRIES_ON_SCREEN)
-    num_page_entries = num_entries;
-  else
-    num_page_entries = NUM_MENU_ENTRIES_ON_SCREEN;
 
   if (button == MB_MENU_INITIALIZE)
   {
