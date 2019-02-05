@@ -1906,7 +1906,7 @@ static void HandleMainMenu_SelectLevel(int step, int direction,
 
   if (new_level_nr != old_level_nr)
   {
-    struct MainControlInfo *mci= getMainControlInfo(MAIN_CONTROL_LEVEL_NUMBER);
+    struct MainControlInfo *mci = getMainControlInfo(MAIN_CONTROL_LEVEL_NUMBER);
 
     PlaySound(SND_MENU_ITEM_SELECTING);
 
@@ -1927,9 +1927,8 @@ static void HandleMainMenu_SelectLevel(int step, int direction,
 
     UpdateScreenMenuGadgets(SCREEN_MASK_MAIN_HAS_SOLUTION, hasSolutionTape());
 
-    // needed because DrawPreviewLevelInitial() takes some time
+    // force redraw of playfield area (may be reset at this point)
     redraw_mask |= REDRAW_FIELD;
-    // SyncDisplay();
   }
 }
 
