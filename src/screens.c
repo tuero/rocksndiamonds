@@ -1929,7 +1929,6 @@ static void HandleMainMenu_SelectLevel(int step, int direction,
 
     // needed because DrawPreviewLevelInitial() takes some time
     redraw_mask |= REDRAW_FIELD;
-    BackToFront();
     // SyncDisplay();
   }
 }
