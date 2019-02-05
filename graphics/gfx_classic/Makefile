@@ -40,7 +40,6 @@ FILES = RocksBusy.$(EXT)		\
 	RocksSP.$(EXT)			\
 	RocksScreen.$(EXT)		\
 	RocksToons.$(EXT)		\
-	overlay/VirtualButtons.$(EXT)	\
 					\
 	RocksCE.$(EXT)			# dynamically generated from template
 

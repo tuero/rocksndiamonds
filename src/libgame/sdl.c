@@ -2885,12 +2885,8 @@ static void DrawTouchInputOverlay_ShowGridButtons(int alpha)
 
 static void DrawTouchInputOverlay(void)
 {
-  static SDL_Texture *texture = NULL;
-  static boolean initialized = FALSE;
   static boolean deactivated = TRUE;
   static boolean show_grid = FALSE;
-  static int width = 0, height = 0;
-  static int alpha_last = -1;
   static int alpha = 0;
   int alpha_max = ALPHA_FROM_TRANSPARENCY(setup.touch.transparency);
   int alpha_step = ALPHA_FADING_STEPSIZE(alpha_max);
@@ -2923,72 +2919,5 @@ static void DrawTouchInputOverlay(void)
     DrawTouchInputOverlay_ShowGrid(alpha);
 
   DrawTouchInputOverlay_ShowGridButtons(alpha);
-
-  return;
-
-
-  // !!! VIRTUAL BUTTONS FROM IMAGE FILE NOT USED ANYMORE !!!
-
-  if (!initialized)
-  {
-    char *basename = "overlay/VirtualButtons.png";
-    char *filename = getCustomImageFilename(basename);
-
-    if (filename == NULL)
-      Error(ERR_EXIT, "LoadCustomImage(): cannot find file '%s'", basename);
-
-    SDL_Surface *surface;
-
-    if ((surface = IMG_Load(filename)) == NULL)
-      Error(ERR_EXIT, "IMG_Load() failed: %s", SDL_GetError());
-
-    width  = surface->w;
-    height = surface->h;
-
-    // set black pixel to transparent if no alpha channel / transparent color
-    if (!SDLHasAlpha(surface) &&
-	!SDLHasColorKey(surface))
-      SDL_SetColorKey(surface, SET_TRANSPARENT_PIXEL,
-		      SDL_MapRGB(surface->format, 0x00, 0x00, 0x00));
-
-    if ((texture = SDLCreateTextureFromSurface(surface)) == NULL)
-      Error(ERR_EXIT, "SDLCreateTextureFromSurface() failed");
-
-    SDL_FreeSurface(surface);
-
-    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-
-    initialized = TRUE;
-  }
-
-  if (alpha != alpha_last)
-    SDL_SetTextureAlphaMod(texture, alpha);
-
-  alpha_last = alpha;
-
-  float ratio_overlay = (float) width / height;
-  float ratio_screen = (float) video.screen_width / video.screen_height;
-  int width_scaled, height_scaled;
-  int xpos, ypos;
-
-  if (ratio_overlay > ratio_screen)
-  {
-    width_scaled = video.screen_width;
-    height_scaled = video.screen_height * ratio_screen / ratio_overlay;
-    xpos = 0;
-    ypos = video.screen_height - height_scaled;
-  }
-  else
-  {
-    width_scaled = video.screen_width * ratio_overlay / ratio_screen;
-    height_scaled = video.screen_height;
-    xpos = (video.screen_width - width_scaled) / 2;
-    ypos = 0;
-  }
-
-  SDL_Rect src_rect = { 0, 0, width, height };
-  SDL_Rect dst_rect = { xpos, ypos, width_scaled, height_scaled };
-
-  SDL_RenderCopy(sdl_renderer, texture, &src_rect, &dst_rect);
 }
 #endif
