@@ -1928,6 +1928,7 @@ static void HandleMainMenu_SelectLevel(int step, int direction,
     UpdateScreenMenuGadgets(SCREEN_MASK_MAIN_HAS_SOLUTION, hasSolutionTape());
 
     // needed because DrawPreviewLevelInitial() takes some time
+    redraw_mask |= REDRAW_FIELD;
     BackToFront();
     // SyncDisplay();
   }
