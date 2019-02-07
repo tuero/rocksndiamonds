@@ -1643,6 +1643,8 @@ struct TextPosInfo
   int tile_size;		// special case for list of network players
   int border_size;		// special case for list of preview players
   int vertical;			// special case for list of preview players
+
+  boolean redefined;		// redefined by custom artwork
 };
 
 struct MouseActionInfo

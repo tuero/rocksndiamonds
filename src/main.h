@@ -2851,6 +2851,8 @@ struct PreviewInfo
   int step_offset;
   int step_delay;
   int anim_mode;
+
+  boolean redefined;		// redefined by custom artwork
 };
 
 struct EditorTabsInfo

@@ -3523,6 +3523,10 @@ void DrawPreviewPlayers(void)
   if (game_status != GAME_MODE_MAIN)
     return;
 
+  // do not draw preview players if level preview redefined, but players aren't
+  if (preview.redefined && !menu.main.preview_players.redefined)
+    return;
+
   boolean player_found[MAX_PLAYERS];
   int num_players = 0;
   int i, x, y;
@@ -3626,6 +3630,10 @@ static void DrawNetworkPlayersExt(boolean force)
     return;
 
   if (!network.connected && !force)
+    return;
+
+  // do not draw network players if level preview redefined, but players aren't
+  if (preview.redefined && !menu.main.network_players.redefined)
     return;
 
   int num_players = 0;

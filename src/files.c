@@ -10264,6 +10264,25 @@ static void LoadMenuDesignSettingsFromFilename(char *filename)
     }
   }
 
+  // special case: check if network and preview player positions are redefined,
+  // to compare this later against the main menu level preview being redefined
+  struct TokenIntPtrInfo menu_config_players[] =
+  {
+    { "main.network_players.x",	&menu.main.network_players.redefined	},
+    { "main.network_players.y",	&menu.main.network_players.redefined	},
+    { "main.preview_players.x",	&menu.main.preview_players.redefined	},
+    { "main.preview_players.y",	&menu.main.preview_players.redefined	},
+    { "preview.x",		&preview.redefined			},
+    { "preview.y",		&preview.redefined			}
+  };
+
+  for (i = 0; i < ARRAY_SIZE(menu_config_players); i++)
+    *menu_config_players[i].value = FALSE;
+
+  for (i = 0; i < ARRAY_SIZE(menu_config_players); i++)
+    if (getHashEntry(setup_file_hash, menu_config_players[i].token) != NULL)
+      *menu_config_players[i].value = TRUE;
+
   // read (and overwrite with) values that may be specified in config file
   for (i = 0; image_config_vars[i].token != NULL; i++)
   {
