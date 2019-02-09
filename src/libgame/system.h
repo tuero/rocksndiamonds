@@ -1290,6 +1290,17 @@ struct SetupInternalInfo
 
   boolean choose_from_top_leveldir;
   boolean show_scaling_in_title;
+
+  boolean menu_game;
+  boolean menu_editor;
+  boolean menu_graphics;
+  boolean menu_sound;
+  boolean menu_artwork;
+  boolean menu_input;
+  boolean menu_touch;
+  boolean menu_shortcuts;
+  boolean menu_exit;
+  boolean menu_save_and_exit;
 };
 
 struct SetupDebugInfo

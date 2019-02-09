@@ -6164,6 +6164,17 @@ static struct
   { &setup.touch.grid_ysize[1],		execSetupChooseGridYSize_1	},
   { &setup.touch.grid_ysize[1],		&grid_size_text[1][1]		},
 
+  { &setup.internal.menu_game,		execSetupGame			},
+  { &setup.internal.menu_editor,	execSetupEditor			},
+  { &setup.internal.menu_graphics,	execSetupGraphics		},
+  { &setup.internal.menu_sound,		execSetupSound			},
+  { &setup.internal.menu_artwork,	execSetupArtwork		},
+  { &setup.internal.menu_input,		execSetupInput			},
+  { &setup.internal.menu_touch,		execSetupTouch			},
+  { &setup.internal.menu_shortcuts,	execSetupShortcuts		},
+  { &setup.internal.menu_exit,		execExitSetup			},
+  { &setup.internal.menu_save_and_exit,	execSaveAndExitSetup		},
+
   { NULL,				NULL				}
 };
 

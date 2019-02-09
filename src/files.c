@@ -8951,6 +8951,46 @@ static struct TokenInfo internal_setup_tokens[] =
     TYPE_INTEGER,
     &setup.internal.default_window_height,	"default_window_height"
   },
+  {
+    TYPE_BOOLEAN,
+    &setup.internal.menu_game,			"menu_game"
+  },
+  {
+    TYPE_BOOLEAN,
+    &setup.internal.menu_editor,		"menu_editor"
+  },
+  {
+    TYPE_BOOLEAN,
+    &setup.internal.menu_graphics,		"menu_graphics"
+  },
+  {
+    TYPE_BOOLEAN,
+    &setup.internal.menu_sound,			"menu_sound"
+  },
+  {
+    TYPE_BOOLEAN,
+    &setup.internal.menu_artwork,		"menu_artwork"
+  },
+  {
+    TYPE_BOOLEAN,
+    &setup.internal.menu_input,			"menu_input"
+  },
+  {
+    TYPE_BOOLEAN,
+    &setup.internal.menu_touch,			"menu_touch"
+  },
+  {
+    TYPE_BOOLEAN,
+    &setup.internal.menu_shortcuts,		"menu_shortcuts"
+  },
+  {
+    TYPE_BOOLEAN,
+    &setup.internal.menu_exit,			"menu_exit"
+  },
+  {
+    TYPE_BOOLEAN,
+    &setup.internal.menu_save_and_exit,		"menu_save_and_exit"
+  },
 };
 
 static struct TokenInfo debug_setup_tokens[] =
