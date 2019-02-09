@@ -8936,20 +8936,20 @@ static struct TokenInfo internal_setup_tokens[] =
     &setup.internal.default_level_series,	"default_level_series"
   },
   {
-    TYPE_BOOLEAN,
-    &setup.internal.choose_from_top_leveldir,	"choose_from_top_leveldir"
-  },
-  {
-    TYPE_BOOLEAN,
-    &setup.internal.show_scaling_in_title,	"show_scaling_in_title"
-  },
-  {
     TYPE_INTEGER,
     &setup.internal.default_window_width,	"default_window_width"
   },
   {
     TYPE_INTEGER,
     &setup.internal.default_window_height,	"default_window_height"
+  },
+  {
+    TYPE_BOOLEAN,
+    &setup.internal.choose_from_top_leveldir,	"choose_from_top_leveldir"
+  },
+  {
+    TYPE_BOOLEAN,
+    &setup.internal.show_scaling_in_title,	"show_scaling_in_title"
   },
   {
     TYPE_BOOLEAN,
