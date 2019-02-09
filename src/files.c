@@ -8352,221 +8352,708 @@ void SaveScore(int nr)
 #define TOKEN_STR_PLAYER_PREFIX			"player_"
 
 
-static struct SetupInfo si;
-static struct SetupAutoSetupInfo sasi;
-static struct SetupEditorInfo sei;
-static struct SetupEditorCascadeInfo seci;
-static struct SetupShortcutInfo ssi;
-static struct SetupInputInfo sii;
-static struct SetupSystemInfo syi;
-static struct SetupInternalInfo sxi;
-static struct SetupDebugInfo sdi;
-static struct OptionInfo soi;
-
 static struct TokenInfo global_setup_tokens[] =
 {
-  { TYPE_STRING, &si.player_name,             "player_name"		},
-  { TYPE_SWITCH, &si.sound,                   "sound"			},
-  { TYPE_SWITCH, &si.sound_loops,             "repeating_sound_loops"	},
-  { TYPE_SWITCH, &si.sound_music,             "background_music"	},
-  { TYPE_SWITCH, &si.sound_simple,            "simple_sound_effects"	},
-  { TYPE_SWITCH, &si.toons,                   "toons"			},
-  { TYPE_SWITCH, &si.scroll_delay,            "scroll_delay"		},
-  { TYPE_INTEGER,&si.scroll_delay_value,      "scroll_delay_value"	},
-  { TYPE_STRING, &si.engine_snapshot_mode,    "engine_snapshot_mode"	},
-  { TYPE_INTEGER,&si.engine_snapshot_memory,  "engine_snapshot_memory"	},
-  { TYPE_SWITCH, &si.fade_screens,            "fade_screens"		},
-  { TYPE_SWITCH, &si.autorecord,              "automatic_tape_recording"},
-  { TYPE_SWITCH, &si.show_titlescreen,        "show_titlescreen"	},
-  { TYPE_SWITCH, &si.quick_doors,             "quick_doors"		},
-  { TYPE_SWITCH, &si.team_mode,               "team_mode"		},
-  { TYPE_SWITCH, &si.handicap,                "handicap"		},
-  { TYPE_SWITCH, &si.skip_levels,             "skip_levels"		},
-  { TYPE_SWITCH, &si.increment_levels,        "increment_levels"	},
-  { TYPE_SWITCH, &si.auto_play_next_level,    "auto_play_next_level"	},
-  { TYPE_SWITCH, &si.skip_scores_after_game,  "skip_scores_after_game"	},
-  { TYPE_SWITCH, &si.time_limit,              "time_limit"		},
-  { TYPE_SWITCH, &si.fullscreen,              "fullscreen"		},
-  { TYPE_INTEGER,&si.window_scaling_percent,  "window_scaling_percent"	},
-  { TYPE_STRING, &si.window_scaling_quality,  "window_scaling_quality"	},
-  { TYPE_STRING, &si.screen_rendering_mode,   "screen_rendering_mode"	},
-  { TYPE_STRING, &si.vsync_mode,              "vsync_mode"		},
-  { TYPE_SWITCH, &si.ask_on_escape,           "ask_on_escape"		},
-  { TYPE_SWITCH, &si.ask_on_escape_editor,    "ask_on_escape_editor"	},
-  { TYPE_SWITCH, &si.ask_on_game_over,        "ask_on_game_over"	},
-  { TYPE_SWITCH, &si.quick_switch,            "quick_player_switch"	},
-  { TYPE_SWITCH, &si.input_on_focus,          "input_on_focus"		},
-  { TYPE_SWITCH, &si.prefer_aga_graphics,     "prefer_aga_graphics"	},
-  { TYPE_SWITCH, &si.game_speed_extended,     "game_speed_extended"	},
-  { TYPE_INTEGER,&si.game_frame_delay,        "game_frame_delay"	},
-  { TYPE_SWITCH, &si.sp_show_border_elements, "sp_show_border_elements"	},
-  { TYPE_SWITCH, &si.small_game_graphics,     "small_game_graphics"	},
-  { TYPE_SWITCH, &si.show_snapshot_buttons,   "show_snapshot_buttons"	},
-  { TYPE_STRING, &si.graphics_set,            "graphics_set"		},
-  { TYPE_STRING, &si.sounds_set,              "sounds_set"		},
-  { TYPE_STRING, &si.music_set,               "music_set"		},
-  { TYPE_SWITCH3,&si.override_level_graphics, "override_level_graphics"	},
-  { TYPE_SWITCH3,&si.override_level_sounds,   "override_level_sounds"	},
-  { TYPE_SWITCH3,&si.override_level_music,    "override_level_music"	},
-  { TYPE_INTEGER,&si.volume_simple,           "volume_simple"		},
-  { TYPE_INTEGER,&si.volume_loops,            "volume_loops"		},
-  { TYPE_INTEGER,&si.volume_music,            "volume_music"		},
-  { TYPE_SWITCH, &si.network_mode,            "network_mode"		},
-  { TYPE_PLAYER, &si.network_player_nr,       "network_player"		},
-  { TYPE_STRING, &si.network_server_hostname, "network_server_hostname"	},
-  { TYPE_STRING, &si.touch.control_type,      "touch.control_type"	},
-  { TYPE_INTEGER,&si.touch.move_distance,     "touch.move_distance"	},
-  { TYPE_INTEGER,&si.touch.drop_distance,     "touch.drop_distance"	},
-  { TYPE_INTEGER,&si.touch.transparency,      "touch.transparency"	},
-  { TYPE_INTEGER,&si.touch.draw_outlined,     "touch.draw_outlined"	},
-  { TYPE_INTEGER,&si.touch.draw_pressed,      "touch.draw_pressed"	},
-  { TYPE_INTEGER,&si.touch.grid_xsize[0],     "touch.virtual_buttons.0.xsize" },
-  { TYPE_INTEGER,&si.touch.grid_ysize[0],     "touch.virtual_buttons.0.ysize" },
-  { TYPE_INTEGER,&si.touch.grid_xsize[1],     "touch.virtual_buttons.1.xsize" },
-  { TYPE_INTEGER,&si.touch.grid_ysize[1],     "touch.virtual_buttons.1.ysize" },
+  {
+    TYPE_STRING,
+    &setup.player_name,				"player_name"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.sound,				"sound"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.sound_loops,				"repeating_sound_loops"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.sound_music,				"background_music"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.sound_simple,			"simple_sound_effects"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.toons,				"toons"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.scroll_delay,			"scroll_delay"
+  },
+  {
+    TYPE_INTEGER,
+    &setup.scroll_delay_value,			"scroll_delay_value"
+  },
+  {
+    TYPE_STRING,
+    &setup.engine_snapshot_mode,		"engine_snapshot_mode"
+  },
+  {
+    TYPE_INTEGER,
+    &setup.engine_snapshot_memory,		"engine_snapshot_memory"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.fade_screens,			"fade_screens"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.autorecord,				"automatic_tape_recording"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.show_titlescreen,			"show_titlescreen"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.quick_doors,				"quick_doors"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.team_mode,				"team_mode"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.handicap,				"handicap"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.skip_levels,				"skip_levels"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.increment_levels,			"increment_levels"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.auto_play_next_level,		"auto_play_next_level"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.skip_scores_after_game,		"skip_scores_after_game"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.time_limit,				"time_limit"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.fullscreen,				"fullscreen"
+  },
+  {
+    TYPE_INTEGER,
+    &setup.window_scaling_percent,		"window_scaling_percent"
+  },
+  {
+    TYPE_STRING,
+    &setup.window_scaling_quality,		"window_scaling_quality"
+  },
+  {
+    TYPE_STRING,
+    &setup.screen_rendering_mode,		"screen_rendering_mode"
+  },
+  {
+    TYPE_STRING,
+    &setup.vsync_mode,				"vsync_mode"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.ask_on_escape,			"ask_on_escape"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.ask_on_escape_editor,		"ask_on_escape_editor"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.ask_on_game_over,			"ask_on_game_over"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.quick_switch,			"quick_player_switch"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.input_on_focus,			"input_on_focus"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.prefer_aga_graphics,			"prefer_aga_graphics"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.game_speed_extended,			"game_speed_extended"
+  },
+  {
+    TYPE_INTEGER,
+    &setup.game_frame_delay,			"game_frame_delay"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.sp_show_border_elements,		"sp_show_border_elements"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.small_game_graphics,			"small_game_graphics"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.show_snapshot_buttons,		"show_snapshot_buttons"
+  },
+  {
+    TYPE_STRING,
+    &setup.graphics_set,			"graphics_set"
+  },
+  {
+    TYPE_STRING,
+    &setup.sounds_set,				"sounds_set"
+  },
+  {
+    TYPE_STRING,
+    &setup.music_set,				"music_set"
+  },
+  {
+    TYPE_SWITCH3,
+    &setup.override_level_graphics,		"override_level_graphics"
+  },
+  {
+    TYPE_SWITCH3,
+    &setup.override_level_sounds,		"override_level_sounds"
+  },
+  {
+    TYPE_SWITCH3,
+    &setup.override_level_music,		"override_level_music"
+  },
+  {
+    TYPE_INTEGER,
+    &setup.volume_simple,			"volume_simple"
+  },
+  {
+    TYPE_INTEGER,
+    &setup.volume_loops,			"volume_loops"
+  },
+  {
+    TYPE_INTEGER,
+    &setup.volume_music,			"volume_music"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.network_mode,			"network_mode"
+  },
+  {
+    TYPE_PLAYER,
+    &setup.network_player_nr,			"network_player"
+  },
+  {
+    TYPE_STRING,
+    &setup.network_server_hostname,		"network_server_hostname"
+  },
+  {
+    TYPE_STRING,
+    &setup.touch.control_type,			"touch.control_type"
+  },
+  {
+    TYPE_INTEGER,
+    &setup.touch.move_distance,			"touch.move_distance"
+  },
+  {
+    TYPE_INTEGER,
+    &setup.touch.drop_distance,			"touch.drop_distance"
+  },
+  {
+    TYPE_INTEGER,
+    &setup.touch.transparency,			"touch.transparency"
+  },
+  {
+    TYPE_INTEGER,
+    &setup.touch.draw_outlined,			"touch.draw_outlined"
+  },
+  {
+    TYPE_INTEGER,
+    &setup.touch.draw_pressed,			"touch.draw_pressed"
+  },
+  {
+    TYPE_INTEGER,
+    &setup.touch.grid_xsize[0],			"touch.virtual_buttons.0.xsize"
+  },
+  {
+    TYPE_INTEGER,
+    &setup.touch.grid_ysize[0],			"touch.virtual_buttons.0.ysize"
+  },
+  {
+    TYPE_INTEGER,
+    &setup.touch.grid_xsize[1],			"touch.virtual_buttons.1.xsize"
+  },
+  {
+    TYPE_INTEGER,
+    &setup.touch.grid_ysize[1],			"touch.virtual_buttons.1.ysize"
+  },
 };
 
 static struct TokenInfo auto_setup_tokens[] =
 {
-  { TYPE_INTEGER,&sasi.editor_zoom_tilesize,	"editor.zoom_tilesize"	},
+  {
+    TYPE_INTEGER,
+    &setup.auto_setup.editor_zoom_tilesize,	"editor.zoom_tilesize"
+  },
 };
 
 static struct TokenInfo editor_setup_tokens[] =
 {
-  { TYPE_SWITCH, &sei.el_classic,	"editor.el_classic"		},
-  { TYPE_SWITCH, &sei.el_custom,	"editor.el_custom"		},
-  { TYPE_SWITCH, &sei.el_user_defined,	"editor.el_user_defined"	},
-  { TYPE_SWITCH, &sei.el_dynamic,	"editor.el_dynamic"		},
-  { TYPE_SWITCH, &sei.el_headlines,	"editor.el_headlines"		},
-  { TYPE_SWITCH, &sei.show_element_token,"editor.show_element_token"	},
+  {
+    TYPE_SWITCH,
+    &setup.editor.el_classic,			"editor.el_classic"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.editor.el_custom,			"editor.el_custom"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.editor.el_user_defined,		"editor.el_user_defined"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.editor.el_dynamic,			"editor.el_dynamic"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.editor.el_headlines,			"editor.el_headlines"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.editor.show_element_token,		"editor.show_element_token"
+  },
 };
 
 static struct TokenInfo editor_cascade_setup_tokens[] =
 {
-  { TYPE_SWITCH, &seci.el_bd,		"editor.cascade.el_bd"		},
-  { TYPE_SWITCH, &seci.el_em,		"editor.cascade.el_em"		},
-  { TYPE_SWITCH, &seci.el_emc,		"editor.cascade.el_emc"		},
-  { TYPE_SWITCH, &seci.el_rnd,		"editor.cascade.el_rnd"		},
-  { TYPE_SWITCH, &seci.el_sb,		"editor.cascade.el_sb"		},
-  { TYPE_SWITCH, &seci.el_sp,		"editor.cascade.el_sp"		},
-  { TYPE_SWITCH, &seci.el_dc,		"editor.cascade.el_dc"		},
-  { TYPE_SWITCH, &seci.el_dx,		"editor.cascade.el_dx"		},
-  { TYPE_SWITCH, &seci.el_mm,		"editor.cascade.el_mm"		},
-  { TYPE_SWITCH, &seci.el_df,		"editor.cascade.el_df"		},
-  { TYPE_SWITCH, &seci.el_chars,	"editor.cascade.el_chars"	},
-  { TYPE_SWITCH, &seci.el_steel_chars,	"editor.cascade.el_steel_chars"	},
-  { TYPE_SWITCH, &seci.el_ce,		"editor.cascade.el_ce"		},
-  { TYPE_SWITCH, &seci.el_ge,		"editor.cascade.el_ge"		},
-  { TYPE_SWITCH, &seci.el_ref,		"editor.cascade.el_ref"		},
-  { TYPE_SWITCH, &seci.el_user,		"editor.cascade.el_user"	},
-  { TYPE_SWITCH, &seci.el_dynamic,	"editor.cascade.el_dynamic"	},
+  {
+    TYPE_SWITCH,
+    &setup.editor_cascade.el_bd,		"editor.cascade.el_bd"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.editor_cascade.el_em,		"editor.cascade.el_em"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.editor_cascade.el_emc,		"editor.cascade.el_emc"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.editor_cascade.el_rnd,		"editor.cascade.el_rnd"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.editor_cascade.el_sb,		"editor.cascade.el_sb"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.editor_cascade.el_sp,		"editor.cascade.el_sp"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.editor_cascade.el_dc,		"editor.cascade.el_dc"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.editor_cascade.el_dx,		"editor.cascade.el_dx"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.editor_cascade.el_mm,		"editor.cascade.el_mm"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.editor_cascade.el_df,		"editor.cascade.el_df"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.editor_cascade.el_chars,		"editor.cascade.el_chars"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.editor_cascade.el_steel_chars,	"editor.cascade.el_steel_chars"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.editor_cascade.el_ce,		"editor.cascade.el_ce"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.editor_cascade.el_ge,		"editor.cascade.el_ge"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.editor_cascade.el_ref,		"editor.cascade.el_ref"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.editor_cascade.el_user,		"editor.cascade.el_user"
+  },
+  {
+    TYPE_SWITCH,
+    &setup.editor_cascade.el_dynamic,		"editor.cascade.el_dynamic"
+  },
 };
 
 static struct TokenInfo shortcut_setup_tokens[] =
 {
-  { TYPE_KEY_X11, &ssi.save_game,	"shortcut.save_game"		},
-  { TYPE_KEY_X11, &ssi.load_game,	"shortcut.load_game"		},
-  { TYPE_KEY_X11, &ssi.toggle_pause,	"shortcut.toggle_pause"		},
-  { TYPE_KEY_X11, &ssi.focus_player[0],	"shortcut.focus_player_1"	},
-  { TYPE_KEY_X11, &ssi.focus_player[1],	"shortcut.focus_player_2"	},
-  { TYPE_KEY_X11, &ssi.focus_player[2],	"shortcut.focus_player_3"	},
-  { TYPE_KEY_X11, &ssi.focus_player[3],	"shortcut.focus_player_4"	},
-  { TYPE_KEY_X11, &ssi.focus_player_all,"shortcut.focus_player_all"	},
-  { TYPE_KEY_X11, &ssi.tape_eject,	"shortcut.tape_eject"		},
-  { TYPE_KEY_X11, &ssi.tape_extra,	"shortcut.tape_extra"		},
-  { TYPE_KEY_X11, &ssi.tape_stop,	"shortcut.tape_stop"		},
-  { TYPE_KEY_X11, &ssi.tape_pause,	"shortcut.tape_pause"		},
-  { TYPE_KEY_X11, &ssi.tape_record,	"shortcut.tape_record"		},
-  { TYPE_KEY_X11, &ssi.tape_play,	"shortcut.tape_play"		},
-  { TYPE_KEY_X11, &ssi.sound_simple,	"shortcut.sound_simple"		},
-  { TYPE_KEY_X11, &ssi.sound_loops,	"shortcut.sound_loops"		},
-  { TYPE_KEY_X11, &ssi.sound_music,	"shortcut.sound_music"		},
-  { TYPE_KEY_X11, &ssi.snap_left,	"shortcut.snap_left"		},
-  { TYPE_KEY_X11, &ssi.snap_right,	"shortcut.snap_right"		},
-  { TYPE_KEY_X11, &ssi.snap_up,		"shortcut.snap_up"		},
-  { TYPE_KEY_X11, &ssi.snap_down,	"shortcut.snap_down"		},
+  {
+    TYPE_KEY_X11,
+    &setup.shortcut.save_game,			"shortcut.save_game"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup.shortcut.load_game,			"shortcut.load_game"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup.shortcut.toggle_pause,		"shortcut.toggle_pause"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup.shortcut.focus_player[0],		"shortcut.focus_player_1"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup.shortcut.focus_player[1],		"shortcut.focus_player_2"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup.shortcut.focus_player[2],		"shortcut.focus_player_3"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup.shortcut.focus_player[3],		"shortcut.focus_player_4"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup.shortcut.focus_player_all,		"shortcut.focus_player_all"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup.shortcut.tape_eject,			"shortcut.tape_eject"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup.shortcut.tape_extra,			"shortcut.tape_extra"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup.shortcut.tape_stop,			"shortcut.tape_stop"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup.shortcut.tape_pause,			"shortcut.tape_pause"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup.shortcut.tape_record,		"shortcut.tape_record"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup.shortcut.tape_play,			"shortcut.tape_play"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup.shortcut.sound_simple,		"shortcut.sound_simple"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup.shortcut.sound_loops,		"shortcut.sound_loops"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup.shortcut.sound_music,		"shortcut.sound_music"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup.shortcut.snap_left,			"shortcut.snap_left"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup.shortcut.snap_right,			"shortcut.snap_right"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup.shortcut.snap_up,			"shortcut.snap_up"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup.shortcut.snap_down,			"shortcut.snap_down"
+  },
 };
 
+static struct SetupInputInfo setup_input;
 static struct TokenInfo player_setup_tokens[] =
 {
-  { TYPE_BOOLEAN, &sii.use_joystick,	".use_joystick"			},
-  { TYPE_STRING,  &sii.joy.device_name,	".joy.device_name"		},
-  { TYPE_INTEGER, &sii.joy.xleft,	".joy.xleft"			},
-  { TYPE_INTEGER, &sii.joy.xmiddle,	".joy.xmiddle"			},
-  { TYPE_INTEGER, &sii.joy.xright,	".joy.xright"			},
-  { TYPE_INTEGER, &sii.joy.yupper,	".joy.yupper"			},
-  { TYPE_INTEGER, &sii.joy.ymiddle,	".joy.ymiddle"			},
-  { TYPE_INTEGER, &sii.joy.ylower,	".joy.ylower"			},
-  { TYPE_INTEGER, &sii.joy.snap,	".joy.snap_field"		},
-  { TYPE_INTEGER, &sii.joy.drop,	".joy.place_bomb"		},
-  { TYPE_KEY_X11, &sii.key.left,	".key.move_left"		},
-  { TYPE_KEY_X11, &sii.key.right,	".key.move_right"		},
-  { TYPE_KEY_X11, &sii.key.up,		".key.move_up"			},
-  { TYPE_KEY_X11, &sii.key.down,	".key.move_down"		},
-  { TYPE_KEY_X11, &sii.key.snap,	".key.snap_field"		},
-  { TYPE_KEY_X11, &sii.key.drop,	".key.place_bomb"		},
+  {
+    TYPE_BOOLEAN,
+    &setup_input.use_joystick,			".use_joystick"
+  },
+  {
+    TYPE_STRING,
+    &setup_input.joy.device_name,		".joy.device_name"
+  },
+  {
+    TYPE_INTEGER,
+    &setup_input.joy.xleft,			".joy.xleft"
+  },
+  {
+    TYPE_INTEGER,
+    &setup_input.joy.xmiddle,			".joy.xmiddle"
+  },
+  {
+    TYPE_INTEGER,
+    &setup_input.joy.xright,			".joy.xright"
+  },
+  {
+    TYPE_INTEGER,
+    &setup_input.joy.yupper,			".joy.yupper"
+  },
+  {
+    TYPE_INTEGER,
+    &setup_input.joy.ymiddle,			".joy.ymiddle"
+  },
+  {
+    TYPE_INTEGER,
+    &setup_input.joy.ylower,			".joy.ylower"
+  },
+  {
+    TYPE_INTEGER,
+    &setup_input.joy.snap,			".joy.snap_field"
+  },
+  {
+    TYPE_INTEGER,
+    &setup_input.joy.drop,			".joy.place_bomb"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup_input.key.left,			".key.move_left"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup_input.key.right,			".key.move_right"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup_input.key.up,			".key.move_up"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup_input.key.down,			".key.move_down"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup_input.key.snap,			".key.snap_field"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup_input.key.drop,			".key.place_bomb"
+  },
 };
 
 static struct TokenInfo system_setup_tokens[] =
 {
-  { TYPE_STRING,  &syi.sdl_videodriver,    "system.sdl_videodriver"	},
-  { TYPE_STRING,  &syi.sdl_audiodriver,	   "system.sdl_audiodriver"	},
-  { TYPE_INTEGER, &syi.audio_fragment_size,"system.audio_fragment_size"	},
+  {
+    TYPE_STRING,
+    &setup.system.sdl_videodriver,		"system.sdl_videodriver"
+  },
+  {
+    TYPE_STRING,
+    &setup.system.sdl_audiodriver,		"system.sdl_audiodriver"
+  },
+  {
+    TYPE_INTEGER,
+    &setup.system.audio_fragment_size,		"system.audio_fragment_size"
+  },
 };
 
 static struct TokenInfo internal_setup_tokens[] =
 {
-  { TYPE_STRING, &sxi.program_title,		"program_title"		},
-  { TYPE_STRING, &sxi.program_version,		"program_version"	},
-  { TYPE_STRING, &sxi.program_author,		"program_author"	},
-  { TYPE_STRING, &sxi.program_email,		"program_email"		},
-  { TYPE_STRING, &sxi.program_website,		"program_website"	},
-  { TYPE_STRING, &sxi.program_copyright,	"program_copyright"	},
-  { TYPE_STRING, &sxi.program_company,		"program_company"	},
-  { TYPE_STRING, &sxi.program_icon_file,	"program_icon_file"	},
-  { TYPE_STRING, &sxi.default_graphics_set,	"default_graphics_set"	},
-  { TYPE_STRING, &sxi.default_sounds_set,	"default_sounds_set"	},
-  { TYPE_STRING, &sxi.default_music_set,	"default_music_set"	},
-  { TYPE_STRING, &sxi.fallback_graphics_file,	"fallback_graphics_file"},
-  { TYPE_STRING, &sxi.fallback_sounds_file,	"fallback_sounds_file"	},
-  { TYPE_STRING, &sxi.fallback_music_file,	"fallback_music_file"	},
-  { TYPE_STRING, &sxi.default_level_series,	"default_level_series"	},
-  { TYPE_BOOLEAN,&sxi.choose_from_top_leveldir,	"choose_from_top_leveldir" },
-  { TYPE_BOOLEAN,&sxi.show_scaling_in_title,	"show_scaling_in_title" },
-  { TYPE_INTEGER,&sxi.default_window_width,	"default_window_width"	},
-  { TYPE_INTEGER,&sxi.default_window_height,	"default_window_height"	},
+  {
+    TYPE_STRING,
+    &setup.internal.program_title,		"program_title"
+  },
+  {
+    TYPE_STRING,
+    &setup.internal.program_version,		"program_version"
+  },
+  {
+    TYPE_STRING,
+    &setup.internal.program_author,		"program_author"
+  },
+  {
+    TYPE_STRING,
+    &setup.internal.program_email,		"program_email"
+  },
+  {
+    TYPE_STRING,
+    &setup.internal.program_website,		"program_website"
+  },
+  {
+    TYPE_STRING,
+    &setup.internal.program_copyright,		"program_copyright"
+  },
+  {
+    TYPE_STRING,
+    &setup.internal.program_company,		"program_company"
+  },
+  {
+    TYPE_STRING,
+    &setup.internal.program_icon_file,		"program_icon_file"
+  },
+  {
+    TYPE_STRING,
+    &setup.internal.default_graphics_set,	"default_graphics_set"
+  },
+  {
+    TYPE_STRING,
+    &setup.internal.default_sounds_set,		"default_sounds_set"
+  },
+  {
+    TYPE_STRING,
+    &setup.internal.default_music_set,		"default_music_set"
+  },
+  {
+    TYPE_STRING,
+    &setup.internal.fallback_graphics_file,	"fallback_graphics_file"
+  },
+  {
+    TYPE_STRING,
+    &setup.internal.fallback_sounds_file,	"fallback_sounds_file"
+  },
+  {
+    TYPE_STRING,
+    &setup.internal.fallback_music_file,	"fallback_music_file"
+  },
+  {
+    TYPE_STRING,
+    &setup.internal.default_level_series,	"default_level_series"
+  },
+  {
+    TYPE_BOOLEAN,
+    &setup.internal.choose_from_top_leveldir,	"choose_from_top_leveldir"
+  },
+  {
+    TYPE_BOOLEAN,
+    &setup.internal.show_scaling_in_title,	"show_scaling_in_title"
+  },
+  {
+    TYPE_INTEGER,
+    &setup.internal.default_window_width,	"default_window_width"
+  },
+  {
+    TYPE_INTEGER,
+    &setup.internal.default_window_height,	"default_window_height"
+  },
 };
 
 static struct TokenInfo debug_setup_tokens[] =
 {
-  { TYPE_INTEGER, &sdi.frame_delay[0],		"debug.frame_delay_0"	},
-  { TYPE_INTEGER, &sdi.frame_delay[1],		"debug.frame_delay_1"	},
-  { TYPE_INTEGER, &sdi.frame_delay[2],		"debug.frame_delay_2"	},
-  { TYPE_INTEGER, &sdi.frame_delay[3],		"debug.frame_delay_3"	},
-  { TYPE_INTEGER, &sdi.frame_delay[4],		"debug.frame_delay_4"	},
-  { TYPE_INTEGER, &sdi.frame_delay[5],		"debug.frame_delay_5"	},
-  { TYPE_INTEGER, &sdi.frame_delay[6],		"debug.frame_delay_6"	},
-  { TYPE_INTEGER, &sdi.frame_delay[7],		"debug.frame_delay_7"	},
-  { TYPE_INTEGER, &sdi.frame_delay[8],		"debug.frame_delay_8"	},
-  { TYPE_INTEGER, &sdi.frame_delay[9],		"debug.frame_delay_9"	},
-  { TYPE_KEY_X11, &sdi.frame_delay_key[0],	"debug.key.frame_delay_0" },
-  { TYPE_KEY_X11, &sdi.frame_delay_key[1],	"debug.key.frame_delay_1" },
-  { TYPE_KEY_X11, &sdi.frame_delay_key[2],	"debug.key.frame_delay_2" },
-  { TYPE_KEY_X11, &sdi.frame_delay_key[3],	"debug.key.frame_delay_3" },
-  { TYPE_KEY_X11, &sdi.frame_delay_key[4],	"debug.key.frame_delay_4" },
-  { TYPE_KEY_X11, &sdi.frame_delay_key[5],	"debug.key.frame_delay_5" },
-  { TYPE_KEY_X11, &sdi.frame_delay_key[6],	"debug.key.frame_delay_6" },
-  { TYPE_KEY_X11, &sdi.frame_delay_key[7],	"debug.key.frame_delay_7" },
-  { TYPE_KEY_X11, &sdi.frame_delay_key[8],	"debug.key.frame_delay_8" },
-  { TYPE_KEY_X11, &sdi.frame_delay_key[9],	"debug.key.frame_delay_9" },
-  { TYPE_BOOLEAN, &sdi.frame_delay_use_mod_key,"debug.frame_delay.use_mod_key"},
-  { TYPE_BOOLEAN, &sdi.frame_delay_game_only,  "debug.frame_delay.game_only" },
-  { TYPE_BOOLEAN, &sdi.show_frames_per_second, "debug.show_frames_per_second" },
+  {
+    TYPE_INTEGER,
+    &setup.debug.frame_delay[0],		"debug.frame_delay_0"
+  },
+  {
+    TYPE_INTEGER,
+    &setup.debug.frame_delay[1],		"debug.frame_delay_1"
+  },
+  {
+    TYPE_INTEGER,
+    &setup.debug.frame_delay[2],		"debug.frame_delay_2"
+  },
+  {
+    TYPE_INTEGER,
+    &setup.debug.frame_delay[3],		"debug.frame_delay_3"
+  },
+  {
+    TYPE_INTEGER,
+    &setup.debug.frame_delay[4],		"debug.frame_delay_4"
+  },
+  {
+    TYPE_INTEGER,
+    &setup.debug.frame_delay[5],		"debug.frame_delay_5"
+  },
+  {
+    TYPE_INTEGER,
+    &setup.debug.frame_delay[6],		"debug.frame_delay_6"
+  },
+  {
+    TYPE_INTEGER,
+    &setup.debug.frame_delay[7],		"debug.frame_delay_7"
+  },
+  {
+    TYPE_INTEGER,
+    &setup.debug.frame_delay[8],		"debug.frame_delay_8"
+  },
+  {
+    TYPE_INTEGER,
+    &setup.debug.frame_delay[9],		"debug.frame_delay_9"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup.debug.frame_delay_key[0],		"debug.key.frame_delay_0"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup.debug.frame_delay_key[1],		"debug.key.frame_delay_1"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup.debug.frame_delay_key[2],		"debug.key.frame_delay_2"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup.debug.frame_delay_key[3],		"debug.key.frame_delay_3"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup.debug.frame_delay_key[4],		"debug.key.frame_delay_4"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup.debug.frame_delay_key[5],		"debug.key.frame_delay_5"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup.debug.frame_delay_key[6],		"debug.key.frame_delay_6"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup.debug.frame_delay_key[7],		"debug.key.frame_delay_7"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup.debug.frame_delay_key[8],		"debug.key.frame_delay_8"
+  },
+  {
+    TYPE_KEY_X11,
+    &setup.debug.frame_delay_key[9],		"debug.key.frame_delay_9"
+  },
+  {
+    TYPE_BOOLEAN,
+    &setup.debug.frame_delay_use_mod_key,	"debug.frame_delay.use_mod_key"},
+  {
+    TYPE_BOOLEAN,
+    &setup.debug.frame_delay_game_only,		"debug.frame_delay.game_only"
+  },
+  {
+    TYPE_BOOLEAN,
+    &setup.debug.show_frames_per_second,	"debug.show_frames_per_second"
+  },
 };
 
 static struct TokenInfo options_setup_tokens[] =
 {
-  { TYPE_BOOLEAN, &soi.verbose,		"options.verbose"		},
+  {
+    TYPE_BOOLEAN,
+    &setup.options.verbose,			"options.verbose"
+  },
 };
 
 static char *get_corrected_login_name(char *login_name)
@@ -8883,14 +9370,6 @@ void setHideSetupEntry(void *setup_value)
     setHashEntry(hide_setup_hash, hide_setup_token, "");
 }
 
-static void setHideSetupEntryRaw(char *token_text, void *setup_value_raw)
-{
-  // !!! DIRTY WORKAROUND; TO BE FIXED AFTER THE MM ENGINE RELEASE !!!
-  void *setup_value = setup_value_raw - (void *)&si + (void *)&setup;
-
-  setHideSetupEntry(setup_value);
-}
-
 boolean hideSetupEntry(void *setup_value)
 {
   char *hide_setup_token = getHideSetupToken(setup_value);
@@ -8911,7 +9390,7 @@ static void setSetupInfoFromTokenText(SetupFileHash *setup_file_hash,
 
   // check if this setup option should be hidden in the setup menu
   if (token_hide_value != NULL && get_boolean_from_string(token_hide_value))
-    setHideSetupEntryRaw(token_text, token_info[token_nr].value);
+    setHideSetupEntry(token_info[token_nr].value);
 }
 
 static void setSetupInfoFromTokenInfo(SetupFileHash *setup_file_hash,
@@ -8932,13 +9411,9 @@ static void decodeSetupFileHash(SetupFileHash *setup_file_hash)
   if (hide_setup_hash == NULL)
     hide_setup_hash = newSetupFileHash();
 
-  // global setup
-  si = setup;
   for (i = 0; i < ARRAY_SIZE(global_setup_tokens); i++)
     setSetupInfoFromTokenInfo(setup_file_hash, global_setup_tokens, i);
-  setup = si;
 
-  // virtual buttons setup
   setup.touch.grid_initialized = TRUE;
   for (i = 0; i < 2; i++)
   {
@@ -8977,26 +9452,19 @@ static void decodeSetupFileHash(SetupFileHash *setup_file_hash)
     }
   }
 
-  // editor setup
-  sei = setup.editor;
   for (i = 0; i < ARRAY_SIZE(editor_setup_tokens); i++)
     setSetupInfoFromTokenInfo(setup_file_hash, editor_setup_tokens, i);
-  setup.editor = sei;
 
-  // shortcut setup
-  ssi = setup.shortcut;
   for (i = 0; i < ARRAY_SIZE(shortcut_setup_tokens); i++)
     setSetupInfoFromTokenInfo(setup_file_hash, shortcut_setup_tokens, i);
-  setup.shortcut = ssi;
 
-  // player setup
   for (pnr = 0; pnr < MAX_PLAYERS; pnr++)
   {
     char prefix[30];
 
     sprintf(prefix, "%s%d", TOKEN_STR_PLAYER_PREFIX, pnr + 1);
 
-    sii = setup.input[pnr];
+    setup_input = setup.input[pnr];
     for (i = 0; i < ARRAY_SIZE(player_setup_tokens); i++)
     {
       char full_token[100];
@@ -9005,32 +9473,20 @@ static void decodeSetupFileHash(SetupFileHash *setup_file_hash)
       setSetupInfoFromTokenText(setup_file_hash, player_setup_tokens, i,
 				full_token);
     }
-    setup.input[pnr] = sii;
+    setup.input[pnr] = setup_input;
   }
 
-  // system setup
-  syi = setup.system;
   for (i = 0; i < ARRAY_SIZE(system_setup_tokens); i++)
     setSetupInfoFromTokenInfo(setup_file_hash, system_setup_tokens, i);
-  setup.system = syi;
 
-  // internal setup
-  sxi = setup.internal;
   for (i = 0; i < ARRAY_SIZE(internal_setup_tokens); i++)
     setSetupInfoFromTokenInfo(setup_file_hash, internal_setup_tokens, i);
-  setup.internal = sxi;
 
-  // debug setup
-  sdi = setup.debug;
   for (i = 0; i < ARRAY_SIZE(debug_setup_tokens); i++)
     setSetupInfoFromTokenInfo(setup_file_hash, debug_setup_tokens, i);
-  setup.debug = sdi;
 
-  // options setup
-  soi = setup.options;
   for (i = 0; i < ARRAY_SIZE(options_setup_tokens); i++)
     setSetupInfoFromTokenInfo(setup_file_hash, options_setup_tokens, i);
-  setup.options = soi;
 
   setHideRelatedSetupEntries();
 }
@@ -9042,13 +9498,10 @@ static void decodeSetupFileHash_AutoSetup(SetupFileHash *setup_file_hash)
   if (!setup_file_hash)
     return;
 
-  // auto setup
-  sasi = setup.auto_setup;
   for (i = 0; i < ARRAY_SIZE(auto_setup_tokens); i++)
     setSetupInfo(auto_setup_tokens, i,
 		 getHashEntry(setup_file_hash,
 			      auto_setup_tokens[i].text));
-  setup.auto_setup = sasi;
 }
 
 static void decodeSetupFileHash_EditorCascade(SetupFileHash *setup_file_hash)
@@ -9058,13 +9511,10 @@ static void decodeSetupFileHash_EditorCascade(SetupFileHash *setup_file_hash)
   if (!setup_file_hash)
     return;
 
-  // editor cascade setup
-  seci = setup.editor_cascade;
   for (i = 0; i < ARRAY_SIZE(editor_cascade_setup_tokens); i++)
     setSetupInfo(editor_cascade_setup_tokens, i,
 		 getHashEntry(setup_file_hash,
 			      editor_cascade_setup_tokens[i].text));
-  setup.editor_cascade = seci;
 }
 
 void LoadSetupFromFilename(char *filename)
@@ -9230,24 +9680,21 @@ void SaveSetup(void)
 
   fprintFileHeader(file, SETUP_FILENAME);
 
-  // global setup
-  si = setup;
   for (i = 0; i < ARRAY_SIZE(global_setup_tokens); i++)
   {
     // just to make things nicer :)
-    if (global_setup_tokens[i].value == &si.sound		||
-	global_setup_tokens[i].value == &si.graphics_set	||
-	global_setup_tokens[i].value == &si.volume_simple	||
-	global_setup_tokens[i].value == &si.network_mode	||
-	global_setup_tokens[i].value == &si.touch.control_type	||
-	global_setup_tokens[i].value == &si.touch.grid_xsize[0]	||
-	global_setup_tokens[i].value == &si.touch.grid_xsize[1])
+    if (global_setup_tokens[i].value == &setup.sound			||
+	global_setup_tokens[i].value == &setup.graphics_set		||
+	global_setup_tokens[i].value == &setup.volume_simple		||
+	global_setup_tokens[i].value == &setup.network_mode		||
+	global_setup_tokens[i].value == &setup.touch.control_type	||
+	global_setup_tokens[i].value == &setup.touch.grid_xsize[0]	||
+	global_setup_tokens[i].value == &setup.touch.grid_xsize[1])
       fprintf(file, "\n");
 
     fprintf(file, "%s\n", getSetupLine(global_setup_tokens, "", i));
   }
 
-  // virtual buttons setup
   for (i = 0; i < 2; i++)
   {
     int grid_xsize = setup.touch.grid_xsize[i];
@@ -9276,19 +9723,14 @@ void SaveSetup(void)
     }
   }
 
-  // editor setup
-  sei = setup.editor;
   fprintf(file, "\n");
   for (i = 0; i < ARRAY_SIZE(editor_setup_tokens); i++)
     fprintf(file, "%s\n", getSetupLine(editor_setup_tokens, "", i));
 
-  // shortcut setup
-  ssi = setup.shortcut;
   fprintf(file, "\n");
   for (i = 0; i < ARRAY_SIZE(shortcut_setup_tokens); i++)
     fprintf(file, "%s\n", getSetupLine(shortcut_setup_tokens, "", i));
 
-  // player setup
   for (pnr = 0; pnr < MAX_PLAYERS; pnr++)
   {
     char prefix[30];
@@ -9296,28 +9738,21 @@ void SaveSetup(void)
     sprintf(prefix, "%s%d", TOKEN_STR_PLAYER_PREFIX, pnr + 1);
     fprintf(file, "\n");
 
-    sii = setup.input[pnr];
+    setup_input = setup.input[pnr];
     for (i = 0; i < ARRAY_SIZE(player_setup_tokens); i++)
       fprintf(file, "%s\n", getSetupLine(player_setup_tokens, prefix, i));
   }
 
-  // system setup
-  syi = setup.system;
   fprintf(file, "\n");
   for (i = 0; i < ARRAY_SIZE(system_setup_tokens); i++)
     fprintf(file, "%s\n", getSetupLine(system_setup_tokens, "", i));
 
-  // internal setup
   // (internal setup values not saved to user setup file)
 
-  // debug setup
-  sdi = setup.debug;
   fprintf(file, "\n");
   for (i = 0; i < ARRAY_SIZE(debug_setup_tokens); i++)
     fprintf(file, "%s\n", getSetupLine(debug_setup_tokens, "", i));
 
-  // options setup
-  soi = setup.options;
   fprintf(file, "\n");
   for (i = 0; i < ARRAY_SIZE(options_setup_tokens); i++)
     fprintf(file, "%s\n", getSetupLine(options_setup_tokens, "", i));
@@ -9344,7 +9779,6 @@ void SaveSetup_AutoSetup(void)
 
   fprintFileHeader(file, AUTOSETUP_FILENAME);
 
-  sasi = setup.auto_setup;
   for (i = 0; i < ARRAY_SIZE(auto_setup_tokens); i++)
     fprintf(file, "%s\n", getSetupLine(auto_setup_tokens, "", i));
 
@@ -9372,7 +9806,6 @@ void SaveSetup_EditorCascade(void)
 
   fprintFileHeader(file, EDITORCASCADE_FILENAME);
 
-  seci = setup.editor_cascade;
   for (i = 0; i < ARRAY_SIZE(editor_cascade_setup_tokens); i++)
     fprintf(file, "%s\n", getSetupLine(editor_cascade_setup_tokens, "", i));
 
