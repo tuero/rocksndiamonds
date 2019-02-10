@@ -686,6 +686,7 @@ static struct
   SDL_FingerID finger_id;
   int counter;
   Key key;
+  byte action;
 } touch_info[NUM_TOUCH_FINGERS];
 
 static void HandleFingerEvent_VirtualButtons(FingerEvent *event)
@@ -814,6 +815,9 @@ static void HandleFingerEvent_VirtualButtons(FingerEvent *event)
 	{
 	  HandleKey(touch_info[i].key, KEY_RELEASED);
 
+	  // undraw previous grid button when moving finger away
+	  overlay.grid_button_action &= ~touch_info[i].action;
+
 	  Error(ERR_DEBUG, "=> key == '%s', key_status == '%s' [slot %d] [2]",
 		getKeyNameFromKey(touch_info[i].key), "KEY_RELEASED", i);
 	}
@@ -831,6 +835,7 @@ static void HandleFingerEvent_VirtualButtons(FingerEvent *event)
       touch_info[i].finger_id = event->fingerId;
       touch_info[i].counter = Counter();
       touch_info[i].key = key;
+      touch_info[i].action = grid_button_action;
     }
     else
     {
@@ -846,6 +851,7 @@ static void HandleFingerEvent_VirtualButtons(FingerEvent *event)
       touch_info[i].finger_id = 0;
       touch_info[i].counter = 0;
       touch_info[i].key = 0;
+      touch_info[i].action = JOY_NO_ACTION;
     }
   }
 }
