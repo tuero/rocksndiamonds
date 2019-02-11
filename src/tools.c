@@ -218,7 +218,7 @@ static int getFieldbufferOffsetX_RND(void)
   if (EVEN(SCR_FIELDX))
   {
     int sbx_right = SBX_Right + (BorderElement != EL_EMPTY ? 1 : 0);
-    int ffx = (scroll_x - SBX_Left)  * TILEX_VAR + dx_var;
+    int ffx = (scroll_x - SBX_Left) * TILEX_VAR + dx_var;
 
     if (ffx < sbx_right * TILEX_VAR + TILEX_VAR / 2)
       fx += dx_var - MIN(ffx, TILEX_VAR / 2) + TILEX_VAR;
@@ -244,7 +244,7 @@ static int getFieldbufferOffsetX_RND(void)
 static int getFieldbufferOffsetY_RND(void)
 {
   int full_lev_fieldy = lev_fieldy + (BorderElement != EL_EMPTY ? 2 : 0);
-  int dy = (ScreenMovDir & (MV_UP | MV_DOWN)    ? ScreenGfxPos : 0);
+  int dy = (ScreenMovDir & (MV_UP | MV_DOWN) ? ScreenGfxPos : 0);
   int dy_var = dy * TILESIZE_VAR / TILESIZE;
   int fy = FY;
 
