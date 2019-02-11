@@ -217,9 +217,10 @@ static int getFieldbufferOffsetX_RND(void)
 
   if (EVEN(SCR_FIELDX))
   {
+    int sbx_right = SBX_Right + (BorderElement != EL_EMPTY ? 1 : 0);
     int ffx = (scroll_x - SBX_Left)  * TILEX_VAR + dx_var;
 
-    if (ffx < SBX_Right * TILEX_VAR + TILEX_VAR / 2 + TILEX_VAR)
+    if (ffx < sbx_right * TILEX_VAR + TILEX_VAR / 2)
       fx += dx_var - MIN(ffx, TILEX_VAR / 2) + TILEX_VAR;
     else
       fx += (dx_var > 0 ? TILEX_VAR : 0);
@@ -249,9 +250,10 @@ static int getFieldbufferOffsetY_RND(void)
 
   if (EVEN(SCR_FIELDY))
   {
+    int sby_lower = SBY_Lower + (BorderElement != EL_EMPTY ? 1 : 0);
     int ffy = (scroll_y - SBY_Upper) * TILEY_VAR + dy_var;
 
-    if (ffy < SBY_Lower * TILEY_VAR + TILEY_VAR / 2 + TILEY_VAR)
+    if (ffy < sby_lower * TILEY_VAR + TILEY_VAR / 2)
       fy += dy_var - MIN(ffy, TILEY_VAR / 2) + TILEY_VAR;
     else
       fy += (dy_var > 0 ? TILEY_VAR : 0);
