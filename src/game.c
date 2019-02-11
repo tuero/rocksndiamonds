@@ -11994,7 +11994,7 @@ void GameActions_RND(void)
 	   element == EL_DC_MAGIC_WALL_FULL ||
 	   element == EL_DC_MAGIC_WALL_ACTIVE ||
 	   element == EL_DC_MAGIC_WALL_EMPTYING) &&
-	  ABS(x-jx) + ABS(y-jy) < ABS(magic_wall_x-jx) + ABS(magic_wall_y-jy))
+	  ABS(x - jx) + ABS(y - jy) < ABS(magic_wall_x - jx) + ABS(magic_wall_y - jy))
       {
 	magic_wall_x = x;
 	magic_wall_y = y;
@@ -12528,7 +12528,7 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
       {
  	if ((player->MovDir == MV_LEFT  && scroll_x > jx - MIDPOSX + offset) ||
 	    (player->MovDir == MV_RIGHT && scroll_x < jx - MIDPOSX - offset))
-	  scroll_x = jx-MIDPOSX + (scroll_x < jx-MIDPOSX ? -offset : +offset);
+	  scroll_x = jx - MIDPOSX + (scroll_x < jx - MIDPOSX ? -offset : +offset);
 
 	// don't scroll over playfield boundaries
 	if (scroll_x < SBX_Left || scroll_x > SBX_Right)
@@ -12546,7 +12546,7 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
       {
 	if ((player->MovDir == MV_UP   && scroll_y > jy - MIDPOSY + offset) ||
 	    (player->MovDir == MV_DOWN && scroll_y < jy - MIDPOSY - offset))
-	  scroll_y = jy-MIDPOSY + (scroll_y < jy-MIDPOSY ? -offset : +offset);
+	  scroll_y = jy - MIDPOSY + (scroll_y < jy - MIDPOSY ? -offset : +offset);
 
 	// don't scroll over playfield boundaries
 	if (scroll_y < SBY_Upper || scroll_y > SBY_Lower)
