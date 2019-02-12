@@ -11994,7 +11994,8 @@ void GameActions_RND(void)
 	   element == EL_DC_MAGIC_WALL_FULL ||
 	   element == EL_DC_MAGIC_WALL_ACTIVE ||
 	   element == EL_DC_MAGIC_WALL_EMPTYING) &&
-	  ABS(x - jx) + ABS(y - jy) < ABS(magic_wall_x - jx) + ABS(magic_wall_y - jy))
+	  ABS(x - jx) + ABS(y - jy) <
+	  ABS(magic_wall_x - jx) + ABS(magic_wall_y - jy))
       {
 	magic_wall_x = x;
 	magic_wall_y = y;
@@ -12512,7 +12513,6 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
        game.centered_player_nr == -1))
   {
     int old_scroll_x = scroll_x, old_scroll_y = scroll_y;
-    int offset = game.scroll_delay_value;
 
     if (!IN_VIS_FIELD(SCREENX(jx), SCREENY(jy)))
     {
@@ -12524,15 +12524,19 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
     }
     else
     {
+      int offset = game.scroll_delay_value;
+
       if (jx != old_jx)		// player has moved horizontally
       {
- 	if ((player->MovDir == MV_LEFT  && scroll_x > jx - MIDPOSX + offset) ||
-	    (player->MovDir == MV_RIGHT && scroll_x < jx - MIDPOSX - offset))
-	  scroll_x = jx - MIDPOSX + (scroll_x < jx - MIDPOSX ? -offset : +offset);
+	int offset_x = offset * (player->MovDir == MV_LEFT ? +1 : -1);
+	int new_scroll_x = jx - MIDPOSX + offset_x;
+
+	if ((player->MovDir == MV_LEFT  && scroll_x > new_scroll_x) ||
+	    (player->MovDir == MV_RIGHT && scroll_x < new_scroll_x))
+	  scroll_x = new_scroll_x;
 
 	// don't scroll over playfield boundaries
-	if (scroll_x < SBX_Left || scroll_x > SBX_Right)
-	  scroll_x = (scroll_x < SBX_Left ? SBX_Left : SBX_Right);
+	scroll_x = MIN(MAX(SBX_Left, scroll_x), SBX_Right);
 
 	// don't scroll more than one field at a time
 	scroll_x = old_scroll_x + SIGN(scroll_x - old_scroll_x);
@@ -12544,13 +12548,15 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
       }
       else			// player has moved vertically
       {
-	if ((player->MovDir == MV_UP   && scroll_y > jy - MIDPOSY + offset) ||
-	    (player->MovDir == MV_DOWN && scroll_y < jy - MIDPOSY - offset))
-	  scroll_y = jy - MIDPOSY + (scroll_y < jy - MIDPOSY ? -offset : +offset);
+	int offset_y = offset * (player->MovDir == MV_UP ? +1 : -1);
+	int new_scroll_y = jy - MIDPOSY + offset_y;
+
+	if ((player->MovDir == MV_UP   && scroll_y > new_scroll_y) ||
+	    (player->MovDir == MV_DOWN && scroll_y < new_scroll_y))
+	  scroll_y = new_scroll_y;
 
 	// don't scroll over playfield boundaries
-	if (scroll_y < SBY_Upper || scroll_y > SBY_Lower)
-	  scroll_y = (scroll_y < SBY_Upper ? SBY_Upper : SBY_Lower);
+	scroll_y = MIN(MAX(SBY_Upper, scroll_y), SBY_Lower);
 
 	// don't scroll more than one field at a time
 	scroll_y = old_scroll_y + SIGN(scroll_y - old_scroll_y);
