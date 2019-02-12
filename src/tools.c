@@ -208,10 +208,10 @@ int correctLevelPosY_EM(int ly)
   return ly;
 }
 
-static int getFieldbufferOffsetX_RND(void)
+int getFieldbufferOffsetX_RND(int dir, int pos)
 {
   int full_lev_fieldx = lev_fieldx + (BorderElement != EL_EMPTY ? 2 : 0);
-  int dx = (ScreenMovDir & (MV_LEFT | MV_RIGHT) ? ScreenGfxPos : 0);
+  int dx = (dir & MV_HORIZONTAL ? pos : 0);
   int dx_var = dx * TILESIZE_VAR / TILESIZE;
   int fx = FX;
 
@@ -241,10 +241,10 @@ static int getFieldbufferOffsetX_RND(void)
   return fx;
 }
 
-static int getFieldbufferOffsetY_RND(void)
+int getFieldbufferOffsetY_RND(int dir, int pos)
 {
   int full_lev_fieldy = lev_fieldy + (BorderElement != EL_EMPTY ? 2 : 0);
-  int dy = (ScreenMovDir & (MV_UP | MV_DOWN) ? ScreenGfxPos : 0);
+  int dy = (dir & MV_VERTICAL ? pos : 0);
   int dy_var = dy * TILESIZE_VAR / TILESIZE;
   int fy = FY;
 
@@ -276,7 +276,7 @@ static int getFieldbufferOffsetY_RND(void)
 
 static int getLevelFromScreenX_RND(int sx)
 {
-  int fx = getFieldbufferOffsetX_RND();
+  int fx = getFieldbufferOffsetX_RND(ScreenMovDir, ScreenGfxPos);
   int dx = fx - FX;
   int px = sx - SX;
   int lx = LEVELX((px + dx) / TILESIZE_VAR);
@@ -286,7 +286,7 @@ static int getLevelFromScreenX_RND(int sx)
 
 static int getLevelFromScreenY_RND(int sy)
 {
-  int fy = getFieldbufferOffsetY_RND();
+  int fy = getFieldbufferOffsetY_RND(ScreenMovDir, ScreenGfxPos);
   int dy = fy - FY;
   int py = sy - SY;
   int ly = LEVELY((py + dy) / TILESIZE_VAR);
@@ -691,12 +691,17 @@ void DrawTileCursor(int draw_target)
 		     dst_x, dst_y);
 }
 
+void BlitScreenToBitmapExt_RND(Bitmap *target_bitmap, int fx, int fy)
+{
+  BlitBitmap(drawto_field, target_bitmap, fx, fy, SXSIZE, SYSIZE, SX, SY);
+}
+
 void BlitScreenToBitmap_RND(Bitmap *target_bitmap)
 {
-  int fx = getFieldbufferOffsetX_RND();
-  int fy = getFieldbufferOffsetY_RND();
+  int fx = getFieldbufferOffsetX_RND(ScreenMovDir, ScreenGfxPos);
+  int fy = getFieldbufferOffsetY_RND(ScreenMovDir, ScreenGfxPos);
 
-  BlitBitmap(drawto_field, target_bitmap, fx, fy, SXSIZE, SYSIZE, SX, SY);
+  BlitScreenToBitmapExt_RND(target_bitmap, fx, fy);
 }
 
 void BlitScreenToBitmap(Bitmap *target_bitmap)

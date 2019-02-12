@@ -66,6 +66,9 @@
 #define REQUEST_WAIT_FOR_INPUT	(REQ_ASK | REQ_CONFIRM | REQ_PLAYER)
 
 
+int getFieldbufferOffsetX_RND(int, int);
+int getFieldbufferOffsetY_RND(int, int);
+
 int correctLevelPosX_EM(int);
 int correctLevelPosY_EM(int);
 
@@ -86,6 +89,7 @@ void DrawTileCursor(int);
 
 void SetDrawtoField(int);
 void RedrawPlayfield(void);
+void BlitScreenToBitmapExt_RND(Bitmap *, int, int);
 void BlitScreenToBitmap_RND(Bitmap *);
 void BlitScreenToBitmap(Bitmap *);
 void BackToFront(void);
