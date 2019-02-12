@@ -5273,11 +5273,8 @@ static void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
 
   while (scroll_x != new_scroll_x || scroll_y != new_scroll_y)
   {
-    int dx = 0, dy = 0;
-    int fx = FX, fy = FY;
-
-    dx = (new_scroll_x < scroll_x ? +1 : new_scroll_x > scroll_x ? -1 : 0);
-    dy = (new_scroll_y < scroll_y ? +1 : new_scroll_y > scroll_y ? -1 : 0);
+    int dx = (new_scroll_x < scroll_x ? +1 : new_scroll_x > scroll_x ? -1 : 0);
+    int dy = (new_scroll_y < scroll_y ? +1 : new_scroll_y > scroll_y ? -1 : 0);
 
     if (dx == 0 && dy == 0)		// no scrolling needed at all
       break;
@@ -5285,14 +5282,19 @@ static void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
     scroll_x -= dx;
     scroll_y -= dy;
 
-    fx += dx * TILEX / 2;
-    fy += dy * TILEY / 2;
+    // set values for horizontal/vertical screen scrolling (half tile size)
+    int dir_x = (dx != 0 ? MV_HORIZONTAL : 0);
+    int dir_y = (dy != 0 ? MV_VERTICAL   : 0);
+    int pos_x = dx * TILEX / 2;
+    int pos_y = dy * TILEY / 2;
+    int fx = getFieldbufferOffsetX_RND(dir_x, pos_x);
+    int fy = getFieldbufferOffsetY_RND(dir_y, pos_y);
 
     ScrollLevel(dx, dy);
     DrawAllPlayers();
 
     // scroll in two steps of half tile size to make things smoother
-    BlitBitmap(drawto_field, window, fx, fy, SXSIZE, SYSIZE, SX, SY);
+    BlitScreenToBitmapExt_RND(window, fx, fy);
 
     // scroll second step to align at full tile size
     BlitScreenToBitmap(window);
