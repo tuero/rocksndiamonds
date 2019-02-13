@@ -11465,8 +11465,9 @@ static void GameActionsExt(void)
     stored_player[map_player_action[local_player->index_nr]].effective_action =
       summarized_player_action;
 
+  // summarize all actions at centered player in local team mode
   if (tape.recording &&
-      setup.team_mode &&
+      setup.team_mode && !network.enabled &&
       setup.input_on_focus &&
       game.centered_player_nr != -1)
   {
