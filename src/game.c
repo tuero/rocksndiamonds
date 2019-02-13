@@ -11471,7 +11471,7 @@ static void GameActionsExt(void)
       game.centered_player_nr != -1)
   {
     for (i = 0; i < MAX_PLAYERS; i++)
-      stored_player[i].effective_action =
+      stored_player[map_player_action[i]].effective_action =
 	(i == game.centered_player_nr ? summarized_player_action : 0);
   }
 
