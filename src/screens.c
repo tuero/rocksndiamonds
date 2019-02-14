@@ -8497,16 +8497,8 @@ static void CreateScreenMenubuttons(void)
 
     menubutton_info[i].get_gadget_position(&x, &y, id);
 
-    if (menubutton_info[i].screen_mask == SCREEN_MASK_MAIN_HAS_SOLUTION)
-    {
-      width  = graphic_info[menubutton_info[i].gfx_pressed].width;
-      height = graphic_info[menubutton_info[i].gfx_pressed].height;
-    }
-    else
-    {
-      width = SC_MENUBUTTON_XSIZE;
-      height = SC_MENUBUTTON_YSIZE;
-    }
+    width  = graphic_info[menubutton_info[i].gfx_pressed].width;
+    height = graphic_info[menubutton_info[i].gfx_pressed].height;
 
     gfx_unpressed = menubutton_info[i].gfx_unpressed;
     gfx_pressed   = menubutton_info[i].gfx_pressed;
