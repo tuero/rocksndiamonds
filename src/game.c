@@ -12532,10 +12532,11 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
     }
     else
     {
-      int offset = game.scroll_delay_value;
+      int offset_raw = game.scroll_delay_value;
 
       if (jx != old_jx)		// player has moved horizontally
       {
+	int offset = MIN(offset_raw, (SCR_FIELDX - 2) / 2);
 	int offset_x = offset * (player->MovDir == MV_LEFT ? +1 : -1);
 	int new_scroll_x = jx - MIDPOSX + offset_x;
 
@@ -12556,6 +12557,7 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
       }
       else			// player has moved vertically
       {
+	int offset = MIN(offset_raw, (SCR_FIELDY - 2) / 2);
 	int offset_y = offset * (player->MovDir == MV_UP ? +1 : -1);
 	int new_scroll_y = jy - MIDPOSY + offset_y;
 

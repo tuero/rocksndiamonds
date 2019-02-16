@@ -549,9 +549,9 @@ void RedrawPlayfield_EM(boolean force_redraw)
   int max_center_distance_player_nr =
     getMaxCenterDistancePlayerNr(screen_x, screen_y);
   int stepsize = TILEX / 8;
-  int offset = game.scroll_delay_value * TILEX;
-  int offset_x = offset;
-  int offset_y = offset;
+  int offset_raw = game.scroll_delay_value;
+  int offset_x = MIN(offset_raw, (SCR_FIELDX - 2) / 2) * TILEX;
+  int offset_y = MIN(offset_raw, (SCR_FIELDY - 2) / 2) * TILEY;
   int screen_x_old = screen_x;
   int screen_y_old = screen_y;
   int x, y, sx, sy;
@@ -590,7 +590,7 @@ void RedrawPlayfield_EM(boolean force_redraw)
 
   if (game.centered_player_nr == -1)
   {
-    if (draw_new_player_location || offset == 0)
+    if (draw_new_player_location || offset_raw == 0)
     {
       setScreenCenteredToAllPlayers(&sx, &sy);
     }
