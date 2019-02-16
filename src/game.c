@@ -12180,12 +12180,17 @@ void GameActions_RND(void)
   DrawAllPlayers();
   PlayAllPlayersSound();
 
-  if (local_player->show_envelope != 0 && (!local_player->active ||
-					   local_player->MovPos == 0))
+  for (i = 0; i < MAX_PLAYERS; i++)
   {
-    ShowEnvelope(local_player->show_envelope - EL_ENVELOPE_1);
+    struct PlayerInfo *player = &stored_player[i];
 
-    local_player->show_envelope = 0;
+    if (player->show_envelope != 0 && (!player->active ||
+				       player->MovPos == 0))
+    {
+      ShowEnvelope(player->show_envelope - EL_ENVELOPE_1);
+
+      player->show_envelope = 0;
+    }
   }
 
   // use random number generator in every frame to make it less predictable
