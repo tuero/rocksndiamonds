@@ -10876,7 +10876,6 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
   };
   static int last_x = -1;
   static int last_y = -1;
-  int old_element = IntelliDrawBuffer[x][y];
 
   if (new_element == EL_UNDEFINED)
   {
@@ -10885,6 +10884,8 @@ static void SetElementIntelliDraw(int x, int y, int new_element,
 
     return;
   }
+
+  int old_element = IntelliDrawBuffer[x][y];
 
   if (IS_TUBE(new_element))
   {
