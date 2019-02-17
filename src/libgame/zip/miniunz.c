@@ -639,7 +639,14 @@ char **zip_extract(char *filename, char *directory)
 
     int success = (miniunz_extract_all(uf, 0, 1, NULL) == UNZ_OK);
 
-    CHDIR(last_directory);	// change back to previous directory
+    if (CHDIR(last_directory))	// change back to previous directory
+    {
+      debug_printf("Cannot change to directory '%s'!\n", last_directory);
+
+      unzClose(uf);
+
+      return NULL;
+    }
 
     unzClose(uf);
 
