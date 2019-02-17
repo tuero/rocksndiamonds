@@ -16,22 +16,6 @@
 #ifndef _ZLIBIOAPI64_H
 #define _ZLIBIOAPI64_H
 
-#if defined(__linux__)
-// Linux needs this to support file operation on files larger then 4+GB
-#  ifndef __USE_FILE_OFFSET64
-#  define __USE_FILE_OFFSET64
-#  endif
-#  ifndef __USE_LARGEFILE64
-#  define __USE_LARGEFILE64
-#  endif
-#  ifndef _LARGEFILE64_SOURCE
-#  define _LARGEFILE64_SOURCE
-#  endif
-#  ifndef _FILE_OFFSET_BIT
-#  define _FILE_OFFSET_BIT 64
-#  endif
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -49,7 +33,7 @@
 #  define ftello64 ftell
 #  define fseeko64 fseek
 #else
-#  if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__DragonFly__) || defined(__OpenBSD__) || defined(__APPLE__) || defined(__ANDROID__)
+#  if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__DragonFly__) || defined(__OpenBSD__) || defined(__APPLE__) || defined(__ANDROID__) || defined(__linux__)
 #    define fopen64 fopen
 #    define ftello64 ftello
 #    define fseeko64 fseeko
