@@ -628,24 +628,24 @@ char **zip_extract(char *filename, char *directory)
 	return NULL;
     }
 
-    if (CHDIR(directory))	// change to target directory
+    if (CHDIR(directory) != 0)		// change to target directory
     {
-      debug_printf("Cannot change to directory '%s'!\n", directory);
+        debug_printf("Cannot change to directory '%s'!\n", directory);
 
-      unzClose(uf);
+        unzClose(uf);
 
-      return NULL;
+        return NULL;
     }
 
     int success = (miniunz_extract_all(uf, 0, 1, NULL) == UNZ_OK);
 
-    if (CHDIR(last_directory))	// change back to previous directory
+    if (CHDIR(last_directory) != 0)	// change back to previous directory
     {
-      debug_printf("Cannot change to directory '%s'!\n", last_directory);
+        debug_printf("Cannot change to directory '%s'!\n", last_directory);
 
-      unzClose(uf);
+        unzClose(uf);
 
-      return NULL;
+        return NULL;
     }
 
     unzClose(uf);
