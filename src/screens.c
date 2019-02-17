@@ -1938,7 +1938,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
   static boolean button_pressed_last = FALSE;
   boolean button_pressed = FALSE;
   int pos = choice;
-  int i;
+  int i = 0;	// needed to prevent compiler warning due to bad code below
 
   if (button == MB_MENU_INITIALIZE)
   {
