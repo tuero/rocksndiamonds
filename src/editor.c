@@ -12791,13 +12791,37 @@ static void HandleDrawingAreas(struct GadgetInfo *gi)
 	{
 	  SetDrawModeHiRes(new_element);
 
-	  if (new_element == EL_PLAYER_1)
+	  if (ELEM_IS_PLAYER(new_element))
 	  {
 	    // remove player at old position
 	    for (y = 0; y < lev_fieldy; y++)
+	    {
 	      for (x = 0; x < lev_fieldx; x++)
-		if (Feld[x][y] == EL_PLAYER_1)
-		  SetElement(x, y, EL_EMPTY);
+	      {
+		int old_element = Feld[x][y];
+
+		if (ELEM_IS_PLAYER(old_element))
+		{
+		  int replaced_with_element =
+		    (old_element == EL_SOKOBAN_FIELD_PLAYER &&
+		     new_element == EL_PLAYER_1 ? EL_SOKOBAN_FIELD_EMPTY :
+
+		     old_element == EL_SOKOBAN_FIELD_PLAYER &&
+		     new_element == old_element ? EL_SOKOBAN_FIELD_EMPTY :
+
+		     new_element == EL_SOKOBAN_FIELD_PLAYER &&
+		     old_element == EL_PLAYER_1 ? EL_EMPTY :
+
+		     new_element >= EL_PLAYER_1 &&
+		     new_element <= EL_PLAYER_4 &&
+		     new_element == old_element ? EL_EMPTY :
+
+		     old_element);
+
+		  SetElement(x, y, replaced_with_element);
+		}
+	      }
+	    }
 	  }
 
 	  SetElementButton(lx, ly, dx, dy, new_element, button);
