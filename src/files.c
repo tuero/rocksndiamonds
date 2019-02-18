@@ -11598,7 +11598,7 @@ void CreateCustomElementImages(char *directory)
   int yoffset_ge = (TILEY * NUM_CUSTOM_ELEMENTS / 16);
   int i;
 
-  SDLInitVideoDisplay();
+  InitVideoDefaults();
 
   ReCreateBitmap(&backbuffer, video.width, video.height);
 
