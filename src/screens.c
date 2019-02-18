@@ -4530,7 +4530,7 @@ void DrawChooseLevelNr(void)
   for (i = leveldir_current->first_level; i <= leveldir_current->last_level;i++)
   {
     TreeInfo *ti = newTreeInfo_setDefaults(TREE_TYPE_LEVEL_NR);
-    char identifier[32], name[32];
+    char identifier[32], name[64];
     int value = i;
 
     // temporarily load level info to get level name
