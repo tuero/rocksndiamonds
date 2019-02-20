@@ -268,14 +268,12 @@ void HandleOtherEvents(Event *event)
       HandleJoystickEvent(event);
       break;
 
-#if defined(USE_DRAG_AND_DROP)
     case SDL_DROPBEGIN:
     case SDL_DROPCOMPLETE:
     case SDL_DROPFILE:
     case SDL_DROPTEXT:
       HandleDropEvent(event);
       break;
-#endif
 
     default:
       break;
@@ -1536,7 +1534,6 @@ void HandleClientMessageEvent(ClientMessageEvent *event)
     CloseAllAndExit(0);
 }
 
-#if defined(USE_DRAG_AND_DROP)
 static boolean HandleDropFileEvent(char *filename)
 {
   Error(ERR_DEBUG, "DROP FILE EVENT: '%s'", filename);
@@ -1600,8 +1597,24 @@ static void HandleDropTextEvent(char *text)
   Error(ERR_DEBUG, "DROP TEXT EVENT: '%s'", text);
 }
 
+static void HandleDropCompleteEvent(int files_succeeded, int files_failed)
+{
+  // only show request dialog if no other request dialog already active
+  if (game.request_active)
+    return;
+
+  if (files_succeeded > 0 && files_failed > 0)
+    Request("New level or artwork set(s) added, "
+	    "but some dropped file(s) failed!", REQ_CONFIRM);
+  else if (files_succeeded > 0)
+    Request("New level or artwork set(s) added!", REQ_CONFIRM);
+  else if (files_failed > 0)
+    Request("Failed to process dropped file(s)!", REQ_CONFIRM);
+}
+
 void HandleDropEvent(Event *event)
 {
+  static boolean confirm_on_drop_complete = FALSE;
   static int files_succeeded = 0;
   static int files_failed = 0;
 
@@ -1609,6 +1622,7 @@ void HandleDropEvent(Event *event)
   {
     case SDL_DROPBEGIN:
     {
+      confirm_on_drop_complete = TRUE;
       files_succeeded = 0;
       files_failed = 0;
 
@@ -1624,6 +1638,18 @@ void HandleDropEvent(Event *event)
       else
 	files_failed++;
 
+      // SDL_DROPBEGIN / SDL_DROPCOMPLETE did not exist in older SDL versions
+      if (!confirm_on_drop_complete)
+      {
+	// process all remaining events, including further SDL_DROPFILE events
+	ClearEventQueue();
+
+	HandleDropCompleteEvent(files_succeeded, files_failed);
+
+	files_succeeded = 0;
+	files_failed = 0;
+      }
+
       break;
     }
 
@@ -1636,17 +1662,7 @@ void HandleDropEvent(Event *event)
 
     case SDL_DROPCOMPLETE:
     {
-      // only show request dialog if no other request dialog already active
-      if (!game.request_active)
-      {
-	if (files_succeeded > 0 && files_failed > 0)
-	  Request("New level or artwork set(s) added, "
-		  "but some dropped file(s) failed!", REQ_CONFIRM);
-	else if (files_succeeded > 0)
-	  Request("New level or artwork set(s) added!", REQ_CONFIRM);
-	else if (files_failed > 0)
-	  Request("Failed to process dropped file(s)!", REQ_CONFIRM);
-      }
+      HandleDropCompleteEvent(files_succeeded, files_failed);
 
       break;
     }
@@ -1655,7 +1671,6 @@ void HandleDropEvent(Event *event)
   if (event->drop.file != NULL)
     SDL_free(event->drop.file);
 }
-#endif
 
 void HandleButton(int mx, int my, int button, int button_nr)
 {

@@ -119,8 +119,10 @@
 #endif
 
 // values for drag-and-drop support (some parts not added before SDL 2.0.5)
-#if SDL_VERSION_ATLEAST(2,0,5)
-#define USE_DRAG_AND_DROP
+#if !SDL_VERSION_ATLEAST(2,0,5)
+#define SDL_DROPTEXT			(SDL_DROPFILE + 1)
+#define SDL_DROPBEGIN			(SDL_DROPFILE + 2)
+#define SDL_DROPCOMPLETE		(SDL_DROPFILE + 3)
 #endif
 
 // default input keys
