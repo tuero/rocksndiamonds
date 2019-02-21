@@ -8402,6 +8402,9 @@ static void InitZoomLevelSettings(int zoom_tilesize)
     ed_tilesize = setup.auto_setup.editor_zoom_tilesize;
     ed_tilesize_default = DEFAULT_EDITOR_TILESIZE;
 
+    // make sure that tile size is always a power of 2
+    ed_tilesize = (1 << log_2(ed_tilesize));
+
     if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
     {
       ed_tilesize = DEFAULT_EDITOR_TILESIZE_MM;
