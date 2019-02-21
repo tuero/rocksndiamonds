@@ -1534,7 +1534,7 @@ void HandleClientMessageEvent(ClientMessageEvent *event)
     CloseAllAndExit(0);
 }
 
-static boolean HandleDropFileEvent(char *filename)
+static int HandleDropFileEvent(char *filename)
 {
   Error(ERR_DEBUG, "DROP FILE EVENT: '%s'", filename);
 
@@ -1543,7 +1543,7 @@ static boolean HandleDropFileEvent(char *filename)
   {
     Error(ERR_WARN, "file '%s' not supported", filename);
 
-    return FALSE;
+    return TREE_TYPE_UNDEFINED;
   }
 
   TreeInfo *tree_node = NULL;
@@ -1554,7 +1554,7 @@ static boolean HandleDropFileEvent(char *filename)
   {
     Error(ERR_WARN, "zip file '%s' has invalid content!", filename);
 
-    return FALSE;
+    return TREE_TYPE_UNDEFINED;
   }
 
   if (tree_type == TREE_TYPE_LEVEL_DIR &&
@@ -1580,7 +1580,7 @@ static boolean HandleDropFileEvent(char *filename)
   {
     // error message already issued by "ExtractZipFileIntoDirectory()"
 
-    return FALSE;
+    return TREE_TYPE_UNDEFINED;
   }
 
   // add extracted level or artwork set to tree info structure
@@ -1589,7 +1589,7 @@ static boolean HandleDropFileEvent(char *filename)
   // update menu screen (and possibly change current level set)
   DrawScreenAfterAddingSet(top_dir, tree_type);
 
-  return TRUE;
+  return tree_type;
 }
 
 static void HandleDropTextEvent(char *text)
@@ -1597,46 +1597,78 @@ static void HandleDropTextEvent(char *text)
   Error(ERR_DEBUG, "DROP TEXT EVENT: '%s'", text);
 }
 
-static void HandleDropCompleteEvent(int files_succeeded, int files_failed)
+static void HandleDropCompleteEvent(int num_level_sets_succeeded,
+				    int num_artwork_sets_succeeded,
+				    int num_files_failed)
 {
   // only show request dialog if no other request dialog already active
   if (game.request_active)
     return;
 
-  if (files_succeeded > 0 && files_failed > 0)
-    Request("New level or artwork set(s) added, "
-	    "but some dropped file(s) failed!", REQ_CONFIRM);
-  else if (files_succeeded > 0)
-    Request("New level or artwork set(s) added!", REQ_CONFIRM);
-  else if (files_failed > 0)
-    Request("Failed to process dropped file(s)!", REQ_CONFIRM);
+  // this case can happen with drag-and-drop with older SDL versions
+  if (num_level_sets_succeeded == 0 &&
+      num_artwork_sets_succeeded == 0 &&
+      num_files_failed == 0)
+    return;
+
+  char message[100];
+
+  if (num_level_sets_succeeded > 0 || num_artwork_sets_succeeded > 0)
+  {
+    char message_part1[50];
+
+    sprintf(message_part1, "New %s set%s added",
+	    (num_artwork_sets_succeeded == 0 ? "level" :
+	     num_level_sets_succeeded == 0 ? "artwork" : "level and artwork"),
+	    (num_level_sets_succeeded +
+	     num_artwork_sets_succeeded > 1 ? "s" : ""));
+
+    if (num_files_failed > 0)
+      sprintf(message, "%s, but %d dropped file%s failed!",
+	      message_part1, num_files_failed, num_files_failed > 1 ? "s" : "");
+    else
+      sprintf(message, "%s!", message_part1);
+  }
+  else if (num_files_failed > 0)
+  {
+    sprintf(message, "Failed to process dropped file%s!",
+	    num_files_failed > 1 ? "s" : "");
+  }
+
+  Request(message, REQ_CONFIRM);
 }
 
 void HandleDropEvent(Event *event)
 {
   static boolean confirm_on_drop_complete = FALSE;
-  static int files_succeeded = 0;
-  static int files_failed = 0;
+  static int num_level_sets_succeeded = 0;
+  static int num_artwork_sets_succeeded = 0;
+  static int num_files_failed = 0;
 
   switch (event->type)
   {
     case SDL_DROPBEGIN:
     {
       confirm_on_drop_complete = TRUE;
-      files_succeeded = 0;
-      files_failed = 0;
+      num_level_sets_succeeded = 0;
+      num_artwork_sets_succeeded = 0;
+      num_files_failed = 0;
 
       break;
     }
 
     case SDL_DROPFILE:
     {
-      boolean success = HandleDropFileEvent(event->drop.file);
+      int tree_type = HandleDropFileEvent(event->drop.file);
 
-      if (success)
-	files_succeeded++;
+      if (tree_type == TREE_TYPE_LEVEL_DIR)
+	num_level_sets_succeeded++;
+      else if (tree_type == TREE_TYPE_GRAPHICS_DIR ||
+	       tree_type == TREE_TYPE_SOUNDS_DIR ||
+	       tree_type == TREE_TYPE_MUSIC_DIR)
+	num_artwork_sets_succeeded++;
       else
-	files_failed++;
+	num_files_failed++;
 
       // SDL_DROPBEGIN / SDL_DROPCOMPLETE did not exist in older SDL versions
       if (!confirm_on_drop_complete)
@@ -1644,10 +1676,13 @@ void HandleDropEvent(Event *event)
 	// process all remaining events, including further SDL_DROPFILE events
 	ClearEventQueue();
 
-	HandleDropCompleteEvent(files_succeeded, files_failed);
+	HandleDropCompleteEvent(num_level_sets_succeeded,
+				num_artwork_sets_succeeded,
+				num_files_failed);
 
-	files_succeeded = 0;
-	files_failed = 0;
+	num_level_sets_succeeded = 0;
+	num_artwork_sets_succeeded = 0;
+	num_files_failed = 0;
       }
 
       break;
@@ -1662,7 +1697,9 @@ void HandleDropEvent(Event *event)
 
     case SDL_DROPCOMPLETE:
     {
-      HandleDropCompleteEvent(files_succeeded, files_failed);
+      HandleDropCompleteEvent(num_level_sets_succeeded,
+			      num_artwork_sets_succeeded,
+			      num_files_failed);
 
       break;
     }
