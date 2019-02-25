@@ -12063,11 +12063,13 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
 
     char *clipboard_text = SDL_GetClipboardText();
     char *ptr = clipboard_text;
+    boolean allow_new_row = FALSE;
     boolean stop = FALSE;
 
     while (*ptr && !stop)
     {
       boolean prefix_found = FALSE;
+      boolean start_new_row = FALSE;
 
       // level sketch element number prefixes (may be multi-byte characters)
       char *prefix_list[] = { "`", "¸" };
@@ -12096,19 +12098,10 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
 	}
       }
 
-      // continue with next character if prefix not found
-      if (!prefix_found)
-      {
-	ptr++;		// !!! FIX THIS for real UTF-8 handling !!!
-
-	continue;
-      }
-
-      // continue with next character if prefix not found
-      if (strlen(ptr) < 3)
-	break;
-
-      if (ptr[0] >= '0' && ptr[0] <= '9' &&
+      // check if prefix found and followed by three numbers
+      if (prefix_found &&
+	  strlen(ptr) >= 3 &&
+	  ptr[0] >= '0' && ptr[0] <= '9' &&
 	  ptr[1] >= '0' && ptr[1] <= '9' &&
 	  ptr[2] >= '0' && ptr[2] <= '9')
       {
@@ -12128,14 +12121,28 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
 
 	x++;
 
-	if (x >= MAX_LEV_FIELDX || *ptr == '\n')
-	{
-	  x = 0;
-	  y++;
+	if (x >= MAX_LEV_FIELDX)
+	  start_new_row = TRUE;
 
-	  if (y >= MAX_LEV_FIELDY)
-	    stop = TRUE;
-	}
+	allow_new_row = TRUE;
+      }
+      else
+      {
+	if ((*ptr == '\n' || *ptr == '\r') && allow_new_row)
+	  start_new_row = TRUE;
+
+	ptr++;		// !!! FIX THIS for real UTF-8 handling !!!
+      }
+
+      if (start_new_row)
+      {
+	x = 0;
+	y++;
+
+	if (y >= MAX_LEV_FIELDY)
+	  stop = TRUE;
+
+	allow_new_row = FALSE;
       }
     }
 
