@@ -3354,7 +3354,7 @@ void InitGame(void)
   SetGameStatus(GAME_MODE_PLAYING);
 
   if (level_editor_test_game)
-    FadeSkipNextFadeIn();
+    FadeSkipNextFadeOut();
   else
     FadeSetEnterScreen();
 
@@ -3365,8 +3365,10 @@ void InitGame(void)
 
   ExpireSoundLoops(TRUE);
 
-  if (!level_editor_test_game)
-    FadeOut(fade_mask);
+  FadeOut(fade_mask);
+
+  if (level_editor_test_game)
+    FadeSkipNextFadeIn();
 
   // needed if different viewport properties defined for playing
   ChangeViewportPropertiesIfNeeded();

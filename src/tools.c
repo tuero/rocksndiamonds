@@ -1064,7 +1064,8 @@ void FadeIn(int fade_mask)
 void FadeOut(int fade_mask)
 {
   // update screen if areas covered by "fade_mask" and "redraw_mask" differ
-  if (!equalRedrawMasks(fade_mask, redraw_mask))
+  if (!equalRedrawMasks(fade_mask, redraw_mask) &&
+      fade_type_skip != FADE_MODE_SKIP_FADE_OUT)
     BackToFront();
 
   SetScreenStates_BeforeFadingOut();
