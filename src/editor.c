@@ -11996,27 +11996,28 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
     char text[MAX_CB_TEXT_SIZE + 1] = "";
     int width  = (draw_with_brush ? brush_width  : lev_fieldx);
     int height = (draw_with_brush ? brush_height : lev_fieldy);
+    char *format = "%s%03d";
+
+    for (y = 0; y < height; y++)
+      for (x = 0; x < width; x++)
+	if ((draw_with_brush ? brush_buffer[x][y] : Feld[x][y]) > 999)
+	  format = "%s%04d";
 
     for (y = 0; y < height; y++)
     {
       for (x = 0; x < width; x++)
       {
 	int element = (draw_with_brush ? brush_buffer[x][y] : Feld[x][y]);
-	int element_mapped = element;
 	char *prefix = (mode == CB_DUMP_BRUSH ||
 			mode == CB_BRUSH_TO_CLIPBOARD ? "`" : "¸");
 
-	if (IS_CUSTOM_ELEMENT(element))
-	  element_mapped = EL_CUSTOM_START;
-	else if (IS_GROUP_ELEMENT(element))
-	  element_mapped = EL_GROUP_START;
-	else if (element >= NUM_FILE_ELEMENTS)
-	  element_mapped = EL_UNKNOWN;
+	if (element >= NUM_FILE_ELEMENTS)
+	  element = EL_UNKNOWN;
 
 	// copy brush to level sketch text buffer for the R'n'D forum:
-	// - large tiles: `xxx (0x60 ASCII)
-	// - small tiles: ¸xxx (0xb8 ISO-8859-1, 0xc2b8 UTF-8)
-	snprintf(part, MAX_CB_PART_SIZE + 1, "%s%03d", prefix, element_mapped);
+	// - large tiles: `xxx or `xxxx (0x60 ASCII)
+	// - small tiles: ¸xxx or ¸xxxx (0xb8 ISO-8859-1, 0xc2b8 UTF-8)
+	snprintf(part, MAX_CB_PART_SIZE + 1, format, prefix, element);
 	strcat(text, part);
       }
 
@@ -12098,7 +12099,7 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
 	}
       }
 
-      // check if prefix found and followed by three numbers
+      // check if prefix found and followed by (at least) three digits
       if (prefix_found &&
 	  strlen(ptr) >= 3 &&
 	  ptr[0] >= '0' && ptr[0] <= '9' &&
@@ -12110,6 +12111,13 @@ static void CopyBrushExt(int from_x, int from_y, int to_x, int to_y,
 		       (ptr[2] - '0'));
 
 	ptr += 3;
+
+	// level sketch element number might consist of four digits
+	if (ptr[0] >= '0' && ptr[0] <= '9')
+	{
+	  element = element * 10 + (ptr[0] - '0');
+	  ptr++;
+	}
 
 	if (element >= NUM_FILE_ELEMENTS)
 	  element = EL_UNKNOWN;
