@@ -1016,6 +1016,8 @@ void HandleFingerEvent(FingerEvent *event)
 	event->pressure);
 #endif
 
+  runtime.uses_touch_device = TRUE;
+
   if (game_status != GAME_MODE_PLAYING)
     return;
 

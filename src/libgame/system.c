@@ -30,6 +30,7 @@
 
 struct ProgramInfo	program;
 struct NetworkInfo	network;
+struct RuntimeInfo	runtime;
 struct OptionInfo	options;
 struct VideoSystemInfo	video;
 struct AudioSystemInfo	audio;
@@ -112,6 +113,11 @@ void InitNetworkInfo(boolean enabled, boolean connected, boolean serveronly,
 
   network.server_host = server_host;
   network.server_port = server_port;
+}
+
+void InitRuntimeInfo()
+{
+  runtime.uses_touch_device = FALSE;
 }
 
 void InitScoresInfo(void)

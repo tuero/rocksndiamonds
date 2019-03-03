@@ -942,6 +942,11 @@ struct NetworkInfo
 
 };
 
+struct RuntimeInfo
+{
+  boolean uses_touch_device;
+};
+
 struct OptionInfo
 {
   char *server_host;
@@ -1688,6 +1693,7 @@ struct LevelStats
 
 extern struct ProgramInfo	program;
 extern struct NetworkInfo	network;
+extern struct RuntimeInfo	runtime;
 extern struct OptionInfo	options;
 extern struct VideoSystemInfo	video;
 extern struct AudioSystemInfo	audio;
@@ -1726,6 +1732,7 @@ extern int			FrameCounter;
 void InitProgramInfo(char *, char *, char *, char *, char *, char *, char *,
 		     char *, int);
 void InitNetworkInfo(boolean, boolean, boolean, char *, int);
+void InitRuntimeInfo(void);
 
 void InitScoresInfo(void);
 void SetWindowTitle(void);

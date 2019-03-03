@@ -6061,6 +6061,8 @@ void OpenAll(void)
 
   InitNetworkSettings();
 
+  InitRuntimeInfo();
+
   if (network.serveronly)
   {
 #if defined(PLATFORM_UNIX)
