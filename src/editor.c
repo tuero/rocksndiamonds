@@ -13782,6 +13782,10 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 		     button == 2 ? ed_tilesize_default :
 		     button == 3 ? ed_tilesize / 2 : ed_tilesize);
 
+      // when using touch device, cycle through all zoom tilesizes
+      if (runtime.uses_touch_device && ed_tilesize > TILESIZE)
+	ed_tilesize = MICRO_TILESIZE;
+
       // limit zoom level by upper and lower bound
       ed_tilesize = MIN(MAX(MICRO_TILESIZE, ed_tilesize), TILESIZE);
 
