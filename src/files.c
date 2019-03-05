@@ -11535,30 +11535,26 @@ void CreateLevelSketchImages(void)
 
   for (i = 0; i < NUM_FILE_ELEMENTS; i++)
   {
-    Bitmap *src_bitmap;
-    int src_x, src_y;
     int element = getMappedElement(i);
-    int graphic = el2edimg(element);
     char basename1[16];
     char basename2[16];
     char *filename1;
     char *filename2;
 
-    sprintf(basename1, "%03d.bmp", i);
-    sprintf(basename2, "%03ds.bmp", i);
+    sprintf(basename1, "%04d.bmp", i);
+    sprintf(basename2, "%04ds.bmp", i);
 
     filename1 = getPath2(global.create_images_dir, basename1);
     filename2 = getPath2(global.create_images_dir, basename2);
 
-    getFixedGraphicSource(graphic, 0, &src_bitmap, &src_x, &src_y);
-    BlitBitmap(src_bitmap, bitmap1, src_x, src_y, TILEX, TILEY,
-	       0, 0);
+    DrawSizedElement(0, 0, element, TILESIZE);
+    BlitBitmap(drawto, bitmap1, SX, SY, TILEX, TILEY, 0, 0);
 
     if (SDL_SaveBMP(bitmap1->surface, filename1) != 0)
       Error(ERR_EXIT, "cannot save level sketch image file '%s'", filename1);
 
-    getMiniGraphicSource(graphic, &src_bitmap, &src_x, &src_y);
-    BlitBitmap(src_bitmap, bitmap2, src_x, src_y, MINI_TILEX, MINI_TILEY, 0, 0);
+    DrawSizedElement(0, 0, element, MINI_TILESIZE);
+    BlitBitmap(drawto, bitmap2, SX, SY, MINI_TILEX, MINI_TILEY, 0, 0);
 
     if (SDL_SaveBMP(bitmap2->surface, filename2) != 0)
       Error(ERR_EXIT, "cannot save level sketch image file '%s'", filename2);
@@ -11566,15 +11562,26 @@ void CreateLevelSketchImages(void)
     free(filename1);
     free(filename2);
 
+    // create corresponding SQL statements (for normal and small images)
+    if (i < 1000)
+    {
+      printf("insert into phpbb_words values (NULL, '`%03d', '<IMG class=\"levelsketch\" src=\"/I/%04d.png\"/>');\n", i, i);
+      printf("insert into phpbb_words values (NULL, '¸%03d', '<IMG class=\"levelsketch\" src=\"/I/%04ds.png\"/>');\n", i, i);
+    }
+
+    printf("insert into phpbb_words values (NULL, '`%04d', '<IMG class=\"levelsketch\" src=\"/I/%04d.png\"/>');\n", i, i);
+    printf("insert into phpbb_words values (NULL, '¸%04d', '<IMG class=\"levelsketch\" src=\"/I/%04ds.png\"/>');\n", i, i);
+
+    // optional: create content for forum level sketch demonstration post
     if (options.debug)
-      printf("%03d `%03d%c", i, i, (i % 10 < 9 ? ' ' : '\n'));
+      fprintf(stderr, "%03d `%03d%c", i, i, (i % 10 < 9 ? ' ' : '\n'));
   }
 
   FreeBitmap(bitmap1);
   FreeBitmap(bitmap2);
 
   if (options.debug)
-    printf("\n");
+    fprintf(stderr, "\n");
 
   Error(ERR_INFO, "%d normal and small images created", NUM_FILE_ELEMENTS);
 
