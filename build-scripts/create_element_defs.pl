@@ -1683,7 +1683,8 @@ sub print_element_to_special_graphic_list
 
     my @elements_with_editor_graphic =
 	(
-	 'char_space'
+	 'char_space',
+	 'steel_char_space'
 	 );
 
     my @unknown_graphics = ();
