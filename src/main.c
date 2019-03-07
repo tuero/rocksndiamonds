@@ -1175,17 +1175,17 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "letter ''"
   },
   {
-    "char_unused",
+    "char_button",
     "char",
     "letter 'button'"
   },
   {
-    "char_unused",
+    "char_up",
     "char",
     "letter 'up'"
   },
   {
-    "char_unused",
+    "char_down",
     "char",
     "letter 'down'"
   },
@@ -4235,17 +4235,17 @@ struct ElementNameInfo element_name_info[MAX_NUM_ELEMENTS + 1] =
     "steel letter ''"
   },
   {
-    "steel_char_unused",
+    "steel_char_button",
     "steel_char",
     "steel letter 'button'"
   },
   {
-    "steel_char_unused",
+    "steel_char_up",
     "steel_char",
     "steel letter 'up'"
   },
   {
-    "steel_char_unused",
+    "steel_char_down",
     "steel_char",
     "steel letter 'down'"
   },
