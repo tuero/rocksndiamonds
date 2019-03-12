@@ -990,25 +990,44 @@ static void PlayGlobalAnimSoundIfLoop(struct GlobalAnimPartControlInfo *part)
   PlayGlobalAnimSound(part);
 }
 
+static boolean checkGlobalAnimEvent(int anim_event, int mask)
+{
+  int trigger_mask = ANIM_EVENT_ANIM_MASK | ANIM_EVENT_PART_MASK;
+  int mask_anim_only = mask & ANIM_EVENT_ANIM_MASK;
+
+  if (mask & ANIM_EVENT_ANY)
+    return (anim_event & ANIM_EVENT_ANY);
+  else if (mask & ANIM_EVENT_SELF)
+    return (anim_event & ANIM_EVENT_SELF);
+  else
+    return ((anim_event & trigger_mask) == mask ||
+	    (anim_event & trigger_mask) == mask_anim_only);
+}
+
 static boolean isClickablePart(struct GlobalAnimPartControlInfo *part, int mask)
 {
   struct GraphicInfo *c = &part->control_info;
-  int trigger_mask = ANIM_EVENT_ANIM_MASK | ANIM_EVENT_PART_MASK;
-  int mask_anim_only = mask & ANIM_EVENT_ANIM_MASK;
-  int init_event = GetGlobalAnimEventValue(c->init_event, 0);
-  int anim_event = GetGlobalAnimEventValue(c->anim_event, 0);
+  int num_init_events = GetGlobalAnimEventValueCount(c->init_event);
+  int num_anim_events = GetGlobalAnimEventValueCount(c->anim_event);
+  int i;
 
-  if (mask & ANIM_EVENT_ANY)
-    return (init_event & ANIM_EVENT_ANY ||
-	    anim_event & ANIM_EVENT_ANY);
-  else if (mask & ANIM_EVENT_SELF)
-    return (init_event & ANIM_EVENT_SELF ||
-	    anim_event & ANIM_EVENT_SELF);
-  else
-    return ((init_event & trigger_mask) == mask ||
-	    (anim_event & trigger_mask) == mask ||
-	    (init_event & trigger_mask) == mask_anim_only ||
-	    (anim_event & trigger_mask) == mask_anim_only);
+  for (i = 0; i < num_init_events; i++)
+  {
+    int init_event = GetGlobalAnimEventValue(c->init_event, i);
+
+    if (checkGlobalAnimEvent(init_event, mask))
+      return TRUE;
+  }
+
+  for (i = 0; i < num_anim_events; i++)
+  {
+    int anim_event = GetGlobalAnimEventValue(c->anim_event, i);
+
+    if (checkGlobalAnimEvent(anim_event, mask))
+      return TRUE;
+  }
+
+  return FALSE;
 }
 
 static boolean isClickedPart(struct GlobalAnimPartControlInfo *part,

@@ -88,6 +88,7 @@ void CreateCustomElementImages(char *);
 
 void FreeGlobalAnimEventInfo(void);
 int GetGlobalAnimEventValue(int, int);
+int GetGlobalAnimEventValueCount(int);
 
 int get_parameter_value(char *, char *, int);
 

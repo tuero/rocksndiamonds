@@ -10014,6 +10014,17 @@ int GetGlobalAnimEventValue(int list_pos, int value_pos)
   return gaeli->event_value[value_pos];
 }
 
+int GetGlobalAnimEventValueCount(int list_pos)
+{
+  if (list_pos == ANIM_EVENT_UNDEFINED)
+    return 0;
+
+  struct GlobalAnimEventInfo *gaei = &global_anim_event_info;
+  struct GlobalAnimEventListInfo *gaeli = gaei->event_list[list_pos];
+
+  return gaeli->num_event_values;
+}
+
 // This function checks if a string <s> of the format "string1, string2, ..."
 // exactly contains a string <s_contained>.
 
@@ -10118,6 +10129,39 @@ static int get_anim_parameter_value(char *s)
   return result;
 }
 
+static int get_anim_parameter_values(char *s)
+{
+  int list_pos = ANIM_EVENT_UNDEFINED;
+  int event_value = ANIM_EVENT_DEFAULT;
+
+  if (string_has_parameter(s, "any"))
+    event_value |= ANIM_EVENT_ANY;
+
+  if (string_has_parameter(s, "click:self") ||
+      string_has_parameter(s, "click") ||
+      string_has_parameter(s, "self"))
+    event_value |= ANIM_EVENT_SELF;
+
+  // if animation event found, add it to global animation event list
+  if (event_value != ANIM_EVENT_NONE)
+    list_pos = AddGlobalAnimEventValue(list_pos, event_value);
+
+  while (s != NULL)
+  {
+    // add optional "click:anim_X" or "click:anim_X.part_X" parameter
+    event_value = get_anim_parameter_value(s);
+
+    // if animation event found, add it to global animation event list
+    if (event_value != ANIM_EVENT_NONE)
+      list_pos = AddGlobalAnimEventValue(list_pos, event_value);
+
+    // continue with next part of the string, starting with next comma
+    s = strchr(s + 1, ',');
+  }
+
+  return list_pos;
+}
+
 static int get_anim_action_parameter_value(char *token)
 {
   int result = getImageIDFromToken(token);
@@ -10215,19 +10259,7 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
   else if (strEqual(suffix, ".init_event") ||
 	   strEqual(suffix, ".anim_event"))
   {
-    result = ANIM_EVENT_DEFAULT;
-
-    if (string_has_parameter(value, "any"))
-      result |= ANIM_EVENT_ANY;
-
-    if (string_has_parameter(value, "click"))
-      result |= ANIM_EVENT_SELF;
-
-    // add optional "click:anim_X" or "click:anim_X.part_X" parameter
-    result |= get_anim_parameter_value(value);
-
-    // final result is position in global animation event list
-    result = AddGlobalAnimEventValue(ANIM_EVENT_UNDEFINED, result);
+    result = get_anim_parameter_values(value);
   }
   else if (strEqual(suffix, ".init_event_action") ||
 	   strEqual(suffix, ".anim_event_action"))
