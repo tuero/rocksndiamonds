@@ -9941,6 +9941,273 @@ static int getElementFromToken(char *token)
   return EL_UNDEFINED;
 }
 
+// This function checks if a string <s> of the format "string1, string2, ..."
+// exactly contains a string <s_contained>.
+
+static boolean string_has_parameter(char *s, char *s_contained)
+{
+  char *substring;
+
+  if (s == NULL || s_contained == NULL)
+    return FALSE;
+
+  if (strlen(s_contained) > strlen(s))
+    return FALSE;
+
+  if (strncmp(s, s_contained, strlen(s_contained)) == 0)
+  {
+    char next_char = s[strlen(s_contained)];
+
+    // check if next character is delimiter or whitespace
+    return (next_char == ',' || next_char == '\0' ||
+	    next_char == ' ' || next_char == '\t' ? TRUE : FALSE);
+  }
+
+  // check if string contains another parameter string after a comma
+  substring = strchr(s, ',');
+  if (substring == NULL)	// string does not contain a comma
+    return FALSE;
+
+  // advance string pointer to next character after the comma
+  substring++;
+
+  // skip potential whitespaces after the comma
+  while (*substring == ' ' || *substring == '\t')
+    substring++;
+
+  return string_has_parameter(substring, s_contained);
+}
+
+static int get_anim_parameter_value(char *s)
+{
+  char *pattern_1 = "click:anim_";
+  char *pattern_2 = ".part_";
+  char *matching_char = NULL;
+  char *s_ptr = s;
+  int result = ANIM_EVENT_NONE;
+
+  matching_char = strstr(s_ptr, pattern_1);
+  if (matching_char == NULL)
+    return ANIM_EVENT_NONE;
+
+  s_ptr = matching_char + strlen(pattern_1);
+
+  // check for main animation number ("anim_X" or "anim_XX")
+  if (*s_ptr >= '0' && *s_ptr <= '9')
+  {
+    int gic_anim_nr = (*s_ptr++ - '0');
+
+    if (*s_ptr >= '0' && *s_ptr <= '9')
+      gic_anim_nr = 10 * gic_anim_nr + (*s_ptr++ - '0');
+
+    if (gic_anim_nr < 1 || gic_anim_nr > MAX_GLOBAL_ANIMS)
+      return ANIM_EVENT_NONE;
+
+    result |= gic_anim_nr << ANIM_EVENT_ANIM_BIT;
+  }
+  else
+  {
+    // invalid main animation number specified
+
+    return ANIM_EVENT_NONE;
+  }
+
+  // check for animation part number ("part_X" or "part_XX") (optional)
+  if (strPrefix(s_ptr, pattern_2))
+  {
+    s_ptr += strlen(pattern_2);
+
+    if (*s_ptr >= '0' && *s_ptr <= '9')
+    {
+      int gic_part_nr = (*s_ptr++ - '0');
+
+      if (*s_ptr >= '0' && *s_ptr <= '9')
+	gic_part_nr = 10 * gic_part_nr + (*s_ptr++ - '0');
+
+      if (gic_part_nr < 1 || gic_part_nr > MAX_GLOBAL_ANIM_PARTS)
+	return ANIM_EVENT_NONE;
+
+      result |= gic_part_nr << ANIM_EVENT_PART_BIT;
+    }
+    else
+    {
+      // invalid animation part number specified
+
+      return ANIM_EVENT_NONE;
+    }
+  }
+
+  // discard result if next character is neither delimiter nor whitespace
+  if (!(*s_ptr == ',' || *s_ptr == '\0' ||
+	*s_ptr == ' ' || *s_ptr == '\t'))
+    return ANIM_EVENT_NONE;
+
+  return result;
+}
+
+static int get_anim_action_parameter_value(char *token)
+{
+  int result = getImageIDFromToken(token);
+
+  if (result == -1)
+  {
+    char *gfx_token = getStringCat2("gfx.", token);
+
+    result = getImageIDFromToken(gfx_token);
+
+    checked_free(gfx_token);
+  }
+
+  if (result == -1)
+  {
+    Key key = getKeyFromX11KeyName(token);
+
+    if (key != KSYM_UNDEFINED)
+      result = -(int)key;
+  }
+
+  if (result == -1)
+    result = ANIM_EVENT_ACTION_NONE;
+
+  return result;
+}
+
+int get_parameter_value(char *value_raw, char *suffix, int type)
+{
+  char *value = getStringToLower(value_raw);
+  int result = 0;	// probably a save default value
+
+  if (strEqual(suffix, ".direction"))
+  {
+    result = (strEqual(value, "left")  ? MV_LEFT :
+	      strEqual(value, "right") ? MV_RIGHT :
+	      strEqual(value, "up")    ? MV_UP :
+	      strEqual(value, "down")  ? MV_DOWN : MV_NONE);
+  }
+  else if (strEqual(suffix, ".position"))
+  {
+    result = (strEqual(value, "left")   ? POS_LEFT :
+	      strEqual(value, "right")  ? POS_RIGHT :
+	      strEqual(value, "top")    ? POS_TOP :
+	      strEqual(value, "upper")  ? POS_UPPER :
+	      strEqual(value, "middle") ? POS_MIDDLE :
+	      strEqual(value, "lower")  ? POS_LOWER :
+	      strEqual(value, "bottom") ? POS_BOTTOM :
+	      strEqual(value, "any")    ? POS_ANY :
+	      strEqual(value, "last")   ? POS_LAST : POS_UNDEFINED);
+  }
+  else if (strEqual(suffix, ".align"))
+  {
+    result = (strEqual(value, "left")   ? ALIGN_LEFT :
+	      strEqual(value, "right")  ? ALIGN_RIGHT :
+	      strEqual(value, "center") ? ALIGN_CENTER :
+	      strEqual(value, "middle") ? ALIGN_CENTER : ALIGN_DEFAULT);
+  }
+  else if (strEqual(suffix, ".valign"))
+  {
+    result = (strEqual(value, "top")    ? VALIGN_TOP :
+	      strEqual(value, "bottom") ? VALIGN_BOTTOM :
+	      strEqual(value, "middle") ? VALIGN_MIDDLE :
+	      strEqual(value, "center") ? VALIGN_MIDDLE : VALIGN_DEFAULT);
+  }
+  else if (strEqual(suffix, ".anim_mode"))
+  {
+    result = (string_has_parameter(value, "none")	? ANIM_NONE :
+	      string_has_parameter(value, "loop")	? ANIM_LOOP :
+	      string_has_parameter(value, "linear")	? ANIM_LINEAR :
+	      string_has_parameter(value, "pingpong")	? ANIM_PINGPONG :
+	      string_has_parameter(value, "pingpong2")	? ANIM_PINGPONG2 :
+	      string_has_parameter(value, "random")	? ANIM_RANDOM :
+	      string_has_parameter(value, "ce_value")	? ANIM_CE_VALUE :
+	      string_has_parameter(value, "ce_score")	? ANIM_CE_SCORE :
+	      string_has_parameter(value, "ce_delay")	? ANIM_CE_DELAY :
+	      string_has_parameter(value, "horizontal")	? ANIM_HORIZONTAL :
+	      string_has_parameter(value, "vertical")	? ANIM_VERTICAL :
+	      string_has_parameter(value, "centered")	? ANIM_CENTERED :
+	      string_has_parameter(value, "all")	? ANIM_ALL :
+	      ANIM_DEFAULT);
+
+    if (string_has_parameter(value, "once"))
+      result |= ANIM_ONCE;
+
+    if (string_has_parameter(value, "reverse"))
+      result |= ANIM_REVERSE;
+
+    if (string_has_parameter(value, "opaque_player"))
+      result |= ANIM_OPAQUE_PLAYER;
+
+    if (string_has_parameter(value, "static_panel"))
+      result |= ANIM_STATIC_PANEL;
+  }
+  else if (strEqual(suffix, ".init_event") ||
+	   strEqual(suffix, ".anim_event"))
+  {
+    result = ANIM_EVENT_DEFAULT;
+
+    if (string_has_parameter(value, "any"))
+      result |= ANIM_EVENT_ANY;
+
+    if (string_has_parameter(value, "click"))
+      result |= ANIM_EVENT_SELF;
+
+    // add optional "click:anim_X" or "click:anim_X.part_X" parameter
+    result |= get_anim_parameter_value(value);
+  }
+  else if (strEqual(suffix, ".init_event_action") ||
+	   strEqual(suffix, ".anim_event_action"))
+  {
+    result = get_anim_action_parameter_value(value_raw);
+  }
+  else if (strEqual(suffix, ".class"))
+  {
+    result = (strEqual(value, ARG_UNDEFINED) ? ARG_UNDEFINED_VALUE :
+	      get_hash_from_key(value));
+  }
+  else if (strEqual(suffix, ".style"))
+  {
+    result = STYLE_DEFAULT;
+
+    if (string_has_parameter(value, "accurate_borders"))
+      result |= STYLE_ACCURATE_BORDERS;
+
+    if (string_has_parameter(value, "inner_corners"))
+      result |= STYLE_INNER_CORNERS;
+
+    if (string_has_parameter(value, "reverse"))
+      result |= STYLE_REVERSE;
+
+    if (string_has_parameter(value, "passthrough_clicks"))
+      result |= STYLE_PASSTHROUGH;
+
+    if (string_has_parameter(value, "multiple_actions"))
+      result |= STYLE_MULTIPLE_ACTIONS;
+  }
+  else if (strEqual(suffix, ".fade_mode"))
+  {
+    result = (string_has_parameter(value, "none")	? FADE_MODE_NONE :
+	      string_has_parameter(value, "fade")	? FADE_MODE_FADE :
+	      string_has_parameter(value, "crossfade")	? FADE_MODE_CROSSFADE :
+	      string_has_parameter(value, "melt")	? FADE_MODE_MELT :
+	      string_has_parameter(value, "curtain")	? FADE_MODE_CURTAIN :
+	      FADE_MODE_DEFAULT);
+  }
+  else if (strPrefix(suffix, ".font"))		// (may also be ".font_xyz")
+  {
+    result = gfx.get_font_from_token_function(value);
+  }
+  else		// generic parameter of type integer or boolean
+  {
+    result = (strEqual(value, ARG_UNDEFINED) ? ARG_UNDEFINED_VALUE :
+	      type == TYPE_INTEGER ? get_integer_from_string(value) :
+	      type == TYPE_BOOLEAN ? get_boolean_from_string(value) :
+	      ARG_UNDEFINED_VALUE);
+  }
+
+  free(value);
+
+  return result;
+}
+
 static int get_token_parameter_value(char *token, char *value_raw)
 {
   char *suffix;

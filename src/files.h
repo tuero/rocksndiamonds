@@ -86,4 +86,6 @@ void ConvertLevels(void);
 void CreateLevelSketchImages(void);
 void CreateCustomElementImages(char *);
 
+int get_parameter_value(char *, char *, int);
+
 #endif	// FILES_H

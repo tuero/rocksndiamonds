@@ -267,8 +267,6 @@ boolean FileIsArtworkType(char *, int);
 
 char *get_mapped_token(char *);
 
-int get_parameter_value(char *, char *, int);
-
 struct FileInfo *getFileListFromConfigList(struct ConfigInfo *,
 					   struct ConfigTypeInfo *,
 					   char **, int);
