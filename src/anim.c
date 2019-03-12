@@ -1073,8 +1073,8 @@ static int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part,
     part->anim_delay_counter =
       (c->anim_delay_fixed + GetSimpleRandom(c->anim_delay_random));
 
-    part->init_event_state = GetGlobalAnimEventValue(c->init_event, 0);
-    part->anim_event_state = GetGlobalAnimEventValue(c->anim_event, 0);
+    part->init_event_state = (c->init_event != ANIM_EVENT_UNDEFINED);
+    part->anim_event_state = (c->anim_event != ANIM_EVENT_UNDEFINED);
 
     part->initial_anim_sync_frame =
       (g->anim_global_sync ? 0 : anim_sync_frame + part->init_delay_counter);
@@ -1161,27 +1161,27 @@ static int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part,
       part->step_yoffset = c->step_yoffset;
 
     if (part->init_delay_counter == 0 &&
-	part->init_event_state == ANIM_EVENT_NONE)
+	!part->init_event_state)
       PlayGlobalAnimSoundAndMusic(part);
   }
 
   if (part->clicked &&
-      part->init_event_state != ANIM_EVENT_NONE)
+      part->init_event_state)
   {
     if (part->initial_anim_sync_frame > 0)
       part->initial_anim_sync_frame -= part->init_delay_counter - 1;
 
     part->init_delay_counter = 1;
-    part->init_event_state = ANIM_EVENT_NONE;
+    part->init_event_state = FALSE;
 
     part->clicked = FALSE;
   }
 
   if (part->clicked &&
-      part->anim_event_state != ANIM_EVENT_NONE)
+      part->anim_event_state)
   {
     part->anim_delay_counter = 1;
-    part->anim_event_state = ANIM_EVENT_NONE;
+    part->anim_event_state = FALSE;
 
     part->clicked = FALSE;
   }
@@ -1192,7 +1192,7 @@ static int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part,
 
     if (part->init_delay_counter == 0)
     {
-      part->init_event_state = ANIM_EVENT_NONE;
+      part->init_event_state = FALSE;
 
       PlayGlobalAnimSoundAndMusic(part);
     }
@@ -1200,7 +1200,7 @@ static int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part,
     return ANIM_STATE_WAITING;
   }
 
-  if (part->init_event_state != ANIM_EVENT_NONE)
+  if (part->init_event_state)
     return ANIM_STATE_WAITING;
 
   // animation part is now running/visible and therefore clickable
@@ -1213,7 +1213,7 @@ static int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part,
       (part->y >=  part->viewport_height && part->step_yoffset >= 0))
   {
     // do not wait for "anim" events for off-screen animations
-    part->anim_event_state = ANIM_EVENT_NONE;
+    part->anim_event_state = FALSE;
 
     // do not stop animation before "anim" or "post" counter are finished
     if (part->anim_delay_counter == 0 &&
@@ -1238,7 +1238,7 @@ static int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part,
 
     if (part->anim_delay_counter == 0)
     {
-      part->anim_event_state = ANIM_EVENT_NONE;
+      part->anim_event_state = FALSE;
 
       StopGlobalAnimSoundAndMusic(part);
 
