@@ -353,6 +353,7 @@
 #define STYLE_DEFAULT		STYLE_NONE
 
 // values for special global animation events
+#define ANIM_EVENT_UNDEFINED	-1
 #define ANIM_EVENT_NONE		0
 #define ANIM_EVENT_SELF		(1 << 16)
 #define ANIM_EVENT_ANY		(1 << 17)

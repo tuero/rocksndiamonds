@@ -3412,6 +3412,18 @@ struct GlobalAnimInfo
   int music[NUM_GLOBAL_ANIM_PARTS_ALL][NUM_SPECIAL_GFX_ARGS];
 };
 
+struct GlobalAnimEventListInfo
+{
+  int *event_value;
+  int num_event_values;
+};
+
+struct GlobalAnimEventInfo
+{
+  struct GlobalAnimEventListInfo **event_list;
+  int num_event_lists;
+};
+
 struct GraphicInfo
 {
   Bitmap **bitmaps;		// bitmaps in all required sizes
@@ -3701,6 +3713,7 @@ extern struct TokenIntPtrInfo	image_config_vars[];
 extern struct FontInfo		font_info[];
 extern struct GlobalAnimInfo	global_anim_info[];
 extern struct GlobalAnimNameInfo global_anim_name_info[];
+extern struct GlobalAnimEventInfo global_anim_event_info;
 extern struct MusicPrefixInfo	music_prefix_info[];
 extern struct GraphicInfo      *graphic_info;
 extern struct SoundInfo	       *sound_info;

@@ -9941,6 +9941,79 @@ static int getElementFromToken(char *token)
   return EL_UNDEFINED;
 }
 
+void FreeGlobalAnimEventInfo(void)
+{
+  struct GlobalAnimEventInfo *gaei = &global_anim_event_info;
+
+  if (gaei->event_list == NULL)
+    return;
+
+  int i;
+
+  for (i = 0; i < gaei->num_event_lists; i++)
+  {
+    checked_free(gaei->event_list[i]->event_value);
+    checked_free(gaei->event_list[i]);
+  }
+
+  checked_free(gaei->event_list);
+
+  gaei->event_list = NULL;
+  gaei->num_event_lists = 0;
+}
+
+static int AddGlobalAnimEventList(void)
+{
+  struct GlobalAnimEventInfo *gaei = &global_anim_event_info;
+  int list_pos = gaei->num_event_lists++;
+
+  gaei->event_list = checked_realloc(gaei->event_list, gaei->num_event_lists *
+				     sizeof(struct GlobalAnimEventListInfo *));
+
+  gaei->event_list[list_pos] =
+    checked_calloc(sizeof(struct GlobalAnimEventListInfo));
+
+  struct GlobalAnimEventListInfo *gaeli = gaei->event_list[list_pos];
+
+  gaeli->event_value = NULL;
+  gaeli->num_event_values = 0;
+
+  return list_pos;
+}
+
+static int AddGlobalAnimEventValue(int list_pos, int event_value)
+{
+  // do not add empty global animation events
+  if (event_value == ANIM_EVENT_NONE)
+    return list_pos;
+
+  // if list position is undefined, create new list
+  if (list_pos == ANIM_EVENT_UNDEFINED)
+    list_pos = AddGlobalAnimEventList();
+
+  struct GlobalAnimEventInfo *gaei = &global_anim_event_info;
+  struct GlobalAnimEventListInfo *gaeli = gaei->event_list[list_pos];
+  int value_pos = gaeli->num_event_values++;
+
+  gaeli->event_value = checked_realloc(gaeli->event_value,
+				       gaeli->num_event_values * sizeof(int *));
+
+  gaeli->event_value[value_pos] = event_value;
+
+  return list_pos;
+}
+
+int GetGlobalAnimEventValue(int list_pos, int value_pos)
+{
+  if (list_pos == ANIM_EVENT_UNDEFINED)
+    return ANIM_EVENT_NONE;
+
+  struct GlobalAnimEventInfo *gaei = &global_anim_event_info;
+  struct GlobalAnimEventListInfo *gaeli = gaei->event_list[list_pos];
+
+  return gaeli->event_value[value_pos];
+}
+
 // This function checks if a string <s> of the format "string1, string2, ..."
 // exactly contains a string <s_contained>.
 
@@ -10152,6 +10225,9 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
 
     // add optional "click:anim_X" or "click:anim_X.part_X" parameter
     result |= get_anim_parameter_value(value);
+
+    // final result is position in global animation event list
+    result = AddGlobalAnimEventValue(ANIM_EVENT_UNDEFINED, result);
   }
   else if (strEqual(suffix, ".init_event_action") ||
 	   strEqual(suffix, ".anim_event_action"))

@@ -86,6 +86,9 @@ void ConvertLevels(void);
 void CreateLevelSketchImages(void);
 void CreateCustomElementImages(char *);
 
+void FreeGlobalAnimEventInfo(void);
+int GetGlobalAnimEventValue(int, int);
+
 int get_parameter_value(char *, char *, int);
 
 #endif	// FILES_H

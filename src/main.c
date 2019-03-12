@@ -7568,6 +7568,11 @@ struct GlobalAnimNameInfo global_anim_name_info[NUM_GLOBAL_ANIM_TOKENS + 1] =
   { NULL			}
 };
 
+struct GlobalAnimEventInfo global_anim_event_info =
+{
+  NULL, 0
+};
+
 
 // ----------------------------------------------------------------------------
 // music token prefix definitions

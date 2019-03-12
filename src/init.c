@@ -1301,8 +1301,8 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   g->anim_delay_random = 0;
   g->post_delay_fixed = 0;
   g->post_delay_random = 0;
-  g->init_event = ANIM_EVENT_DEFAULT;
-  g->anim_event = ANIM_EVENT_DEFAULT;
+  g->init_event = ANIM_EVENT_UNDEFINED;
+  g->anim_event = ANIM_EVENT_UNDEFINED;
   g->init_event_action = -1;
   g->anim_event_action = -1;
   g->draw_masked = FALSE;
@@ -1722,6 +1722,8 @@ static void InitGraphicInfo(void)
 
     -1
   };
+
+  FreeGlobalAnimEventInfo();
 
   checked_free(graphic_info);
 

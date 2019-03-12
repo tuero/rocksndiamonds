@@ -14,6 +14,7 @@
 #include "anim.h"
 #include "main.h"
 #include "tools.h"
+#include "files.h"
 #include "events.h"
 #include "screens.h"
 
@@ -994,18 +995,20 @@ static boolean isClickablePart(struct GlobalAnimPartControlInfo *part, int mask)
   struct GraphicInfo *c = &part->control_info;
   int trigger_mask = ANIM_EVENT_ANIM_MASK | ANIM_EVENT_PART_MASK;
   int mask_anim_only = mask & ANIM_EVENT_ANIM_MASK;
+  int init_event = GetGlobalAnimEventValue(c->init_event, 0);
+  int anim_event = GetGlobalAnimEventValue(c->anim_event, 0);
 
   if (mask & ANIM_EVENT_ANY)
-    return (c->init_event & ANIM_EVENT_ANY ||
-	    c->anim_event & ANIM_EVENT_ANY);
+    return (init_event & ANIM_EVENT_ANY ||
+	    anim_event & ANIM_EVENT_ANY);
   else if (mask & ANIM_EVENT_SELF)
-    return (c->init_event & ANIM_EVENT_SELF ||
-	    c->anim_event & ANIM_EVENT_SELF);
+    return (init_event & ANIM_EVENT_SELF ||
+	    anim_event & ANIM_EVENT_SELF);
   else
-    return ((c->init_event & trigger_mask) == mask ||
-	    (c->anim_event & trigger_mask) == mask ||
-	    (c->init_event & trigger_mask) == mask_anim_only ||
-	    (c->anim_event & trigger_mask) == mask_anim_only);
+    return ((init_event & trigger_mask) == mask ||
+	    (anim_event & trigger_mask) == mask ||
+	    (init_event & trigger_mask) == mask_anim_only ||
+	    (anim_event & trigger_mask) == mask_anim_only);
 }
 
 static boolean isClickedPart(struct GlobalAnimPartControlInfo *part,
@@ -1070,8 +1073,8 @@ static int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part,
     part->anim_delay_counter =
       (c->anim_delay_fixed + GetSimpleRandom(c->anim_delay_random));
 
-    part->init_event_state = c->init_event;
-    part->anim_event_state = c->anim_event;
+    part->init_event_state = GetGlobalAnimEventValue(c->init_event, 0);
+    part->anim_event_state = GetGlobalAnimEventValue(c->anim_event, 0);
 
     part->initial_anim_sync_frame =
       (g->anim_global_sync ? 0 : anim_sync_frame + part->init_delay_counter);
