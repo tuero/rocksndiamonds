@@ -992,16 +992,15 @@ static void PlayGlobalAnimSoundIfLoop(struct GlobalAnimPartControlInfo *part)
 
 static boolean checkGlobalAnimEvent(int anim_event, int mask)
 {
-  int trigger_mask = ANIM_EVENT_ANIM_MASK | ANIM_EVENT_PART_MASK;
-  int mask_anim_only = mask & ANIM_EVENT_ANIM_MASK;
+  int mask_anim_only = mask & ~ANIM_EVENT_PART_MASK;
 
   if (mask & ANIM_EVENT_ANY)
     return (anim_event & ANIM_EVENT_ANY);
   else if (mask & ANIM_EVENT_SELF)
     return (anim_event & ANIM_EVENT_SELF);
   else
-    return ((anim_event & trigger_mask) == mask ||
-	    (anim_event & trigger_mask) == mask_anim_only);
+    return (anim_event == mask ||
+	    anim_event == mask_anim_only);
 }
 
 static boolean isClickablePart(struct GlobalAnimPartControlInfo *part, int mask)
@@ -1618,7 +1617,7 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, boolean clicked)
 	  // check if this click is defined to trigger other animations
 	  int gic_anim_nr = part->old_anim_nr + 1;	// X as in "anim_X"
 	  int gic_part_nr = part->old_nr + 1;		// Y as in "part_Y"
-	  int mask = gic_anim_nr << ANIM_EVENT_ANIM_BIT;
+	  int mask = ANIM_EVENT_CLICK | (gic_anim_nr << ANIM_EVENT_ANIM_BIT);
 
 	  if (!part->is_base)
 	    mask |= gic_part_nr << ANIM_EVENT_PART_BIT;

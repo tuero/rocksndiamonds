@@ -357,7 +357,10 @@
 #define ANIM_EVENT_NONE		0
 #define ANIM_EVENT_SELF		(1 << 16)
 #define ANIM_EVENT_ANY		(1 << 17)
+#define ANIM_EVENT_CLICK	(1 << 18)
 
+// anim number: bits 0-7
+// part number: bits 8-15
 #define ANIM_EVENT_ANIM_BIT	0
 #define ANIM_EVENT_PART_BIT	8
 

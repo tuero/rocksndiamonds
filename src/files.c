@@ -10064,17 +10064,35 @@ static boolean string_has_parameter(char *s, char *s_contained)
 
 static int get_anim_parameter_value(char *s)
 {
-  char *pattern_1 = "click:anim_";
+  int event_value[] =
+  {
+    ANIM_EVENT_CLICK
+  };
+  char *pattern_1[] =
+  {
+    "click:anim_"
+  };
   char *pattern_2 = ".part_";
   char *matching_char = NULL;
   char *s_ptr = s;
+  int pattern_1_len = 0;
   int result = ANIM_EVENT_NONE;
+  int i;
 
-  matching_char = strstr(s_ptr, pattern_1);
+  for (i = 0; i < ARRAY_SIZE(event_value); i++)
+  {
+    matching_char = strstr(s_ptr, pattern_1[i]);
+    pattern_1_len = strlen(pattern_1[i]);
+    result = event_value[i];
+
+    if (matching_char != NULL)
+      break;
+  }
+
   if (matching_char == NULL)
     return ANIM_EVENT_NONE;
 
-  s_ptr = matching_char + strlen(pattern_1);
+  s_ptr = matching_char + pattern_1_len;
 
   // check for main animation number ("anim_X" or "anim_XX")
   if (*s_ptr >= '0' && *s_ptr <= '9')
