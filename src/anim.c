@@ -19,6 +19,9 @@
 #include "screens.h"
 
 
+#define DEBUG_ANIM_EVENTS		0
+
+
 // values for global toon animation definition
 #define NUM_GLOBAL_TOON_ANIMS		1
 #define NUM_GLOBAL_TOON_PARTS		MAX_NUM_TOONS
@@ -1099,6 +1102,11 @@ static void InitGlobalAnim_Triggered(struct GlobalAnimPartControlInfo *part,
 	part2->triggered = TRUE;
 	*anything_clicked = clickConsumed(part); 	// click was on "part"!
 
+#if DEBUG_ANIM_EVENTS
+	printf("::: => %d.%d TRIGGERED BY %d.%d\n",
+	       part2->old_anim_nr + 1, part2->old_nr + 1,
+	       part->old_anim_nr + 1, part->old_nr + 1);
+#endif
 #if 0
 	printf("::: %d.%d TRIGGER CLICKED [%d]\n", anim2_nr, part2_nr,
 	       part2->control_info.anim_event_action);
@@ -1651,6 +1659,11 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, boolean clicked)
 	// always handle "any" click events (clicking anywhere on screen) ...
 	if (isClickablePart(part, ANIM_EVENT_ANY))
 	{
+#if DEBUG_ANIM_EVENTS
+	  printf("::: => %d.%d TRIGGERED BY ANY\n",
+		 part->old_anim_nr + 1, part->old_nr + 1);
+#endif
+
 	  part->clicked = TRUE;
 	  anything_clicked = clickConsumed(part);
 	}
@@ -1675,6 +1688,11 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, boolean clicked)
 
 	  if (isClickablePart(part, ANIM_EVENT_SELF))
 	  {
+#if DEBUG_ANIM_EVENTS
+	    printf("::: => %d.%d TRIGGERED BY SELF\n",
+		   part->old_anim_nr + 1, part->old_nr + 1);
+#endif
+
 	    part->clicked = TRUE;
 	    anything_clicked = clickConsumed(part);
 	  }
