@@ -205,6 +205,7 @@ struct AnimClassGameMode
 };
 
 // forward declaration for internal use
+static boolean DoGlobalAnim_EventAction(struct GlobalAnimPartControlInfo *);
 static void HandleGlobalAnim(int, int);
 static void DoAnimationExt(void);
 static void ResetGlobalAnim_Clickable(void);
@@ -1064,6 +1065,65 @@ static boolean clickConsumed(struct GlobalAnimPartControlInfo *part)
   return (part->control_info.style & STYLE_PASSTHROUGH ? FALSE : TRUE);
 }
 
+static void InitGlobalAnim_Triggered(struct GlobalAnimPartControlInfo *part,
+				     boolean *anything_clicked,
+				     boolean *any_event_action,
+				     int event_value)
+{
+  struct GlobalAnimControlInfo *ctrl = &global_anim_ctrl[part->mode_nr];
+
+  int gic_anim_nr = part->old_anim_nr + 1;	// X as in "anim_X"
+  int gic_part_nr = part->old_nr + 1;		// Y as in "part_Y"
+  int mask = event_value | (gic_anim_nr << ANIM_EVENT_ANIM_BIT);
+
+  if (!part->is_base)
+    mask |= gic_part_nr << ANIM_EVENT_PART_BIT;
+
+  int anim2_nr;
+
+  for (anim2_nr = 0; anim2_nr < ctrl->num_anims; anim2_nr++)
+  {
+    struct GlobalAnimMainControlInfo *anim2 = &ctrl->anim[anim2_nr];
+    int part2_nr;
+
+    for (part2_nr = 0; part2_nr < anim2->num_parts_all; part2_nr++)
+    {
+      struct GlobalAnimPartControlInfo *part2 = &anim2->part[part2_nr];
+
+      if (part2->state != ANIM_STATE_RUNNING)
+	continue;
+
+      if (isClickablePart(part2, mask))
+      {
+	part2->clicked = TRUE;
+	*anything_clicked = clickConsumed(part); 	// click was on "part"!
+
+#if 0
+	printf("::: %d.%d TRIGGER CLICKED [%d]\n", anim2_nr, part2_nr,
+	       part2->control_info.anim_event_action);
+#endif
+
+	// after executing event action, ignore any further actions
+	if (!*any_event_action && DoGlobalAnim_EventAction(part2))
+	  *any_event_action = TRUE;
+      }
+
+#if 0
+      struct GraphicInfo *c = &part2->control_info;
+
+      printf("::: - %d.%d: 0x%08x, 0x%08x [0x%08x]",
+	     anim2_nr, part2_nr, c->init_event, c->anim_event, mask);
+
+      if (isClickablePart(part2, mask))
+	printf(" <--- TRIGGERED BY %d.%d",
+	       anim_nr, part_nr);
+
+      printf("\n");
+#endif
+    }
+  }
+}
+
 static int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part,
 				 int state)
 {
@@ -1615,56 +1675,8 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, boolean clicked)
 	  }
 
 	  // check if this click is defined to trigger other animations
-	  int gic_anim_nr = part->old_anim_nr + 1;	// X as in "anim_X"
-	  int gic_part_nr = part->old_nr + 1;		// Y as in "part_Y"
-	  int mask = ANIM_EVENT_CLICK | (gic_anim_nr << ANIM_EVENT_ANIM_BIT);
-
-	  if (!part->is_base)
-	    mask |= gic_part_nr << ANIM_EVENT_PART_BIT;
-
-	  int anim2_nr;
-
-	  for (anim2_nr = 0; anim2_nr < ctrl->num_anims; anim2_nr++)
-	  {
-	    struct GlobalAnimMainControlInfo *anim2 = &ctrl->anim[anim2_nr];
-	    int part2_nr;
-
-	    for (part2_nr = 0; part2_nr < anim2->num_parts_all; part2_nr++)
-	    {
-	      struct GlobalAnimPartControlInfo *part2 = &anim2->part[part2_nr];
-
-	      if (part2->state != ANIM_STATE_RUNNING)
-		continue;
-
-	      if (isClickablePart(part2, mask))
-	      {
-		part2->clicked = TRUE;
-		anything_clicked = clickConsumed(part);	// click was on "part"!
-
-#if 0
-		printf("::: %d.%d TRIGGER CLICKED [%d]\n", anim2_nr, part2_nr,
-		       part2->control_info.anim_event_action);
-#endif
-
-		// after executing event action, ignore any further actions
-		if (!any_event_action && DoGlobalAnim_EventAction(part2))
-		  any_event_action = TRUE;
-	      }
-
-#if 0
-	      struct GraphicInfo *c = &part2->control_info;
-
-	      printf("::: - %d.%d: 0x%08x, 0x%08x [0x%08x]",
-		     anim2_nr, part2_nr, c->init_event, c->anim_event, mask);
-
-	      if (isClickablePart(part2, mask))
-		printf(" <--- TRIGGERED BY %d.%d",
-		       anim_nr, part_nr);
-
-	      printf("\n");
-#endif
-	    }
-	  }
+	  InitGlobalAnim_Triggered(part, &anything_clicked, &any_event_action,
+				   ANIM_EVENT_CLICK);
 	}
       }
     }
