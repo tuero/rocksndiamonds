@@ -113,6 +113,7 @@ struct GlobalAnimPartControlInfo
   boolean init_event_state;
   boolean anim_event_state;
 
+  boolean triggered;
   boolean clickable;
   boolean clicked;
 
@@ -1095,7 +1096,7 @@ static void InitGlobalAnim_Triggered(struct GlobalAnimPartControlInfo *part,
 
       if (isClickablePart(part2, mask))
       {
-	part2->clicked = TRUE;
+	part2->triggered = TRUE;
 	*anything_clicked = clickConsumed(part); 	// click was on "part"!
 
 #if 0
@@ -1600,6 +1601,10 @@ static void InitGlobalAnim_Clickable(void)
       {
 	struct GlobalAnimPartControlInfo *part = &anim->part[part_nr];
 
+	if (part->triggered)
+	  part->clicked = TRUE;
+
+	part->triggered = FALSE;
 	part->clickable = FALSE;
       }
     }
