@@ -1072,7 +1072,7 @@ static boolean clickConsumed(struct GlobalAnimPartControlInfo *part)
 static void InitGlobalAnim_Triggered(struct GlobalAnimPartControlInfo *part,
 				     boolean *anything_clicked,
 				     boolean *any_event_action,
-				     int event_value)
+				     int event_value, char *info_text)
 {
   struct GlobalAnimControlInfo *ctrl = &global_anim_ctrl[part->mode_nr];
 
@@ -1103,8 +1103,8 @@ static void InitGlobalAnim_Triggered(struct GlobalAnimPartControlInfo *part,
 	*anything_clicked = clickConsumed(part); 	// click was on "part"!
 
 #if DEBUG_ANIM_EVENTS
-	printf("::: => %d.%d TRIGGERED BY %d.%d\n",
-	       part2->old_anim_nr + 1, part2->old_nr + 1,
+	printf("::: => %d.%d TRIGGERED BY %s OF %d.%d\n",
+	       part2->old_anim_nr + 1, part2->old_nr + 1, info_text,
 	       part->old_anim_nr + 1, part->old_nr + 1);
 #endif
 #if 0
@@ -1145,7 +1145,7 @@ static void HandleGlobalAnimEvent(struct GlobalAnimPartControlInfo *part,
 
   // check if this event is defined to trigger other animations
   InitGlobalAnim_Triggered(part, &anything_clicked, &any_event_action,
-			   event_value);
+			   event_value, info_text);
 }
 
 static int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part,
@@ -1732,7 +1732,7 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, boolean clicked)
 
 	  // check if this click is defined to trigger other animations
 	  InitGlobalAnim_Triggered(part, &anything_clicked, &any_event_action,
-				   ANIM_EVENT_CLICK);
+				   ANIM_EVENT_CLICK, "CLICK");
 	}
       }
     }
