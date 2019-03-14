@@ -1133,6 +1133,21 @@ static void InitGlobalAnim_Triggered(struct GlobalAnimPartControlInfo *part,
   }
 }
 
+static void HandleGlobalAnimEvent(struct GlobalAnimPartControlInfo *part,
+				  int event_value, char *info_text)
+{
+#if DEBUG_ANIM_EVENTS
+  printf("::: %d.%d %s\n", part->old_anim_nr + 1, part->old_nr + 1, info_text);
+#endif
+
+  boolean anything_clicked = FALSE;
+  boolean any_event_action = FALSE;
+
+  // check if this event is defined to trigger other animations
+  InitGlobalAnim_Triggered(part, &anything_clicked, &any_event_action,
+			   event_value);
+}
+
 static int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part,
 				 int state)
 {
@@ -1249,7 +1264,15 @@ static int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part,
 
     if (part->init_delay_counter == 0 &&
 	!part->init_event_state)
+    {
       PlayGlobalAnimSoundAndMusic(part);
+
+      HandleGlobalAnimEvent(part, ANIM_EVENT_START, "START [ANIM]");
+    }
+    else
+    {
+      HandleGlobalAnimEvent(part, ANIM_EVENT_INIT, "START [INIT_DELAY/EVENT]");
+    }
   }
 
   if (part->clicked &&
@@ -1282,6 +1305,8 @@ static int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part,
       part->init_event_state = FALSE;
 
       PlayGlobalAnimSoundAndMusic(part);
+
+      HandleGlobalAnimEvent(part, ANIM_EVENT_START, "START [ANIM]");
     }
 
     return ANIM_STATE_WAITING;
@@ -1308,6 +1333,8 @@ static int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part,
     {
       StopGlobalAnimSoundAndMusic(part);
 
+      HandleGlobalAnimEvent(part, ANIM_EVENT_END, "END [ANIM/OFF-SCREEN]");
+
       part->post_delay_counter =
 	(c->post_delay_fixed + GetSimpleRandom(c->post_delay_random));
 
@@ -1329,6 +1356,8 @@ static int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part,
 
       StopGlobalAnimSoundAndMusic(part);
 
+      HandleGlobalAnimEvent(part, ANIM_EVENT_END, "END [ANIM_DELAY/EVENT]");
+
       part->post_delay_counter =
 	(c->post_delay_fixed + GetSimpleRandom(c->post_delay_random));
 
@@ -1345,7 +1374,11 @@ static int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part,
     part->post_delay_counter--;
 
     if (part->post_delay_counter == 0)
+    {
+      HandleGlobalAnimEvent(part, ANIM_EVENT_POST, "END [POST_DELAY]");
+
       return ANIM_STATE_RESTART;
+    }
 
     return ANIM_STATE_WAITING;
   }

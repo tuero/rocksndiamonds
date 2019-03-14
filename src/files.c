@@ -10066,11 +10066,19 @@ static int get_anim_parameter_value(char *s)
 {
   int event_value[] =
   {
-    ANIM_EVENT_CLICK
+    ANIM_EVENT_CLICK,
+    ANIM_EVENT_INIT,
+    ANIM_EVENT_START,
+    ANIM_EVENT_END,
+    ANIM_EVENT_POST
   };
   char *pattern_1[] =
   {
-    "click:anim_"
+    "click:anim_",
+    "init:anim_",
+    "start:anim_",
+    "end:anim_",
+    "post:anim_"
   };
   char *pattern_2 = ".part_";
   char *matching_char = NULL;
