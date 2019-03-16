@@ -14085,7 +14085,7 @@ void HandleLevelEditorKeyInput(Key key)
     else if (key == KSYM_Escape)
       DrawLevelText(0, 0, 0, TEXT_END);
   }
-  else if (button_status == MB_RELEASED)
+  else
   {
     int id = GADGET_ID_NONE;
     int new_element_shift = element_shift;
