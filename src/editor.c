@@ -14071,7 +14071,6 @@ static void HandleControlButtons(struct GadgetInfo *gi)
 void HandleLevelEditorKeyInput(Key key)
 {
   char letter = getCharFromKey(key);
-  int button = MB_LEFTBUTTON;
 
   if (drawing_function == GADGET_ID_TEXT &&
       DrawLevelText(0, 0, 0, TEXT_QUERY_TYPING) == TRUE)
@@ -14084,150 +14083,141 @@ void HandleLevelEditorKeyInput(Key key)
       DrawLevelText(0, 0, 0, TEXT_NEWLINE);
     else if (key == KSYM_Escape)
       DrawLevelText(0, 0, 0, TEXT_END);
+
+    return;
   }
-  else
+
+  int id = GADGET_ID_NONE;
+  int new_element_shift = element_shift;
+  int step = ED_ELEMENTLIST_BUTTONS_VERT - 1;
+  int button = MB_LEFTBUTTON;
+  int i;
+
+  switch (key)
   {
-    int id = GADGET_ID_NONE;
-    int new_element_shift = element_shift;
-    int step = ED_ELEMENTLIST_BUTTONS_VERT - 1;
-    int i;
+    case KSYM_Left:
+      id = GADGET_ID_SCROLL_LEFT;
+      break;
+    case KSYM_Right:
+      id = GADGET_ID_SCROLL_RIGHT;
+      break;
+    case KSYM_Up:
+      id = GADGET_ID_SCROLL_UP;
+      break;
+    case KSYM_Down:
+      id = GADGET_ID_SCROLL_DOWN;
+      break;
 
-    switch (key)
-    {
-      case KSYM_Left:
-	id = GADGET_ID_SCROLL_LEFT;
+    case KSYM_Page_Up:
+    case KSYM_Page_Down:
+      step *= (key == KSYM_Page_Up ? -1 : +1);
+      element_shift += step * ED_ELEMENTLIST_BUTTONS_HORIZ;
+
+      if (element_shift < 0)
+	element_shift = 0;
+      if (element_shift > num_editor_elements - ED_NUM_ELEMENTLIST_BUTTONS)
+	element_shift = num_editor_elements - ED_NUM_ELEMENTLIST_BUTTONS;
+
+      ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_LIST_VERTICAL],
+		   GDI_SCROLLBAR_ITEM_POSITION,
+		   element_shift / ED_ELEMENTLIST_BUTTONS_HORIZ, GDI_END);
+
+      ModifyEditorElementList();
+
+      break;
+
+    case KSYM_Home:
+    case KSYM_End:
+      element_shift = (key == KSYM_Home ? 0 :
+		       num_editor_elements - ED_NUM_ELEMENTLIST_BUTTONS);
+
+      ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_LIST_VERTICAL],
+		   GDI_SCROLLBAR_ITEM_POSITION,
+		   element_shift / ED_ELEMENTLIST_BUTTONS_HORIZ, GDI_END);
+
+      ModifyEditorElementList();
+
+      break;
+
+    case KSYM_Insert:
+    case KSYM_Delete:
+
+      // this is needed to prevent interference with running "True X-Mouse"
+      if (GetKeyModStateFromEvents() & KMOD_Control)
 	break;
-      case KSYM_Right:
-	id = GADGET_ID_SCROLL_RIGHT;
-	break;
-      case KSYM_Up:
-	id = GADGET_ID_SCROLL_UP;
-	break;
-      case KSYM_Down:
-	id = GADGET_ID_SCROLL_DOWN;
-	break;
 
-      case KSYM_Page_Up:
-      case KSYM_Page_Down:
-	step *= (key == KSYM_Page_Up ? -1 : +1);
-        element_shift += step * ED_ELEMENTLIST_BUTTONS_HORIZ;
-
-        if (element_shift < 0)
-          element_shift = 0;
-        if (element_shift > num_editor_elements - ED_NUM_ELEMENTLIST_BUTTONS)
-          element_shift = num_editor_elements - ED_NUM_ELEMENTLIST_BUTTONS;
-
-        ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_LIST_VERTICAL],
-                     GDI_SCROLLBAR_ITEM_POSITION,
-                     element_shift / ED_ELEMENTLIST_BUTTONS_HORIZ, GDI_END);
-
-	ModifyEditorElementList();
-
-	break;
-
-      case KSYM_Home:
-      case KSYM_End:
-	element_shift = (key == KSYM_Home ? 0 :
-			 num_editor_elements - ED_NUM_ELEMENTLIST_BUTTONS);
-
-	ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_LIST_VERTICAL],
-		     GDI_SCROLLBAR_ITEM_POSITION,
-		     element_shift / ED_ELEMENTLIST_BUTTONS_HORIZ, GDI_END);
-
-	ModifyEditorElementList();
-
-	break;
-
-      case KSYM_Insert:
-      case KSYM_Delete:
-
-	// this is needed to prevent interference with running "True X-Mouse"
-	if (GetKeyModStateFromEvents() & KMOD_Control)
+      // check for last or next editor cascade block in element list
+      for (i = 0; i < num_editor_elements; i++)
+      {
+	if ((key == KSYM_Insert && i == element_shift) ||
+	    (key == KSYM_Delete && new_element_shift > element_shift))
 	  break;
 
-	// check for last or next editor cascade block in element list
-	for (i = 0; i < num_editor_elements; i++)
-	{
-	  if ((key == KSYM_Insert && i == element_shift) ||
-	      (key == KSYM_Delete && new_element_shift > element_shift))
-	    break;
+	// jump to next cascade block (or to start of element list)
+	if (i == 0 || IS_EDITOR_CASCADE(editor_elements[i]))
+	  new_element_shift = i;
+      }
 
-	  // jump to next cascade block (or to start of element list)
-	  if (i == 0 || IS_EDITOR_CASCADE(editor_elements[i]))
-	    new_element_shift = i;
-	}
+      if (i < num_editor_elements)
+	element_shift = new_element_shift;
 
-	if (i < num_editor_elements)
-	  element_shift = new_element_shift;
+      if (element_shift > num_editor_elements - ED_NUM_ELEMENTLIST_BUTTONS)
+	element_shift = num_editor_elements - ED_NUM_ELEMENTLIST_BUTTONS;
 
-	if (element_shift > num_editor_elements - ED_NUM_ELEMENTLIST_BUTTONS)
-	  element_shift = num_editor_elements - ED_NUM_ELEMENTLIST_BUTTONS;
+      ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_LIST_VERTICAL],
+		   GDI_SCROLLBAR_ITEM_POSITION,
+		   element_shift / ED_ELEMENTLIST_BUTTONS_HORIZ, GDI_END);
 
-	ModifyGadget(level_editor_gadget[GADGET_ID_SCROLL_LIST_VERTICAL],
-		     GDI_SCROLLBAR_ITEM_POSITION,
-		     element_shift / ED_ELEMENTLIST_BUTTONS_HORIZ, GDI_END);
+      ModifyEditorElementList();
 
-	ModifyEditorElementList();
+      break;
 
-	break;
+    case KSYM_Escape:
+      if (edit_mode == ED_MODE_DRAWING)
+	RequestExitLevelEditor(setup.ask_on_escape_editor, TRUE);
+      else if (edit_mode == ED_MODE_INFO)
+	HandleControlButtons(level_editor_gadget[GADGET_ID_INFO]);
+      else if (edit_mode == ED_MODE_PROPERTIES)
+	HandleControlButtons(level_editor_gadget[GADGET_ID_PROPERTIES]);
+      else if (edit_mode == ED_MODE_PALETTE)
+	HandleControlButtons(level_editor_gadget[GADGET_ID_PALETTE]);
+      else		// should never happen
+	ChangeEditModeWindow(ED_MODE_DRAWING);
 
-      case KSYM_Escape:
-        if (edit_mode == ED_MODE_DRAWING)
-	{
-	  RequestExitLevelEditor(setup.ask_on_escape_editor, TRUE);
-	}
-        else if (edit_mode == ED_MODE_INFO)
-	{
-	  HandleControlButtons(level_editor_gadget[GADGET_ID_INFO]);
-	}
-        else if (edit_mode == ED_MODE_PROPERTIES)
-	{
-	  HandleControlButtons(level_editor_gadget[GADGET_ID_PROPERTIES]);
-	}
-        else if (edit_mode == ED_MODE_PALETTE)
-	{
-	  HandleControlButtons(level_editor_gadget[GADGET_ID_PALETTE]);
-	}
-	else		// should never happen
-	{
-	  ChangeEditModeWindow(ED_MODE_DRAWING);
-	}
+      break;
 
-        break;
-
-      default:
-	break;
-    }
-
-    if (id != GADGET_ID_NONE)
-      ClickOnGadget(level_editor_gadget[id], button);
-    else if (letter == '1' || letter == '?')
-      ClickOnGadget(level_editor_gadget[GADGET_ID_ELEMENT_LEFT], button);
-    else if (letter == '2')
-      ClickOnGadget(level_editor_gadget[GADGET_ID_ELEMENT_MIDDLE], button);
-    else if (letter == '3')
-      ClickOnGadget(level_editor_gadget[GADGET_ID_ELEMENT_RIGHT], button);
-    else if (letter == '.')
-      ClickOnGadget(level_editor_gadget[GADGET_ID_SINGLE_ITEMS], button);
-    else if (letter == 'U')
-      ClickOnGadget(level_editor_gadget[GADGET_ID_UNDO], 3);
-    else if (letter == '-' || key == KSYM_KP_Subtract)
-      ClickOnGadget(level_editor_gadget[GADGET_ID_ZOOM], 3);
-    else if (letter == '0' || key == KSYM_KP_0)
-      ClickOnGadget(level_editor_gadget[GADGET_ID_ZOOM], 2);
-    else if (letter == '+' || key == KSYM_KP_Add ||
-	     letter == '=')	// ("Shift-=" is "+" on US keyboards)
-      ClickOnGadget(level_editor_gadget[GADGET_ID_ZOOM], 1);
-    else if (key == KSYM_Return ||
-	     key == KSYM_space ||
-	     key == setup.shortcut.toggle_pause)
-      ClickOnGadget(level_editor_gadget[GADGET_ID_TEST], button);
-    else
-      for (i = 0; i < ED_NUM_CTRL_BUTTONS; i++)
-	if (letter && letter == controlbutton_info[i].shortcut)
-	  if (!anyTextGadgetActive())
-	    ClickOnGadget(level_editor_gadget[i], button);
+    default:
+      break;
   }
+
+  if (id != GADGET_ID_NONE)
+    ClickOnGadget(level_editor_gadget[id], button);
+  else if (letter == '1' || letter == '?')
+    ClickOnGadget(level_editor_gadget[GADGET_ID_ELEMENT_LEFT], button);
+  else if (letter == '2')
+    ClickOnGadget(level_editor_gadget[GADGET_ID_ELEMENT_MIDDLE], button);
+  else if (letter == '3')
+    ClickOnGadget(level_editor_gadget[GADGET_ID_ELEMENT_RIGHT], button);
+  else if (letter == '.')
+    ClickOnGadget(level_editor_gadget[GADGET_ID_SINGLE_ITEMS], button);
+  else if (letter == 'U')
+    ClickOnGadget(level_editor_gadget[GADGET_ID_UNDO], 3);
+  else if (letter == '-' || key == KSYM_KP_Subtract)
+    ClickOnGadget(level_editor_gadget[GADGET_ID_ZOOM], 3);
+  else if (letter == '0' || key == KSYM_KP_0)
+    ClickOnGadget(level_editor_gadget[GADGET_ID_ZOOM], 2);
+  else if (letter == '+' || key == KSYM_KP_Add ||
+	   letter == '=')	// ("Shift-=" is "+" on US keyboards)
+    ClickOnGadget(level_editor_gadget[GADGET_ID_ZOOM], 1);
+  else if (key == KSYM_Return ||
+	   key == KSYM_space ||
+	   key == setup.shortcut.toggle_pause)
+    ClickOnGadget(level_editor_gadget[GADGET_ID_TEST], button);
+  else
+    for (i = 0; i < ED_NUM_CTRL_BUTTONS; i++)
+      if (letter && letter == controlbutton_info[i].shortcut)
+	if (!anyTextGadgetActive())
+	  ClickOnGadget(level_editor_gadget[i], button);
 }
 
 void HandleLevelEditorIdle(void)
