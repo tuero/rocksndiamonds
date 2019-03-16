@@ -854,10 +854,20 @@ static boolean SetGlobalAnimPart_Viewport(struct GlobalAnimPartControlInfo *part
   }
   else if (part->control_info.class == get_hash_from_key("door_2"))
   {
-    viewport_x = VX;
-    viewport_y = VY;
-    viewport_width  = VXSIZE;
-    viewport_height = VYSIZE;
+    if (part->mode_nr == GAME_MODE_EDITOR)
+    {
+      viewport_x = EX;
+      viewport_y = EY;
+      viewport_width  = EXSIZE;
+      viewport_height = EYSIZE;
+    }
+    else
+    {
+      viewport_x = VX;
+      viewport_y = VY;
+      viewport_width  = VXSIZE;
+      viewport_height = VYSIZE;
+    }
   }
   else		// default: "playfield"
   {
