@@ -362,6 +362,7 @@
 #define ANIM_EVENT_START	(1 << 20)
 #define ANIM_EVENT_END		(1 << 21)
 #define ANIM_EVENT_POST		(1 << 22)
+#define ANIM_EVENT_UNCLICK_ANY	(1 << 23)
 
 // anim number: bits 0-7
 // part number: bits 8-15

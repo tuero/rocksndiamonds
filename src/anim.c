@@ -1013,6 +1013,8 @@ static boolean checkGlobalAnimEvent(int anim_event, int mask)
     return (anim_event & ANIM_EVENT_ANY);
   else if (mask & ANIM_EVENT_SELF)
     return (anim_event & ANIM_EVENT_SELF);
+  else if (mask & ANIM_EVENT_UNCLICK_ANY)
+    return (anim_event & ANIM_EVENT_UNCLICK_ANY);
   else
     return (anim_event == mask ||
 	    anim_event == mask_anim_only);
@@ -1662,7 +1664,11 @@ static void InitGlobalAnim_Clickable(void)
   }
 }
 
-static boolean InitGlobalAnim_Clicked(int mx, int my, boolean clicked)
+#define ANIM_CLICKED_RESET	0
+#define ANIM_CLICKED_PRESSED	1
+#define ANIM_CLICKED_RELEASED	2
+
+static boolean InitGlobalAnim_Clicked(int mx, int my, int clicked_event)
 {
   boolean anything_clicked = FALSE;
   boolean any_part_clicked = FALSE;
@@ -1686,7 +1692,7 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, boolean clicked)
       {
 	struct GlobalAnimPartControlInfo *part = &anim->part[part_nr];
 
-	if (!clicked)
+	if (clicked_event == ANIM_CLICKED_RESET)
 	{
 	  part->clicked = FALSE;
 
@@ -1700,10 +1706,24 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, boolean clicked)
 	  continue;
 
 	// always handle "any" click events (clicking anywhere on screen) ...
-	if (isClickablePart(part, ANIM_EVENT_ANY))
+	if (clicked_event == ANIM_CLICKED_PRESSED &&
+	    isClickablePart(part, ANIM_EVENT_ANY))
 	{
 #if DEBUG_ANIM_EVENTS
 	  printf("::: => %d.%d TRIGGERED BY ANY\n",
+		 part->old_anim_nr + 1, part->old_nr + 1);
+#endif
+
+	  part->clicked = TRUE;
+	  anything_clicked = clickConsumed(part);
+	}
+
+	// always handle "unclick:any" events (releasing anywhere on screen) ...
+	if (clicked_event == ANIM_CLICKED_RELEASED &&
+	    isClickablePart(part, ANIM_EVENT_UNCLICK_ANY))
+	{
+#if DEBUG_ANIM_EVENTS
+	  printf("::: => %d.%d TRIGGERED BY UNCLICK:ANY\n",
 		 part->old_anim_nr + 1, part->old_nr + 1);
 #endif
 
@@ -1715,7 +1735,8 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, boolean clicked)
 	if (any_part_clicked)
 	  continue;
 
-	if (isClickedPart(part, mx, my, clicked))
+	if (clicked_event == ANIM_CLICKED_PRESSED &&
+	    isClickedPart(part, mx, my, TRUE))
 	{
 #if 0
 	  printf("::: %d.%d CLICKED [%d]\n", anim_nr, part_nr,
@@ -1758,7 +1779,7 @@ static void ResetGlobalAnim_Clickable(void)
 
 static void ResetGlobalAnim_Clicked(void)
 {
-  InitGlobalAnim_Clicked(-1, -1, FALSE);
+  InitGlobalAnim_Clicked(-1, -1, ANIM_CLICKED_RESET);
 }
 
 boolean HandleGlobalAnimClicks(int mx, int my, int button)
@@ -1776,12 +1797,15 @@ boolean HandleGlobalAnimClicks(int mx, int my, int button)
 
   if (press_event)
   {
-    click_consumed = InitGlobalAnim_Clicked(mx, my, TRUE);
+    click_consumed = InitGlobalAnim_Clicked(mx, my, ANIM_CLICKED_PRESSED);
     click_consumed_current = click_consumed;
   }
 
   if (release_event)
+  {
+    InitGlobalAnim_Clicked(mx, my, ANIM_CLICKED_RELEASED);
     click_consumed = FALSE;
+  }
 
   return click_consumed_current;
 }

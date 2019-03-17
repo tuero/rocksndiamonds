@@ -10168,6 +10168,9 @@ static int get_anim_parameter_values(char *s)
       string_has_parameter(s, "self"))
     event_value |= ANIM_EVENT_SELF;
 
+  if (string_has_parameter(s, "unclick:any"))
+    event_value |= ANIM_EVENT_UNCLICK_ANY;
+
   // if animation event found, add it to global animation event list
   if (event_value != ANIM_EVENT_NONE)
     list_pos = AddGlobalAnimEventValue(list_pos, event_value);
