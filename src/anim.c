@@ -828,7 +828,8 @@ static boolean SetGlobalAnimPart_Viewport(struct GlobalAnimPartControlInfo *part
   int viewport_height;
   boolean changed = FALSE;
 
-  if (part->last_anim_status == global.anim_status)
+  if (part->last_anim_status == global.anim_status &&
+      part->control_info.class != get_hash_from_key("pointer"))
     return FALSE;
 
   part->last_anim_status = global.anim_status;
@@ -842,6 +843,15 @@ static boolean SetGlobalAnimPart_Viewport(struct GlobalAnimPartControlInfo *part
     viewport_y = 0;
     viewport_width  = WIN_XSIZE;
     viewport_height = WIN_YSIZE;
+
+    part->drawing_stage = DRAW_GLOBAL_ANIM_STAGE_2;
+  }
+  else if (part->control_info.class == get_hash_from_key("pointer"))
+  {
+    viewport_x = gfx.mouse_x + part->control_info.x;
+    viewport_y = gfx.mouse_y + part->control_info.y;
+    viewport_width  = part->graphic_info.width;
+    viewport_height = part->graphic_info.height;
 
     part->drawing_stage = DRAW_GLOBAL_ANIM_STAGE_2;
   }
@@ -1256,10 +1266,13 @@ static int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part,
       part->step_yoffset = 0;
     }
 
-    if (c->x != ARG_UNDEFINED_VALUE)
-      part->x = c->x;
-    if (c->y != ARG_UNDEFINED_VALUE)
-      part->y = c->y;
+    if (part->control_info.class != get_hash_from_key("pointer"))
+    {
+      if (c->x != ARG_UNDEFINED_VALUE)
+	part->x = c->x;
+      if (c->y != ARG_UNDEFINED_VALUE)
+	part->y = c->y;
+    }
 
     if (c->position == POS_LAST &&
 	anim->last_x > -g->width  && anim->last_x < part->viewport_width &&
