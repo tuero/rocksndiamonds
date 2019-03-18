@@ -317,6 +317,8 @@ void InitGfxCustomArtworkInfo(void)
 void InitGfxOtherSettings(void)
 {
   gfx.cursor_mode = CURSOR_DEFAULT;
+  gfx.mouse_x = 0;
+  gfx.mouse_y = 0;
 }
 
 void InitTileCursorInfo(void)

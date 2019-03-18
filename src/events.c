@@ -74,6 +74,9 @@ static int FilterEvents(const Event *event)
   {
     ((MotionEvent *)event)->x -= video.screen_xoffset;
     ((MotionEvent *)event)->y -= video.screen_yoffset;
+
+    gfx.mouse_x = ((MotionEvent *)event)->x;
+    gfx.mouse_y = ((MotionEvent *)event)->y;
   }
 
   // non-motion events are directly passed to event handler functions

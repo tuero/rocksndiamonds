@@ -1111,6 +1111,7 @@ struct GfxInfo
   void (*draw_tile_cursor_function)(int);
 
   int cursor_mode;
+  int mouse_x, mouse_y;
 };
 
 struct TileCursorInfo
