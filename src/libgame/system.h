@@ -1854,7 +1854,6 @@ KeyMod GetKeyModState(void);
 KeyMod GetKeyModStateFromEvents(void);
 void StartTextInput(int, int, int, int);
 void StopTextInput(void);
-boolean CheckCloseWindowEvent(ClientMessageEvent *);
 
 void InitJoysticks(void);
 boolean ReadJoystick(int, int *, int *, boolean *, boolean *);

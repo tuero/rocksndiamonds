@@ -64,7 +64,6 @@ typedef SDL_TextInputEvent	TextEvent;
 typedef SDL_Event		PauseResumeEvent;
 typedef SDL_WindowEvent		WindowEvent;
 typedef SDL_KeyboardEvent	KeyEvent;
-typedef SDL_Event		ClientMessageEvent;
 
 
 // structure definitions
@@ -107,7 +106,7 @@ struct MouseCursorInfo
 #define EVENT_TEXTINPUT		SDL_TEXTINPUT
 #define EVENT_KEYPRESS		SDL_KEYDOWN
 #define EVENT_KEYRELEASE	SDL_KEYUP
-#define EVENT_CLIENTMESSAGE	SDL_QUIT
+#define EVENT_QUIT		SDL_QUIT
 
 #define KSYM_UNDEFINED		SDLK_UNKNOWN
 

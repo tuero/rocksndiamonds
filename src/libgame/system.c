@@ -1733,14 +1733,6 @@ void StopTextInput(void)
 #endif
 }
 
-boolean CheckCloseWindowEvent(ClientMessageEvent *event)
-{
-  if (event->type != EVENT_CLIENTMESSAGE)
-    return FALSE;
-
-  return TRUE;		// the only possible message here is SDL_QUIT
-}
-
 
 // ============================================================================
 // joystick functions

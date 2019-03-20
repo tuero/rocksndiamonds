@@ -31,7 +31,6 @@ void HandleTextEvent(TextEvent *);
 void HandlePauseResumeEvent(PauseResumeEvent *);
 boolean HandleKeysDebug(Key, int);
 void HandleKeyEvent(KeyEvent *);
-void HandleClientMessageEvent(ClientMessageEvent *);
 void HandleDropEvent(Event *);
 
 void HandleToonAnimations(void);

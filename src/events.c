@@ -233,10 +233,6 @@ void HandleOtherEvents(Event *event)
 {
   switch (event->type)
   {
-    case EVENT_CLIENTMESSAGE:
-      HandleClientMessageEvent((ClientMessageEvent *) event);
-      break;
-
     case SDL_CONTROLLERBUTTONDOWN:
     case SDL_CONTROLLERBUTTONUP:
       // for any game controller button event, disable overlay buttons
@@ -259,6 +255,10 @@ void HandleOtherEvents(Event *event)
     case SDL_DROPFILE:
     case SDL_DROPTEXT:
       HandleDropEvent(event);
+      break;
+
+    case EVENT_QUIT:
+      CloseAllAndExit(0);
       break;
 
     default:
@@ -1422,12 +1422,6 @@ void HandleKeyEvent(KeyEvent *event)
   // only handle raw key input without text modifier keys pressed
   if (!checkTextInputKeyModState())
     HandleKey(key, key_status);
-}
-
-void HandleClientMessageEvent(ClientMessageEvent *event)
-{
-  if (CheckCloseWindowEvent(event))
-    CloseAllAndExit(0);
 }
 
 static int HandleDropFileEvent(char *filename)
