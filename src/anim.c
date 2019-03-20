@@ -1795,13 +1795,16 @@ static void ResetGlobalAnim_Clicked(void)
   InitGlobalAnim_Clicked(-1, -1, ANIM_CLICKED_RESET);
 }
 
-boolean HandleGlobalAnimClicks(int mx, int my, int button)
+boolean HandleGlobalAnimClicks(int mx, int my, int button, boolean force_click)
 {
   static boolean click_consumed = FALSE;
   static int last_button = 0;
   boolean press_event;
   boolean release_event;
   boolean click_consumed_current = click_consumed;
+
+  if (button != 0 && force_click)
+    last_button = 0;
 
   // check if button state has changed since last invocation
   press_event   = (button != 0 && last_button == 0);

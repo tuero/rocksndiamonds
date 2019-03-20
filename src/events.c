@@ -1745,7 +1745,7 @@ void HandleButton(int mx, int my, int button, int button_nr)
       !virtual_button_pressed));
 #endif
 
-  if (HandleGlobalAnimClicks(mx, my, button))
+  if (HandleGlobalAnimClicks(mx, my, button, FALSE))
   {
     // do not handle this button event anymore
     return;		// force mouse event not to be handled at all
@@ -2249,7 +2249,7 @@ void HandleKey(Key key, int key_status)
 
   if (HandleGlobalAnimClicks(-1, -1, (key == KSYM_space ||
 				      key == KSYM_Return ||
-				      key == KSYM_Escape)))
+				      key == KSYM_Escape), TRUE))
   {
     // do not handle this key event anymore
     if (key != KSYM_Escape)	// always allow ESC key to be handled
@@ -2560,7 +2560,7 @@ void HandleJoystick(void)
   int dy	= (up   ? -1	: down  ? 1	: 0);
   boolean use_delay_value_first = (joytest != joytest_last);
 
-  if (HandleGlobalAnimClicks(-1, -1, newbutton))
+  if (HandleGlobalAnimClicks(-1, -1, newbutton, FALSE))
   {
     // do not handle this button event anymore
     return;
