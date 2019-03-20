@@ -21,9 +21,7 @@ void HandleOtherEvents(Event *);
 void ClearAutoRepeatKeyEvents(void);
 void ClearEventQueue(void);
 void ClearPlayerAction(void);
-void SleepWhileUnmapped(void);
 
-void HandleExposeEvent(ExposeEvent *);
 void HandleButtonEvent(ButtonEvent *);
 void HandleMotionEvent(MotionEvent *);
 void HandleWheelEvent(WheelEvent *);
@@ -33,7 +31,6 @@ void HandleTextEvent(TextEvent *);
 void HandlePauseResumeEvent(PauseResumeEvent *);
 boolean HandleKeysDebug(Key, int);
 void HandleKeyEvent(KeyEvent *);
-void HandleFocusEvent(FocusChangeEvent *);
 void HandleClientMessageEvent(ClientMessageEvent *);
 void HandleDropEvent(Event *);
 

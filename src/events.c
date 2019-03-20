@@ -233,23 +233,6 @@ void HandleOtherEvents(Event *event)
 {
   switch (event->type)
   {
-    case EVENT_EXPOSE:
-      HandleExposeEvent((ExposeEvent *) event);
-      break;
-
-    case EVENT_UNMAPNOTIFY:
-#if 0
-      // This causes the game to stop not only when iconified, but also
-      // when on another virtual desktop, which might be not desired.
-      SleepWhileUnmapped();
-#endif
-      break;
-
-    case EVENT_FOCUSIN:
-    case EVENT_FOCUSOUT:
-      HandleFocusEvent((FocusChangeEvent *) event);
-      break;
-
     case EVENT_CLIENTMESSAGE:
       HandleClientMessageEvent((ClientMessageEvent *) event);
       break;
@@ -441,58 +424,6 @@ static void SetPlayerMouseAction(int mx, int my, int button)
   }
 
   SetTileCursorXY(lx, ly);
-}
-
-void SleepWhileUnmapped(void)
-{
-  boolean window_unmapped = TRUE;
-
-  KeyboardAutoRepeatOn();
-
-  while (window_unmapped)
-  {
-    Event event;
-
-    if (!WaitValidEvent(&event))
-      continue;
-
-    switch (event.type)
-    {
-      case EVENT_BUTTONRELEASE:
-	button_status = MB_RELEASED;
-	break;
-
-      case EVENT_KEYRELEASE:
-	key_joystick_mapping = 0;
-	break;
-
-      case SDL_CONTROLLERBUTTONUP:
-	HandleJoystickEvent(&event);
-	key_joystick_mapping = 0;
-	break;
-
-      case EVENT_MAPNOTIFY:
-	window_unmapped = FALSE;
-	break;
-
-      case EVENT_UNMAPNOTIFY:
-	// this is only to surely prevent the 'should not happen' case
-	// of recursively looping between 'SleepWhileUnmapped()' and
-	// 'HandleOtherEvents()' which usually calls this funtion.
-	break;
-
-      default:
-	HandleOtherEvents(&event);
-	break;
-    }
-  }
-
-  if (game_status == GAME_MODE_PLAYING)
-    KeyboardAutoRepeatOffUnlessAutoplay();
-}
-
-void HandleExposeEvent(ExposeEvent *event)
-{
 }
 
 void HandleButtonEvent(ButtonEvent *event)
@@ -1491,46 +1422,6 @@ void HandleKeyEvent(KeyEvent *event)
   // only handle raw key input without text modifier keys pressed
   if (!checkTextInputKeyModState())
     HandleKey(key, key_status);
-}
-
-void HandleFocusEvent(FocusChangeEvent *event)
-{
-  static int old_joystick_status = -1;
-
-  if (event->type == EVENT_FOCUSOUT)
-  {
-    KeyboardAutoRepeatOn();
-    old_joystick_status = joystick.status;
-    joystick.status = JOYSTICK_NOT_AVAILABLE;
-
-    ClearPlayerAction();
-  }
-  else if (event->type == EVENT_FOCUSIN)
-  {
-    /* When there are two Rocks'n'Diamonds windows which overlap and
-       the player moves the pointer from one game window to the other,
-       a 'FocusOut' event is generated for the window the pointer is
-       leaving and a 'FocusIn' event is generated for the window the
-       pointer is entering. In some cases, it can happen that the
-       'FocusIn' event is handled by the one game process before the
-       'FocusOut' event by the other game process. In this case the
-       X11 environment would end up with activated keyboard auto repeat,
-       because unfortunately this is a global setting and not (which
-       would be far better) set for each X11 window individually.
-       The effect would be keyboard auto repeat while playing the game
-       (game_status == GAME_MODE_PLAYING), which is not desired.
-       To avoid this special case, we just wait 1/10 second before
-       processing the 'FocusIn' event. */
-
-    if (game_status == GAME_MODE_PLAYING)
-    {
-      Delay(100);
-      KeyboardAutoRepeatOffUnlessAutoplay();
-    }
-
-    if (old_joystick_status != -1)
-      joystick.status = old_joystick_status;
-  }
 }
 
 void HandleClientMessageEvent(ClientMessageEvent *event)

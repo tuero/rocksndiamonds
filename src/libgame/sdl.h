@@ -64,8 +64,6 @@ typedef SDL_TextInputEvent	TextEvent;
 typedef SDL_Event		PauseResumeEvent;
 typedef SDL_WindowEvent		WindowEvent;
 typedef SDL_KeyboardEvent	KeyEvent;
-typedef SDL_Event		ExposeEvent;
-typedef SDL_Event		FocusChangeEvent;
 typedef SDL_Event		ClientMessageEvent;
 
 
@@ -109,12 +107,7 @@ struct MouseCursorInfo
 #define EVENT_TEXTINPUT		SDL_TEXTINPUT
 #define EVENT_KEYPRESS		SDL_KEYDOWN
 #define EVENT_KEYRELEASE	SDL_KEYUP
-#define EVENT_EXPOSE		SDL_USEREVENT + 0
-#define EVENT_FOCUSIN		SDL_USEREVENT + 1
-#define EVENT_FOCUSOUT		SDL_USEREVENT + 2
 #define EVENT_CLIENTMESSAGE	SDL_QUIT
-#define EVENT_MAPNOTIFY		SDL_USEREVENT + 4
-#define EVENT_UNMAPNOTIFY	SDL_USEREVENT + 5
 
 #define KSYM_UNDEFINED		SDLK_UNKNOWN
 
