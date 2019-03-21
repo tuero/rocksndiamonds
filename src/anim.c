@@ -1197,6 +1197,8 @@ static int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part,
     part->anim_delay_counter =
       (c->anim_delay_fixed + GetSimpleRandom(c->anim_delay_random));
 
+    part->post_delay_counter = 0;
+
     part->init_event_state = (c->init_event != ANIM_EVENT_UNDEFINED);
     part->anim_event_state = (c->anim_event != ANIM_EVENT_UNDEFINED);
 
