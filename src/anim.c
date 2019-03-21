@@ -1638,15 +1638,13 @@ static boolean DoGlobalAnim_EventAction(struct GlobalAnimPartControlInfo *part)
   if (anim_event_action == -1)
     return FALSE;
 
-  boolean action_executed = (DoGadgetAction(anim_event_action) ||
-			     DoScreenAction(anim_event_action) ||
-			     DoKeysymAction(anim_event_action));
+  PushUserEvent(USEREVENT_ANIM_EVENT_ACTION, anim_event_action, 0);
 
   // check if further actions are allowed to be executed
   if (part->control_info.style & STYLE_MULTIPLE_ACTIONS)
     return FALSE;
 
-  return action_executed;
+  return TRUE;
 }
 
 static void InitGlobalAnim_Clickable(void)

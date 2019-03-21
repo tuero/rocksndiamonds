@@ -1607,6 +1607,14 @@ void HandleUserEvent(UserEvent *event)
 {
   switch (event->code)
   {
+    case USEREVENT_ANIM_EVENT_ACTION:
+      // execute action functions until matching action was found
+      if (DoKeysymAction(event->value1) ||
+	  DoGadgetAction(event->value1) ||
+	  DoScreenAction(event->value1))
+	return;
+      break;
+
     default:
       break;
   }

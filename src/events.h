@@ -14,6 +14,11 @@
 
 #include "main.h"
 
+
+#define USEREVENT_NONE			0
+#define USEREVENT_ANIM_EVENT_ACTION	1
+
+
 boolean NextValidEvent(Event *);
 
 void EventLoop(void);
