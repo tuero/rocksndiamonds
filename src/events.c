@@ -2145,9 +2145,12 @@ void HandleKey(Key key, int key_status)
     return;
   }
 
-  if (HandleGlobalAnimClicks(-1, -1, (key == KSYM_space ||
-				      key == KSYM_Return ||
-				      key == KSYM_Escape), TRUE))
+  // some key events are handled like clicks for global animations
+  boolean click = (key == KSYM_space ||
+		   key == KSYM_Return ||
+		   key == KSYM_Escape);
+
+  if (click && HandleGlobalAnimClicks(-1, -1, MB_LEFTBUTTON, TRUE))
   {
     // do not handle this key event anymore
     if (key != KSYM_Escape)	// always allow ESC key to be handled
