@@ -218,6 +218,10 @@ static void HandleEvents(void)
 	HandleKeyEvent((KeyEvent *) &event);
 	break;
 
+      case EVENT_USER:
+	HandleUserEvent((UserEvent *) &event);
+	break;
+
       default:
 	HandleOtherEvents(&event);
 	break;
@@ -1597,6 +1601,15 @@ void HandleDropEvent(Event *event)
 
   if (event->drop.file != NULL)
     SDL_free(event->drop.file);
+}
+
+void HandleUserEvent(UserEvent *event)
+{
+  switch (event->code)
+  {
+    default:
+      break;
+  }
 }
 
 void HandleButton(int mx, int my, int button, int button_nr)

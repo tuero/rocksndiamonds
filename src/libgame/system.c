@@ -1733,6 +1733,20 @@ void StopTextInput(void)
 #endif
 }
 
+void PushUserEvent(int code, int value1, int value2)
+{
+  UserEvent event;
+
+  SDL_memset(&event, 0, sizeof(event));
+
+  event.type = EVENT_USER;
+  event.code = code;
+  event.value1 = value1;
+  event.value2 = value2;
+
+  SDL_PushEvent((SDL_Event *)&event);
+}
+
 
 // ============================================================================
 // joystick functions

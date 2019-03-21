@@ -32,6 +32,7 @@ void HandlePauseResumeEvent(PauseResumeEvent *);
 boolean HandleKeysDebug(Key, int);
 void HandleKeyEvent(KeyEvent *);
 void HandleDropEvent(Event *);
+void HandleUserEvent(UserEvent *);
 
 void HandleToonAnimations(void);
 

@@ -88,6 +88,21 @@ struct MouseCursorInfo
   byte mask[CURSOR_MAX_WIDTH * CURSOR_MAX_HEIGHT / 8];
 };
 
+struct UserEventInfo
+{
+  // same as in "struct SDL_UserEvent"
+  Uint32 type;
+  Uint32 timestamp;
+  Uint32 windowID;
+  Sint32 code;
+
+  // changed to use integer values instead of void pointers
+  Uint32 value1;
+  Uint32 value2;
+};
+
+typedef struct UserEventInfo	UserEvent;
+
 
 // SDL symbol definitions
 
@@ -106,6 +121,7 @@ struct MouseCursorInfo
 #define EVENT_TEXTINPUT		SDL_TEXTINPUT
 #define EVENT_KEYPRESS		SDL_KEYDOWN
 #define EVENT_KEYRELEASE	SDL_KEYUP
+#define EVENT_USER		SDL_USEREVENT
 #define EVENT_QUIT		SDL_QUIT
 
 #define KSYM_UNDEFINED		SDLK_UNKNOWN
