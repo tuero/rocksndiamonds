@@ -1635,7 +1635,9 @@ static void DoAnimationExt(void)
 
 static boolean DoGlobalAnim_EventAction(struct GlobalAnimPartControlInfo *part)
 {
-  int anim_event_action = part->control_info.anim_event_action;
+  int anim_event_action = (part->init_event_state ?
+			   part->control_info.init_event_action :
+			   part->control_info.anim_event_action);
 
   if (anim_event_action == -1)
     return FALSE;
