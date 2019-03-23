@@ -1635,14 +1635,14 @@ static void DoAnimationExt(void)
 
 static boolean DoGlobalAnim_EventAction(struct GlobalAnimPartControlInfo *part)
 {
-  int anim_event_action = (part->init_event_state ?
-			   part->control_info.init_event_action :
-			   part->control_info.anim_event_action);
+  int event_action = (part->init_event_state ?
+		      part->control_info.init_event_action :
+		      part->control_info.anim_event_action);
 
-  if (anim_event_action == -1)
+  if (event_action == ANIM_EVENT_ACTION_NONE)
     return FALSE;
 
-  PushUserEvent(USEREVENT_ANIM_EVENT_ACTION, anim_event_action, 0);
+  PushUserEvent(USEREVENT_ANIM_EVENT_ACTION, event_action, 0);
 
   // check if further actions are allowed to be executed
   if (part->control_info.style & STYLE_MULTIPLE_ACTIONS)
