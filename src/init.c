@@ -1297,10 +1297,13 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   g->clone_from = -1;			// do not use clone graphic
   g->init_delay_fixed = 0;
   g->init_delay_random = 0;
+  g->init_delay_action = -1;
   g->anim_delay_fixed = 0;
   g->anim_delay_random = 0;
+  g->anim_delay_action = -1;
   g->post_delay_fixed = 0;
   g->post_delay_random = 0;
+  g->post_delay_action = -1;
   g->init_event = ANIM_EVENT_UNDEFINED;
   g->anim_event = ANIM_EVENT_UNDEFINED;
   g->init_event_action = -1;
@@ -1531,6 +1534,12 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
     g->init_event_action = parameter[GFX_ARG_INIT_EVENT_ACTION];
   if (parameter[GFX_ARG_ANIM_EVENT_ACTION] != ARG_UNDEFINED_VALUE)
     g->anim_event_action = parameter[GFX_ARG_ANIM_EVENT_ACTION];
+  if (parameter[GFX_ARG_INIT_DELAY_ACTION] != ARG_UNDEFINED_VALUE)
+    g->init_delay_action = parameter[GFX_ARG_INIT_DELAY_ACTION];
+  if (parameter[GFX_ARG_ANIM_DELAY_ACTION] != ARG_UNDEFINED_VALUE)
+    g->anim_delay_action = parameter[GFX_ARG_ANIM_DELAY_ACTION];
+  if (parameter[GFX_ARG_POST_DELAY_ACTION] != ARG_UNDEFINED_VALUE)
+    g->post_delay_action = parameter[GFX_ARG_POST_DELAY_ACTION];
 
   // used for toon animations and global animations
   g->step_offset  = parameter[GFX_ARG_STEP_OFFSET];

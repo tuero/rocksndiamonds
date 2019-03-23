@@ -19,6 +19,7 @@
 #include "screens.h"
 
 
+#define DEBUG_ANIM_DELAY		0
 #define DEBUG_ANIM_EVENTS		0
 
 
@@ -209,6 +210,7 @@ struct AnimClassGameMode
 };
 
 // forward declaration for internal use
+static void DoGlobalAnim_DelayAction(struct GlobalAnimPartControlInfo *, int);
 static boolean DoGlobalAnim_EventAction(struct GlobalAnimPartControlInfo *);
 static void HandleGlobalAnim(int, int);
 static void DoAnimationExt(void);
@@ -1155,6 +1157,16 @@ static void InitGlobalAnim_Triggered(struct GlobalAnimPartControlInfo *part,
   }
 }
 
+static void HandleGlobalAnimDelay(struct GlobalAnimPartControlInfo *part,
+				  int delay_type, char *info_text)
+{
+#if DEBUG_ANIM_DELAY
+  printf("::: %d.%d %s\n", part->old_anim_nr + 1, part->old_nr + 1, info_text);
+#endif
+
+  DoGlobalAnim_DelayAction(part, delay_type);
+}
+
 static void HandleGlobalAnimEvent(struct GlobalAnimPartControlInfo *part,
 				  int event_value, char *info_text)
 {
@@ -1294,6 +1306,7 @@ static int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part,
     {
       PlayGlobalAnimSoundAndMusic(part);
 
+      HandleGlobalAnimDelay(part, ANIM_DELAY_INIT,  "START [INIT_DELAY]");
       HandleGlobalAnimEvent(part, ANIM_EVENT_START, "START [ANIM]");
     }
     else
@@ -1333,6 +1346,7 @@ static int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part,
 
       PlayGlobalAnimSoundAndMusic(part);
 
+      HandleGlobalAnimDelay(part, ANIM_DELAY_INIT,  "START [INIT_DELAY]");
       HandleGlobalAnimEvent(part, ANIM_EVENT_START, "START [ANIM]");
     }
 
@@ -1383,7 +1397,8 @@ static int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part,
 
       StopGlobalAnimSoundAndMusic(part);
 
-      HandleGlobalAnimEvent(part, ANIM_EVENT_END, "END [ANIM_DELAY/EVENT]");
+      HandleGlobalAnimDelay(part, ANIM_DELAY_ANIM, "END [ANIM_DELAY]");
+      HandleGlobalAnimEvent(part, ANIM_EVENT_END,  "END [ANIM_DELAY/EVENT]");
 
       part->post_delay_counter =
 	(c->post_delay_fixed + GetSimpleRandom(c->post_delay_random));
@@ -1402,6 +1417,7 @@ static int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part,
 
     if (part->post_delay_counter == 0)
     {
+      HandleGlobalAnimDelay(part, ANIM_DELAY_POST, "END [POST_DELAY]");
       HandleGlobalAnimEvent(part, ANIM_EVENT_POST, "END [POST_DELAY]");
 
       return ANIM_STATE_RESTART;
@@ -1631,6 +1647,21 @@ static void DoAnimationExt(void)
   // force screen redraw in next frame to continue drawing global animations
   redraw_mask = REDRAW_ALL;
 #endif
+}
+
+static void DoGlobalAnim_DelayAction(struct GlobalAnimPartControlInfo *part,
+				     int delay_type)
+{
+  int delay_action =
+    (delay_type == ANIM_DELAY_INIT ? part->control_info.init_delay_action :
+     delay_type == ANIM_DELAY_ANIM ? part->control_info.anim_delay_action :
+     delay_type == ANIM_DELAY_POST ? part->control_info.post_delay_action :
+     ANIM_DELAY_ACTION_NONE);
+
+  if (delay_action == ANIM_DELAY_ACTION_NONE)
+    return;
+
+  PushUserEvent(USEREVENT_ANIM_DELAY_ACTION, delay_action, 0);
 }
 
 static boolean DoGlobalAnim_EventAction(struct GlobalAnimPartControlInfo *part)

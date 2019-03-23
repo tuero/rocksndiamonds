@@ -1607,6 +1607,7 @@ void HandleUserEvent(UserEvent *event)
 {
   switch (event->code)
   {
+    case USEREVENT_ANIM_DELAY_ACTION:
     case USEREVENT_ANIM_EVENT_ACTION:
       // execute action functions until matching action was found
       if (DoKeysymAction(event->value1) ||

@@ -16,7 +16,8 @@
 
 
 #define USEREVENT_NONE			0
-#define USEREVENT_ANIM_EVENT_ACTION	1
+#define USEREVENT_ANIM_DELAY_ACTION	1
+#define USEREVENT_ANIM_EVENT_ACTION	2
 
 
 boolean NextValidEvent(Event *);

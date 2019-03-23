@@ -2370,10 +2370,13 @@ enum
   GFX_ARG_DRAW_ORDER,
   GFX_ARG_INIT_DELAY_FIXED,
   GFX_ARG_INIT_DELAY_RANDOM,
+  GFX_ARG_INIT_DELAY_ACTION,
   GFX_ARG_ANIM_DELAY_FIXED,
   GFX_ARG_ANIM_DELAY_RANDOM,
+  GFX_ARG_ANIM_DELAY_ACTION,
   GFX_ARG_POST_DELAY_FIXED,
   GFX_ARG_POST_DELAY_RANDOM,
+  GFX_ARG_POST_DELAY_ACTION,
   GFX_ARG_INIT_EVENT,
   GFX_ARG_INIT_EVENT_ACTION,
   GFX_ARG_ANIM_EVENT,
@@ -3461,10 +3464,13 @@ struct GraphicInfo
 
   int init_delay_fixed;		// optional initial delay values for global
   int init_delay_random;	// animations (pause interval before start)
+  int init_delay_action;	// optional action called on animation start
   int anim_delay_fixed;		// optional delay values for bored/sleeping
   int anim_delay_random;	// and global animations (animation length)
+  int anim_delay_action;	// optional action called on animation end
   int post_delay_fixed;		// optional delay values after bored/global
   int post_delay_random;	// animations (pause before next animation)
+  int post_delay_action;	// optional action called after post delay
 
   int init_event;		// optional event triggering animation start
   int init_event_action;	// optional action called on animation start

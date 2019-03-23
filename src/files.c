@@ -10290,7 +10290,10 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
   {
     result = get_anim_parameter_values(value);
   }
-  else if (strEqual(suffix, ".init_event_action") ||
+  else if (strEqual(suffix, ".init_delay_action") ||
+	   strEqual(suffix, ".anim_delay_action") ||
+	   strEqual(suffix, ".post_delay_action") ||
+	   strEqual(suffix, ".init_event_action") ||
 	   strEqual(suffix, ".anim_event_action"))
   {
     result = get_anim_action_parameter_value(value_raw);

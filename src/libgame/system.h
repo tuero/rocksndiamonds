@@ -352,6 +352,16 @@
 
 #define STYLE_DEFAULT		STYLE_NONE
 
+// values for special global animation delay types
+#define ANIM_DELAY_UNDEFINED	-1
+#define ANIM_DELAY_NONE		0
+#define ANIM_DELAY_INIT		1
+#define ANIM_DELAY_ANIM		2
+#define ANIM_DELAY_POST		3
+
+// values for special global animation delay actions
+#define ANIM_DELAY_ACTION_NONE	-1
+
 // values for special global animation events
 #define ANIM_EVENT_UNDEFINED	-1
 #define ANIM_EVENT_NONE		0
