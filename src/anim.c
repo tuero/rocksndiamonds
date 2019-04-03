@@ -813,13 +813,24 @@ static void DrawGlobalAnimationsExt(int drawing_target, int drawing_stage)
 
 void DrawGlobalAnimations(int drawing_target, int drawing_stage)
 {
+  int last_cursor_mode_override = gfx.cursor_mode_override;
+
   if (drawing_stage == DRAW_GLOBAL_ANIM_STAGE_1)
+  {
     ResetGlobalAnim_Clickable();
+
+    gfx.cursor_mode_override = CURSOR_UNDEFINED;
+  }
 
   DrawGlobalAnimationsExt(drawing_target, drawing_stage);
 
   if (drawing_stage == DRAW_GLOBAL_ANIM_STAGE_2)
+  {
     ResetGlobalAnim_Clicked();
+  }
+
+  if (gfx.cursor_mode_override != last_cursor_mode_override)
+    SetMouseCursor(gfx.cursor_mode);
 }
 
 static boolean SetGlobalAnimPart_Viewport(struct GlobalAnimPartControlInfo *part)
@@ -856,6 +867,8 @@ static boolean SetGlobalAnimPart_Viewport(struct GlobalAnimPartControlInfo *part
     viewport_height = part->graphic_info.height;
 
     part->drawing_stage = DRAW_GLOBAL_ANIM_STAGE_2;
+
+    gfx.cursor_mode_override = CURSOR_NONE;
   }
   else if (part->control_info.class == get_hash_from_key("door_1"))
   {

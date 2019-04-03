@@ -317,6 +317,9 @@ void InitGfxCustomArtworkInfo(void)
 void InitGfxOtherSettings(void)
 {
   gfx.cursor_mode = CURSOR_DEFAULT;
+  gfx.cursor_mode_override = CURSOR_UNDEFINED;
+  gfx.cursor_mode_final = gfx.cursor_mode;
+
   gfx.mouse_x = 0;
   gfx.mouse_y = 0;
 }
@@ -1552,6 +1555,7 @@ void SetMouseCursor(int mode)
   static struct MouseCursorInfo *cursor_none = NULL;
   static struct MouseCursorInfo *cursor_playfield = NULL;
   struct MouseCursorInfo *cursor_new;
+  int mode_final = mode;
 
   if (cursor_none == NULL)
     cursor_none = get_cursor_from_image(cursor_image_none);
@@ -1559,13 +1563,17 @@ void SetMouseCursor(int mode)
   if (cursor_playfield == NULL)
     cursor_playfield = get_cursor_from_image(cursor_image_playfield);
 
-  cursor_new = (mode == CURSOR_DEFAULT   ? NULL :
-		mode == CURSOR_NONE      ? cursor_none :
-		mode == CURSOR_PLAYFIELD ? cursor_playfield : NULL);
+  if (gfx.cursor_mode_override != CURSOR_UNDEFINED)
+    mode_final = gfx.cursor_mode_override;
+
+  cursor_new = (mode_final == CURSOR_DEFAULT   ? NULL :
+		mode_final == CURSOR_NONE      ? cursor_none :
+		mode_final == CURSOR_PLAYFIELD ? cursor_playfield : NULL);
 
   SDLSetMouseCursor(cursor_new);
 
   gfx.cursor_mode = mode;
+  gfx.cursor_mode_final = mode_final;
 }
 
 

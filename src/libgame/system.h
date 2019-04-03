@@ -469,6 +469,7 @@
 				 y >= gfx.ey && y < gfx.ey + gfx.eysize)
 
 // values for mouse cursor
+#define CURSOR_UNDEFINED	-1
 #define CURSOR_DEFAULT		0
 #define CURSOR_NONE		1
 #define CURSOR_PLAYFIELD	2
@@ -1121,6 +1122,8 @@ struct GfxInfo
   void (*draw_tile_cursor_function)(int);
 
   int cursor_mode;
+  int cursor_mode_override;
+  int cursor_mode_final;
   int mouse_x, mouse_y;
 };
 
