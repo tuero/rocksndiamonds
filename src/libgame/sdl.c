@@ -2362,7 +2362,7 @@ void SDLWaitEvent(Event *event)
   SDL_WaitEvent(event);
 }
 
-void SDLCorrectMouseEventXY(int *x, int *y)
+void SDLCorrectRawMousePosition(int *x, int *y)
 {
   if (sdl_renderer == NULL)
     return;

@@ -1852,6 +1852,8 @@ void FreeBitmapTextures(Bitmap **);
 void ScaleBitmap(Bitmap **, int);
 
 void SetMouseCursor(int);
+void UpdateRawMousePosition(int, int);
+void UpdateMousePosition(void);
 
 void OpenAudio(void);
 void CloseAudio(void);

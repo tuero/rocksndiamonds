@@ -1576,6 +1576,28 @@ void SetMouseCursor(int mode)
   gfx.cursor_mode_final = mode_final;
 }
 
+void UpdateRawMousePosition(int mouse_x, int mouse_y)
+{
+  // mouse events do not contain logical screen size corrections yet
+  SDLCorrectRawMousePosition(&mouse_x, &mouse_y);
+
+  mouse_x -= video.screen_xoffset;
+  mouse_y -= video.screen_yoffset;
+
+  gfx.mouse_x = mouse_x;
+  gfx.mouse_y = mouse_y;
+}
+
+void UpdateMousePosition(void)
+{
+  int mouse_x, mouse_y;
+
+  SDL_PumpEvents();
+  SDL_GetMouseState(&mouse_x, &mouse_y);
+
+  UpdateRawMousePosition(mouse_x, mouse_y);
+}
+
 
 // ============================================================================
 // audio functions

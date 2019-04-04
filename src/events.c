@@ -54,20 +54,13 @@ static void HandleEventActions(void);
 
 int FilterMouseMotionEvents(void *userdata, Event *event)
 {
-  if (event->type != EVENT_MOTIONNOTIFY)
-    return 1;
+  if (event->type == EVENT_MOTIONNOTIFY)
+  {
+    int mouse_x = ((MotionEvent *)event)->x;
+    int mouse_y = ((MotionEvent *)event)->y;
 
-  int mouse_x = ((MotionEvent *)event)->x;
-  int mouse_y = ((MotionEvent *)event)->y;
-
-  // mouse events do not contain logical screen size corrections at this stage
-  SDLCorrectMouseEventXY(&mouse_x, &mouse_y);
-
-  mouse_x -= video.screen_xoffset;
-  mouse_y -= video.screen_yoffset;
-
-  gfx.mouse_x = mouse_x;
-  gfx.mouse_y = mouse_y;
+    UpdateRawMousePosition(mouse_x, mouse_y);
+  }
 
   return 1;
 }
@@ -592,6 +585,8 @@ void HandleWindowEvent(WindowEvent *event)
 
 	if (game_status == GAME_MODE_SETUP)
 	  RedrawSetupScreenAfterFullscreenToggle();
+
+	UpdateMousePosition();
 
 	SetWindowTitle();
       }
@@ -2142,6 +2137,8 @@ void HandleKey(Key key, int key_status)
     if (game_status == GAME_MODE_SETUP)
       RedrawSetupScreenAfterFullscreenToggle();
 
+    UpdateMousePosition();
+
     // set flag to ignore repeated "key pressed" events
     ignore_repeated_key = TRUE;
 
@@ -2172,6 +2169,8 @@ void HandleKey(Key key, int key_status)
 
     if (game_status == GAME_MODE_SETUP)
       RedrawSetupScreenAfterFullscreenToggle();
+
+    UpdateMousePosition();
 
     return;
   }

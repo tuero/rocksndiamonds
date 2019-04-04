@@ -423,7 +423,7 @@ void SDLOpenAudio(void);
 void SDLCloseAudio(void);
 
 void SDLWaitEvent(Event *);
-void SDLCorrectMouseEventXY(int *, int *);
+void SDLCorrectRawMousePosition(int *, int *);
 
 void HandleJoystickEvent(Event *);
 void SDLInitJoysticks(void);
