@@ -6108,6 +6108,8 @@ void OpenAll(void)
   InitVideoBuffer(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH, setup.fullscreen);
   InitVideoOverlay();
 
+  InitEventFilter(FilterMouseMotionEvents);
+
   print_timestamp_time("[init video stuff]");
 
   InitElementPropertiesStatic();

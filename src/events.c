@@ -47,6 +47,31 @@ static void HandleNoEvent(void);
 static void HandleEventActions(void);
 
 
+// event filter to set mouse x/y position (for pointer class global animations)
+// (this is especially required to ensure smooth global animation mouse pointer
+// movement when the screen is updated without handling events; this can happen
+// when drawing door/envelope request animations, for example)
+
+int FilterMouseMotionEvents(void *userdata, Event *event)
+{
+  if (event->type != EVENT_MOTIONNOTIFY)
+    return 1;
+
+  int mouse_x = ((MotionEvent *)event)->x;
+  int mouse_y = ((MotionEvent *)event)->y;
+
+  // mouse events do not contain logical screen size corrections at this stage
+  SDLCorrectMouseEventXY(&mouse_x, &mouse_y);
+
+  mouse_x -= video.screen_xoffset;
+  mouse_y -= video.screen_yoffset;
+
+  gfx.mouse_x = mouse_x;
+  gfx.mouse_y = mouse_y;
+
+  return 1;
+}
+
 // event filter especially needed for SDL event filtering due to
 // delay problems with lots of mouse motion events when mouse button
 // not pressed (X11 can handle this with 'PointerMotionHintMask')
@@ -74,9 +99,6 @@ static int FilterEvents(const Event *event)
   {
     ((MotionEvent *)event)->x -= video.screen_xoffset;
     ((MotionEvent *)event)->y -= video.screen_yoffset;
-
-    gfx.mouse_x = ((MotionEvent *)event)->x;
-    gfx.mouse_y = ((MotionEvent *)event)->y;
   }
 
   // non-motion events are directly passed to event handler functions

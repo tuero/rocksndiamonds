@@ -20,6 +20,7 @@
 #define USEREVENT_ANIM_EVENT_ACTION	2
 
 
+int FilterMouseMotionEvents(void *, Event *);
 boolean NextValidEvent(Event *);
 
 void EventLoop(void);

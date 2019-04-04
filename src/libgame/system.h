@@ -1857,6 +1857,7 @@ void OpenAudio(void);
 void CloseAudio(void);
 void SetAudioMode(boolean);
 
+void InitEventFilter(EventFilter);
 boolean PendingEvent(void);
 void WaitEvent(Event *event);
 void PeekEvent(Event *event);

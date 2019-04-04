@@ -1623,6 +1623,11 @@ void SetAudioMode(boolean enabled)
 // event functions
 // ============================================================================
 
+void InitEventFilter(EventFilter filter_function)
+{
+  SDL_SetEventFilter(filter_function, NULL);
+}
+
 boolean PendingEvent(void)
 {
   return (SDL_PollEvent(NULL) ? TRUE : FALSE);

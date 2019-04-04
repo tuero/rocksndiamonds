@@ -2362,6 +2362,27 @@ void SDLWaitEvent(Event *event)
   SDL_WaitEvent(event);
 }
 
+void SDLCorrectMouseEventXY(int *x, int *y)
+{
+  if (sdl_renderer == NULL)
+    return;
+
+  // this corrects the raw mouse position for logical screen size within event
+  // filters (correction done later by SDL library when handling mouse events)
+
+  SDL_Rect viewport;
+  float scale_x, scale_y;
+
+  SDL_RenderGetViewport(sdl_renderer, &viewport);
+  SDL_RenderGetScale(sdl_renderer, &scale_x, &scale_y);
+
+  *x = (int)(*x / scale_x);
+  *y = (int)(*y / scale_y);
+
+  *x -= viewport.x;
+  *y -= viewport.y;
+}
+
 
 // ============================================================================
 // joystick functions

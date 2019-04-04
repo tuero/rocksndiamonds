@@ -65,6 +65,8 @@ typedef SDL_Event		PauseResumeEvent;
 typedef SDL_WindowEvent		WindowEvent;
 typedef SDL_KeyboardEvent	KeyEvent;
 
+typedef SDL_EventFilter		EventFilter;
+
 
 // structure definitions
 
@@ -421,6 +423,7 @@ void SDLOpenAudio(void);
 void SDLCloseAudio(void);
 
 void SDLWaitEvent(Event *);
+void SDLCorrectMouseEventXY(int *, int *);
 
 void HandleJoystickEvent(Event *);
 void SDLInitJoysticks(void);
