@@ -5,6 +5,9 @@
 #include "Globals.h"
 
 
+static int *PlayField16Mem;
+static byte *PlayField8Mem;
+
 boolean LevelLoaded;
 
 boolean DemoAvailable;
@@ -167,16 +170,22 @@ void InitGlobals(void)
   menBorder = False;
 
   // add preceding playfield buffer (as large as preceding memory area)
-  PlayField16 = checked_calloc((game_sp.preceding_buffer_size +
-				SP_MAX_PLAYFIELD_SIZE +
-				SP_HEADER_SIZE) * sizeof(int));
-  PlayField16 = &PlayField16[game_sp.preceding_buffer_size];
+  PlayField16Mem = checked_calloc((game_sp.preceding_buffer_size +
+				   SP_MAX_PLAYFIELD_SIZE +
+				   SP_HEADER_SIZE) * sizeof(int));
+  PlayField16 = &PlayField16Mem[game_sp.preceding_buffer_size];
 
   // add preceding playfield buffer (as large as one playfield row)
-  PlayField8 = checked_calloc((SP_MAX_PLAYFIELD_WIDTH +
-			       SP_MAX_PLAYFIELD_SIZE +
-			       SP_HEADER_SIZE) * sizeof(byte));
-  PlayField8 = &PlayField8[SP_MAX_PLAYFIELD_WIDTH];
+  PlayField8Mem = checked_calloc((SP_MAX_PLAYFIELD_WIDTH +
+				  SP_MAX_PLAYFIELD_SIZE +
+				  SP_HEADER_SIZE) * sizeof(byte));
+  PlayField8 = &PlayField8Mem[SP_MAX_PLAYFIELD_WIDTH];
+}
+
+void FreeGlobals(void)
+{
+  checked_free(PlayField16Mem);
+  checked_free(PlayField8Mem);
 }
 
 int GetSI(int X, int Y)

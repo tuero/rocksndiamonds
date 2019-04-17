@@ -271,6 +271,7 @@ int GetStretchY(int si);
 int GetX(int si);
 int GetY(int si);
 void InitGlobals(void);
+void FreeGlobals(void);
 
 void PrepareLevel(void);
 

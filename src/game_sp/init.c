@@ -64,6 +64,7 @@ void sp_open_all(void)
 
 void sp_close_all(void)
 {
+  FreeGlobals();
 }
 
 void InitPrecedingPlayfieldMemory(void)
