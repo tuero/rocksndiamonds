@@ -494,22 +494,41 @@ char *getProgramMainDataPath(char *command_filename, char *base_path)
 
 char *getProgramConfigFilename(char *command_filename)
 {
-  char *command_filename_1 = getStringCopy(command_filename);
+  static char *config_filename_1 = NULL;
+  static char *config_filename_2 = NULL;
+  static char *config_filename_3 = NULL;
+  static boolean initialized = FALSE;
 
-  // strip trailing executable suffix from command filename
-  if (strSuffix(command_filename_1, ".exe"))
-    command_filename_1[strlen(command_filename_1) - 4] = '\0';
+  if (!initialized)
+  {
+    char *command_filename_1 = getStringCopy(command_filename);
 
-  char *ro_base_path = getProgramMainDataPath(command_filename, RO_BASE_PATH);
-  char *conf_directory = getPath2(ro_base_path, CONF_DIRECTORY);
+    // strip trailing executable suffix from command filename
+    if (strSuffix(command_filename_1, ".exe"))
+      command_filename_1[strlen(command_filename_1) - 4] = '\0';
 
-  char *command_basepath = getBasePath(command_filename);
-  char *command_basename = getBaseNameNoSuffix(command_filename);
-  char *command_filename_2 = getPath2(command_basepath, command_basename);
+    char *ro_base_path = getProgramMainDataPath(command_filename, RO_BASE_PATH);
+    char *conf_directory = getPath2(ro_base_path, CONF_DIRECTORY);
 
-  char *config_filename_1 = getStringCat2(command_filename_1, ".conf");
-  char *config_filename_2 = getStringCat2(command_filename_2, ".conf");
-  char *config_filename_3 = getPath2(conf_directory, SETUP_FILENAME);
+    char *command_basepath = getBasePath(command_filename);
+    char *command_basename = getBaseNameNoSuffix(command_filename);
+    char *command_filename_2 = getPath2(command_basepath, command_basename);
+
+    config_filename_1 = getStringCat2(command_filename_1, ".conf");
+    config_filename_2 = getStringCat2(command_filename_2, ".conf");
+    config_filename_3 = getPath2(conf_directory, SETUP_FILENAME);
+
+    checked_free(ro_base_path);
+    checked_free(conf_directory);
+
+    checked_free(command_basepath);
+    checked_free(command_basename);
+
+    checked_free(command_filename_1);
+    checked_free(command_filename_2);
+
+    initialized = TRUE;
+  }
 
   // 1st try: look for config file that exactly matches the binary filename
   if (fileExists(config_filename_1))
