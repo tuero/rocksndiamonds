@@ -457,7 +457,7 @@ char *getProgramMainDataPath(char *command_filename, char *base_path)
 {
   // check if the program's main data base directory is configured
   if (!strEqual(base_path, "."))
-    return base_path;
+    return getStringCopy(base_path);
 
   /* if the program is configured to start from current directory (default),
      determine program package directory from program binary (some versions
