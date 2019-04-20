@@ -4705,7 +4705,8 @@ void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
 
     FadeSound(SND_BACKGROUND_SCORES);
 
-    if (game_status_last_screen == GAME_MODE_PLAYING &&
+    if (button == MB_MENU_CHOICE &&
+	game_status_last_screen == GAME_MODE_PLAYING &&
 	setup.auto_play_next_level && setup.increment_levels &&
 	level_nr < leveldir_current->last_level &&
 	!network_playing)
