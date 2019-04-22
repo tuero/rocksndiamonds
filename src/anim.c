@@ -863,8 +863,11 @@ static boolean SetGlobalAnimPart_Viewport(struct GlobalAnimPartControlInfo *part
   }
   else if (part->control_info.class == get_hash_from_key("pointer"))
   {
-    viewport_x = gfx.mouse_x + part->control_info.x;
-    viewport_y = gfx.mouse_y + part->control_info.y;
+    int mx = MIN(MAX(0, gfx.mouse_x), WIN_XSIZE - 1);
+    int my = MIN(MAX(0, gfx.mouse_y), WIN_YSIZE - 1);
+
+    viewport_x = mx + part->control_info.x;
+    viewport_y = my + part->control_info.y;
     viewport_width  = part->graphic_info.width;
     viewport_height = part->graphic_info.height;
 
