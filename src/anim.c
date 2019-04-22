@@ -230,6 +230,8 @@ static int anim_classes_last = ANIM_CLASS_NONE;
 
 static boolean drawing_to_fading_buffer = FALSE;
 
+static boolean handle_click = FALSE;
+
 
 // ============================================================================
 // generic animation frame calculation
@@ -1198,6 +1200,9 @@ static void HandleGlobalAnimEvent(struct GlobalAnimPartControlInfo *part,
 static int HandleGlobalAnim_Part(struct GlobalAnimPartControlInfo *part,
 				 int state)
 {
+  if (handle_click && !part->clicked)
+    return state;
+
   struct GlobalAnimControlInfo *ctrl = &global_anim_ctrl[part->mode_nr];
   struct GlobalAnimMainControlInfo *anim = &ctrl->anim[part->anim_nr];
   struct GraphicInfo *g = &part->graphic_info;
@@ -1826,6 +1831,15 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, int clicked_event)
 	}
       }
     }
+  }
+
+  if (anything_clicked)
+  {
+    handle_click = TRUE;
+
+    HandleGlobalAnim(ANIM_CONTINUE, game_status);
+
+    handle_click = FALSE;
   }
 
   return (anything_clicked || any_event_action);
