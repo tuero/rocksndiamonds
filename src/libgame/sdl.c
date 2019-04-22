@@ -224,6 +224,8 @@ static void UpdateScreenExt(SDL_Rect *rect, boolean with_frame_delay)
 
 static void UpdateScreen_WithFrameDelay(SDL_Rect *rect)
 {
+  PumpEvents();		// execute event filter actions while waiting
+
   UpdateScreenExt(rect, TRUE);
 }
 

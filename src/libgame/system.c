@@ -1665,6 +1665,11 @@ void PeekEvent(Event *event)
   SDL_PeepEvents(event, 1, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT);
 }
 
+void PumpEvents(void)
+{
+  SDL_PumpEvents();
+}
+
 void CheckQuitEvent(void)
 {
   if (SDL_QuitRequested())

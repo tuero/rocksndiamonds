@@ -1863,6 +1863,7 @@ void InitEventFilter(EventFilter);
 boolean PendingEvent(void);
 void WaitEvent(Event *event);
 void PeekEvent(Event *event);
+void PumpEvents(void);
 void CheckQuitEvent(void);
 Key GetEventKey(KeyEvent *, boolean);
 KeyMod HandleKeyModState(Key, int);
