@@ -887,7 +887,9 @@ static boolean SetGlobalAnimPart_Viewport(struct GlobalAnimPartControlInfo *part
 
     part->drawing_stage = DRAW_GLOBAL_ANIM_STAGE_2;
 
-    gfx.cursor_mode_override = CURSOR_NONE;
+    // do not use global animation mouse pointer when reloading artwork
+    if (global.anim_status != GAME_MODE_LOADING)
+      gfx.cursor_mode_override = CURSOR_NONE;
   }
   else if (part->control_info.class == get_hash_from_key("door_1"))
   {
