@@ -2846,7 +2846,7 @@ void ShowEnvelope(int envelope_nr)
   AnimateEnvelope(envelope_nr, main_anim_mode, ACTION_OPENING);
 
   if (tape.playing)
-    Delay(wait_delay_value);
+    Delay_WithScreenUpdates(wait_delay_value);
   else
     WaitForEventToContinue();
 
