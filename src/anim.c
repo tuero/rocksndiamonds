@@ -933,7 +933,8 @@ static boolean SetGlobalAnimPart_Viewport(struct GlobalAnimPartControlInfo *part
     part->viewport_width  = viewport_width;
     part->viewport_height = viewport_height;
 
-    changed = TRUE;
+    if (part->control_info.class != get_hash_from_key("pointer"))
+      changed = TRUE;
   }
 
   return changed;
