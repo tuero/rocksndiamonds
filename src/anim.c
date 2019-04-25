@@ -880,8 +880,8 @@ static boolean SetGlobalAnimPart_Viewport(struct GlobalAnimPartControlInfo *part
     int mx = MIN(MAX(0, gfx.mouse_x), WIN_XSIZE - 1);
     int my = MIN(MAX(0, gfx.mouse_y), WIN_YSIZE - 1);
 
-    viewport_x = mx + part->control_info.x;
-    viewport_y = my + part->control_info.y;
+    viewport_x = mx - part->control_info.x;
+    viewport_y = my - part->control_info.y;
     viewport_width  = part->graphic_info.width;
     viewport_height = part->graphic_info.height;
 
