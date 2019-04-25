@@ -3127,7 +3127,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
 
 	DrawLaser(0, DL_LASER_ENABLED);
 	BackToFront();
-	Delay(50);
+	Delay_WithScreenUpdates(50);
       }
 
       StopSound_MM(SND_MM_GAME_HEALTH_CHARGING);
@@ -3264,7 +3264,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
 
 	DrawLaser(0, DL_LASER_ENABLED);
 	BackToFront();
-	Delay(50);
+	Delay_WithScreenUpdates(50);
       }
 
       DrawLaser(0, DL_LASER_DISABLED);
@@ -3417,7 +3417,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
 
       DrawLaser(0, DL_LASER_ENABLED);
 
-      Delay(50);
+      Delay_WithScreenUpdates(50);
     }
 
     Feld[ELX][ELY] = element;
@@ -3491,7 +3491,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
 
       DrawWallsAnimation_MM(ELX, ELY, Feld[ELX][ELY], phase, laser.wall_mask);
       BackToFront();
-      Delay(100);
+      Delay_WithScreenUpdates(100);
     }
 
     if (Feld[ELX][ELY] == EL_WALL_ICE)
@@ -3624,7 +3624,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
       DrawWallsAnimation_MM(dx, dy, de, i, dm);
 
       BackToFront();
-      Delay(20);
+      Delay_WithScreenUpdates(20);
     }
 
     DrawLaser(0, DL_LASER_ENABLED);
@@ -3705,7 +3705,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
       redraw_mask |= REDRAW_DOOR_1;
       BackToFront();
 
-      Delay(20);
+      Delay_WithScreenUpdates(20);
     }
 
     game_mm.energy_left = MAX_LASER_ENERGY;
@@ -3878,7 +3878,7 @@ void GameWon_MM(void)
       }
 
       BackToFront();
-      Delay(10);
+      Delay_WithScreenUpdates(10);
     }
 
     if (setup.sound_loops)
@@ -3906,7 +3906,7 @@ void GameWon_MM(void)
       */
 
       BackToFront();
-      Delay(10);
+      Delay_WithScreenUpdates(10);
     }
 
     if (setup.sound_loops)
