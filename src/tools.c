@@ -4333,12 +4333,6 @@ static int RequestHandleEvents(unsigned int req_state)
 		button_status = MB_RELEASED;
 	    }
 
-	    if (HandleGlobalAnimClicks(mx, my, button_status, FALSE))
-	    {
-	      // do not handle this button event anymore
-	      continue;		// force mouse event not to be handled at all
-	    }
-
 	    // this sets 'request_gadget_id'
 	    HandleGadgets(mx, my, button_status);
 
@@ -4368,6 +4362,8 @@ static int RequestHandleEvents(unsigned int req_state)
 		break;
 
 	      default:
+		// only check clickable animations if no request gadget clicked
+		HandleGlobalAnimClicks(mx, my, button_status, FALSE);
 		break;
 	    }
 
