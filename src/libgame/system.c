@@ -570,6 +570,7 @@ void InitVideoBuffer(int width, int height, int depth, boolean fullscreen)
 
   video.window_scaling_available = WINDOW_SCALING_STATUS;
 
+  video.frame_counter = 0;
   video.frame_delay = 0;
   video.frame_delay_value = GAME_FRAME_DELAY;
 

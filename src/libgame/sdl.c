@@ -218,6 +218,8 @@ static void UpdateScreenExt(SDL_Rect *rect, boolean with_frame_delay)
   if (with_frame_delay)
     WaitUntilDelayReached(&video.frame_delay, video.frame_delay_value);
 
+  video.frame_counter++;
+
   // show render target buffer on screen
   SDL_RenderPresent(sdl_renderer);
 }

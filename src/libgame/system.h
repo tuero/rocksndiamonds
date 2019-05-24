@@ -1011,6 +1011,7 @@ struct VideoSystemInfo
   int screen_rendering_mode;
   int vsync_mode;
 
+  unsigned int frame_counter;
   unsigned int frame_delay;
   unsigned int frame_delay_value;
 
