@@ -1314,6 +1314,7 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   g->fade_delay = -1;
   g->post_delay = -1;
   g->auto_delay = -1;
+  g->auto_delay_unit = AUTO_DELAY_UNIT_DEFAULT;
   g->align = ALIGN_CENTER;		// default for title screens
   g->valign = VALIGN_MIDDLE;		// default for title screens
   g->sort_priority = 0;			// default for title screens
@@ -1581,6 +1582,8 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
     g->post_delay = parameter[GFX_ARG_POST_DELAY];
   if (parameter[GFX_ARG_AUTO_DELAY] != ARG_UNDEFINED_VALUE)
     g->auto_delay = parameter[GFX_ARG_AUTO_DELAY];
+  if (parameter[GFX_ARG_AUTO_DELAY_UNIT] != ARG_UNDEFINED_VALUE)
+    g->auto_delay_unit = parameter[GFX_ARG_AUTO_DELAY_UNIT];
   if (parameter[GFX_ARG_ALIGN] != ARG_UNDEFINED_VALUE)
     g->align = parameter[GFX_ARG_ALIGN];
   if (parameter[GFX_ARG_VALIGN] != ARG_UNDEFINED_VALUE)

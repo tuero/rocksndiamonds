@@ -988,6 +988,7 @@ static struct TitleFadingInfo getTitleFading(struct TitleControlInfo *tci)
   ti.fade_delay = tmi.fade_delay;
   ti.post_delay = tmi.post_delay;
   ti.auto_delay = tmi.auto_delay;
+  ti.auto_delay_unit = tmi.auto_delay_unit;
 
   return ti;
 }

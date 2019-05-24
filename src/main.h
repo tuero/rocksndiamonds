@@ -2389,6 +2389,7 @@ enum
   GFX_ARG_FADE_DELAY,
   GFX_ARG_POST_DELAY,
   GFX_ARG_AUTO_DELAY,
+  GFX_ARG_AUTO_DELAY_UNIT,
   GFX_ARG_ALIGN,
   GFX_ARG_VALIGN,
   GFX_ARG_SORT_PRIORITY,
@@ -2724,6 +2725,7 @@ struct TitleFadingInfo
   int fade_delay;
   int post_delay;
   int auto_delay;
+  int auto_delay_unit;
 };
 
 struct TitleMessageInfo
@@ -2742,6 +2744,7 @@ struct TitleMessageInfo
   int fade_delay;
   int post_delay;
   int auto_delay;
+  int auto_delay_unit;
 };
 
 struct InitInfo
@@ -3496,6 +3499,7 @@ struct GraphicInfo
   int fade_delay;		// optional setting for drawing title screens
   int post_delay;		// optional setting for drawing title screens
   int auto_delay;		// optional setting for drawing title screens
+  int auto_delay_unit;		// optional setting for drawing title screens
   int align, valign;		// optional setting for drawing title screens
   int sort_priority;		// optional setting for drawing title screens
 

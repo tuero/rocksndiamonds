@@ -410,6 +410,11 @@
 
 #define FADE_MODE_DEFAULT	FADE_MODE_FADE
 
+#define AUTO_DELAY_UNIT_MS	0
+#define AUTO_DELAY_UNIT_FRAMES	1
+
+#define AUTO_DELAY_UNIT_DEFAULT	AUTO_DELAY_UNIT_MS
+
 // values for toon positions
 #define POS_UNDEFINED		-1
 #define POS_LEFT		0

@@ -10331,6 +10331,12 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
 	      string_has_parameter(value, "curtain")	? FADE_MODE_CURTAIN :
 	      FADE_MODE_DEFAULT);
   }
+  else if (strEqual(suffix, ".auto_delay_unit"))
+  {
+    result = (string_has_parameter(value, "ms")     ? AUTO_DELAY_UNIT_MS :
+	      string_has_parameter(value, "frames") ? AUTO_DELAY_UNIT_FRAMES :
+	      AUTO_DELAY_UNIT_DEFAULT);
+  }
   else if (strPrefix(suffix, ".font"))		// (may also be ".font_xyz")
   {
     result = gfx.get_font_from_token_function(value);
@@ -10397,10 +10403,14 @@ static void InitMenuDesignSettings_SpecialPreProcessing(void)
     title_initial_first_default.post_delay;
   titlescreen_initial_first_default.auto_delay =
     title_initial_first_default.auto_delay;
+  titlescreen_initial_first_default.auto_delay_unit =
+    title_initial_first_default.auto_delay_unit;
   titlescreen_first_default.fade_mode  = title_first_default.fade_mode;
   titlescreen_first_default.fade_delay = title_first_default.fade_delay;
   titlescreen_first_default.post_delay = title_first_default.post_delay;
   titlescreen_first_default.auto_delay = title_first_default.auto_delay;
+  titlescreen_first_default.auto_delay_unit =
+    title_first_default.auto_delay_unit;
   titlemessage_initial_first_default.fade_mode  =
     title_initial_first_default.fade_mode;
   titlemessage_initial_first_default.fade_delay =
@@ -10409,27 +10419,36 @@ static void InitMenuDesignSettings_SpecialPreProcessing(void)
     title_initial_first_default.post_delay;
   titlemessage_initial_first_default.auto_delay =
     title_initial_first_default.auto_delay;
+  titlemessage_initial_first_default.auto_delay_unit =
+    title_initial_first_default.auto_delay_unit;
   titlemessage_first_default.fade_mode  = title_first_default.fade_mode;
   titlemessage_first_default.fade_delay = title_first_default.fade_delay;
   titlemessage_first_default.post_delay = title_first_default.post_delay;
   titlemessage_first_default.auto_delay = title_first_default.auto_delay;
+  titlemessage_first_default.auto_delay_unit =
+    title_first_default.auto_delay_unit;
 
   titlescreen_initial_default.fade_mode  = title_initial_default.fade_mode;
   titlescreen_initial_default.fade_delay = title_initial_default.fade_delay;
   titlescreen_initial_default.post_delay = title_initial_default.post_delay;
   titlescreen_initial_default.auto_delay = title_initial_default.auto_delay;
+  titlescreen_initial_default.auto_delay_unit =
+    title_initial_default.auto_delay_unit;
   titlescreen_default.fade_mode  = title_default.fade_mode;
   titlescreen_default.fade_delay = title_default.fade_delay;
   titlescreen_default.post_delay = title_default.post_delay;
   titlescreen_default.auto_delay = title_default.auto_delay;
+  titlescreen_default.auto_delay_unit = title_default.auto_delay_unit;
   titlemessage_initial_default.fade_mode  = title_initial_default.fade_mode;
   titlemessage_initial_default.fade_delay = title_initial_default.fade_delay;
   titlemessage_initial_default.post_delay = title_initial_default.post_delay;
-  titlemessage_initial_default.auto_delay = title_initial_default.auto_delay;
+  titlemessage_initial_default.auto_delay_unit =
+    title_initial_default.auto_delay_unit;
   titlemessage_default.fade_mode  = title_default.fade_mode;
   titlemessage_default.fade_delay = title_default.fade_delay;
   titlemessage_default.post_delay = title_default.post_delay;
   titlemessage_default.auto_delay = title_default.auto_delay;
+  titlemessage_default.auto_delay_unit = title_default.auto_delay_unit;
 
   // special case: initialize "ARG_DEFAULT" values in static default config
   // (e.g., init "titlemessage_1.fade_mode" from "[titlemessage].fade_mode")
@@ -10818,6 +10837,7 @@ static void LoadMenuDesignSettingsFromFilename(char *filename)
     { TYPE_INTEGER,	&tfi.fade_delay,	".fade_delay"		},
     { TYPE_INTEGER,	&tfi.post_delay,	".post_delay"		},
     { TYPE_INTEGER,	&tfi.auto_delay,	".auto_delay"		},
+    { TYPE_INTEGER,	&tfi.auto_delay_unit,	".auto_delay_unit"	},
 
     { -1,		NULL,			NULL			}
   };
@@ -10840,6 +10860,7 @@ static void LoadMenuDesignSettingsFromFilename(char *filename)
     { TYPE_INTEGER,	&tmi.fade_delay,	".fade_delay"		},
     { TYPE_INTEGER,	&tmi.post_delay,	".post_delay"		},
     { TYPE_INTEGER,	&tmi.auto_delay,	".auto_delay"		},
+    { TYPE_INTEGER,	&tmi.auto_delay_unit,	".auto_delay_unit"	},
 
     { -1,		NULL,			NULL			}
   };
