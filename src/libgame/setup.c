@@ -1093,7 +1093,8 @@ void InitUserLevelDirectory(char *level_subdir)
     createDirectory(getUserLevelDir(NULL), "main user level", PERMS_PRIVATE);
     createDirectory(getUserLevelDir(level_subdir), "user level", PERMS_PRIVATE);
 
-    SaveUserLevelInfo();
+    if (setup.internal.create_user_levelset)
+      SaveUserLevelInfo();
   }
 }
 

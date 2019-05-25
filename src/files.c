@@ -8953,6 +8953,10 @@ static struct TokenInfo internal_setup_tokens[] =
   },
   {
     TYPE_BOOLEAN,
+    &setup.internal.create_user_levelset,	"create_user_levelset"
+  },
+  {
+    TYPE_BOOLEAN,
     &setup.internal.menu_game,			"menu_game"
   },
   {
@@ -9324,6 +9328,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->internal.default_level_series = getStringCopy(UNDEFINED_LEVELSET);
   si->internal.choose_from_top_leveldir = FALSE;
   si->internal.show_scaling_in_title = TRUE;
+  si->internal.create_user_levelset = TRUE;
 
   si->internal.default_window_width  = WIN_XSIZE_DEFAULT;
   si->internal.default_window_height = WIN_YSIZE_DEFAULT;
