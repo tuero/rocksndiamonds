@@ -1705,6 +1705,25 @@ static void gotoTopLevelDir(void)
   }
 }
 
+static unsigned int getAutoDelayCounter(struct TitleFadingInfo *fi)
+{
+  boolean use_frame_counter = (fi->auto_delay_unit == AUTO_DELAY_UNIT_FRAMES);
+
+  return (use_frame_counter ? video.frame_counter : Counter());
+}
+
+static boolean TitleAutoDelayReached(unsigned int *counter_var,
+				     struct TitleFadingInfo *fi)
+{
+  return DelayReachedExt(counter_var, fi->auto_delay, getAutoDelayCounter(fi));
+}
+
+static void ResetTitleAutoDelay(unsigned int *counter_var,
+				struct TitleFadingInfo *fi)
+{
+  *counter_var = getAutoDelayCounter(fi);
+}
+
 void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 {
   static unsigned int title_delay = 0;
@@ -1779,12 +1798,12 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 
     FadeIn(REDRAW_ALL);
 
-    DelayReached(&title_delay, 0);	// reset delay counter
+    ResetTitleAutoDelay(&title_delay, &fading);
 
     return;
   }
 
-  if (fading.auto_delay > 0 && DelayReached(&title_delay, fading.auto_delay))
+  if (fading.auto_delay > 0 && TitleAutoDelayReached(&title_delay, &fading))
     button = MB_MENU_CHOICE;
 
   if (button == MB_MENU_LEAVE)
@@ -1842,7 +1861,7 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 
       FadeIn(REDRAW_ALL);
 
-      DelayReached(&title_delay, 0);	// reset delay counter
+      ResetTitleAutoDelay(&title_delay, &fading);
     }
     else
     {
