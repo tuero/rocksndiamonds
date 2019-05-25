@@ -880,6 +880,11 @@ static boolean SetGlobalAnimPart_Viewport(struct GlobalAnimPartControlInfo *part
     int mx = MIN(MAX(0, gfx.mouse_x), WIN_XSIZE - 1);
     int my = MIN(MAX(0, gfx.mouse_y), WIN_YSIZE - 1);
 
+    // prevent displaying off-screen custom mouse cursor in upper left corner
+    if (gfx.mouse_x == POS_OFFSCREEN &&
+	gfx.mouse_y == POS_OFFSCREEN)
+      mx = my = POS_OFFSCREEN;
+
     viewport_x = mx - part->control_info.x;
     viewport_y = my - part->control_info.y;
     viewport_width  = part->graphic_info.width;

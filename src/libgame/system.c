@@ -320,8 +320,9 @@ void InitGfxOtherSettings(void)
   gfx.cursor_mode_override = CURSOR_UNDEFINED;
   gfx.cursor_mode_final = gfx.cursor_mode;
 
-  gfx.mouse_x = 0;
-  gfx.mouse_y = 0;
+  // prevent initially displaying custom mouse cursor in upper left corner
+  gfx.mouse_x = POS_OFFSCREEN;
+  gfx.mouse_y = POS_OFFSCREEN;
 }
 
 void InitTileCursorInfo(void)
