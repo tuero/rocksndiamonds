@@ -1158,7 +1158,7 @@ static void InitGlobalAnim_Triggered(struct GlobalAnimPartControlInfo *part,
     {
       struct GlobalAnimPartControlInfo *part2 = &anim2->part[part2_nr];
 
-      if (part2->state != ANIM_STATE_RUNNING)
+      if (!(part2->state & ANIM_STATE_RUNNING))
 	continue;
 
       if (isClickablePart(part2, mask))
@@ -1791,7 +1791,7 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, int clicked_event)
 	if (!part->clickable)
 	  continue;
 
-	if (part->state != ANIM_STATE_RUNNING)
+	if (!(part->state & ANIM_STATE_RUNNING))
 	  continue;
 
 	// always handle "any" click events (clicking anywhere on screen) ...
