@@ -1,0 +1,3 @@
+/home/tuero/Documents/rocksndiamonds/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/tuero/Documents/rocksndiamonds/cmake-build-debug/CMakeFiles/rocksndiamonds.dir
+/home/tuero/Documents/rocksndiamonds/cmake-build-debug/CMakeFiles/edit_cache.dir

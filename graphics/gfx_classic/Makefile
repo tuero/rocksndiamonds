@@ -41,7 +41,7 @@ FILES = RocksBusy.$(EXT)		\
 	RocksScreen.$(EXT)		\
 	RocksToons.$(EXT)		\
 					\
-	RocksCE.$(EXT)			# dynamically generated from template
+# 	RocksCE.$(EXT)			# dynamically generated from template
 
 
 # -----------------------------------------------------------------------------
@@ -56,10 +56,10 @@ all: $(FILES)
 %.png: %.ilbm
 	ilbmtoppm $< | pnmtopng > $@
 
-RocksCE.ilbm: RocksCE-template.ilbm
-	$(RND) -e "create CE image ."
-	bmptoppm RocksCE.bmp | ppmtoilbm > RocksCE.ilbm
-	$(RM) RocksCE.bmp
+# RocksCE.ilbm: RocksCE-template.ilbm
+# 	$(RND) -e "create CE image ."
+# 	bmptoppm RocksCE.bmp | ppmtoilbm > RocksCE.ilbm
+# 	$(RM) RocksCE.bmp
 
 clean:
 	@for i in $(FILES); do			\

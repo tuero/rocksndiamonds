@@ -9608,6 +9608,7 @@ void LoadSetup(void)
 
   // try to load setup values from default setup file
   filename = getDefaultSetupFilename();
+//  printf("%s", filename );
 
   if (fileExists(filename))
     LoadSetupFromFilename(filename);
