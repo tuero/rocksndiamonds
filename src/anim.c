@@ -1164,7 +1164,7 @@ static void InitGlobalAnim_Triggered(struct GlobalAnimPartControlInfo *part,
       if (isClickablePart(part2, mask))
       {
 	part2->triggered = TRUE;
-	*click_consumed = clickConsumed(part);		// click was on "part"!
+	*click_consumed |= clickConsumed(part); 	// click was on "part"!
 
 #if DEBUG_ANIM_EVENTS
 	printf("::: => %d.%d TRIGGERED BY %s OF %d.%d\n",
@@ -1804,7 +1804,7 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, int clicked_event)
 #endif
 
 	  part->clicked = TRUE;
-	  click_consumed = clickConsumed(part);
+	  click_consumed |= clickConsumed(part);
 	}
 
 	// always handle "unclick:any" events (releasing anywhere on screen) ...
@@ -1817,7 +1817,7 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, int clicked_event)
 #endif
 
 	  part->clicked = TRUE;
-	  click_consumed = clickConsumed(part);
+	  click_consumed |= clickConsumed(part);
 	}
 
 	// ... but only handle the first (topmost) clickable animation
@@ -1837,7 +1837,7 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, int clicked_event)
 	    any_event_action = TRUE;
 
 	  // determine if mouse clicks should be blocked from other animations
-	  any_part_clicked = clickConsumed(part);
+	  any_part_clicked |= clickConsumed(part);
 
 	  if (isClickablePart(part, ANIM_EVENT_SELF))
 	  {
@@ -1847,7 +1847,7 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, int clicked_event)
 #endif
 
 	    part->clicked = TRUE;
-	    click_consumed = clickConsumed(part);
+	    click_consumed |= clickConsumed(part);
 	  }
 
 	  // check if this click is defined to trigger other animations
