@@ -1760,6 +1760,7 @@ static void InitGlobalAnim_Clickable(void)
 static boolean InitGlobalAnim_Clicked(int mx, int my, int clicked_event)
 {
   boolean click_consumed = FALSE;
+  boolean anything_clicked = FALSE;
   boolean any_part_clicked = FALSE;
   boolean any_event_action = FALSE;
   int mode_nr;
@@ -1803,7 +1804,7 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, int clicked_event)
 		 part->old_anim_nr + 1, part->old_nr + 1);
 #endif
 
-	  part->clicked = TRUE;
+	  anything_clicked = part->clicked = TRUE;
 	  click_consumed |= clickConsumed(part);
 	}
 
@@ -1816,7 +1817,7 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, int clicked_event)
 		 part->old_anim_nr + 1, part->old_nr + 1);
 #endif
 
-	  part->clicked = TRUE;
+	  anything_clicked = part->clicked = TRUE;
 	  click_consumed |= clickConsumed(part);
 	}
 
@@ -1846,7 +1847,7 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, int clicked_event)
 		   part->old_anim_nr + 1, part->old_nr + 1);
 #endif
 
-	    part->clicked = TRUE;
+	    anything_clicked = part->clicked = TRUE;
 	    click_consumed |= clickConsumed(part);
 	  }
 
@@ -1858,7 +1859,7 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, int clicked_event)
     }
   }
 
-  if (click_consumed)
+  if (anything_clicked)
   {
     handle_click = TRUE;
 
