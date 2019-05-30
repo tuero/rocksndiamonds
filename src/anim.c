@@ -1134,7 +1134,7 @@ static boolean clickConsumed(struct GlobalAnimPartControlInfo *part)
 }
 
 static void InitGlobalAnim_Triggered(struct GlobalAnimPartControlInfo *part,
-				     boolean *anything_clicked,
+				     boolean *click_consumed,
 				     boolean *any_event_action,
 				     int event_value, char *info_text)
 {
@@ -1164,7 +1164,7 @@ static void InitGlobalAnim_Triggered(struct GlobalAnimPartControlInfo *part,
       if (isClickablePart(part2, mask))
       {
 	part2->triggered = TRUE;
-	*anything_clicked = clickConsumed(part); 	// click was on "part"!
+	*click_consumed = clickConsumed(part);		// click was on "part"!
 
 #if DEBUG_ANIM_EVENTS
 	printf("::: => %d.%d TRIGGERED BY %s OF %d.%d\n",
@@ -1214,11 +1214,11 @@ static void HandleGlobalAnimEvent(struct GlobalAnimPartControlInfo *part,
   printf("::: %d.%d %s\n", part->old_anim_nr + 1, part->old_nr + 1, info_text);
 #endif
 
-  boolean anything_clicked = FALSE;
+  boolean click_consumed = FALSE;
   boolean any_event_action = FALSE;
 
   // check if this event is defined to trigger other animations
-  InitGlobalAnim_Triggered(part, &anything_clicked, &any_event_action,
+  InitGlobalAnim_Triggered(part, &click_consumed, &any_event_action,
 			   event_value, info_text);
 }
 
@@ -1759,7 +1759,7 @@ static void InitGlobalAnim_Clickable(void)
 
 static boolean InitGlobalAnim_Clicked(int mx, int my, int clicked_event)
 {
-  boolean anything_clicked = FALSE;
+  boolean click_consumed = FALSE;
   boolean any_part_clicked = FALSE;
   boolean any_event_action = FALSE;
   int mode_nr;
@@ -1804,7 +1804,7 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, int clicked_event)
 #endif
 
 	  part->clicked = TRUE;
-	  anything_clicked = clickConsumed(part);
+	  click_consumed = clickConsumed(part);
 	}
 
 	// always handle "unclick:any" events (releasing anywhere on screen) ...
@@ -1817,7 +1817,7 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, int clicked_event)
 #endif
 
 	  part->clicked = TRUE;
-	  anything_clicked = clickConsumed(part);
+	  click_consumed = clickConsumed(part);
 	}
 
 	// ... but only handle the first (topmost) clickable animation
@@ -1847,18 +1847,18 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, int clicked_event)
 #endif
 
 	    part->clicked = TRUE;
-	    anything_clicked = clickConsumed(part);
+	    click_consumed = clickConsumed(part);
 	  }
 
 	  // check if this click is defined to trigger other animations
-	  InitGlobalAnim_Triggered(part, &anything_clicked, &any_event_action,
+	  InitGlobalAnim_Triggered(part, &click_consumed, &any_event_action,
 				   ANIM_EVENT_CLICK, "CLICK");
 	}
       }
     }
   }
 
-  if (anything_clicked)
+  if (click_consumed)
   {
     handle_click = TRUE;
 
@@ -1867,7 +1867,7 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, int clicked_event)
     handle_click = FALSE;
   }
 
-  return (anything_clicked || any_event_action);
+  return (click_consumed || any_event_action);
 }
 
 static void ResetGlobalAnim_Clickable(void)
