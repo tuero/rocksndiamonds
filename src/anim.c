@@ -1764,6 +1764,7 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, int clicked_event)
   boolean any_part_clicked = FALSE;
   boolean any_event_action = FALSE;
   int mode_nr;
+  int i;
 
   // check game modes in reverse draw order (to stop when clicked)
   for (mode_nr = NUM_GAME_MODES - 1; mode_nr >= 0; mode_nr--)
@@ -1863,7 +1864,8 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, int clicked_event)
   {
     handle_click = TRUE;
 
-    HandleGlobalAnim(ANIM_CONTINUE, game_status);
+    for (i = 0; i < NUM_GAME_MODES; i++)
+      HandleGlobalAnim(ANIM_CONTINUE, i);
 
     handle_click = FALSE;
 
