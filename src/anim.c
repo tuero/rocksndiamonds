@@ -1866,6 +1866,9 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, int clicked_event)
     HandleGlobalAnim(ANIM_CONTINUE, game_status);
 
     handle_click = FALSE;
+
+    // prevent ignoring release event if processed within same game frame
+    StopProcessingEvents();
   }
 
   return (click_consumed || any_event_action);

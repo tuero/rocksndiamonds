@@ -40,6 +40,7 @@ static unsigned int special_cursor_delay = 0;
 static unsigned int special_cursor_delay_value = 1000;
 
 static boolean virtual_button_pressed = FALSE;
+static boolean stop_processing_events = FALSE;
 
 
 // forward declarations for internal use
@@ -182,6 +183,11 @@ boolean NextValidEvent(Event *event)
   return FALSE;
 }
 
+void StopProcessingEvents(void)
+{
+  stop_processing_events = TRUE;
+}
+
 static void HandleEvents(void)
 {
   Event event;
@@ -189,6 +195,8 @@ static void HandleEvents(void)
   unsigned int event_frame_delay_value = GAME_FRAME_DELAY;
 
   ResetDelayCounter(&event_frame_delay);
+
+  stop_processing_events = FALSE;
 
   while (NextValidEvent(&event))
   {
@@ -244,6 +252,10 @@ static void HandleEvents(void)
 
     // do not handle events for longer than standard frame delay period
     if (DelayReached(&event_frame_delay, event_frame_delay_value))
+      break;
+
+    // do not handle any further events if triggered by a special flag
+    if (stop_processing_events)
       break;
   }
 }

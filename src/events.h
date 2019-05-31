@@ -22,6 +22,7 @@
 
 int FilterMouseMotionEvents(void *, Event *);
 boolean NextValidEvent(Event *);
+void StopProcessingEvents(void);
 
 void EventLoop(void);
 void HandleOtherEvents(Event *);
