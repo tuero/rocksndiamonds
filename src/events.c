@@ -103,6 +103,15 @@ static int FilterEvents(const Event *event)
   cursor_inside_playfield = (motion->x >= SX && motion->x < SX + SXSIZE &&
 			     motion->y >= SY && motion->y < SY + SYSIZE);
 
+  // set correct mouse x/y position (for pointer class global animations)
+  // (this is required in rare cases where the mouse x/y position calculated
+  // from raw values (to apply logical screen size scaling corrections) does
+  // not match the final mouse event x/y position -- this may happen because
+  // the SDL renderer's viewport position is internally represented as float,
+  // but only accessible as integer, which may lead to rounding errors)
+  gfx.mouse_x = motion->x;
+  gfx.mouse_y = motion->y;
+
   // do no reset mouse cursor before all pending events have been processed
   if (gfx.cursor_mode == cursor_mode_last &&
       ((game_status == GAME_MODE_TITLE &&
