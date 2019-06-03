@@ -131,6 +131,7 @@ static void ReloadCustomMusic(void);
 static void FreeSound(void *);
 static void FreeMusic(void *);
 static void FreeAllMusic_NoConf(void);
+static void Mixer_StopMusicChannel(void);
 
 static SoundInfo *getSoundInfoEntryFromSoundID(int);
 static MusicInfo *getMusicInfoEntryFromMusicID(int);
@@ -222,6 +223,10 @@ static void Mixer_PlayMusicChannel(void)
   if (mixer[audio.music_channel].type != MUS_TYPE_WAV)
   {
     int loops = (IS_LOOP(mixer[audio.music_channel]) ? -1 : 1);
+
+    // stopping music channel before playing next track seems to be needed to
+    // prevent audio problems that may occur when playing MP3 files on Windows
+    Mixer_StopMusicChannel();
 
     // use short fade-in to prevent "plop" sound for certain music files
     // (this may happen when switching on music while playing the game)
