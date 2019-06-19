@@ -242,6 +242,9 @@ int getAnimationFrame(int num_frames, int delay, int mode, int start_frame,
 {
   int frame = 0;
 
+  if (delay < 1)			// delay must be at least 1
+    delay = 1;
+
   sync_frame += start_frame * delay;
 
   if (mode & ANIM_LOOP)			// looping animation

@@ -1476,7 +1476,7 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   else
     g->anim_frames = 1;
 
-  if (g->anim_frames == 0)		// frames must be at least 1
+  if (g->anim_frames < 1)		// frames must be at least 1
     g->anim_frames = 1;
 
   g->anim_frames_per_line =
@@ -1484,7 +1484,7 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
      parameter[GFX_ARG_FRAMES_PER_LINE] : anim_frames_per_line);
 
   g->anim_delay = parameter[GFX_ARG_DELAY];
-  if (g->anim_delay == 0)		// delay must be at least 1
+  if (g->anim_delay < 1)		// delay must be at least 1
     g->anim_delay = 1;
 
   g->anim_mode = parameter[GFX_ARG_ANIM_MODE];
@@ -1551,6 +1551,9 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   g->position     = parameter[GFX_ARG_POSITION];
   g->x            = parameter[GFX_ARG_X];	// (may be uninitialized,
   g->y            = parameter[GFX_ARG_Y];	// unlike src_x and src_y)
+
+  if (g->step_delay < 1)			// delay must be at least 1
+    g->step_delay = 1;
 
   // this is only used for drawing font characters
   g->draw_xoffset = parameter[GFX_ARG_DRAW_XOFFSET];
