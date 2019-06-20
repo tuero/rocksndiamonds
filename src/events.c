@@ -1910,6 +1910,13 @@ static void HandleKeysSpecial(Key key)
       {
 	CopyClipboardToBrush();
       }
+      else if (letter == 'z')	// undo or redo last operation
+      {
+	if (GetKeyModState() & KMOD_Shift)
+	  RedoLevelEditorOperation();
+	else
+	  UndoLevelEditorOperation();
+      }
     }
   }
 

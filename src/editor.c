@@ -12355,6 +12355,16 @@ void CopyBrushToClipboard_Small(void)
   CopyBrushExt(0, 0, 0, 0, 0, CB_BRUSH_TO_CLIPBOARD_SMALL);
 }
 
+void UndoLevelEditorOperation(void)
+{
+  ClickOnGadget(level_editor_gadget[GADGET_ID_UNDO], -1);
+}
+
+void RedoLevelEditorOperation(void)
+{
+  ClickOnGadget(level_editor_gadget[GADGET_ID_UNDO], 3);
+}
+
 static void FloodFill(int from_x, int from_y, int fill_element)
 {
   FloodFillLevel(from_x, from_y, fill_element, Feld, lev_fieldx, lev_fieldy);
@@ -13820,7 +13830,9 @@ static void HandleControlButtons(struct GadgetInfo *gi)
       break;
 
     case GADGET_ID_UNDO:
-      if (button == 1 && GetKeyModState() & (KMOD_Shift|KMOD_Control))
+      if (button < 0)	// keep button value (even if modifier keys are pressed)
+	button = -button;
+      else if (button == 1 && GetKeyModState() & (KMOD_Shift | KMOD_Control))
 	button = 3;
 
       if (button == 1 && undo_buffer_steps == 0)
