@@ -1,17 +1,4 @@
 /opt/clion-2018.3.4/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=/usr/bin/g++ -G "CodeBlocks - Unix Makefiles" /home/tuero/Documents/rocksndiamonds
--- The C compiler identification is GNU 7.3.0
--- Check for working C compiler: /usr/bin/cc
--- Check for working C compiler: /usr/bin/cc -- works
--- Detecting C compiler ABI info
--- Detecting C compiler ABI info - done
--- Detecting C compile features
--- Detecting C compile features - done
 -- Configuring done
 -- Generating done
-CMake Warning:
-  Manually-specified variables were not used by the project:
-
-    CMAKE_CXX_COMPILER
-
-
 -- Build files have been written to: /home/tuero/Documents/rocksndiamonds/cmake-build-debug

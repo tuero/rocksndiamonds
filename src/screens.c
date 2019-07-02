@@ -1978,21 +1978,22 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 	  insideTextPosRect(main_controls[i].pos_input,  mx - mSX, my - mSY))
       {
 	pos = main_controls[i].nr;
-
 	break;
       }
     }
 
     // check if level preview was clicked
-    if (insidePreviewRect(&preview, mx - SX, my - SY))
-      pos = MAIN_CONTROL_GAME;
+    if (insidePreviewRect(&preview, mx - SX, my - SY)) {
+        pos = MAIN_CONTROL_GAME;
+    }
 
     // handle pressed/unpressed state for active/inactive menu buttons
     // (if pos != -1, "i" contains index position corresponding to "pos")
     if (button &&
 	pos >= MAIN_CONTROL_NAME && pos <= MAIN_CONTROL_QUIT &&
-	insideMenuPosRect(main_controls[i].pos_button, mx - mSX, my - mSY))
-      button_pressed = TRUE;
+	insideMenuPosRect(main_controls[i].pos_button, mx - mSX, my - mSY)) {
+        button_pressed = TRUE;
+    }
 
     if (button_pressed != button_pressed_last)
     {
@@ -2044,9 +2045,10 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       }
       else if (dx != 0)
       {
-	if (choice != MAIN_CONTROL_INFO &&
-	    choice != MAIN_CONTROL_SETUP)
-	  HandleMainMenu_SelectLevel(1, dx, NO_DIRECT_LEVEL_SELECT);
+        if (choice != MAIN_CONTROL_INFO &&
+            choice != MAIN_CONTROL_SETUP){
+            HandleMainMenu_SelectLevel(1, dx, NO_DIRECT_LEVEL_SELECT);
+        }
       }
     }
     else
@@ -2075,6 +2077,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       }
       else if (pos == MAIN_CONTROL_LEVELS)
       {
+          // choosing map set
 	if (leveldir_first)
 	{
 	  CloseDoor(DOOR_CLOSE_2);
@@ -2124,6 +2127,7 @@ void HandleMainMenu(int mx, int my, int dx, int dy, int button)
       }
       else if (pos == MAIN_CONTROL_GAME)
       {
+          printf("%s\n", "start game button selected");
 	StartGameActions(network.enabled, setup.autorecord, level.random_seed);
       }
       else if (pos == MAIN_CONTROL_SETUP)
@@ -4277,7 +4281,6 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
       if (game_status == GAME_MODE_LEVELNR)
       {
 	int new_level_nr = atoi(level_number_current->identifier);
-
 	HandleMainMenu_SelectLevel(0, 0, new_level_nr);
       }
 
@@ -4434,6 +4437,7 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
     }
     else
     {
+        // leveldir_current->subdir is still old here
       TreeInfo *node_first, *node_cursor;
       int entry_pos = ti->cl_first + y;
 
@@ -4461,7 +4465,7 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
       else
       {
 	FadeSetEnterMenu();
-
+    // This changes the leveldir_current->subdir ???
 	node_cursor->cl_first = ti->cl_first;
 	node_cursor->cl_cursor = ti->cl_cursor;
 	*ti_ptr = node_cursor;
@@ -4507,7 +4511,6 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 	  if (game_status == GAME_MODE_LEVELNR)
 	  {
 	    int new_level_nr = atoi(level_number_current->identifier);
-
 	    HandleMainMenu_SelectLevel(0, 0, new_level_nr);
 	  }
 

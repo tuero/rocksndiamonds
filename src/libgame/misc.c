@@ -904,6 +904,18 @@ boolean strSuffixLower(char *s, char *suffix)
 // command line option handling functions
 // ----------------------------------------------------------------------------
 
+static boolean isNumber(char number[])
+{
+    int i = 0;
+    for (; number[i] != 0; i++)
+    {
+        //if (number[i] > '9' || number[i] < '0')
+        if (!isdigit(number[i]))
+            return FALSE;
+    }
+    return TRUE;
+}
+
 void GetOptions(int argc, char *argv[],
 		void (*print_usage_function)(void),
 		void (*print_version_function)(void))
@@ -938,6 +950,9 @@ void GetOptions(int argc, char *argv[],
   options.network = FALSE;
   options.verbose = FALSE;
   options.debug = FALSE;
+  options.solver = FALSE;
+  options.level_number = 7;
+  options.delay = GAME_FRAME_DELAY;
 
 #if 1
   options.verbose = TRUE;
@@ -1093,6 +1108,42 @@ void GetOptions(int argc, char *argv[],
 
       // when doing batch processing, always enable verbose mode (warnings)
       options.verbose = TRUE;
+    }
+    else if (strncmp(option, "-solver", option_len) == 0)
+    {
+        options.solver = TRUE;
+    }
+    else if (strncmp(option, "-loadlevel", option_len) == 0)
+    {
+        if (option_arg == NULL) {
+            Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
+        }
+        else if (!isNumber(option_arg)) {
+            // Additionally check for valid level file if it exists?
+            Error(ERR_EXIT_HELP, "option '%s' argument must be a valid integer", option_str);
+        }
+        else {
+            options.level_number = atoi(option_arg);
+        }
+        if (option_arg == next_option) {
+            options_left++;
+        }
+    }
+    else if (strncmp(option, "-delay", option_len) == 0)
+    {
+        if (option_arg == NULL) {
+            Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
+        }
+        else if (!isNumber(option_arg) || atoi(option_arg) < 0) {
+            // Additionally check for valid level file if it exists?
+            Error(ERR_EXIT_HELP, "option '%s' argument must be a valid positive integer", option_str);
+        }
+        else {
+            options.delay = atoi(option_arg);
+        }
+        if (option_arg == next_option) {
+            options_left++;
+        }
     }
 #if defined(PLATFORM_MACOSX)
     else if (strPrefix(option, "-psn"))

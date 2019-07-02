@@ -20,12 +20,14 @@ src/conf_e2s.c
 src/conf_fnt.c
 src/conf_g2s.c
 src/conf_g2m.c
-src/conf_var.c
+#src/conf_var.c
 src/conf_act.c
-graphics/gfx_classic/*.png
-graphics/gfx_classic/RocksCE.ilbm
-graphics/gfx_classic/overlay/VirtualButtons.png
+# graphics/gfx_classic/*.png
+# graphics/gfx_classic/RocksCE.ilbm
+# graphics/gfx_classic/overlay/VirtualButtons.png
 
 # ignore compiled executable files
 rocksndiamonds
 rocksndiamonds.exe
+
+.DS_Store

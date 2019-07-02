@@ -995,6 +995,10 @@ struct OptionInfo
   boolean network;
   boolean verbose;
   boolean debug;
+  // Custom options
+  boolean solver;               // Solver to act as controller
+  int level_number;             // level number to load
+  int delay;                    // SetVideoFrameDelay
 };
 
 struct VideoSystemInfo
@@ -1685,7 +1689,7 @@ struct TextPosInfo
   int id;
 
   int direction;		// needed for panel time/health graphics
-  int class;			// needed for panel time/health graphics
+  int class_;			// needed for panel time/health graphics
   int style;			// needed for panel time/health graphics
 
   int tile_size;		// special case for list of network players

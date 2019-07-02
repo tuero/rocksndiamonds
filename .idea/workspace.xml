@@ -11,11 +11,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="dd82a1ed-05d1-4c55-ae5d-ab5f386bb689" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/graphics/gfx_classic/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/graphics/gfx_classic/Makefile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/files.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/files.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/init.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/init.c" afterDir="false" />
-    </list>
+    <list default="true" id="dd82a1ed-05d1-4c55-ae5d-ab5f386bb689" name="Default Changelist" comment="" />
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -26,25 +22,110 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
+  <component name="DatabaseView">
+    <option name="SHOW_INTERMEDIATE" value="true" />
+    <option name="GROUP_DATA_SOURCES" value="true" />
+    <option name="GROUP_SCHEMA" value="true" />
+    <option name="GROUP_CONTENTS" value="false" />
+    <option name="SORT_POSITIONED" value="false" />
+    <option name="SHOW_EMPTY_GROUPS" value="false" />
+    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
+    <option name="HIDDEN_KINDS">
+      <set />
+    </option>
+    <expand />
+    <select />
+  </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main.c">
+        <entry file="file://$PROJECT_DIR$/src/main.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="381">
-              <caret line="7608" column="14" selection-start-line="7608" selection-end-line="7609" />
+            <state relative-caret-position="267">
+              <caret line="3677" column="62" selection-start-line="3677" selection-start-column="20" selection-end-line="3677" selection-end-column="62" />
+              <folding>
+                <element signature="e#534#551#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/events.c">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="622">
+              <caret line="359" column="13" selection-start-line="359" selection-start-column="13" selection-end-line="359" selection-end-column="13" />
+              <folding>
+                <element signature="e#505#533#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/game.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="495">
+              <caret line="248" column="20" selection-start-line="248" selection-start-column="20" selection-end-line="248" selection-end-column="20" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/init.c">
+        <entry file="file://$PROJECT_DIR$/src/main.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1841">
-              <caret line="6171" column="15" selection-start-line="6171" selection-start-column="2" selection-end-line="6171" selection-end-column="15" />
+            <state relative-caret-position="285">
+              <caret line="7747" column="1" selection-start-line="7747" selection-start-column="1" selection-end-line="7747" selection-end-column="1" />
               <folding>
-                <element signature="e#176863#176924#0" expanded="true" />
+                <element signature="e#125966#125998#0" expanded="true" />
+                <element signature="e#126078#126121#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/screens.c">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="502">
+              <caret line="8296" column="7" selection-start-line="8296" selection-start-column="7" selection-end-line="8296" selection-end-column="7" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/game.c">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="247">
+              <caret line="4909" selection-start-line="4909" selection-end-line="4909" />
+              <folding>
+                <element signature="e#503#531#0" expanded="true" />
+                <element signature="e#1040#1404#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/libgame/system.c">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="277">
+              <caret line="798" column="5" selection-start-line="798" selection-start-column="5" selection-end-line="798" selection-end-column="5" />
+              <folding>
+                <element signature="e#490#509#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/tools.c">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-933">
+              <caret line="2577" column="55" selection-start-line="2577" selection-start-column="55" selection-end-line="2577" selection-end-column="55" />
+              <folding>
+                <element signature="e#504#521#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -53,56 +134,22 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/libgame/misc.c">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="149">
-              <caret line="3763" column="31" selection-start-line="3763" selection-start-column="4" selection-end-line="3763" selection-end-column="31" />
+            <state relative-caret-position="188">
+              <caret line="951" column="13" selection-start-line="951" selection-start-column="13" selection-end-line="951" selection-end-column="13" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/libgame/system.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="7260">
+              <caret line="484" column="8" selection-start-line="484" selection-start-column="8" selection-end-line="484" selection-end-column="8" />
               <folding>
-                <element signature="e#96227#97261#0" expanded="true" />
+                <element signature="e#597#616#0" expanded="true" />
+                <element signature="e#647#667#0" expanded="true" />
+                <element signature="e#700#720#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main.h">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="286">
-              <caret line="3279" column="15" selection-start-line="3279" selection-end-line="3280" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/libgame/system.c">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="286">
-              <caret line="541" column="5" selection-start-line="541" selection-start-column="5" selection-end-line="541" selection-end-column="5" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/game_em/input.c">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="21">
-              <caret line="85" column="20" selection-start-line="85" selection-start-column="2" selection-end-line="85" selection-end-column="20" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/files.c">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-929">
-              <caret line="11846" column="5" selection-start-line="11846" selection-start-column="5" selection-end-line="11846" selection-end-column="5" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/libgame/setup.c">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="676">
-              <caret line="532" column="69" selection-start-line="532" selection-start-column="15" selection-end-line="532" selection-end-column="69" />
             </state>
           </provider>
         </entry>
@@ -111,12 +158,36 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>MenuFrameDelay</find>
-      <find>main</find>
-      <find>element_name_info</find>
-      <find>element_action</find>
-      <find>m</find>
-      <find>openall</find>
+      <find>stored_player</find>
+      <find>score</find>
+      <find>sc</find>
+      <find>lev_fieldy</find>
+      <find>P</find>
+      <find>playerinfo</find>
+      <find>class</find>
+      <find>videoframede</find>
+      <find>delay</find>
+      <find>Feld</find>
+      <find>setVideoFrameDel</find>
+      <find>PlayerInfo</find>
+      <find>setvideo</find>
+      <find>setVideo</find>
+      <find>setVideoFrame</find>
+      <find>Game</find>
+      <find>GameIn</find>
+      <find>SBX_Left</find>
+      <find>DrawLevel</find>
+      <find>drawLevelF</find>
+      <find>backto</find>
+      <find>Bit</find>
+      <find>is_sim</find>
+      <find>rnd</find>
+      <find>get_random_number</find>
+      <find>level</find>
+      <find>Player</find>
+      <find>setvideoframe</find>
+      <find>ContinueMo</find>
+      <find>DrawLevelField</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -126,24 +197,38 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/CMakeLists.txt" />
-        <option value="$PROJECT_DIR$/src/main.c" />
-        <option value="$PROJECT_DIR$/src/init.c" />
+        <option value="$PROJECT_DIR$/src/libgame/setup.c" />
         <option value="$PROJECT_DIR$/src/files.c" />
+        <option value="$PROJECT_DIR$/src/anim.c" />
+        <option value="$PROJECT_DIR$/src/init.c" />
+        <option value="$PROJECT_DIR$/src/conf_var.c" />
+        <option value="$PROJECT_DIR$/src/events.h" />
+        <option value="$PROJECT_DIR$/src/screens.c" />
+        <option value="$PROJECT_DIR$/src/screens.h" />
+        <option value="$PROJECT_DIR$/src/libgame/system.c" />
+        <option value="$PROJECT_DIR$/src/libgame/misc.h" />
+        <option value="$PROJECT_DIR$/src/main.h" />
+        <option value="$PROJECT_DIR$/src/libgame/system.h" />
+        <option value="$PROJECT_DIR$/src/libgame/misc.c" />
+        <option value="$PROJECT_DIR$/src/events.c" />
+        <option value="$PROJECT_DIR$/src/game.c" />
+        <option value="$PROJECT_DIR$/src/tools.c" />
+        <option value="$PROJECT_DIR$/src/main.c" />
       </list>
     </option>
   </component>
-  <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
+  <component name="OCFindUsagesOptions" text="false" ivars="false" properties="true" derivedClasses="false" />
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="3840" />
-    <option name="y" value="-2" />
-    <option name="width" value="1920" />
-    <option name="height" value="1041" />
+    <option name="x" value="2430" />
+    <option name="width" value="1717" />
+    <option name="height" value="929" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -160,14 +245,15 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="Errors" />
   </component>
   <component name="RunDashboard">
@@ -200,24 +286,41 @@
       <option name="presentableId" value="Default" />
       <updated>1559148300127</updated>
       <workItem from="1559148301238" duration="1655000" />
-      <workItem from="1559152846152" duration="10248000" />
+      <workItem from="1559152846152" duration="35511000" />
+      <workItem from="1559233154054" duration="17955000" />
+      <workItem from="1559324138540" duration="21017000" />
+      <workItem from="1559368541849" duration="2960000" />
+      <workItem from="1559430234150" duration="1483000" />
+      <workItem from="1559515387085" duration="658000" />
+      <workItem from="1559591452852" duration="633000" />
+      <workItem from="1560459344123" duration="4163000" />
+      <workItem from="1560630698587" duration="16678000" />
+      <workItem from="1560929372913" duration="599000" />
+      <workItem from="1560963603648" duration="4092000" />
+      <workItem from="1561065964423" duration="1844000" />
+      <workItem from="1561097469358" duration="778000" />
+      <workItem from="1561399296840" duration="16921000" />
+      <workItem from="1561495508502" duration="16254000" />
+      <workItem from="1561568536847" duration="8332000" />
+      <workItem from="1561660185353" duration="21092000" />
+      <workItem from="1561743760023" duration="3532000" />
+      <workItem from="1561755828928" duration="3494000" />
+      <workItem from="1561831283804" duration="12018000" />
+      <workItem from="1561914452191" duration="8920000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="11903000" />
+    <option name="totallyTimeSpent" value="203783000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="3840" y="-2" width="1920" height="1041" extended-state="6" />
-    <editor active="true" />
+    <frame x="1920" y="25" width="1920" height="1014" extended-state="6" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2497332" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.22411953" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info anchor="bottom" id="Messages" weight="0.32894737" />
-      <window_info anchor="bottom" id="CMake" weight="0.32894737" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info active="true" anchor="bottom" x="1920" y="55" width="1920" height="984" id="Find" order="1" type="WINDOWED" visible="true" weight="0.32894737" />
+      <window_info anchor="bottom" x="3840" y="30" width="1920" height="1009" id="Find" order="1" type="WINDOWED" weight="0.32894737" />
       <window_info anchor="bottom" id="Run" order="2" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
@@ -227,10 +330,12 @@
       <window_info anchor="bottom" id="Version Control" order="8" />
       <window_info anchor="bottom" id="Terminal" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
+      <window_info anchor="bottom" id="Messages" order="11" weight="0.32894737" />
+      <window_info anchor="bottom" id="CMake" order="12" weight="0.33898306" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="Database" order="3" />
+      <window_info anchor="right" id="Database" order="3" weight="0.32977587" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -282,93 +387,8 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/tools.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="475">
-          <caret line="818" column="30" selection-start-line="818" selection-start-column="20" selection-end-line="818" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/screens.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="511">
-          <caret line="8293" column="13" selection-start-line="8293" selection-start-column="2" selection-end-line="8293" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/game.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="8746">
-          <caret line="4266" column="36" selection-start-line="4266" selection-start-column="6" selection-end-line="4266" selection-end-column="36" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/init.h">
       <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/events.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="351">
-          <caret line="338" column="23" selection-start-line="338" selection-start-column="6" selection-end-line="338" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/libgame/system.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="295">
-          <caret line="921" column="19" selection-start-line="921" selection-start-column="19" selection-end-line="921" selection-end-column="19" />
-          <folding>
-            <element signature="e#597#616#0" expanded="true" />
-            <element signature="e#647#667#0" expanded="true" />
-            <element signature="e#700#720#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/libgame/setup.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="676">
-          <caret line="532" column="69" selection-start-line="532" selection-start-column="15" selection-end-line="532" selection-end-column="69" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="286">
-          <caret line="3279" column="15" selection-start-line="3279" selection-end-line="3280" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/game_em/input.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="21">
-          <caret line="85" column="20" selection-start-line="85" selection-start-column="2" selection-end-line="85" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/libgame/misc.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="149">
-          <caret line="3763" column="31" selection-start-line="3763" selection-start-column="4" selection-end-line="3763" selection-end-column="31" />
-          <folding>
-            <element signature="e#96227#97261#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="381">
-          <caret line="7608" column="14" selection-start-line="7608" selection-end-line="7609" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/libgame/system.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="286">
-          <caret line="541" column="5" selection-start-line="541" selection-start-column="5" selection-end-line="541" selection-end-column="5" />
-        </state>
-      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/netserv.c">
       <provider selected="true" editor-type-id="text-editor">
@@ -391,19 +411,260 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/tools.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-3825" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/header.tmpl">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/anim.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="345">
+          <caret line="23" lean-forward="true" selection-start-line="23" selection-end-line="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/game_em/input.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="21">
+          <caret line="85" column="20" selection-start-line="85" selection-start-column="2" selection-end-line="85" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/libgame/setup.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="18270">
+          <caret line="1218" column="10" selection-start-line="1218" selection-start-column="10" selection-end-line="1218" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/libgame/setup.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3855">
+          <caret line="257" column="28" selection-start-line="257" selection-start-column="5" selection-end-line="257" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/SDL2/SDL.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="286">
+          <caret line="92" column="28" selection-start-line="92" selection-start-column="28" selection-end-line="92" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/libgame/sdl.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="286">
+          <caret line="418" column="5" selection-start-line="418" selection-start-column="5" selection-end-line="418" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/config.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="720">
+          <caret line="124" column="28" selection-start-line="124" selection-start-column="9" selection-end-line="124" selection-end-column="28" />
+          <folding>
+            <element signature="e#2619#3038#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/files.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-929">
-          <caret line="11846" column="5" selection-start-line="11846" selection-start-column="5" selection-end-line="11846" selection-end-column="5" />
+        <state relative-caret-position="98985">
+          <caret line="6599" column="31" selection-start-line="6599" selection-start-column="18" selection-end-line="6599" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/custom.cpp" />
+    <entry file="file://$PROJECT_DIR$/src/libgame/libgame.h">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/anim.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="277">
+          <caret line="940" column="33" selection-start-line="940" selection-start-column="33" selection-end-line="940" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/game_em/game_em.h">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/game_em/export.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-10935" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/libgame/image.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="361">
+          <caret line="194" column="22" selection-start-line="194" selection-start-column="22" selection-end-line="194" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/conf_gfx.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="19" column="27" selection-start-line="19" selection-start-column="27" selection-end-line="19" selection-end-column="27" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build-scripts/create_element_defs.pl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1434">
+          <caret line="2335" column="34" selection-start-line="2335" selection-start-column="34" selection-end-line="2335" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/conf_var.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="11" column="79" lean-forward="true" selection-start-line="11" selection-start-column="79" selection-end-line="11" selection-end-column="79" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/editor.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="286">
+          <caret line="13667" column="6" selection-start-line="13667" selection-start-column="6" selection-end-line="13667" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/events.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="615">
+          <caret line="53" selection-start-line="53" selection-end-line="53" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/init.c">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1841">
-          <caret line="6171" column="15" selection-start-line="6171" selection-start-column="2" selection-end-line="6171" selection-end-column="15" />
+        <state relative-caret-position="-3539">
+          <caret line="4489" column="5" selection-start-line="4489" selection-start-column="5" selection-end-line="4489" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/screens.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="675">
+          <caret line="45" column="26" selection-start-line="45" selection-start-column="5" selection-end-line="45" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/libgame/gadgets.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3435">
+          <caret line="229" column="7" selection-start-line="229" selection-start-column="7" selection-end-line="229" selection-end-column="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/libgame/misc.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2160">
+          <caret line="144" column="25" selection-start-line="144" selection-start-column="25" selection-end-line="144" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/libgame/random.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="324">
+          <caret line="201" column="12" selection-start-line="201" selection-start-column="12" selection-end-line="201" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/libgame/system.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="7260">
+          <caret line="484" column="8" selection-start-line="484" selection-start-column="8" selection-end-line="484" selection-end-column="8" />
           <folding>
-            <element signature="e#176863#176924#0" expanded="true" />
+            <element signature="e#597#616#0" expanded="true" />
+            <element signature="e#647#667#0" expanded="true" />
+            <element signature="e#700#720#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/libgame/misc.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="188">
+          <caret line="951" column="13" selection-start-line="951" selection-start-column="13" selection-end-line="951" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/game.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="495">
+          <caret line="248" column="20" selection-start-line="248" selection-start-column="20" selection-end-line="248" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/libgame/system.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="277">
+          <caret line="798" column="5" selection-start-line="798" selection-start-column="5" selection-end-line="798" selection-end-column="5" />
+          <folding>
+            <element signature="e#490#509#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/events.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="622">
+          <caret line="359" column="13" selection-start-line="359" selection-start-column="13" selection-end-line="359" selection-end-column="13" />
+          <folding>
+            <element signature="e#505#533#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/screens.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="502">
+          <caret line="8296" column="7" selection-start-line="8296" selection-start-column="7" selection-end-line="8296" selection-end-column="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/game.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="247">
+          <caret line="4909" selection-start-line="4909" selection-end-line="4909" />
+          <folding>
+            <element signature="e#503#531#0" expanded="true" />
+            <element signature="e#1040#1404#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tools.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-933">
+          <caret line="2577" column="55" selection-start-line="2577" selection-start-column="55" selection-end-line="2577" selection-end-column="55" />
+          <folding>
+            <element signature="e#504#521#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="267">
+          <caret line="3677" column="62" selection-start-line="3677" selection-start-column="20" selection-end-line="3677" selection-end-column="62" />
+          <folding>
+            <element signature="e#534#551#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="285">
+          <caret line="7747" column="1" selection-start-line="7747" selection-start-column="1" selection-end-line="7747" selection-end-column="1" />
+          <folding>
+            <element signature="e#125966#125998#0" expanded="true" />
+            <element signature="e#126078#126121#0" expanded="true" />
           </folding>
         </state>
       </provider>

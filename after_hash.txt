@@ -1,0 +1,140 @@
+Engine Type: EM
+Player MovPos: 0
+Player MovDir: 0
+Player is_moving: 0
+Player is_waiting: 0
+Player move_delay: 0
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105    80     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   107   105   105   105   105   105 
+-----------------
+starting game loop
+Simulation: Game ended
+BFS ellapsed time: 28134ms
+BFS total nodes expanded: 23
+Size of Open: 0
+Size of Closed: 23
+memory: 32768
+solution length: 72
+right (right) (right) (right) (right) (right) (right) (right) down (down) (down) (down) (down) (down) (down) (down) down (down) (down) (down) (down) (down) (down) (down) down (down) (down) (down) (down) (down) (down) (down) down (down) (down) (down) (down) (down) (down) (down) down (down) (down) (down) (down) (down) (down) (down) down (down) (down) (down) (down) (down) (down) (down) right (right) (right) (right) (right) (right) (right) (right) right (right) (right) (right) (right) (right) (right) (right) 
+Controller: right
+Counter: 1
+Engine Type: EM
+Player MovPos: 0
+Player MovDir: 8
+Player is_moving: 0
+Player is_waiting: 0
+Player move_delay: 0
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105     0     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   107   105   105   105   105   105 
+-----------------
+Controller: right
+Counter: 2
+Engine Type: EM
+Player MovPos: -28
+Player MovDir: 2
+Player is_moving: 1
+Player is_waiting: 0
+Player move_delay: 7
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105     0     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   107   105   105   105   105   105 
+-----------------
+Controller: right
+Counter: 3
+Engine Type: EM
+Player MovPos: -24
+Player MovDir: 2
+Player is_moving: 1
+Player is_waiting: 0
+Player move_delay: 6
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105     0     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   107   105   105   105   105   105 
+-----------------
+Controller: right
+Counter: 4
+Engine Type: EM
+Player MovPos: -20
+Player MovDir: 2
+Player is_moving: 1
+Player is_waiting: 0
+Player move_delay: 5
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105     0     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   107   105   105   105   105   105 
+-----------------
+Controller: right
+Counter: 5
+Engine Type: EM
+Player MovPos: -16
+Player MovDir: 2
+Player is_moving: 1
+Player is_waiting: 0
+Player move_delay: 4
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105     0     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   107   105   105   105   105   105 
+-----------------
+Controller: right
+Counter: 6
+Engine Type: EM
+Player MovPos: -12
+Player MovDir: 2
+Player is_moving: 1
+Player is_waiting: 0
+Player move_delay: 3
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105     0     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   107   105   105   105   105   105 
+-----------------

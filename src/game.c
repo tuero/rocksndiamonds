@@ -2206,583 +2206,534 @@ static void UpdatePlayfieldElementCount(void)
 
 static void UpdateGameControlValues(void)
 {
-  int i, k;
-  int time = (game.LevelSolved ?
-	      game.LevelSolved_CountingTime :
-	      level.game_engine_type == GAME_ENGINE_TYPE_EM ?
-	      level.native_em_level->lev->time :
-	      level.game_engine_type == GAME_ENGINE_TYPE_SP ?
-	      level.native_sp_level->game_sp->time_played :
-	      level.game_engine_type == GAME_ENGINE_TYPE_MM ?
-	      game_mm.energy_left :
-	      game.no_time_limit ? TimePlayed : TimeLeft);
-  int score = (game.LevelSolved ?
-	       game.LevelSolved_CountingScore :
-	       level.game_engine_type == GAME_ENGINE_TYPE_EM ?
-	       level.native_em_level->lev->score :
-	       level.game_engine_type == GAME_ENGINE_TYPE_SP ?
-	       level.native_sp_level->game_sp->score :
-	       level.game_engine_type == GAME_ENGINE_TYPE_MM ?
-	       game_mm.score :
-	       game.score);
-  int gems = (level.game_engine_type == GAME_ENGINE_TYPE_EM ?
-	      level.native_em_level->lev->required :
-	      level.game_engine_type == GAME_ENGINE_TYPE_SP ?
-	      level.native_sp_level->game_sp->infotrons_still_needed :
-	      level.game_engine_type == GAME_ENGINE_TYPE_MM ?
-	      game_mm.kettles_still_needed :
-	      game.gems_still_needed);
-  int exit_closed = (level.game_engine_type == GAME_ENGINE_TYPE_EM ?
-		     level.native_em_level->lev->required > 0 :
-		     level.game_engine_type == GAME_ENGINE_TYPE_SP ?
-		     level.native_sp_level->game_sp->infotrons_still_needed > 0 :
-		     level.game_engine_type == GAME_ENGINE_TYPE_MM ?
-		     game_mm.kettles_still_needed > 0 ||
-		     game_mm.lights_still_needed > 0 :
-		     game.gems_still_needed > 0 ||
-		     game.sokoban_fields_still_needed > 0 ||
-		     game.sokoban_objects_still_needed > 0 ||
-		     game.lights_still_needed > 0);
-  int health = (game.LevelSolved ?
-		game.LevelSolved_CountingHealth :
-		level.game_engine_type == GAME_ENGINE_TYPE_MM ?
-		MM_HEALTH(game_mm.laser_overload_value) :
-		game.health);
+    if (is_simulating == FALSE) {
+        int i, k;
+        int time = (game.LevelSolved ?
+                    game.LevelSolved_CountingTime :
+                    level.game_engine_type == GAME_ENGINE_TYPE_EM ?
+                    level.native_em_level->lev->time :
+                    level.game_engine_type == GAME_ENGINE_TYPE_SP ?
+                    level.native_sp_level->game_sp->time_played :
+                    level.game_engine_type == GAME_ENGINE_TYPE_MM ?
+                    game_mm.energy_left :
+                    game.no_time_limit ? TimePlayed : TimeLeft);
+        int score = (game.LevelSolved ?
+                     game.LevelSolved_CountingScore :
+                     level.game_engine_type == GAME_ENGINE_TYPE_EM ?
+                     level.native_em_level->lev->score :
+                     level.game_engine_type == GAME_ENGINE_TYPE_SP ?
+                     level.native_sp_level->game_sp->score :
+                     level.game_engine_type == GAME_ENGINE_TYPE_MM ?
+                     game_mm.score :
+                     game.score);
+        int gems = (level.game_engine_type == GAME_ENGINE_TYPE_EM ?
+                    level.native_em_level->lev->required :
+                    level.game_engine_type == GAME_ENGINE_TYPE_SP ?
+                    level.native_sp_level->game_sp->infotrons_still_needed :
+                    level.game_engine_type == GAME_ENGINE_TYPE_MM ?
+                    game_mm.kettles_still_needed :
+                    game.gems_still_needed);
+        int exit_closed = (level.game_engine_type == GAME_ENGINE_TYPE_EM ?
+                           level.native_em_level->lev->required > 0 :
+                           level.game_engine_type == GAME_ENGINE_TYPE_SP ?
+                           level.native_sp_level->game_sp->infotrons_still_needed > 0 :
+                           level.game_engine_type == GAME_ENGINE_TYPE_MM ?
+                           game_mm.kettles_still_needed > 0 ||
+                           game_mm.lights_still_needed > 0 :
+                           game.gems_still_needed > 0 ||
+                           game.sokoban_fields_still_needed > 0 ||
+                           game.sokoban_objects_still_needed > 0 ||
+                           game.lights_still_needed > 0);
+        int health = (game.LevelSolved ?
+                      game.LevelSolved_CountingHealth :
+                      level.game_engine_type == GAME_ENGINE_TYPE_MM ?
+                      MM_HEALTH(game_mm.laser_overload_value) :
+                      game.health);
 
-  UpdatePlayfieldElementCount();
+        UpdatePlayfieldElementCount();
 
-  // update game panel control values
+        // update game panel control values
 
-  // used instead of "level_nr" (for network games)
-  game_panel_controls[GAME_PANEL_LEVEL_NUMBER].value = levelset.level_nr;
-  game_panel_controls[GAME_PANEL_GEMS].value = gems;
+        // used instead of "level_nr" (for network games)
+        game_panel_controls[GAME_PANEL_LEVEL_NUMBER].value = levelset.level_nr;
+        game_panel_controls[GAME_PANEL_GEMS].value = gems;
 
-  game_panel_controls[GAME_PANEL_INVENTORY_COUNT].value = 0;
-  for (i = 0; i < MAX_NUM_KEYS; i++)
-    game_panel_controls[GAME_PANEL_KEY_1 + i].value = EL_EMPTY;
-  game_panel_controls[GAME_PANEL_KEY_WHITE].value = EL_EMPTY;
-  game_panel_controls[GAME_PANEL_KEY_WHITE_COUNT].value = 0;
+        game_panel_controls[GAME_PANEL_INVENTORY_COUNT].value = 0;
+        for (i = 0; i < MAX_NUM_KEYS; i++)
+            game_panel_controls[GAME_PANEL_KEY_1 + i].value = EL_EMPTY;
+        game_panel_controls[GAME_PANEL_KEY_WHITE].value = EL_EMPTY;
+        game_panel_controls[GAME_PANEL_KEY_WHITE_COUNT].value = 0;
 
-  if (game.centered_player_nr == -1)
-  {
-    for (i = 0; i < MAX_PLAYERS; i++)
-    {
-      // only one player in Supaplex game engine
-      if (level.game_engine_type == GAME_ENGINE_TYPE_SP && i > 0)
-	break;
+        if (game.centered_player_nr == -1) {
+            for (i = 0; i < MAX_PLAYERS; i++) {
+                // only one player in Supaplex game engine
+                if (level.game_engine_type == GAME_ENGINE_TYPE_SP && i > 0)
+                    break;
 
-      for (k = 0; k < MAX_NUM_KEYS; k++)
-      {
-	if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
-	{
-	  if (level.native_em_level->ply[i]->keys & (1 << k))
-	    game_panel_controls[GAME_PANEL_KEY_1 + k].value =
-	      get_key_element_from_nr(k);
-	}
-	else if (stored_player[i].key[k])
-	  game_panel_controls[GAME_PANEL_KEY_1 + k].value =
-	    get_key_element_from_nr(k);
-      }
+                for (k = 0; k < MAX_NUM_KEYS; k++) {
+                    if (level.game_engine_type == GAME_ENGINE_TYPE_EM) {
+                        if (level.native_em_level->ply[i]->keys & (1 << k))
+                            game_panel_controls[GAME_PANEL_KEY_1 + k].value =
+                                    get_key_element_from_nr(k);
+                    } else if (stored_player[i].key[k])
+                        game_panel_controls[GAME_PANEL_KEY_1 + k].value =
+                                get_key_element_from_nr(k);
+                }
 
-      game_panel_controls[GAME_PANEL_INVENTORY_COUNT].value +=
-	getPlayerInventorySize(i);
+                game_panel_controls[GAME_PANEL_INVENTORY_COUNT].value +=
+                        getPlayerInventorySize(i);
 
-      if (stored_player[i].num_white_keys > 0)
-	game_panel_controls[GAME_PANEL_KEY_WHITE].value =
-	  EL_DC_KEY_WHITE;
+                if (stored_player[i].num_white_keys > 0)
+                    game_panel_controls[GAME_PANEL_KEY_WHITE].value =
+                            EL_DC_KEY_WHITE;
 
-      game_panel_controls[GAME_PANEL_KEY_WHITE_COUNT].value +=
-	stored_player[i].num_white_keys;
+                game_panel_controls[GAME_PANEL_KEY_WHITE_COUNT].value +=
+                        stored_player[i].num_white_keys;
+            }
+        } else {
+            int player_nr = game.centered_player_nr;
+
+            for (k = 0; k < MAX_NUM_KEYS; k++) {
+                if (level.game_engine_type == GAME_ENGINE_TYPE_EM) {
+                    if (level.native_em_level->ply[player_nr]->keys & (1 << k))
+                        game_panel_controls[GAME_PANEL_KEY_1 + k].value =
+                                get_key_element_from_nr(k);
+                } else if (stored_player[player_nr].key[k])
+                    game_panel_controls[GAME_PANEL_KEY_1 + k].value =
+                            get_key_element_from_nr(k);
+            }
+
+            game_panel_controls[GAME_PANEL_INVENTORY_COUNT].value +=
+                    getPlayerInventorySize(player_nr);
+
+            if (stored_player[player_nr].num_white_keys > 0)
+                game_panel_controls[GAME_PANEL_KEY_WHITE].value = EL_DC_KEY_WHITE;
+
+            game_panel_controls[GAME_PANEL_KEY_WHITE_COUNT].value +=
+                    stored_player[player_nr].num_white_keys;
+        }
+
+        for (i = 0; i < NUM_PANEL_INVENTORY; i++) {
+            game_panel_controls[GAME_PANEL_INVENTORY_FIRST_1 + i].value =
+                    get_inventory_element_from_pos(local_player, i);
+            game_panel_controls[GAME_PANEL_INVENTORY_LAST_1 + i].value =
+                    get_inventory_element_from_pos(local_player, -i - 1);
+        }
+
+        game_panel_controls[GAME_PANEL_SCORE].value = score;
+        game_panel_controls[GAME_PANEL_HIGHSCORE].value = highscore[0].Score;
+
+        game_panel_controls[GAME_PANEL_TIME].value = time;
+
+        game_panel_controls[GAME_PANEL_TIME_HH].value = time / 3600;
+        game_panel_controls[GAME_PANEL_TIME_MM].value = (time / 60) % 60;
+        game_panel_controls[GAME_PANEL_TIME_SS].value = time % 60;
+
+        if (level.time == 0)
+            game_panel_controls[GAME_PANEL_TIME_ANIM].value = 100;
+        else
+            game_panel_controls[GAME_PANEL_TIME_ANIM].value = time * 100 / level.time;
+
+        game_panel_controls[GAME_PANEL_HEALTH].value = health;
+        game_panel_controls[GAME_PANEL_HEALTH_ANIM].value = health;
+
+        game_panel_controls[GAME_PANEL_FRAME].value = FrameCounter;
+
+        game_panel_controls[GAME_PANEL_SHIELD_NORMAL].value =
+                (local_player->shield_normal_time_left > 0 ? EL_SHIELD_NORMAL_ACTIVE :
+                 EL_EMPTY);
+        game_panel_controls[GAME_PANEL_SHIELD_NORMAL_TIME].value =
+                local_player->shield_normal_time_left;
+        game_panel_controls[GAME_PANEL_SHIELD_DEADLY].value =
+                (local_player->shield_deadly_time_left > 0 ? EL_SHIELD_DEADLY_ACTIVE :
+                 EL_EMPTY);
+        game_panel_controls[GAME_PANEL_SHIELD_DEADLY_TIME].value =
+                local_player->shield_deadly_time_left;
+
+        game_panel_controls[GAME_PANEL_EXIT].value =
+                (exit_closed ? EL_EXIT_CLOSED : EL_EXIT_OPEN);
+
+        game_panel_controls[GAME_PANEL_EMC_MAGIC_BALL].value =
+                (game.ball_state ? EL_EMC_MAGIC_BALL_ACTIVE : EL_EMC_MAGIC_BALL);
+        game_panel_controls[GAME_PANEL_EMC_MAGIC_BALL_SWITCH].value =
+                (game.ball_state ? EL_EMC_MAGIC_BALL_SWITCH_ACTIVE :
+                 EL_EMC_MAGIC_BALL_SWITCH);
+
+        game_panel_controls[GAME_PANEL_LIGHT_SWITCH].value =
+                (game.light_time_left > 0 ? EL_LIGHT_SWITCH_ACTIVE : EL_LIGHT_SWITCH);
+        game_panel_controls[GAME_PANEL_LIGHT_SWITCH_TIME].value =
+                game.light_time_left;
+
+        game_panel_controls[GAME_PANEL_TIMEGATE_SWITCH].value =
+                (game.timegate_time_left > 0 ? EL_TIMEGATE_OPEN : EL_TIMEGATE_CLOSED);
+        game_panel_controls[GAME_PANEL_TIMEGATE_SWITCH_TIME].value =
+                game.timegate_time_left;
+
+        game_panel_controls[GAME_PANEL_SWITCHGATE_SWITCH].value =
+                EL_SWITCHGATE_SWITCH_UP + game.switchgate_pos;
+
+        game_panel_controls[GAME_PANEL_EMC_LENSES].value =
+                (game.lenses_time_left > 0 ? EL_EMC_LENSES : EL_EMPTY);
+        game_panel_controls[GAME_PANEL_EMC_LENSES_TIME].value =
+                game.lenses_time_left;
+
+        game_panel_controls[GAME_PANEL_EMC_MAGNIFIER].value =
+                (game.magnify_time_left > 0 ? EL_EMC_MAGNIFIER : EL_EMPTY);
+        game_panel_controls[GAME_PANEL_EMC_MAGNIFIER_TIME].value =
+                game.magnify_time_left;
+
+        game_panel_controls[GAME_PANEL_BALLOON_SWITCH].value =
+                (game.wind_direction == MV_LEFT ? EL_BALLOON_SWITCH_LEFT :
+                 game.wind_direction == MV_RIGHT ? EL_BALLOON_SWITCH_RIGHT :
+                 game.wind_direction == MV_UP ? EL_BALLOON_SWITCH_UP :
+                 game.wind_direction == MV_DOWN ? EL_BALLOON_SWITCH_DOWN :
+                 EL_BALLOON_SWITCH_NONE);
+
+        game_panel_controls[GAME_PANEL_DYNABOMB_NUMBER].value =
+                local_player->dynabomb_count;
+        game_panel_controls[GAME_PANEL_DYNABOMB_SIZE].value =
+                local_player->dynabomb_size;
+        game_panel_controls[GAME_PANEL_DYNABOMB_POWER].value =
+                (local_player->dynabomb_xl ? EL_DYNABOMB_INCREASE_POWER : EL_EMPTY);
+
+        game_panel_controls[GAME_PANEL_PENGUINS].value =
+                game.friends_still_needed;
+
+        game_panel_controls[GAME_PANEL_SOKOBAN_OBJECTS].value =
+                game.sokoban_objects_still_needed;
+        game_panel_controls[GAME_PANEL_SOKOBAN_FIELDS].value =
+                game.sokoban_fields_still_needed;
+
+        game_panel_controls[GAME_PANEL_ROBOT_WHEEL].value =
+                (game.robot_wheel_active ? EL_ROBOT_WHEEL_ACTIVE : EL_ROBOT_WHEEL);
+
+        for (i = 0; i < NUM_BELTS; i++) {
+            game_panel_controls[GAME_PANEL_CONVEYOR_BELT_1 + i].value =
+                    (game.belt_dir[i] != MV_NONE ? EL_CONVEYOR_BELT_1_MIDDLE_ACTIVE :
+                     EL_CONVEYOR_BELT_1_MIDDLE) + i;
+            game_panel_controls[GAME_PANEL_CONVEYOR_BELT_1_SWITCH + i].value =
+                    getBeltSwitchElementFromBeltNrAndBeltDir(i, game.belt_dir[i]);
+        }
+
+        game_panel_controls[GAME_PANEL_MAGIC_WALL].value =
+                (game.magic_wall_active ? EL_MAGIC_WALL_ACTIVE : EL_MAGIC_WALL);
+        game_panel_controls[GAME_PANEL_MAGIC_WALL_TIME].value =
+                game.magic_wall_time_left;
+
+        game_panel_controls[GAME_PANEL_GRAVITY_STATE].value =
+                local_player->gravity;
+
+        for (i = 0; i < NUM_PANEL_GRAPHICS; i++)
+            game_panel_controls[GAME_PANEL_GRAPHIC_1 + i].value = EL_GRAPHIC_1 + i;
+
+        for (i = 0; i < NUM_PANEL_ELEMENTS; i++)
+            game_panel_controls[GAME_PANEL_ELEMENT_1 + i].value =
+                    (IS_DRAWABLE_ELEMENT(game.panel.element[i].id) ?
+                     game.panel.element[i].id : EL_UNDEFINED);
+
+        for (i = 0; i < NUM_PANEL_ELEMENTS; i++)
+            game_panel_controls[GAME_PANEL_ELEMENT_COUNT_1 + i].value =
+                    (IS_VALID_ELEMENT(game.panel.element_count[i].id) ?
+                     element_info[game.panel.element_count[i].id].element_count : 0);
+
+        for (i = 0; i < NUM_PANEL_CE_SCORE; i++)
+            game_panel_controls[GAME_PANEL_CE_SCORE_1 + i].value =
+                    (IS_CUSTOM_ELEMENT(game.panel.ce_score[i].id) ?
+                     element_info[game.panel.ce_score[i].id].collect_score : 0);
+
+        for (i = 0; i < NUM_PANEL_CE_SCORE; i++)
+            game_panel_controls[GAME_PANEL_CE_SCORE_1_ELEMENT + i].value =
+                    (IS_CUSTOM_ELEMENT(game.panel.ce_score_element[i].id) ?
+                     element_info[game.panel.ce_score_element[i].id].collect_score :
+                     EL_UNDEFINED);
+
+        game_panel_controls[GAME_PANEL_PLAYER_NAME].value = 0;
+        game_panel_controls[GAME_PANEL_LEVEL_NAME].value = 0;
+        game_panel_controls[GAME_PANEL_LEVEL_AUTHOR].value = 0;
+
+        // update game panel control frames
+
+        for (i = 0; game_panel_controls[i].nr != -1; i++) {
+            struct GamePanelControlInfo *gpc = &game_panel_controls[i];
+
+            if (gpc->type == TYPE_ELEMENT) {
+                if (gpc->value != EL_UNDEFINED && gpc->value != EL_EMPTY) {
+                    int last_anim_random_frame = gfx.anim_random_frame;
+                    int element = gpc->value;
+                    int graphic = el2panelimg(element);
+
+                    if (gpc->value != gpc->last_value) {
+                        gpc->gfx_frame = 0;
+                        gpc->gfx_random = INIT_GFX_RANDOM();
+                    } else {
+                        gpc->gfx_frame++;
+
+                        if (ANIM_MODE(graphic) == ANIM_RANDOM &&
+                            IS_NEXT_FRAME(gpc->gfx_frame, graphic))
+                            gpc->gfx_random = INIT_GFX_RANDOM();
+                    }
+
+                    if (ANIM_MODE(graphic) == ANIM_RANDOM)
+                        gfx.anim_random_frame = gpc->gfx_random;
+
+                    if (ANIM_MODE(graphic) == ANIM_CE_SCORE)
+                        gpc->gfx_frame = element_info[element].collect_score;
+
+                    gpc->frame = getGraphicAnimationFrame(el2panelimg(gpc->value),
+                                                          gpc->gfx_frame);
+
+                    if (ANIM_MODE(graphic) == ANIM_RANDOM)
+                        gfx.anim_random_frame = last_anim_random_frame;
+                }
+            } else if (gpc->type == TYPE_GRAPHIC) {
+                if (gpc->graphic != IMG_UNDEFINED) {
+                    int last_anim_random_frame = gfx.anim_random_frame;
+                    int graphic = gpc->graphic;
+
+                    if (gpc->value != gpc->last_value) {
+                        gpc->gfx_frame = 0;
+                        gpc->gfx_random = INIT_GFX_RANDOM();
+                    } else {
+                        gpc->gfx_frame++;
+
+                        if (ANIM_MODE(graphic) == ANIM_RANDOM &&
+                            IS_NEXT_FRAME(gpc->gfx_frame, graphic))
+                            gpc->gfx_random = INIT_GFX_RANDOM();
+                    }
+
+                    if (ANIM_MODE(graphic) == ANIM_RANDOM)
+                        gfx.anim_random_frame = gpc->gfx_random;
+
+                    gpc->frame = getGraphicAnimationFrame(graphic, gpc->gfx_frame);
+
+                    if (ANIM_MODE(graphic) == ANIM_RANDOM)
+                        gfx.anim_random_frame = last_anim_random_frame;
+                }
+            }
+        }
     }
-  }
-  else
-  {
-    int player_nr = game.centered_player_nr;
-
-    for (k = 0; k < MAX_NUM_KEYS; k++)
-    {
-      if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
-      {
-	if (level.native_em_level->ply[player_nr]->keys & (1 << k))
-	  game_panel_controls[GAME_PANEL_KEY_1 + k].value =
-	    get_key_element_from_nr(k);
-      }
-      else if (stored_player[player_nr].key[k])
-	game_panel_controls[GAME_PANEL_KEY_1 + k].value =
-	  get_key_element_from_nr(k);
-    }
-
-    game_panel_controls[GAME_PANEL_INVENTORY_COUNT].value +=
-      getPlayerInventorySize(player_nr);
-
-    if (stored_player[player_nr].num_white_keys > 0)
-      game_panel_controls[GAME_PANEL_KEY_WHITE].value = EL_DC_KEY_WHITE;
-
-    game_panel_controls[GAME_PANEL_KEY_WHITE_COUNT].value +=
-      stored_player[player_nr].num_white_keys;
-  }
-
-  for (i = 0; i < NUM_PANEL_INVENTORY; i++)
-  {
-    game_panel_controls[GAME_PANEL_INVENTORY_FIRST_1 + i].value =
-      get_inventory_element_from_pos(local_player, i);
-    game_panel_controls[GAME_PANEL_INVENTORY_LAST_1 + i].value =
-      get_inventory_element_from_pos(local_player, -i - 1);
-  }
-
-  game_panel_controls[GAME_PANEL_SCORE].value = score;
-  game_panel_controls[GAME_PANEL_HIGHSCORE].value = highscore[0].Score;
-
-  game_panel_controls[GAME_PANEL_TIME].value = time;
-
-  game_panel_controls[GAME_PANEL_TIME_HH].value = time / 3600;
-  game_panel_controls[GAME_PANEL_TIME_MM].value = (time / 60) % 60;
-  game_panel_controls[GAME_PANEL_TIME_SS].value = time % 60;
-
-  if (level.time == 0)
-    game_panel_controls[GAME_PANEL_TIME_ANIM].value = 100;
-  else
-    game_panel_controls[GAME_PANEL_TIME_ANIM].value = time * 100 / level.time;
-
-  game_panel_controls[GAME_PANEL_HEALTH].value = health;
-  game_panel_controls[GAME_PANEL_HEALTH_ANIM].value = health;
-
-  game_panel_controls[GAME_PANEL_FRAME].value = FrameCounter;
-
-  game_panel_controls[GAME_PANEL_SHIELD_NORMAL].value =
-    (local_player->shield_normal_time_left > 0 ? EL_SHIELD_NORMAL_ACTIVE :
-     EL_EMPTY);
-  game_panel_controls[GAME_PANEL_SHIELD_NORMAL_TIME].value =
-    local_player->shield_normal_time_left;
-  game_panel_controls[GAME_PANEL_SHIELD_DEADLY].value =
-    (local_player->shield_deadly_time_left > 0 ? EL_SHIELD_DEADLY_ACTIVE :
-     EL_EMPTY);
-  game_panel_controls[GAME_PANEL_SHIELD_DEADLY_TIME].value =
-    local_player->shield_deadly_time_left;
-
-  game_panel_controls[GAME_PANEL_EXIT].value =
-    (exit_closed ? EL_EXIT_CLOSED : EL_EXIT_OPEN);
-
-  game_panel_controls[GAME_PANEL_EMC_MAGIC_BALL].value =
-    (game.ball_state ? EL_EMC_MAGIC_BALL_ACTIVE : EL_EMC_MAGIC_BALL);
-  game_panel_controls[GAME_PANEL_EMC_MAGIC_BALL_SWITCH].value =
-    (game.ball_state ? EL_EMC_MAGIC_BALL_SWITCH_ACTIVE :
-     EL_EMC_MAGIC_BALL_SWITCH);
-
-  game_panel_controls[GAME_PANEL_LIGHT_SWITCH].value =
-    (game.light_time_left > 0 ? EL_LIGHT_SWITCH_ACTIVE : EL_LIGHT_SWITCH);
-  game_panel_controls[GAME_PANEL_LIGHT_SWITCH_TIME].value =
-    game.light_time_left;
-
-  game_panel_controls[GAME_PANEL_TIMEGATE_SWITCH].value =
-    (game.timegate_time_left > 0 ? EL_TIMEGATE_OPEN : EL_TIMEGATE_CLOSED);
-  game_panel_controls[GAME_PANEL_TIMEGATE_SWITCH_TIME].value =
-    game.timegate_time_left;
-
-  game_panel_controls[GAME_PANEL_SWITCHGATE_SWITCH].value =
-    EL_SWITCHGATE_SWITCH_UP + game.switchgate_pos;
-
-  game_panel_controls[GAME_PANEL_EMC_LENSES].value =
-    (game.lenses_time_left > 0 ? EL_EMC_LENSES : EL_EMPTY);
-  game_panel_controls[GAME_PANEL_EMC_LENSES_TIME].value =
-    game.lenses_time_left;
-
-  game_panel_controls[GAME_PANEL_EMC_MAGNIFIER].value =
-    (game.magnify_time_left > 0 ? EL_EMC_MAGNIFIER : EL_EMPTY);
-  game_panel_controls[GAME_PANEL_EMC_MAGNIFIER_TIME].value =
-    game.magnify_time_left;
-
-  game_panel_controls[GAME_PANEL_BALLOON_SWITCH].value =
-    (game.wind_direction == MV_LEFT  ? EL_BALLOON_SWITCH_LEFT  :
-     game.wind_direction == MV_RIGHT ? EL_BALLOON_SWITCH_RIGHT :
-     game.wind_direction == MV_UP    ? EL_BALLOON_SWITCH_UP    :
-     game.wind_direction == MV_DOWN  ? EL_BALLOON_SWITCH_DOWN  :
-     EL_BALLOON_SWITCH_NONE);
-
-  game_panel_controls[GAME_PANEL_DYNABOMB_NUMBER].value =
-    local_player->dynabomb_count;
-  game_panel_controls[GAME_PANEL_DYNABOMB_SIZE].value =
-    local_player->dynabomb_size;
-  game_panel_controls[GAME_PANEL_DYNABOMB_POWER].value =
-    (local_player->dynabomb_xl ? EL_DYNABOMB_INCREASE_POWER : EL_EMPTY);
-
-  game_panel_controls[GAME_PANEL_PENGUINS].value =
-    game.friends_still_needed;
-
-  game_panel_controls[GAME_PANEL_SOKOBAN_OBJECTS].value =
-    game.sokoban_objects_still_needed;
-  game_panel_controls[GAME_PANEL_SOKOBAN_FIELDS].value =
-    game.sokoban_fields_still_needed;
-
-  game_panel_controls[GAME_PANEL_ROBOT_WHEEL].value =
-    (game.robot_wheel_active ? EL_ROBOT_WHEEL_ACTIVE : EL_ROBOT_WHEEL);
-
-  for (i = 0; i < NUM_BELTS; i++)
-  {
-    game_panel_controls[GAME_PANEL_CONVEYOR_BELT_1 + i].value =
-      (game.belt_dir[i] != MV_NONE ? EL_CONVEYOR_BELT_1_MIDDLE_ACTIVE :
-       EL_CONVEYOR_BELT_1_MIDDLE) + i;
-    game_panel_controls[GAME_PANEL_CONVEYOR_BELT_1_SWITCH + i].value =
-      getBeltSwitchElementFromBeltNrAndBeltDir(i, game.belt_dir[i]);
-  }
-
-  game_panel_controls[GAME_PANEL_MAGIC_WALL].value =
-    (game.magic_wall_active ? EL_MAGIC_WALL_ACTIVE : EL_MAGIC_WALL);
-  game_panel_controls[GAME_PANEL_MAGIC_WALL_TIME].value =
-    game.magic_wall_time_left;
-
-  game_panel_controls[GAME_PANEL_GRAVITY_STATE].value =
-    local_player->gravity;
-
-  for (i = 0; i < NUM_PANEL_GRAPHICS; i++)
-    game_panel_controls[GAME_PANEL_GRAPHIC_1 + i].value = EL_GRAPHIC_1 + i;
-
-  for (i = 0; i < NUM_PANEL_ELEMENTS; i++)
-    game_panel_controls[GAME_PANEL_ELEMENT_1 + i].value =
-      (IS_DRAWABLE_ELEMENT(game.panel.element[i].id) ?
-       game.panel.element[i].id : EL_UNDEFINED);
-
-  for (i = 0; i < NUM_PANEL_ELEMENTS; i++)
-    game_panel_controls[GAME_PANEL_ELEMENT_COUNT_1 + i].value =
-      (IS_VALID_ELEMENT(game.panel.element_count[i].id) ?
-       element_info[game.panel.element_count[i].id].element_count : 0);
-
-  for (i = 0; i < NUM_PANEL_CE_SCORE; i++)
-    game_panel_controls[GAME_PANEL_CE_SCORE_1 + i].value =
-      (IS_CUSTOM_ELEMENT(game.panel.ce_score[i].id) ?
-       element_info[game.panel.ce_score[i].id].collect_score : 0);
-
-  for (i = 0; i < NUM_PANEL_CE_SCORE; i++)
-    game_panel_controls[GAME_PANEL_CE_SCORE_1_ELEMENT + i].value =
-      (IS_CUSTOM_ELEMENT(game.panel.ce_score_element[i].id) ?
-       element_info[game.panel.ce_score_element[i].id].collect_score :
-       EL_UNDEFINED);
-
-  game_panel_controls[GAME_PANEL_PLAYER_NAME].value = 0;
-  game_panel_controls[GAME_PANEL_LEVEL_NAME].value = 0;
-  game_panel_controls[GAME_PANEL_LEVEL_AUTHOR].value = 0;
-
-  // update game panel control frames
-
-  for (i = 0; game_panel_controls[i].nr != -1; i++)
-  {
-    struct GamePanelControlInfo *gpc = &game_panel_controls[i];
-
-    if (gpc->type == TYPE_ELEMENT)
-    {
-      if (gpc->value != EL_UNDEFINED && gpc->value != EL_EMPTY)
-      {
-	int last_anim_random_frame = gfx.anim_random_frame;
-	int element = gpc->value;
-	int graphic = el2panelimg(element);
-
-	if (gpc->value != gpc->last_value)
-	{
-	  gpc->gfx_frame = 0;
-	  gpc->gfx_random = INIT_GFX_RANDOM();
-	}
-	else
-	{
-	  gpc->gfx_frame++;
-
-	  if (ANIM_MODE(graphic) == ANIM_RANDOM &&
-	      IS_NEXT_FRAME(gpc->gfx_frame, graphic))
-	    gpc->gfx_random = INIT_GFX_RANDOM();
-	}
-
-	if (ANIM_MODE(graphic) == ANIM_RANDOM)
-	  gfx.anim_random_frame = gpc->gfx_random;
-
-	if (ANIM_MODE(graphic) == ANIM_CE_SCORE)
-	  gpc->gfx_frame = element_info[element].collect_score;
-
-	gpc->frame = getGraphicAnimationFrame(el2panelimg(gpc->value),
-					      gpc->gfx_frame);
-
-	if (ANIM_MODE(graphic) == ANIM_RANDOM)
-	  gfx.anim_random_frame = last_anim_random_frame;
-      }
-    }
-    else if (gpc->type == TYPE_GRAPHIC)
-    {
-      if (gpc->graphic != IMG_UNDEFINED)
-      {
-	int last_anim_random_frame = gfx.anim_random_frame;
-	int graphic = gpc->graphic;
-
-	if (gpc->value != gpc->last_value)
-	{
-	  gpc->gfx_frame = 0;
-	  gpc->gfx_random = INIT_GFX_RANDOM();
-	}
-	else
-	{
-	  gpc->gfx_frame++;
-
-	  if (ANIM_MODE(graphic) == ANIM_RANDOM &&
-	      IS_NEXT_FRAME(gpc->gfx_frame, graphic))
-	    gpc->gfx_random = INIT_GFX_RANDOM();
-	}
-
-	if (ANIM_MODE(graphic) == ANIM_RANDOM)
-	  gfx.anim_random_frame = gpc->gfx_random;
-
-	gpc->frame = getGraphicAnimationFrame(graphic, gpc->gfx_frame);
-
-	if (ANIM_MODE(graphic) == ANIM_RANDOM)
-	  gfx.anim_random_frame = last_anim_random_frame;
-      }
-    }
-  }
 }
 
 static void DisplayGameControlValues(void)
 {
-  boolean redraw_panel = FALSE;
-  int i;
+    if (is_simulating == FALSE) {
+        boolean redraw_panel = FALSE;
+        int i;
 
-  for (i = 0; game_panel_controls[i].nr != -1; i++)
-  {
-    struct GamePanelControlInfo *gpc = &game_panel_controls[i];
+        for (i = 0; game_panel_controls[i].nr != -1; i++) {
+            struct GamePanelControlInfo *gpc = &game_panel_controls[i];
 
-    if (PANEL_DEACTIVATED(gpc->pos))
-      continue;
+            if (PANEL_DEACTIVATED(gpc->pos))
+                continue;
 
-    if (gpc->value == gpc->last_value &&
-	gpc->frame == gpc->last_frame)
-      continue;
+            if (gpc->value == gpc->last_value &&
+                gpc->frame == gpc->last_frame)
+                continue;
 
-    redraw_panel = TRUE;
-  }
+            redraw_panel = TRUE;
+        }
 
-  if (!redraw_panel)
-    return;
+        if (!redraw_panel)
+            return;
 
-  // copy default game door content to main double buffer
+        // copy default game door content to main double buffer
 
-  // !!! CHECK AGAIN !!!
-  SetPanelBackground();
-  // SetDoorBackgroundImage(IMG_BACKGROUND_PANEL);
-  DrawBackground(DX, DY, DXSIZE, DYSIZE);
+        // !!! CHECK AGAIN !!!
+        SetPanelBackground();
+        // SetDoorBackgroundImage(IMG_BACKGROUND_PANEL);
+        DrawBackground(DX, DY, DXSIZE, DYSIZE);
 
-  // redraw game control buttons
-  RedrawGameButtons();
+        // redraw game control buttons
+        RedrawGameButtons();
 
-  SetGameStatus(GAME_MODE_PSEUDO_PANEL);
+        SetGameStatus(GAME_MODE_PSEUDO_PANEL);
 
-  for (i = 0; i < NUM_GAME_PANEL_CONTROLS; i++)
-  {
-    int nr = game_panel_order[i].nr;
-    struct GamePanelControlInfo *gpc = &game_panel_controls[nr];
-    struct TextPosInfo *pos = gpc->pos;
-    int type = gpc->type;
-    int value = gpc->value;
-    int frame = gpc->frame;
-    int size = pos->size;
-    int font = pos->font;
-    boolean draw_masked = pos->draw_masked;
-    int mask_mode = (draw_masked ? BLIT_MASKED : BLIT_OPAQUE);
+        for (i = 0; i < NUM_GAME_PANEL_CONTROLS; i++) {
+            int nr = game_panel_order[i].nr;
+            struct GamePanelControlInfo *gpc = &game_panel_controls[nr];
+            struct TextPosInfo *pos = gpc->pos;
+            int type = gpc->type;
+            int value = gpc->value;
+            int frame = gpc->frame;
+            int size = pos->size;
+            int font = pos->font;
+            boolean draw_masked = pos->draw_masked;
+            int mask_mode = (draw_masked ? BLIT_MASKED : BLIT_OPAQUE);
 
-    if (PANEL_DEACTIVATED(pos))
-      continue;
+            if (PANEL_DEACTIVATED(pos))
+                continue;
 
-    gpc->last_value = value;
-    gpc->last_frame = frame;
+            gpc->last_value = value;
+            gpc->last_frame = frame;
 
-    if (type == TYPE_INTEGER)
-    {
-      if (nr == GAME_PANEL_LEVEL_NUMBER ||
-	  nr == GAME_PANEL_TIME)
-      {
-	boolean use_dynamic_size = (size == -1 ? TRUE : FALSE);
+            if (type == TYPE_INTEGER) {
+                if (nr == GAME_PANEL_LEVEL_NUMBER ||
+                    nr == GAME_PANEL_TIME) {
+                    boolean use_dynamic_size = (size == -1 ? TRUE : FALSE);
 
-	if (use_dynamic_size)		// use dynamic number of digits
-	{
-	  int value_change = (nr == GAME_PANEL_LEVEL_NUMBER ? 100 : 1000);
-	  int size1 = (nr == GAME_PANEL_LEVEL_NUMBER ? 2 : 3);
-	  int size2 = size1 + 1;
-	  int font1 = pos->font;
-	  int font2 = pos->font_alt;
+                    if (use_dynamic_size)        // use dynamic number of digits
+                    {
+                        int value_change = (nr == GAME_PANEL_LEVEL_NUMBER ? 100 : 1000);
+                        int size1 = (nr == GAME_PANEL_LEVEL_NUMBER ? 2 : 3);
+                        int size2 = size1 + 1;
+                        int font1 = pos->font;
+                        int font2 = pos->font_alt;
 
-	  size = (value < value_change ? size1 : size2);
-	  font = (value < value_change ? font1 : font2);
-	}
-      }
+                        size = (value < value_change ? size1 : size2);
+                        font = (value < value_change ? font1 : font2);
+                    }
+                }
 
-      // correct text size if "digits" is zero or less
-      if (size <= 0)
-	size = strlen(int2str(value, size));
+                // correct text size if "digits" is zero or less
+                if (size <= 0)
+                    size = strlen(int2str(value, size));
 
-      // dynamically correct text alignment
-      pos->width = size * getFontWidth(font);
+                // dynamically correct text alignment
+                pos->width = size * getFontWidth(font);
 
-      DrawTextExt(drawto, PANEL_XPOS(pos), PANEL_YPOS(pos),
-		  int2str(value, size), font, mask_mode);
+                DrawTextExt(drawto, PANEL_XPOS(pos), PANEL_YPOS(pos),
+                            int2str(value, size), font, mask_mode);
+            } else if (type == TYPE_ELEMENT) {
+                int element, graphic;
+                Bitmap *src_bitmap;
+                int src_x, src_y;
+                int width, height;
+                int dst_x = PANEL_XPOS(pos);
+                int dst_y = PANEL_YPOS(pos);
+
+                if (value != EL_UNDEFINED && value != EL_EMPTY) {
+                    element = value;
+                    graphic = el2panelimg(value);
+
+                    // printf("::: %d, '%s' [%d]\n", element, EL_NAME(element), size);
+
+                    if (element >= EL_GRAPHIC_1 && element <= EL_GRAPHIC_8 && size == 0)
+                        size = TILESIZE;
+
+                    getSizedGraphicSource(graphic, frame, size, &src_bitmap,
+                                          &src_x, &src_y);
+
+                    width = graphic_info[graphic].width * size / TILESIZE;
+                    height = graphic_info[graphic].height * size / TILESIZE;
+
+                    if (draw_masked)
+                        BlitBitmapMasked(src_bitmap, drawto, src_x, src_y, width, height,
+                                         dst_x, dst_y);
+                    else
+                        BlitBitmap(src_bitmap, drawto, src_x, src_y, width, height,
+                                   dst_x, dst_y);
+                }
+            } else if (type == TYPE_GRAPHIC) {
+                int graphic = gpc->graphic;
+                int graphic_active = gpc->graphic_active;
+                Bitmap *src_bitmap;
+                int src_x, src_y;
+                int width, height;
+                int dst_x = PANEL_XPOS(pos);
+                int dst_y = PANEL_YPOS(pos);
+                boolean skip = (pos->class_ == get_hash_from_key("mm_engine_only") &&
+                                level.game_engine_type != GAME_ENGINE_TYPE_MM);
+
+                if (graphic != IMG_UNDEFINED && !skip) {
+                    if (pos->style == STYLE_REVERSE)
+                        value = 100 - value;
+
+                    getGraphicSource(graphic_active, frame, &src_bitmap, &src_x, &src_y);
+
+                    if (pos->direction & MV_HORIZONTAL) {
+                        width = graphic_info[graphic_active].width * value / 100;
+                        height = graphic_info[graphic_active].height;
+
+                        if (pos->direction == MV_LEFT) {
+                            src_x += graphic_info[graphic_active].width - width;
+                            dst_x += graphic_info[graphic_active].width - width;
+                        }
+                    } else {
+                        width = graphic_info[graphic_active].width;
+                        height = graphic_info[graphic_active].height * value / 100;
+
+                        if (pos->direction == MV_UP) {
+                            src_y += graphic_info[graphic_active].height - height;
+                            dst_y += graphic_info[graphic_active].height - height;
+                        }
+                    }
+
+                    if (draw_masked)
+                        BlitBitmapMasked(src_bitmap, drawto, src_x, src_y, width, height,
+                                         dst_x, dst_y);
+                    else
+                        BlitBitmap(src_bitmap, drawto, src_x, src_y, width, height,
+                                   dst_x, dst_y);
+
+                    getGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
+
+                    if (pos->direction & MV_HORIZONTAL) {
+                        if (pos->direction == MV_RIGHT) {
+                            src_x += width;
+                            dst_x += width;
+                        } else {
+                            dst_x = PANEL_XPOS(pos);
+                        }
+
+                        width = graphic_info[graphic].width - width;
+                    } else {
+                        if (pos->direction == MV_DOWN) {
+                            src_y += height;
+                            dst_y += height;
+                        } else {
+                            dst_y = PANEL_YPOS(pos);
+                        }
+
+                        height = graphic_info[graphic].height - height;
+                    }
+
+                    if (draw_masked)
+                        BlitBitmapMasked(src_bitmap, drawto, src_x, src_y, width, height,
+                                         dst_x, dst_y);
+                    else
+                        BlitBitmap(src_bitmap, drawto, src_x, src_y, width, height,
+                                   dst_x, dst_y);
+                }
+            } else if (type == TYPE_STRING) {
+                boolean active = (value != 0);
+                char *state_normal = "off";
+                char *state_active = "on";
+                char *state = (active ? state_active : state_normal);
+                char *s = (nr == GAME_PANEL_GRAVITY_STATE ? state :
+                           nr == GAME_PANEL_PLAYER_NAME ? setup.player_name :
+                           nr == GAME_PANEL_LEVEL_NAME ? level.name :
+                           nr == GAME_PANEL_LEVEL_AUTHOR ? level.author : NULL);
+
+                if (nr == GAME_PANEL_GRAVITY_STATE) {
+                    int font1 = pos->font;        // (used for normal state)
+                    int font2 = pos->font_alt;    // (used for active state)
+
+                    font = (active ? font2 : font1);
+                }
+
+                if (s != NULL) {
+                    char *s_cut;
+
+                    if (size <= 0) {
+                        // don't truncate output if "chars" is zero or less
+                        size = strlen(s);
+
+                        // dynamically correct text alignment
+                        pos->width = size * getFontWidth(font);
+                    }
+
+                    s_cut = getStringCopyN(s, size);
+
+                    DrawTextExt(drawto, PANEL_XPOS(pos), PANEL_YPOS(pos),
+                                s_cut, font, mask_mode);
+
+                    free(s_cut);
+                }
+            }
+
+            redraw_mask |= REDRAW_DOOR_1;
+        }
     }
-    else if (type == TYPE_ELEMENT)
-    {
-      int element, graphic;
-      Bitmap *src_bitmap;
-      int src_x, src_y;
-      int width, height;
-      int dst_x = PANEL_XPOS(pos);
-      int dst_y = PANEL_YPOS(pos);
-
-      if (value != EL_UNDEFINED && value != EL_EMPTY)
-      {
-	element = value;
-	graphic = el2panelimg(value);
-
-	// printf("::: %d, '%s' [%d]\n", element, EL_NAME(element), size);
-
-	if (element >= EL_GRAPHIC_1 && element <= EL_GRAPHIC_8 && size == 0)
-	  size = TILESIZE;
-
-	getSizedGraphicSource(graphic, frame, size, &src_bitmap,
-			      &src_x, &src_y);
-
-	width  = graphic_info[graphic].width  * size / TILESIZE;
-	height = graphic_info[graphic].height * size / TILESIZE;
-
-	if (draw_masked)
-	  BlitBitmapMasked(src_bitmap, drawto, src_x, src_y, width, height,
-			   dst_x, dst_y);
-	else
-	  BlitBitmap(src_bitmap, drawto, src_x, src_y, width, height,
-		     dst_x, dst_y);
-      }
-    }
-    else if (type == TYPE_GRAPHIC)
-    {
-      int graphic        = gpc->graphic;
-      int graphic_active = gpc->graphic_active;
-      Bitmap *src_bitmap;
-      int src_x, src_y;
-      int width, height;
-      int dst_x = PANEL_XPOS(pos);
-      int dst_y = PANEL_YPOS(pos);
-      boolean skip = (pos->class == get_hash_from_key("mm_engine_only") &&
-		      level.game_engine_type != GAME_ENGINE_TYPE_MM);
-
-      if (graphic != IMG_UNDEFINED && !skip)
-      {
-	if (pos->style == STYLE_REVERSE)
-	  value = 100 - value;
-
-	getGraphicSource(graphic_active, frame, &src_bitmap, &src_x, &src_y);
-
-	if (pos->direction & MV_HORIZONTAL)
-	{
-	  width  = graphic_info[graphic_active].width * value / 100;
-	  height = graphic_info[graphic_active].height;
-
-	  if (pos->direction == MV_LEFT)
-	  {
-	    src_x += graphic_info[graphic_active].width - width;
-	    dst_x += graphic_info[graphic_active].width - width;
-	  }
-	}
-	else
-	{
-	  width  = graphic_info[graphic_active].width;
-	  height = graphic_info[graphic_active].height * value / 100;
-
-	  if (pos->direction == MV_UP)
-	  {
-	    src_y += graphic_info[graphic_active].height - height;
-	    dst_y += graphic_info[graphic_active].height - height;
-	  }
-	}
-
-	if (draw_masked)
-	  BlitBitmapMasked(src_bitmap, drawto, src_x, src_y, width, height,
-			   dst_x, dst_y);
-	else
-	  BlitBitmap(src_bitmap, drawto, src_x, src_y, width, height,
-		     dst_x, dst_y);
-
-	getGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
-
-	if (pos->direction & MV_HORIZONTAL)
-	{
-	  if (pos->direction == MV_RIGHT)
-	  {
-	    src_x += width;
-	    dst_x += width;
-	  }
-	  else
-	  {
-	    dst_x = PANEL_XPOS(pos);
-	  }
-
-	  width = graphic_info[graphic].width - width;
-	}
-	else
-	{
-	  if (pos->direction == MV_DOWN)
-	  {
-	    src_y += height;
-	    dst_y += height;
-	  }
-	  else
-	  {
-	    dst_y = PANEL_YPOS(pos);
-	  }
-
-	  height = graphic_info[graphic].height - height;
-	}
-
-	if (draw_masked)
-	  BlitBitmapMasked(src_bitmap, drawto, src_x, src_y, width, height,
-			   dst_x, dst_y);
-	else
-	  BlitBitmap(src_bitmap, drawto, src_x, src_y, width, height,
-		     dst_x, dst_y);
-      }
-    }
-    else if (type == TYPE_STRING)
-    {
-      boolean active = (value != 0);
-      char *state_normal = "off";
-      char *state_active = "on";
-      char *state = (active ? state_active : state_normal);
-      char *s = (nr == GAME_PANEL_GRAVITY_STATE ? state :
-		 nr == GAME_PANEL_PLAYER_NAME   ? setup.player_name :
-		 nr == GAME_PANEL_LEVEL_NAME    ? level.name :
-		 nr == GAME_PANEL_LEVEL_AUTHOR  ? level.author : NULL);
-
-      if (nr == GAME_PANEL_GRAVITY_STATE)
-      {
-	int font1 = pos->font;		// (used for normal state)
-	int font2 = pos->font_alt;	// (used for active state)
-
-	font = (active ? font2 : font1);
-      }
-
-      if (s != NULL)
-      {
-	char *s_cut;
-
-	if (size <= 0)
-	{
-	  // don't truncate output if "chars" is zero or less
-	  size = strlen(s);
-
-	  // dynamically correct text alignment
-	  pos->width = size * getFontWidth(font);
-	}
-
-	s_cut = getStringCopyN(s, size);
-
-	DrawTextExt(drawto, PANEL_XPOS(pos), PANEL_YPOS(pos),
-		    s_cut, font, mask_mode);
-
-	free(s_cut);
-      }
-    }
-
-    redraw_mask |= REDRAW_DOOR_1;
-  }
 
   SetGameStatus(GAME_MODE_PLAYING);
 }
@@ -3630,6 +3581,7 @@ void InitGame(void)
   DebugPrintPlayerStatus("Player status at level initialization");
 #endif
 
+  // Iterates over level y and x ?
   SCAN_PLAYFIELD(x, y)
   {
     Feld[x][y] = Last[x][y] = level.field[x][y];
@@ -4903,7 +4855,7 @@ void InitPlayerGfxAnimation(struct PlayerInfo *player, int action, int dir)
 static void ResetGfxFrame(int x, int y)
 {
   // profiling showed that "autotest" spends 10~20% of its time in this function
-  if (DrawingDeactivatedField())
+  if (DrawingDeactivatedField() || is_simulating==TRUE)
     return;
 
   int element = Feld[x][y];
@@ -5271,7 +5223,7 @@ static void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
 
   ScrollScreen(NULL, SCROLL_GO_ON);	// scroll last frame to full tile
 
-  SetVideoFrameDelay(wait_delay_value);
+  SetVideoFrameDelay(is_simulating ? 0 : wait_delay_value);
 
   while (scroll_x != new_scroll_x || scroll_y != new_scroll_y)
   {
@@ -5305,7 +5257,7 @@ static void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
   DrawAllPlayers();
   BackToFront();
 
-  SetVideoFrameDelay(frame_delay_value_old);
+  SetVideoFrameDelay(is_simulating ? 0 : frame_delay_value_old);
 }
 
 static void RelocatePlayer(int jx, int jy, int el_player_raw)
@@ -5338,7 +5290,7 @@ static void RelocatePlayer(int jx, int jy, int el_player_raw)
   if (!player_relocated)	// no need to relocate the player
     return;
 
-  if (IS_PLAYER(jx, jy))	// player already placed at new position
+  if (IS_PLAYER(jx, jy) && is_simulating == FALSE)	// player already placed at new position
   {
     RemoveField(jx, jy);	// temporarily remove newly placed player
     DrawLevelField(jx, jy);
@@ -5346,7 +5298,7 @@ static void RelocatePlayer(int jx, int jy, int el_player_raw)
 
   if (player->present)
   {
-    while (player->MovPos)
+    while (player->MovPos && is_simulating == FALSE)
     {
       ScrollPlayer(player, SCROLL_GO_ON);
       ScrollScreen(NULL, SCROLL_GO_ON);
@@ -5357,9 +5309,10 @@ static void RelocatePlayer(int jx, int jy, int el_player_raw)
 
       BackToFront_WithFrameDelay(wait_delay_value);
     }
-
-    DrawPlayer(player);		// needed here only to cleanup last field
-    DrawLevelField(player->jx, player->jy);	// remove player graphic
+    if (is_simulating == FALSE) {
+        DrawPlayer(player);        // needed here only to cleanup last field
+        DrawLevelField(player->jx, player->jy);    // remove player graphic
+    }
 
     player->is_moving = FALSE;
   }
@@ -5386,8 +5339,8 @@ static void RelocatePlayer(int jx, int jy, int el_player_raw)
   }
 
   // only visually relocate centered player
-  DrawRelocateScreen(old_jx, old_jy, player->jx, player->jy, player->MovDir,
-		     FALSE, level.instant_relocation);
+  if (is_simulating == FALSE){DrawRelocateScreen(old_jx, old_jy, player->jx, player->jy, player->MovDir,
+		     FALSE, level.instant_relocation);}
 
   TestIfPlayerTouchesBadThing(jx, jy);
   TestIfPlayerTouchesCustomElement(jx, jy);
@@ -11380,7 +11333,7 @@ static void GameActionsExt(void)
   if (tape.playing && tape.warp_forward && !tape.pausing)
     game_frame_delay_value = 0;
 
-  SetVideoFrameDelay(game_frame_delay_value);
+  SetVideoFrameDelay((game_frame_delay_value == 0 || is_simulating) ? 0 : options.delay);
 
   // (de)activate virtual buttons depending on current game status
   if (strEqual(setup.touch.control_type, TOUCH_CONTROL_VIRTUAL_BUTTONS))
@@ -11405,7 +11358,7 @@ static void GameActionsExt(void)
   WaitUntilDelayReached(&game_frame_delay, game_frame_delay_value);
 #endif
 #endif
-
+    // --skip this
   if (network_playing && !network_player_action_received)
   {
     // try to get network player actions in time
@@ -11450,6 +11403,7 @@ static void GameActionsExt(void)
     game.set_centered_player = TRUE;
   }
 
+  // -- get player actions ?
   for (i = 0; i < MAX_PLAYERS; i++)
   {
     summarized_player_action |= stored_player[i].action;
@@ -11575,7 +11529,7 @@ static void GameActionsExt(void)
     GameActions_RND_Main();
   }
 
-  BlitScreenToBitmap(backbuffer);
+  if (is_simulating == FALSE) { BlitScreenToBitmap(backbuffer);}
 
   CheckLevelSolved();
   CheckLevelTime();
@@ -11685,6 +11639,7 @@ void GameActions_RND(void)
     }
   }
 
+  // -- Isn't used in custom/EM
   if (game.set_centered_player)
   {
     boolean all_players_fit_to_screen = checkIfAllPlayersFitToScreen_RND();
@@ -11705,6 +11660,7 @@ void GameActions_RND(void)
     }
   }
 
+  // -- Also isnt' used in custom/EM
   if (game.set_centered_player &&
       ScreenMovPos == 0)	// screen currently aligned at tile position
   {
@@ -11746,11 +11702,11 @@ void GameActions_RND(void)
     if (stored_player[i].programmed_action)
       actual_player_action = stored_player[i].programmed_action;
 
+    // Key pressed
     PlayerActions(&stored_player[i], actual_player_action);
 
     ScrollPlayer(&stored_player[i], SCROLL_GO_ON);
   }
-
   ScrollScreen(NULL, SCROLL_GO_ON);
 
   /* for backwards compatibility, the following code emulates a fixed bug that
@@ -11857,156 +11813,144 @@ void GameActions_RND(void)
 #endif
   }
 
-  SCAN_PLAYFIELD(x, y)
-  {
-    element = Feld[x][y];
-    graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
-    last_gfx_frame = GfxFrame[x][y];
+        SCAN_PLAYFIELD(x, y) {
+                element = Feld[x][y];
+                graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
+                last_gfx_frame = GfxFrame[x][y];
 
-    ResetGfxFrame(x, y);
+                if (is_simulating == FALSE) {ResetGfxFrame(x, y);}
 
-    if (GfxFrame[x][y] != last_gfx_frame && !Stop[x][y])
-      DrawLevelGraphicAnimation(x, y, graphic);
+                if (GfxFrame[x][y] != last_gfx_frame && !Stop[x][y])
+                    if (is_simulating == FALSE) {DrawLevelGraphicAnimation(x, y, graphic);}
 
-    if (ANIM_MODE(graphic) == ANIM_RANDOM &&
-	IS_NEXT_FRAME(GfxFrame[x][y], graphic))
-      ResetRandomAnimationValue(x, y);
+                if (ANIM_MODE(graphic) == ANIM_RANDOM &&
+                    IS_NEXT_FRAME(GfxFrame[x][y], graphic))
+                    ResetRandomAnimationValue(x, y);
 
-    SetRandomAnimationValue(x, y);
+                SetRandomAnimationValue(x, y);
 
-    PlayLevelSoundActionIfLoop(x, y, GfxAction[x][y]);
+                if (is_simulating == FALSE) {PlayLevelSoundActionIfLoop(x, y, GfxAction[x][y]);}
 
-    if (IS_INACTIVE(element))
-    {
-      if (IS_ANIMATED(graphic))
-	DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
+                if (IS_INACTIVE(element)) {
+                    if (IS_ANIMATED(graphic))
+                        if (is_simulating == FALSE) {DrawLevelGraphicAnimationIfNeeded(x, y, graphic);}
 
-      continue;
-    }
+                    continue;
+                }
 
-    // this may take place after moving, so 'element' may have changed
-    if (IS_CHANGING(x, y) &&
-	(game.engine_version < VERSION_IDENT(3,0,7,1) || !Stop[x][y]))
-    {
-      int page = element_info[element].event_page_nr[CE_DELAY];
+                // this may take place after moving, so 'element' may have changed
+                if (IS_CHANGING(x, y) &&
+                    (game.engine_version < VERSION_IDENT(3, 0, 7, 1) || !Stop[x][y])) {
+                    int page = element_info[element].event_page_nr[CE_DELAY];
 
-      HandleElementChange(x, y, page);
+                    HandleElementChange(x, y, page);
 
-      element = Feld[x][y];
-      graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
-    }
+                    element = Feld[x][y];
+                    graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
+                }
 
-    if (!IS_MOVING(x, y) && (CAN_FALL(element) || CAN_MOVE(element)))
-    {
-      StartMoving(x, y);
+                if (!IS_MOVING(x, y) && (CAN_FALL(element) || CAN_MOVE(element))) {
+                    StartMoving(x, y);
 
-      element = Feld[x][y];
-      graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
+                    element = Feld[x][y];
+                    graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
 
-      if (IS_ANIMATED(graphic) &&
-	  !IS_MOVING(x, y) &&
-	  !Stop[x][y])
-	DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
+                    if (IS_ANIMATED(graphic) &&
+                        !IS_MOVING(x, y) &&
+                        !Stop[x][y])
+                        DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
 
-      if (IS_GEM(element) || element == EL_SP_INFOTRON)
-	TEST_DrawTwinkleOnField(x, y);
-    }
-    else if (element == EL_ACID)
-    {
-      if (!Stop[x][y])
-	DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
-    }
-    else if ((element == EL_EXIT_OPEN ||
-	      element == EL_EM_EXIT_OPEN ||
-	      element == EL_SP_EXIT_OPEN ||
-	      element == EL_STEEL_EXIT_OPEN ||
-	      element == EL_EM_STEEL_EXIT_OPEN ||
-	      element == EL_SP_TERMINAL ||
-	      element == EL_SP_TERMINAL_ACTIVE ||
-	      element == EL_EXTRA_TIME ||
-	      element == EL_SHIELD_NORMAL ||
-	      element == EL_SHIELD_DEADLY) &&
-	     IS_ANIMATED(graphic))
-      DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
-    else if (IS_MOVING(x, y))
-      ContinueMoving(x, y);
-    else if (IS_ACTIVE_BOMB(element))
-      CheckDynamite(x, y);
-    else if (element == EL_AMOEBA_GROWING)
-      AmoebeWaechst(x, y);
-    else if (element == EL_AMOEBA_SHRINKING)
-      AmoebaDisappearing(x, y);
+                    if (IS_GEM(element) || element == EL_SP_INFOTRON)
+                        TEST_DrawTwinkleOnField(x, y);
+                } else if (element == EL_ACID) {
+                    if (!Stop[x][y])
+                        DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
+                } else if ((element == EL_EXIT_OPEN ||
+                            element == EL_EM_EXIT_OPEN ||
+                            element == EL_SP_EXIT_OPEN ||
+                            element == EL_STEEL_EXIT_OPEN ||
+                            element == EL_EM_STEEL_EXIT_OPEN ||
+                            element == EL_SP_TERMINAL ||
+                            element == EL_SP_TERMINAL_ACTIVE ||
+                            element == EL_EXTRA_TIME ||
+                            element == EL_SHIELD_NORMAL ||
+                            element == EL_SHIELD_DEADLY) &&
+                           IS_ANIMATED(graphic))
+                    DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
+                else if (IS_MOVING(x, y))
+                    ContinueMoving(x, y);
+                else if (IS_ACTIVE_BOMB(element))
+                    CheckDynamite(x, y);
+                else if (element == EL_AMOEBA_GROWING)
+                    AmoebeWaechst(x, y);
+                else if (element == EL_AMOEBA_SHRINKING)
+                    AmoebaDisappearing(x, y);
 
 #if !USE_NEW_AMOEBA_CODE
-    else if (IS_AMOEBALIVE(element))
-      AmoebeAbleger(x, y);
+                else if (IS_AMOEBALIVE(element))
+                    AmoebeAbleger(x, y);
 #endif
 
-    else if (element == EL_GAME_OF_LIFE || element == EL_BIOMAZE)
-      Life(x, y);
-    else if (element == EL_EXIT_CLOSED)
-      CheckExit(x, y);
-    else if (element == EL_EM_EXIT_CLOSED)
-      CheckExitEM(x, y);
-    else if (element == EL_STEEL_EXIT_CLOSED)
-      CheckExitSteel(x, y);
-    else if (element == EL_EM_STEEL_EXIT_CLOSED)
-      CheckExitSteelEM(x, y);
-    else if (element == EL_SP_EXIT_CLOSED)
-      CheckExitSP(x, y);
-    else if (element == EL_EXPANDABLE_WALL_GROWING ||
-	     element == EL_EXPANDABLE_STEELWALL_GROWING)
-      MauerWaechst(x, y);
-    else if (element == EL_EXPANDABLE_WALL ||
-	     element == EL_EXPANDABLE_WALL_HORIZONTAL ||
-	     element == EL_EXPANDABLE_WALL_VERTICAL ||
-	     element == EL_EXPANDABLE_WALL_ANY ||
-	     element == EL_BD_EXPANDABLE_WALL)
-      MauerAbleger(x, y);
-    else if (element == EL_EXPANDABLE_STEELWALL_HORIZONTAL ||
-	     element == EL_EXPANDABLE_STEELWALL_VERTICAL ||
-	     element == EL_EXPANDABLE_STEELWALL_ANY)
-      MauerAblegerStahl(x, y);
-    else if (element == EL_FLAMES)
-      CheckForDragon(x, y);
-    else if (element == EL_EXPLOSION)
-      ;	// drawing of correct explosion animation is handled separately
-    else if (element == EL_ELEMENT_SNAPPING ||
-	     element == EL_DIAGONAL_SHRINKING ||
-	     element == EL_DIAGONAL_GROWING)
-    {
-      graphic = el_act_dir2img(GfxElement[x][y], GfxAction[x][y],GfxDir[x][y]);
+                else if (element == EL_GAME_OF_LIFE || element == EL_BIOMAZE)
+                    Life(x, y);
+                else if (element == EL_EXIT_CLOSED)
+                    CheckExit(x, y);
+                else if (element == EL_EM_EXIT_CLOSED)
+                    CheckExitEM(x, y);
+                else if (element == EL_STEEL_EXIT_CLOSED)
+                    CheckExitSteel(x, y);
+                else if (element == EL_EM_STEEL_EXIT_CLOSED)
+                    CheckExitSteelEM(x, y);
+                else if (element == EL_SP_EXIT_CLOSED)
+                    CheckExitSP(x, y);
+                else if (element == EL_EXPANDABLE_WALL_GROWING ||
+                         element == EL_EXPANDABLE_STEELWALL_GROWING)
+                    MauerWaechst(x, y);
+                else if (element == EL_EXPANDABLE_WALL ||
+                         element == EL_EXPANDABLE_WALL_HORIZONTAL ||
+                         element == EL_EXPANDABLE_WALL_VERTICAL ||
+                         element == EL_EXPANDABLE_WALL_ANY ||
+                         element == EL_BD_EXPANDABLE_WALL)
+                    MauerAbleger(x, y);
+                else if (element == EL_EXPANDABLE_STEELWALL_HORIZONTAL ||
+                         element == EL_EXPANDABLE_STEELWALL_VERTICAL ||
+                         element == EL_EXPANDABLE_STEELWALL_ANY)
+                    MauerAblegerStahl(x, y);
+                else if (element == EL_FLAMES)
+                    CheckForDragon(x, y);
+                else if (element == EL_EXPLOSION);    // drawing of correct explosion animation is handled separately
+                else if (element == EL_ELEMENT_SNAPPING ||
+                         element == EL_DIAGONAL_SHRINKING ||
+                         element == EL_DIAGONAL_GROWING) {
+                    graphic = el_act_dir2img(GfxElement[x][y], GfxAction[x][y], GfxDir[x][y]);
 
-      DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
-    }
-    else if (IS_ANIMATED(graphic) && !IS_CHANGING(x, y))
-      DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
+                    DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
+                } else if (IS_ANIMATED(graphic) && !IS_CHANGING(x, y))
+                    DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
 
-    if (IS_BELT_ACTIVE(element))
-      PlayLevelSoundAction(x, y, ACTION_ACTIVE);
+                if (IS_BELT_ACTIVE(element))
+                    PlayLevelSoundAction(x, y, ACTION_ACTIVE);
 
-    if (game.magic_wall_active)
-    {
-      int jx = local_player->jx, jy = local_player->jy;
+                if (game.magic_wall_active) {
+                    int jx = local_player->jx, jy = local_player->jy;
 
-      // play the element sound at the position nearest to the player
-      if ((element == EL_MAGIC_WALL_FULL ||
-	   element == EL_MAGIC_WALL_ACTIVE ||
-	   element == EL_MAGIC_WALL_EMPTYING ||
-	   element == EL_BD_MAGIC_WALL_FULL ||
-	   element == EL_BD_MAGIC_WALL_ACTIVE ||
-	   element == EL_BD_MAGIC_WALL_EMPTYING ||
-	   element == EL_DC_MAGIC_WALL_FULL ||
-	   element == EL_DC_MAGIC_WALL_ACTIVE ||
-	   element == EL_DC_MAGIC_WALL_EMPTYING) &&
-	  ABS(x - jx) + ABS(y - jy) <
-	  ABS(magic_wall_x - jx) + ABS(magic_wall_y - jy))
-      {
-	magic_wall_x = x;
-	magic_wall_y = y;
-      }
-    }
-  }
+                    // play the element sound at the position nearest to the player
+                    if ((element == EL_MAGIC_WALL_FULL ||
+                         element == EL_MAGIC_WALL_ACTIVE ||
+                         element == EL_MAGIC_WALL_EMPTYING ||
+                         element == EL_BD_MAGIC_WALL_FULL ||
+                         element == EL_BD_MAGIC_WALL_ACTIVE ||
+                         element == EL_BD_MAGIC_WALL_EMPTYING ||
+                         element == EL_DC_MAGIC_WALL_FULL ||
+                         element == EL_DC_MAGIC_WALL_ACTIVE ||
+                         element == EL_DC_MAGIC_WALL_EMPTYING) &&
+                        ABS(x - jx) + ABS(y - jy) <
+                        ABS(magic_wall_x - jx) + ABS(magic_wall_y - jy)) {
+                        magic_wall_x = x;
+                        magic_wall_y = y;
+                    }
+                }
+            }
 
 #if USE_NEW_AMOEBA_CODE
   // new experimental amoeba growth stuff
@@ -12178,9 +12122,10 @@ void GameActions_RND(void)
     GfxRedraw[x][y] = GFX_REDRAW_NONE;
   }
 #endif
-
-  DrawAllPlayers();
-  PlayAllPlayersSound();
+    if (is_simulating == FALSE) {
+        DrawAllPlayers();
+        PlayAllPlayersSound();
+    }
 
   for (i = 0; i < MAX_PLAYERS; i++)
   {
@@ -12662,11 +12607,13 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
   if (player->MovPos == 0 && mode == SCROLL_GO_ON)	// player not moving
     return;
 
+  // -- Seems to go through when player is leaving its box on move (i.e. first frame after action selection)
   if (mode == SCROLL_INIT)
   {
     player->actual_frame_counter = FrameCounter;
     player->GfxPos = move_stepsize * (player->MovPos / move_stepsize);
 
+    // Not sure how we get into this loop
     if ((player->block_last_field || player->block_delay_adjustment > 0) &&
 	Feld[last_jx][last_jy] == EL_EMPTY)
     {
@@ -12693,9 +12640,12 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
     if (player->MovPos != 0)	// player has not yet reached destination
       return;
   }
-  else if (!FrameReached(&player->actual_frame_counter, 1))
-    return;
+  // This seems to go fall inside during same game tick as the above, must be several internal ticks between frame game ticks?
+  else if (!FrameReached(&player->actual_frame_counter, 1)) {
+      return;
+  }
 
+  // -- All ticks player is moving except for initial tick on move (i.e. not on tick lx/ly updated)
   if (player->MovPos != 0)
   {
     player->MovPos += (player->MovPos > 0 ? -1 : 1) * move_stepsize;
@@ -12706,6 +12656,7 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
       CheckGravityMovement(player);
   }
 
+  // -- Only on last tick of player animation?
   if (player->MovPos == 0)	// player reached destination field
   {
     if (player->move_delay_reset_counter > 0)
@@ -14568,47 +14519,47 @@ void InitPlayLevelSound(void)
 
 static void PlayLevelSound(int x, int y, int nr)
 {
-  int sx = SCREENX(x), sy = SCREENY(y);
-  int volume, stereo_position;
-  int max_distance = 8;
-  int type = (IS_LOOP_SOUND(nr) ? SND_CTRL_PLAY_LOOP : SND_CTRL_PLAY_SOUND);
+    if (is_simulating == FALSE) {
+        int sx = SCREENX(x), sy = SCREENY(y);
+        int volume, stereo_position;
+        int max_distance = 8;
+        int type = (IS_LOOP_SOUND(nr) ? SND_CTRL_PLAY_LOOP : SND_CTRL_PLAY_SOUND);
 
-  if ((!setup.sound_simple && !IS_LOOP_SOUND(nr)) ||
-      (!setup.sound_loops && IS_LOOP_SOUND(nr)))
-    return;
+        if ((!setup.sound_simple && !IS_LOOP_SOUND(nr)) ||
+            (!setup.sound_loops && IS_LOOP_SOUND(nr)))
+            return;
 
-  if (!IN_LEV_FIELD(x, y) ||
-      sx < -max_distance || sx >= SCR_FIELDX + max_distance ||
-      sy < -max_distance || sy >= SCR_FIELDY + max_distance)
-    return;
+        if (!IN_LEV_FIELD(x, y) ||
+            sx < -max_distance || sx >= SCR_FIELDX + max_distance ||
+            sy < -max_distance || sy >= SCR_FIELDY + max_distance)
+            return;
 
-  volume = SOUND_MAX_VOLUME;
+        volume = SOUND_MAX_VOLUME;
 
-  if (!IN_SCR_FIELD(sx, sy))
-  {
-    int dx = ABS(sx - SCR_FIELDX / 2) - SCR_FIELDX / 2;
-    int dy = ABS(sy - SCR_FIELDY / 2) - SCR_FIELDY / 2;
+        if (!IN_SCR_FIELD(sx, sy)) {
+            int dx = ABS(sx - SCR_FIELDX / 2) - SCR_FIELDX / 2;
+            int dy = ABS(sy - SCR_FIELDY / 2) - SCR_FIELDY / 2;
 
-    volume -= volume * (dx > dy ? dx : dy) / max_distance;
-  }
+            volume -= volume * (dx > dy ? dx : dy) / max_distance;
+        }
 
-  stereo_position = (SOUND_MAX_LEFT +
-		     (sx + max_distance) * SOUND_MAX_LEFT2RIGHT /
-		     (SCR_FIELDX + 2 * max_distance));
+        stereo_position = (SOUND_MAX_LEFT +
+                           (sx + max_distance) * SOUND_MAX_LEFT2RIGHT /
+                           (SCR_FIELDX + 2 * max_distance));
 
-  if (IS_LOOP_SOUND(nr))
-  {
-    /* This assures that quieter loop sounds do not overwrite louder ones,
-       while restarting sound volume comparison with each new game frame. */
+        if (IS_LOOP_SOUND(nr)) {
+            /* This assures that quieter loop sounds do not overwrite louder ones,
+               while restarting sound volume comparison with each new game frame. */
 
-    if (loop_sound_volume[nr] > volume && loop_sound_frame[nr] == FrameCounter)
-      return;
+            if (loop_sound_volume[nr] > volume && loop_sound_frame[nr] == FrameCounter)
+                return;
 
-    loop_sound_volume[nr] = volume;
-    loop_sound_frame[nr] = FrameCounter;
-  }
+            loop_sound_volume[nr] = volume;
+            loop_sound_frame[nr] = FrameCounter;
+        }
 
-  PlaySoundExt(nr, volume, stereo_position, type);
+        PlaySoundExt(nr, volume, stereo_position, type);
+    }
 }
 
 static void PlayLevelSoundNearest(int x, int y, int sound_action)

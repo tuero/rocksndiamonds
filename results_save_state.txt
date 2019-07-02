@@ -1,0 +1,37 @@
+Engine Type: EM
+Player MovPos: 0
+Player is_moving: 0
+Player is_waiting: 0
+Player move_delay: 0
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105    80     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   105   105   105   105   105   105 
+  105   105   105     0   107   105   105   105   105   105 
+-----------------
+starting game loop
+Simulation: Game ended
+BFS ellapsed time: 1555825ms
+BFS total nodes expanded: 513
+Size of Open: 523
+Size of Closed: 513
+memory: 32768
+solution length: 72
+right (right) (right) (right) (right) (right) (right) (right) down (down) (down) (down) (down) (down) (down) (down) down (down) (down) (down) (down) (down) (down) (down) down (down) (down) (down) (down) (down) (down) (down) down (down) (down) (down) (down) (down) (down) (down) down (down) (down) (down) (down) (down) (down) (down) down (down) (down) (down) (down) (down) (down) (down) right (right) (right) (right) (right) (right) (right) (right) right (right) (right) (right) (right) (right) (right) (right) 
+Controller: right
+Controller: right
+Counter: 1
+Controller: right
+Controller: right
+Counter: 2
+Controller: right
+Controller: right
+Counter: 3
+Controller: right
+Controller: right
+Counter: 4

@@ -7749,16 +7749,36 @@ static void InitProgramConfig(char *command_filename)
 
 int main(int argc, char *argv[])
 {
+    // Find files/directories
   InitProgramConfig(argv[0]);
 
+  // This just sets functions
   InitWindowTitleFunction(getWindowTitleString);
   InitExitMessageFunction(DisplayExitMessage);
   InitExitFunction(CloseAllAndExit);
+
+  // inits SDL (this will need to be removed)
   InitPlatformDependentStuff();
 
+  // Handles command line arguments
   GetOptions(argc, argv, print_usage, print_version);
+
   OpenAll();
 
+    // Level select
+    setLevel(0);
+    LoadLevelSetup_SeriesInfo();
+
+    // Load maps for above mapset, and set current level
+    if (options.solver == TRUE) {
+        LoadLevel(options.level_number);
+        printBoardState();
+    }
+
+    // start game
+    StartGameActions(network.enabled, setup.autorecord, level.random_seed);
+
+    // normal event loop
   EventLoop();
   CloseAllAndExit(0);
 

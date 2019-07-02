@@ -22,6 +22,8 @@
 #include "anim.h"
 #include "network.h"
 
+#include "custom/custom.h"
+
 
 #define	DEBUG_EVENTS		0
 
@@ -43,8 +45,8 @@ static boolean virtual_button_pressed = FALSE;
 
 
 // forward declarations for internal use
-static void HandleNoEvent(void);
-static void HandleEventActions(void);
+//static void HandleNoEvent(void);
+//static void HandleEventActions(void);
 
 
 // event filter to set mouse x/y position (for pointer class global animations)
@@ -182,7 +184,7 @@ boolean NextValidEvent(Event *event)
   return FALSE;
 }
 
-static void HandleEvents(void)
+void HandleEvents(void)
 {
   Event event;
   unsigned int event_frame_delay = 0;
@@ -322,21 +324,41 @@ static void HandleMouseCursor(void)
 
 void EventLoop(void)
 {
+    int test_counter = 0;
+    printf("%s\n", "starting game loop");
+    if (options.solver == TRUE) {findPath();}
+
   while (1)
   {
-    if (PendingEvent())
-      HandleEvents();
-    else
-      HandleNoEvent();
+      test_counter += 1;
+
+      // mouse movement, arrow keys
+    if (PendingEvent()){
+        HandleEvents();
+    }
+    // wait for idle to hide mouse?
+    else {
+        HandleNoEvent();
+    }
 
     // execute event related actions after pending events have been processed
     HandleEventActions();
 
-    // don't use all CPU time when idle; the main loop while playing
+    // Get action from controller
+    if (options.solver == TRUE) {
+        stored_player[0].action = getAction();
+    }
+    if (options.debug == TRUE && options.solver == TRUE) {
+        printf("Counter: %d\n", test_counter);
+        printBoardState();
+    }
+
+      // don't use all CPU time when idle; the main loop while playing
     // has its own synchronization and is CPU friendly, too
 
-    if (game_status == GAME_MODE_PLAYING)
-      HandleGameActions();
+    if (game_status == GAME_MODE_PLAYING){
+        HandleGameActions();
+    }
 
     // always copy backbuffer to visible screen for every video frame
     BackToFront();

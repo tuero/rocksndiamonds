@@ -114,6 +114,7 @@ OPTIONS = -O3 -Wall
 endif
 
 CFLAGS = $(OPTIONS) $(SYS_CFLAGS)  $(EXTRA_CFLAGS) $(CONFIG)
+CPPFLAGS = -Wall -Wextra -g -O3 -std=c++14 $(SYS_CFLAGS)  $(EXTRA_CFLAGS) $(CONFIG)
 LDFLAGS =           $(SYS_LDFLAGS) $(EXTRA_LDFLAGS) -lm -lz
 
 
@@ -133,7 +134,7 @@ SRCS =	main.c		\
 	tape.c		\
 	anim.c		\
 	network.c	\
-	netserv.c
+	netserv.c   
 
 OBJS =	main.o		\
 	conf_gfx.o	\
@@ -151,7 +152,7 @@ OBJS =	main.o		\
 	tape.o		\
 	anim.o		\
 	network.o	\
-	netserv.o
+	netserv.o   
 
 CNFS =	conf_gfx.h	\
 	conf_snd.h	\
@@ -194,6 +195,9 @@ GAME_SP = $(GAME_SP_DIR)/game_sp.a
 GAME_MM_DIR = game_mm
 GAME_MM = $(GAME_MM_DIR)/game_mm.a
 
+CUSTOM_DIR = custom
+CUSTOM = $(CUSTOM_DIR)/custom.a
+
 RNDLIBS = $(LIBGAME) $(GAME_EM) $(GAME_SP) $(GAME_MM)
 AUTOCONF = conf_gfx.h conf_snd.h conf_mus.h
 
@@ -207,15 +211,16 @@ endif
 
 GRAPHICS_DIR = ../graphics
 
+CCP := g++
 
 # -----------------------------------------------------------------------------
 # build targets
 # -----------------------------------------------------------------------------
 
-all: $(AUTOCONF) libgame_dir game_em_dir game_sp_dir game_mm_dir $(PROGNAME) graphics_dir
+all: $(AUTOCONF) libgame_dir game_em_dir game_sp_dir game_mm_dir custom_dir $(PROGNAME) graphics_dir
 
-$(PROGNAME): $(RNDLIBS) $(TIMESTAMP_FILE) $(OBJS) $(ICON)
-	$(CC) $(PROFILING) $(OBJS) $(ICON) $(RNDLIBS) $(LDFLAGS) -o $(PROGNAME)
+$(PROGNAME): $(RNDLIBS) $(TIMESTAMP_FILE) $(OBJS) $(CUSTOM) $(ICON)
+	$(CCP) $(PROFILING) $(OBJS) $(CUSTOM) $(ICON) $(RNDLIBS) $(LDFLAGS) -o $(PROGNAME)
 ifdef BUILD_DIST
 	strip $(PROGNAME)
 endif
@@ -239,6 +244,11 @@ game_mm_dir:
 	@$(MAKE) -C $(GAME_MM_DIR)
 $(GAME_MM):
 	@$(MAKE) -C $(GAME_MM_DIR)
+
+custom_dir:
+	@$(MAKE) -C $(CUSTOM_DIR)
+$(CUSTOM):
+	@$(MAKE) -C $(CUSTOM_DIR)
 
 auto-conf:
 	@for i in $(CNFS); do			\
@@ -281,6 +291,7 @@ clean-obj:
 	$(MAKE) -C $(GAME_EM_DIR) clean
 	$(MAKE) -C $(GAME_SP_DIR) clean
 	$(MAKE) -C $(GAME_MM_DIR) clean
+	$(MAKE) -C $(CUSTOM_DIR) clean
 	$(RM) $(OBJS)
 	$(RM) $(RNDLIBS)
 
