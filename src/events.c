@@ -326,7 +326,7 @@ void EventLoop(void)
 {
     int test_counter = 0;
     printf("%s\n", "starting game loop");
-    if (options.solver == TRUE) {findPath();}
+    if (options.solver == CONTROLLER_TYPE_BFS) {findPath();}
 
   while (1)
   {
@@ -345,10 +345,10 @@ void EventLoop(void)
     HandleEventActions();
 
     // Get action from controller
-    if (options.solver == TRUE) {
-        stored_player[0].action = getAction();
+    if (options.solver != CONTROLLER_TYPE_USER) {
+        stored_player[0].action = getAction(options.solver);
     }
-    if (options.debug == TRUE && options.solver == TRUE) {
+    if (options.debug == TRUE && options.solver != CONTROLLER_TYPE_USER) {
         printf("Counter: %d\n", test_counter);
         printBoardState();
     }

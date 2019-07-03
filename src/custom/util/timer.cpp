@@ -26,7 +26,7 @@ void Timer::stop() {
 }
 
 
-bool Timer::checkTime() {
+int Timer::checkTime() {
     auto end_time = std::chrono::high_resolution_clock::now();
     int clock_duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();
     return clock_duration;

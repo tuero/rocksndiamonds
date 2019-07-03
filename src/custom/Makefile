@@ -27,17 +27,20 @@ MCTS_OBJ 	:= 	$(MCTS_DIR)/mcts.o 				\
 UTIL_DIR 	:=	util
 UTIL_OBJ 	:= 	$(UTIL_DIR)/timer.o 	
 
+TEST_DIR 	:=	tests
+TEST_OBJ 	:= 	$(TEST_DIR)/engine_speed.o 
+
 
 # -----------------------------------------------------------------------------
 # build targets
 # -----------------------------------------------------------------------------
 
-.PHONY: all clean bfs eng mcts util
+.PHONY: all clean bfs eng mcts util tests
 
-all: bfs eng mcts util $(CUSTOM)
+all: bfs eng mcts util tests $(CUSTOM)
 
-$(CUSTOM): $(BFS_OBJ) $(ENG_OBJ) $(MCTS_OBJ) $(UTIL_OBJ) $(OBJS)
-	$(AR) cr $(CUSTOM) $(BFS_OBJ) $(ENG_OBJ) $(MCTS_OBJ) $(UTIL_OBJ) $(OBJS)
+$(CUSTOM): $(BFS_OBJ) $(ENG_OBJ) $(MCTS_OBJ) $(UTIL_OBJ) $(TEST_OBJ) $(OBJS)
+	$(AR) cr $(CUSTOM) $(BFS_OBJ) $(ENG_OBJ) $(MCTS_OBJ) $(UTIL_OBJ) $(TEST_OBJ) $(OBJS)
 	$(RANLIB) $(CUSTOM)
 
 bfs:
@@ -60,6 +63,11 @@ util:
 $(UTIL_OBJ):
 	@$(MAKE) -C $(UTIL_DIR)
 
+tests:
+	@$(MAKE) -C $(TEST_DIR)
+$(TEST_OBJ):
+	@$(MAKE) -C $(TEST_DIR)
+
 %.o: %.cpp .depend
 	$(CCP) $(CPPFLAGS) -c $*.cpp
 
@@ -68,6 +76,7 @@ clean:
 	$(MAKE) -C $(ENG_DIR) clean
 	$(MAKE) -C $(MCTS_DIR) clean
 	$(MAKE) -C $(UTIL_DIR) clean
+	$(MAKE) -C $(TEST_OBJ) clean
 	$(RM) $(OBJS)
 	$(RM) $(CUSTOM)
 	$(RM) -f .depend

@@ -9,11 +9,15 @@
 #include "engine/action.h"
 #include "engine/engine_helper.h"
 #include "bfs/bfs.h"
+#include "mcts/mcts.h"
+#include "tests/engine_speed.h"
 
 
 boolean is_simulating;
 std::vector<Action> solution;
 int solution_index;
+
+MCTS mcts;
 
 // Level info
 char *level_bd = (char *)"classic_boulderdash";
@@ -21,19 +25,23 @@ char *level_em = (char *)"classic_emerald_mine";
 char *level_custom = (char *)"tuero";
 
 
+extern "C" void calcDistances() {
+    dijkstra();
+}
+
+
 extern "C" void findPath() {
     GameState state;
     GameInfo saveGame;
+    int ms, count;
 
     // Save current game state
     state.setFromSimulator();
     saveGame = game;
 
     // Find path
-    is_simulating = TRUE;
-    bfs(solution);
+    bfs(solution, ms, count);
     solution_index = 0;
-    is_simulating = FALSE;
 
     // Reset game state to before search
     game = saveGame;
@@ -41,14 +49,27 @@ extern "C" void findPath() {
 }
 
 
-extern "C" int getAction() {
-    if ((int)solution.size() <= solution_index) {
-        std::cout << "ERROR: Controller has no available action" << std::endl;
-        return 0;
+extern "C" int getAction(controller_type controller) {
+    int action = 0;
+    int ms, count, iterations;
+
+    if (controller == CONTROLLER_TYPE_BFS) {
+        if ((int)solution.size() <= solution_index) {
+            std::cout << "ERROR: Controller has no available action" << std::endl;
+            return 0;
+        }
+        action = solution[solution_index];
+        solution_index += 1;
+    }
+    else if (controller == CONTROLLER_TYPE_MCTS) {
+        if (solution.empty()) {
+            mcts.run(solution, ms, iterations, count);
+        }
+        action = solution.front();
+        solution.erase(solution.begin());
     }
 
-    int action = solution[solution_index];
-    solution_index += 1;
+
     std::cout << "Controller: " << actionToString(static_cast<Action>(action)) << std::endl;
 
     return action;
@@ -70,6 +91,25 @@ extern "C" void setLevel(int levelset) {
     leveldir_current->subdir = levelset_dir;
     leveldir_current->identifier = levelset_dir;
 } 
+
+
+extern "C" void testEngineSpeed() {
+    LoadLevel(11);
+    engineSpeedNoOptimizations();
+    engineSpeedWithOptimizations();
+}
+
+
+extern "C" void testBFSSpeed() {
+    LoadLevel(options.level_number);
+    bfsSpeed();
+}
+
+extern "C" void testMCTSSpeed() {
+    LoadLevel(options.level_number);
+    calcDistances();
+    mctsSpeed();
+}
 
 
 extern "C" void printBoardState() {
@@ -95,6 +135,21 @@ extern "C" void printBoardState() {
         for (x = 0; x < level.fieldx; x++) {
             std::cout.width(5);
             std::cout << Feld[x][y] << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    std::cout << "-----------------" << std::endl;
+}
+
+
+extern "C" void printBoardDistances() {
+    std::cout << "DEBUG: Distances" << std::endl;
+    int x, y;
+    for (y = 0; y < level.fieldy; y++) {
+        for (x = 0; x < level.fieldx; x++) {
+            std::cout.width(5);
+            std::cout << distances[y][x] << " ";
         }
         std::cout << std::endl;
     }

@@ -7770,9 +7770,23 @@ int main(int argc, char *argv[])
     LoadLevelSetup_SeriesInfo();
 
     // Load maps for above mapset, and set current level
-    if (options.solver == TRUE) {
+    if (options.solver == CONTROLLER_TYPE_TEST_SPEED) {
+        testEngineSpeed();
+        return 0;
+    }
+    else if (options.solver == CONTROLLER_TYPE_TEST_BFS) {
+        testBFSSpeed();
+        return 0;
+    }
+    else if (options.solver == CONTROLLER_TYPE_TEST_MCTS) {
+        testMCTSSpeed();
+        return 0;
+    }
+    else if (options.solver != CONTROLLER_TYPE_USER) {
         LoadLevel(options.level_number);
+        calcDistances();
         printBoardState();
+        printBoardDistances();
     }
 
     // start game

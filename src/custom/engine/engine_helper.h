@@ -7,6 +7,8 @@
 #include <iostream>
 #include <chrono>
 #include <array>
+#include <vector>
+#include <algorithm>
 
 #include "engine_types.h"
 #include "action.h"
@@ -15,6 +17,8 @@ extern "C" {
     #include "../../main.h"
 }
 
+
+extern std::vector<std::vector<int>> distances;
 
 /*
  * Check if the current status of the engine is loss of life
@@ -34,6 +38,13 @@ bool engineGameSolved();
  */
 void setEnginePlayerAction(Action action);
 
+
+/*
+ * Set the action for the engine to perform on behalf of the player on
+ * the next iteration as a random action
+ */
+void setEngineRandomPlayerAction();
+
 /*
  * Simulate the engine ahead a single tick
  */
@@ -51,6 +62,14 @@ void engineSimulate();
  * Assumes simulator is in the current state to check
  */
 bool isWall(Action action);
+
+float getDistanceToGoal();
+
+void setSimulatorFlag(bool simulator_flag);
+
+void dijkstra();
+
+void debug_print_distances();
 
 /*
  * Print current engine status

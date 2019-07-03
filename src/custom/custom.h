@@ -11,10 +11,16 @@ extern "C"
     // C declarations
     #include "../main.h"
     #include "../screens.h"
+    #include "../files.h"
     void findPath(void);
     void printBoardState(void);
+    void printBoardDistances(void);
     void setLevel(int levelset); 
-    int getAction(void);
+    int getAction(controller_type controller);
+    void calcDistances(void);
+    void testEngineSpeed(void);
+    void testBFSSpeed(void);
+    void testMCTSSpeed(void);
 
 #ifdef __cplusplus
 }

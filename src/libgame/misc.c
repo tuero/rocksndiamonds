@@ -950,7 +950,7 @@ void GetOptions(int argc, char *argv[],
   options.network = FALSE;
   options.verbose = FALSE;
   options.debug = FALSE;
-  options.solver = FALSE;
+  options.solver = CONTROLLER_TYPE_USER;
   options.level_number = 7;
   options.delay = GAME_FRAME_DELAY;
 
@@ -1111,7 +1111,31 @@ void GetOptions(int argc, char *argv[],
     }
     else if (strncmp(option, "-solver", option_len) == 0)
     {
-        options.solver = TRUE;
+        if (option_arg == NULL) {
+            Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
+        }
+        else if (strcmp("BFS", option_arg) == 0 || strcmp("bfs", option_arg) == 0) {
+            options.solver = CONTROLLER_TYPE_BFS;
+        }
+        else if (strcmp("MCTS", option_arg) == 0 || strcmp("mcts", option_arg) == 0) {
+            options.solver = CONTROLLER_TYPE_MCTS;
+        }
+        else if (strcmp("test_engine", option_arg) == 0) {
+            options.solver = CONTROLLER_TYPE_TEST_SPEED;
+        }
+        else if (strcmp("test_bfs", option_arg) == 0) {
+            options.solver = CONTROLLER_TYPE_TEST_BFS;
+        }
+        else if (strcmp("test_mcts", option_arg) == 0) {
+            options.solver = CONTROLLER_TYPE_TEST_MCTS;
+        }
+        else {
+            // Additionally check for valid level file if it exists?
+            Error(ERR_EXIT_HELP, "option '%s' argument must be a valid integer", option_str);
+        }
+        if (option_arg == next_option) {
+            options_left++;
+        }
     }
     else if (strncmp(option, "-loadlevel", option_len) == 0)
     {

@@ -2,7 +2,9 @@
 #include "bfs.h"
 
 
-void bfs(std::vector<Action> &solution) {
+void bfs(std::vector<Action> &solution, int &time_ms, int &node_count) {
+    setSimulatorFlag(true);
+
     // Starting state will be the reference point which all 
     // simulations will be based from
     typedef std::unique_ptr<TreeNodeBFS> Pointer;
@@ -44,14 +46,14 @@ void bfs(std::vector<Action> &solution) {
 
         // Game over due to dying?
         if (engineGameFailed()) {
-            std::cout << "Simulation: Loss of life." << std::endl;
+            if (options.debug) {std::cout << "Simulation: Loss of life." << std::endl;}
             continue;
         }
 
         // Game won
         if (engineGameSolved()) {
             TreeNodeBFS* tempNode = node.get();
-            std::cout << "Simulation: Game ended" << std::endl;
+            if (options.debug) {std::cout << "Simulation: Game ended" << std::endl;}
             while(tempNode != nullptr && tempNode->getParent() != nullptr) {
                 for (int i = 0; i < 7; i++) {
                     solution.insert(solution.begin(), tempNode->getActionTaken());
@@ -90,23 +92,30 @@ void bfs(std::vector<Action> &solution) {
     timer.stop();
     int ms = timer.getDuration();
 
-    // int ms = stopClock();  
-    std::cout << "BFS ellapsed time: " << ms << "ms" << std::endl;
-    std::cout << "BFS total nodes expanded: " << count_expanded << std::endl;
-    std::cout << "Size of Open: " << open.size() << std::endl;
-    std::cout << "Size of Closed: " << closed.size() << std::endl;
-    std::cout << "memory: " << sizeof(board_short) << std::endl;
+    if (options.debug) {
+        std::cout << "BFS ellapsed time: " << ms << "ms" << std::endl;
+        std::cout << "BFS total nodes expanded: " << count_expanded << std::endl;
+        std::cout << "Size of Open: " << open.size() << std::endl;
+        std::cout << "Size of Closed: " << closed.size() << std::endl;
+        std::cout << "memory: " << sizeof(board_short) << std::endl; 
+    }  
 
     // Put simulator back to original state
     startingState.restoreSimulator();
+    setSimulatorFlag(false);
+
+    time_ms = ms;
+    node_count = count_expanded;
 
     // Print solution
-    std::cout << "solution length: " << solution.size() << std::endl;
-    for (int i = 0; i < (int)solution.size(); i++) {
-        if (i % 8 != 0) {std::cout << "(";}
-        std::cout << actionToString(solution[i]);
-        if (i % 8 != 0) {std::cout << ")";} 
-        std::cout << " ";
+    if (options.debug) {
+       std::cout << "solution length: " << solution.size() << std::endl;
+        for (int i = 0; i < (int)solution.size(); i++) {
+            if (i % 8 != 0) {std::cout << "(";}
+            std::cout << actionToString(solution[i]);
+            if (i % 8 != 0) {std::cout << ")";} 
+            std::cout << " ";
+        }
+        std::cout << std::endl; 
     }
-    std::cout << std::endl;
 }

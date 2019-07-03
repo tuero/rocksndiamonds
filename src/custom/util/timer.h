@@ -31,7 +31,7 @@ public:
     /*
      * Check how long as passed since the clock has started (in micro-seconds)
      */
-    bool checkTime();
+    int checkTime();
 
     /*
      * Get time in micro-seconds 

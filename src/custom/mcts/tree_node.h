@@ -23,9 +23,11 @@ private:
     std::vector<Pointer> children;          // current children from this node
     std::vector<Action> actions;
 
-    int num_visits;
+    int visits_count;
     int depth;
     float value;
+    float distance;
+    int depth_found;
 
     void addChild(const Action childAction);
 
@@ -43,14 +45,28 @@ public:
 
     TreeNode* expand();
 
-
-
-
-
-
-
-
     TreeNode* getParent();
+
+    void updateStats(const float value, const int depth_found);
+
+    int getChildCount() const;
+
+    TreeNode* getChild(int index);
+
+    float getValue() const;
+
+    int getVisitCount() const;
+
+    float getDistance() const;
+
+    float getDepth() const;
+
+    float getDepthFound() const;
+
+
+
+
+
 
     TreeNode* getChild(const Action action);
 

@@ -18,6 +18,6 @@
 
 
 
-void bfs(std::vector<Action> &solution);
+void bfs(std::vector<Action> &solution, int &time_ms, int &node_count);
 
 #endif

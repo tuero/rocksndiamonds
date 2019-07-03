@@ -6,9 +6,11 @@ TreeNode::TreeNode(TreeNode* parent, const std::vector<Action> &actions_from_sta
     :  parent(parent), actions_from_start(actions_from_start) 
 {
     action_taken = Action::noop;
-    num_visits = 0;
+    visits_count = 0;
     depth = (parent == nullptr ? 0 : parent->depth + 1);
     value = 0;
+    distance = 0;
+    depth_found = 0;
 }
 
 
@@ -61,6 +63,7 @@ TreeNode* TreeNode::expand() {
     // Simulator is set to the child state, so determine what the available actions
     // the child has
     child.get()->setActions();
+    child.get()->distance = getDistanceToGoal();
 
     // Store child
     children.push_back(std::move(child));
@@ -69,54 +72,44 @@ TreeNode* TreeNode::expand() {
 }
 
 
-
-
-
-
-
-
-
-
-void TreeNode::addChild(const Action childAction) {
-    Pointer child = std::make_unique<TreeNode>(this, actions_from_start);
-    child.get()->action_taken = childAction;
-    children.push_back(std::move(child));
-}
-
-
 TreeNode* TreeNode::getParent() {
     return parent;
 }
 
 
-TreeNode* TreeNode::getChild(const Action action) {
-    TreeNode* child_node = new TreeNode(this, actions_from_start);
-    child_node->setActionTaken(action);
-    stored_player[0].action = action;
-
-    for (int i = 0; i < 8; i++) {
-        child_node->actions_from_start.push_back(action);
-        HandleGameActions();
-    }
-
-    return child_node;
+void TreeNode::updateStats(const float value, const int depth_found) {
+    visits_count += 1;
+    this->value = value;
+    this->depth_found = depth_found;
 }
 
 
-void TreeNode::setActionTaken(Action actionTaken) {
-    action_taken = actionTaken;
-    stored_player[0].action = action_taken;
+int TreeNode::getChildCount() const {
+    return children.size();
+}
 
-    for (int i = 0; i < 8; i++) {
-        actions_from_start.push_back(action_taken);
-        HandleGameActions();
-    }
+TreeNode* TreeNode::getChild(int index) {
+    assert(index < children.size());
+    return children[index].get();
 }
 
 
-void TreeNode::setSimulatorToCurrent() {
-    for (auto & element : actions_from_start) {
-        stored_player[0].action = element;
-        HandleGameActions();
-    }
+float TreeNode::getValue() const {
+    return value;
+}
+
+int TreeNode::getVisitCount() const {
+    return visits_count;
+}
+
+float TreeNode::getDistance() const {
+    return distance;
+}
+
+float TreeNode::getDepth() const {
+    return (float)depth;
+}
+
+float TreeNode::getDepthFound() const {
+    return (float)depth_found;
 }

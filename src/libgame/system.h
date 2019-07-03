@@ -972,6 +972,9 @@ struct RuntimeInfo
   boolean uses_touch_device;
 };
 
+typedef enum controller_type {CONTROLLER_TYPE_USER, CONTROLLER_TYPE_TEST_SPEED, CONTROLLER_TYPE_TEST_BFS,
+                              CONTROLLER_TYPE_TEST_MCTS, CONTROLLER_TYPE_BFS, CONTROLLER_TYPE_MCTS} controller_type;
+
 struct OptionInfo
 {
   char *server_host;
@@ -996,7 +999,7 @@ struct OptionInfo
   boolean verbose;
   boolean debug;
   // Custom options
-  boolean solver;               // Solver to act as controller
+  controller_type solver;       // Solver to act as controller
   int level_number;             // level number to load
   int delay;                    // SetVideoFrameDelay
 };
