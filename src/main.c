@@ -7747,18 +7747,74 @@ static void InitProgramConfig(char *command_filename)
 		  GAME_VERSION_ACTUAL);
 }
 
+int step_counter = 0;
+
 int main(int argc, char *argv[])
 {
+    // Find files/directories
   InitProgramConfig(argv[0]);
 
+  // This just sets functions
   InitWindowTitleFunction(getWindowTitleString);
   InitExitMessageFunction(DisplayExitMessage);
   InitExitFunction(CloseAllAndExit);
+
+  // inits SDL (this will need to be removed)
   InitPlatformDependentStuff();
 
+  // Handles command line arguments
   GetOptions(argc, argv, print_usage, print_version);
+
   OpenAll();
 
+    // Set default level set to custom (makes it easier to programmatically select levels)
+    setLevelSet(0);
+    LoadLevelSetup_SeriesInfo();
+
+    // Init custom logging
+    initLogger();
+
+    // Load maps for above mapset, and set current level
+    if (options.controller_type == CONTROLLER_TYPE_TEST_SPEED) {
+        LoadLevel(options.level_number);
+        handleLevelStart();
+        testEngineSpeed();
+        return 0;
+    }
+    else if (options.controller_type == CONTROLLER_TYPE_TEST_BFS) {
+        LoadLevel(options.level_number);
+        handleLevelStart();
+        testBFSSpeed();
+        return 0;
+    }
+    else if (options.controller_type == CONTROLLER_TYPE_TEST_MCTS) {
+        LoadLevel(options.level_number);
+        handleLevelStart();
+        testMCTSSpeed();
+        return 0;
+    }
+    else if (options.controller_type == CONTROLLER_TYPE_TEST_RNG) {
+        LoadLevel(options.level_number);
+        handleLevelStart();
+        testRNGAfterSimulations();
+        return 0;
+    }
+    else if (options.controller_type == CONTROLLER_TYPE_TEST_ALL) {
+        LoadLevel(options.level_number);
+        handleLevelStart();
+        testAll();
+        return 0;
+    }
+    else if (options.level_number > 0) {
+        LoadLevel(options.level_number);
+    }
+
+    // start game
+    if (options.controller_type != CONTROLLER_TYPE_USER) {
+        StartGameActions(network.enabled, setup.autorecord, level.random_seed);
+    }
+
+    // normal event loop
   EventLoop();
   CloseAllAndExit(0);
 

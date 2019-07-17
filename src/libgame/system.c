@@ -21,6 +21,8 @@
 #include "joystick.h"
 #include "misc.h"
 
+#include "../main.h"
+
 #define ENABLE_UNUSED_CODE	0	// currently unused functions
 
 
@@ -798,102 +800,101 @@ void BlitBitmap(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 		int src_x, int src_y, int width, int height,
 		int dst_x, int dst_y)
 {
-  int dst_x_unclipped = dst_x;
-  int dst_y_unclipped = dst_y;
+    if (is_simulating == FALSE) {
+        int dst_x_unclipped = dst_x;
+        int dst_y_unclipped = dst_y;
 
-  if (program.headless)
-    return;
+        if (program.headless)
+            return;
 
-  if (src_bitmap == NULL || dst_bitmap == NULL)
-    return;
+        if (src_bitmap == NULL || dst_bitmap == NULL)
+            return;
 
-  if (DrawingDeactivated(dst_x, dst_y, width, height))
-    return;
+        if (DrawingDeactivated(dst_x, dst_y, width, height))
+            return;
 
-  if (!InClippedRectangle(src_bitmap, &src_x, &src_y, &width, &height, FALSE) ||
-      !InClippedRectangle(dst_bitmap, &dst_x, &dst_y, &width, &height, TRUE))
-    return;
+        if (!InClippedRectangle(src_bitmap, &src_x, &src_y, &width, &height, FALSE) ||
+            !InClippedRectangle(dst_bitmap, &dst_x, &dst_y, &width, &height, TRUE))
+            return;
 
-  // source x/y might need adjustment if destination x/y was clipped top/left
-  src_x += dst_x - dst_x_unclipped;
-  src_y += dst_y - dst_y_unclipped;
+        // source x/y might need adjustment if destination x/y was clipped top/left
+        src_x += dst_x - dst_x_unclipped;
+        src_y += dst_y - dst_y_unclipped;
 
-  // !!! 2013-12-11: An "old friend" is back. Same bug in SDL2 2.0.1 !!!
-  // !!! 2009-03-30: Fixed by using self-compiled, patched SDL.dll !!!
-  /* (This bug still exists in the actual (as of 2009-06-15) version 1.2.13,
-     but is already fixed in SVN and should therefore finally be fixed with
-     the next official SDL release, which is probably version 1.2.14.) */
-  // !!! 2009-03-24: It seems that this problem still exists in 1.2.12 !!!
+        // !!! 2013-12-11: An "old friend" is back. Same bug in SDL2 2.0.1 !!!
+        // !!! 2009-03-30: Fixed by using self-compiled, patched SDL.dll !!!
+        /* (This bug still exists in the actual (as of 2009-06-15) version 1.2.13,
+           but is already fixed in SVN and should therefore finally be fixed with
+           the next official SDL release, which is probably version 1.2.14.) */
+        // !!! 2009-03-24: It seems that this problem still exists in 1.2.12 !!!
 
-  if (src_bitmap == dst_bitmap)
-  {
-    // needed when blitting directly to same bitmap -- should not be needed with
-    // recent SDL libraries, but apparently does not work in 1.2.11 directly
+        if (src_bitmap == dst_bitmap) {
+            // needed when blitting directly to same bitmap -- should not be needed with
+            // recent SDL libraries, but apparently does not work in 1.2.11 directly
 
-    static Bitmap *tmp_bitmap = NULL;
-    static int tmp_bitmap_xsize = 0;
-    static int tmp_bitmap_ysize = 0;
+            static Bitmap *tmp_bitmap = NULL;
+            static int tmp_bitmap_xsize = 0;
+            static int tmp_bitmap_ysize = 0;
 
-    // start with largest static bitmaps for initial bitmap size ...
-    if (tmp_bitmap_xsize == 0 && tmp_bitmap_ysize == 0)
-    {
-      tmp_bitmap_xsize = MAX(gfx.win_xsize, gfx.scrollbuffer_width);
-      tmp_bitmap_ysize = MAX(gfx.win_ysize, gfx.scrollbuffer_height);
+            // start with largest static bitmaps for initial bitmap size ...
+            if (tmp_bitmap_xsize == 0 && tmp_bitmap_ysize == 0) {
+                tmp_bitmap_xsize = MAX(gfx.win_xsize, gfx.scrollbuffer_width);
+                tmp_bitmap_ysize = MAX(gfx.win_ysize, gfx.scrollbuffer_height);
+            }
+
+            // ... and allow for later re-adjustments due to custom artwork bitmaps
+            if (src_bitmap->width > tmp_bitmap_xsize ||
+                src_bitmap->height > tmp_bitmap_ysize) {
+                tmp_bitmap_xsize = MAX(tmp_bitmap_xsize, src_bitmap->width);
+                tmp_bitmap_ysize = MAX(tmp_bitmap_ysize, src_bitmap->height);
+
+                FreeBitmap(tmp_bitmap);
+
+                tmp_bitmap = NULL;
+            }
+
+            if (tmp_bitmap == NULL)
+                tmp_bitmap = CreateBitmap(tmp_bitmap_xsize, tmp_bitmap_ysize,
+                                          DEFAULT_DEPTH);
+
+            sysCopyArea(src_bitmap, tmp_bitmap,
+                        src_x, src_y, width, height, dst_x, dst_y, BLIT_OPAQUE);
+            sysCopyArea(tmp_bitmap, dst_bitmap,
+                        dst_x, dst_y, width, height, dst_x, dst_y, BLIT_OPAQUE);
+
+            return;
+        }
+
+        sysCopyArea(src_bitmap, dst_bitmap,
+                    src_x, src_y, width, height, dst_x, dst_y, BLIT_OPAQUE);
     }
-
-    // ... and allow for later re-adjustments due to custom artwork bitmaps
-    if (src_bitmap->width > tmp_bitmap_xsize ||
-	src_bitmap->height > tmp_bitmap_ysize)
-    {
-      tmp_bitmap_xsize = MAX(tmp_bitmap_xsize, src_bitmap->width);
-      tmp_bitmap_ysize = MAX(tmp_bitmap_ysize, src_bitmap->height);
-
-      FreeBitmap(tmp_bitmap);
-
-      tmp_bitmap = NULL;
-    }
-
-    if (tmp_bitmap == NULL)
-      tmp_bitmap = CreateBitmap(tmp_bitmap_xsize, tmp_bitmap_ysize,
-				DEFAULT_DEPTH);
-
-    sysCopyArea(src_bitmap, tmp_bitmap,
-		src_x, src_y, width, height, dst_x, dst_y, BLIT_OPAQUE);
-    sysCopyArea(tmp_bitmap, dst_bitmap,
-		dst_x, dst_y, width, height, dst_x, dst_y, BLIT_OPAQUE);
-
-    return;
-  }
-
-  sysCopyArea(src_bitmap, dst_bitmap,
-	      src_x, src_y, width, height, dst_x, dst_y, BLIT_OPAQUE);
 }
 
 void BlitBitmapTiled(Bitmap *src_bitmap, Bitmap *dst_bitmap,
 		     int src_x, int src_y, int src_width, int src_height,
 		     int dst_x, int dst_y, int dst_width, int dst_height)
 {
-  int src_xsize = (src_width  == 0 ? src_bitmap->width  : src_width);
-  int src_ysize = (src_height == 0 ? src_bitmap->height : src_height);
-  int dst_xsize = dst_width;
-  int dst_ysize = dst_height;
-  int src_xsteps = (dst_xsize + src_xsize - 1) / src_xsize;
-  int src_ysteps = (dst_ysize + src_ysize - 1) / src_ysize;
-  int x, y;
+    if (is_simulating == FALSE) {
+        int src_xsize = (src_width == 0 ? src_bitmap->width : src_width);
+        int src_ysize = (src_height == 0 ? src_bitmap->height : src_height);
+        int dst_xsize = dst_width;
+        int dst_ysize = dst_height;
+        int src_xsteps = (dst_xsize + src_xsize - 1) / src_xsize;
+        int src_ysteps = (dst_ysize + src_ysize - 1) / src_ysize;
+        int x, y;
 
-  for (y = 0; y < src_ysteps; y++)
-  {
-    for (x = 0; x < src_xsteps; x++)
-    {
-      int draw_x = dst_x + x * src_xsize;
-      int draw_y = dst_y + y * src_ysize;
-      int draw_xsize = MIN(src_xsize, dst_xsize - x * src_xsize);
-      int draw_ysize = MIN(src_ysize, dst_ysize - y * src_ysize);
+        for (y = 0; y < src_ysteps; y++) {
+            for (x = 0; x < src_xsteps; x++) {
+                int draw_x = dst_x + x * src_xsize;
+                int draw_y = dst_y + y * src_ysize;
+                int draw_xsize = MIN(src_xsize, dst_xsize - x * src_xsize);
+                int draw_ysize = MIN(src_ysize, dst_ysize - y * src_ysize);
 
-      BlitBitmap(src_bitmap, dst_bitmap, src_x, src_y, draw_xsize, draw_ysize,
-		 draw_x, draw_y);
+                BlitBitmap(src_bitmap, dst_bitmap, src_x, src_y, draw_xsize, draw_ysize,
+                           draw_x, draw_y);
+            }
+        }
     }
-  }
 }
 
 void FadeRectangle(int x, int y, int width, int height,

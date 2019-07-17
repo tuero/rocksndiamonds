@@ -51,4 +51,8 @@ void HandleSpecialGameControllerKeys(Key, int);
 
 boolean DoKeysymAction(int);
 
+void HandleEvents(void);
+void HandleNoEvent(void);
+void HandleEventActions(void);
+
 #endif

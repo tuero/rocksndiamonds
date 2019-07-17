@@ -4442,6 +4442,7 @@ void LoadLevelSetup_SeriesInfo(void)
   level_subdir = leveldir_current->subdir;
 
   filename = getPath2(getLevelSetupDir(level_subdir), LEVELSETUP_FILENAME);
+//    printf("%s\n", filename);
 
   if ((level_setup_hash = loadSetupFileHash(filename)))
   {

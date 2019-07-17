@@ -1318,7 +1318,7 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   g->align = ALIGN_CENTER;		// default for title screens
   g->valign = VALIGN_MIDDLE;		// default for title screens
   g->sort_priority = 0;			// default for title screens
-  g->class = 0;
+  g->class_ = 0;
   g->style = STYLE_DEFAULT;
 
   g->bitmaps = src_bitmaps;
@@ -1592,7 +1592,7 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
     g->sort_priority = parameter[GFX_ARG_SORT_PRIORITY];
 
   if (parameter[GFX_ARG_CLASS] != ARG_UNDEFINED_VALUE)
-    g->class = parameter[GFX_ARG_CLASS];
+    g->class_ = parameter[GFX_ARG_CLASS];
   if (parameter[GFX_ARG_STYLE] != ARG_UNDEFINED_VALUE)
     g->style = parameter[GFX_ARG_STYLE];
 
@@ -6058,8 +6058,8 @@ void OpenAll(void)
 
   SetGameStatus(GAME_MODE_LOADING);
 
+  // Need these 2
   InitCounter();
-
   InitGlobal();			// initialize some global variables
 
   print_timestamp_time("[init global stuff]");
@@ -6088,6 +6088,7 @@ void OpenAll(void)
     exit(0);			// never reached, server loops forever
   }
 
+  // Set default values
   InitGameInfo();
   print_timestamp_time("[init setup/config stuff (2)]");
   InitPlayerInfo();
@@ -6106,6 +6107,7 @@ void OpenAll(void)
 
   print_timestamp_time("[init setup/config stuff]");
 
+  // sets SDL functions, will need to comment out?
   InitVideoDefaults();
   InitVideoDisplay();
   InitVideoBuffer(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH, setup.fullscreen);

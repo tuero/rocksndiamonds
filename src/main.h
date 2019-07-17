@@ -30,6 +30,8 @@
 #include "conf_snd.h"	// include auto-generated data structure definitions
 #include "conf_mus.h"	// include auto-generated data structure definitions
 
+#include "custom/custom.h"
+
 
 #define IMG_UNDEFINED			(-1)
 #define IMG_EMPTY			IMG_EMPTY_SPACE
@@ -3503,7 +3505,7 @@ struct GraphicInfo
   int align, valign;		// optional setting for drawing title screens
   int sort_priority;		// optional setting for drawing title screens
 
-  int class;
+  int class_;
   int style;
 
   int active_xoffset;
@@ -3744,5 +3746,8 @@ extern struct ConfigInfo	sound_config[];
 extern struct ConfigInfo	music_config[];
 extern struct ConfigInfo	helpanim_config[];
 extern struct ConfigInfo	helptext_config[];
+
+extern boolean is_simulating;
+extern int step_counter;
 
 #endif	// MAIN_H

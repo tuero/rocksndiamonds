@@ -799,106 +799,100 @@ static boolean equalRedrawMasks(int mask_1, int mask_2)
 
 void BackToFront(void)
 {
-  static int last_redraw_mask = REDRAW_NONE;
+    if (is_simulating == FALSE) {
+        static int last_redraw_mask = REDRAW_NONE;
 
-  // force screen redraw in every frame to continue drawing global animations
-  // (but always use the last redraw mask to prevent unwanted side effects)
-  if (redraw_mask == REDRAW_NONE)
-    redraw_mask = last_redraw_mask;
+        // force screen redraw in every frame to continue drawing global animations
+        // (but always use the last redraw mask to prevent unwanted side effects)
+        if (redraw_mask == REDRAW_NONE)
+            redraw_mask = last_redraw_mask;
 
-  last_redraw_mask = redraw_mask;
+        last_redraw_mask = redraw_mask;
 
 #if 1
-  // masked border now drawn immediately when blitting backbuffer to window
+        // masked border now drawn immediately when blitting backbuffer to window
 #else
-  // draw masked border to all viewports, if defined
-  DrawMaskedBorder(redraw_mask);
+        // draw masked border to all viewports, if defined
+        DrawMaskedBorder(redraw_mask);
 #endif
 
-  // draw frames per second (only if debug mode is enabled)
-  if (redraw_mask & REDRAW_FPS)
-    DrawFramesPerSecond();
+        // draw frames per second (only if debug mode is enabled)
+        if (redraw_mask & REDRAW_FPS)
+            DrawFramesPerSecond();
 
-  // remove playfield redraw before potentially merging with doors redraw
-  if (DrawingDeactivated(REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE))
-    redraw_mask &= ~REDRAW_FIELD;
+        // remove playfield redraw before potentially merging with doors redraw
+        if (DrawingDeactivated(REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE))
+            redraw_mask &= ~REDRAW_FIELD;
 
-  // redraw complete window if both playfield and (some) doors need redraw
-  if (redraw_mask & REDRAW_FIELD && redraw_mask & REDRAW_DOORS)
-    redraw_mask = REDRAW_ALL;
+        // redraw complete window if both playfield and (some) doors need redraw
+        if (redraw_mask & REDRAW_FIELD && redraw_mask & REDRAW_DOORS)
+            redraw_mask = REDRAW_ALL;
 
-  /* although redrawing the whole window would be fine for normal gameplay,
-     being able to only redraw the playfield is required for deactivating
-     certain drawing areas (mainly playfield) to work, which is needed for
-     warp-forward to be fast enough (by skipping redraw of most frames) */
+        /* although redrawing the whole window would be fine for normal gameplay,
+           being able to only redraw the playfield is required for deactivating
+           certain drawing areas (mainly playfield) to work, which is needed for
+           warp-forward to be fast enough (by skipping redraw of most frames) */
 
-  if (redraw_mask & REDRAW_ALL)
-  {
-    BlitBitmap(backbuffer, window, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
-  }
-  else if (redraw_mask & REDRAW_FIELD)
-  {
-    BlitBitmap(backbuffer, window,
-	       REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE, REAL_SX, REAL_SY);
-  }
-  else if (redraw_mask & REDRAW_DOORS)
-  {
-    // merge door areas to prevent calling screen redraw more than once
-    int x1 = WIN_XSIZE;
-    int y1 = WIN_YSIZE;
-    int x2 = 0;
-    int y2 = 0;
+        if (redraw_mask & REDRAW_ALL) {
+            BlitBitmap(backbuffer, window, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
+        } else if (redraw_mask & REDRAW_FIELD) {
+            BlitBitmap(backbuffer, window,
+                       REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE, REAL_SX, REAL_SY);
+        } else if (redraw_mask & REDRAW_DOORS) {
+            // merge door areas to prevent calling screen redraw more than once
+            int x1 = WIN_XSIZE;
+            int y1 = WIN_YSIZE;
+            int x2 = 0;
+            int y2 = 0;
 
-    if (redraw_mask & REDRAW_DOOR_1)
-    {
-      x1 = MIN(x1, DX);
-      y1 = MIN(y1, DY);
-      x2 = MAX(x2, DX + DXSIZE);
-      y2 = MAX(y2, DY + DYSIZE);
-    }
+            if (redraw_mask & REDRAW_DOOR_1) {
+                x1 = MIN(x1, DX);
+                y1 = MIN(y1, DY);
+                x2 = MAX(x2, DX + DXSIZE);
+                y2 = MAX(y2, DY + DYSIZE);
+            }
 
-    if (redraw_mask & REDRAW_DOOR_2)
-    {
-      x1 = MIN(x1, VX);
-      y1 = MIN(y1, VY);
-      x2 = MAX(x2, VX + VXSIZE);
-      y2 = MAX(y2, VY + VYSIZE);
-    }
+            if (redraw_mask & REDRAW_DOOR_2) {
+                x1 = MIN(x1, VX);
+                y1 = MIN(y1, VY);
+                x2 = MAX(x2, VX + VXSIZE);
+                y2 = MAX(y2, VY + VYSIZE);
+            }
 
-    if (redraw_mask & REDRAW_DOOR_3)
-    {
-      x1 = MIN(x1, EX);
-      y1 = MIN(y1, EY);
-      x2 = MAX(x2, EX + EXSIZE);
-      y2 = MAX(y2, EY + EYSIZE);
-    }
+            if (redraw_mask & REDRAW_DOOR_3) {
+                x1 = MIN(x1, EX);
+                y1 = MIN(y1, EY);
+                x2 = MAX(x2, EX + EXSIZE);
+                y2 = MAX(y2, EY + EYSIZE);
+            }
 
-    // make sure that at least one pixel is blitted, and inside the screen
-    // (else nothing is blitted, causing the animations not to be updated)
-    x1 = MIN(MAX(0, x1), WIN_XSIZE - 1);
-    y1 = MIN(MAX(0, y1), WIN_YSIZE - 1);
-    x2 = MIN(MAX(1, x2), WIN_XSIZE);
-    y2 = MIN(MAX(1, y2), WIN_YSIZE);
+            // make sure that at least one pixel is blitted, and inside the screen
+            // (else nothing is blitted, causing the animations not to be updated)
+            x1 = MIN(MAX(0, x1), WIN_XSIZE - 1);
+            y1 = MIN(MAX(0, y1), WIN_YSIZE - 1);
+            x2 = MIN(MAX(1, x2), WIN_XSIZE);
+            y2 = MIN(MAX(1, y2), WIN_YSIZE);
 
-    BlitBitmap(backbuffer, window, x1, y1, x2 - x1, y2 - y1, x1, y1);
-  }
+            BlitBitmap(backbuffer, window, x1, y1, x2 - x1, y2 - y1, x1, y1);
+        }
 
-  redraw_mask = REDRAW_NONE;
+        redraw_mask = REDRAW_NONE;
 
 #if DEBUG_FRAME_TIME
-  PrintFrameTimeDebugging();
+        PrintFrameTimeDebugging();
 #endif
+    }
 }
 
 void BackToFront_WithFrameDelay(unsigned int frame_delay_value)
 {
   unsigned int frame_delay_value_old = GetVideoFrameDelay();
 
-  SetVideoFrameDelay(frame_delay_value);
+  SetVideoFrameDelay(is_simulating ? 0 : frame_delay_value);
 
-  BackToFront();
+  if (is_simulating == FALSE){BackToFront();}
 
-  SetVideoFrameDelay(frame_delay_value_old);
+  SetVideoFrameDelay(is_simulating ? 0 : frame_delay_value_old);
 }
 
 static int fade_type_skip = FADE_TYPE_NONE;
@@ -1643,11 +1637,12 @@ void DrawGraphic(int x, int y, int graphic, int frame)
     return;
   }
 #endif
+  if (is_simulating == FALSE) {
+      DrawGraphicExt(drawto_field, FX + x * TILEX_VAR, FY + y * TILEY_VAR, graphic,
+                     frame);
 
-  DrawGraphicExt(drawto_field, FX + x * TILEX_VAR, FY + y * TILEY_VAR, graphic,
-		 frame);
-
-  MarkTileDirty(x, y);
+      MarkTileDirty(x, y);
+  }
 }
 
 void DrawFixedGraphic(int x, int y, int graphic, int frame)
@@ -1669,22 +1664,26 @@ void DrawFixedGraphic(int x, int y, int graphic, int frame)
 void DrawGraphicExt(DrawBuffer *dst_bitmap, int x, int y, int graphic,
 		    int frame)
 {
-  Bitmap *src_bitmap;
-  int src_x, src_y;
+    if (is_simulating == FALSE) {
+        Bitmap *src_bitmap;
+        int src_x, src_y;
 
-  getGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
+        getGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
 
-  BlitBitmap(src_bitmap, dst_bitmap, src_x, src_y, TILEX_VAR, TILEY_VAR, x, y);
+        BlitBitmap(src_bitmap, dst_bitmap, src_x, src_y, TILEX_VAR, TILEY_VAR, x, y);
+    }
 }
 
 void DrawFixedGraphicExt(DrawBuffer *dst_bitmap, int x, int y, int graphic,
 			 int frame)
 {
-  Bitmap *src_bitmap;
-  int src_x, src_y;
+    if (is_simulating == FALSE) {
+        Bitmap *src_bitmap;
+        int src_x, src_y;
 
-  getFixedGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
-  BlitBitmap(src_bitmap, dst_bitmap, src_x, src_y, TILEX, TILEY, x, y);
+        getFixedGraphicSource(graphic, frame, &src_bitmap, &src_x, &src_y);
+        BlitBitmap(src_bitmap, dst_bitmap, src_x, src_y, TILEX, TILEY, x, y);
+    }
 }
 
 void DrawGraphicThruMask(int x, int y, int graphic, int frame)
@@ -1996,59 +1995,54 @@ static void DrawGraphicShiftedThruMask(int x, int y, int dx, int dy,
 void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
 			  int cut_mode, int mask_mode)
 {
-  int lx = LEVELX(x), ly = LEVELY(y);
-  int graphic;
-  int frame;
+    if (is_simulating == FALSE) {
+        int lx = LEVELX(x), ly = LEVELY(y);
+        int graphic;
+        int frame;
 
-  if (IN_LEV_FIELD(lx, ly))
-  {
-    SetRandomAnimationValue(lx, ly);
+        if (IN_LEV_FIELD(lx, ly)) {
+            SetRandomAnimationValue(lx, ly);
 
-    graphic = el_act_dir2img(element, GfxAction[lx][ly], GfxDir[lx][ly]);
-    frame = getGraphicAnimationFrame(graphic, GfxFrame[lx][ly]);
+            graphic = el_act_dir2img(element, GfxAction[lx][ly], GfxDir[lx][ly]);
+            frame = getGraphicAnimationFrame(graphic, GfxFrame[lx][ly]);
 
-    // do not use double (EM style) movement graphic when not moving
-    if (graphic_info[graphic].double_movement && !dx && !dy)
-    {
-      graphic = el_act_dir2img(element, ACTION_DEFAULT, GfxDir[lx][ly]);
-      frame = getGraphicAnimationFrame(graphic, GfxFrame[lx][ly]);
+            // do not use double (EM style) movement graphic when not moving
+            if (graphic_info[graphic].double_movement && !dx && !dy) {
+                graphic = el_act_dir2img(element, ACTION_DEFAULT, GfxDir[lx][ly]);
+                frame = getGraphicAnimationFrame(graphic, GfxFrame[lx][ly]);
+            }
+        } else    // border element
+        {
+            graphic = el2img(element);
+            frame = getGraphicAnimationFrame(graphic, -1);
+        }
+
+        if (element == EL_EXPANDABLE_WALL) {
+            boolean left_stopped = FALSE, right_stopped = FALSE;
+
+            if (!IN_LEV_FIELD(lx - 1, ly) || IS_WALL(Feld[lx - 1][ly]))
+                left_stopped = TRUE;
+            if (!IN_LEV_FIELD(lx + 1, ly) || IS_WALL(Feld[lx + 1][ly]))
+                right_stopped = TRUE;
+
+            if (left_stopped && right_stopped)
+                graphic = IMG_WALL;
+            else if (left_stopped) {
+                graphic = IMG_EXPANDABLE_WALL_GROWING_RIGHT;
+                frame = graphic_info[graphic].anim_frames - 1;
+            } else if (right_stopped) {
+                graphic = IMG_EXPANDABLE_WALL_GROWING_LEFT;
+                frame = graphic_info[graphic].anim_frames - 1;
+            }
+        }
+
+        if (dx || dy)
+            DrawGraphicShifted(x, y, dx, dy, graphic, frame, cut_mode, mask_mode);
+        else if (mask_mode == USE_MASKING)
+            DrawGraphicThruMask(x, y, graphic, frame);
+        else
+            DrawGraphic(x, y, graphic, frame);
     }
-  }
-  else	// border element
-  {
-    graphic = el2img(element);
-    frame = getGraphicAnimationFrame(graphic, -1);
-  }
-
-  if (element == EL_EXPANDABLE_WALL)
-  {
-    boolean left_stopped = FALSE, right_stopped = FALSE;
-
-    if (!IN_LEV_FIELD(lx - 1, ly) || IS_WALL(Feld[lx - 1][ly]))
-      left_stopped = TRUE;
-    if (!IN_LEV_FIELD(lx + 1, ly) || IS_WALL(Feld[lx + 1][ly]))
-      right_stopped = TRUE;
-
-    if (left_stopped && right_stopped)
-      graphic = IMG_WALL;
-    else if (left_stopped)
-    {
-      graphic = IMG_EXPANDABLE_WALL_GROWING_RIGHT;
-      frame = graphic_info[graphic].anim_frames - 1;
-    }
-    else if (right_stopped)
-    {
-      graphic = IMG_EXPANDABLE_WALL_GROWING_LEFT;
-      frame = graphic_info[graphic].anim_frames - 1;
-    }
-  }
-
-  if (dx || dy)
-    DrawGraphicShifted(x, y, dx, dy, graphic, frame, cut_mode, mask_mode);
-  else if (mask_mode == USE_MASKING)
-    DrawGraphicThruMask(x, y, graphic, frame);
-  else
-    DrawGraphic(x, y, graphic, frame);
 }
 
 void DrawLevelElementExt(int x, int y, int dx, int dy, int element,
@@ -2114,8 +2108,8 @@ static void DrawLevelFieldCrumbledInnerCorners(int x, int y, int dx, int dy,
 
     // check if neighbour field is of same crumble type
     boolean same = (IS_CRUMBLED_TILE(xx, yy, element) &&
-		    graphic_info[graphic].class ==
-		    graphic_info[el_act2crm(element, ACTION_DEFAULT)].class);
+		    graphic_info[graphic].class_ ==
+		    graphic_info[el_act2crm(element, ACTION_DEFAULT)].class_);
 
     // return if check prevents inner corner
     if (same == (dxx == dx && dyy == dy))
@@ -2178,8 +2172,8 @@ static void DrawLevelFieldCrumbledBorders(int x, int y, int graphic, int frame,
 
     // check if neighbour field is of same crumble type
     if (IS_CRUMBLED_TILE(xx, yy, element) &&
-	graphic_info[graphic].class ==
-	graphic_info[el_act2crm(element, ACTION_DEFAULT)].class)
+	graphic_info[graphic].class_ ==
+	graphic_info[el_act2crm(element, ACTION_DEFAULT)].class_)
     {
       // no crumbled corner, but continued crumbled border
 
@@ -2248,8 +2242,8 @@ static void DrawLevelFieldCrumbledExt(int x, int y, int graphic, int frame)
 
       // check if neighbour field is of same crumble type
       if (IS_CRUMBLED_TILE(xx, yy, element) &&
-	  graphic_info[graphic].class ==
-	  graphic_info[el_act2crm(element, ACTION_DEFAULT)].class)
+	  graphic_info[graphic].class_ ==
+	  graphic_info[el_act2crm(element, ACTION_DEFAULT)].class_)
 	continue;
 
       DrawLevelFieldCrumbledBorders(x, y, graphic, frame, i);
@@ -2338,7 +2332,7 @@ void DrawLevelFieldCrumbled(int x, int y)
 {
   int graphic;
 
-  if (!IN_LEV_FIELD(x, y))
+  if (!IN_LEV_FIELD(x, y) || is_simulating == TRUE)
     return;
 
   if (Feld[x][y] == EL_ELEMENT_SNAPPING &&
@@ -2358,6 +2352,7 @@ void DrawLevelFieldCrumbled(int x, int y)
 void DrawLevelFieldCrumbledDigging(int x, int y, int direction,
 				   int step_frame)
 {
+    if (is_simulating == TRUE) {return;}
   int graphic1 = el_act_dir2img(GfxElement[x][y], ACTION_DIGGING, direction);
   int graphic2 = el_act_dir2crm(GfxElement[x][y], ACTION_DIGGING, direction);
   int frame1 = getGraphicAnimationFrame(graphic1, step_frame);
@@ -2459,6 +2454,7 @@ void DrawLevelElement(int x, int y, int element)
 
 void DrawScreenField(int x, int y)
 {
+    if (is_simulating == TRUE) {return;}
   int lx = LEVELX(x), ly = LEVELY(y);
   int element, content;
 
@@ -2572,24 +2568,22 @@ void DrawScreenField(int x, int y)
 
 void DrawLevelField(int x, int y)
 {
-  if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
-    DrawScreenField(SCREENX(x), SCREENY(y));
-  else if (IS_MOVING(x, y))
-  {
-    int newx,newy;
+    if (is_simulating == TRUE) {return;}
+    if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
+        DrawScreenField(SCREENX(x), SCREENY(y));
+    else if (IS_MOVING(x, y)) {
+        int newx, newy;
 
-    Moving2Blocked(x, y, &newx, &newy);
-    if (IN_SCR_FIELD(SCREENX(newx), SCREENY(newy)))
-      DrawScreenField(SCREENX(newx), SCREENY(newy));
-  }
-  else if (IS_BLOCKED(x, y))
-  {
-    int oldx, oldy;
+        Moving2Blocked(x, y, &newx, &newy);
+        if (IN_SCR_FIELD(SCREENX(newx), SCREENY(newy)))
+            DrawScreenField(SCREENX(newx), SCREENY(newy));
+    } else if (IS_BLOCKED(x, y)) {
+        int oldx, oldy;
 
-    Blocked2Moving(x, y, &oldx, &oldy);
-    if (IN_SCR_FIELD(SCREENX(oldx), SCREENY(oldy)))
-      DrawScreenField(SCREENX(oldx), SCREENY(oldy));
-  }
+        Blocked2Moving(x, y, &oldx, &oldy);
+        if (IN_SCR_FIELD(SCREENX(oldx), SCREENY(oldy)))
+            DrawScreenField(SCREENX(oldx), SCREENY(oldy));
+    }
 }
 
 static void DrawSizedWallExt_MM(int dst_x, int dst_y, int element, int tilesize,
@@ -3214,12 +3208,13 @@ void DrawLevel(int draw_background_mask)
   SetDrawBackgroundMask(draw_background_mask);
 
   ClearField();
+    if (is_simulating == FALSE) {
+        for (x = BX1; x <= BX2; x++)
+            for (y = BY1; y <= BY2; y++)
+                DrawScreenField(x, y);
 
-  for (x = BX1; x <= BX2; x++)
-    for (y = BY1; y <= BY2; y++)
-      DrawScreenField(x, y);
-
-  redraw_mask |= REDRAW_FIELD;
+        redraw_mask |= REDRAW_FIELD;
+    }
 }
 
 void DrawSizedLevel(int size_x, int size_y, int scroll_x, int scroll_y,
@@ -3738,15 +3733,17 @@ void DrawFixedGraphicAnimationExt(DrawBuffer *dst_bitmap, int x, int y,
 
 static void DrawGraphicAnimation(int x, int y, int graphic)
 {
-  int lx = LEVELX(x), ly = LEVELY(y);
+    if (is_simulating == FALSE) {
+        int lx = LEVELX(x), ly = LEVELY(y);
 
-  if (!IN_SCR_FIELD(x, y))
-    return;
+        if (!IN_SCR_FIELD(x, y))
+            return;
 
-  DrawGraphicAnimationExt(drawto_field, FX + x * TILEX_VAR, FY + y * TILEY_VAR,
-			  graphic, GfxFrame[lx][ly], NO_MASKING);
+        DrawGraphicAnimationExt(drawto_field, FX + x * TILEX_VAR, FY + y * TILEY_VAR,
+                                graphic, GfxFrame[lx][ly], NO_MASKING);
 
-  MarkTileDirty(x, y);
+        MarkTileDirty(x, y);
+    }
 }
 
 void DrawFixedGraphicAnimation(int x, int y, int graphic)
@@ -3775,23 +3772,25 @@ void DrawLevelElementAnimation(int x, int y, int element)
 
 void DrawLevelGraphicAnimationIfNeeded(int x, int y, int graphic)
 {
-  int sx = SCREENX(x), sy = SCREENY(y);
+    if (is_simulating == FALSE) {
+        int sx = SCREENX(x), sy = SCREENY(y);
 
-  if (!IN_LEV_FIELD(x, y) || !IN_SCR_FIELD(sx, sy))
-    return;
+        if (!IN_LEV_FIELD(x, y) || !IN_SCR_FIELD(sx, sy))
+            return;
 
-  if (!IS_NEW_FRAME(GfxFrame[x][y], graphic))
-    return;
+        if (!IS_NEW_FRAME(GfxFrame[x][y], graphic))
+            return;
 
-  DrawGraphicAnimation(sx, sy, graphic);
+        DrawGraphicAnimation(sx, sy, graphic);
 
 #if 1
-  if (GFX_CRUMBLED(TILE_GFX_ELEMENT(x, y)))
-    DrawLevelFieldCrumbled(x, y);
+        if (GFX_CRUMBLED(TILE_GFX_ELEMENT(x, y)))
+            DrawLevelFieldCrumbled(x, y);
 #else
-  if (GFX_CRUMBLED(Feld[x][y]))
-    DrawLevelFieldCrumbled(x, y);
+        if (GFX_CRUMBLED(Feld[x][y]))
+          DrawLevelFieldCrumbled(x, y);
 #endif
+    }
 }
 
 void DrawLevelElementAnimationIfNeeded(int x, int y, int element)
@@ -3872,310 +3871,284 @@ enum
 
 static void DrawPlayerExt(struct PlayerInfo *player, int drawing_stage)
 {
-  static int static_last_player_graphic[MAX_PLAYERS];
-  static int static_last_player_frame[MAX_PLAYERS];
-  static boolean static_player_is_opaque[MAX_PLAYERS];
-  static boolean draw_player[MAX_PLAYERS];
-  int pnr = player->index_nr;
+    if (is_simulating == FALSE) {
+        static int static_last_player_graphic[MAX_PLAYERS];
+        static int static_last_player_frame[MAX_PLAYERS];
+        static boolean static_player_is_opaque[MAX_PLAYERS];
+        static boolean draw_player[MAX_PLAYERS];
+        int pnr = player->index_nr;
 
-  if (drawing_stage == DRAW_PLAYER_STAGE_INIT)
-  {
-    static_last_player_graphic[pnr] = getPlayerGraphic(player, player->MovDir);
-    static_last_player_frame[pnr] = player->Frame;
-    static_player_is_opaque[pnr] = FALSE;
+        if (drawing_stage == DRAW_PLAYER_STAGE_INIT) {
+            static_last_player_graphic[pnr] = getPlayerGraphic(player, player->MovDir);
+            static_last_player_frame[pnr] = player->Frame;
+            static_player_is_opaque[pnr] = FALSE;
 
-    draw_player[pnr] = TRUE;
-  }
+            draw_player[pnr] = TRUE;
+        }
 
-  if (!draw_player[pnr])
-    return;
+        if (!draw_player[pnr])
+            return;
 
 #if DEBUG
-  if (!IN_LEV_FIELD(player->jx, player->jy))
-  {
-    printf("DrawPlayerField(): x = %d, y = %d\n", player->jx, player->jy);
-    printf("DrawPlayerField(): This should never happen!\n");
+        if (!IN_LEV_FIELD(player->jx, player->jy))
+        {
+          printf("DrawPlayerField(): x = %d, y = %d\n", player->jx, player->jy);
+          printf("DrawPlayerField(): This should never happen!\n");
 
-    draw_player[pnr] = FALSE;
+          draw_player[pnr] = FALSE;
 
-    return;
-  }
+          return;
+        }
 #endif
 
-  int last_player_graphic  = static_last_player_graphic[pnr];
-  int last_player_frame    = static_last_player_frame[pnr];
-  boolean player_is_opaque = static_player_is_opaque[pnr];
+        int last_player_graphic = static_last_player_graphic[pnr];
+        int last_player_frame = static_last_player_frame[pnr];
+        boolean player_is_opaque = static_player_is_opaque[pnr];
 
-  int jx = player->jx;
-  int jy = player->jy;
-  int move_dir = (player->is_waiting ? player->dir_waiting : player->MovDir);
-  int dx = (move_dir == MV_LEFT ? -1 : move_dir == MV_RIGHT ? +1 : 0);
-  int dy = (move_dir == MV_UP   ? -1 : move_dir == MV_DOWN  ? +1 : 0);
-  int last_jx = (player->is_moving ? jx - dx : jx);
-  int last_jy = (player->is_moving ? jy - dy : jy);
-  int next_jx = jx + dx;
-  int next_jy = jy + dy;
-  boolean player_is_moving = (player->MovPos != 0 ? TRUE : FALSE);
-  int sx = SCREENX(jx);
-  int sy = SCREENY(jy);
-  int sxx = (move_dir == MV_LEFT || move_dir == MV_RIGHT ? player->GfxPos : 0);
-  int syy = (move_dir == MV_UP   || move_dir == MV_DOWN  ? player->GfxPos : 0);
-  int element = Feld[jx][jy];
-  int last_element = Feld[last_jx][last_jy];
-  int action = (player->is_pushing    ? ACTION_PUSHING         :
-		player->is_digging    ? ACTION_DIGGING         :
-		player->is_collecting ? ACTION_COLLECTING      :
-		player->is_moving     ? ACTION_MOVING          :
-		player->is_snapping   ? ACTION_SNAPPING        :
-		player->is_dropping   ? ACTION_DROPPING        :
-		player->is_waiting    ? player->action_waiting :
-		ACTION_DEFAULT);
+        int jx = player->jx;
+        int jy = player->jy;
+        int move_dir = (player->is_waiting ? player->dir_waiting : player->MovDir);
+        int dx = (move_dir == MV_LEFT ? -1 : move_dir == MV_RIGHT ? +1 : 0);
+        int dy = (move_dir == MV_UP ? -1 : move_dir == MV_DOWN ? +1 : 0);
+        int last_jx = (player->is_moving ? jx - dx : jx);
+        int last_jy = (player->is_moving ? jy - dy : jy);
+        int next_jx = jx + dx;
+        int next_jy = jy + dy;
+        boolean player_is_moving = (player->MovPos != 0 ? TRUE : FALSE);
+        int sx = SCREENX(jx);
+        int sy = SCREENY(jy);
+        int sxx = (move_dir == MV_LEFT || move_dir == MV_RIGHT ? player->GfxPos : 0);
+        int syy = (move_dir == MV_UP || move_dir == MV_DOWN ? player->GfxPos : 0);
+        int element = Feld[jx][jy];
+        int last_element = Feld[last_jx][last_jy];
+        int action = (player->is_pushing ? ACTION_PUSHING :
+                      player->is_digging ? ACTION_DIGGING :
+                      player->is_collecting ? ACTION_COLLECTING :
+                      player->is_moving ? ACTION_MOVING :
+                      player->is_snapping ? ACTION_SNAPPING :
+                      player->is_dropping ? ACTION_DROPPING :
+                      player->is_waiting ? player->action_waiting :
+                      ACTION_DEFAULT);
 
-  if (drawing_stage == DRAW_PLAYER_STAGE_INIT)
-  {
-    // ------------------------------------------------------------------------
-    // initialize drawing the player
-    // ------------------------------------------------------------------------
+        if (drawing_stage == DRAW_PLAYER_STAGE_INIT) {
+            // ------------------------------------------------------------------------
+            // initialize drawing the player
+            // ------------------------------------------------------------------------
 
-    draw_player[pnr] = FALSE;
+            draw_player[pnr] = FALSE;
 
-    // GfxElement[][] is set to the element the player is digging or collecting;
-    // remove also for off-screen player if the player is not moving anymore
-    if (IN_LEV_FIELD(jx, jy) && !player_is_moving)
-      GfxElement[jx][jy] = EL_UNDEFINED;
+            // GfxElement[][] is set to the element the player is digging or collecting;
+            // remove also for off-screen player if the player is not moving anymore
+            if (IN_LEV_FIELD(jx, jy) && !player_is_moving)
+                GfxElement[jx][jy] = EL_UNDEFINED;
 
-    if (!player->active || !IN_SCR_FIELD(SCREENX(last_jx), SCREENY(last_jy)))
-      return;
+            if (!player->active || !IN_SCR_FIELD(SCREENX(last_jx), SCREENY(last_jy)))
+                return;
 
-    if (element == EL_EXPLOSION)
-      return;
+            if (element == EL_EXPLOSION)
+                return;
 
-    InitPlayerGfxAnimation(player, action, move_dir);
+            InitPlayerGfxAnimation(player, action, move_dir);
 
-    draw_player[pnr] = TRUE;
-  }
-  else if (drawing_stage == DRAW_PLAYER_STAGE_LAST_FIELD)
-  {
-    // ------------------------------------------------------------------------
-    // draw things in the field the player is leaving, if needed
-    // ------------------------------------------------------------------------
+            draw_player[pnr] = TRUE;
+        } else if (drawing_stage == DRAW_PLAYER_STAGE_LAST_FIELD) {
+            // ------------------------------------------------------------------------
+            // draw things in the field the player is leaving, if needed
+            // ------------------------------------------------------------------------
 
-    if (!IN_SCR_FIELD(sx, sy))
-      draw_player[pnr] = FALSE;
+            if (!IN_SCR_FIELD(sx, sy))
+                draw_player[pnr] = FALSE;
 
-    if (!player->is_moving)
-      return;
+            if (!player->is_moving)
+                return;
 
-    if (Back[last_jx][last_jy] && IS_DRAWABLE(last_element))
-    {
-      DrawLevelElement(last_jx, last_jy, Back[last_jx][last_jy]);
+            if (Back[last_jx][last_jy] && IS_DRAWABLE(last_element)) {
+                DrawLevelElement(last_jx, last_jy, Back[last_jx][last_jy]);
 
-      if (last_element == EL_DYNAMITE_ACTIVE ||
-	  last_element == EL_EM_DYNAMITE_ACTIVE ||
-	  last_element == EL_SP_DISK_RED_ACTIVE)
-	DrawDynamite(last_jx, last_jy);
-      else
-	DrawLevelFieldThruMask(last_jx, last_jy);
-    }
-    else if (last_element == EL_DYNAMITE_ACTIVE ||
-	     last_element == EL_EM_DYNAMITE_ACTIVE ||
-	     last_element == EL_SP_DISK_RED_ACTIVE)
-      DrawDynamite(last_jx, last_jy);
-    else
-      DrawLevelField(last_jx, last_jy);
+                if (last_element == EL_DYNAMITE_ACTIVE ||
+                    last_element == EL_EM_DYNAMITE_ACTIVE ||
+                    last_element == EL_SP_DISK_RED_ACTIVE)
+                    DrawDynamite(last_jx, last_jy);
+                else
+                    DrawLevelFieldThruMask(last_jx, last_jy);
+            } else if (last_element == EL_DYNAMITE_ACTIVE ||
+                       last_element == EL_EM_DYNAMITE_ACTIVE ||
+                       last_element == EL_SP_DISK_RED_ACTIVE)
+                DrawDynamite(last_jx, last_jy);
+            else
+                DrawLevelField(last_jx, last_jy);
 
-    if (player->is_pushing && IN_SCR_FIELD(SCREENX(next_jx), SCREENY(next_jy)))
-      DrawLevelElement(next_jx, next_jy, EL_EMPTY);
-  }
-  else if (drawing_stage == DRAW_PLAYER_STAGE_FIELD_UNDER_PLAYER)
-  {
-    // ------------------------------------------------------------------------
-    // draw things behind the player, if needed
-    // ------------------------------------------------------------------------
+            if (player->is_pushing && IN_SCR_FIELD(SCREENX(next_jx), SCREENY(next_jy)))
+                DrawLevelElement(next_jx, next_jy, EL_EMPTY);
+        } else if (drawing_stage == DRAW_PLAYER_STAGE_FIELD_UNDER_PLAYER) {
+            // ------------------------------------------------------------------------
+            // draw things behind the player, if needed
+            // ------------------------------------------------------------------------
 
-    if (Back[jx][jy])
-    {
-      DrawLevelElement(jx, jy, Back[jx][jy]);
+            if (Back[jx][jy]) {
+                DrawLevelElement(jx, jy, Back[jx][jy]);
 
-      return;
-    }
+                return;
+            }
 
-    if (IS_ACTIVE_BOMB(element))
-    {
-      DrawLevelElement(jx, jy, EL_EMPTY);
+            if (IS_ACTIVE_BOMB(element)) {
+                DrawLevelElement(jx, jy, EL_EMPTY);
 
-      return;
-    }
+                return;
+            }
 
-    if (player_is_moving && GfxElement[jx][jy] != EL_UNDEFINED)
-    {
-      int old_element = GfxElement[jx][jy];
-      int old_graphic = el_act_dir2img(old_element, action, move_dir);
-      int frame = getGraphicAnimationFrame(old_graphic, player->StepFrame);
+            if (player_is_moving && GfxElement[jx][jy] != EL_UNDEFINED) {
+                int old_element = GfxElement[jx][jy];
+                int old_graphic = el_act_dir2img(old_element, action, move_dir);
+                int frame = getGraphicAnimationFrame(old_graphic, player->StepFrame);
 
-      if (GFX_CRUMBLED(old_element))
-	DrawLevelFieldCrumbledDigging(jx, jy, move_dir, player->StepFrame);
-      else
-	DrawGraphic(sx, sy, old_graphic, frame);
+                if (GFX_CRUMBLED(old_element))
+                    DrawLevelFieldCrumbledDigging(jx, jy, move_dir, player->StepFrame);
+                else
+                    DrawGraphic(sx, sy, old_graphic, frame);
 
-      if (graphic_info[old_graphic].anim_mode & ANIM_OPAQUE_PLAYER)
-	static_player_is_opaque[pnr] = TRUE;
-    }
-    else
-    {
-      GfxElement[jx][jy] = EL_UNDEFINED;
+                if (graphic_info[old_graphic].anim_mode & ANIM_OPAQUE_PLAYER)
+                    static_player_is_opaque[pnr] = TRUE;
+            } else {
+                GfxElement[jx][jy] = EL_UNDEFINED;
 
-      // make sure that pushed elements are drawn with correct frame rate
-      int graphic = el_act_dir2img(element, ACTION_PUSHING, move_dir);
+                // make sure that pushed elements are drawn with correct frame rate
+                int graphic = el_act_dir2img(element, ACTION_PUSHING, move_dir);
 
-      if (player->is_pushing && player->is_moving && !IS_ANIM_MODE_CE(graphic))
-	GfxFrame[jx][jy] = player->StepFrame;
+                if (player->is_pushing && player->is_moving && !IS_ANIM_MODE_CE(graphic))
+                    GfxFrame[jx][jy] = player->StepFrame;
 
-      DrawLevelField(jx, jy);
-    }
-  }
-  else if (drawing_stage == DRAW_PLAYER_STAGE_ELEMENT_PUSHED)
-  {
-    // ------------------------------------------------------------------------
-    // draw things the player is pushing, if needed
-    // ------------------------------------------------------------------------
+                DrawLevelField(jx, jy);
+            }
+        } else if (drawing_stage == DRAW_PLAYER_STAGE_ELEMENT_PUSHED) {
+            // ------------------------------------------------------------------------
+            // draw things the player is pushing, if needed
+            // ------------------------------------------------------------------------
 
-    if (!player->is_pushing || !player->is_moving)
-      return;
+            if (!player->is_pushing || !player->is_moving)
+                return;
 
-    int gfx_frame = GfxFrame[jx][jy];
+            int gfx_frame = GfxFrame[jx][jy];
 
-    if (!IS_MOVING(jx, jy))		// push movement already finished
-    {
-      element = Feld[next_jx][next_jy];
-      gfx_frame = GfxFrame[next_jx][next_jy];
-    }
+            if (!IS_MOVING(jx, jy))        // push movement already finished
+            {
+                element = Feld[next_jx][next_jy];
+                gfx_frame = GfxFrame[next_jx][next_jy];
+            }
 
-    int graphic = el_act_dir2img(element, ACTION_PUSHING, move_dir);
-    int sync_frame = (IS_ANIM_MODE_CE(graphic) ? gfx_frame : player->StepFrame);
-    int frame = getGraphicAnimationFrame(graphic, sync_frame);
+            int graphic = el_act_dir2img(element, ACTION_PUSHING, move_dir);
+            int sync_frame = (IS_ANIM_MODE_CE(graphic) ? gfx_frame : player->StepFrame);
+            int frame = getGraphicAnimationFrame(graphic, sync_frame);
 
-    // draw background element under pushed element (like the Sokoban field)
-    if (game.use_masked_pushing && IS_MOVING(jx, jy))
-    {
-      // this allows transparent pushing animation over non-black background
+            // draw background element under pushed element (like the Sokoban field)
+            if (game.use_masked_pushing && IS_MOVING(jx, jy)) {
+                // this allows transparent pushing animation over non-black background
 
-      if (Back[jx][jy])
-	DrawLevelElement(jx, jy, Back[jx][jy]);
-      else
-	DrawLevelElement(jx, jy, EL_EMPTY);
+                if (Back[jx][jy])
+                    DrawLevelElement(jx, jy, Back[jx][jy]);
+                else
+                    DrawLevelElement(jx, jy, EL_EMPTY);
 
-      if (Back[next_jx][next_jy])
-	DrawLevelElement(next_jx, next_jy, Back[next_jx][next_jy]);
-      else
-	DrawLevelElement(next_jx, next_jy, EL_EMPTY);
-    }
-    else if (Back[next_jx][next_jy])
-      DrawLevelElement(next_jx, next_jy, Back[next_jx][next_jy]);
+                if (Back[next_jx][next_jy])
+                    DrawLevelElement(next_jx, next_jy, Back[next_jx][next_jy]);
+                else
+                    DrawLevelElement(next_jx, next_jy, EL_EMPTY);
+            } else if (Back[next_jx][next_jy])
+                DrawLevelElement(next_jx, next_jy, Back[next_jx][next_jy]);
 
-    int px = SCREENX(jx), py = SCREENY(jy);
-    int pxx = (TILEX - ABS(sxx)) * dx;
-    int pyy = (TILEY - ABS(syy)) * dy;
+            int px = SCREENX(jx), py = SCREENY(jy);
+            int pxx = (TILEX - ABS(sxx)) * dx;
+            int pyy = (TILEY - ABS(syy)) * dy;
 
 #if 1
-    // do not draw (EM style) pushing animation when pushing is finished
-    // (two-tile animations usually do not contain start and end frame)
-    if (graphic_info[graphic].double_movement && !IS_MOVING(jx, jy))
-      DrawLevelElement(next_jx, next_jy, Feld[next_jx][next_jy]);
-    else
-      DrawGraphicShiftedThruMask(px, py, pxx, pyy, graphic, frame, NO_CUTTING);
+            // do not draw (EM style) pushing animation when pushing is finished
+            // (two-tile animations usually do not contain start and end frame)
+            if (graphic_info[graphic].double_movement && !IS_MOVING(jx, jy))
+                DrawLevelElement(next_jx, next_jy, Feld[next_jx][next_jy]);
+            else
+                DrawGraphicShiftedThruMask(px, py, pxx, pyy, graphic, frame, NO_CUTTING);
 #else
-    // masked drawing is needed for EMC style (double) movement graphics
-    // !!! (ONLY WHEN DRAWING PUSHED ELEMENT OVER THE PLAYER) !!!
-    DrawGraphicShiftedThruMask(px, py, pxx, pyy, graphic, frame, NO_CUTTING);
+            // masked drawing is needed for EMC style (double) movement graphics
+            // !!! (ONLY WHEN DRAWING PUSHED ELEMENT OVER THE PLAYER) !!!
+            DrawGraphicShiftedThruMask(px, py, pxx, pyy, graphic, frame, NO_CUTTING);
 #endif
-  }
-  else if (drawing_stage == DRAW_PLAYER_STAGE_PLAYER)
-  {
-    // ------------------------------------------------------------------------
-    // draw player himself
-    // ------------------------------------------------------------------------
+        } else if (drawing_stage == DRAW_PLAYER_STAGE_PLAYER) {
+            // ------------------------------------------------------------------------
+            // draw player himself
+            // ------------------------------------------------------------------------
 
-    int graphic = getPlayerGraphic(player, move_dir);
+            int graphic = getPlayerGraphic(player, move_dir);
 
-    // in the case of changed player action or direction, prevent the current
-    // animation frame from being restarted for identical animations
-    if (player->Frame == 0 && equalGraphics(graphic, last_player_graphic))
-      player->Frame = last_player_frame;
+            // in the case of changed player action or direction, prevent the current
+            // animation frame from being restarted for identical animations
+            if (player->Frame == 0 && equalGraphics(graphic, last_player_graphic))
+                player->Frame = last_player_frame;
 
-    int frame = getGraphicAnimationFrame(graphic, player->Frame);
+            int frame = getGraphicAnimationFrame(graphic, player->Frame);
 
-    if (player_is_opaque)
-      DrawGraphicShifted(sx,sy, sxx,syy, graphic, frame, NO_CUTTING,NO_MASKING);
-    else
-      DrawGraphicShiftedThruMask(sx, sy, sxx, syy, graphic, frame, NO_CUTTING);
+            if (player_is_opaque)
+                DrawGraphicShifted(sx, sy, sxx, syy, graphic, frame, NO_CUTTING, NO_MASKING);
+            else
+                DrawGraphicShiftedThruMask(sx, sy, sxx, syy, graphic, frame, NO_CUTTING);
 
-    if (SHIELD_ON(player))
-    {
-      graphic = (player->shield_deadly_time_left ? IMG_SHIELD_DEADLY_ACTIVE :
-		 IMG_SHIELD_NORMAL_ACTIVE);
-      frame = getGraphicAnimationFrame(graphic, -1);
+            if (SHIELD_ON(player)) {
+                graphic = (player->shield_deadly_time_left ? IMG_SHIELD_DEADLY_ACTIVE :
+                           IMG_SHIELD_NORMAL_ACTIVE);
+                frame = getGraphicAnimationFrame(graphic, -1);
 
-      DrawGraphicShiftedThruMask(sx, sy, sxx, syy, graphic, frame, NO_CUTTING);
+                DrawGraphicShiftedThruMask(sx, sy, sxx, syy, graphic, frame, NO_CUTTING);
+            }
+        } else if (drawing_stage == DRAW_PLAYER_STAGE_ELEMENT_OVER_PLAYER) {
+            // ------------------------------------------------------------------------
+            // draw things in front of player (active dynamite or dynabombs)
+            // ------------------------------------------------------------------------
+
+            if (IS_ACTIVE_BOMB(element)) {
+                int graphic = el2img(element);
+                int frame = getGraphicAnimationFrame(graphic, GfxFrame[jx][jy]);
+
+                if (game.emulation == EMU_SUPAPLEX)
+                    DrawGraphic(sx, sy, IMG_SP_DISK_RED, frame);
+                else
+                    DrawGraphicThruMask(sx, sy, graphic, frame);
+            }
+
+            if (player_is_moving && last_element == EL_EXPLOSION) {
+                int element = (GfxElement[last_jx][last_jy] != EL_UNDEFINED ?
+                               GfxElement[last_jx][last_jy] : EL_EMPTY);
+                int graphic = el_act2img(element, ACTION_EXPLODING);
+                int delay = (game.emulation == EMU_SUPAPLEX ? 3 : 2);
+                int phase = ExplodePhase[last_jx][last_jy] - 1;
+                int frame = getGraphicAnimationFrame(graphic, phase - delay);
+
+                if (phase >= delay)
+                    DrawGraphicThruMask(SCREENX(last_jx), SCREENY(last_jy), graphic, frame);
+            }
+        } else if (drawing_stage == DRAW_PLAYER_STAGE_FIELD_OVER_PLAYER) {
+            // ------------------------------------------------------------------------
+            // draw elements the player is just walking/passing through/under
+            // ------------------------------------------------------------------------
+
+            if (player_is_moving) {
+                // handle the field the player is leaving ...
+                if (IS_ACCESSIBLE_INSIDE(last_element))
+                    DrawLevelField(last_jx, last_jy);
+                else if (IS_ACCESSIBLE_UNDER(last_element))
+                    DrawLevelFieldThruMask(last_jx, last_jy);
+            }
+
+            // do not redraw accessible elements if the player is just pushing them
+            if (!player_is_moving || !player->is_pushing) {
+                // ... and the field the player is entering
+                if (IS_ACCESSIBLE_INSIDE(element))
+                    DrawLevelField(jx, jy);
+                else if (IS_ACCESSIBLE_UNDER(element))
+                    DrawLevelFieldThruMask(jx, jy);
+            }
+
+            MarkTileDirty(sx, sy);
+        }
     }
-  }
-  else if (drawing_stage == DRAW_PLAYER_STAGE_ELEMENT_OVER_PLAYER)
-  {
-    // ------------------------------------------------------------------------
-    // draw things in front of player (active dynamite or dynabombs)
-    // ------------------------------------------------------------------------
-
-    if (IS_ACTIVE_BOMB(element))
-    {
-      int graphic = el2img(element);
-      int frame = getGraphicAnimationFrame(graphic, GfxFrame[jx][jy]);
-
-      if (game.emulation == EMU_SUPAPLEX)
-	DrawGraphic(sx, sy, IMG_SP_DISK_RED, frame);
-      else
-	DrawGraphicThruMask(sx, sy, graphic, frame);
-    }
-
-    if (player_is_moving && last_element == EL_EXPLOSION)
-    {
-      int element = (GfxElement[last_jx][last_jy] != EL_UNDEFINED ?
-		     GfxElement[last_jx][last_jy] :  EL_EMPTY);
-      int graphic = el_act2img(element, ACTION_EXPLODING);
-      int delay = (game.emulation == EMU_SUPAPLEX ? 3 : 2);
-      int phase = ExplodePhase[last_jx][last_jy] - 1;
-      int frame = getGraphicAnimationFrame(graphic, phase - delay);
-
-      if (phase >= delay)
-	DrawGraphicThruMask(SCREENX(last_jx), SCREENY(last_jy), graphic, frame);
-    }
-  }
-  else if (drawing_stage == DRAW_PLAYER_STAGE_FIELD_OVER_PLAYER)
-  {
-    // ------------------------------------------------------------------------
-    // draw elements the player is just walking/passing through/under
-    // ------------------------------------------------------------------------
-
-    if (player_is_moving)
-    {
-      // handle the field the player is leaving ...
-      if (IS_ACCESSIBLE_INSIDE(last_element))
-	DrawLevelField(last_jx, last_jy);
-      else if (IS_ACCESSIBLE_UNDER(last_element))
-	DrawLevelFieldThruMask(last_jx, last_jy);
-    }
-
-    // do not redraw accessible elements if the player is just pushing them
-    if (!player_is_moving || !player->is_pushing)
-    {
-      // ... and the field the player is entering
-      if (IS_ACCESSIBLE_INSIDE(element))
-	DrawLevelField(jx, jy);
-      else if (IS_ACCESSIBLE_UNDER(element))
-	DrawLevelFieldThruMask(jx, jy);
-    }
-
-    MarkTileDirty(sx, sy);
-  }
 }
 
 void DrawPlayer(struct PlayerInfo *player)
@@ -4188,12 +4161,14 @@ void DrawPlayer(struct PlayerInfo *player)
 
 void DrawAllPlayers(void)
 {
-  int i, j;
+    if (is_simulating == FALSE) {
+        int i, j;
 
-  for (i = 0; i < NUM_DRAW_PLAYER_STAGES; i++)
-    for (j = 0; j < MAX_PLAYERS; j++)
-      if (stored_player[j].active)
-	DrawPlayerExt(&stored_player[j], i);
+        for (i = 0; i < NUM_DRAW_PLAYER_STAGES; i++)
+            for (j = 0; j < MAX_PLAYERS; j++)
+                if (stored_player[j].active)
+                    DrawPlayerExt(&stored_player[j], i);
+    }
 }
 
 void DrawPlayerField(int x, int y)
