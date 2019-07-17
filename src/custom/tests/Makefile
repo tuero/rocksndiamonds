@@ -4,9 +4,10 @@
 # configuration
 # -----------------------------------------------------------------------------
 
-SRCS := 	engine_speed.cpp 
-
-OBJS :=  	engine_speed.o
+SRCS := 	test_engine_speed.cpp  	     		 	\
+			test_rng.cpp 							
+OBJS :=  	test_engine_speed.o 					\
+			test_rng.o 								
 
 
 

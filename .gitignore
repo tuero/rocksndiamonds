@@ -31,3 +31,11 @@ rocksndiamonds
 rocksndiamonds.exe
 
 .DS_Store
+
+
+# Custom
+todo.txt
+CMakeLists.txt
+.idea/
+calgrind.out*
+

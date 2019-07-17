@@ -29,9 +29,14 @@ public:
     void stop();
 
     /*
-     * Check how long as passed since the clock has started (in micro-seconds)
+     * Check to see if there is time remaining for the given limit
      */
-    int checkTime();
+    bool hasTimeLeft(int limit);
+
+    /*
+     * Get time remaining (difference between limit and start time)
+     */
+    int getTimeLeft(int limit);
 
     /*
      * Get time in micro-seconds 

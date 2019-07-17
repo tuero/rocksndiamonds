@@ -973,7 +973,8 @@ struct RuntimeInfo
 };
 
 typedef enum controller_type {CONTROLLER_TYPE_USER, CONTROLLER_TYPE_TEST_SPEED, CONTROLLER_TYPE_TEST_BFS,
-                              CONTROLLER_TYPE_TEST_MCTS, CONTROLLER_TYPE_BFS, CONTROLLER_TYPE_MCTS} controller_type;
+                              CONTROLLER_TYPE_TEST_MCTS, CONTROLLER_TYPE_BFS, CONTROLLER_TYPE_TEST_ALL,
+                              CONTROLLER_TYPE_MCTS, CONTROLLER_TYPE_TEST_RNG, CONTROLLER_TYPE_REPLAY} controller_type;
 
 struct OptionInfo
 {
@@ -999,9 +1000,10 @@ struct OptionInfo
   boolean verbose;
   boolean debug;
   // Custom options
-  controller_type solver;       // Solver to act as controller
-  int level_number;             // level number to load
-  int delay;                    // SetVideoFrameDelay
+  controller_type controller_type;       // Solver to act as controller
+  int level_number;                      // level number to load
+  int delay;                             // SetVideoFrameDelay
+  char* replay_file;
 };
 
 struct VideoSystemInfo

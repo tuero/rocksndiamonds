@@ -9,33 +9,43 @@
 
 extern "C" {
     #include "../../main.h"
+    #include "../../libgame/system.h"
 }
 
-
-// ------------- Short naming -------------
-typedef std::array<short, MAX_LEV_FIELDX * MAX_LEV_FIELDY> board_short;
-typedef std::array<int, MAX_LEV_FIELDX * MAX_LEV_FIELDY> board_int;
-typedef std::array<boolean, MAX_LEV_FIELDX * MAX_LEV_FIELDY> board_bool;
-typedef std::array<short, MAX_NUM_AMOEBA> amoeba_short;
-
-
-// ------------- Action values -------------
-static const int _ENGINE_NOOP    = 0;
-static const int _ENGINE_LEFT    = 1;
-static const int _ENGINE_RIGHT   = 2; 
-static const int _ENGINE_UP      = 4;
-static const int _ENGINE_DOWN    = 8;
-static const int _NUM_ACTIONS    = 5;
+namespace enginetype{
+    // ------------- Short naming -------------
+    typedef std::array<short, MAX_LEV_FIELDX * MAX_LEV_FIELDY> board_short;
+    typedef std::array<int, MAX_LEV_FIELDX * MAX_LEV_FIELDY> board_int;
+    typedef std::array<boolean, MAX_LEV_FIELDX * MAX_LEV_FIELDY> board_bool;
+    typedef std::array<short, MAX_NUM_AMOEBA> amoeba_short;
 
 
-// ------------- Field Values -------------
-static const int _FIELD_EMPTY   = 0;
-static const int _FIELD_WALL    = 105;
-static const int _FIELD_GOAL    = 107;
+    // ------------- Controller types -------------
+    enum ControllerType{BFS=CONTROLLER_TYPE_BFS, MCTS=CONTROLLER_TYPE_MCTS, REPLAY=CONTROLLER_TYPE_REPLAY};
+
+    enum Statistics{RUN_TIME, COUNT_EXPANDED_NODES, COUNT_SIMULATED_NODES, MAX_DEPTH};
 
 
-// ------------- Misc -------------
-static const int _ENGINE_RESOLUTION = 8;     // Engine ticks per time step the agent considers
+    // ------------- Action values -------------
+    static const int ENGINE_NOOP    = 0;
+    static const int ENGINE_LEFT    = 1;
+    static const int ENGINE_RIGHT   = 2; 
+    static const int ENGINE_UP      = 4;
+    static const int ENGINE_DOWN    = 8;
+    static const int NUM_ACTIONS    = 5;
+
+
+    // ------------- Field Values -------------
+    static const int FIELD_EMPTY   = 0;
+    static const int FIELD_WALL    = 105;
+    static const int FIELD_GOAL    = 107;
+
+
+    // ------------- Misc -------------
+    static const int ENGINE_RESOLUTION = 8;     // Engine ticks per time step the agent considers
+
+}
+
 
 
 #endif  //ENGINE_TYPES_H

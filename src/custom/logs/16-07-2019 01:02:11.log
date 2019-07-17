@@ -1,0 +1,46 @@
+﻿2019-07-16 01:02:11.735 DEBUG [40452] [logwrap::logEngineType@82] Using engine type RND
+2019-07-16 01:02:11.735 DEBUG [40452] [logwrap::logPlayerDetails@98] Player Info: X: 0 Y: 0 MovPos: 0 MovDir: 0 is_moving: 0 is_waiting: 0 move_delay: 0 
+2019-07-16 01:02:11.735 DEBUG [40452] [logwrap::logBoardState@130] Board state at step: 0
+  105   105   105   105     0   105   105   105   105   105 
+  105   105   105   105     0   105   105   105   105   105 
+  105   105   105   105     0   105   105   105   105   105 
+  105   105   105    80     0   105   105   105   105   105 
+  105   105   105   105   360   105   105   105   105   105 
+  105   105   105   105     0   105   105   105   105   105 
+  105   105   105     0     0   105   105   105   105   105 
+  105   105   105   105     0   105   105   105   105   105 
+  105   105   105   105     0   105   105   105   105   105 
+  105   105   105   105     0   105   105   105   105   105 
+  105   105   105   105   360   105   105   105   105   105 
+  105   105   105   105     0     0   107   105   105   105 
+  105   105   105   105     0   105   105   105   105   105 
+  105   105   105   105   105   105   105   105   105   105 
+
+2019-07-16 01:02:11.735 DEBUG [40452] [logwrap::logBoardDistances@160] Board distances:
+   -1    -1    -1    -1    13    -1    -1    -1    -1    -1 
+   -1    -1    -1    -1    12    -1    -1    -1    -1    -1 
+   -1    -1    -1    -1    11    -1    -1    -1    -1    -1 
+   -1    -1    -1    11    10    -1    -1    -1    -1    -1 
+   -1    -1    -1    -1     9    -1    -1    -1    -1    -1 
+   -1    -1    -1    -1     8    -1    -1    -1    -1    -1 
+   -1    -1    -1     8     7    -1    -1    -1    -1    -1 
+   -1    -1    -1    -1     6    -1    -1    -1    -1    -1 
+   -1    -1    -1    -1     5    -1    -1    -1    -1    -1 
+   -1    -1    -1    -1     4    -1    -1    -1    -1    -1 
+   -1    -1    -1    -1     3    -1    -1    -1    -1    -1 
+   -1    -1    -1    -1     2     1     0    -1    -1    -1 
+   -1    -1    -1    -1     3    -1    -1    -1    -1    -1 
+   -1    -1    -1    -1    -1    -1    -1    -1    -1    -1 
+
+2019-07-16 01:02:11.735 ERROR [40452] [Controller::setController@126] Unknown controller type: 3
+2019-07-16 01:02:11.736 DEBUG [40452] [testenginespeed::testMctsSpeed@126] Running test: MCTS.
+2019-07-16 01:02:11.736 DEBUG [40452] [testenginespeed::testMctsSpeed@127] Level: 10
+2019-07-16 01:02:13.140 DEBUG [40452] [testenginespeed::testMctsSpeed@148] Test: MCTS speed
+2019-07-16 01:02:13.140 DEBUG [40452] [testenginespeed::testMctsSpeed@149] Number of nodes expanded: 24
+2019-07-16 01:02:13.140 DEBUG [40452] [testenginespeed::testMctsSpeed@150] Number of nodes simulated: 885
+2019-07-16 01:02:13.140 DEBUG [40452] [testenginespeed::testMctsSpeed@151] Max depth explored: 4
+2019-07-16 01:02:13.140 DEBUG [40452] [testenginespeed::testMctsSpeed@152] Total time: 18841us
+2019-07-16 01:02:13.140 DEBUG [40452] [testenginespeed::testMctsSpeed@153] Average time (resolution=8): 785us
+2019-07-16 01:02:13.140 DEBUG [40452] [testenginespeed::testMctsSpeed@154] Average time (resolution=1): 98us
+2019-07-16 01:02:13.140 DEBUG [40452] [testenginespeed::testMctsSpeed@156] End of test...
+2019-07-16 01:02:13.140 DEBUG [40452] [testenginespeed::testMctsSpeed@157] 

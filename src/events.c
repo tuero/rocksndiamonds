@@ -324,13 +324,19 @@ static void HandleMouseCursor(void)
 
 void EventLoop(void)
 {
-    int test_counter = 0;
-    printf("%s\n", "starting game loop");
-    if (options.solver == CONTROLLER_TYPE_BFS) {findPath();}
+    step_counter = 0;
+    clock_t t = clock();
+    int prev_game_status = GAME_MODE_MAIN;
 
   while (1)
   {
-      test_counter += 1;
+      // New level loaded, so calculate tile distances and print starting state
+      if (prev_game_status != game_status && game_status == GAME_MODE_PLAYING &&
+          options.controller_type != CONTROLLER_TYPE_USER)
+      {
+          handleLevelStart();
+      }
+      prev_game_status = game_status;
 
       // mouse movement, arrow keys
     if (PendingEvent()){
@@ -343,20 +349,24 @@ void EventLoop(void)
 
     // execute event related actions after pending events have been processed
     HandleEventActions();
-
-    // Get action from controller
-    if (options.solver != CONTROLLER_TYPE_USER) {
-        stored_player[0].action = getAction(options.solver);
-    }
-    if (options.debug == TRUE && options.solver != CONTROLLER_TYPE_USER) {
-        printf("Counter: %d\n", test_counter);
-        printBoardState();
-    }
+//  debugBoardState();
+//  debugMovPosState();
+//  debugMovDirState();
+//      clock_t timeTaken = clock() - t;
+//      double time_taken = ((double)timeTaken)/CLOCKS_PER_SEC;
+//    t = clock();
+//    printf("fun() took %f seconds to execute \n", time_taken);
 
       // don't use all CPU time when idle; the main loop while playing
     // has its own synchronization and is CPU friendly, too
 
     if (game_status == GAME_MODE_PLAYING){
+        // Get action from controller
+        // We can get rid of the conditional by just returning user action
+        // if no controller is selected
+        if (options.controller_type != CONTROLLER_TYPE_USER) {
+            stored_player[0].action = getAction();
+        }
         HandleGameActions();
     }
 
@@ -368,6 +378,8 @@ void EventLoop(void)
 
     if (game_status == GAME_MODE_QUIT)
       return;
+
+    step_counter += 1;
   }
 }
 

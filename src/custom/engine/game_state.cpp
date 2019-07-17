@@ -2,34 +2,32 @@
 #include "game_state.h"
 
 
-
-
-
 GameState::GameState() {}
 
 
 bool GameState::operator==(const GameState &other){
         return 
                // (saved_shorts == other.saved_shorts) &&
-               // (saved_ints == other.saved_ints) &&
-               // (saved_bools == other.saved_bools) &&
+        (saved_shorts == other.saved_shorts) &&
+               (saved_ints == other.saved_ints) &&
+               (saved_bools == other.saved_bools);
                // (saved_amoebas == other.saved_amoebas) &&
-               (saved_player.jx == other.saved_player.jx) &&
-               (saved_player.jy == other.saved_player.jy) &&
-               (saved_player.MovDir == other.saved_player.MovDir) &&
-               (saved_player.MovPos == other.saved_player.MovPos) &&
-               (saved_all_players_gone == other.saved_all_players_gone) &&
-               (saved_game_status == other.saved_game_status) &&
-               (saved_LevelSolved_GameEnd == other.saved_LevelSolved_GameEnd) &&
-               (saved_em_game_over == other.saved_em_game_over) &&
-               (saved_em_level_solved == other.saved_em_level_solved) &&
-               (saved_sp_game_over == other.saved_sp_game_over) &&
-               (saved_sp_level_solved == other.saved_sp_level_solved) &&
-               (saved_mm_game_over == other.saved_mm_game_over) &&
-               (saved_mm_level_solved == other.saved_mm_level_solved) &&
-               (saved_GameOver == other.saved_GameOver) &&
-               (saved_LevelSolved == other.saved_LevelSolved) &&
-               (saved_LevelSolved_GameWon == other.saved_LevelSolved_GameWon);    
+               // (saved_player.jx == other.saved_player.jx) &&
+               // (saved_player.jy == other.saved_player.jy) &&
+               // (saved_player.MovDir == other.saved_player.MovDir) &&
+               // (saved_player.MovPos == other.saved_player.MovPos) &&
+               // (saved_all_players_gone == other.saved_all_players_gone) &&
+               // (saved_game_status == other.saved_game_status) &&
+               // (saved_LevelSolved_GameEnd == other.saved_LevelSolved_GameEnd) &&
+               // (saved_em_game_over == other.saved_em_game_over) &&
+               // (saved_em_level_solved == other.saved_em_level_solved) &&
+               // (saved_sp_game_over == other.saved_sp_game_over) &&
+               // (saved_sp_level_solved == other.saved_sp_level_solved) &&
+               // (saved_mm_game_over == other.saved_mm_game_over) &&
+               // (saved_mm_level_solved == other.saved_mm_level_solved) &&
+               // (saved_GameOver == other.saved_GameOver) &&
+               // (saved_LevelSolved == other.saved_LevelSolved) &&
+               // (saved_LevelSolved_GameWon == other.saved_LevelSolved_GameWon);    
 }
 
 
@@ -54,27 +52,27 @@ void GameState::applyAction(Action action) {
  */
 void GameState::setFromSimulator() {
     for (int i = 0; i < num_shorts; i++) {
-        std::copy(decayed_begin(*(pointers_shorts[i])), 
-                  decayed_end(*(pointers_shorts[i])), 
-                  decayed_begin(saved_shorts[i])
+        std::copy(enginehelper::decayed_begin(*(pointers_shorts[i])), 
+                  enginehelper::decayed_end(*(pointers_shorts[i])), 
+                  enginehelper::decayed_begin(saved_shorts[i])
                 );
     }
     for (int i = 0; i < num_ints; i++) {
-        std::copy(decayed_begin(*(pointers_ints[i])), 
-                  decayed_end(*(pointers_ints[i])), 
-                  decayed_begin(saved_ints[i])
+        std::copy(enginehelper::decayed_begin(*(pointers_ints[i])), 
+                  enginehelper::decayed_end(*(pointers_ints[i])), 
+                  enginehelper::decayed_begin(saved_ints[i])
                 );
     }
     for (int i = 0; i < num_bools; i++) {
-        std::copy(decayed_begin(*(pointers_bools[i])), 
-                  decayed_end(*(pointers_bools[i])), 
-                  decayed_begin(saved_bools[i])
+        std::copy(enginehelper::decayed_begin(*(pointers_bools[i])), 
+                  enginehelper::decayed_end(*(pointers_bools[i])), 
+                  enginehelper::decayed_begin(saved_bools[i])
                 );
     }
     for (int i = 0; i < num_amoebas; i++) {
-        std::copy(decayed_begin(*(pointers_amoebas[i])), 
-                  decayed_end(*(pointers_amoebas[i])), 
-                  decayed_begin(saved_amoebas[i])
+        std::copy(enginehelper::decayed_begin(*(pointers_amoebas[i])), 
+                  enginehelper::decayed_end(*(pointers_amoebas[i])), 
+                  enginehelper::decayed_begin(saved_amoebas[i])
                 );
     }
 
@@ -96,6 +94,8 @@ void GameState::setFromSimulator() {
     saved_scroll_x = scroll_x;
     saved_scroll_y = scroll_y;
 
+    saved_FrameCounter = FrameCounter;
+
     save_TimeFrames = TimeFrames;
     save_TimePlayed = TimePlayed;
     save_TimeLeft = TimeLeft;
@@ -108,27 +108,27 @@ void GameState::setFromSimulator() {
  */
 void GameState::restoreSimulator() {
     for (int i = 0; i < num_shorts; i++) {
-        std::copy(decayed_begin(saved_shorts[i]), 
-                  decayed_end(saved_shorts[i]), 
-                  decayed_begin(*(pointers_shorts[i]))
+        std::copy(enginehelper::decayed_begin(saved_shorts[i]), 
+                  enginehelper::decayed_end(saved_shorts[i]), 
+                  enginehelper::decayed_begin(*(pointers_shorts[i]))
                 );
     }
     for (int i = 0; i < num_ints; i++) {
-        std::copy(decayed_begin(saved_ints[i]), 
-                  decayed_end(saved_ints[i]), 
-                  decayed_begin(*(pointers_ints[i]))
+        std::copy(enginehelper::decayed_begin(saved_ints[i]), 
+                  enginehelper::decayed_end(saved_ints[i]), 
+                  enginehelper::decayed_begin(*(pointers_ints[i]))
                 );
     }
     for (int i = 0; i < num_bools; i++) {
-        std::copy(decayed_begin(saved_bools[i]), 
-                  decayed_end(saved_bools[i]), 
-                  decayed_begin(*(pointers_bools[i]))
+        std::copy(enginehelper::decayed_begin(saved_bools[i]), 
+                  enginehelper::decayed_end(saved_bools[i]), 
+                  enginehelper::decayed_begin(*(pointers_bools[i]))
                 );
     }
     for (int i = 0; i < num_amoebas; i++) {
-        std::copy(decayed_begin(saved_amoebas[i]), 
-                  decayed_end(saved_amoebas[i]), 
-                  decayed_begin(*(pointers_amoebas[i]))
+        std::copy(enginehelper::decayed_begin(saved_amoebas[i]), 
+                  enginehelper::decayed_end(saved_amoebas[i]), 
+                  enginehelper::decayed_begin(*(pointers_amoebas[i]))
                 );
     }
 
@@ -149,6 +149,8 @@ void GameState::restoreSimulator() {
 
     scroll_x = saved_scroll_x;
     scroll_y = saved_scroll_y;
+
+    FrameCounter = saved_FrameCounter;
 
     TimeFrames = save_TimeFrames;
     TimePlayed = save_TimePlayed;

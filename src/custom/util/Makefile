@@ -4,9 +4,13 @@
 # configuration
 # -----------------------------------------------------------------------------
 
-SRCS := 	timer.cpp 
+SRCS := 	timer.cpp 								\
+			rng.cpp 								\
+			logging_wrapper.cpp
 
-OBJS :=  	timer.o
+OBJS :=  	timer.o 								\
+			rng.o 									\
+			logging_wrapper.o
 
 
 

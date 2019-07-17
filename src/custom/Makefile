@@ -11,52 +11,56 @@ SRCS 		:=	custom.cpp 						\
 OBJS 		:=	custom.o 						\
 	  			hash_table.o 
 
-BFS_DIR 	:= 	bfs
+CTR_DIR 	:= 	controller
+CTR_OBJ 	:= 	$(CTR_DIR)/controller.o 
+
+BFS_DIR 	:= 	$(CTR_DIR)/bfs
 BFS_OBJ 	:= 	$(BFS_DIR)/bfs.o 				\
 				$(BFS_DIR)/tree_node_bfs.o	
+
+MCTS_DIR 	:= 	$(CTR_DIR)/mcts
+MCTS_OBJ 	:= 	$(MCTS_DIR)/mcts.o 				\
+				$(MCTS_DIR)/tree_node.o		
+
+REPLAY_DIR 	:= 	$(CTR_DIR)/replay
+REPLAY_OBJ 	:= 	$(REPLAY_DIR)/replay.o 				
 
 ENG_DIR 	:= 	engine
 ENG_OBJ 	:= 	$(ENG_DIR)/action.o 			\
 				$(ENG_DIR)/engine_helper.o 		\
 				$(ENG_DIR)/game_state.o	
 
-MCTS_DIR 	:= 	mcts
-MCTS_OBJ 	:= 	$(MCTS_DIR)/mcts.o 				\
-				$(MCTS_DIR)/tree_node.o	
-
 UTIL_DIR 	:=	util
-UTIL_OBJ 	:= 	$(UTIL_DIR)/timer.o 	
+UTIL_OBJ 	:= 	$(UTIL_DIR)/timer.o 			\
+				$(UTIL_DIR)/rng.o 				\
+				$(UTIL_DIR)/logging_wrapper.o
 
 TEST_DIR 	:=	tests
-TEST_OBJ 	:= 	$(TEST_DIR)/engine_speed.o 
+TEST_OBJ 	:= 	$(TEST_DIR)/test_engine_speed.o 	\
+				$(TEST_DIR)/test_rng.o  			
 
 
 # -----------------------------------------------------------------------------
 # build targets
 # -----------------------------------------------------------------------------
 
-.PHONY: all clean bfs eng mcts util tests
+.PHONY: all clean controller eng util tests 
 
-all: bfs eng mcts util tests $(CUSTOM)
+all: controller eng util tests $(CUSTOM)
 
-$(CUSTOM): $(BFS_OBJ) $(ENG_OBJ) $(MCTS_OBJ) $(UTIL_OBJ) $(TEST_OBJ) $(OBJS)
-	$(AR) cr $(CUSTOM) $(BFS_OBJ) $(ENG_OBJ) $(MCTS_OBJ) $(UTIL_OBJ) $(TEST_OBJ) $(OBJS)
+$(CUSTOM): $(CTR_OBJ) $(BFS_OBJ) $(MCTS_OBJ) $(REPLAY_OBJ) $(ENG_OBJ) $(UTIL_OBJ) $(TEST_OBJ) $(OBJS)
+	$(AR) cr $(CUSTOM) $(CTR_OBJ) $(BFS_OBJ) $(MCTS_OBJ) $(REPLAY_OBJ) $(ENG_OBJ) $(UTIL_OBJ) $(TEST_OBJ) $(OBJS)
 	$(RANLIB) $(CUSTOM)
 
-bfs:
-	@$(MAKE) -C $(BFS_DIR)
-$(BFS_OBJ):
-	@$(MAKE) -C $(BFS_DIR)
+controller:
+	@$(MAKE) -C $(CTR_DIR)
+$(CTR_OBJ):
+	@$(MAKE) -C $(CTR_DIR)
 
 eng:
 	@$(MAKE) -C $(ENG_DIR)
 $(ENG_OBJ):
 	@$(MAKE) -C $(ENG_DIR)
-
-mcts:
-	@$(MAKE) -C $(MCTS_DIR)
-$(MCTS_OBJ):
-	@$(MAKE) -C $(MCTS_DIR)
 
 util:
 	@$(MAKE) -C $(UTIL_DIR)
@@ -72,11 +76,10 @@ $(TEST_OBJ):
 	$(CCP) $(CPPFLAGS) -c $*.cpp
 
 clean:
-	$(MAKE) -C $(BFS_DIR) clean
+	$(MAKE) -C $(CTR_DIR) clean
 	$(MAKE) -C $(ENG_DIR) clean
-	$(MAKE) -C $(MCTS_DIR) clean
 	$(MAKE) -C $(UTIL_DIR) clean
-	$(MAKE) -C $(TEST_OBJ) clean
+	$(MAKE) -C $(TEST_DIR) clean
 	$(RM) $(OBJS)
 	$(RM) $(CUSTOM)
 	$(RM) -f .depend

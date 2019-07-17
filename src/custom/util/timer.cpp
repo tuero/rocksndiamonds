@@ -26,11 +26,19 @@ void Timer::stop() {
 }
 
 
-int Timer::checkTime() {
+bool Timer::hasTimeLeft(int limit) {
     auto end_time = std::chrono::high_resolution_clock::now();
     int clock_duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();
-    return clock_duration;
+    return clock_duration < limit;
 }
+
+
+int Timer::getTimeLeft(int limit) {
+    auto end_time = std::chrono::high_resolution_clock::now();
+    int clock_duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();
+    return limit - clock_duration;
+}
+
 
 int Timer::getDuration() {
     return std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();

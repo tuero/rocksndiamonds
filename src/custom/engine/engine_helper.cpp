@@ -2,6 +2,22 @@
 
 #include "engine_helper.h"
 
+namespace enginehelper {
+
+
+// Hashing data structures
+uint64_t zobristElement[MAX_LEV_FIELDX * MAX_LEV_FIELDY][MAX_NUM_ELEMENTS];
+uint64_t zobristDir[MAX_LEV_FIELDX * MAX_LEV_FIELDY][MAX_DIR];
+
+
+
+/*
+ * Get the controller type defined by user CLA
+ */
+enginetype::ControllerType getControllerType() {
+    return static_cast<enginetype::ControllerType>(options.controller_type);
+}
+
 
 /*
  * Check if the current status of the engine is loss of life
@@ -35,27 +51,36 @@ void setEnginePlayerAction(Action action) {
  * the next iteration as a random action
  */
 void setEngineRandomPlayerAction() {
-    // stored_player[0].action = ALL_ACTIONS[std::rand() % _NUM_ACTIONS];
     std::vector<Action> available_actions;
 
     int playerX = stored_player[0].jx;
     int playerY = stored_player[0].jy;
 
+    // Won't select actions which player won't be able to move due
+    // to being blocked by walls
     available_actions.push_back(Action::noop);
-    if (Feld[playerX][playerY+1] != _FIELD_WALL) {
+    if (Feld[playerX][playerY+1] != enginetype::FIELD_WALL) {
         available_actions.push_back(Action::down);
     }
-    else if (Feld[playerX+1][playerY] != _FIELD_WALL) {
+    else if (Feld[playerX+1][playerY] != enginetype::FIELD_WALL) {
         available_actions.push_back(Action::right);
     }
-    else if (Feld[playerX][playerY-1] != _FIELD_WALL) {
+    else if (Feld[playerX][playerY-1] != enginetype::FIELD_WALL) {
         available_actions.push_back(Action::up);
     }
-    else if (Feld[playerX-1][playerY] != _FIELD_WALL) {
+    else if (Feld[playerX-1][playerY] != enginetype::FIELD_WALL) {
         available_actions.push_back(Action::left);
     }
     
     stored_player[0].action = available_actions[std::rand() % available_actions.size()];
+}
+
+
+/*
+ * Get the currently stored player action
+ */
+int getEnginePlayerAction() {
+    return stored_player[0].action;
 }
 
 
@@ -72,7 +97,7 @@ void engineSimulateSingle() {
  * This performs ENGINE_RESOLUTION ticks
  */
 void engineSimulate() {
-    for (int i = 0; i < _ENGINE_RESOLUTION; i++) {
+    for (int i = 0; i < enginetype::ENGINE_RESOLUTION; i++) {
         HandleGameActions();
     }
 }
@@ -86,16 +111,16 @@ bool isWall(Action action) {
     int playerX = stored_player[0].jx;
     int playerY = stored_player[0].jy;
 
-    if (action == Action::down && Feld[playerX][playerY+1] == _FIELD_WALL) {
+    if (action == Action::down && Feld[playerX][playerY+1] == enginetype::FIELD_WALL) {
         return true;
     }
-    else if (action == Action::right && Feld[playerX+1][playerY] == _FIELD_WALL) {
+    else if (action == Action::right && Feld[playerX+1][playerY] == enginetype::FIELD_WALL) {
         return true;
     }
-    else if (action == Action::up && Feld[playerX][playerY-1] == _FIELD_WALL) {
+    else if (action == Action::up && Feld[playerX][playerY-1] == enginetype::FIELD_WALL) {
         return true;
     }
-    else if (action == Action::left && Feld[playerX-1][playerY] == _FIELD_WALL) {
+    else if (action == Action::left && Feld[playerX-1][playerY] == enginetype::FIELD_WALL) {
         return true;
     }
     return false;
@@ -116,32 +141,91 @@ bool isWall(Action action) {
 
 }
 
+
+/*
+ * Set flag for simulating
+ * This will cause blocking actions in engine such as not rending to screen
+ * Profiling shows a 10x in speed with simulator_flag set
+ */
 void setSimulatorFlag(bool simulator_flag) {
     is_simulating = (simulator_flag ? TRUE : FALSE);
 }
 
 
+/*
+ * Initialize Zorbrist tables, used to hash game board states
+ */
+void initZorbristTables() {
+    for (int i = 0; i < MAX_LEV_FIELDX*MAX_LEV_FIELDY; i++) {
+        // K is item type
+        for (int k = 0; k < MAX_NUM_ELEMENTS; k++) {
+            zobristElement[i][k] = RNG::getRandomNumber();
+        }
+        for (int k = 0; k < MAX_DIR; k++) {
+            zobristDir[i][k] = RNG::getRandomNumber();
+        }
+    }
+}
+
+
+/*
+ * Get the hash representation of the current state in the engine
+ */
+uint64_t stateToHash() {
+    int px = stored_player[0].jx;
+    int py = stored_player[0].jy;
+    int pMov = stored_player[0].MovDir;
+    uint64_t hashValue = 0; 
+
+    // Set initial hash
+    for (int x = 0; x < level.fieldx; x++) {
+        for (int y = 0; y < level.fieldy; y++) {
+            hashValue ^= zobristElement[y*level.fieldx + x][Feld[x][y]];
+            hashValue ^= zobristDir[y*level.fieldx + x][MovDir[x][y]];
+        }
+    }
+
+    hashValue ^= zobristElement[py*level.fieldx + px][80];
+    hashValue ^= zobristDir[py*level.fieldx + px][pMov];
+
+    return hashValue;
+}
+
+/*
+ * Get the replay game name
+ */
+std::string getReplayFileName() {
+    std::string replay_file(options.replay_file);
+    return replay_file;
+}
+
+
+/*
+ * Get the players current shortest path distance to goal
+ * This uses distance tile maps pre-calculated using Dijkstra algorithm,
+ * NOT Euclidean distance.
+ */
 float getDistanceToGoal() {
     int playerX = stored_player[0].jx;
     int playerY = stored_player[0].jy;
-    return (float)distances[playerY][playerX];
+    return (float)distances[playerX][playerY];
 }
 
 
 
 typedef std::array<int, 2> Point;
-int INF = std::numeric_limits<int>::max();
-std::vector<std::vector<int>> distances;
+short INF = std::numeric_limits<short>::max();
+short distances[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 
 void getMinDistanceIndex(std::vector<Point> &Q, int &index) {
     int min_index = -1;
-    int min_value = INF;
+    short min_value = INF;
     for (int i = 0; i < (int)Q.size(); i++) {
         int x = Q[i][0]; 
         int y = Q[i][1];
-        if (distances[y][x] <= min_value) {
+        if (distances[x][y] <= min_value) {
             min_index = i;
-            min_value = distances[y][x];
+            min_value = distances[x][y];
         }
     }
     index = min_index;
@@ -152,23 +236,23 @@ void getNeighbours(Point u, std::vector<Point> &neighbours, std::vector<Point> &
     int x = u[0];
     int y = u[1];
 
-    if (x-1 >= 0 && Feld[x-1][y] != _FIELD_WALL 
+    if (x-1 >= 0 && Feld[x-1][y] != enginetype::FIELD_WALL 
         && std::find(Q.begin(), Q.end(), (Point){x-1,y}) != Q.end()) 
     {
         neighbours.push_back((Point){x-1,y});
     }
-    if (x+1 < level.fieldx && Feld[x+1][y] != _FIELD_WALL && 
+    if (x+1 < level.fieldx && Feld[x+1][y] != enginetype::FIELD_WALL && 
         std::find(Q.begin(), Q.end(), (Point){x+1,y}) != Q.end()) 
     {
         neighbours.push_back((Point){x+1,y});
     }
 
-    if (y-1 >= 0 && Feld[x][y-1] != _FIELD_WALL 
+    if (y-1 >= 0 && Feld[x][y-1] != enginetype::FIELD_WALL 
         && std::find(Q.begin(), Q.end(), (Point){x,y-1}) != Q.end()) 
     {
         neighbours.push_back((Point){x,y-1});
     }
-    if (y+1 < level.fieldy && Feld[x][y+1] != _FIELD_WALL && 
+    if (y+1 < level.fieldy && Feld[x][y+1] != enginetype::FIELD_WALL && 
         std::find(Q.begin(), Q.end(), (Point){x,y+1}) != Q.end()) 
     {
         neighbours.push_back((Point){x,y+1});
@@ -179,25 +263,28 @@ void getNeighbours(Point u, std::vector<Point> &neighbours, std::vector<Point> &
 void dijkstra() {
     int goalX=-1, goalY=-1;
     int x, y;
-    distances.clear();
     std::vector<Point> Q;
 
     // Find goal
     for (y = 0; y < level.fieldy; y++) {
-        std::vector<int> temp;
         for (x = 0; x < level.fieldx; x++) {
-            int dist = INF;
-            if (Feld[x][y] == _FIELD_GOAL) {
+            short dist = INF;
+            if (Feld[x][y] == enginetype::FIELD_GOAL) {
                 goalX = x;
                 goalY = y;
                 dist = 0;
             }
-            if (Feld[x][y] != _FIELD_WALL) {
+            if (Feld[x][y] != enginetype::FIELD_WALL) {
                 Q.push_back({x, y});
             }
-            temp.push_back(dist);
+            distances[x][y] = dist;
         }
-        distances.push_back(temp);
+    }
+
+    // If no goal, then break
+    if (goalX == -1 || goalY == -1) {
+        PLOGD_(logwrap::FileLogger) << "Level has no goal.";
+        return;
     }
 
     // Calc distances
@@ -215,9 +302,9 @@ void dijkstra() {
 
         // For each neighbour, update distance
         for (Point v : neighbours) {
-            int alt = distances[u[1]][u[0]] + 1;
-            if (alt < distances[v[1]][v[0]]) {
-                distances[v[1]][v[0]] = alt;
+            int alt = distances[u[0]][u[1]] + 1;
+            if (alt < distances[v[0]][v[1]]) {
+                distances[v[0]][v[1]] = alt;
             }
         }
     }
@@ -225,47 +312,9 @@ void dijkstra() {
     // Set max distances to neg
     for (y = 0; y < level.fieldy; y++) {
         for (x = 0; x < level.fieldx; x++) {
-            distances[y][x] = (distances[y][x] == INF ? -1 : distances[y][x]);
+            distances[x][y] = (distances[x][y] == INF ? -1 : distances[x][y]);
         }
     }
 }
 
-
-/*
- * Print current engine status
- */
-void debug_print_distances() {
-    int x, y;
-    for (y = 0; y < level.fieldy; y++) {
-        for (x = 0; x < level.fieldx; x++) {
-            std::cout.width(5);
-            std::cout << distances[y][x] << " ";
-        }
-        std::cout << std::endl;
-    }
-
-    std::cout << "-----------------" << std::endl;
-}
-
-
-/*
- * Print current engine status
- */
-void debug_print() {
-    int x, y;
-    std::cout << "Player x : " << stored_player[0].jx;
-    std::cout << " y : " << stored_player[0].jy;
-    std::cout << "Player MovPos: " << stored_player[0].MovPos << std::endl;
-    std::cout << "Player is_moving: " << stored_player[0].is_moving << std::endl;
-    std::cout << "Player is_waiting: " << stored_player[0].is_waiting << std::endl;
-    std::cout << "Player move_delay: " << stored_player[0].move_delay << std::endl;
-    for (y = 0; y < level.fieldy; y++) {
-        for (x = 0; x < level.fieldx; x++) {
-            std::cout.width(5);
-            std::cout << Feld[x][y] << " ";
-        }
-        std::cout << std::endl;
-    }
-
-    std::cout << "-----------------" << std::endl;
 }

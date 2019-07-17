@@ -32,6 +32,8 @@
 #include "text.h"
 #include "image.h"
 
+#include "../custom/custom.h"
+
 
 // ============================================================================
 // some generic helper functions
@@ -516,7 +518,8 @@ unsigned int init_random_number(int nr, int seed)
 
 unsigned int get_random_number(int nr, int max)
 {
-  return (max > 0 ? random_linux_libc(nr) % max : 0);
+//  return (max > 0 ? random_linux_libc(nr) % max : 0);
+  return (max > 0 ? getRandomNumber(max) : 0);
 }
 
 
@@ -950,8 +953,8 @@ void GetOptions(int argc, char *argv[],
   options.network = FALSE;
   options.verbose = FALSE;
   options.debug = FALSE;
-  options.solver = CONTROLLER_TYPE_USER;
-  options.level_number = 7;
+  options.controller_type = CONTROLLER_TYPE_USER;
+  options.level_number = 0;
   options.delay = GAME_FRAME_DELAY;
 
 #if 1
@@ -1029,6 +1032,7 @@ void GetOptions(int argc, char *argv[],
       options.music_directory    = getPath2(ro_base_path, MUSIC_DIRECTORY);
       options.docs_directory     = getPath2(ro_base_path, DOCS_DIRECTORY);
       options.conf_directory     = getPath2(ro_base_path, CONF_DIRECTORY);
+      options.replay_file = "";
     }
     else if (strncmp(option, "-levels", option_len) == 0)
     {
@@ -1109,29 +1113,76 @@ void GetOptions(int argc, char *argv[],
       // when doing batch processing, always enable verbose mode (warnings)
       options.verbose = TRUE;
     }
-    else if (strncmp(option, "-solver", option_len) == 0)
+    else if (strncmp(option, "-controller", option_len) == 0)
     {
         if (option_arg == NULL) {
             Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
         }
         else if (strcmp("BFS", option_arg) == 0 || strcmp("bfs", option_arg) == 0) {
-            options.solver = CONTROLLER_TYPE_BFS;
+            options.controller_type = CONTROLLER_TYPE_BFS;
         }
         else if (strcmp("MCTS", option_arg) == 0 || strcmp("mcts", option_arg) == 0) {
-            options.solver = CONTROLLER_TYPE_MCTS;
+            options.controller_type = CONTROLLER_TYPE_MCTS;
         }
         else if (strcmp("test_engine", option_arg) == 0) {
-            options.solver = CONTROLLER_TYPE_TEST_SPEED;
+            options.controller_type = CONTROLLER_TYPE_TEST_SPEED;
         }
         else if (strcmp("test_bfs", option_arg) == 0) {
-            options.solver = CONTROLLER_TYPE_TEST_BFS;
+            options.controller_type = CONTROLLER_TYPE_TEST_BFS;
         }
         else if (strcmp("test_mcts", option_arg) == 0) {
-            options.solver = CONTROLLER_TYPE_TEST_MCTS;
+            options.controller_type = CONTROLLER_TYPE_TEST_MCTS;
+        }
+        else if (strcmp("test_rng", option_arg) == 0) {
+            options.controller_type = CONTROLLER_TYPE_TEST_RNG;
+        }
+        else if (strcmp("test_all", option_arg) == 0) {
+            options.controller_type = CONTROLLER_TYPE_TEST_ALL;
         }
         else {
             // Additionally check for valid level file if it exists?
             Error(ERR_EXIT_HELP, "option '%s' argument must be a valid integer", option_str);
+        }
+        if (option_arg == next_option) {
+            options_left++;
+        }
+    }
+    else if (strncmp(option, "-test", option_len) == 0)
+    {
+        if (option_arg == NULL) {
+            Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
+        }
+        else if (strcmp("engine", option_arg) == 0) {
+            options.controller_type = CONTROLLER_TYPE_TEST_SPEED;
+        }
+        else if (strcmp("bfs", option_arg) == 0) {
+            options.controller_type = CONTROLLER_TYPE_TEST_BFS;
+        }
+        else if (strcmp("mcts", option_arg) == 0) {
+            options.controller_type = CONTROLLER_TYPE_TEST_MCTS;
+        }
+        else if (strcmp("rng", option_arg) == 0) {
+            options.controller_type = CONTROLLER_TYPE_TEST_RNG;
+        }
+        else if (strcmp("all", option_arg) == 0) {
+            options.controller_type = CONTROLLER_TYPE_TEST_ALL;
+        }
+        else {
+            // Additionally check for valid level file if it exists?
+            Error(ERR_EXIT_HELP, "option '%s' argument must be a valid integer", option_str);
+        }
+        if (option_arg == next_option) {
+            options_left++;
+        }
+    }
+    else if (strncmp(option, "-replay", option_len) == 0)
+    {
+        if (option_arg == NULL) {
+            Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
+        }
+        else {
+            options.replay_file = option_arg;
+            options.controller_type = CONTROLLER_TYPE_REPLAY;
         }
         if (option_arg == next_option) {
             options_left++;

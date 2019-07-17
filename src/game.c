@@ -11333,7 +11333,8 @@ static void GameActionsExt(void)
   if (tape.playing && tape.warp_forward && !tape.pausing)
     game_frame_delay_value = 0;
 
-  SetVideoFrameDelay((game_frame_delay_value == 0 || is_simulating) ? 0 : options.delay);
+  if (checkGameFailed() || options.delay != 20 || (game.LevelSolved && !game.LevelSolved_GameEnd)) {game_frame_delay_value = options.delay;}
+  SetVideoFrameDelay((game_frame_delay_value == 0 || is_simulating) ? 0 : game_frame_delay_value);
 
   // (de)activate virtual buttons depending on current game status
   if (strEqual(setup.touch.control_type, TOUCH_CONTROL_VIRTUAL_BUTTONS))

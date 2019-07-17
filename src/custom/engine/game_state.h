@@ -35,7 +35,7 @@ private:
         &WasJustMoving, &WasJustFalling, &CheckCollision, &CheckImpact, &AmoebaNr, 
         &ExplodeField, &ExplodePhase, &ExplodeDelay
     };
-    int (*pointers_ints[num_shorts])[MAX_LEV_FIELDX][MAX_LEV_FIELDY] = {
+    int (*pointers_ints[num_ints])[MAX_LEV_FIELDX][MAX_LEV_FIELDY] = {
         &RunnerVisit, &PlayerVisit, 
         &GfxFrame, &GfxRandom, &GfxElement, &GfxAction, &GfxDir, &GfxRedraw
     };
@@ -48,10 +48,10 @@ private:
 public:
 
     // Containers of saved game state
-    std::array<board_short, num_shorts> saved_shorts;
-    std::array<board_int, num_ints> saved_ints;
-    std::array<board_bool, num_bools> saved_bools;
-    std::array<amoeba_short, num_amoebas> saved_amoebas;
+    std::array<enginetype::board_short, num_shorts> saved_shorts;
+    std::array<enginetype::board_int, num_ints> saved_ints;
+    std::array<enginetype::board_bool, num_bools> saved_bools;
+    std::array<enginetype::amoeba_short, num_amoebas> saved_amoebas;
 
     struct PlayerInfo saved_player;
 
@@ -74,6 +74,8 @@ public:
     // Current position in viewfinder
     int saved_scroll_x;
     int saved_scroll_y;
+
+    int saved_FrameCounter;
 
     // Time remaining (we don't want simulation counting for play time)
     int save_TimeFrames, save_TimePlayed, save_TimeLeft, save_TapeTime;

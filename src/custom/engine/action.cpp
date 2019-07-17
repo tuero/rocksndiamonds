@@ -17,6 +17,19 @@ std::string actionToString(const Action action) {
 
 
 /*
+ * Get string representation of action
+ */
+Action stringToAction(const std::string str) {
+    Action action = Action::noop;
+    if (str == "left") {action = Action::left;}
+    else if (str == "right") {action = Action::right;}
+    else if (str == "up") {action = Action::up;}
+    else if (str == "down") {action = Action::down;}
+    return action;
+}
+
+
+/*
  * Get cardinal direction opposite to the input action
  */
 Action actionGetOpposite(const Action action) {

@@ -3748,6 +3748,6 @@ extern struct ConfigInfo	helpanim_config[];
 extern struct ConfigInfo	helptext_config[];
 
 extern boolean is_simulating;
-extern int controller;
+extern int step_counter;
 
 #endif	// MAIN_H
