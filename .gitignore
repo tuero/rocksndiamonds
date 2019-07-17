@@ -37,5 +37,6 @@ rocksndiamonds.exe
 todo.txt
 CMakeLists.txt
 .idea/
+cmake-build-debug/
 calgrind.out*
 
