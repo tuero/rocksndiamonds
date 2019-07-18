@@ -28,6 +28,7 @@ extern "C" {
 namespace enginehelper {
 
     extern short distances[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+    extern short max_distance;
 
     static const uint64_t MAX_HASH = UINT64_MAX;
     static const int MAX_DIR = 32;

@@ -50,6 +50,9 @@ private:
     unsigned int count_simulated_nodes = 0;
     unsigned int count_expanded_nodes = 0;
     unsigned int max_depth = 0;
+
+    // Misc
+    unsigned int calls_since_rest = 0;
     std::string msg;
 
     Pointer root = nullptr;

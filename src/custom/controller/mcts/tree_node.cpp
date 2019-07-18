@@ -25,15 +25,17 @@ TreeNode::TreeNode(TreeNode* parent, const std::vector<Action> &actions_from_sta
 
 void TreeNode::setActions() {
     // Simulator must be in this new state to determine the possible child actions
+    // We always keep noop at front so far left of tree is sequence of noops
     actions.clear();
+    actions.push_back(Action::noop);
 
     for (Action action : ALL_ACTIONS) {
         // Player is blocked by wall
-        if (enginehelper::isWall(action)) {continue;}
+        if (enginehelper::isWall(action) || action == Action::noop) {continue;}
         actions.push_back(action);
     }
 
-    std::random_shuffle(actions.begin(), actions.end());
+    std::random_shuffle(std::next(actions.begin()), actions.end());
 }
 
 
@@ -93,18 +95,30 @@ TreeNode* TreeNode::expand() {
         enginehelper::engineSimulateSingle();
     }
 
-    GameState reference;
-    reference.setFromSimulator();
-    enginehelper::setEnginePlayerAction(Action::noop);
-    enginehelper::engineSimulateSingle();
-
     // Simulator is set to the child state, so determine what the available actions
     // the child has
     child.get()->setActions();
     child.get()->distance_to_goal = enginehelper::getDistanceToGoal();
+
     child.get()->is_terminal = getTerminalStatusFromEngine();
     child.get()->is_deadly = getDeadlyStatusFromEngine();
     child.get()->is_solved = getSolvedStatusFromEngine();
+
+    GameState reference;
+    reference.setFromSimulator();
+    for (unsigned int i = 0; i < enginetype::ENGINE_RESOLUTION - 1; i++) {
+        enginehelper::setEnginePlayerAction(Action::noop);
+        enginehelper::engineSimulateSingle();
+        child.get()->is_terminal = child.get()->is_terminal | getTerminalStatusFromEngine();
+        child.get()->is_deadly = child.get()->is_deadly | getDeadlyStatusFromEngine();
+    }
+    // enginehelper::setEnginePlayerAction(Action::noop);
+    // enginehelper::engineSimulateSingle();
+
+    // Extra steps to ensure we do not terminate the next tick
+    // child.get()->is_terminal = getTerminalStatusFromEngine();
+    // child.get()->is_deadly = getDeadlyStatusFromEngine();
+    // child.get()->is_solved = getSolvedStatusFromEngine();
 
     reference.restoreSimulator();
     RNG::setSeedEngineHash();

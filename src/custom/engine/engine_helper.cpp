@@ -111,16 +111,24 @@ bool isWall(Action action) {
     int playerX = stored_player[0].jx;
     int playerY = stored_player[0].jy;
 
-    if (action == Action::down && Feld[playerX][playerY+1] == enginetype::FIELD_WALL) {
+    if (action == Action::down && (Feld[playerX][playerY+1] == enginetype::FIELD_WALL || 
+        playerY+1 == level.fieldy))
+    {
         return true;
     }
-    else if (action == Action::right && Feld[playerX+1][playerY] == enginetype::FIELD_WALL) {
+    else if (action == Action::right && (Feld[playerX+1][playerY] == enginetype::FIELD_WALL || 
+        playerX+1 == level.fieldx))
+    {
         return true;
     }
-    else if (action == Action::up && Feld[playerX][playerY-1] == enginetype::FIELD_WALL) {
+    else if (action == Action::up && (Feld[playerX][playerY-1] == enginetype::FIELD_WALL || 
+        playerY == 0))
+    {
         return true;
     }
-    else if (action == Action::left && Feld[playerX-1][playerY] == enginetype::FIELD_WALL) {
+    else if (action == Action::left && (Feld[playerX-1][playerY] == enginetype::FIELD_WALL || 
+        playerX == 0)) 
+    {
         return true;
     }
     return false;
@@ -216,6 +224,7 @@ float getDistanceToGoal() {
 typedef std::array<int, 2> Point;
 short INF = std::numeric_limits<short>::max();
 short distances[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short max_distance = -1;
 
 void getMinDistanceIndex(std::vector<Point> &Q, int &index) {
     int min_index = -1;
@@ -313,6 +322,7 @@ void dijkstra() {
     for (y = 0; y < level.fieldy; y++) {
         for (x = 0; x < level.fieldx; x++) {
             distances[x][y] = (distances[x][y] == INF ? -1 : distances[x][y]);
+            max_distance = (max_distance < distances[x][y]) ? distances[x][y] : max_distance;
         }
     }
 }

@@ -73,15 +73,30 @@ TreeNode* MCTS::selectBestChild(TreeNode* current) {
     TreeNode* current_child = nullptr;
     TreeNode* best_child = nullptr;
 
+    GameState reference;
+    reference.setFromSimulator();
+
     for (unsigned int i = 0; i < current->getChildCount(); i++) {
         current_child = current->getChild(i);
         float node_value = nodeValue(current_child);
         int node_distance = current_child->getDistance();
 
         // Better child node found
+        // Determine if child is deadly
+        reference.restoreSimulator();
+        for (unsigned int i = 0; i < enginetype::ENGINE_RESOLUTION; i++) {
+            enginehelper::setEnginePlayerAction(current_child->getActionTaken());
+            enginehelper::engineSimulateSingle();
+        }
+
+        if (enginehelper::engineGameFailed()) {
+            PLOGE_IF_(logwrap::FileLogger, !current_child->isDeadly()) << "This shouldn't happen.";
+            // continue; 
+        }
+
+
         if (current_child->isDeadly()) {
             std::string msg = "Child " + actionToString(current_child->getActionTaken()) + " is terminal.";
-            std::cout << msg << std::endl;
             PLOGD_(logwrap::FileLogger) << msg;
             continue;
         }
@@ -94,7 +109,7 @@ TreeNode* MCTS::selectBestChild(TreeNode* current) {
     }
 
     if (best_child == nullptr) {
-        std::cout << "ERROR: No non-terminal child found." << std::endl;
+        PLOGE_(logwrap::FileLogger) << " No non-terminal child found.";
     }
 
     return best_child;
@@ -151,20 +166,18 @@ TreeNode* MCTS::selectMostVisitedChild(TreeNode* current) {
 float MCTS::nodeValue(TreeNode* current) {
     float value = 0.0;
     
-    int visit_count = current->getVisitCount();
+    float visit_count = (float)current->getVisitCount();
     int depth = current->getDepth();
-    int distance = current->getDistance();
+    float distance = (float)current->getDistance();
     float goals_count = current->getGoalCount();
     float died_count = current->getDiedCount();
     float count_safe = current->getIsSafe();
 
-    value += w_distance * (1.0/ ((float)distance + 1.0));
+    value += w_distance * (enginehelper::max_distance - distance);
     value += w_visit_count * visit_count;
-    // value += 8*(1.0/ ((float)distance + 1.0));
-    value += w_goals_count * (float)goals_count / (float)visit_count;
-    value -= w_died_count * ((float)died_count / (float)visit_count);
-    value += w_safe_count * (count_safe/ (float)visit_count);
-    // value += 1.0*(count_safe/ (float)visit_count);
+    value += w_goals_count * (goals_count / visit_count);
+    value -= w_died_count * (died_count / visit_count);
+    value += w_safe_count * (count_safe/ visit_count);
 
     return value;
 }
@@ -177,17 +190,24 @@ std::string MCTS::childValues(TreeNode* current) {
 
     for (unsigned int i = 0; i < current->getChildCount(); i++) {
         current_child = current->getChild(i);
+        float visit_count = (float)current_child->getVisitCount();
+        float distance = (float)current_child->getDistance();
+        float goals_count = current_child->getGoalCount();
+        float died_count = current_child->getDiedCount();
+        float count_safe = current_child->getIsSafe();
 
-        output += "action: ";
-        output += actionToString(current_child->getActionTaken()) + " ";
-        output += "value: ";
-        output += std::to_string(nodeValue(current_child)) + " ";
-        output += "visit count: ";
-        output += std::to_string(current_child->getVisitCount()) + " ";
-        output += "death: ";
-        output += std::to_string(current_child->getDiedCount()) + " ";
-        output += "safe: ";
-        output += std::to_string(current_child->getIsSafe()) + " ";
+        output += "\taction: ";
+        output += actionToString(current_child->getActionTaken());
+        output += ", value: ";
+        output += std::to_string(nodeValue(current_child));
+        output += ", visit count: ";
+        output += std::to_string(visit_count);
+        output += ", distance: ";
+        output += std::to_string(w_distance * (enginehelper::max_distance - distance));
+        output += ", death: ";
+        output += std::to_string(-w_died_count * (died_count / visit_count));
+        output += ", safe: ";
+        output += std::to_string(w_safe_count * (count_safe/ visit_count));
         output += "\n";
     }
 
@@ -197,6 +217,7 @@ std::string MCTS::childValues(TreeNode* current) {
 
 void MCTS::reset(std::vector<Action> &next_action) {
     root = std::make_unique<TreeNode>(nullptr);
+    calls_since_rest = 0;
     
     // Reset statistics
     count_simulated_nodes = 0;
@@ -209,16 +230,18 @@ void MCTS::reset(std::vector<Action> &next_action) {
 
     // step forward
     enginehelper::setSimulatorFlag(true);
-    std::string msg = "";
+    std::string msg = "Setting root to next action in queue: ";
+    msg += actionToString(next_action[0]);
     for (unsigned int i = 0; i < next_action.size(); i++) {
         enginehelper::setEnginePlayerAction(next_action[i]);
         enginehelper::engineSimulateSingle();
-        msg += actionToString(next_action[i]) + " ";
     }
 
     PLOGD_(logwrap::ConsolLogger) << msg;
     PLOGD_(logwrap::FileLogger) << msg;
     logwrap::logPlayerDetails();
+    logwrap::logBoardState();
+    logwrap::logMovPosState();
     // save root state to where we will be when done executing current queued action
     rootSavedState.setFromSimulator();
     root.get()->setActions();
@@ -240,10 +263,10 @@ void MCTS::reset(std::vector<Action> &next_action) {
 
 void MCTS::handleEmpty(std::vector<Action> &currentSolution, std::vector<Action> &forwardSolution) {
     currentSolution = forwardSolution;
-    reset(currentSolution);
     std::string msg = "Resetting MCTS tree.";
     PLOGD_(logwrap::FileLogger) << msg;
     PLOGD_(logwrap::ConsolLogger) << msg;
+    reset(currentSolution);
 }
 
 
@@ -260,6 +283,8 @@ void MCTS::run(std::vector<Action> &currentSolution, std::vector<Action> &forwar
     timer.init();
     float timeTotal = 0;
     float counter = 0;
+    float sim_denom = 1.0 / num_simulations;
+    calls_since_rest += 1;
 
     // Save the current game state from the simulator
     GameState startingState;
@@ -267,10 +292,9 @@ void MCTS::run(std::vector<Action> &currentSolution, std::vector<Action> &forwar
 
     // Set current game state to root state
     rootSavedState.restoreSimulator();
-    // logwrap::logPlayerDetails();
+    RNG::setSeedEngineHash();
 
     // MCTS starting configurations
-    // root.get()->setActions();
     TreeNode* best_child = nullptr;
 
     // Log state before MCTS to ensure we are simulating after queued actions are taken.
@@ -303,10 +327,9 @@ void MCTS::run(std::vector<Action> &currentSolution, std::vector<Action> &forwar
                 + ", simulated nodes: " + std::to_string(count_simulated_nodes);
         PLOGD_(logwrap::FileLogger) << msg;
 
+        // Select child based on policy and forward engine simulator
         while (!current->getTerminalStatusFromEngine() && current->allExpanded()) {
-            // select child based on policy
             current = get_best_uct_child(current);
-            // update simulator
             enginehelper::setEnginePlayerAction(current->getActionTaken());
             for (unsigned int i = 0; i < enginetype::ENGINE_RESOLUTION; i++) {
                 // Shouldn't need to handle EOL or EOG, as we are using same seed for random events
@@ -353,8 +376,8 @@ void MCTS::run(std::vector<Action> &currentSolution, std::vector<Action> &forwar
                     count_simulated_nodes += 1;
                 }
             }
-            times_goal_found += enginehelper::engineGameSolved() ? 0.05 : 0;
-            times_died += enginehelper::engineGameFailed() ? 0.05 : 0;
+            times_goal_found += enginehelper::engineGameSolved() ? sim_denom : 0;
+            times_died += enginehelper::engineGameFailed() ? sim_denom : 0;
         }
         // Check if safe
         reference_state.restoreSimulator();
@@ -394,25 +417,22 @@ void MCTS::run(std::vector<Action> &currentSolution, std::vector<Action> &forwar
     timer.stop();
     int ms = timer.getDuration();
 
+    // Update statistics
     statistics[enginetype::RUN_TIME] = ms;
     statistics[enginetype::COUNT_EXPANDED_NODES] = count_expanded_nodes;
     statistics[enginetype::COUNT_SIMULATED_NODES] = count_simulated_nodes;
     statistics[enginetype::MAX_DEPTH] = max_depth;
 
+    // Get best child and its associated action
+    rootSavedState.restoreSimulator();
+    RNG::setSeedEngineHash();
     best_child = selectBestChild(root.get());
-
-
     Action best_action = (best_child == nullptr ? Action::noop : best_child->getActionTaken());
 
-    if (options.debug || 1==1) {
-        std::cout << "MCTS ellapsed time: " << ms << "ms" << std::endl;
-        std::cout << "Best action: " << actionToString(best_action) << std::endl;
-        std::cout << "Child node values: " << std::endl; 
-        std::cout << childValues(root.get());
-        std::cout << std::endl;
-    }
-
-    PLOGD_(logwrap::FileLogger) << childValues(root.get());
+    // Logg root child nodes along with their current valuation
+    msg = "Child node values:\n" + childValues(root.get());
+    PLOGD_(logwrap::FileLogger) << msg;
+    PLOGD_IF_(logwrap::ConsolLogger, calls_since_rest == 8) << msg;
 
     // Put simulator back to original state
     startingState.restoreSimulator();
