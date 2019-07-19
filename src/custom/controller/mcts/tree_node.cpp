@@ -112,16 +112,16 @@ TreeNode* TreeNode::expand() {
         child.get()->is_terminal = child.get()->is_terminal | getTerminalStatusFromEngine();
         child.get()->is_deadly = child.get()->is_deadly | getDeadlyStatusFromEngine();
     }
-    // enginehelper::setEnginePlayerAction(Action::noop);
-    // enginehelper::engineSimulateSingle();
+    enginehelper::setEnginePlayerAction(Action::noop);
+    enginehelper::engineSimulateSingle();
 
     // Extra steps to ensure we do not terminate the next tick
     // child.get()->is_terminal = getTerminalStatusFromEngine();
     // child.get()->is_deadly = getDeadlyStatusFromEngine();
     // child.get()->is_solved = getSolvedStatusFromEngine();
 
-    reference.restoreSimulator();
-    RNG::setSeedEngineHash();
+    // reference.restoreSimulator();
+    // RNG::setSeedEngineHash();
 
     // Store child
     children.push_back(std::move(child));

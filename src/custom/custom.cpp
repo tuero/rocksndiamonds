@@ -83,7 +83,11 @@ extern "C" void setLevelSet(int levelset) {
     char *levelset_dir;
 
     // setup.c -> getHomeDir
-    leveldir_current->basepath = (char *)"/home/tuero/.rocksndiamonds/levels";
+    #ifdef __APPLE__
+        leveldir_current->basepath = (char *)"/Users/tuero/.rocksndiamonds/levels";
+    #else
+        leveldir_current->basepath = (char *)"/home/tuero/.rocksndiamonds/levels";
+    #endif
 
     // Levelset subfolder names
     switch(levelset) {
