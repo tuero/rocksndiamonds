@@ -120,6 +120,9 @@ void Controller::setController(enginetype::ControllerType controller) {
     else if (controller == enginetype::MCTS) {
         baseController = std::make_unique<MCTS>();
     }
+    else if (controller == enginetype::USER) {
+        baseController = std::make_unique<User>();
+    }
     else {
         // Throw error
         msg = "Unknown controller type: " + std::to_string(controller);

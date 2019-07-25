@@ -49,6 +49,9 @@ extern "C"
      */
     int getAction(void);
 
+    void spawnYam(void);
+    void newDiamond(void);
+
     // -------------------- RNG ----------------------
 
     /*

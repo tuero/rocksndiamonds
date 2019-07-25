@@ -18,6 +18,7 @@
 #include "bfs/bfs.h"
 #include "mcts/mcts.h"
 #include "replay/replay.h"
+#include "user/user.h"
 
 
 class Controller {

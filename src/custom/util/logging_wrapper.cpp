@@ -36,6 +36,7 @@ namespace logwrap {
         if (enginehelper::getControllerType() != enginetype::REPLAY) {
             saved_run_file.open(log_dir + datetimeToString() + run_suffix, std::ios::app);
             saved_run_file << RNG::getEngineSeed() << std::endl;
+            saved_run_file << enginehelper::getLevelNumber() << std::endl;
         }
 
         // Default logger to file

@@ -10,8 +10,8 @@ Replay::Replay(){
     int level_num;
     uint64_t seed;
 
-    replayFileStream >> level_num;
     replayFileStream >> seed;
+    replayFileStream >> level_num;
 
     RNG::setEngineSeed(seed);
     enginehelper::loadLevel(level_num);
@@ -27,9 +27,6 @@ void Replay::handleEmpty(std::vector<Action> &currentSolution, std::vector<Actio
     // Silent compiler warning
     (void)currentSolution;
     (void)forwardSolution;
-
-    // std::string replay_file = enginehelper::getReplayFileName();
-    // setReplayFile(replay_file);
 }
 
 
@@ -51,6 +48,7 @@ void Replay::run(std::vector<Action> &currentSolution, std::vector<Action> &forw
         std::vector<Action> path;
         if (replayFileStream.is_open()){
             while (std::getline(replayFileStream,line)){
+                if (line.length() == 0) {continue;}
                 currentSolution.push_back(stringToAction(line));
             }
             replayFileStream.close();

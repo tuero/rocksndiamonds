@@ -23,7 +23,17 @@ enginetype::ControllerType getControllerType() {
  * Call engine function to load the given level
  */
 void loadLevel(int level_num) {
+    // Other functions replay on options being set
+    options.level_number = level_num;
     LoadLevel(level_num);
+}
+
+
+/*
+ * Get the level number from command line argument
+ */
+int getLevelNumber() {
+    return options.level_number;
 }
 
 

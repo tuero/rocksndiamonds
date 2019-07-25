@@ -4,7 +4,9 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <array>
 #include <ctime> 
+#include <random>
 
 #include "engine/game_state.h"
 #include "engine/action.h"
@@ -61,7 +63,10 @@ extern "C" void handleLevelStart() {
     controller.clearSolution();
 
     // Warm up the simulator RNG
-    RNG::setSimulatingSeed();
+    // RNG::setSimulatingSeed();
+
+    RNG::setEngineSeed(RNG::getEngineSeed());
+    RNG::setSimulatingSeed(RNG::getSimulationSeed());
 }
 
 
@@ -121,6 +126,122 @@ extern "C" void setLevelSet(int levelset) {
  */
 extern "C" int getAction() {
     return controller.getAction();
+}
+
+
+int yamCounter = 0;
+int spaceCounter = 0;
+
+// rowIndex, yamCounter, spaceCounter
+std::vector<std::array<int, 3>> counters = {{6,0,0}, {10,0,0}};
+
+void addElement(std::array<int, 3> &counters) {
+    // create space
+    if (counters[1] == 5) {
+        counters[1] = 0;
+
+        // std::random_device rd;
+        // std::mt19937 mt(rd());
+        // std::uniform_int_distribution<int> dist(16, 32);
+        // counters[2] = dist(mt);
+        counters[2] = RNG::getRandomNumber(16) + 16;
+        return;
+    }
+
+    // Spacing decrement
+    if (counters[2] != 0) {
+        counters[2] -= 1;
+        return;
+    }
+
+    // Add new object
+    Feld[0][counters[0]] = enginetype::FIELD_CUSTOM_12;
+    MovDir[0][counters[0]] = 2;
+    counters[1] += 1;
+}
+
+extern "C" void spawnYam() {
+
+    if (options.level_number != 17) {
+        return;
+    }
+
+
+    for (unsigned int i = 0; i < counters.size(); i++) {
+        int row = counters[i][0];
+        if (Feld[0][row] == enginetype::FIELD_EMPTY && Feld[1][row] == enginetype::FIELD_EMPTY &&
+        ((Feld[2][row] == enginetype::FIELD_EMPTY) || (Feld[2][row] == enginetype::FIELD_CUSTOM_12 && Feld[3][row] == enginetype::FIELD_TEMP))) {
+            addElement(counters[i]);
+        }
+    }
+}
+
+
+extern "C" void newDiamond() {
+    // Count diamonds in game
+    if (options.level_number != 16) {
+        return;
+    }
+    int count_diamonds = 0;
+    for (int y = 0; y < level.fieldy; y++) {
+        for (int x = 0; x < level.fieldx; x++) {
+            if (Feld[x][y] == enginetype::FIELD_CUSTOM_11) {
+                count_diamonds += 1;
+            }
+        }
+    }
+
+    if (count_diamonds == 0) {
+        // level.gems_needed += 1;
+
+        // std::random_device rd;
+        // std::mt19937 mt(rd());
+        // std::uniform_int_distribution<int> distx(0, level.fieldx - 1);
+        // std::uniform_int_distribution<int> disty(0, level.fieldy - 1);
+
+        // spawn new diamond
+        while (true) {
+            // int x1 = distx(mt);
+            // int y1 = disty(mt);
+
+            // int x2 = distx(mt);
+            // int y2 = disty(mt);
+
+            int x1 = RNG::getRandomNumber(level.fieldx - 1);
+            int y1 = RNG::getRandomNumber(level.fieldy - 1);
+
+            int x2 = RNG::getRandomNumber(level.fieldx - 1);
+            int y2 = RNG::getRandomNumber(level.fieldy - 1);
+
+            if ((x1 == stored_player[0].jx && y1 == stored_player[0].jy) || 
+                (x2 == stored_player[0].jx && y2 == stored_player[0].jy)) 
+            {
+                continue;
+            }
+
+            if (Feld[x1][y1] != enginetype::FIELD_EMPTY && 
+                Feld[x2][y2] != enginetype::FIELD_EMPTY) 
+            {
+                continue;
+            }
+
+            if (x1 == x2 && y1 == y2) {
+                continue;
+            }
+
+            // Spawning diamond on tile yamyam will be moving towards
+            if (MovDir[x1][y1] != 0) {
+                continue;
+            }
+
+            std::cout << "Putting new diamond at x=" << x1 << ", y=" << y1 << std::endl;
+            std::cout << "Putting new yamyam at x=" << x2 << ", y=" << y2 << std::endl;
+            Feld[x1][y1] = enginetype::FIELD_CUSTOM_11;
+            Feld[x2][y2] = enginetype::FIELD_YAMYAM;
+            MovDir[x2][y2] = 4;
+            break;
+        }
+    }
 }
 
 

@@ -972,9 +972,10 @@ struct RuntimeInfo
   boolean uses_touch_device;
 };
 
-typedef enum controller_type {CONTROLLER_TYPE_USER, CONTROLLER_TYPE_TEST_SPEED, CONTROLLER_TYPE_TEST_BFS,
+typedef enum controller_type {CONTROLLER_TYPE_DEFAULT, CONTROLLER_TYPE_TEST_SPEED, CONTROLLER_TYPE_TEST_BFS,
                               CONTROLLER_TYPE_TEST_MCTS, CONTROLLER_TYPE_BFS, CONTROLLER_TYPE_TEST_ALL,
-                              CONTROLLER_TYPE_MCTS, CONTROLLER_TYPE_TEST_RNG, CONTROLLER_TYPE_REPLAY} controller_type;
+                              CONTROLLER_TYPE_USER, CONTROLLER_TYPE_MCTS, CONTROLLER_TYPE_TEST_RNG,
+                              CONTROLLER_TYPE_REPLAY} controller_type;
 
 struct OptionInfo
 {

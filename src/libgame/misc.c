@@ -953,7 +953,7 @@ void GetOptions(int argc, char *argv[],
   options.network = FALSE;
   options.verbose = FALSE;
   options.debug = FALSE;
-  options.controller_type = CONTROLLER_TYPE_USER;
+  options.controller_type = CONTROLLER_TYPE_DEFAULT;
   options.level_number = 0;
   options.delay = GAME_FRAME_DELAY;
 
@@ -1123,6 +1123,9 @@ void GetOptions(int argc, char *argv[],
         }
         else if (strcmp("MCTS", option_arg) == 0 || strcmp("mcts", option_arg) == 0) {
             options.controller_type = CONTROLLER_TYPE_MCTS;
+        }
+        else if (strcmp("USER", option_arg) == 0 || strcmp("user", option_arg) == 0) {
+            options.controller_type = CONTROLLER_TYPE_USER;
         }
         else if (strcmp("test_engine", option_arg) == 0) {
             options.controller_type = CONTROLLER_TYPE_TEST_SPEED;

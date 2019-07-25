@@ -23,7 +23,10 @@ MCTS_OBJ 	:= 	$(MCTS_DIR)/mcts.o 				\
 				$(MCTS_DIR)/tree_node.o		
 
 REPLAY_DIR 	:= 	$(CTR_DIR)/replay
-REPLAY_OBJ 	:= 	$(REPLAY_DIR)/replay.o 				
+REPLAY_OBJ 	:= 	$(REPLAY_DIR)/replay.o 		
+
+USER_DIR 	:= 	$(CTR_DIR)/user
+USER_OBJ 	:= 	$(USER_DIR)/user.o 			
 
 ENG_DIR 	:= 	engine
 ENG_OBJ 	:= 	$(ENG_DIR)/action.o 			\
@@ -48,8 +51,8 @@ TEST_OBJ 	:= 	$(TEST_DIR)/test_engine_speed.o 	\
 
 all: controller eng util tests $(CUSTOM)
 
-$(CUSTOM): $(CTR_OBJ) $(BFS_OBJ) $(MCTS_OBJ) $(REPLAY_OBJ) $(ENG_OBJ) $(UTIL_OBJ) $(TEST_OBJ) $(OBJS)
-	$(AR) cr $(CUSTOM) $(CTR_OBJ) $(BFS_OBJ) $(MCTS_OBJ) $(REPLAY_OBJ) $(ENG_OBJ) $(UTIL_OBJ) $(TEST_OBJ) $(OBJS)
+$(CUSTOM): $(CTR_OBJ) $(BFS_OBJ) $(MCTS_OBJ) $(REPLAY_OBJ) $(USER_OBJ) $(ENG_OBJ) $(UTIL_OBJ) $(TEST_OBJ) $(OBJS)
+	$(AR) cr $(CUSTOM) $(CTR_OBJ) $(BFS_OBJ) $(MCTS_OBJ) $(REPLAY_OBJ) $(USER_OBJ) $(ENG_OBJ) $(UTIL_OBJ) $(TEST_OBJ) $(OBJS)
 	$(RANLIB) $(CUSTOM)
 
 controller:

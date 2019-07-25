@@ -332,7 +332,7 @@ void EventLoop(void)
   {
       // New level loaded, so calculate tile distances and print starting state
       if (prev_game_status != game_status && game_status == GAME_MODE_PLAYING &&
-          options.controller_type != CONTROLLER_TYPE_USER)
+          options.controller_type != CONTROLLER_TYPE_DEFAULT)
       {
           handleLevelStart();
       }
@@ -364,7 +364,9 @@ void EventLoop(void)
         // Get action from controller
         // We can get rid of the conditional by just returning user action
         // if no controller is selected
-        if (options.controller_type != CONTROLLER_TYPE_USER) {
+        if (options.controller_type != CONTROLLER_TYPE_DEFAULT) {
+            newDiamond();
+            spawnYam();
             stored_player[0].action = getAction();
         }
         HandleGameActions();

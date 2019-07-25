@@ -46,6 +46,11 @@ namespace enginehelper {
     void loadLevel(int level_num);
 
     /*
+     * Get the level number from command line argument
+     */
+    int getLevelNumber();
+
+    /*
      * Check if the current status of the engine is loss of life
      */
     bool engineGameFailed();

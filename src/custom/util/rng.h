@@ -14,7 +14,8 @@ private:
     static const uint64_t MAX_VALUE = UINT64_MAX;
     static std::mt19937 gen_engine;
     static std::mt19937 gen_simulating;
-    static std::uniform_int_distribution<uint64_t> distribution;
+    static std::uniform_int_distribution<uint64_t> dist_engine;
+    static std::uniform_int_distribution<uint64_t> dist_simulation;
     static uint64_t seed_engine;
     static uint64_t seed_simulation;
 public:
@@ -53,6 +54,12 @@ public:
      * Normally this is used for saving in replay files to reload games with the same seed
      */
     static uint64_t getEngineSeed();
+
+    /*
+     * Get the seed for the RNG used for engine.
+     * Normally this is used for saving in replay files to reload games with the same seed
+     */
+    static uint64_t getSimulationSeed();
 };
 
 

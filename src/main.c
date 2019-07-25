@@ -7812,7 +7812,7 @@ int main(int argc, char *argv[])
     }
 
     // start game
-    if (options.controller_type != CONTROLLER_TYPE_USER) {
+    if (options.controller_type != CONTROLLER_TYPE_DEFAULT) {
         StartGameActions(network.enabled, setup.autorecord, level.random_seed);
     }
 

@@ -21,7 +21,8 @@ namespace enginetype{
 
 
     // ------------- Controller types -------------
-    enum ControllerType{BFS=CONTROLLER_TYPE_BFS, MCTS=CONTROLLER_TYPE_MCTS, REPLAY=CONTROLLER_TYPE_REPLAY};
+    enum ControllerType{BFS=CONTROLLER_TYPE_BFS, MCTS=CONTROLLER_TYPE_MCTS, 
+                        USER=CONTROLLER_TYPE_USER, REPLAY=CONTROLLER_TYPE_REPLAY};
 
     enum Statistics{RUN_TIME, COUNT_EXPANDED_NODES, COUNT_SIMULATED_NODES, MAX_DEPTH};
 
@@ -36,9 +37,14 @@ namespace enginetype{
 
 
     // ------------- Field Values -------------
-    static const int FIELD_EMPTY   = 0;
-    static const int FIELD_WALL    = 105;
-    static const int FIELD_GOAL    = 107;
+    static const int FIELD_EMPTY        = 0;
+    static const int FIELD_YAMYAM       = 11;
+    static const int FELD_DIAMOND       = 56;
+    static const int FIELD_WALL         = 105;
+    static const int FIELD_GOAL         = 107;
+    static const int FIELD_CUSTOM_11    = 370;
+    static const int FIELD_CUSTOM_12    = 371;
+    static const int FIELD_TEMP         = 1296;
 
 
     // ------------- Misc -------------
