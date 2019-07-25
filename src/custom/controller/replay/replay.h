@@ -26,8 +26,9 @@
 
 class Replay : public BaseController {
 private:
-    std::string replayFileName;
     const std::string replay_dir = "./src/custom/logs/";
+    std::string replayFileName;
+    std::ifstream replayFileStream;
 
 public:
 

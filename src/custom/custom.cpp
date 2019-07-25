@@ -57,11 +57,20 @@ extern "C" void handleLevelStart() {
     debugBoardDistances();
 
     // Set controller and clear solution
-    controller.setController(enginehelper::getControllerType());
+    // controller.setController(enginehelper::getControllerType());
     controller.clearSolution();
 
-    // RNG seeding
-    RNG::setInitialRandomBit();
+    // Warm up the simulator RNG
+    RNG::setSimulatingSeed();
+}
+
+
+/*
+ * Initialize the controller to be used
+ * Controller is supplied by a command line argument
+ */
+extern "C" void initController() {
+    controller.setController(enginehelper::getControllerType());
 }
 
 
@@ -133,7 +142,7 @@ extern "C" int getRandomNumber(int max) {
  * advances the RNG used by the engine)
  */
 extern "C" void setRandomNumberSeed() {
-    RNG::setSeedEngineHash();
+    // RNG::setSeedEngineHash();
 }
 
 

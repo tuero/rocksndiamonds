@@ -23,6 +23,12 @@ extern "C"
     void handleLevelStart(void);
 
     /*
+     * Initialize the controller to be used
+     * Controller is supplied by a command line argument
+     */
+    void initController(void);
+
+    /*
      * Initialize the loggers, as well as max log level
      * Two types of loggers: consol and file
      */

@@ -22,6 +22,7 @@
 
 extern "C" {
     #include "../../main.h"
+    #include "../../files.h"
 }
 
 
@@ -38,6 +39,11 @@ namespace enginehelper {
      * Get the controller type defined by user CLA
      */
     enginetype::ControllerType getControllerType();
+
+    /*
+     * Call engine function to load the given level
+     */
+    void loadLevel(int level_num);
 
     /*
      * Check if the current status of the engine is loss of life
@@ -91,6 +97,11 @@ namespace enginehelper {
      * Profiling shows a 10x in speed with simulator_flag set
      */
     void setSimulatorFlag(bool simulator_flag);
+
+    /*
+     * Get the simulator flag status
+     */
+    bool isSimulating();
 
     /*
      * Initialize Zorbrist tables, used to hash game board states

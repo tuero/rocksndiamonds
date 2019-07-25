@@ -2,7 +2,20 @@
 
 #include "replay.h"
 
-Replay::Replay(){}
+Replay::Replay(){
+    replayFileName = enginehelper::getReplayFileName();
+    replayFileStream.open(replay_dir + replayFileName, std::ifstream::in);
+
+    // First lines are level number and RNG seed
+    int level_num;
+    uint64_t seed;
+
+    replayFileStream >> level_num;
+    replayFileStream >> seed;
+
+    RNG::setEngineSeed(seed);
+    enginehelper::loadLevel(level_num);
+}
 
 
 void Replay::setReplayFile(std::string &file) {
@@ -15,8 +28,8 @@ void Replay::handleEmpty(std::vector<Action> &currentSolution, std::vector<Actio
     (void)currentSolution;
     (void)forwardSolution;
 
-    std::string replay_file = enginehelper::getReplayFileName();
-    setReplayFile(replay_file);
+    // std::string replay_file = enginehelper::getReplayFileName();
+    // setReplayFile(replay_file);
 }
 
 
@@ -34,13 +47,13 @@ void Replay::run(std::vector<Action> &currentSolution, std::vector<Action> &forw
 
     std::string line;
     try{
-        std::ifstream replayFile (replay_dir + replayFileName);
+        // std::ifstream replayFile (replay_dir + replayFileName);
         std::vector<Action> path;
-        if (replayFile.is_open()){
-            while (std::getline(replayFile,line)){
+        if (replayFileStream.is_open()){
+            while (std::getline(replayFileStream,line)){
                 currentSolution.push_back(stringToAction(line));
             }
-            replayFile.close();
+            replayFileStream.close();
         }
     }
     catch (const std::ifstream::failure& e) {

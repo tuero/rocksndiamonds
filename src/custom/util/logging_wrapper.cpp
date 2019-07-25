@@ -35,6 +35,7 @@ namespace logwrap {
         // Don't create replay file if we are currently in a replay
         if (enginehelper::getControllerType() != enginetype::REPLAY) {
             saved_run_file.open(log_dir + datetimeToString() + run_suffix, std::ios::app);
+            saved_run_file << RNG::getEngineSeed() << std::endl;
         }
 
         // Default logger to file

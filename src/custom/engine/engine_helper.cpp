@@ -20,6 +20,14 @@ enginetype::ControllerType getControllerType() {
 
 
 /*
+ * Call engine function to load the given level
+ */
+void loadLevel(int level_num) {
+    LoadLevel(level_num);
+}
+
+
+/*
  * Check if the current status of the engine is loss of life
  */
 bool engineGameFailed() {
@@ -157,6 +165,14 @@ bool isWall(Action action) {
  */
 void setSimulatorFlag(bool simulator_flag) {
     is_simulating = (simulator_flag ? TRUE : FALSE);
+}
+
+
+/*
+ * Get the simulator flag status
+ */
+bool isSimulating() {
+    return is_simulating;
 }
 
 

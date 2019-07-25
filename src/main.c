@@ -7774,6 +7774,8 @@ int main(int argc, char *argv[])
     // Init custom logging
     initLogger();
 
+    initController();
+
     // Load maps for above mapset, and set current level
     if (options.controller_type == CONTROLLER_TYPE_TEST_SPEED) {
         LoadLevel(options.level_number);
