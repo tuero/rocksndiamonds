@@ -1033,6 +1033,7 @@ void GetOptions(int argc, char *argv[],
       options.docs_directory     = getPath2(ro_base_path, DOCS_DIRECTORY);
       options.conf_directory     = getPath2(ro_base_path, CONF_DIRECTORY);
       options.replay_file = "";
+      options.level_set = "";
     }
     else if (strncmp(option, "-levels", option_len) == 0)
     {
@@ -1186,6 +1187,18 @@ void GetOptions(int argc, char *argv[],
         else {
             options.replay_file = option_arg;
             options.controller_type = CONTROLLER_TYPE_REPLAY;
+        }
+        if (option_arg == next_option) {
+            options_left++;
+        }
+    }
+    else if (strncmp(option, "-levelset", option_len) == 0)
+    {
+        if (option_arg == NULL) {
+            Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
+        }
+        else {
+            options.level_set = option_arg;
         }
         if (option_arg == next_option) {
             options_left++;

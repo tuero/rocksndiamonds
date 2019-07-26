@@ -38,7 +38,7 @@ namespace logwrap {
      * Initialize loggers 
      * Loggers for stdout and log file
      */
-    void initLogger(plog::Severity log_level);
+    void initLogger(plog::Severity log_level, std::string &cla_args);
 
     /*
      * Set max log level used for both loggers

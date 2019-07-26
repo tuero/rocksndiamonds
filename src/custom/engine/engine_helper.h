@@ -45,6 +45,8 @@ namespace enginehelper {
      */
     void loadLevel(int level_num);
 
+    std::string getStringCLA();
+
     /*
      * Get the level number from command line argument
      */
@@ -125,13 +127,20 @@ namespace enginehelper {
 
     /*
      * Get the players current shortest path distance to goal
-     * This uses distance tile maps pre-calculated using Dijkstra algorithm,
+     * This uses distance tile maps pre-calculated using Dijkstra's algorithm,
      * NOT Euclidean distance.
      */
     float getDistanceToGoal();
 
+    /*
+     * Find the grid location of the goal, given by enginetype::FIELD_GOAL
+     */
+    void findGoalLocation(int &goal_x, int &goal_y);
 
-    void dijkstra();
+    /*
+     * Set the grid distances to goal using Dijkstra's algorithm (shortest path)
+     */
+    void setBoardDistances(int goal_x, int goal_y);
 
 
 

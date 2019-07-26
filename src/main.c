@@ -7765,16 +7765,19 @@ int main(int argc, char *argv[])
   // Handles command line arguments
   GetOptions(argc, argv, print_usage, print_version);
 
-  OpenAll();
-
-    // Set default level set to custom (makes it easier to programmatically select levels)
-    setLevelSet(0);
-    LoadLevelSetup_SeriesInfo();
-
     // Init custom logging
-    initLogger();
-
+    initLogger(argc, argv);
     initController();
+
+    // Set level set
+    // Complicated to get working nicely, work-around is to set leveldir_current to specified levelset,
+    // save the levelsetup as last series played, then let OpenAll() load. By default, OpenAll() will
+    // load the levelset last played, which we mask to the one we want now.
+//    LoadLevelInfo();
+    setLevelSet();
+//    SaveLevelSetup_LastSeries();
+
+  OpenAll();
 
     // Load maps for above mapset, and set current level
     if (options.controller_type == CONTROLLER_TYPE_TEST_SPEED) {

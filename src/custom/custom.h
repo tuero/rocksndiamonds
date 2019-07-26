@@ -32,14 +32,12 @@ extern "C"
      * Initialize the loggers, as well as max log level
      * Two types of loggers: consol and file
      */
-    void initLogger(void);
+    void initLogger(int argc, char *argv[]);
 
     /*
-     * Set the levelset. 
-     * This should almost always be 0, as this corresponds to the users custom folder.
-     * Higher values can be used if the level folders are copied to the user directory.
+     * Set the levelset given by the command line argument
      */
-    void setLevelSet(int levelset); 
+    void setLevelSet(void); 
 
     // --------------- Action Handler ------------------
 

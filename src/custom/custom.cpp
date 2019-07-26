@@ -8,18 +8,25 @@
 #include <ctime> 
 #include <random>
 
+// engine
 #include "engine/game_state.h"
 #include "engine/action.h"
 #include "engine/engine_helper.h"
 #include "engine/engine_types.h"
+
+// controller
 #include "controller/controller.h"
-// Tests
-#include "tests/test_engine_speed.h"
-#include "tests/test_rng.h"
+
+// util and logging
+#include "util/rng.h"
 #include "util/logging_wrapper.h"
 #include <plog/Log.h>
 
-#include "util/rng.h"
+// Tests
+#include "tests/test_engine_speed.h"
+#include "tests/test_rng.h"
+
+
 
 // External variables accessible to engine
 boolean is_simulating;
@@ -46,8 +53,13 @@ std::string SEP(30, '-');
  * for state hashing, and sends starting state information to logger.
  */
 extern "C" void handleLevelStart() {
+    // Log level
+    PLOGI_(logwrap::FileLogger) << "Level being played: " << level.file_info.nr;
+
     // Calculate tile distances to goal
-    enginehelper::dijkstra();
+    int goal_x, goal_y;
+    enginehelper::findGoalLocation(goal_x, goal_y);
+    enginehelper::setBoardDistances(goal_x, goal_y);
 
     // Initialize zorbrist tables for state hashing
     enginehelper::initZorbristTables();
@@ -58,13 +70,10 @@ extern "C" void handleLevelStart() {
     debugBoardState();
     debugBoardDistances();
 
-    // Set controller and clear solution
-    // controller.setController(enginehelper::getControllerType());
+    // clear solution
     controller.clearSolution();
 
-    // Warm up the simulator RNG
-    // RNG::setSimulatingSeed();
-
+    // Ensure RNG seeds reset during level start
     RNG::setEngineSeed(RNG::getEngineSeed());
     RNG::setSimulatingSeed(RNG::getSimulationSeed());
 }
@@ -83,38 +92,46 @@ extern "C" void initController() {
  * Initialize the loggers, as well as max log level
  * Two types of loggers: consol and file
  */
-extern "C" void initLogger() {
-    logwrap::initLogger((options.debug==TRUE ? plog::verbose : plog::error));
+extern "C" void initLogger(int argc, char *argv[]) {
+    std::vector<std::string> allArgs(argv, argv + argc);
+    std::string cla_args;
+
+    // Convert args vector to string
+    for (unsigned int i = 0; i < allArgs.size(); i++) {
+        cla_args += allArgs[i] + " ";
+    }
+
+    logwrap::initLogger((options.debug==TRUE ? plog::verbose : plog::info), cla_args);
 }
 
 
 /*
- * Set the levelset. 
- * This should almost always be 0, as this corresponds to the users custom folder.
- * Higher values can be used if the level folders are copied to the user directory.
+ * Set the levelset given by the command line argument
  */
-extern "C" void setLevelSet(int levelset) {
-    char *levelset_dir;
+extern "C" void setLevelSet() {
+    // No levelset given
+    if (options.level_set == NULL) {return;}
 
-    // setup.c -> getHomeDir
-    #ifdef __APPLE__
-        leveldir_current->basepath = (char *)"/Users/tuero/.rocksndiamonds/levels";
-    #else
-        leveldir_current->basepath = (char *)"/home/tuero/.rocksndiamonds/levels";
-    #endif
+    std::string level_set(options.level_set);
 
-    // Levelset subfolder names
-    switch(levelset) {
-        case 1: {levelset_dir = level_bd; break;}           // Boulder Dash
-        case 2: {levelset_dir = level_em; break;}           // Emerald Mines
-        default: {levelset_dir = level_custom; break;}      // Custom
+    try{
+        // Initialize leveldir_current and related objects
+        LoadLevelInfo();
+
+        PLOGI_(logwrap::FileLogger) << "Setting levelset " << level_set;
+
+        // Set levelset to save
+        leveldir_current->fullpath = options.level_set;
+        leveldir_current->subdir = options.level_set;
+        leveldir_current->identifier = options.level_set;
+
+        // Save the levelset
+        // We save because on startup, the previously saved levelset is loaded
+        SaveLevelSetup_LastSeries();
     }
-
-    PLOGI_(logwrap::FileLogger) << "Setting levelset " << levelset_dir;
-
-    leveldir_current->fullpath = levelset_dir;
-    leveldir_current->subdir = levelset_dir;
-    leveldir_current->identifier = levelset_dir;
+    catch (...){
+        PLOGE_(logwrap::FileLogger) << "Something went wrong trying to load levelset " << level_set;
+    }
 } 
 
 
@@ -139,11 +156,6 @@ void addElement(std::array<int, 3> &counters) {
     // create space
     if (counters[1] == 5) {
         counters[1] = 0;
-
-        // std::random_device rd;
-        // std::mt19937 mt(rd());
-        // std::uniform_int_distribution<int> dist(16, 32);
-        // counters[2] = dist(mt);
         counters[2] = RNG::getRandomNumber(16) + 16;
         return;
     }
@@ -194,19 +206,8 @@ extern "C" void newDiamond() {
     if (count_diamonds == 0) {
         // level.gems_needed += 1;
 
-        // std::random_device rd;
-        // std::mt19937 mt(rd());
-        // std::uniform_int_distribution<int> distx(0, level.fieldx - 1);
-        // std::uniform_int_distribution<int> disty(0, level.fieldy - 1);
-
         // spawn new diamond
         while (true) {
-            // int x1 = distx(mt);
-            // int y1 = disty(mt);
-
-            // int x2 = distx(mt);
-            // int y2 = disty(mt);
-
             int x1 = RNG::getRandomNumber(level.fieldx - 1);
             int y1 = RNG::getRandomNumber(level.fieldy - 1);
 
@@ -290,7 +291,9 @@ extern "C" void testEngineSpeed() {
  * Results are logged to file
  */
 extern "C" void testBFSSpeed() {
-    enginehelper::dijkstra();
+    int goal_x, goal_y;
+    enginehelper::findGoalLocation(goal_x, goal_y);
+    enginehelper::setBoardDistances(goal_x, goal_y);
     logwrap::setLogLevel(plog::debug);
     testenginespeed::testBfsSpeed();
 }
@@ -303,7 +306,9 @@ extern "C" void testBFSSpeed() {
  * Results are logged to file
  */
 extern "C" void testMCTSSpeed() {
-    enginehelper::dijkstra();
+    int goal_x, goal_y;
+    enginehelper::findGoalLocation(goal_x, goal_y);
+    enginehelper::setBoardDistances(goal_x, goal_y);
     logwrap::setLogLevel(plog::debug);
     testenginespeed::testMctsSpeed();
 }
@@ -330,7 +335,9 @@ extern "C" void testAll() {
     GameState state;
     state.setFromSimulator();
 
-    enginehelper::dijkstra();
+    int goal_x, goal_y;
+    enginehelper::findGoalLocation(goal_x, goal_y);
+    enginehelper::setBoardDistances(goal_x, goal_y);
 
     PLOGI_(logwrap::FileLogger) << msg;
 

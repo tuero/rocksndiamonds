@@ -1005,6 +1005,7 @@ struct OptionInfo
   int level_number;                      // level number to load
   int delay;                             // SetVideoFrameDelay
   char* replay_file;
+  char* level_set;
 };
 
 struct VideoSystemInfo

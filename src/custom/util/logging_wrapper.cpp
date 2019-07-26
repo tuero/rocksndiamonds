@@ -28,7 +28,7 @@ namespace logwrap {
      * Initialize loggers 
      * Loggers for stdout and log file
      */
-    void initLogger(plog::Severity log_level) {
+    void initLogger(plog::Severity log_level, std::string &cla_args) {
         // log file name with path
         std::string log_file_path = log_dir + datetimeToString() + log_suffix;
 
@@ -48,8 +48,8 @@ namespace logwrap {
         static plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
         plog::init<ConsolLogger>(log_level, &consoleAppender);
 
-        // Log CLA used
-        
+        // Log CLAs used
+        PLOGI_(logwrap::FileLogger) << cla_args;
     }
 
 
@@ -81,7 +81,7 @@ namespace logwrap {
             msg += "RND";
         }
 
-        PLOGD_(logwrap::FileLogger) << msg;
+        PLOGI_(logwrap::FileLogger) << msg;
     }
 
 
