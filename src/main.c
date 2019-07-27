@@ -7765,19 +7765,21 @@ int main(int argc, char *argv[])
   // Handles command line arguments
   GetOptions(argc, argv, print_usage, print_version);
 
-    // Init custom logging
-    initLogger(argc, argv);
-    initController();
-
     // Set level set
     // Complicated to get working nicely, work-around is to set leveldir_current to specified levelset,
     // save the levelsetup as last series played, then let OpenAll() load. By default, OpenAll() will
     // load the levelset last played, which we mask to the one we want now.
-//    LoadLevelInfo();
+    initLogger(argc, argv);
     setLevelSet();
-//    SaveLevelSetup_LastSeries();
 
   OpenAll();
+
+    // Init custom logging
+    initController();
+
+    // Save replay level information
+    // This has to be done after level is loaded so level pointers are valid
+    saveReplayLevelInfo();
 
     // Load maps for above mapset, and set current level
     if (options.controller_type == CONTROLLER_TYPE_TEST_SPEED) {

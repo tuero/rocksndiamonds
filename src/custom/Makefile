@@ -34,9 +34,10 @@ ENG_OBJ 	:= 	$(ENG_DIR)/action.o 			\
 				$(ENG_DIR)/game_state.o	
 
 UTIL_DIR 	:=	util
-UTIL_OBJ 	:= 	$(UTIL_DIR)/timer.o 			\
-				$(UTIL_DIR)/rng.o 				\
-				$(UTIL_DIR)/logging_wrapper.o
+UTIL_OBJ 	:= 	$(UTIL_DIR)/timer.o 				\
+				$(UTIL_DIR)/rng.o 					\
+				$(UTIL_DIR)/logging_wrapper.o 		\
+				$(UTIL_DIR)/level_programming.o
 
 TEST_DIR 	:=	tests
 TEST_OBJ 	:= 	$(TEST_DIR)/test_engine_speed.o 	\

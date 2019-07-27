@@ -325,7 +325,7 @@ static void HandleMouseCursor(void)
 void EventLoop(void)
 {
     step_counter = 0;
-    clock_t t = clock();
+//    clock_t t = clock();
     int prev_game_status = GAME_MODE_MAIN;
 
   while (1)
@@ -349,13 +349,6 @@ void EventLoop(void)
 
     // execute event related actions after pending events have been processed
     HandleEventActions();
-//  debugBoardState();
-//  debugMovPosState();
-//  debugMovDirState();
-//      clock_t timeTaken = clock() - t;
-//      double time_taken = ((double)timeTaken)/CLOCKS_PER_SEC;
-//    t = clock();
-//    printf("fun() took %f seconds to execute \n", time_taken);
 
       // don't use all CPU time when idle; the main loop while playing
     // has its own synchronization and is CPU friendly, too
@@ -365,8 +358,7 @@ void EventLoop(void)
         // We can get rid of the conditional by just returning user action
         // if no controller is selected
         if (options.controller_type != CONTROLLER_TYPE_DEFAULT) {
-            newDiamond();
-            spawnYam();
+            spawnElements();
             stored_player[0].action = getAction();
         }
         HandleGameActions();

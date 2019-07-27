@@ -18,6 +18,7 @@
 #include "controller/controller.h"
 
 // util and logging
+#include "util/level_programming.h"
 #include "util/rng.h"
 #include "util/logging_wrapper.h"
 #include <plog/Log.h>
@@ -40,6 +41,8 @@ Controller controller;
 char *level_bd = (char *)"classic_boulderdash";
 char *level_em = (char *)"classic_emerald_mine";
 char *level_custom = (char *)"tuero";
+
+std::string levelset_survival = "custom_survival";
 
 std::string SEP(30, '-');
 
@@ -101,38 +104,30 @@ extern "C" void initLogger(int argc, char *argv[]) {
         cla_args += allArgs[i] + " ";
     }
 
-    logwrap::initLogger((options.debug==TRUE ? plog::verbose : plog::info), cla_args);
+    // Set log level depending if debug flag set or if we are in a replay
+    plog::Severity log_level = plog::info;
+    if (options.debug == TRUE) {log_level = plog::verbose;}
+    if (options.controller_type == CONTROLLER_TYPE_REPLAY) {log_level = plog::error;}
+
+    logwrap::initLogger(log_level, cla_args);
 }
 
 
 /*
  * Set the levelset given by the command line argument
  */
-extern "C" void setLevelSet() {
-    // No levelset given
-    if (options.level_set == NULL) {return;}
-
-    std::string level_set(options.level_set);
-
-    try{
-        // Initialize leveldir_current and related objects
-        LoadLevelInfo();
-
-        PLOGI_(logwrap::FileLogger) << "Setting levelset " << level_set;
-
-        // Set levelset to save
-        leveldir_current->fullpath = options.level_set;
-        leveldir_current->subdir = options.level_set;
-        leveldir_current->identifier = options.level_set;
-
-        // Save the levelset
-        // We save because on startup, the previously saved levelset is loaded
-        SaveLevelSetup_LastSeries();
-    }
-    catch (...){
-        PLOGE_(logwrap::FileLogger) << "Something went wrong trying to load levelset " << level_set;
-    }
+extern "C" void setLevelSet(void) {
+    enginehelper::setLevelSet();
 } 
+
+
+/*
+ * Save the RNG seed, levelset and level used
+ */
+extern "C" void saveReplayLevelInfo(void) {
+    if (options.controller_type == CONTROLLER_TYPE_REPLAY) {return;}
+    logwrap::saveReplayLevelInfo();
+}
 
 
 // ----------------------- Action Handler --------------------------
@@ -143,6 +138,19 @@ extern "C" void setLevelSet() {
  */
 extern "C" int getAction() {
     return controller.getAction();
+}
+
+
+/*
+ * Some custom levels have elements that continuously spawn in
+ * Hook needs to be made in event loop, as these features are not supported
+ * in the built in CE programming
+ */
+extern "C" void spawnElements() {
+    std::string subdir_string(leveldir_current->subdir);
+    if (subdir_string == levelset_survival) {
+        levelprogramming::spawnElements();
+    }
 }
 
 
@@ -170,79 +178,6 @@ void addElement(std::array<int, 3> &counters) {
     Feld[0][counters[0]] = enginetype::FIELD_CUSTOM_12;
     MovDir[0][counters[0]] = 2;
     counters[1] += 1;
-}
-
-extern "C" void spawnYam() {
-
-    if (options.level_number != 17) {
-        return;
-    }
-
-
-    for (unsigned int i = 0; i < counters.size(); i++) {
-        int row = counters[i][0];
-        if (Feld[0][row] == enginetype::FIELD_EMPTY && Feld[1][row] == enginetype::FIELD_EMPTY &&
-        ((Feld[2][row] == enginetype::FIELD_EMPTY) || (Feld[2][row] == enginetype::FIELD_CUSTOM_12 && Feld[3][row] == enginetype::FIELD_TEMP))) {
-            addElement(counters[i]);
-        }
-    }
-}
-
-
-extern "C" void newDiamond() {
-    // Count diamonds in game
-    if (options.level_number != 16) {
-        return;
-    }
-    int count_diamonds = 0;
-    for (int y = 0; y < level.fieldy; y++) {
-        for (int x = 0; x < level.fieldx; x++) {
-            if (Feld[x][y] == enginetype::FIELD_CUSTOM_11) {
-                count_diamonds += 1;
-            }
-        }
-    }
-
-    if (count_diamonds == 0) {
-        // level.gems_needed += 1;
-
-        // spawn new diamond
-        while (true) {
-            int x1 = RNG::getRandomNumber(level.fieldx - 1);
-            int y1 = RNG::getRandomNumber(level.fieldy - 1);
-
-            int x2 = RNG::getRandomNumber(level.fieldx - 1);
-            int y2 = RNG::getRandomNumber(level.fieldy - 1);
-
-            if ((x1 == stored_player[0].jx && y1 == stored_player[0].jy) || 
-                (x2 == stored_player[0].jx && y2 == stored_player[0].jy)) 
-            {
-                continue;
-            }
-
-            if (Feld[x1][y1] != enginetype::FIELD_EMPTY && 
-                Feld[x2][y2] != enginetype::FIELD_EMPTY) 
-            {
-                continue;
-            }
-
-            if (x1 == x2 && y1 == y2) {
-                continue;
-            }
-
-            // Spawning diamond on tile yamyam will be moving towards
-            if (MovDir[x1][y1] != 0) {
-                continue;
-            }
-
-            std::cout << "Putting new diamond at x=" << x1 << ", y=" << y1 << std::endl;
-            std::cout << "Putting new yamyam at x=" << x2 << ", y=" << y2 << std::endl;
-            Feld[x1][y1] = enginetype::FIELD_CUSTOM_11;
-            Feld[x2][y2] = enginetype::FIELD_YAMYAM;
-            MovDir[x2][y2] = 4;
-            break;
-        }
-    }
 }
 
 

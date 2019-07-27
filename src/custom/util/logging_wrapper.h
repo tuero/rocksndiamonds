@@ -46,6 +46,11 @@ namespace logwrap {
     void setLogLevel(plog::Severity log_level);
 
     /*
+     * Log RNG seed, levelset and level number used 
+     */
+    void saveReplayLevelInfo();
+
+    /*
      * Logs the engine type being used my the simulator
      * Depending on the level set being used, different parts of the simulator
      * are used. In most cases (and in all custom maps), TYPE_RND is used.

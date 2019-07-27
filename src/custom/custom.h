@@ -39,6 +39,11 @@ extern "C"
      */
     void setLevelSet(void); 
 
+    /*
+     * Save the RNG seed, levelset and level used
+     */
+    void saveReplayLevelInfo(void);
+
     // --------------- Action Handler ------------------
 
     /*
@@ -47,8 +52,13 @@ extern "C"
      */
     int getAction(void);
 
-    void spawnYam(void);
-    void newDiamond(void);
+    /*
+     * Some custom levels have elements that continuously spawn in
+     * Hook needs to be made in event loop, as these features are not supported
+     * in the built in CE programming
+     */
+    void spawnElements(void);
+
 
     // -------------------- RNG ----------------------
 

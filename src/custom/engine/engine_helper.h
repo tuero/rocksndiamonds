@@ -23,6 +23,7 @@
 extern "C" {
     #include "../../main.h"
     #include "../../files.h"
+    #include "../../init.h"
 }
 
 
@@ -41,16 +42,24 @@ namespace enginehelper {
     enginetype::ControllerType getControllerType();
 
     /*
+     * Call engine functions to load the levelset
+     */
+    void setLevelSet();
+
+    /*
      * Call engine function to load the given level
      */
     void loadLevel(int level_num);
-
-    std::string getStringCLA();
 
     /*
      * Get the level number from command line argument
      */
     int getLevelNumber();
+
+    /*
+     * Get the levelset used
+     */
+    std::string getLevelSet();
 
     /*
      * Check if the current status of the engine is loss of life
@@ -97,6 +106,26 @@ namespace enginehelper {
      * Assumes simulator is in the current state to check
      */
     bool isWall(Action action);
+
+    /*
+     * Check if the grid cell at location (x,y) is empty
+     */
+    bool isGridEmpty(int x, int y);
+
+    /*
+     * Get all empty grid cells
+     */
+    void getEmptyGridCells(std::vector<enginetype::GridCell> &emptyGridCells);
+
+    /*
+     * Count how many of a specified element in the game
+     */
+    int countNumOfElement(int element);
+
+    /*
+     * Add the specified element to the game
+     */
+    void spawnElement(int element, int dir, enginetype::GridCell gridCell);
 
     /*
      * Set flag for simulating

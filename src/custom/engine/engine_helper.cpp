@@ -20,6 +20,41 @@ enginetype::ControllerType getControllerType() {
 
 
 /*
+ * Call engine functions to load the levelset
+ */
+void setLevelSet() {
+    // Need to load levelset before openall
+    // Maybe get setLevelset to check if replay, then get the levelset from there?
+    // Kind of messy, need a better
+
+    // No levelset given
+    if (options.level_set == NULL) {return;}
+
+    std::string level_set(options.level_set);
+
+    try{
+        // Initialize leveldir_current and related objects
+        LoadLevelInfo();
+
+        PLOGI_(logwrap::FileLogger) << "Setting levelset " << level_set;
+
+        // Set levelset to save
+        leveldir_current->fullpath = options.level_set;
+        leveldir_current->subdir = options.level_set;
+        leveldir_current->identifier = options.level_set;
+
+        // Save the levelset
+        // We save because on startup, the previously saved levelset is loaded
+        SaveLevelSetup_LastSeries();
+        OpenAll();
+    }
+    catch (...){
+        PLOGE_(logwrap::FileLogger) << "Something went wrong trying to load levelset " << level_set;
+    }
+}
+
+
+/*
  * Call engine function to load the given level
  */
 void loadLevel(int level_num) {
@@ -35,6 +70,15 @@ void loadLevel(int level_num) {
  */
 int getLevelNumber() {
     return options.level_number;
+}
+
+
+/*
+ * Get the levelset used
+ */
+std::string getLevelSet() {
+    std::string level_set(leveldir_current->subdir);
+    return level_set;
 }
 
 
@@ -166,6 +210,71 @@ bool isWall(Action action) {
     // }
     // return false;
 
+}
+
+
+/*
+ * Check if the grid cell at location (x,y) is empty
+ */
+bool isGridEmpty(int x, int y) {
+    // Check bounds (this shouldn't happen but best to be safe)
+    if (x < 0 || x >= level.fieldx || y < 0 || y >= level.fieldy) {
+        PLOGE_(logwrap::FileLogger) << "Index out of bounds.";
+        return false;
+    }
+
+    // Player position is not indicated in Feld, so check first
+    if (stored_player[0].jx == x && stored_player[0].jy == y) {
+        return false;
+    }
+
+    // Element is currently attempting to move to grid (x,y)
+    if (MovDir[x][y] != 0) {
+        return false;
+    }
+
+    // Grid now empty if Feld is empty
+    return Feld[x][y] == enginetype::FIELD_EMPTY;
+}
+
+
+/*
+ * Get all empty grid cells
+ */
+void getEmptyGridCells(std::vector<enginetype::GridCell> &emptyGridCells) {
+    emptyGridCells.clear();
+    for (int y = 0; y < level.fieldy; y++) {
+        for (int x = 0; x < level.fieldx; x++) {
+            if (isGridEmpty(x, y)) {
+                emptyGridCells.push_back(enginetype::GridCell{x, y});
+            }
+        }
+    }
+}
+
+
+/*
+ * Count how many of a specified element in the game
+ */
+int countNumOfElement(int element) {
+    int count_element = 0;
+    for (int y = 0; y < level.fieldy; y++) {
+        for (int x = 0; x < level.fieldx; x++) {
+            if (Feld[x][y] == element) {
+                count_element += 1;
+            }
+        }
+    }
+    return count_element;
+}
+
+
+/*
+ * Add the specified element to the game
+ */
+void spawnElement(int element, int dir, enginetype::GridCell gridCell) {
+    Feld[gridCell.x][gridCell.y] = element;
+    MovDir[gridCell.x][gridCell.y] = dir;
 }
 
 

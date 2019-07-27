@@ -1,4 +1,4 @@
-
+// Move main.c code to engine_helper
 
 #include "logging_wrapper.h"
 
@@ -35,8 +35,6 @@ namespace logwrap {
         // Don't create replay file if we are currently in a replay
         if (enginehelper::getControllerType() != enginetype::REPLAY) {
             saved_run_file.open(log_dir + datetimeToString() + run_suffix, std::ios::app);
-            saved_run_file << RNG::getEngineSeed() << std::endl;
-            saved_run_file << enginehelper::getLevelNumber() << std::endl;
         }
 
         // Default logger to file
@@ -59,6 +57,21 @@ namespace logwrap {
     void setLogLevel(plog::Severity log_level) {
         plog::get<logwrap::FileLogger>()->setMaxSeverity(log_level);
         plog::get<logwrap::ConsolLogger>()->setMaxSeverity(log_level);
+    }
+
+
+    /*
+     * Log RNG seed, levelset and level number used 
+     */
+    void saveReplayLevelInfo() {
+        if (!saved_run_file.is_open()) {
+            PLOGE_(logwrap::FileLogger) << "Can't save replay level info, file already closed.";
+            return;
+        }
+
+        saved_run_file << RNG::getEngineSeed() << std::endl;
+        saved_run_file << enginehelper::getLevelSet() << std::endl;
+        saved_run_file << enginehelper::getLevelNumber() << std::endl;
     }
 
 
@@ -168,6 +181,7 @@ namespace logwrap {
      * Used for replays
      */
     void savePlayerMove(std::string &action) {
+        if (options.controller_type == CONTROLLER_TYPE_REPLAY) {return;}
         if (!saved_run_file.is_open()) {
             PLOGE_(logwrap::FileLogger) << "Can't save player move, file is already closed.";
             return;

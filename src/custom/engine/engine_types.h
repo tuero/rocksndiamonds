@@ -20,6 +20,9 @@ namespace enginetype{
     typedef std::array<short, MAX_NUM_AMOEBA> amoeba_short;
 
 
+    struct GridCell{int x; int y;};
+
+
     // ------------- Controller types -------------
     enum ControllerType{BFS=CONTROLLER_TYPE_BFS, MCTS=CONTROLLER_TYPE_MCTS, 
                         USER=CONTROLLER_TYPE_USER, REPLAY=CONTROLLER_TYPE_REPLAY};
@@ -42,6 +45,16 @@ namespace enginetype{
     static const int FELD_DIAMOND       = 56;
     static const int FIELD_WALL         = 105;
     static const int FIELD_GOAL         = 107;
+    static const int FIELD_CUSTOM_1     = 360;      // Diamond, no gravity
+    static const int FIELD_CUSTOM_2     = 361;      // Yamyam, normal speed, deterministic delay
+    static const int FIELD_CUSTOM_3     = 362;      // Yamyam, normal speed, stochastic delay
+    static const int FIELD_CUSTOM_4     = 363;
+    static const int FIELD_CUSTOM_5     = 364;
+    static const int FIELD_CUSTOM_6     = 365;
+    static const int FIELD_CUSTOM_7     = 366;
+    static const int FIELD_CUSTOM_8     = 367;
+    static const int FIELD_CUSTOM_9     = 368;
+    static const int FIELD_CUSTOM_10    = 369;
     static const int FIELD_CUSTOM_11    = 370;
     static const int FIELD_CUSTOM_12    = 371;
     static const int FIELD_TEMP         = 1296;
