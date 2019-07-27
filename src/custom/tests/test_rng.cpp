@@ -14,7 +14,7 @@ namespace testrng{
         StartGameActions(network.enabled, setup.autorecord, level.random_seed);
         enginehelper::setSimulatorFlag(FALSE);
 
-        RNG::setInitialRandomBit();
+        // RNG::setInitialRandomBit();
         enginehelper::initZorbristTables();
 
         // Save starting state
@@ -33,7 +33,7 @@ namespace testrng{
 
             // Simulate a random number of states forward
             for (int j = 0; j < depth; j++) {
-                RNG::setSeedEngineHash();
+                // RNG::setSeedEngineHash();
                 enginehelper::setEngineRandomPlayerAction();
                 actionsTaken.push_back(static_cast<Action>(enginehelper::getEnginePlayerAction()));
                 enginehelper::engineSimulate();
@@ -46,7 +46,7 @@ namespace testrng{
             // Now restore reference state and perform the same actions
             referenceState.restoreSimulator();
             for (int j = 0; j < depth; j++) {
-                RNG::setSeedEngineHash();
+                // RNG::setSeedEngineHash();
                 enginehelper::setEnginePlayerAction(actionsTaken[j]);
                 enginehelper::engineSimulate();
             }

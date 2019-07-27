@@ -38,12 +38,17 @@ namespace logwrap {
      * Initialize loggers 
      * Loggers for stdout and log file
      */
-    void initLogger(plog::Severity log_level);
+    void initLogger(plog::Severity log_level, std::string &cla_args);
 
     /*
      * Set max log level used for both loggers
      */
     void setLogLevel(plog::Severity log_level);
+
+    /*
+     * Log RNG seed, levelset and level number used 
+     */
+    void saveReplayLevelInfo();
 
     /*
      * Logs the engine type being used my the simulator

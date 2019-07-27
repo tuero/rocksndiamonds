@@ -22,6 +22,8 @@
 
 extern "C" {
     #include "../../main.h"
+    #include "../../files.h"
+    #include "../../init.h"
 }
 
 
@@ -38,6 +40,26 @@ namespace enginehelper {
      * Get the controller type defined by user CLA
      */
     enginetype::ControllerType getControllerType();
+
+    /*
+     * Call engine functions to load the levelset
+     */
+    void setLevelSet();
+
+    /*
+     * Call engine function to load the given level
+     */
+    void loadLevel(int level_num);
+
+    /*
+     * Get the level number from command line argument
+     */
+    int getLevelNumber();
+
+    /*
+     * Get the levelset used
+     */
+    std::string getLevelSet();
 
     /*
      * Check if the current status of the engine is loss of life
@@ -86,11 +108,36 @@ namespace enginehelper {
     bool isWall(Action action);
 
     /*
+     * Check if the grid cell at location (x,y) is empty
+     */
+    bool isGridEmpty(int x, int y);
+
+    /*
+     * Get all empty grid cells
+     */
+    void getEmptyGridCells(std::vector<enginetype::GridCell> &emptyGridCells);
+
+    /*
+     * Count how many of a specified element in the game
+     */
+    int countNumOfElement(int element);
+
+    /*
+     * Add the specified element to the game
+     */
+    void spawnElement(int element, int dir, enginetype::GridCell gridCell);
+
+    /*
      * Set flag for simulating
      * This will cause blocking actions in engine such as not rending to screen
      * Profiling shows a 10x in speed with simulator_flag set
      */
     void setSimulatorFlag(bool simulator_flag);
+
+    /*
+     * Get the simulator flag status
+     */
+    bool isSimulating();
 
     /*
      * Initialize Zorbrist tables, used to hash game board states
@@ -109,13 +156,20 @@ namespace enginehelper {
 
     /*
      * Get the players current shortest path distance to goal
-     * This uses distance tile maps pre-calculated using Dijkstra algorithm,
+     * This uses distance tile maps pre-calculated using Dijkstra's algorithm,
      * NOT Euclidean distance.
      */
     float getDistanceToGoal();
 
+    /*
+     * Find the grid location of the goal, given by enginetype::FIELD_GOAL
+     */
+    void findGoalLocation(int &goal_x, int &goal_y);
 
-    void dijkstra();
+    /*
+     * Set the grid distances to goal using Dijkstra's algorithm (shortest path)
+     */
+    void setBoardDistances(int goal_x, int goal_y);
 
 
 

@@ -96,10 +96,7 @@ Action Controller::getAction() {
     PLOGD_(logwrap::FileLogger) << msg;
     PLOGD_IF_(logwrap::ConsolLogger, step_counter % enginetype::ENGINE_RESOLUTION == 0) << msg;
 
-    // if (controller == enginetype::REPLAY) {
-    //     return action;
-    // }
-
+    // Save action to replay file
     logwrap::savePlayerMove(action_str);
 
     step_counter += 1;
@@ -119,6 +116,9 @@ void Controller::setController(enginetype::ControllerType controller) {
     }
     else if (controller == enginetype::MCTS) {
         baseController = std::make_unique<MCTS>();
+    }
+    else if (controller == enginetype::USER) {
+        baseController = std::make_unique<User>();
     }
     else {
         // Throw error

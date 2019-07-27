@@ -256,7 +256,7 @@ void MCTS::reset(std::vector<Action> &next_action) {
 
     // reset engine back to reference state
     reference_state.restoreSimulator();
-    RNG::setSeedEngineHash();
+    // RNG::setSeedEngineHash();
     enginehelper::setSimulatorFlag(false);
 }
 
@@ -292,7 +292,7 @@ void MCTS::run(std::vector<Action> &currentSolution, std::vector<Action> &forwar
 
     // Set current game state to root state
     rootSavedState.restoreSimulator();
-    RNG::setSeedEngineHash();
+    // RNG::setSeedEngineHash();
 
     // MCTS starting configurations
     TreeNode* best_child = nullptr;
@@ -319,7 +319,7 @@ void MCTS::run(std::vector<Action> &currentSolution, std::vector<Action> &forwar
         // Put simulator back to root state
         // !TODO -> Maybe encorporate set seed into restore simulator?
         rootSavedState.restoreSimulator();
-        RNG::setSeedEngineHash();
+        // RNG::setSeedEngineHash();
 
         msg = "Time remaining: " + std::to_string(timer.getTimeLeft(max_time));
         PLOGD_(logwrap::FileLogger) << msg;
@@ -361,7 +361,7 @@ void MCTS::run(std::vector<Action> &currentSolution, std::vector<Action> &forwar
         // The expansion step sets the simulator to the expanded node's state
         for (unsigned int i = 0; i < num_simulations; i++) {
             reference_state.restoreSimulator();
-            RNG::setSeedEngineHash();
+            // RNG::setSeedEngineHash();
             if (!current->isTerminal()) {
                 for (unsigned int t = 0; t < max_iterations_depth; t++) {
                     // Terminal condition in simulator
@@ -381,7 +381,7 @@ void MCTS::run(std::vector<Action> &currentSolution, std::vector<Action> &forwar
         }
         // Check if safe
         reference_state.restoreSimulator();
-        RNG::setSeedEngineHash();
+        // RNG::setSeedEngineHash();
         if (!current->isTerminal() && current->getActionTaken() != Action::noop) {
             for (unsigned int t = 0; t < max_iterations_depth; t++) {
                 // Terminal condition in simulator
@@ -425,7 +425,7 @@ void MCTS::run(std::vector<Action> &currentSolution, std::vector<Action> &forwar
 
     // Get best child and its associated action
     rootSavedState.restoreSimulator();
-    RNG::setSeedEngineHash();
+    // RNG::setSeedEngineHash();
     best_child = selectBestChild(root.get());
     Action best_action = (best_child == nullptr ? Action::noop : best_child->getActionTaken());
 
@@ -436,7 +436,7 @@ void MCTS::run(std::vector<Action> &currentSolution, std::vector<Action> &forwar
 
     // Put simulator back to original state
     startingState.restoreSimulator();
-    RNG::setSeedEngineHash();
+    // RNG::setSeedEngineHash();
     enginehelper::setSimulatorFlag(false);
 
     // return best action

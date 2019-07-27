@@ -953,7 +953,7 @@ void GetOptions(int argc, char *argv[],
   options.network = FALSE;
   options.verbose = FALSE;
   options.debug = FALSE;
-  options.controller_type = CONTROLLER_TYPE_USER;
+  options.controller_type = CONTROLLER_TYPE_DEFAULT;
   options.level_number = 0;
   options.delay = GAME_FRAME_DELAY;
 
@@ -1033,6 +1033,7 @@ void GetOptions(int argc, char *argv[],
       options.docs_directory     = getPath2(ro_base_path, DOCS_DIRECTORY);
       options.conf_directory     = getPath2(ro_base_path, CONF_DIRECTORY);
       options.replay_file = "";
+      options.level_set = "";
     }
     else if (strncmp(option, "-levels", option_len) == 0)
     {
@@ -1124,6 +1125,9 @@ void GetOptions(int argc, char *argv[],
         else if (strcmp("MCTS", option_arg) == 0 || strcmp("mcts", option_arg) == 0) {
             options.controller_type = CONTROLLER_TYPE_MCTS;
         }
+        else if (strcmp("USER", option_arg) == 0 || strcmp("user", option_arg) == 0) {
+            options.controller_type = CONTROLLER_TYPE_USER;
+        }
         else if (strcmp("test_engine", option_arg) == 0) {
             options.controller_type = CONTROLLER_TYPE_TEST_SPEED;
         }
@@ -1183,6 +1187,18 @@ void GetOptions(int argc, char *argv[],
         else {
             options.replay_file = option_arg;
             options.controller_type = CONTROLLER_TYPE_REPLAY;
+        }
+        if (option_arg == next_option) {
+            options_left++;
+        }
+    }
+    else if (strncmp(option, "-levelset", option_len) == 0)
+    {
+        if (option_arg == NULL) {
+            Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
+        }
+        else {
+            options.level_set = option_arg;
         }
         if (option_arg == next_option) {
             options_left++;

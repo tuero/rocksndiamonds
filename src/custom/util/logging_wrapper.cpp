@@ -1,4 +1,4 @@
-
+// Move main.c code to engine_helper
 
 #include "logging_wrapper.h"
 
@@ -28,7 +28,7 @@ namespace logwrap {
      * Initialize loggers 
      * Loggers for stdout and log file
      */
-    void initLogger(plog::Severity log_level) {
+    void initLogger(plog::Severity log_level, std::string &cla_args) {
         // log file name with path
         std::string log_file_path = log_dir + datetimeToString() + log_suffix;
 
@@ -46,8 +46,8 @@ namespace logwrap {
         static plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
         plog::init<ConsolLogger>(log_level, &consoleAppender);
 
-        // Log CLA used
-        
+        // Log CLAs used
+        PLOGI_(logwrap::FileLogger) << cla_args;
     }
 
 
@@ -57,6 +57,21 @@ namespace logwrap {
     void setLogLevel(plog::Severity log_level) {
         plog::get<logwrap::FileLogger>()->setMaxSeverity(log_level);
         plog::get<logwrap::ConsolLogger>()->setMaxSeverity(log_level);
+    }
+
+
+    /*
+     * Log RNG seed, levelset and level number used 
+     */
+    void saveReplayLevelInfo() {
+        if (!saved_run_file.is_open()) {
+            PLOGE_(logwrap::FileLogger) << "Can't save replay level info, file already closed.";
+            return;
+        }
+
+        saved_run_file << RNG::getEngineSeed() << std::endl;
+        saved_run_file << enginehelper::getLevelSet() << std::endl;
+        saved_run_file << enginehelper::getLevelNumber() << std::endl;
     }
 
 
@@ -79,7 +94,7 @@ namespace logwrap {
             msg += "RND";
         }
 
-        PLOGD_(logwrap::FileLogger) << msg;
+        PLOGI_(logwrap::FileLogger) << msg;
     }
 
 
@@ -166,6 +181,7 @@ namespace logwrap {
      * Used for replays
      */
     void savePlayerMove(std::string &action) {
+        if (options.controller_type == CONTROLLER_TYPE_REPLAY) {return;}
         if (!saved_run_file.is_open()) {
             PLOGE_(logwrap::FileLogger) << "Can't save player move, file is already closed.";
             return;

@@ -20,6 +20,69 @@ enginetype::ControllerType getControllerType() {
 
 
 /*
+ * Call engine functions to load the levelset
+ */
+void setLevelSet() {
+    // Need to load levelset before openall
+    // Maybe get setLevelset to check if replay, then get the levelset from there?
+    // Kind of messy, need a better
+
+    // No levelset given
+    if (options.level_set == NULL) {return;}
+
+    std::string level_set(options.level_set);
+
+    try{
+        // Initialize leveldir_current and related objects
+        LoadLevelInfo();
+
+        PLOGI_(logwrap::FileLogger) << "Setting levelset " << level_set;
+
+        // Set levelset to save
+        leveldir_current->fullpath = options.level_set;
+        leveldir_current->subdir = options.level_set;
+        leveldir_current->identifier = options.level_set;
+
+        // Save the levelset
+        // We save because on startup, the previously saved levelset is loaded
+        SaveLevelSetup_LastSeries();
+        OpenAll();
+    }
+    catch (...){
+        PLOGE_(logwrap::FileLogger) << "Something went wrong trying to load levelset " << level_set;
+    }
+}
+
+
+/*
+ * Call engine function to load the given level
+ */
+void loadLevel(int level_num) {
+    // Other functions replay on options being set
+    options.level_number = level_num;
+    PLOGI_(logwrap::FileLogger) << "Loading level " << level_num;
+    LoadLevel(level_num);
+}
+
+
+/*
+ * Get the level number from command line argument
+ */
+int getLevelNumber() {
+    return options.level_number;
+}
+
+
+/*
+ * Get the levelset used
+ */
+std::string getLevelSet() {
+    std::string level_set(leveldir_current->subdir);
+    return level_set;
+}
+
+
+/*
  * Check if the current status of the engine is loss of life
  */
 bool engineGameFailed() {
@@ -151,12 +214,85 @@ bool isWall(Action action) {
 
 
 /*
+ * Check if the grid cell at location (x,y) is empty
+ */
+bool isGridEmpty(int x, int y) {
+    // Check bounds (this shouldn't happen but best to be safe)
+    if (x < 0 || x >= level.fieldx || y < 0 || y >= level.fieldy) {
+        PLOGE_(logwrap::FileLogger) << "Index out of bounds.";
+        return false;
+    }
+
+    // Player position is not indicated in Feld, so check first
+    if (stored_player[0].jx == x && stored_player[0].jy == y) {
+        return false;
+    }
+
+    // Element is currently attempting to move to grid (x,y)
+    if (MovDir[x][y] != 0) {
+        return false;
+    }
+
+    // Grid now empty if Feld is empty
+    return Feld[x][y] == enginetype::FIELD_EMPTY;
+}
+
+
+/*
+ * Get all empty grid cells
+ */
+void getEmptyGridCells(std::vector<enginetype::GridCell> &emptyGridCells) {
+    emptyGridCells.clear();
+    for (int y = 0; y < level.fieldy; y++) {
+        for (int x = 0; x < level.fieldx; x++) {
+            if (isGridEmpty(x, y)) {
+                emptyGridCells.push_back(enginetype::GridCell{x, y});
+            }
+        }
+    }
+}
+
+
+/*
+ * Count how many of a specified element in the game
+ */
+int countNumOfElement(int element) {
+    int count_element = 0;
+    for (int y = 0; y < level.fieldy; y++) {
+        for (int x = 0; x < level.fieldx; x++) {
+            if (Feld[x][y] == element) {
+                count_element += 1;
+            }
+        }
+    }
+    return count_element;
+}
+
+
+/*
+ * Add the specified element to the game
+ */
+void spawnElement(int element, int dir, enginetype::GridCell gridCell) {
+    Feld[gridCell.x][gridCell.y] = element;
+    MovDir[gridCell.x][gridCell.y] = dir;
+}
+
+
+/*
  * Set flag for simulating
  * This will cause blocking actions in engine such as not rending to screen
  * Profiling shows a 10x in speed with simulator_flag set
  */
 void setSimulatorFlag(bool simulator_flag) {
     is_simulating = (simulator_flag ? TRUE : FALSE);
+}
+
+
+/*
+ * Get the simulator flag status
+ */
+bool isSimulating() {
+    return is_simulating;
 }
 
 
@@ -220,13 +356,17 @@ float getDistanceToGoal() {
 }
 
 
-
+// Data types/structures for Dijkstra
 typedef std::array<int, 2> Point;
 short INF = std::numeric_limits<short>::max();
 short distances[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short max_distance = -1;
 
-void getMinDistanceIndex(std::vector<Point> &Q, int &index) {
+
+/*
+ * Find the next min index point from point queue Q
+ */
+void _getMinDistanceIndex(std::vector<Point> &Q, int &index) {
     int min_index = -1;
     short min_value = INF;
     for (int i = 0; i < (int)Q.size(); i++) {
@@ -241,7 +381,10 @@ void getMinDistanceIndex(std::vector<Point> &Q, int &index) {
 }
 
 
-void getNeighbours(Point u, std::vector<Point> &neighbours, std::vector<Point> &Q) {
+/*
+ * Get the neighbours of point u from queue Q and insert into neighbours
+ */
+void _getNeighbours(Point u, std::vector<Point> &neighbours, std::vector<Point> &Q) {
     int x = u[0];
     int y = u[1];
 
@@ -269,45 +412,67 @@ void getNeighbours(Point u, std::vector<Point> &neighbours, std::vector<Point> &
 }
 
 
-void dijkstra() {
-    int goalX=-1, goalY=-1;
-    int x, y;
-    std::vector<Point> Q;
+/*
+ * Find the grid location of the goal, given by enginetype::FIELD_GOAL
+ */
+void findGoalLocation(int &goal_x, int &goal_y) {
+    for (int y = 0; y < level.fieldy; y++) {
+        for (int x = 0; x < level.fieldx; x++) {
+            if (Feld[x][y] == enginetype::FIELD_GOAL) {
+                goal_x = x;
+                goal_y = y;
+                PLOGI_(logwrap::FileLogger) << "Found goal at x=" << x << ", y=" << y << ".";
+                return;
+            }
+        }
+    }
+}
 
-    // Find goal
+
+/*
+ * Set the grid distances to goal using Dijkstra's algorithm (shortest path)
+ */
+void setBoardDistances(int goal_x, int goal_y) {
+    int x, y;
+    std::vector<Point> Q;       // Queue of points 
+
+    PLOGI_(logwrap::FileLogger) << "Setting board distances.";
+
+    // Initialize distances
     for (y = 0; y < level.fieldy; y++) {
         for (x = 0; x < level.fieldx; x++) {
-            short dist = INF;
-            if (Feld[x][y] == enginetype::FIELD_GOAL) {
-                goalX = x;
-                goalY = y;
-                dist = 0;
-            }
-            if (Feld[x][y] != enginetype::FIELD_WALL) {
-                Q.push_back({x, y});
-            }
-            distances[x][y] = dist;
+            distances[x][y] = INF;
+            if (Feld[x][y] != enginetype::FIELD_WALL) {Q.push_back({x, y});}
         }
     }
 
     // If no goal, then break
-    if (goalX == -1 || goalY == -1) {
-        PLOGD_(logwrap::FileLogger) << "Level has no goal.";
+    if (goal_x == -1 || goal_y == -1) {
+        PLOGI_(logwrap::FileLogger) << "Level has no goal.";
         return;
     }
+
+    // Check goal in bounds
+    if (goal_x < 0 || goal_x >= level.fieldx || goal_y < 0 || goal_y >= level.fieldy) {
+        PLOGI_(logwrap::FileLogger) << "Provided goal is out of level bounds.";
+        return;
+    }
+
+    // Set goal distance
+    distances[goal_x][goal_y] = 0;
 
     // Calc distances
     Point u;
     int index;
     while (!Q.empty()) {
         // Get min distance from vertex set and remove
-        getMinDistanceIndex(Q, index);
+        _getMinDistanceIndex(Q, index);
         u = Q[index];
         Q.erase(Q.begin() + index);
 
         // Get neighbours
         std::vector<Point> neighbours;
-        getNeighbours(u, neighbours, Q);
+        _getNeighbours(u, neighbours, Q);
 
         // For each neighbour, update distance
         for (Point v : neighbours) {

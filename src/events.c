@@ -325,14 +325,14 @@ static void HandleMouseCursor(void)
 void EventLoop(void)
 {
     step_counter = 0;
-    clock_t t = clock();
+//    clock_t t = clock();
     int prev_game_status = GAME_MODE_MAIN;
 
   while (1)
   {
       // New level loaded, so calculate tile distances and print starting state
       if (prev_game_status != game_status && game_status == GAME_MODE_PLAYING &&
-          options.controller_type != CONTROLLER_TYPE_USER)
+          options.controller_type != CONTROLLER_TYPE_DEFAULT)
       {
           handleLevelStart();
       }
@@ -349,13 +349,6 @@ void EventLoop(void)
 
     // execute event related actions after pending events have been processed
     HandleEventActions();
-//  debugBoardState();
-//  debugMovPosState();
-//  debugMovDirState();
-//      clock_t timeTaken = clock() - t;
-//      double time_taken = ((double)timeTaken)/CLOCKS_PER_SEC;
-//    t = clock();
-//    printf("fun() took %f seconds to execute \n", time_taken);
 
       // don't use all CPU time when idle; the main loop while playing
     // has its own synchronization and is CPU friendly, too
@@ -364,7 +357,8 @@ void EventLoop(void)
         // Get action from controller
         // We can get rid of the conditional by just returning user action
         // if no controller is selected
-        if (options.controller_type != CONTROLLER_TYPE_USER) {
+        if (options.controller_type != CONTROLLER_TYPE_DEFAULT) {
+            spawnElements();
             stored_player[0].action = getAction();
         }
         HandleGameActions();

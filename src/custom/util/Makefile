@@ -6,11 +6,13 @@
 
 SRCS := 	timer.cpp 								\
 			rng.cpp 								\
-			logging_wrapper.cpp
+			logging_wrapper.cpp 					\
+			level_programming.cpp
 
 OBJS :=  	timer.o 								\
 			rng.o 									\
-			logging_wrapper.o
+			logging_wrapper.o 						\
+			level_programming.o
 
 
 

@@ -23,17 +23,26 @@ extern "C"
     void handleLevelStart(void);
 
     /*
+     * Initialize the controller to be used
+     * Controller is supplied by a command line argument
+     */
+    void initController(void);
+
+    /*
      * Initialize the loggers, as well as max log level
      * Two types of loggers: consol and file
      */
-    void initLogger(void);
+    void initLogger(int argc, char *argv[]);
 
     /*
-     * Set the levelset. 
-     * This should almost always be 0, as this corresponds to the users custom folder.
-     * Higher values can be used if the level folders are copied to the user directory.
+     * Set the levelset given by the command line argument
      */
-    void setLevelSet(int levelset); 
+    void setLevelSet(void); 
+
+    /*
+     * Save the RNG seed, levelset and level used
+     */
+    void saveReplayLevelInfo(void);
 
     // --------------- Action Handler ------------------
 
@@ -42,6 +51,14 @@ extern "C"
      * Implementation of solution will depend on controller type.
      */
     int getAction(void);
+
+    /*
+     * Some custom levels have elements that continuously spawn in
+     * Hook needs to be made in event loop, as these features are not supported
+     * in the built in CE programming
+     */
+    void spawnElements(void);
+
 
     // -------------------- RNG ----------------------
 
