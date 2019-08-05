@@ -47,6 +47,13 @@ std::string levelset_survival = "custom_survival";
 std::string SEP(30, '-');
 
 
+#include "controller/pfa/abstract_graph.h"
+extern "C" void testAG() {
+    enginehelper::setNeighbours();
+    AbstractGraph abstract_graph;
+    abstract_graph.abstract();
+}
+
 
 // ------------------------ Init Functions --------------------------
 

@@ -22,6 +22,11 @@ MCTS_DIR 	:= 	$(CTR_DIR)/mcts
 MCTS_OBJ 	:= 	$(MCTS_DIR)/mcts.o 				\
 				$(MCTS_DIR)/tree_node.o		
 
+PFA_DIR 	:= 	$(CTR_DIR)/pfa
+PFA_OBJ 	:= 	$(PFA_DIR)/abstract_graph.o 				\
+				$(PFA_DIR)/abstract_node.o 					\
+				$(PFA_DIR)/pfa.o
+
 REPLAY_DIR 	:= 	$(CTR_DIR)/replay
 REPLAY_OBJ 	:= 	$(REPLAY_DIR)/replay.o 		
 
@@ -52,8 +57,8 @@ TEST_OBJ 	:= 	$(TEST_DIR)/test_engine_speed.o 	\
 
 all: controller eng util tests $(CUSTOM)
 
-$(CUSTOM): $(CTR_OBJ) $(BFS_OBJ) $(MCTS_OBJ) $(REPLAY_OBJ) $(USER_OBJ) $(ENG_OBJ) $(UTIL_OBJ) $(TEST_OBJ) $(OBJS)
-	$(AR) cr $(CUSTOM) $(CTR_OBJ) $(BFS_OBJ) $(MCTS_OBJ) $(REPLAY_OBJ) $(USER_OBJ) $(ENG_OBJ) $(UTIL_OBJ) $(TEST_OBJ) $(OBJS)
+$(CUSTOM): $(CTR_OBJ) $(BFS_OBJ) $(MCTS_OBJ) $(PFA_OBJ) $(REPLAY_OBJ) $(USER_OBJ) $(ENG_OBJ) $(UTIL_OBJ) $(TEST_OBJ) $(OBJS)
+	$(AR) cr $(CUSTOM) $(CTR_OBJ) $(BFS_OBJ) $(MCTS_OBJ) $(PFA_OBJ) $(REPLAY_OBJ) $(USER_OBJ) $(ENG_OBJ) $(UTIL_OBJ) $(TEST_OBJ) $(OBJS)
 	$(RANLIB) $(CUSTOM)
 
 controller:

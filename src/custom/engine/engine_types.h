@@ -20,7 +20,18 @@ namespace enginetype{
     typedef std::array<short, MAX_NUM_AMOEBA> amoeba_short;
 
 
-    struct GridCell{int x; int y;};
+    struct GridCell{
+        int x; 
+        int y;
+
+        bool operator<(const GridCell& rhs) const {
+            return rhs.x < x || (rhs.x == x && rhs.y < y);
+        }
+
+        bool operator==(const GridCell& rhs) const {
+            return (x == rhs.x && y == rhs.y);
+        }
+    };
 
 
     // ------------- Controller types -------------

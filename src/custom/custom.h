@@ -113,6 +113,8 @@ extern "C"
      */
     void testAll(void);
 
+    void testAG(void);
+
 
     // ------------- Debug Logging ------------------
 

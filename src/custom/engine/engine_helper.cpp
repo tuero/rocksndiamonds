@@ -83,6 +83,22 @@ std::string getLevelSet() {
 
 
 /*
+ * Get the level height
+ */
+int getLevelHeight() {
+    return level.fieldx;
+}
+
+
+/*
+ * Get the level width
+ */
+int getLevelWidth() {
+    return level.fieldy;
+}
+
+
+/*
  * Check if the current status of the engine is loss of life
  */
 bool engineGameFailed() {
@@ -219,7 +235,7 @@ bool isWall(Action action) {
 bool isGridEmpty(int x, int y) {
     // Check bounds (this shouldn't happen but best to be safe)
     if (x < 0 || x >= level.fieldx || y < 0 || y >= level.fieldy) {
-        PLOGE_(logwrap::FileLogger) << "Index out of bounds.";
+        // PLOGE_(logwrap::FileLogger) << "Index out of bounds.";
         return false;
     }
 
@@ -238,6 +254,18 @@ bool isGridEmpty(int x, int y) {
 }
 
 
+bool isNonWall(int x, int y) {
+    // Check bounds (this shouldn't happen but best to be safe)
+    if (x < 0 || x >= level.fieldx || y < 0 || y >= level.fieldy) {
+        // PLOGE_(logwrap::FileLogger) << "Index out of bounds.";
+        return false;
+    }
+
+    // Grid now empty if Feld is empty
+    return Feld[x][y] != enginetype::FIELD_WALL;
+}
+
+
 /*
  * Get all empty grid cells
  */
@@ -250,6 +278,38 @@ void getEmptyGridCells(std::vector<enginetype::GridCell> &emptyGridCells) {
             }
         }
     }
+}
+
+
+void setNeighbours() {
+    for (int y = 0; y < level.fieldy; y++) {
+        for (int x = 0; x < level.fieldx; x++) {
+            if (isNonWall(x, y)) {
+                enginetype::GridCell grid_cell = {x, y};
+
+                // find neighbours
+                std::vector<enginetype::GridCell> neighbours;
+                if (isNonWall(x-1, y)) {neighbours.push_back(enginetype::GridCell{x-1, y});}
+                if (isNonWall(x+1, y)) {neighbours.push_back(enginetype::GridCell{x+1, y});}
+                if (isNonWall(x, y-1)) {neighbours.push_back(enginetype::GridCell{x, y-1});}
+                if (isNonWall(x, y+1)) {neighbours.push_back(enginetype::GridCell{x, y+1});}
+
+                grid_neighbours_[grid_cell] = neighbours;
+            }
+        }
+    }
+}
+
+bool checkIfNeighbours(std::vector<enginetype::GridCell> &cells_left, std::vector<enginetype::GridCell> &cells_right) {
+    for (auto const cell_left : cells_left) {
+        for (auto const cell_right : cells_right) {
+            std::vector<enginetype::GridCell> right_result = grid_neighbours_[cell_right];
+            if (std::find(right_result.begin(), right_result.end(), cell_left) != right_result.end()) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 

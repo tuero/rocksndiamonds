@@ -8,6 +8,7 @@
 #include <chrono>
 #include <array>
 #include <vector>
+#include <map>
 #include <algorithm>
 #include <limits>
 #include <cstdint>
@@ -31,6 +32,8 @@ namespace enginehelper {
 
     extern short distances[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
     extern short max_distance;
+
+    static std::map<enginetype::GridCell, std::vector<enginetype::GridCell>> grid_neighbours_;
 
     static const uint64_t MAX_HASH = UINT64_MAX;
     static const int MAX_DIR = 32;
@@ -60,6 +63,16 @@ namespace enginehelper {
      * Get the levelset used
      */
     std::string getLevelSet();
+
+    /*
+     * Get the level height
+     */
+    int getLevelHeight();
+
+    /*
+     * Get the level width
+     */
+    int getLevelWidth();
 
     /*
      * Check if the current status of the engine is loss of life
@@ -107,6 +120,8 @@ namespace enginehelper {
      */
     bool isWall(Action action);
 
+    bool isNonWall(int x, int y);
+
     /*
      * Check if the grid cell at location (x,y) is empty
      */
@@ -116,6 +131,10 @@ namespace enginehelper {
      * Get all empty grid cells
      */
     void getEmptyGridCells(std::vector<enginetype::GridCell> &emptyGridCells);
+
+    void setNeighbours();
+
+    bool checkIfNeighbours(std::vector<enginetype::GridCell> &cells_left, std::vector<enginetype::GridCell> &cells_right);
 
     /*
      * Count how many of a specified element in the game

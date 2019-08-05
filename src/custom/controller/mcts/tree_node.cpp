@@ -1,7 +1,7 @@
 
 #include "tree_node.h"
 
-typedef std::unique_ptr<TreeNode> Pointer;
+// typedef std::unique_ptr<TreeNode> Pointer;
 
 TreeNode::TreeNode(TreeNode* parent, const std::vector<Action> &actions_from_start)
     :  parent(parent), actions_from_start(actions_from_start) 
@@ -149,7 +149,7 @@ TreeNode* TreeNode::getChild(unsigned int index) {
     return children[index].get();
 }
 
-Pointer TreeNode::getChildByAction(Action action) {
+TreeNode::Pointer TreeNode::getChildByAction(Action action) {
     for (unsigned int i = 0; i < children.size(); i++) {
         if (children[i].get()->getActionTaken() == action) {
             return std::move(children[i]);
