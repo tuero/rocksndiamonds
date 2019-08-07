@@ -99,6 +99,29 @@ int getLevelWidth() {
 
 
 /*
+ * Get the player grid position
+ */
+enginetype::GridCell getPlayerPosition() {
+    enginetype::GridCell grid_cell{stored_player[0].jx, stored_player[0].jy};
+    return grid_cell;
+}
+
+
+/*
+ * Get the current goal location (defined by distance of 0)
+ */
+enginetype::GridCell getCurrentGoalLocation() {
+    enginetype::GridCell grid_cell{-1, -1};
+    for (int x = 0; x < level.fieldx; x++) {
+        for (int y = 0; y < level.fieldy; y++) {
+            if (distances[x][y] == 0) {grid_cell.x = x; grid_cell.y = y;}
+        }
+    }
+    return grid_cell;
+}
+
+
+/*
  * Check if the current status of the engine is loss of life
  */
 bool engineGameFailed() {
@@ -476,6 +499,8 @@ void _getNeighbours(Point u, std::vector<Point> &neighbours, std::vector<Point> 
  * Find the grid location of the goal, given by enginetype::FIELD_GOAL
  */
 void findGoalLocation(int &goal_x, int &goal_y) {
+    goal_x = -1;
+    goal_y = -1;
     for (int y = 0; y < level.fieldy; y++) {
         for (int x = 0; x < level.fieldx; x++) {
             if (Feld[x][y] == enginetype::FIELD_GOAL) {
@@ -492,7 +517,7 @@ void findGoalLocation(int &goal_x, int &goal_y) {
 /*
  * Set the grid distances to goal using Dijkstra's algorithm (shortest path)
  */
-void setBoardDistances(int goal_x, int goal_y) {
+void setBoardDistancesDijkstra(int goal_x, int goal_y) {
     int x, y;
     std::vector<Point> Q;       // Queue of points 
 
@@ -548,6 +573,46 @@ void setBoardDistances(int goal_x, int goal_y) {
         for (x = 0; x < level.fieldx; x++) {
             distances[x][y] = (distances[x][y] == INF ? -1 : distances[x][y]);
             max_distance = (max_distance < distances[x][y]) ? distances[x][y] : max_distance;
+        }
+    }
+}
+
+/*
+ * Set the grid distances to goal using L1 distance
+ */
+void setBoardDistancesL1(int goal_x, int goal_y) {
+    PLOGI_(logwrap::FileLogger) << "Setting board distances.";
+
+    if (goal_x == -1 && goal_y == -1) {findGoalLocation(goal_x, goal_y);}
+
+    // Initialize distances
+    for (int y = 0; y < level.fieldy; y++) {
+        for (int x = 0; x < level.fieldx; x++) {
+            distances[x][y] = -1;
+        }
+    }
+
+    // If no goal, then break
+    if (goal_x == -1 || goal_y == -1) {
+        PLOGI_(logwrap::FileLogger) << "Level has no goal.";
+        return;
+    }
+
+    // Check goal in bounds
+    if (goal_x < 0 || goal_x >= level.fieldx || goal_y < 0 || goal_y >= level.fieldy) {
+        PLOGI_(logwrap::FileLogger) << "Provided goal is out of level bounds.";
+        return;
+    }
+
+    // Set goal distance
+    distances[goal_x][goal_y] = 0;
+
+    // Set other grid distances
+    for (int y = 0; y < level.fieldy; y++) {
+        for (int x = 0; x < level.fieldx; x++) {
+            if (Feld[x][y] != enginetype::FIELD_WALL) {
+                distances[x][y] = std::abs(goal_x - x) + std::abs(goal_y - y);
+            }
         }
     }
 }

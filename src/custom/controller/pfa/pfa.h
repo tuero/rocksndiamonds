@@ -1,16 +1,20 @@
 
 
-#ifndef MCTS_H
-#define MCTS_H
+#ifndef PFA_H
+#define PFA_H
 
 #include <iostream>
 #include <vector>
+#include <deque>
 #include <string>
 #include <map>
+#include <cmath>
 
 #include "../base_controller.h"
 
 #include "abstract_graph.h"
+#include "abstract_node.h"
+
 #include "../../engine/engine_types.h"
 #include "../../engine/engine_helper.h"
 #include "../../engine/action.h"
@@ -25,6 +29,11 @@ class PFA : public BaseController {
 private:
     Timer timer;
     AbstractGraph abstract_graph;
+    std::deque<AbstractNode*> abstract_path;
+
+    void logPath();
+
+    void findPath();
 
 public:
 
@@ -37,6 +46,6 @@ public:
 
 };
 
-#endif  //MCTS
+#endif  //PFA_H
 
 

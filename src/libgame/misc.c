@@ -1128,6 +1128,9 @@ void GetOptions(int argc, char *argv[],
         else if (strcmp("USER", option_arg) == 0 || strcmp("user", option_arg) == 0) {
             options.controller_type = CONTROLLER_TYPE_USER;
         }
+        else if (strcmp("PFA", option_arg) == 0 || strcmp("pfa", option_arg) == 0) {
+            options.controller_type = CONTROLLER_TYPE_PFA;
+        }
         else if (strcmp("test_engine", option_arg) == 0) {
             options.controller_type = CONTROLLER_TYPE_TEST_SPEED;
         }

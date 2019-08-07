@@ -69,7 +69,8 @@ extern "C" void handleLevelStart() {
     // Calculate tile distances to goal
     int goal_x, goal_y;
     enginehelper::findGoalLocation(goal_x, goal_y);
-    enginehelper::setBoardDistances(goal_x, goal_y);
+    enginehelper::setBoardDistancesDijkstra(goal_x, goal_y);
+    enginehelper::setNeighbours();
 
     // Initialize zorbrist tables for state hashing
     enginehelper::initZorbristTables();
@@ -235,7 +236,7 @@ extern "C" void testEngineSpeed() {
 extern "C" void testBFSSpeed() {
     int goal_x, goal_y;
     enginehelper::findGoalLocation(goal_x, goal_y);
-    enginehelper::setBoardDistances(goal_x, goal_y);
+    enginehelper::setBoardDistancesDijkstra(goal_x, goal_y);
     logwrap::setLogLevel(plog::debug);
     testenginespeed::testBfsSpeed();
 }
@@ -250,7 +251,7 @@ extern "C" void testBFSSpeed() {
 extern "C" void testMCTSSpeed() {
     int goal_x, goal_y;
     enginehelper::findGoalLocation(goal_x, goal_y);
-    enginehelper::setBoardDistances(goal_x, goal_y);
+    enginehelper::setBoardDistancesDijkstra(goal_x, goal_y);
     logwrap::setLogLevel(plog::debug);
     testenginespeed::testMctsSpeed();
 }
@@ -279,7 +280,7 @@ extern "C" void testAll() {
 
     int goal_x, goal_y;
     enginehelper::findGoalLocation(goal_x, goal_y);
-    enginehelper::setBoardDistances(goal_x, goal_y);
+    enginehelper::setBoardDistancesDijkstra(goal_x, goal_y);
 
     PLOGI_(logwrap::FileLogger) << msg;
 

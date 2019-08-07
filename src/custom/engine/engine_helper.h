@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <limits>
 #include <cstdint>
+#include <cstdlib>              // abs
 
 #include "engine_types.h"
 #include "action.h"
@@ -73,6 +74,16 @@ namespace enginehelper {
      * Get the level width
      */
     int getLevelWidth();
+
+    /*
+     * Get the player grid position
+     */
+    enginetype::GridCell getPlayerPosition();
+
+    /*
+     * Get the current goal location (defined by distance of 0)
+     */
+    enginetype::GridCell getCurrentGoalLocation();
 
     /*
      * Check if the current status of the engine is loss of life
@@ -188,7 +199,12 @@ namespace enginehelper {
     /*
      * Set the grid distances to goal using Dijkstra's algorithm (shortest path)
      */
-    void setBoardDistances(int goal_x, int goal_y);
+    void setBoardDistancesDijkstra(int goal_x=-1, int goal_y=-1);
+
+    /*
+     * Set the grid distances to goal using L1 distance
+     */
+    void setBoardDistancesL1(int goal_x=-1, int goal_y=-1);
 
 
 

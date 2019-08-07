@@ -7822,7 +7822,7 @@ int main(int argc, char *argv[])
     }
 
     handleLevelStart();
-    testAG();
+//    testAG();
 //    return 0;
 
     // normal event loop

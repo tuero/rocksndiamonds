@@ -87,9 +87,9 @@ Action Controller::getAction() {
     baseController.get()->run(currentSolution, forwardSolution, statistics);
 
     // Get next action in action-currentSolution queue
-    action = currentSolution.front();
+    if (!currentSolution.empty()) {action = currentSolution.front();}
     std::string action_str = actionToString(action);
-    currentSolution.erase(currentSolution.begin());
+    if (!currentSolution.empty()) {currentSolution.erase(currentSolution.begin());}
 
     // Send action information to logger
     msg = "Controller sending action: " + action_str;
@@ -119,6 +119,9 @@ void Controller::setController(enginetype::ControllerType controller) {
     }
     else if (controller == enginetype::USER) {
         baseController = std::make_unique<User>();
+    }
+    else if (controller == enginetype::PFA) {
+        baseController = std::make_unique<PFA>();
     }
     else {
         // Throw error
