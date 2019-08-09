@@ -33,6 +33,13 @@ namespace enginetype{
         }
     };
 
+    class GridCellHash {
+    public:
+        std::size_t operator()(const GridCell& grid_cell) const {
+            return grid_cell.y * MAX_LEV_FIELDY + grid_cell.x;
+        }
+    };
+
 
     // ------------- Controller types -------------
     enum ControllerType{BFS=CONTROLLER_TYPE_BFS, MCTS=CONTROLLER_TYPE_MCTS, 

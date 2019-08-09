@@ -22,7 +22,6 @@ void PFA::findPath() {
     // int abstract_level = abstract_graph.getLevel() / 2;
     // int abstract_level = log(abstract_graph.getLevel());
     int abstract_level = 4;
-    enginetype::GridCell player_grid = enginehelper::getPlayerPosition();
     AbstractNode* start_node = abstract_graph.getStartNode(abstract_level);
 
     PLOGI_(logwrap::FileLogger) << "Abstraction level: " << start_node->getLevel();

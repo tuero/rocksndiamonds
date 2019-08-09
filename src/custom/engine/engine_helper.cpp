@@ -86,7 +86,7 @@ std::string getLevelSet() {
  * Get the level height
  */
 int getLevelHeight() {
-    return level.fieldx;
+    return level.fieldy;
 }
 
 
@@ -94,7 +94,7 @@ int getLevelHeight() {
  * Get the level width
  */
 int getLevelWidth() {
-    return level.fieldy;
+    return level.fieldx;
 }
 
 

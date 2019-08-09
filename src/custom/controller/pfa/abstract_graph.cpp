@@ -1,36 +1,41 @@
 
-
 #include "abstract_graph.h"
 
 
+AbstractGraph::AbstractGraph() {}
+
+/*
+ * Initialize base layer of abstract graph 
+ * A node is created for each individual walkable grid cell (non-wall)
+ */
 void AbstractGraph::init() {
-    enginehelper::setBoardDistancesL1();
-
-    // Populate base level with node representing each grid
-    int width = enginehelper::getLevelWidth();
-    int height = enginehelper::getLevelHeight();
-    level_ = 0;
-    id_ = 0;
-
     Timer timer;
     timer.start();
 
+    // Initialize distances to goal using L1 (can only move in the 4 cardinal directions)
+    enginehelper::setBoardDistancesL1();
+    int width = enginehelper::getLevelWidth();
+    int height = enginehelper::getLevelHeight();
+
+    // Reset member variables
+    top_level_ = 0;
+    id_ = -1;
+    rep_map_.clear();
+
     // Create a node for each map grid tile
-    for (int y = 0; y < width; y++) {
-        for (int x = 0; x < height; x++) {
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
             float h = (float)enginehelper::distances[x][y];
-            int id = next_level_.size();
 
             // Distance of -1 indicates a stationary wall
-            if (h == -1) {
-                continue;
-            }
+            if (h == -1) {continue;}
+
+            // Forward id to represent next node
+            ++id_;
 
             // Create and store node
-            enginetype::GridCell grid_cell = {x,y};
-            Pointer node = std::make_unique<AbstractNode>(id_, level_, h, grid_cell);
-            next_level_[id_] = std::move(node);
-            id_ += 1;
+            next_level_[id_] = std::make_unique<AbstractNode>(id_, top_level_, h, enginetype::GridCell{x,y});
+            rep_map_[{x,y}] = id_;
         }
     }
 
@@ -41,24 +46,29 @@ void AbstractGraph::init() {
     setCurrentFromNext();
 
     timer.stop();
-
     PLOGI_(logwrap::FileLogger) << "Init Time: " << timer.getDuration();
-
+    PLOGI_(logwrap::ConsolLogger) << "Init Time: " << timer.getDuration();
 }
 
 
-AbstractGraph::AbstractGraph() {}
-
-
+/*
+ * Get the node which represents the top level of the abstraction
+ */
 AbstractNode* AbstractGraph::getTopLevelNode() {
-    return current_level_.begin()->second.get();
-    // return flat_nodes_[0].begin()->second.get();
+    PLOGE_IF_(logwrap::FileLogger, current_level_.size() > 1) << "Top level has more than 1 node.";
+    PLOGE_IF_(logwrap::ConsolLogger, current_level_.size() > 1) << "Top level has more than 1 node.";
+    return current_level_[id_].get();
 }
 
 
+/*
+ * Get the node at the specified abstraction level which contains the player's 
+ * starting position. Used for pathfinding.
+ */
 AbstractNode* AbstractGraph::getStartNode(int level) {
-    if (level < 0 || level > level_) {
+    if (level < 0 || level > top_level_) {
         PLOGE_(logwrap::FileLogger) << "Invalid level.";
+        PLOGE_(logwrap::ConsolLogger) << "Invalid level.";
         return nullptr;
     }
 
@@ -69,8 +79,9 @@ AbstractNode* AbstractGraph::getStartNode(int level) {
     // Traverse down the abstractions until we reach desired level
     while(start_node->getLevel() > level) {
         std::vector<AbstractNode*> children =  start_node->getChildren();
+
         // Find the child which has the grid we care about
-        for (auto child : children) {
+        for (auto const & child : children) {
             if (child->representsCell(player_grid)) {
                 start_node = child;
                 break;
@@ -82,60 +93,36 @@ AbstractNode* AbstractGraph::getStartNode(int level) {
 }
 
 
-void AbstractGraph::findCliquesThree2() {
-    for (auto it = current_level_.begin(); it != current_level_.end(); ++it) {
-        int current_id = it->first;
-        std::map<int, AbstractNode*> current_neighbours = it->second.get()->getNeighbours();
-        bool removed = false;
+/*
+ * Make an abstract node representing the given children, and
+ * add it to the next_level_ map.
+ */
+void AbstractGraph::makeNode(std::vector<Pointer> &children) {
+    // Forward id to represent next node
+    ++id_;
 
-        // Node not in a clique of 2 if it has fewer then 2 neighbours
-        if (current_neighbours.size() < 2) {++it; continue;}
+    // Make and store node
+    Pointer node = std::make_unique<AbstractNode>(id_, top_level_, children);
+    recordRepresentedCells(node.get());
+    next_level_[id_] = std::move(node);
+}
 
-        for (auto neighbour : current_neighbours) {
-            if (neighbour.first <= current_id) {continue;}
-            auto temp_search1 = current_level_.find(neighbour.first);
-            if (temp_search1 == current_level_.end()) {continue;}
 
-            std::map<int, AbstractNode*> second_neighbours = neighbour.second->getNeighbours();
-
-            for (auto second_neighbour : second_neighbours) {
-                if (second_neighbour.first == current_id) {continue;}
-                if (second_neighbour.first <= current_id || second_neighbour.first < neighbour.first) {continue;}
-                auto temp_search2 = current_level_.find(second_neighbour.first);
-                if (temp_search2 == current_level_.end()) {continue;}
-
-                std::map<int, AbstractNode*> third_neighbours = second_neighbour.second->getNeighbours();
-
-                // Found clique
-                auto search = third_neighbours.find(current_id);
-                if (search != third_neighbours.end()) {
-                    std::cout << "Found CLique " << current_id << " " << neighbour.first << " " << second_neighbour.first << std::endl;
-                    std::vector<Pointer> children;
-                    children.push_back(std::move(it->second));
-                    children.push_back(std::move(temp_search2->second));
-                    children.push_back(std::move(temp_search1->second));
-
-                    // Make node and store
-                    Pointer node = std::make_unique<AbstractNode>(id_, level_, children);
-                    next_level_[id_] = std::move(node);
-                    id_ += 1;
-
-                    // Erase clique from current level
-                    current_level_.erase(neighbour.first);
-                    current_level_.erase(second_neighbour.first);
-                    it = current_level_.erase(it);
-                    removed = true;
-                    break;
-                }
-            }
-            if (removed) {break;}
-        }
-
-        if (!removed) {++it;}
+/*
+ * Store node ID for cells that it represents. This map is used later
+ * when determining neighbours.
+ */
+void AbstractGraph::recordRepresentedCells(AbstractNode* node) {
+    int id = node->getId();
+    for (auto const & grid_cell : node->getRepresentedCells()) {
+        rep_map_[grid_cell] = id;
     }
 }
 
 
+/*
+ * Check for cliques of size 3 and create an abstract node.
+ */
 void AbstractGraph::findCliquesThree() {
     for (auto it = current_level_.begin(); it != current_level_.end(); ) {
         bool removed = false;
@@ -150,7 +137,7 @@ void AbstractGraph::findCliquesThree() {
         // and maximal clique size is 3
         // If neighbour of current_node also has a neighbour in current_neighbours then we have 
         // a 3-clique
-        for (auto const &neighbour : current_neighbours) {
+        for (auto const & neighbour : current_neighbours) {
             int neighbour_id = neighbour.first;
             AbstractNode* second_node = neighbour.second;
             std::map<int, AbstractNode*> second_neighbours = second_node->getNeighbours();
@@ -172,8 +159,7 @@ void AbstractGraph::findCliquesThree() {
 
                 // If the 2nd neighbour id in current_neighbours, then we found a clique
                 // We don't need this iterator later, so we use temp
-                auto temp_search = current_neighbours.find(second_neighbour_id);
-                if (temp_search == current_neighbours.end()) {continue;}
+                if (current_neighbours.find(second_neighbour_id) == current_neighbours.end()) {continue;}
 
                 // Sanity check that node wasn't previously used in clique, and save
                 // search result to remove
@@ -186,11 +172,7 @@ void AbstractGraph::findCliquesThree() {
                 children.push_back(std::move(search->second));
                 children.push_back(std::move(search_second->second));
 
-                // Make node and store
-                int id = next_level_.size();
-                Pointer node = std::make_unique<AbstractNode>(id_, level_, children);
-                next_level_[id_] = std::move(node);
-                id_ += 1;
+                makeNode(children);
 
                 // Erase clique from current level
                 current_level_.erase(second_neighbour_id);
@@ -209,6 +191,9 @@ void AbstractGraph::findCliquesThree() {
 }
 
 
+/*
+ * Check for cliques of size 2 and create an abstract node.
+ */
 void AbstractGraph::findCliquesTwo() {
     for (auto it = current_level_.begin(); it != current_level_.end(); ) {
         bool removed = false;
@@ -221,17 +206,10 @@ void AbstractGraph::findCliquesTwo() {
         float min_value = std::numeric_limits<float>::max();
         AbstractNode* saved_neighbour = nullptr;
 
-        for (auto const &neighbour : current_neighbours) {
-            int neighbour_id = neighbour.first;
-
+        for (auto const & neighbour : current_neighbours) {
             // If neighbour is not in current_level_, then it has been previously used
             // in another clique and so we skip to another neighbour
-            auto search = current_level_.find(neighbour_id);
-            if (search == current_level_.end()) {continue;}
-
-
-
-
+            if (current_level_.find(neighbour.first) == current_level_.end()) {continue;}
 
             // Otherwise, neighbour is free to be used in clique
             float difference = std::abs(neighbour.second->getValueH() - it->second.get()->getValueH());
@@ -240,35 +218,16 @@ void AbstractGraph::findCliquesTwo() {
                 min_value = difference;
                 saved_neighbour = neighbour.second;
             }
-
-            // std::vector<Pointer> children;
-            // children.push_back(std::move(it->second));
-            // children.push_back(std::move(search->second));
-
-            // // Make node and store
-            // int id = next_level_.size();
-            // Pointer node = std::make_unique<AbstractNode>(id_, level_, children);
-            // next_level_[id_] = std::move(node);
-            // id_ += 1;
-
-            // // Erase clique from current level
-            // current_level_.erase(neighbour_id);
-            // it = current_level_.erase(it);
-            // removed = true;
-            // break;
         }
 
+        // Use min-distance clique
         if (removed) {
             auto search2 = current_level_.find(saved_neighbour->getId());
             std::vector<Pointer> children;
             children.push_back(std::move(it->second));
             children.push_back(std::move(search2->second));
 
-            // Make node and store
-            int id = next_level_.size();
-            Pointer node = std::make_unique<AbstractNode>(id_, level_, children);
-            next_level_[id_] = std::move(node);
-            id_ += 1;
+            makeNode(children);
 
             // Erase clique from current level
             current_level_.erase(saved_neighbour->getId());
@@ -281,42 +240,93 @@ void AbstractGraph::findCliquesTwo() {
 }
 
 
+/*
+ * Abstract remaining nodes as a clique of size 1.
+ */
 void AbstractGraph::findCliquesOne() {
     // Remaining nodes were not a part of larger size cliques
     // so we abstract themselves
     for (auto it = current_level_.begin(); it != current_level_.end(); ++it) {
-        int id = next_level_.size();
-
         // Don't use initialization list as it uses copy-constructor
         // and breaks references
         std::vector<Pointer> children;
         children.push_back(std::move(it->second));
 
-        // Make node and store
-        Pointer node = std::make_unique<AbstractNode>(id_, level_, children);
-        next_level_[id_] = std::move(node);
-        id_ += 1;
+        makeNode(children);
     }
 }
 
 
-void AbstractGraph::joinNeighbours() {
-    for (auto it = next_level_.begin(); it != next_level_.end(); ++it) {
-            for (auto it_inner = std::next(it); it_inner != next_level_.end(); ++it_inner) {
-                AbstractNode* node_left = it->second.get();
-                AbstractNode* node_right = it_inner->second.get();
-
-                std::vector<enginetype::GridCell> cells_left = node_left->getRepresentedCells();
-                std::vector<enginetype::GridCell> cells_right = node_right->getRepresentedCells();
-
-                if (enginehelper::checkIfNeighbours(cells_left, cells_right)) {
-                    node_left->addNeighbour(node_right);
-                    node_right->addNeighbour(node_left);
-                }
-            }
-        }
+/*
+ * Check if the given grid cell is a neighbour to the node represented
+ * by the given ID.
+ */
+bool AbstractGraph::checkNeighbour(int current_id, enginetype::GridCell grid_cell) {
+    return (rep_map_.find(grid_cell) != rep_map_.end() && rep_map_[grid_cell] != current_id);
 }
 
+
+/*
+ * Find neighbours in the new abstract level and join.
+ */
+void AbstractGraph::joinNeighbours() {
+    // for (auto it = next_level_.begin(); it != next_level_.end(); ++it) {
+    //     for (auto it_inner = std::next(it); it_inner != next_level_.end(); ++it_inner) {
+    //         AbstractNode* node_left = it->second.get();
+    //         AbstractNode* node_right = it_inner->second.get();
+
+    //         std::vector<enginetype::GridCell> cells_left = node_left->getRepresentedCells();
+    //         std::vector<enginetype::GridCell> cells_right = node_right->getRepresentedCells();
+
+    //         if (enginehelper::checkIfNeighbours(cells_left, cells_right)) {
+    //             node_left->addNeighbour(node_right);
+    //             node_right->addNeighbour(node_left);
+    //         }
+    //     }
+    // }
+
+
+    for (auto it = next_level_.begin(); it != next_level_.end(); ++it) {
+        int current_id = it->first;
+        int neighbour_id;
+        AbstractNode* current_node = it->second.get();
+        std::vector<enginetype::GridCell> represented_cells = current_node->getRepresentedCells();
+
+        // For each grid cell the node represents, look for which other abstract nodes
+        // represent the neighbouring grid cells.
+        for (auto grid_cell : represented_cells) {
+
+            // Node left
+            if (checkNeighbour(current_id, {grid_cell.x-1, grid_cell.y})) {
+                neighbour_id = rep_map_[{grid_cell.x-1, grid_cell.y}];
+                current_node->addNeighbour(next_level_[neighbour_id].get());
+            }
+
+            // Node right
+            if (checkNeighbour(current_id, {grid_cell.x+1, grid_cell.y})) {
+                neighbour_id = rep_map_[{grid_cell.x+1, grid_cell.y}];
+                current_node->addNeighbour(next_level_[neighbour_id].get());
+            }
+
+            // Node above
+            if (checkNeighbour(current_id, {grid_cell.x, grid_cell.y-1})) {
+                neighbour_id = rep_map_[{grid_cell.x, grid_cell.y-1}];
+                current_node->addNeighbour(next_level_[neighbour_id].get());
+            }
+
+            // Node below
+            if (checkNeighbour(current_id, {grid_cell.x, grid_cell.y+1})) {
+                neighbour_id = rep_map_[{grid_cell.x, grid_cell.y+1}];
+                current_node->addNeighbour(next_level_[neighbour_id].get());
+            }
+        }
+    }
+}
+
+
+/*
+ * Store the newly created abstracted level
+ */
 void AbstractGraph::setCurrentFromNext() {
     current_level_.clear();
     for (auto it = next_level_.begin(); it != next_level_.end(); ++it) {
@@ -326,13 +336,16 @@ void AbstractGraph::setCurrentFromNext() {
 }
 
 
+/*
+ * Helper method to recursively traverse downward, setting distances for all
+ * child nodes, then update the current node using the average of child values.
+ */
 void AbstractGraph::calcDistancesRecursive(AbstractNode* current_node) {
     // Base level, value is fetched from distances struct
     if (current_node->getLevel() == 0) {
         std::vector<enginetype::GridCell> represented_cells = current_node->getRepresentedCells();
         enginetype::GridCell grid_cell = represented_cells[0];
-        float value = (float)enginehelper::distances[grid_cell.x][grid_cell.y];
-        current_node->setValueH(value);
+        current_node->setValueH(enginehelper::distances[grid_cell.x][grid_cell.y]);
         return;
     }
 
@@ -346,6 +359,12 @@ void AbstractGraph::calcDistancesRecursive(AbstractNode* current_node) {
     current_node->updateValue();
 }
 
+
+/*
+ * Set the goal location.
+ * Will force all nodes to recalculate their values (average 
+ * distance to the goal).
+ */
 void AbstractGraph::setGoal(int goal_x, int goal_y) {
     // Run L1 to set distances
     enginehelper::setBoardDistancesL1(goal_x, goal_y);
@@ -358,6 +377,9 @@ void AbstractGraph::setGoal(int goal_x, int goal_y) {
 }
 
 
+/*
+ * Pretty print the board with the repsective abstract nodes
+ */
 void AbstractGraph::boardPrint(std::vector<std::vector<int>> &print_array){
     std::ostringstream os;
     os << std::endl;
@@ -369,16 +391,16 @@ void AbstractGraph::boardPrint(std::vector<std::vector<int>> &print_array){
     enginetype::GridCell goal_pos = enginehelper::getCurrentGoalLocation();
 
     int min_value = print_array[0][0];
-    for (int y = 0; y < width; y++) {
-        for (int x = 0; x < height; x++) {
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
             if (print_array[y][x] != -1 && print_array[y][x] < min_value) {min_value = print_array[y][x];}            
         }
     }
 
     LOGD_(logwrap::FileLogger) << "Min value used: " << min_value;
 
-    for (int y = 0; y < width; y++) {
-        for (int x = 0; x < height; x++) {
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
             os.width(5);
             if (x == player_pos.x && y == player_pos.y) {os << "P" << " ";}
             else if (x == goal_pos.x && y == goal_pos.y) {os << "G" << " ";}
@@ -407,9 +429,9 @@ void AbstractGraph::logGraph() {
     std::vector<std::vector<int>> print_array;
 
     // Create a node for each map grid tile
-    for (int y = 0; y < width; y++) {
+    for (int y = 0; y < height; y++) {
         std::vector<int> row;
-        for (int x = 0; x < height; x++) {
+        for (int x = 0; x < width; x++) {
             row.push_back(-1);
         }
         print_array.push_back(row);
@@ -420,7 +442,7 @@ void AbstractGraph::logGraph() {
         current_level.push_back(node.second.get());
     }
 
-    int old_level = level_;
+    int old_level = top_level_;
 
     LOGD_(logwrap::FileLogger) << header;
     while (!current_level.empty()) {
@@ -432,7 +454,7 @@ void AbstractGraph::logGraph() {
             // print
             boardPrint(print_array);
             // reset
-            for (int y = 0; y < width; y++) {for (int x = 0; x < height; x++) {print_array[y][x] = -1;}}
+            for (int y = 0; y < height; y++) {for (int x = 0; x < width; x++) {print_array[y][x] = -1;}}
         }
 
         // Get node info
@@ -482,6 +504,9 @@ void AbstractGraph::logGraph() {
 }
 
 
+/*
+ * Abstract the base level upwards until there is a single abstracted node.
+ */
 void AbstractGraph::abstract() {
     LOGI_(logwrap::FileLogger) << "Abstracting graph.";
 
@@ -489,12 +514,12 @@ void AbstractGraph::abstract() {
     timer.start();
     while(current_level_.size() > 1) {
         next_level_.clear();
-        nodes_to_delete.clear();
-        level_ += 1;
+        top_level_ += 1;
 
         findCliquesThree();
         findCliquesTwo();
         findCliquesOne();
+
         joinNeighbours();
         setCurrentFromNext();
 
@@ -505,9 +530,11 @@ void AbstractGraph::abstract() {
     timer.stop();
 
     LOGI_(logwrap::FileLogger) << "Abstraction complete.";
-    LOGI_(logwrap::FileLogger) << "Number of levels: " << level_;
-    LOGI_(logwrap::FileLogger) << "Total nodes: " << id_;
     LOGI_(logwrap::FileLogger) << "Abstract Time: " << timer.getDuration();
+    LOGI_(logwrap::ConsolLogger) << "Abstract Time: " << timer.getDuration();
+    LOGI_(logwrap::FileLogger) << "Number of levels: " << top_level_;
+    LOGI_(logwrap::ConsolLogger) << "Number of levels: " << top_level_;
+    LOGI_(logwrap::FileLogger) << "Total nodes: " << id_;
 
     logGraph();
 
@@ -519,6 +546,9 @@ void AbstractGraph::abstract() {
 }
 
 
+/*
+ * Get the number of abstracted levels
+ */
 int AbstractGraph::getLevel() {
-    return level_;
+    return top_level_;
 }
