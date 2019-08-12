@@ -587,6 +587,9 @@ void HandleWindowEvent(WindowEvent *event)
       event->event == SDL_WINDOWEVENT_EXPOSED)
     SDLRedrawWindow();
 #endif
+  if (event->event == SDL_WINDOWEVENT_CLOSE) {
+      closeMapWindow();
+  }
 
   if (event->event == SDL_WINDOWEVENT_RESIZED)
   {

@@ -1239,6 +1239,10 @@ void GetOptions(int argc, char *argv[],
             options_left++;
         }
     }
+    else if (strncmp(option, "-window", option_len) == 0)
+    {
+        options.summary_window = TRUE;
+    }
 #if defined(PLATFORM_MACOSX)
     else if (strPrefix(option, "-psn"))
     {

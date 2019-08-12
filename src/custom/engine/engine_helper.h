@@ -76,6 +76,11 @@ namespace enginehelper {
     int getLevelWidth();
 
     /*
+     * Get the item located at the given (x,y) grid location
+     */
+    int getGridItem(int x, int y);
+
+    /*
      * Get the player grid position
      */
     enginetype::GridCell getPlayerPosition();

@@ -42,7 +42,8 @@ UTIL_DIR 	:=	util
 UTIL_OBJ 	:= 	$(UTIL_DIR)/timer.o 				\
 				$(UTIL_DIR)/rng.o 					\
 				$(UTIL_DIR)/logging_wrapper.o 		\
-				$(UTIL_DIR)/level_programming.o
+				$(UTIL_DIR)/level_programming.o  	\
+				$(UTIL_DIR)/summary_window.o
 
 TEST_DIR 	:=	tests
 TEST_OBJ 	:= 	$(TEST_DIR)/test_engine_speed.o 	\
@@ -56,6 +57,7 @@ TEST_OBJ 	:= 	$(TEST_DIR)/test_engine_speed.o 	\
 .PHONY: all clean controller eng util tests 
 
 all: controller eng util tests $(CUSTOM)
+# all: $(CUSTOM)
 
 $(CUSTOM): $(CTR_OBJ) $(BFS_OBJ) $(MCTS_OBJ) $(PFA_OBJ) $(REPLAY_OBJ) $(USER_OBJ) $(ENG_OBJ) $(UTIL_OBJ) $(TEST_OBJ) $(OBJS)
 	$(AR) cr $(CUSTOM) $(CTR_OBJ) $(BFS_OBJ) $(MCTS_OBJ) $(PFA_OBJ) $(REPLAY_OBJ) $(USER_OBJ) $(ENG_OBJ) $(UTIL_OBJ) $(TEST_OBJ) $(OBJS)

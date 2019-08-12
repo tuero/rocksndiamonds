@@ -19,6 +19,7 @@
 #include "../../engine/engine_helper.h"
 #include "../../engine/action.h"
 #include "../../util/timer.h"
+#include "../../util/summary_window.h"
 
 //Logging
 #include "../util/logging_wrapper.h"
@@ -33,7 +34,7 @@ private:
 
     void logPath();
 
-    void findPath();
+    void findPath(int abstract_level);
 
 public:
 

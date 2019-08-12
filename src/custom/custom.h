@@ -44,6 +44,13 @@ extern "C"
      */
     void saveReplayLevelInfo(void);
 
+    // ----------------------- Summary Window -------------------------
+
+    /*
+     * Close the summary window.
+     */
+    void closeMapWindow(void);
+
     // --------------- Action Handler ------------------
 
     /*
@@ -112,8 +119,6 @@ extern "C"
      * Results are logged to file
      */
     void testAll(void);
-
-    void testAG(void);
 
 
     // ------------- Debug Logging ------------------

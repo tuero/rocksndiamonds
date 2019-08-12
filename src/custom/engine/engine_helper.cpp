@@ -99,6 +99,18 @@ int getLevelWidth() {
 
 
 /*
+ * Get the item located at the given (x,y) grid location
+ */
+int getGridItem(int x, int y) {
+    if (x < 0 || x >= level.fieldx || y < 0 || y >= level.fieldy) {
+        PLOGE_(logwrap::FileLogger) << "Position out of bounds.";
+    }
+
+    return Feld[x][y];
+}
+
+
+/*
  * Get the player grid position
  */
 enginetype::GridCell getPlayerPosition() {

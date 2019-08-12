@@ -47,6 +47,11 @@ private:
     void recordRepresentedCells(AbstractNode* node);
 
     /*
+     * Helper to recursively get nodes at a g vien level
+     */
+    void getNodesRecursive(AbstractNode* node, int level, std::vector<AbstractNode*> &nodes_at_level);
+
+    /*
      * Check for cliques of size 3 and create an abstract node.
      */
     void findCliquesThree();
@@ -115,6 +120,16 @@ public:
     AbstractNode* getStartNode(int level);
 
     /*
+     * Get the abstract nodes for a given level.
+     */
+    std::vector<AbstractNode*> getNodesAtLevel(int level);
+
+    /*
+     * Get the abstract node ID for each gridcell at the specified level
+     */
+    std::vector<std::vector<int>> getAbstractRepresentation(int level, bool min_colouring=false);
+
+    /*
      * Get the number of abstracted levels
      */
     int getLevel();
@@ -127,7 +142,7 @@ public:
     void setGoal(int goal_x, int goal_y);
 
     /*
-     * Log details of the abstract graph
+     * Log details of the abstract graph.
      */
     void logGraph();
 

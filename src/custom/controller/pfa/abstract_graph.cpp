@@ -94,6 +94,85 @@ AbstractNode* AbstractGraph::getStartNode(int level) {
 
 
 /*
+ * Helper to recursively get nodes at a g vien level
+ */
+void AbstractGraph::getNodesRecursive(AbstractNode* node, int level,
+    std::vector<AbstractNode*> &nodes_at_level) 
+{
+    // Base case, at level.
+    if (node->getLevel() == level) {
+        nodes_at_level.push_back(node);
+        return;
+    }
+
+    // Continue downwards
+    std::vector<AbstractNode*> children = node->getChildren();
+    for (auto child : children) {
+        getNodesRecursive(child, level, nodes_at_level);
+    }
+}
+
+
+/*
+ * Get the abstract nodes for a given level.
+ */
+std::vector<AbstractNode*> AbstractGraph::getNodesAtLevel(int level) {
+    std::vector<AbstractNode*> nodes_at_level;
+    if (level < 0 || level > top_level_) {return nodes_at_level;}
+
+    for (auto const &node : current_level_) {
+        getNodesRecursive(node.second.get(), level, nodes_at_level);
+    }
+
+    return nodes_at_level;
+}
+
+
+/*
+ * Get the abstract node ID for each gridcell at the specified level
+ */
+std::vector<std::vector<int>> AbstractGraph::getAbstractRepresentation(int level, bool min_colouring) {
+    int width = enginehelper::getLevelWidth();
+    int height = enginehelper::getLevelHeight();
+
+    std::vector<std::vector<int>> grid_representation(width, std::vector<int>(height, -1));
+    std::vector<AbstractNode*> nodes = getNodesAtLevel(level);
+    std::map<int, int> colouring_map;
+
+    if (min_colouring) {
+
+        for (int i = 0; i < (int)nodes.size(); i++) {
+            AbstractNode* node = nodes[i];
+            std::set<int> available_colours;
+            for (int i = 0; i < (int)nodes.size(); i++) {available_colours.insert(i);}
+
+            // Check what colours (if any) have been assigned to the neighbours
+            for (auto const & neighbour : node->getNeighbours()) {
+                if (colouring_map.find(neighbour.first) == colouring_map.end()) {continue;}
+                available_colours.erase(colouring_map[neighbour.first]);
+            }
+
+            // Node gets min available colour
+            colouring_map[node->getId()] = *(available_colours.begin());
+        }
+    }
+
+    for (auto const & node : nodes) {
+        for (auto const & cell : node->getRepresentedCells()) {
+            if (min_colouring) {
+                grid_representation[cell.x][cell.y] = colouring_map[node->getId()];
+            }
+            else {
+                grid_representation[cell.x][cell.y] = node->getId();
+            }
+        }
+    }
+
+    return grid_representation;
+}
+
+
+/*
  * Make an abstract node representing the given children, and
  * add it to the next_level_ map.
  */

@@ -17,9 +17,12 @@
 // controller
 #include "controller/controller.h"
 
-// util and logging
+// util
 #include "util/level_programming.h"
 #include "util/rng.h"
+#include "util/summary_window.h"
+
+// Logging
 #include "util/logging_wrapper.h"
 #include <plog/Log.h>
 
@@ -41,18 +44,11 @@ Controller controller;
 char *level_bd = (char *)"classic_boulderdash";
 char *level_em = (char *)"classic_emerald_mine";
 char *level_custom = (char *)"tuero";
-
 std::string levelset_survival = "custom_survival";
+
 
 std::string SEP(30, '-');
 
-
-#include "controller/pfa/abstract_graph.h"
-extern "C" void testAG() {
-    enginehelper::setNeighbours();
-    AbstractGraph abstract_graph;
-    abstract_graph.abstract();
-}
 
 
 // ------------------------ Init Functions --------------------------
@@ -87,6 +83,8 @@ extern "C" void handleLevelStart() {
     // Ensure RNG seeds reset during level start
     RNG::setEngineSeed(RNG::getEngineSeed());
     RNG::setSimulatingSeed(RNG::getSimulationSeed());
+
+    if (options.summary_window) {SummaryWindow::init();}
 }
 
 
@@ -138,6 +136,15 @@ extern "C" void saveReplayLevelInfo(void) {
 }
 
 
+// ----------------------- Summary Window -------------------------
+
+/*
+ * Close the summary window.
+ */
+extern "C" void closeMapWindow() {
+    SummaryWindow::close();
+}
+
 // ----------------------- Action Handler --------------------------
 
 /*
@@ -145,6 +152,7 @@ extern "C" void saveReplayLevelInfo(void) {
  * Implementation of solution will depend on controller type.
  */
 extern "C" int getAction() {
+    if (options.summary_window) {SummaryWindow::draw();}
     return controller.getAction();
 }
 

@@ -2,8 +2,7 @@
 #include "pfa.h"
 
 
-PFA::PFA() {
-}
+PFA::PFA() {}
 
 
 void PFA::logPath() {
@@ -11,17 +10,13 @@ void PFA::logPath() {
     PLOGI_(logwrap::FileLogger) << "Logging path: ";
 
     for (auto const &node: abstract_path) {
-        // msg = "Node id: " << node->getId();
         PLOGI_(logwrap::FileLogger) << "Node id: " << node->getId();
     }
 }
 
 
-void PFA::findPath() {
+void PFA::findPath(int abstract_level) {
     // Get start node
-    // int abstract_level = abstract_graph.getLevel() / 2;
-    // int abstract_level = log(abstract_graph.getLevel());
-    int abstract_level = 4;
     AbstractNode* start_node = abstract_graph.getStartNode(abstract_level);
 
     PLOGI_(logwrap::FileLogger) << "Abstraction level: " << start_node->getLevel();
@@ -33,11 +28,12 @@ void PFA::findPath() {
     std::map<int, AbstractNode*> open_map;
     std::map<int, AbstractNode*> closed;
 
+    // Starting node
     start_node->setPathParent(nullptr);
     open_queue.push(start_node);
     open_map[start_node->getId()] = start_node;
 
-    // A*
+    // A* pathfinding on abstract level
     while (!open_queue.empty()) {
         // Pull minimal f node
         AbstractNode* node = open_queue.top();
@@ -65,6 +61,7 @@ void PFA::findPath() {
             return;
         }
 
+        // Expand children
         std::map<int, AbstractNode*> children = node->getNeighbours();
         for (auto child : children) {
             int child_id = child.first;
@@ -84,9 +81,11 @@ void PFA::findPath() {
                 open_map.erase(child_node->getId());
             }
 
+            // Set g and parent
             child_node->setValueG(new_g);
             child_node->setPathParent(node);
 
+            // Save children
             open_queue.push(child_node);
             open_map[child_node->getId()] = child_node;
         }
@@ -104,13 +103,19 @@ void PFA::handleEmpty(std::vector<Action> &currentSolution, std::vector<Action> 
     abstract_graph.init();
     abstract_graph.abstract();
 
+    // int abstract_level = abstract_graph.getLevel() / 2;
+    // int abstract_level = log(abstract_graph.getLevel());
+    int abstract_level = 4;
+    SummaryWindow::grid_representation = abstract_graph.getAbstractRepresentation(abstract_level, true);
+
     // Find path on abstract graph
     abstract_path.clear();
 
     Timer timer;
 
+    // Run A* on abstracted graph
     timer.start();
-    findPath();
+    findPath(abstract_level);
     timer.stop();
 
     PLOGI_(logwrap::FileLogger) << "Path Time: " << timer.getDuration();
