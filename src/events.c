@@ -358,7 +358,7 @@ void EventLoop(void)
         // We can get rid of the conditional by just returning user action
         // if no controller is selected
         if (options.controller_type != CONTROLLER_TYPE_DEFAULT) {
-            spawnElements();
+            handleCustomLevelProgramming();
             stored_player[0].action = getAction();
         }
         HandleGameActions();

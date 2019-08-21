@@ -33,6 +33,11 @@ void Replay::handleEmpty(std::vector<Action> &currentSolution, std::vector<Actio
     // Silent compiler warning
     (void)currentSolution;
     (void)forwardSolution;
+    abstract_graph.init();
+    abstract_graph.abstract();
+    int abstract_level = 4;
+    grid_representation = abstract_graph.getAbstractRepresentation(abstract_level, true);
+    SummaryWindow::grid_representation = grid_representation;
 }
 
 

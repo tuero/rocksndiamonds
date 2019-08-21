@@ -25,6 +25,8 @@ MCTS_OBJ 	:= 	$(MCTS_DIR)/mcts.o 				\
 PFA_DIR 	:= 	$(CTR_DIR)/pfa
 PFA_OBJ 	:= 	$(PFA_DIR)/abstract_graph.o 				\
 				$(PFA_DIR)/abstract_node.o 					\
+				$(PFA_DIR)/pfa_mcts.o 					\
+				$(PFA_DIR)/pfa_tree_node.o 				\
 				$(PFA_DIR)/pfa.o
 
 REPLAY_DIR 	:= 	$(CTR_DIR)/replay

@@ -45,6 +45,48 @@ private:
     short (*pointers_amoebas[num_amoebas])[MAX_NUM_AMOEBA] = {
         &AmoebaCnt, &AmoebaCnt2
     };
+
+
+// short Feld_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+// short Last_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+// short MovPos_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+// short MovDir_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+// short MovDelay_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+// short ChangeDelay_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+// short ChangePage_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+// short CustomValue_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+// short Store_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+// short Store2_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+// short StorePlayer_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+// short Back_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+// short ChangeCount_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+// short ChangeEvent_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+// short WasJustMoving_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+// short WasJustFalling_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+// short CheckCollision_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+// short CheckImpact_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+// short AmoebaNr_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+// short ExplodeField_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+// short ExplodePhase_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+// short ExplodeDelay_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+
+// int RunnerVisit_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+// int PlayerVisit_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+// int GfxFrame_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+// int GfxRandom_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+// int GfxElement_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+// int GfxAction_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+// int GfxDir_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+// int GfxRedraw_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+
+// boolean Stop_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+// boolean Pushed_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+
+// short AmoebaCnt_[MAX_NUM_AMOEBA];
+// short AmoebaCnt2_[MAX_NUM_AMOEBA];
+
+
+
 public:
 
     // Containers of saved game state

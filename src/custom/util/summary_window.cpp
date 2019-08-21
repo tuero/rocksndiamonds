@@ -14,6 +14,9 @@ std::vector<SDL_Rect> SummaryWindow::texture_rects;
 std::map<int, std::string> SummaryWindow::graphics_map = {
         {-1, "./src/custom/graphics/avatar.png"}, 
         {enginetype::FELD_DIAMOND, "./src/custom/graphics/diamond.png"}, 
+        {enginetype::FIELD_CUSTOM_1, "./src/custom/graphics/diamond.png"}, 
+        {enginetype::FIELD_YAMYAM, "./src/custom/graphics/yamyam.png"}, 
+        {enginetype::FIELD_CUSTOM_2, "./src/custom/graphics/yamyam.png"}, 
         {enginetype::FIELD_GOAL, "./src/custom/graphics/door.png"},
         {enginetype::FIELD_WALL, "./src/custom/graphics/wall.png"}    
 };
@@ -112,11 +115,26 @@ void SummaryWindow::draw() {
             // Abstracted nodes representing grid cells
             if (grid_representation.size() > col && grid_representation[col].size() > row) {
                 int id = grid_representation[col][row];
-                SDL_SetRenderDrawColor(renderer, grid_colors[id][0], grid_colors[id][1], grid_colors[id][2], 255);       // r, g, b, a
-                // SDL_RenderFillRect(renderer, &texture_rects[counter]);
-                SDL_RenderDrawRect(renderer, &texture_rects[counter]);
+                
+                if (id == -1) {
+                    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);       // r, g, b, a
+                    SDL_RenderFillRect(renderer, &texture_rects[counter]);
+                }
+                else if (id == -2) {
+                    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);       // r, g, b, a
+                    SDL_RenderFillRect(renderer, &texture_rects[counter]);
+                }
+                else if (id == -3) {
+                    SDL_SetRenderDrawColor(renderer, 128, 128, 128, 255);       // r, g, b, a
+                    SDL_RenderFillRect(renderer, &texture_rects[counter]);
+                }
+                else {
+                    SDL_SetRenderDrawColor(renderer, grid_colors[id][0], grid_colors[id][1], grid_colors[id][2], 255);       // r, g, b, a
+                    SDL_RenderDrawRect(renderer, &texture_rects[counter]);
+                }
                 SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
             }
+
 
             // Draw player
             if (col == player_pos.x && row == player_pos.y) {
@@ -124,7 +142,7 @@ void SummaryWindow::draw() {
             }
 
             // Draw texture representing item in map
-            int item_id = enginehelper::getGridItem(col, row);
+            int item_id = enginehelper::getGridItem({col, row});
             if (graphics_map.find(item_id) != graphics_map.end()) {
                 SDL_RenderCopy(renderer, textures_map[item_id], NULL, &texture_rects[counter]);
             }

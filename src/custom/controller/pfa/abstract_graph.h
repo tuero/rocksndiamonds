@@ -139,13 +139,15 @@ public:
      * Will force all nodes to recalculate their values (average 
      * distance to the goal).
      */
-    void setGoal(int goal_x, int goal_y);
+    void setGoal(enginetype::GridCell goal_cell);
 
     /*
      * Log details of the abstract graph.
      */
     void logGraph();
 
+
+    void logGraphLevel(int level);
 
 
 };

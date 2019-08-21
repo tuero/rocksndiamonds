@@ -13,7 +13,7 @@ void AbstractGraph::init() {
     timer.start();
 
     // Initialize distances to goal using L1 (can only move in the 4 cardinal directions)
-    enginehelper::setBoardDistancesL1();
+    // enginehelper::setBoardDistancesL1();
     int width = enginehelper::getLevelWidth();
     int height = enginehelper::getLevelHeight();
 
@@ -34,8 +34,9 @@ void AbstractGraph::init() {
             ++id_;
 
             // Create and store node
-            next_level_[id_] = std::make_unique<AbstractNode>(id_, top_level_, h, enginetype::GridCell{x,y});
-            rep_map_[{x,y}] = id_;
+            enginetype::GridCell grid_cell = {x,y};
+            next_level_[id_] = std::make_unique<AbstractNode>(id_, top_level_, h, grid_cell);
+            rep_map_[grid_cell] = id_;
         }
     }
 
@@ -88,6 +89,8 @@ AbstractNode* AbstractGraph::getStartNode(int level) {
             }
         }
     }
+
+    PLOGD_(logwrap::FileLogger) << "Player " << player_grid.x << " " << player_grid.y;
 
     return start_node;
 }
@@ -373,7 +376,7 @@ void AbstractGraph::joinNeighbours() {
 
         // For each grid cell the node represents, look for which other abstract nodes
         // represent the neighbouring grid cells.
-        for (auto grid_cell : represented_cells) {
+        for (auto const & grid_cell : represented_cells) {
 
             // Node left
             if (checkNeighbour(current_id, {grid_cell.x-1, grid_cell.y})) {
@@ -444,9 +447,9 @@ void AbstractGraph::calcDistancesRecursive(AbstractNode* current_node) {
  * Will force all nodes to recalculate their values (average 
  * distance to the goal).
  */
-void AbstractGraph::setGoal(int goal_x, int goal_y) {
+void AbstractGraph::setGoal(enginetype::GridCell goal_cell) {
     // Run L1 to set distances
-    enginehelper::setBoardDistancesL1(goal_x, goal_y);
+    enginehelper::setBoardDistancesL1(goal_cell);
 
     // Update nodes in graph
     // current_level_ should the single abstracted node 
@@ -469,12 +472,16 @@ void AbstractGraph::boardPrint(std::vector<std::vector<int>> &print_array){
     enginetype::GridCell player_pos = enginehelper::getPlayerPosition();
     enginetype::GridCell goal_pos = enginehelper::getCurrentGoalLocation();
 
-    int min_value = print_array[0][0];
+    int min_value = std::numeric_limits<int>::max();
+    int max_value = std::numeric_limits<int>::min();
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
-            if (print_array[y][x] != -1 && print_array[y][x] < min_value) {min_value = print_array[y][x];}            
+            if (print_array[y][x] != -1 && print_array[y][x] < min_value) {min_value = print_array[y][x];}
+            if (print_array[y][x] != -1 && print_array[y][x] > max_value) {max_value = print_array[y][x];}              
         }
     }
+
+    if (max_value < 10000) {min_value = 0;}
 
     LOGD_(logwrap::FileLogger) << "Min value used: " << min_value;
 
@@ -516,27 +523,77 @@ void AbstractGraph::logGraph() {
         print_array.push_back(row);
     }
 
-    // Pre-load vector
-    for (auto const &node : current_level_) {
-        current_level.push_back(node.second.get());
+    for (int level = top_level_; level >= 0; level--) {
+        std::vector<AbstractNode*> nodes = getNodesAtLevel(level);
+        for (auto const & current_node : nodes) {
+            int node_level = current_node->getLevel();
+            int node_id = current_node->getId();
+            float node_value = current_node->getValueH();
+            bool is_goal = current_node->representsGoal();
+
+            std::vector<AbstractNode*> children = current_node->getChildren();
+            std::map<int, AbstractNode*> neighbours = current_node->getNeighbours();
+            std::vector<enginetype::GridCell> represented_cells = current_node->getRepresentedCells();
+
+            // Current node
+            msg = "Level: " + std::to_string(node_level) + ", Node: " + std::to_string(node_id); 
+            msg += ", value: " + std::to_string(node_value) + ", goal: " + std::to_string(is_goal);
+            // LOGD_(logwrap::FileLogger) << msg;
+            LOGI_(logwrap::FileLogger) << msg;
+
+            // Neighbours
+            msg = "\tNeighbours: ";
+            for (auto const &neighbour : neighbours) {
+                msg += std::to_string(neighbour.first) + ", ";
+            }
+            // LOGD_(logwrap::FileLogger) << msg;
+            LOGI_(logwrap::FileLogger) << msg;
+
+            // Node Reperesentation
+            msg = "\tRepresenting: ";
+            for (auto const &rep : represented_cells) {
+                msg += "(" + std::to_string(rep.x) + "," + std::to_string(rep.y) + "), ";
+                print_array[rep.y][rep.x] = node_id;
+            }
+            // LOGD_(logwrap::FileLogger) << msg;
+            LOGI_(logwrap::FileLogger) << msg;
+
+            // Children
+            msg = "\tChildren: ";
+            for (auto const &child : children) {
+                msg += std::to_string(child->getId()) + ", ";
+            }
+            // LOGD_(logwrap::FileLogger) << msg;
+            LOGI_(logwrap::FileLogger) << msg;
+        }
+        boardPrint(print_array);
     }
 
-    int old_level = top_level_;
-
     LOGD_(logwrap::FileLogger) << header;
-    while (!current_level.empty()) {
-        // Pull node
-        AbstractNode* current_node = current_level.front();
-        current_level.pop_front();
+}
 
-        if (old_level != current_node->getLevel()) {
-            // print
-            boardPrint(print_array);
-            // reset
-            for (int y = 0; y < height; y++) {for (int x = 0; x < width; x++) {print_array[y][x] = -1;}}
+
+void AbstractGraph::logGraphLevel(int level) {
+    std::deque<AbstractNode*> current_level;
+    std::string header = "----------- Abstract Graph Display -----------";
+    std::string msg;
+
+    int width = enginehelper::getLevelWidth();
+    int height = enginehelper::getLevelHeight();
+
+    std::vector<std::vector<int>> print_array;
+
+    // Create a node for each map grid tile
+    for (int y = 0; y < height; y++) {
+        std::vector<int> row;
+        for (int x = 0; x < width; x++) {
+            row.push_back(-1);
         }
+        print_array.push_back(row);
+    }
 
-        // Get node info
+    std::vector<AbstractNode*> nodes = getNodesAtLevel(level);
+    for (auto const & current_node : nodes) {
         int node_level = current_node->getLevel();
         int node_id = current_node->getId();
         float node_value = current_node->getValueH();
@@ -549,14 +606,16 @@ void AbstractGraph::logGraph() {
         // Current node
         msg = "Level: " + std::to_string(node_level) + ", Node: " + std::to_string(node_id); 
         msg += ", value: " + std::to_string(node_value) + ", goal: " + std::to_string(is_goal);
-        LOGD_(logwrap::FileLogger) << msg;
+        // LOGD_(logwrap::FileLogger) << msg;
+        LOGI_(logwrap::FileLogger) << msg;
 
         // Neighbours
         msg = "\tNeighbours: ";
         for (auto const &neighbour : neighbours) {
             msg += std::to_string(neighbour.first) + ", ";
         }
-        LOGD_(logwrap::FileLogger) << msg;
+        // LOGD_(logwrap::FileLogger) << msg;
+        LOGI_(logwrap::FileLogger) << msg;
 
         // Node Reperesentation
         msg = "\tRepresenting: ";
@@ -564,22 +623,18 @@ void AbstractGraph::logGraph() {
             msg += "(" + std::to_string(rep.x) + "," + std::to_string(rep.y) + "), ";
             print_array[rep.y][rep.x] = node_id;
         }
-        LOGD_(logwrap::FileLogger) << msg;
+        // LOGD_(logwrap::FileLogger) << msg;
+        LOGI_(logwrap::FileLogger) << msg;
 
         // Children
         msg = "\tChildren: ";
         for (auto const &child : children) {
             msg += std::to_string(child->getId()) + ", ";
         }
-        LOGD_(logwrap::FileLogger) << msg;
-
-        // Add children and continue
-        current_level.insert(current_level.end(), children.begin(), children.end());
-
-        old_level = current_node->getLevel();
-
+        // LOGD_(logwrap::FileLogger) << msg;
+        LOGI_(logwrap::FileLogger) << msg;
     }
-    LOGD_(logwrap::FileLogger) << header;
+    boardPrint(print_array);
 }
 
 

@@ -63,10 +63,12 @@ void AbstractNode::addNeighbour(AbstractNode* neighbour) {
  */
 void AbstractNode::updateValue() {
     h_ = 0.0;
+    represents_goal_ = false;
 
     for (auto const &child : children_) {
         AbstractNode* child_node = child.second.get();
         h_ += child_node->getValueH();
+        represents_goal_ = (represents_goal_ || child_node->representsGoal());
     }
 
     h_ = h_ / children_.size();

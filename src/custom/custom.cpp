@@ -63,10 +63,16 @@ extern "C" void handleLevelStart() {
     PLOGI_(logwrap::FileLogger) << "Level being played: " << level.file_info.nr;
 
     // Calculate tile distances to goal
-    int goal_x, goal_y;
-    enginehelper::findGoalLocation(goal_x, goal_y);
-    enginehelper::setBoardDistancesDijkstra(goal_x, goal_y);
-    enginehelper::setNeighbours();
+    std::string subdir_string(leveldir_current->subdir);
+    if (subdir_string == levelset_survival) {
+        levelprogramming::customLevelProgrammingStart();
+    }
+    else {
+        // Calculate tile distances to goal
+        enginetype::GridCell goal_cell = enginehelper::findGoalLocation();
+        enginehelper::setBoardDistancesDijkstra(goal_cell);
+        // enginehelper::setNeighbours();
+    }
 
     // Initialize zorbrist tables for state hashing
     enginehelper::initZorbristTables();
@@ -162,10 +168,10 @@ extern "C" int getAction() {
  * Hook needs to be made in event loop, as these features are not supported
  * in the built in CE programming
  */
-extern "C" void spawnElements() {
+extern "C" void handleCustomLevelProgramming() {
     std::string subdir_string(leveldir_current->subdir);
     if (subdir_string == levelset_survival) {
-        levelprogramming::spawnElements();
+        levelprogramming::customLevelProgrammingUpdate();
     }
 }
 
@@ -242,9 +248,8 @@ extern "C" void testEngineSpeed() {
  * Results are logged to file
  */
 extern "C" void testBFSSpeed() {
-    int goal_x, goal_y;
-    enginehelper::findGoalLocation(goal_x, goal_y);
-    enginehelper::setBoardDistancesDijkstra(goal_x, goal_y);
+    enginetype::GridCell goal_cell = enginehelper::findGoalLocation();
+    enginehelper::setBoardDistancesDijkstra(goal_cell);
     logwrap::setLogLevel(plog::debug);
     testenginespeed::testBfsSpeed();
 }
@@ -257,9 +262,8 @@ extern "C" void testBFSSpeed() {
  * Results are logged to file
  */
 extern "C" void testMCTSSpeed() {
-    int goal_x, goal_y;
-    enginehelper::findGoalLocation(goal_x, goal_y);
-    enginehelper::setBoardDistancesDijkstra(goal_x, goal_y);
+    enginetype::GridCell goal_cell = enginehelper::findGoalLocation();
+    enginehelper::setBoardDistancesDijkstra(goal_cell);
     logwrap::setLogLevel(plog::debug);
     testenginespeed::testMctsSpeed();
 }
@@ -286,9 +290,8 @@ extern "C" void testAll() {
     GameState state;
     state.setFromSimulator();
 
-    int goal_x, goal_y;
-    enginehelper::findGoalLocation(goal_x, goal_y);
-    enginehelper::setBoardDistancesDijkstra(goal_x, goal_y);
+    enginetype::GridCell goal_cell = enginehelper::findGoalLocation();
+    enginehelper::setBoardDistancesDijkstra(goal_cell);
 
     PLOGI_(logwrap::FileLogger) << msg;
 

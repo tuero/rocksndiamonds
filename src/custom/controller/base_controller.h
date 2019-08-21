@@ -15,6 +15,8 @@ class BaseController {
 
 public:
 
+    virtual void handleLevelStart() {}
+
     virtual void handleEmpty(std::vector<Action> &currentSolution, std::vector<Action> &forwardSolution) = 0;
 
     virtual void run(std::vector<Action> &currentSolution, std::vector<Action> &forwardSolution, 

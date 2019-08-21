@@ -18,6 +18,19 @@ enginetype::ControllerType getControllerType() {
     return static_cast<enginetype::ControllerType>(options.controller_type);
 }
 
+/*
+ * Get the replay game name
+ */
+std::string getReplayFileName() {
+    std::string replay_file(options.replay_file);
+    return replay_file;
+}
+
+
+// -------------------------------------------------------
+// -------------------Level Information-------------------
+// -------------------------------------------------------
+
 
 /*
  * Call engine functions to load the levelset
@@ -53,6 +66,14 @@ void setLevelSet() {
     }
 }
 
+/*
+ * Get the levelset used
+ */
+std::string getLevelSet() {
+    std::string level_set(leveldir_current->subdir);
+    return level_set;
+}
+
 
 /*
  * Call engine function to load the given level
@@ -74,15 +95,6 @@ int getLevelNumber() {
 
 
 /*
- * Get the levelset used
- */
-std::string getLevelSet() {
-    std::string level_set(leveldir_current->subdir);
-    return level_set;
-}
-
-
-/*
  * Get the level height
  */
 int getLevelHeight() {
@@ -98,15 +110,20 @@ int getLevelWidth() {
 }
 
 
+// -------------------------------------------------------
+// -----------------Map Item Information------------------
+// -------------------------------------------------------
+
+
 /*
  * Get the item located at the given (x,y) grid location
  */
-int getGridItem(int x, int y) {
-    if (x < 0 || x >= level.fieldx || y < 0 || y >= level.fieldy) {
+int getGridItem(enginetype::GridCell cell) {
+    if (cell.x < 0 || cell.x >= level.fieldx || cell.y < 0 || cell.y >= level.fieldy) {
         PLOGE_(logwrap::FileLogger) << "Position out of bounds.";
     }
 
-    return Feld[x][y];
+    return Feld[cell.x][cell.y];
 }
 
 
@@ -131,6 +148,169 @@ enginetype::GridCell getCurrentGoalLocation() {
     }
     return grid_cell;
 }
+
+
+/*
+ * Check if the grid cell at location (x,y) is empty
+ */
+bool _isGridEmpty(enginetype::GridCell cell) {
+    // Check bounds (this shouldn't happen but best to be safe)
+    if (cell.x < 0 || cell.x >= level.fieldx || cell.y < 0 || cell.y >= level.fieldy) {
+        // PLOGE_(logwrap::FileLogger) << "Index out of bounds.";
+        return false;
+    }
+
+    // Player position is not indicated in Feld, so check first
+    if (stored_player[0].jx == cell.x && stored_player[0].jy == cell.y) {
+        return false;
+    }
+
+    // Element is currently attempting to move to grid (x,y)
+    if (MovDir[cell.x][cell.y] != 0) {
+        return false;
+    }
+
+    // Grid now empty if Feld is empty
+    return Feld[cell.x][cell.y] == enginetype::FIELD_EMPTY;
+}
+
+
+/*
+ * Returns true if a wall is on the direction the player wants to move
+ * Assumes simulator is in the current state to check
+ */
+bool isWall(Action action) {
+    int playerX = stored_player[0].jx;
+    int playerY = stored_player[0].jy;
+
+    if (action == Action::down && (Feld[playerX][playerY+1] == enginetype::FIELD_WALL || 
+        playerY+1 == level.fieldy))
+    {
+        return true;
+    }
+    else if (action == Action::right && (Feld[playerX+1][playerY] == enginetype::FIELD_WALL || 
+        playerX+1 == level.fieldx))
+    {
+        return true;
+    }
+    else if (action == Action::up && (Feld[playerX][playerY-1] == enginetype::FIELD_WALL || 
+        playerY == 0))
+    {
+        return true;
+    }
+    else if (action == Action::left && (Feld[playerX-1][playerY] == enginetype::FIELD_WALL || 
+        playerX == 0)) 
+    {
+        return true;
+    }
+    return false;
+}
+
+
+/*
+ * Helper function to check if cell is in bounds and in allowed area
+ */
+bool _canExpandDirection(int x, int y, int player_bounds, int map_bounds, 
+    std::vector<enginetype::GridCell> &allowed_cells) 
+{
+    // Check if direction is blocked by map mounds/wall
+    if (Feld[x][y] == enginetype::FIELD_WALL || player_bounds == map_bounds) {
+        return false;
+    }
+
+    // Check if direction is in allowed cells
+    for (auto const & cell : allowed_cells) {
+        if (cell.x == x && cell.y == y) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+/*
+ * Used in PFA_MCTS
+ * Checks if the player tree can expand to neighbouring gridcell given a list of allowed gridcells
+ */
+bool canExpand(Action action, std::vector<enginetype::GridCell> &allowed_cells) {
+    int playerX = stored_player[0].jx;
+    int playerY = stored_player[0].jy;
+
+    if (action == Action::down) {
+        return _canExpandDirection(playerX, playerY+1, playerY+1, level.fieldy, allowed_cells);
+    }
+    else if (action == Action::up) {
+        return _canExpandDirection(playerX, playerY-1, playerY, 0, allowed_cells);
+    }
+    else if (action == Action::right) {
+        return _canExpandDirection(playerX+1, playerY, playerX+1, level.fieldx, allowed_cells);
+    }
+    else if (action == Action::left) {
+        return _canExpandDirection(playerX-1, playerY, playerX, 0, allowed_cells);
+    }
+
+    // Otherwise, we have a noop which is always allowed
+    return true;
+}
+
+
+/*
+ * Check if two grid cells are neighbours
+ */
+bool checkIfNeighbours(enginetype::GridCell left, enginetype::GridCell right) {
+    if (left.x == right.x && std::abs(left.y - right.y) == 1) {return true;}
+    if (left.y == right.y && std::abs(left.x - right.x) == 1) {return true;}
+    return false;
+}
+
+
+// -------------------------------------------------------
+// ---------------Custom Level Programming----------------
+// -------------------------------------------------------
+
+/*
+ * Count how many of a specified element in the game
+ */
+int countNumOfElement(int element) {
+    int element_count = 0;
+    for (int y = 0; y < level.fieldy; y++) {
+        for (int x = 0; x < level.fieldx; x++) {
+            if (Feld[x][y] == element) {
+                element_count += 1;
+            }
+        }
+    }
+    return element_count;
+}
+
+
+/*
+ * Add the specified element to the game
+ */
+void spawnElement(int element, int dir, enginetype::GridCell gridCell) {
+    Feld[gridCell.x][gridCell.y] = element;
+    MovDir[gridCell.x][gridCell.y] = dir;
+}
+
+
+/*
+ * Get all empty grid cells
+ */
+void getEmptyGridCells(std::vector<enginetype::GridCell> &emptyGridCells) {
+    emptyGridCells.clear();
+    for (int y = 0; y < level.fieldy; y++) {
+        for (int x = 0; x < level.fieldx; x++) {
+            if (_isGridEmpty({x, y})) {
+                emptyGridCells.push_back(enginetype::GridCell{x, y});
+            }
+        }
+    }
+}
+
+
+// -------------------------------------------------------
+// -----------------Game Engine State---------------------
+// -------------------------------------------------------
 
 
 /*
@@ -216,163 +396,6 @@ void engineSimulate() {
     }
 }
 
-
-/*
- * Returns true if a wall is on the direction the player wants to move
- * Assumes simulator is in the current state to check
- */
-bool isWall(Action action) {
-    int playerX = stored_player[0].jx;
-    int playerY = stored_player[0].jy;
-
-    if (action == Action::down && (Feld[playerX][playerY+1] == enginetype::FIELD_WALL || 
-        playerY+1 == level.fieldy))
-    {
-        return true;
-    }
-    else if (action == Action::right && (Feld[playerX+1][playerY] == enginetype::FIELD_WALL || 
-        playerX+1 == level.fieldx))
-    {
-        return true;
-    }
-    else if (action == Action::up && (Feld[playerX][playerY-1] == enginetype::FIELD_WALL || 
-        playerY == 0))
-    {
-        return true;
-    }
-    else if (action == Action::left && (Feld[playerX-1][playerY] == enginetype::FIELD_WALL || 
-        playerX == 0)) 
-    {
-        return true;
-    }
-    return false;
-
-    // if (action == Action::down && (Feld[playerX][playerY+1] != _FIELD_EMPTY && Feld[playerX][playerY+1] != _FIELD_GOAL)) {
-    //     return true;
-    // }
-    // else if (action == Action::right && (Feld[playerX+1][playerY] != _FIELD_EMPTY && Feld[playerX+1][playerY] != _FIELD_GOAL)) {
-    //     return true;
-    // }
-    // else if (action == Action::up && (Feld[playerX][playerY-1] != _FIELD_EMPTY && Feld[playerX][playerY-1] != _FIELD_GOAL)) {
-    //     return true;
-    // }
-    // else if (action == Action::left && (Feld[playerX-1][playerY] != _FIELD_EMPTY && Feld[playerX-1][playerY] != _FIELD_GOAL)) {
-    //     return true;
-    // }
-    // return false;
-
-}
-
-
-/*
- * Check if the grid cell at location (x,y) is empty
- */
-bool isGridEmpty(int x, int y) {
-    // Check bounds (this shouldn't happen but best to be safe)
-    if (x < 0 || x >= level.fieldx || y < 0 || y >= level.fieldy) {
-        // PLOGE_(logwrap::FileLogger) << "Index out of bounds.";
-        return false;
-    }
-
-    // Player position is not indicated in Feld, so check first
-    if (stored_player[0].jx == x && stored_player[0].jy == y) {
-        return false;
-    }
-
-    // Element is currently attempting to move to grid (x,y)
-    if (MovDir[x][y] != 0) {
-        return false;
-    }
-
-    // Grid now empty if Feld is empty
-    return Feld[x][y] == enginetype::FIELD_EMPTY;
-}
-
-
-bool isNonWall(int x, int y) {
-    // Check bounds (this shouldn't happen but best to be safe)
-    if (x < 0 || x >= level.fieldx || y < 0 || y >= level.fieldy) {
-        // PLOGE_(logwrap::FileLogger) << "Index out of bounds.";
-        return false;
-    }
-
-    // Grid now empty if Feld is empty
-    return Feld[x][y] != enginetype::FIELD_WALL;
-}
-
-
-/*
- * Get all empty grid cells
- */
-void getEmptyGridCells(std::vector<enginetype::GridCell> &emptyGridCells) {
-    emptyGridCells.clear();
-    for (int y = 0; y < level.fieldy; y++) {
-        for (int x = 0; x < level.fieldx; x++) {
-            if (isGridEmpty(x, y)) {
-                emptyGridCells.push_back(enginetype::GridCell{x, y});
-            }
-        }
-    }
-}
-
-
-void setNeighbours() {
-    for (int y = 0; y < level.fieldy; y++) {
-        for (int x = 0; x < level.fieldx; x++) {
-            if (isNonWall(x, y)) {
-                enginetype::GridCell grid_cell = {x, y};
-
-                // find neighbours
-                std::vector<enginetype::GridCell> neighbours;
-                if (isNonWall(x-1, y)) {neighbours.push_back(enginetype::GridCell{x-1, y});}
-                if (isNonWall(x+1, y)) {neighbours.push_back(enginetype::GridCell{x+1, y});}
-                if (isNonWall(x, y-1)) {neighbours.push_back(enginetype::GridCell{x, y-1});}
-                if (isNonWall(x, y+1)) {neighbours.push_back(enginetype::GridCell{x, y+1});}
-
-                grid_neighbours_[grid_cell] = neighbours;
-            }
-        }
-    }
-}
-
-bool checkIfNeighbours(std::vector<enginetype::GridCell> &cells_left, std::vector<enginetype::GridCell> &cells_right) {
-    for (auto const cell_left : cells_left) {
-        for (auto const cell_right : cells_right) {
-            std::vector<enginetype::GridCell> right_result = grid_neighbours_[cell_right];
-            if (std::find(right_result.begin(), right_result.end(), cell_left) != right_result.end()) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-
-/*
- * Count how many of a specified element in the game
- */
-int countNumOfElement(int element) {
-    int count_element = 0;
-    for (int y = 0; y < level.fieldy; y++) {
-        for (int x = 0; x < level.fieldx; x++) {
-            if (Feld[x][y] == element) {
-                count_element += 1;
-            }
-        }
-    }
-    return count_element;
-}
-
-
-/*
- * Add the specified element to the game
- */
-void spawnElement(int element, int dir, enginetype::GridCell gridCell) {
-    Feld[gridCell.x][gridCell.y] = element;
-    MovDir[gridCell.x][gridCell.y] = dir;
-}
-
-
 /*
  * Set flag for simulating
  * This will cause blocking actions in engine such as not rending to screen
@@ -389,6 +412,11 @@ void setSimulatorFlag(bool simulator_flag) {
 bool isSimulating() {
     return is_simulating;
 }
+
+
+// -------------------------------------------------------
+// -------------------State Hashing-----------------------
+// -------------------------------------------------------
 
 
 /*
@@ -430,24 +458,37 @@ uint64_t stateToHash() {
     return hashValue;
 }
 
+
+// -------------------------------------------------------
+// ----------------Distance Functions---------------------
+// -------------------------------------------------------
+
+
 /*
- * Get the replay game name
+ * Get L1 distance between two gridcells
  */
-std::string getReplayFileName() {
-    std::string replay_file(options.replay_file);
-    return replay_file;
+int getL1Distance(enginetype::GridCell left, enginetype::GridCell right) {
+    return (std::abs(left.x - right.x) + std::abs(left.y - right.y));
 }
 
 
 /*
- * Get the players current shortest path distance to goal
- * This uses distance tile maps pre-calculated using Dijkstra algorithm,
- * NOT Euclidean distance.
+ * Get the minimum player distance in reference to given list of gridcells
  */
-float getDistanceToGoal() {
+int minDistanceToAllowedCells(std::vector<enginetype::GridCell> &goal_cells) {
     int playerX = stored_player[0].jx;
     int playerY = stored_player[0].jy;
-    return (float)distances[playerX][playerY];
+    int min_distance = std::numeric_limits<int>::max();
+
+    PLOGE_IF_(logwrap::FileLogger, goal_cells.empty()) << "No goal nodes.";
+    assert(goal_cells.size() > 0);
+
+    for (auto const & grid : goal_cells) {
+        int distance = std::abs(grid.x - playerX) + std::abs(grid.y - playerY);
+        if (distance < min_distance) {min_distance = distance;}
+    }
+
+    return min_distance;
 }
 
 
@@ -455,7 +496,40 @@ float getDistanceToGoal() {
 typedef std::array<int, 2> Point;
 short INF = std::numeric_limits<short>::max();
 short distances[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+short abstract_node_distances[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short max_distance = -1;
+
+/*
+ * Get the players current shortest path distance to goal
+ * This uses distance tile maps pre-calculated using Dijkstra algorithm,
+ * NOT Euclidean distance.
+ */
+float getPlayerDistanceToGoal() {
+    int playerX = stored_player[0].jx;
+    int playerY = stored_player[0].jy;
+    return (float)distances[playerX][playerY];
+}
+
+
+/*
+ * Get the distance to goal from given gridcell
+ * This is set by distance metric, usually L1
+ */
+int getGridDistanceToGoal(enginetype::GridCell grid_cell) {
+    return distances[grid_cell.x][grid_cell.y];
+}
+
+
+/*
+ * Get the player distance to the next abstract node
+ * Internal abstract node distances are set by Dijsktra, used to help
+ * player get around corners that fails by L1 shortest distance
+ */
+int getPlayerDistanceToNextNode() {
+    int playerX = stored_player[0].jx;
+    int playerY = stored_player[0].jy;
+    return abstract_node_distances[playerX][playerY];
+}
 
 
 /*
@@ -475,11 +549,25 @@ void _getMinDistanceIndex(std::vector<Point> &Q, int &index) {
     index = min_index;
 }
 
+void _getMinDistanceIndexAbstract(std::vector<Point> &Q, int &index) {
+    int min_index = -1;
+    short min_value = INF;
+    for (int i = 0; i < (int)Q.size(); i++) {
+        int x = Q[i][0]; 
+        int y = Q[i][1];
+        if (abstract_node_distances[x][y] <= min_value) {
+            min_index = i;
+            min_value = abstract_node_distances[x][y];
+        }
+    }
+    index = min_index;
+}
+
 
 /*
  * Get the neighbours of point u from queue Q and insert into neighbours
  */
-void _getNeighbours(Point u, std::vector<Point> &neighbours, std::vector<Point> &Q) {
+void _getNeighboursDijkstra(Point u, std::vector<Point> &neighbours, std::vector<Point> &Q) {
     int x = u[0];
     int y = u[1];
 
@@ -510,26 +598,27 @@ void _getNeighbours(Point u, std::vector<Point> &neighbours, std::vector<Point> 
 /*
  * Find the grid location of the goal, given by enginetype::FIELD_GOAL
  */
-void findGoalLocation(int &goal_x, int &goal_y) {
-    goal_x = -1;
-    goal_y = -1;
+enginetype::GridCell findGoalLocation() {
+    enginetype::GridCell goal_cell = {-1, -1};
     for (int y = 0; y < level.fieldy; y++) {
         for (int x = 0; x < level.fieldx; x++) {
             if (Feld[x][y] == enginetype::FIELD_GOAL) {
-                goal_x = x;
-                goal_y = y;
+                goal_cell.x = x;
+                goal_cell.y = y;
                 PLOGI_(logwrap::FileLogger) << "Found goal at x=" << x << ", y=" << y << ".";
-                return;
+                return goal_cell;
             }
         }
     }
+
+    return goal_cell;
 }
 
 
 /*
  * Set the grid distances to goal using Dijkstra's algorithm (shortest path)
  */
-void setBoardDistancesDijkstra(int goal_x, int goal_y) {
+void setBoardDistancesDijkstra(enginetype::GridCell goal_cell) {
     int x, y;
     std::vector<Point> Q;       // Queue of points 
 
@@ -544,19 +633,19 @@ void setBoardDistancesDijkstra(int goal_x, int goal_y) {
     }
 
     // If no goal, then break
-    if (goal_x == -1 || goal_y == -1) {
+    if (goal_cell.x == -1 || goal_cell.y == -1) {
         PLOGI_(logwrap::FileLogger) << "Level has no goal.";
         return;
     }
 
     // Check goal in bounds
-    if (goal_x < 0 || goal_x >= level.fieldx || goal_y < 0 || goal_y >= level.fieldy) {
+    if (goal_cell.x < 0 || goal_cell.x >= level.fieldx || goal_cell.y < 0 || goal_cell.y >= level.fieldy) {
         PLOGI_(logwrap::FileLogger) << "Provided goal is out of level bounds.";
         return;
     }
 
     // Set goal distance
-    distances[goal_x][goal_y] = 0;
+    distances[goal_cell.x][goal_cell.y] = 0;
 
     // Calc distances
     Point u;
@@ -569,7 +658,7 @@ void setBoardDistancesDijkstra(int goal_x, int goal_y) {
 
         // Get neighbours
         std::vector<Point> neighbours;
-        _getNeighbours(u, neighbours, Q);
+        _getNeighboursDijkstra(u, neighbours, Q);
 
         // For each neighbour, update distance
         for (Point v : neighbours) {
@@ -592,12 +681,15 @@ void setBoardDistancesDijkstra(int goal_x, int goal_y) {
 /*
  * Set the grid distances to goal using L1 distance
  */
-void setBoardDistancesL1(int goal_x, int goal_y) {
+void setBoardDistancesL1(enginetype::GridCell goal_cell) {
     PLOGI_(logwrap::FileLogger) << "Setting board distances.";
 
-    if (goal_x == -1 && goal_y == -1) {findGoalLocation(goal_x, goal_y);}
+    if (goal_cell.x == -1 && goal_cell.y == -1) {
+        enginetype::GridCell goal_cell = findGoalLocation();
+    }
 
     // Initialize distances
+    max_distance = -1;
     for (int y = 0; y < level.fieldy; y++) {
         for (int x = 0; x < level.fieldx; x++) {
             distances[x][y] = -1;
@@ -605,26 +697,95 @@ void setBoardDistancesL1(int goal_x, int goal_y) {
     }
 
     // If no goal, then break
-    if (goal_x == -1 || goal_y == -1) {
+    if (goal_cell.x == -1 || goal_cell.y == -1) {
         PLOGI_(logwrap::FileLogger) << "Level has no goal.";
         return;
     }
 
     // Check goal in bounds
-    if (goal_x < 0 || goal_x >= level.fieldx || goal_y < 0 || goal_y >= level.fieldy) {
+    if (goal_cell.x < 0 || goal_cell.x >= level.fieldx || goal_cell.y < 0 || goal_cell.y >= level.fieldy) {
         PLOGI_(logwrap::FileLogger) << "Provided goal is out of level bounds.";
         return;
     }
 
     // Set goal distance
-    distances[goal_x][goal_y] = 0;
+    distances[goal_cell.x][goal_cell.y] = 0;
 
     // Set other grid distances
     for (int y = 0; y < level.fieldy; y++) {
         for (int x = 0; x < level.fieldx; x++) {
             if (Feld[x][y] != enginetype::FIELD_WALL) {
-                distances[x][y] = std::abs(goal_x - x) + std::abs(goal_y - y);
+                distances[x][y] = std::abs(goal_cell.x - x) + std::abs(goal_cell.y - y);
+                max_distance = (max_distance < distances[x][y]) ? distances[x][y] : max_distance;
             }
+        }
+    }
+}
+
+
+/*
+ * Used in PFA_MCST
+ * Set the internal grid cell distances to goal in abstract node
+ * This helps MCTS get around corners that fails with just L1
+ */
+void setAbstractNodeDistances(std::vector<enginetype::GridCell> goal_cells,
+    std::vector<enginetype::GridCell> allowed_cells) 
+{
+    int x, y;
+    std::vector<Point> Q;       // Queue of points 
+
+    // Initialize distances
+    for (y = 0; y < level.fieldy; y++) {
+        for (x = 0; x < level.fieldx; x++) {
+            abstract_node_distances[x][y] = INF;
+        }
+    }
+    for (auto const & allowed_cell : allowed_cells) {
+        if (std::find(goal_cells.begin(), goal_cells.end(), allowed_cell) != goal_cells.end()) {
+            continue;
+        }
+        Q.push_back({allowed_cell.x, allowed_cell.y});
+    }
+
+    // If no goal, then break
+    if (goal_cells.empty()) {
+        PLOGI_(logwrap::FileLogger) << "Level has no goal.";
+        return;
+    }
+
+    // Set goal distance
+    for (auto const & goal_cell : goal_cells) {
+        abstract_node_distances[goal_cell.x][goal_cell.y] = 0;
+        Q.push_back({goal_cell.x, goal_cell.y});
+    }
+
+    // Calc distances
+    Point u;
+    int index;
+    while (!Q.empty()) {
+        // Get min distance from vertex set and remove
+        _getMinDistanceIndexAbstract(Q, index);
+        u = Q[index];
+        Q.erase(Q.begin() + index);
+
+        // Get neighbours
+        std::vector<Point> neighbours;
+        _getNeighboursDijkstra(u, neighbours, Q);
+
+        // For each neighbour, update distance
+        for (Point v : neighbours) {
+            int alt = abstract_node_distances[u[0]][u[1]] + 1;
+            if (alt < abstract_node_distances[v[0]][v[1]]) {
+                abstract_node_distances[v[0]][v[1]] = alt;
+            }
+        }
+    }
+
+    // Set max distances to neg
+    for (y = 0; y < level.fieldy; y++) {
+        for (x = 0; x < level.fieldx; x++) {
+            abstract_node_distances[x][y] = (abstract_node_distances[x][y] == INF ? -1 : abstract_node_distances[x][y]);
+            max_distance = (max_distance < abstract_node_distances[x][y]) ? abstract_node_distances[x][y] : max_distance;
         }
     }
 }

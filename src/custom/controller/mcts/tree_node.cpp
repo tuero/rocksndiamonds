@@ -98,7 +98,7 @@ TreeNode* TreeNode::expand() {
     // Simulator is set to the child state, so determine what the available actions
     // the child has
     child.get()->setActions();
-    child.get()->distance_to_goal = enginehelper::getDistanceToGoal();
+    child.get()->distance_to_goal = enginehelper::getPlayerDistanceToGoal();
 
     child.get()->is_terminal = getTerminalStatusFromEngine();
     child.get()->is_deadly = getDeadlyStatusFromEngine();

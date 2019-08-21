@@ -13,6 +13,9 @@
 
 #include "../base_controller.h"
 
+#include "../pfa/abstract_graph.h"
+#include "../../util/summary_window.h"
+
 #include "../../engine/game_state.h"
 #include "../../engine/engine_types.h"
 #include "../../engine/engine_helper.h"
@@ -29,6 +32,8 @@ private:
     const std::string replay_dir = "./src/custom/logs/";
     std::string replayFileName;
     std::ifstream replayFileStream;
+    AbstractGraph abstract_graph;
+    std::vector<std::vector<int>> grid_representation;
 
 public:
 

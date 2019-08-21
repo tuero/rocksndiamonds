@@ -20,7 +20,10 @@ namespace levelprogramming {
     /*
      * Spawn new elements based on level rules
      */
-    void spawnElements();
+    void customLevelProgrammingUpdate();
+
+
+    void customLevelProgrammingStart();
 
 }
 

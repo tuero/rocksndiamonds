@@ -16,12 +16,20 @@ void PFA::logPath() {
 
 
 void PFA::findPath(int abstract_level) {
+    timer.start();
+
     // Get start node
     AbstractNode* start_node = abstract_graph.getStartNode(abstract_level);
+    std::vector<AbstractNode*> nodes = abstract_graph.getNodesAtLevel(abstract_level);
+
+    for (auto const & node : nodes) {
+        node->setValueG(std::numeric_limits<float>::max());
+    }
 
     PLOGI_(logwrap::FileLogger) << "Abstraction level: " << start_node->getLevel();
     PLOGI_(logwrap::FileLogger) << "Start node: " << start_node->getId();
     PLOGI_(logwrap::FileLogger) << "Starting A*";
+    PLOGI_(logwrap::ConsolLogger) << "Starting A*";
 
     // A* datastructures
     std::priority_queue<AbstractNode*, std::vector<AbstractNode*>, CompareAbstractNode> open_queue;
@@ -58,7 +66,7 @@ void PFA::findPath(int abstract_level) {
             }
 
             PLOGI_(logwrap::FileLogger) << "Path length: " << abstract_path.size();
-            return;
+            break;
         }
 
         // Expand children
@@ -66,8 +74,11 @@ void PFA::findPath(int abstract_level) {
         for (auto child : children) {
             int child_id = child.first;
             AbstractNode* child_node = child.second;
+            float new_g = std::numeric_limits<float>::max();
 
-            float new_g = node->getValueG() + 1;
+            if (node->getValueG() < new_g) {
+                new_g = node->getValueG() + 1;
+            }
 
             auto search_closed = closed.find(child_id);
             if (search_closed != closed.end()) {
@@ -91,48 +102,99 @@ void PFA::findPath(int abstract_level) {
         }
     }
 
+    timer.stop();
+
+    PLOGI_(logwrap::FileLogger) << "Path Time: " << timer.getDuration();
+    PLOGI_(logwrap::ConsolLogger) << "Path Time: " << timer.getDuration();
+    logPath();
+
+}
+
+
+
+void PFA::handleLevelStart() {
+    past_goal_ = enginehelper::getCurrentGoalLocation();
+    abstract_graph.init();
+    abstract_graph.abstract();
+    abstract_graph.logGraphLevel(abstract_level);
+
+    abstract_path.clear();
+    findPath(abstract_level);
+}
+
+
+void PFA::sendAbstractPathToSummaryWindow() {
+    grid_representation = abstract_graph.getAbstractRepresentation(abstract_level, true);
+    enginetype::GridCell goal_location = enginehelper::getCurrentGoalLocation();
+
+    for (auto const & node : abstract_path) {
+        for (auto const & grid_cell : node->getRepresentedCells()) {
+            grid_representation[grid_cell.x][grid_cell.y] = -3;
+        }
+    }
+
+    if (abstract_path.size() > 1) {
+        for (auto const & grid_cell : goal_abstract_node->getRepresentedCells()) {
+            grid_representation[grid_cell.x][grid_cell.y] = -2;
+        }
+    }
+    else {
+        grid_representation[goal_location.x][goal_location.y] = -2;
+    }
+
+    for (auto const & grid_cell : current_abstract_node->getRepresentedCells()) {
+        grid_representation[grid_cell.x][grid_cell.y] = -1;
+    }
+
+    SummaryWindow::grid_representation = grid_representation;
+}
+
+
+
+void PFA::setNodeFromPath() {
+    enginetype::GridCell player_cell = enginehelper::getPlayerPosition();
+    while (!abstract_path.empty()) {
+        std::vector<enginetype::GridCell> rep_cells = abstract_path.front()->getRepresentedCells();
+
+        // If player is not in this abstract node, then we must have already visited
+        // Remove until we find where the player is in our path
+        if (std::find(rep_cells.begin(), rep_cells.end(), player_cell) != rep_cells.end()) {
+            rep_cells.erase(rep_cells.begin());
+            break;
+        }
+        abstract_path.erase(abstract_path.begin());
+    }
+
+    current_abstract_node = abstract_path.front();
+    goal_abstract_node = abstract_path.front();
+
+    if (abstract_path.size() > 1) {
+        goal_abstract_node = abstract_path[1];
+    }
 }
 
 
 void PFA::handleEmpty(std::vector<Action> &currentSolution, std::vector<Action> &forwardSolution) {
-    // Silent compiler warning
-    // (void)currentSolution;
-    // (void)forwardSolution;
-
-    // Abstract graph
-    abstract_graph.init();
-    abstract_graph.abstract();
-
-    // int abstract_level = abstract_graph.getLevel() / 2;
-    // int abstract_level = log(abstract_graph.getLevel());
-    int abstract_level = 4;
-    SummaryWindow::grid_representation = abstract_graph.getAbstractRepresentation(abstract_level, true);
-
-    // Find path on abstract graph
-    abstract_path.clear();
-
-    Timer timer;
-
-    // Run A* on abstracted graph
-    timer.start();
-    findPath(abstract_level);
-    timer.stop();
-
-    PLOGI_(logwrap::FileLogger) << "Path Time: " << timer.getDuration();
-    logPath();
-
-    for (int i = 0; i < 1000; i++) {
-        currentSolution.push_back(Action::noop);
-        forwardSolution.push_back(Action::noop);
+    enginetype::GridCell current_goal = enginehelper::getCurrentGoalLocation();
+    if (past_goal_.x != current_goal.x || past_goal_.y != current_goal.y) {
+        abstract_graph.setGoal(current_goal);
+        // abstract_graph.logGraphLevel(4);
+        abstract_path.clear();
+        findPath(abstract_level);
     }
+    past_goal_ = current_goal;
+
+    // We are in the abstract node which contains the goal
+    setNodeFromPath();
+
+    sendAbstractPathToSummaryWindow();
+
+    pfa_mcts.handleEmpty(currentSolution, forwardSolution, current_abstract_node, goal_abstract_node);
 }
 
 
 void PFA::run(std::vector<Action> &currentSolution, std::vector<Action> &forwardSolution, 
         std::map<enginetype::Statistics, int> &statistics) 
 {
-    // Silent compiler warning
-    (void)currentSolution;
-    (void)forwardSolution;
-    (void)statistics;
+    pfa_mcts.run(currentSolution, forwardSolution, statistics);
 }

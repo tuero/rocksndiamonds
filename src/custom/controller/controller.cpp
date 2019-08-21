@@ -5,14 +5,14 @@
 Controller::Controller() {
     setController(enginehelper::getControllerType());
     step_counter = 0;
-    clearSolution();
+    // clearSolution();
 }
 
 
 Controller::Controller(enginetype::ControllerType controller) {
     setController(controller);
     step_counter = 0;
-    clearSolution();
+    // clearSolution();
 }
 
 
@@ -52,6 +52,8 @@ void Controller::clearSolution() {
         forwardSolution.push_back(Action::noop);
     }
     // mcts.reset(forwardSolution);
+
+    baseController.get()->handleLevelStart();
 }
 
 
@@ -69,10 +71,10 @@ Action Controller::getAction() {
     // Log current state of game
     msg = "Current state before selecting action:";
     PLOGD_(logwrap::FileLogger) << msg;
-    logwrap::logPlayerDetails();
-    logwrap::logBoardState();
-    logwrap::logMovPosState();
-    logwrap::logMovDirState();
+    // logwrap::logPlayerDetails();
+    // logwrap::logBoardState();
+    // logwrap::logMovPosState();
+    // logwrap::logMovDirState();
 
 
     // Handle empty action solution queue
