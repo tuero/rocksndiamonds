@@ -1128,6 +1128,9 @@ void GetOptions(int argc, char *argv[],
         else if (strcmp("USER", option_arg) == 0 || strcmp("user", option_arg) == 0) {
             options.controller_type = CONTROLLER_TYPE_USER;
         }
+        else if (strcmp("PFA", option_arg) == 0 || strcmp("pfa", option_arg) == 0) {
+            options.controller_type = CONTROLLER_TYPE_PFA;
+        }
         else if (strcmp("test_engine", option_arg) == 0) {
             options.controller_type = CONTROLLER_TYPE_TEST_SPEED;
         }
@@ -1235,6 +1238,10 @@ void GetOptions(int argc, char *argv[],
         if (option_arg == next_option) {
             options_left++;
         }
+    }
+    else if (strncmp(option, "-window", option_len) == 0)
+    {
+        options.summary_window = TRUE;
     }
 #if defined(PLATFORM_MACOSX)
     else if (strPrefix(option, "-psn"))

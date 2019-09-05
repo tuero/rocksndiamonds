@@ -44,6 +44,13 @@ extern "C"
      */
     void saveReplayLevelInfo(void);
 
+    // ----------------------- Summary Window -------------------------
+
+    /*
+     * Close the summary window.
+     */
+    void closeMapWindow(void);
+
     // --------------- Action Handler ------------------
 
     /*
@@ -57,7 +64,7 @@ extern "C"
      * Hook needs to be made in event loop, as these features are not supported
      * in the built in CE programming
      */
-    void spawnElements(void);
+    void handleCustomLevelProgramming(void);
 
 
     // -------------------- RNG ----------------------

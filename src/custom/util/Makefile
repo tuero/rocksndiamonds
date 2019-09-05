@@ -7,12 +7,14 @@
 SRCS := 	timer.cpp 								\
 			rng.cpp 								\
 			logging_wrapper.cpp 					\
-			level_programming.cpp
+			level_programming.cpp 					\
+			summary_window.cpp 
 
 OBJS :=  	timer.o 								\
 			rng.o 									\
 			logging_wrapper.o 						\
-			level_programming.o
+			level_programming.o 					\
+			summary_window.o
 
 
 

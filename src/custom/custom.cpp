@@ -17,9 +17,12 @@
 // controller
 #include "controller/controller.h"
 
-// util and logging
+// util
 #include "util/level_programming.h"
 #include "util/rng.h"
+#include "util/summary_window.h"
+
+// Logging
 #include "util/logging_wrapper.h"
 #include <plog/Log.h>
 
@@ -41,8 +44,8 @@ Controller controller;
 char *level_bd = (char *)"classic_boulderdash";
 char *level_em = (char *)"classic_emerald_mine";
 char *level_custom = (char *)"tuero";
-
 std::string levelset_survival = "custom_survival";
+
 
 std::string SEP(30, '-');
 
@@ -60,9 +63,16 @@ extern "C" void handleLevelStart() {
     PLOGI_(logwrap::FileLogger) << "Level being played: " << level.file_info.nr;
 
     // Calculate tile distances to goal
-    int goal_x, goal_y;
-    enginehelper::findGoalLocation(goal_x, goal_y);
-    enginehelper::setBoardDistances(goal_x, goal_y);
+    std::string subdir_string(leveldir_current->subdir);
+    if (subdir_string == levelset_survival) {
+        levelprogramming::customLevelProgrammingStart();
+    }
+    else {
+        // Calculate tile distances to goal
+        enginetype::GridCell goal_cell = enginehelper::findGoalLocation();
+        enginehelper::setBoardDistancesDijkstra(goal_cell);
+        // enginehelper::setNeighbours();
+    }
 
     // Initialize zorbrist tables for state hashing
     enginehelper::initZorbristTables();
@@ -79,6 +89,8 @@ extern "C" void handleLevelStart() {
     // Ensure RNG seeds reset during level start
     RNG::setEngineSeed(RNG::getEngineSeed());
     RNG::setSimulatingSeed(RNG::getSimulationSeed());
+
+    if (options.summary_window) {SummaryWindow::init();}
 }
 
 
@@ -130,6 +142,15 @@ extern "C" void saveReplayLevelInfo(void) {
 }
 
 
+// ----------------------- Summary Window -------------------------
+
+/*
+ * Close the summary window.
+ */
+extern "C" void closeMapWindow() {
+    SummaryWindow::close();
+}
+
 // ----------------------- Action Handler --------------------------
 
 /*
@@ -137,6 +158,7 @@ extern "C" void saveReplayLevelInfo(void) {
  * Implementation of solution will depend on controller type.
  */
 extern "C" int getAction() {
+    if (options.summary_window) {SummaryWindow::draw();}
     return controller.getAction();
 }
 
@@ -146,10 +168,10 @@ extern "C" int getAction() {
  * Hook needs to be made in event loop, as these features are not supported
  * in the built in CE programming
  */
-extern "C" void spawnElements() {
+extern "C" void handleCustomLevelProgramming() {
     std::string subdir_string(leveldir_current->subdir);
     if (subdir_string == levelset_survival) {
-        levelprogramming::spawnElements();
+        levelprogramming::customLevelProgrammingUpdate();
     }
 }
 
@@ -226,9 +248,8 @@ extern "C" void testEngineSpeed() {
  * Results are logged to file
  */
 extern "C" void testBFSSpeed() {
-    int goal_x, goal_y;
-    enginehelper::findGoalLocation(goal_x, goal_y);
-    enginehelper::setBoardDistances(goal_x, goal_y);
+    enginetype::GridCell goal_cell = enginehelper::findGoalLocation();
+    enginehelper::setBoardDistancesDijkstra(goal_cell);
     logwrap::setLogLevel(plog::debug);
     testenginespeed::testBfsSpeed();
 }
@@ -241,9 +262,8 @@ extern "C" void testBFSSpeed() {
  * Results are logged to file
  */
 extern "C" void testMCTSSpeed() {
-    int goal_x, goal_y;
-    enginehelper::findGoalLocation(goal_x, goal_y);
-    enginehelper::setBoardDistances(goal_x, goal_y);
+    enginetype::GridCell goal_cell = enginehelper::findGoalLocation();
+    enginehelper::setBoardDistancesDijkstra(goal_cell);
     logwrap::setLogLevel(plog::debug);
     testenginespeed::testMctsSpeed();
 }
@@ -270,9 +290,8 @@ extern "C" void testAll() {
     GameState state;
     state.setFromSimulator();
 
-    int goal_x, goal_y;
-    enginehelper::findGoalLocation(goal_x, goal_y);
-    enginehelper::setBoardDistances(goal_x, goal_y);
+    enginetype::GridCell goal_cell = enginehelper::findGoalLocation();
+    enginehelper::setBoardDistancesDijkstra(goal_cell);
 
     PLOGI_(logwrap::FileLogger) << msg;
 

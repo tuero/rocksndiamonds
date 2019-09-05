@@ -16,6 +16,13 @@ MCTS_DIR 	:= 	mcts
 MCTS_OBJ 	:= 	$(MCTS_DIR)/mcts.o 				\
 				$(MCTS_DIR)/tree_node.o	
 
+PFA_DIR 	:= 	pfa
+PFA_OBJ 	:= 	$(PFA_DIR)/abstract_graph.o 				\
+				$(PFA_DIR)/abstract_node.o 					\
+				$(PFA_DIR)/pfa_mcts.cpp 					\
+				$(PFA_DIR)/pfa_tree_node.cpp 				\
+				$(PFA_DIR)/pfa.o
+
 REPLAY_DIR 	:= 	replay
 REPLAY_OBJ 	:= 	$(REPLAY_DIR)/replay.o 		
 
@@ -28,9 +35,9 @@ USER_OBJ 	:= 	$(USER_DIR)/user.o
 # build targets
 # -----------------------------------------------------------------------------
 
-.PHONY: all clean bfs mcts replay user
+.PHONY: all clean bfs mcts pfa replay user
 
-all: bfs mcts replay user $(OBJS)
+all: bfs mcts pfa replay user $(OBJS)
 
 bfs:
 	@$(MAKE) -C $(BFS_DIR)
@@ -41,6 +48,11 @@ mcts:
 	@$(MAKE) -C $(MCTS_DIR)
 $(MCTS_OBJ):
 	@$(MAKE) -C $(MCTS_DIR)
+
+pfa:
+	@$(MAKE) -C $(PFA_DIR)
+$(PFA_OBJ):
+	@$(MAKE) -C $(PFA_DIR)
 
 replay:
 	@$(MAKE) -C $(REPLAY_DIR)
@@ -58,6 +70,7 @@ $(USER_OBJ):
 clean:
 	$(MAKE) -C $(BFS_DIR) clean
 	$(MAKE) -C $(MCTS_DIR) clean
+	$(MAKE) -C $(PFA_DIR) clean
 	$(MAKE) -C $(REPLAY_DIR) clean
 	$(MAKE) -C $(USER_DIR) clean
 	$(RM) $(OBJS)

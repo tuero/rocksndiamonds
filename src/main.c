@@ -7821,6 +7821,7 @@ int main(int argc, char *argv[])
         StartGameActions(network.enabled, setup.autorecord, level.random_seed);
     }
 
+
     // normal event loop
   EventLoop();
   CloseAllAndExit(0);

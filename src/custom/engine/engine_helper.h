@@ -8,9 +8,11 @@
 #include <chrono>
 #include <array>
 #include <vector>
+#include <map>
 #include <algorithm>
 #include <limits>
 #include <cstdint>
+#include <cstdlib>              // abs
 
 #include "engine_types.h"
 #include "action.h"
@@ -32,6 +34,8 @@ namespace enginehelper {
     extern short distances[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
     extern short max_distance;
 
+    static std::map<enginetype::GridCell, std::vector<enginetype::GridCell>> grid_neighbours_;
+
     static const uint64_t MAX_HASH = UINT64_MAX;
     static const int MAX_DIR = 32;
 
@@ -42,9 +46,25 @@ namespace enginehelper {
     enginetype::ControllerType getControllerType();
 
     /*
+     * Get the replay game name
+     */
+    std::string getReplayFileName();
+
+
+// -------------------------------------------------------
+// -------------------Level Information-------------------
+// -------------------------------------------------------
+
+
+    /*
      * Call engine functions to load the levelset
      */
     void setLevelSet();
+
+    /*
+     * Get the levelset used
+     */
+    std::string getLevelSet();
 
     /*
      * Call engine function to load the given level
@@ -57,9 +77,81 @@ namespace enginehelper {
     int getLevelNumber();
 
     /*
-     * Get the levelset used
+     * Get the level height
      */
-    std::string getLevelSet();
+    int getLevelHeight();
+
+    /*
+     * Get the level width
+     */
+    int getLevelWidth();
+
+
+
+// -------------------------------------------------------
+// -----------------Map Item Information------------------
+// -------------------------------------------------------
+
+
+    /*
+     * Get the item located at the given (x,y) grid location
+     */
+    int getGridItem(enginetype::GridCell cell);
+
+    /*
+     * Get the player grid position
+     */
+    enginetype::GridCell getPlayerPosition();
+
+    /*
+     * Get the current goal location (defined by distance of 0)
+     */
+    enginetype::GridCell getCurrentGoalLocation();
+
+    /*
+     * Returns true if a wall is on the direction the player wants to move
+     * Assumes simulator is in the current state to check
+     */
+    bool isWall(Action action);
+
+    /*
+     * Used in PFA_MCTS
+     * Checks if the player tree can expand to neighbouring gridcell given a list of allowed gridcells
+     */
+    bool canExpand(Action action, std::vector<enginetype::GridCell> &allowed_cells);
+
+    /*
+     * Check if two grid cells are neighbours
+     */
+    bool checkIfNeighbours(enginetype::GridCell left, enginetype::GridCell right);
+
+
+
+// -------------------------------------------------------
+// ---------------Custom Level Programming----------------
+// -------------------------------------------------------
+
+
+    /*
+     * Count how many of a specified element in the game
+     */
+    int countNumOfElement(int element);
+
+    /*
+     * Add the specified element to the game
+     */
+    void spawnElement(int element, int dir, enginetype::GridCell gridCell);
+
+    /*
+     * Get all empty grid cells
+     */
+    void getEmptyGridCells(std::vector<enginetype::GridCell> &emptyGridCells);
+
+
+
+// -------------------------------------------------------
+// -----------------Game Engine State---------------------
+// -------------------------------------------------------
 
     /*
      * Check if the current status of the engine is loss of life
@@ -102,32 +194,6 @@ namespace enginehelper {
     void engineSimulate();
 
     /*
-     * Returns true if a wall is on the direction the player wants to move
-     * Assumes simulator is in the current state to check
-     */
-    bool isWall(Action action);
-
-    /*
-     * Check if the grid cell at location (x,y) is empty
-     */
-    bool isGridEmpty(int x, int y);
-
-    /*
-     * Get all empty grid cells
-     */
-    void getEmptyGridCells(std::vector<enginetype::GridCell> &emptyGridCells);
-
-    /*
-     * Count how many of a specified element in the game
-     */
-    int countNumOfElement(int element);
-
-    /*
-     * Add the specified element to the game
-     */
-    void spawnElement(int element, int dir, enginetype::GridCell gridCell);
-
-    /*
      * Set flag for simulating
      * This will cause blocking actions in engine such as not rending to screen
      * Profiling shows a 10x in speed with simulator_flag set
@@ -139,6 +205,11 @@ namespace enginehelper {
      */
     bool isSimulating();
 
+
+// -------------------------------------------------------
+// -------------------State Hashing-----------------------
+// -------------------------------------------------------
+
     /*
      * Initialize Zorbrist tables, used to hash game board states
      */
@@ -149,27 +220,63 @@ namespace enginehelper {
      */
     uint64_t stateToHash();
 
+
+// -------------------------------------------------------
+// ----------------Distance Functions---------------------
+// -------------------------------------------------------
+
     /*
-     * Get the replay game name
+     * Get L1 distance between two gridcells
      */
-    std::string getReplayFileName();
+    int getL1Distance(enginetype::GridCell left, enginetype::GridCell right);
+
+    /*
+     * Get the minimum player distance in reference to given list of gridcells
+     */
+    int minDistanceToAllowedCells(std::vector<enginetype::GridCell> &goal_cells);
 
     /*
      * Get the players current shortest path distance to goal
      * This uses distance tile maps pre-calculated using Dijkstra's algorithm,
      * NOT Euclidean distance.
      */
-    float getDistanceToGoal();
+    float getPlayerDistanceToGoal();
+
+    /*
+     * Get the distance to goal from given gridcell
+     * This is set by distance metric, usually L1
+     */
+    int getGridDistanceToGoal(enginetype::GridCell grid_cell);
+
+    /*
+     * Get the player distance to the next abstract node
+     * Internal abstract node distances are set by Dijsktra, used to help
+     * player get around corners that fails by L1 shortest distance
+     */
+    int getPlayerDistanceToNextNode();
 
     /*
      * Find the grid location of the goal, given by enginetype::FIELD_GOAL
      */
-    void findGoalLocation(int &goal_x, int &goal_y);
+    enginetype::GridCell findGoalLocation();
 
     /*
      * Set the grid distances to goal using Dijkstra's algorithm (shortest path)
      */
-    void setBoardDistances(int goal_x, int goal_y);
+    void setBoardDistancesDijkstra(enginetype::GridCell goal_cell);
+
+    /*
+     * Set the grid distances to goal using L1 distance
+     */
+    void setBoardDistancesL1(enginetype::GridCell goal_cell);
+
+    /*
+     * Used in PFA_MCST
+     * Set the internal grid cell distances to goal in abstract node
+     * This helps MCTS get around corners that fails with just L1
+     */
+    void setAbstractNodeDistances(std::vector<enginetype::GridCell> goal_cells,
+    std::vector<enginetype::GridCell> allowed_cells);
 
 
 

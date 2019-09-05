@@ -1,7 +1,7 @@
 
 #include "tree_node.h"
 
-typedef std::unique_ptr<TreeNode> Pointer;
+// typedef std::unique_ptr<TreeNode> Pointer;
 
 TreeNode::TreeNode(TreeNode* parent, const std::vector<Action> &actions_from_start)
     :  parent(parent), actions_from_start(actions_from_start) 
@@ -98,7 +98,7 @@ TreeNode* TreeNode::expand() {
     // Simulator is set to the child state, so determine what the available actions
     // the child has
     child.get()->setActions();
-    child.get()->distance_to_goal = enginehelper::getDistanceToGoal();
+    child.get()->distance_to_goal = enginehelper::getPlayerDistanceToGoal();
 
     child.get()->is_terminal = getTerminalStatusFromEngine();
     child.get()->is_deadly = getDeadlyStatusFromEngine();
@@ -149,7 +149,7 @@ TreeNode* TreeNode::getChild(unsigned int index) {
     return children[index].get();
 }
 
-Pointer TreeNode::getChildByAction(Action action) {
+TreeNode::Pointer TreeNode::getChildByAction(Action action) {
     for (unsigned int i = 0; i < children.size(); i++) {
         if (children[i].get()->getActionTaken() == action) {
             return std::move(children[i]);

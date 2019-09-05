@@ -20,12 +20,31 @@ namespace enginetype{
     typedef std::array<short, MAX_NUM_AMOEBA> amoeba_short;
 
 
-    struct GridCell{int x; int y;};
+    struct GridCell{
+        int x; 
+        int y;
+
+        bool operator<(const GridCell& rhs) const {
+            return rhs.x < x || (rhs.x == x && rhs.y < y);
+        }
+
+        bool operator==(const GridCell& rhs) const {
+            return (x == rhs.x && y == rhs.y);
+        }
+    };
+
+    class GridCellHash {
+    public:
+        std::size_t operator()(const GridCell& grid_cell) const {
+            return grid_cell.y * MAX_LEV_FIELDY + grid_cell.x;
+        }
+    };
 
 
     // ------------- Controller types -------------
     enum ControllerType{BFS=CONTROLLER_TYPE_BFS, MCTS=CONTROLLER_TYPE_MCTS, 
-                        USER=CONTROLLER_TYPE_USER, REPLAY=CONTROLLER_TYPE_REPLAY};
+                        USER=CONTROLLER_TYPE_USER, REPLAY=CONTROLLER_TYPE_REPLAY,
+                        PFA=CONTROLLER_TYPE_PFA};
 
     enum Statistics{RUN_TIME, COUNT_EXPANDED_NODES, COUNT_SIMULATED_NODES, MAX_DEPTH};
 
@@ -41,6 +60,10 @@ namespace enginetype{
 
     // ------------- Field Values -------------
     static const int FIELD_EMPTY        = 0;
+    static const int FIELD_BD_STEEL_WALL = 13;
+    static const int FIELD_BD_NORMAL_WALL = 105;
+    static const int FIELD_EM_STEEL_WALL = 13;
+    static const int FIELD_EM_NORMAL_WALL = 2;
     static const int FIELD_YAMYAM       = 11;
     static const int FELD_DIAMOND       = 56;
     static const int FIELD_WALL         = 105;

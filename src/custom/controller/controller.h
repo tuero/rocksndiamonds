@@ -19,6 +19,7 @@
 #include "mcts/mcts.h"
 #include "replay/replay.h"
 #include "user/user.h"
+#include "pfa/pfa.h"
 
 
 class Controller {
