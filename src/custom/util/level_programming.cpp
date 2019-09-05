@@ -88,7 +88,7 @@ void handleSurvivalUpdate() {
     // With every new diamond comes another Yamyam
     if (count_diamonds == 0) {
         spawnDiamond();
-        if (count_yamyam < 20) {spawnYamYam();}
+        if (count_yamyam < 15) {spawnYamYam();}
     }
 }
 

@@ -49,7 +49,7 @@ private:
     // Statistics
     unsigned int count_simulated_nodes = 0;
     unsigned int count_expanded_nodes = 0;
-    unsigned int max_depth = 0;
+    int max_depth = 0;
 
     // Misc
     unsigned int calls_since_rest = 0;
@@ -74,6 +74,8 @@ private:
 
     PFATreeNode* get_best_uct_child(PFATreeNode* node);
 
+    PFATreeNode* getBestChild(PFATreeNode* current);
+
     std::string childValues(PFATreeNode* current);
 
 public:
@@ -83,10 +85,15 @@ public:
     void handleEmpty(std::vector<Action> &currentSolution, std::vector<Action> &forwardSolution, 
         AbstractNode* current_abstract_node, AbstractNode* goal_abstract_node);
 
+    void handleEmpty(std::vector<Action> &currentSolution, std::vector<Action> &forwardSolution, 
+        std::deque<AbstractNode*> abstract_path, AbstractNode* goal_abstract_node);
+
     void reset(std::vector<Action> &next_action);
 
     void run(std::vector<Action> &currentSolution, std::vector<Action> &forwardSolution, 
         std::map<enginetype::Statistics, int> &statistics);    
+
+    enginetype::GridCell getRootPlayerCell();
 
 };
 

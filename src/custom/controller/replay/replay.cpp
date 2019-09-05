@@ -35,7 +35,7 @@ void Replay::handleEmpty(std::vector<Action> &currentSolution, std::vector<Actio
     (void)forwardSolution;
     abstract_graph.init();
     abstract_graph.abstract();
-    int abstract_level = 4;
+    int abstract_level = abstract_graph.getLevelUsed();
     grid_representation = abstract_graph.getAbstractRepresentation(abstract_level, true);
     SummaryWindow::grid_representation = grid_representation;
 }

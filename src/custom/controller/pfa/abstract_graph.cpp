@@ -67,6 +67,8 @@ AbstractNode* AbstractGraph::getTopLevelNode() {
  * starting position. Used for pathfinding.
  */
 AbstractNode* AbstractGraph::getStartNode(int level) {
+    if (level == -1) {level = level_used_;}
+
     if (level < 0 || level > top_level_) {
         PLOGE_(logwrap::FileLogger) << "Invalid level.";
         PLOGE_(logwrap::ConsolLogger) << "Invalid level.";
@@ -102,6 +104,8 @@ AbstractNode* AbstractGraph::getStartNode(int level) {
 void AbstractGraph::getNodesRecursive(AbstractNode* node, int level,
     std::vector<AbstractNode*> &nodes_at_level) 
 {
+    if (level == -1) {level = level_used_;}
+
     // Base case, at level.
     if (node->getLevel() == level) {
         nodes_at_level.push_back(node);
@@ -120,6 +124,8 @@ void AbstractGraph::getNodesRecursive(AbstractNode* node, int level,
  * Get the abstract nodes for a given level.
  */
 std::vector<AbstractNode*> AbstractGraph::getNodesAtLevel(int level) {
+    if (level == -1) {level = level_used_;}
+
     std::vector<AbstractNode*> nodes_at_level;
     if (level < 0 || level > top_level_) {return nodes_at_level;}
 
@@ -135,6 +141,8 @@ std::vector<AbstractNode*> AbstractGraph::getNodesAtLevel(int level) {
  * Get the abstract node ID for each gridcell at the specified level
  */
 std::vector<std::vector<int>> AbstractGraph::getAbstractRepresentation(int level, bool min_colouring) {
+    if (level == -1) {level = level_used_;}
+
     int width = enginehelper::getLevelWidth();
     int height = enginehelper::getLevelHeight();
 
@@ -198,6 +206,71 @@ void AbstractGraph::recordRepresentedCells(AbstractNode* node) {
     int id = node->getId();
     for (auto const & grid_cell : node->getRepresentedCells()) {
         rep_map_[grid_cell] = id;
+    }
+}
+
+
+void AbstractGraph::findCycleFour() {
+    adj_matrix_.clear();
+    adj_forward_.clear();
+    adj_backward_.clear();
+
+    int node_num = 0;
+    for (auto it = current_level_.begin(); it != current_level_.end(); ++it) {
+        adj_forward_[node_num] = it->first;
+        adj_backward_[it->first] = node_num;
+        node_num += 1;
+    }
+
+    adj_matrix_.insert(adj_matrix_.end(), node_num, std::vector<std::array<int, 2>>(node_num, {0, -1}));
+
+    // https://mathoverflow.net/questions/16393/finding-a-cycle-of-fixed-length
+    // Raphael Yuster, Uri Zwick: Finding Even Cycles Even Faster. SIAM J. Discrete Math. 10(2): 209-222 (1997)
+    for (int i = 0; i < node_num; i++) {
+        int node_id = adj_forward_[i];
+
+        if (current_level_.find(node_id) == current_level_.end()) {continue;}
+
+        AbstractNode* node = current_level_[node_id].get();
+        std::vector<AbstractNode*> neighbours = node->getNeighboursVec();
+
+        for (int n1 = 0; n1 < (int)neighbours.size(); n1++) {
+            for (int n2 = n1+1; n2 < (int)neighbours.size(); n2++) {
+                if (current_level_.find(neighbours[n1]->getId()) == current_level_.end()) {continue;}
+                if (current_level_.find(neighbours[n2]->getId()) == current_level_.end()) {continue;}
+
+                int j = adj_backward_[neighbours[n1]->getId()];
+                int k = adj_backward_[neighbours[n2]->getId()];
+                if (j > k) {std::swap(j,k);}
+
+                // 4-Cycle found, of nodes i, j, k
+                if (adj_matrix_[j][k][0] == 1) {
+                    // Find the 4th node
+                    int l = adj_matrix_[j][k][1];
+
+                    // Create clique
+                    std::vector<Pointer> children;
+                    children.push_back(std::move(current_level_[node_id]));
+                    children.push_back(std::move(current_level_[neighbours[n1]->getId()]));
+                    children.push_back(std::move(current_level_[neighbours[n2]->getId()]));
+                    children.push_back(std::move(current_level_[adj_forward_[l]]));
+
+                    makeNode(children);
+
+                    // Erase clique from current level
+                    current_level_.erase(node_id);
+                    current_level_.erase(neighbours[n1]->getId());
+                    current_level_.erase(neighbours[n2]->getId());
+                    current_level_.erase(adj_forward_[l]);
+
+                    adj_matrix_[std::min(i, l)][std::max(i, l)] = {0, -1};
+                    adj_matrix_[j][k] = {0, -1};
+                } 
+                else {
+                    adj_matrix_[j][k] = {1, i};
+                }
+            }
+        }
     }
 }
 
@@ -574,6 +647,8 @@ void AbstractGraph::logGraph() {
 
 
 void AbstractGraph::logGraphLevel(int level) {
+    if (level == -1) {level = level_used_;}
+
     std::deque<AbstractNode*> current_level;
     std::string header = "----------- Abstract Graph Display -----------";
     std::string msg;
@@ -650,6 +725,7 @@ void AbstractGraph::abstract() {
         next_level_.clear();
         top_level_ += 1;
 
+        findCycleFour();
         findCliquesThree();
         findCliquesTwo();
         findCliquesOne();
@@ -661,6 +737,9 @@ void AbstractGraph::abstract() {
         // Sanity check
         // PLOGE_IF_(logwrap::FileLogger, !current_level_.empty()) << "Not all nodes could be abstracted.";
     }
+
+    level_used_ = top_level_ / 2;
+
     timer.stop();
 
     LOGI_(logwrap::FileLogger) << "Abstraction complete.";
@@ -685,4 +764,9 @@ void AbstractGraph::abstract() {
  */
 int AbstractGraph::getLevel() {
     return top_level_;
+}
+
+
+int AbstractGraph::getLevelUsed() {
+    return level_used_;
 }

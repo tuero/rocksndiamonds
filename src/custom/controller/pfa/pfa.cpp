@@ -38,6 +38,7 @@ void PFA::findPath(int abstract_level) {
 
     // Starting node
     start_node->setPathParent(nullptr);
+    start_node->setValueG(0);
     open_queue.push(start_node);
     open_map[start_node->getId()] = start_node;
 
@@ -50,8 +51,8 @@ void PFA::findPath(int abstract_level) {
 
 
         // consistent heuristic node skip
-        auto search = closed.find(node->getId());
-        if (search != closed.end()) {continue;}
+        // auto search = closed.find(node->getId());
+        // if (search != closed.end()) {continue;}
 
         closed[node->getId()] = node;
 
@@ -76,29 +77,57 @@ void PFA::findPath(int abstract_level) {
             AbstractNode* child_node = child.second;
             float new_g = std::numeric_limits<float>::max();
 
-            if (node->getValueG() < new_g) {
-                new_g = node->getValueG() + 1;
-            }
+            // if (node->getValueG() < new_g) {
+            //     // new_g = node->getValueG() + 1;
+            //     new_g = node->getValueG() + std::abs(node->getValueH() - child_node->getValueH());
+            // }
 
-            auto search_closed = closed.find(child_id);
-            if (search_closed != closed.end()) {
+            // auto search_closed = closed.find(child_id);
+            // if (search_closed != closed.end()) {
+            //     if (child_node->getValueG() <= new_g) {continue;}
+            //     closed.erase(child_node->getId());
+            // }
+
+            // auto search_open = open_map.find(child_id);
+            // if (search_open != open_map.end()) {
+            //     if (child_node->getValueG() <= new_g) {continue;}
+            //     open_map.erase(child_node->getId());
+            // }
+
+            // // Set g and parent
+            // child_node->setValueG(new_g);
+            // child_node->setPathParent(node);
+
+            // // Save children
+            // open_queue.push(child_node);
+            // open_map[child_node->getId()] = child_node;
+
+
+
+            // ------new
+            new_g = node->getValueG() + std::abs(node->getValueH() - child_node->getValueH());
+            // new_g = node->getValueG() + 1;
+            if (open_map.find(child_id) != open_map.end()) {
                 if (child_node->getValueG() <= new_g) {continue;}
+                child_node->setValueG(new_g);
+                child_node->setPathParent(node);
+            }
+            else if (closed.find(child_id) != closed.end()) {
+                if (child_node->getValueG() <= new_g) {continue;}
+                child_node->setValueG(new_g);
+                child_node->setPathParent(node);
                 closed.erase(child_node->getId());
+
+                open_queue.push(child_node);
+                open_map[child_node->getId()] = child_node;
+            }
+            else {
+                child_node->setValueG(new_g);
+                child_node->setPathParent(node);
+                open_queue.push(child_node);
+                open_map[child_node->getId()] = child_node;
             }
 
-            auto search_open = open_map.find(child_id);
-            if (search_open != open_map.end()) {
-                if (child_node->getValueG() <= new_g) {continue;}
-                open_map.erase(child_node->getId());
-            }
-
-            // Set g and parent
-            child_node->setValueG(new_g);
-            child_node->setPathParent(node);
-
-            // Save children
-            open_queue.push(child_node);
-            open_map[child_node->getId()] = child_node;
         }
     }
 
@@ -116,6 +145,11 @@ void PFA::handleLevelStart() {
     past_goal_ = enginehelper::getCurrentGoalLocation();
     abstract_graph.init();
     abstract_graph.abstract();
+
+    abstract_level = abstract_graph.getLevelUsed();
+
+    PLOGI_(logwrap::FileLogger) << "Level being used: " << abstract_level;
+    PLOGI_(logwrap::ConsolLogger) << "Level being used: " << abstract_level;
     abstract_graph.logGraphLevel(abstract_level);
 
     abstract_path.clear();
@@ -153,6 +187,7 @@ void PFA::sendAbstractPathToSummaryWindow() {
 
 void PFA::setNodeFromPath() {
     enginetype::GridCell player_cell = enginehelper::getPlayerPosition();
+
     while (!abstract_path.empty()) {
         std::vector<enginetype::GridCell> rep_cells = abstract_path.front()->getRepresentedCells();
 
@@ -175,21 +210,37 @@ void PFA::setNodeFromPath() {
 
 
 void PFA::handleEmpty(std::vector<Action> &currentSolution, std::vector<Action> &forwardSolution) {
+    // Go to state MCTS is currently in
+    GameState reference_state;
+    reference_state.setFromSimulator();
+    enginehelper::setSimulatorFlag(true);
+    for (unsigned int i = 0; i < forwardSolution.size(); i++) {
+        enginehelper::setEnginePlayerAction(forwardSolution[i]);
+        enginehelper::engineSimulateSingle();
+    }
+
+    // Check if we need to rerun A* on abstract path
     enginetype::GridCell current_goal = enginehelper::getCurrentGoalLocation();
     if (past_goal_.x != current_goal.x || past_goal_.y != current_goal.y) {
         abstract_graph.setGoal(current_goal);
-        // abstract_graph.logGraphLevel(4);
         abstract_path.clear();
         findPath(abstract_level);
+        abstract_graph.logGraphLevel(abstract_level);
     }
     past_goal_ = current_goal;
 
     // We are in the abstract node which contains the goal
     setNodeFromPath();
 
+
+    // Restore back to current state
+    reference_state.restoreSimulator();
+    enginehelper::setSimulatorFlag(false);
+
     sendAbstractPathToSummaryWindow();
 
-    pfa_mcts.handleEmpty(currentSolution, forwardSolution, current_abstract_node, goal_abstract_node);
+    // pfa_mcts.handleEmpty(currentSolution, forwardSolution, current_abstract_node, goal_abstract_node);
+    pfa_mcts.handleEmpty(currentSolution, forwardSolution, abstract_path, goal_abstract_node);
 }
 
 

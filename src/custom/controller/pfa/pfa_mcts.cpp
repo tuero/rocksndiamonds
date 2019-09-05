@@ -72,7 +72,7 @@ PFATreeNode* PFA_MCTS::get_best_uct_child(PFATreeNode* node) {
     float epsilon = 0.00001;
 
     float best_utc_score = std::numeric_limits<float>::min();
-    PFATreeNode* best_node = NULL;
+    PFATreeNode* best_node = nullptr;
 
     // iterate all immediate children and find best UTC score
     unsigned int num_children = node->getChildCount();
@@ -90,6 +90,27 @@ PFATreeNode* PFA_MCTS::get_best_uct_child(PFATreeNode* node) {
     }
 
     return best_node;
+}
+
+
+PFATreeNode* PFA_MCTS::getBestChild(PFATreeNode* current) {
+    float best_score = std::numeric_limits<float>::min();
+    PFATreeNode* current_child = nullptr;
+    PFATreeNode* best_child = nullptr;
+
+    for (unsigned int i = 0; i < current->getChildCount(); i++) {
+        current_child = current->getChild(i);
+        if (current_child->isDeadly()) {continue;}
+
+        // Better child node found
+        float value = nodeValue(current_child);
+        if (value > best_score) {
+            best_score = value;
+            best_child = current_child;
+        }
+    }
+
+    return best_child;
 }
 
 
@@ -124,11 +145,26 @@ float PFA_MCTS::nodeValue(PFATreeNode* current) {
     float survival_frequency = current->getSurvivalFrequency();
     int min_depth = current->getMinDepthToGoal();
 
-    if (min_depth == std::numeric_limits<int>::max()) {min_depth = max_depth;}
+    // if (min_depth == std::numeric_limits<int>::max()) {min_depth = max_depth;}
+    // value += (max_depth - min_depth) * 10;
 
-    value += max_depth - min_depth;
+    if (min_depth != std::numeric_limits<int>::max()) {
+        value += (max_depth - min_depth) * 10;
+    }
+
     value += allowed_cells_.size() - l1_distance;
-    value += survival_frequency * 10;
+    value += survival_frequency * 50;
+
+    // if (value == 18.00) {
+    //     std::cout << "value: " << value << std::endl;
+    //     std::cout << "max_depth: " << max_depth << ", min_depth: " << min_depth;
+    //     std::cout << ", allowed_cells_: " << allowed_cells_.size() << ", l1_distance: " << l1_distance;
+    //     std::cout << ", survival_frequency: " << survival_frequency << std::endl; 
+    //     std::cout << "A: " << (max_depth - min_depth) * 10;
+    //     std::cout << ", B: " << allowed_cells_.size() - l1_distance;
+    //     std::cout << ", C: " << survival_frequency * 10 << std::endl;
+
+    // }
 
     return value;
 }
@@ -142,9 +178,9 @@ std::string PFA_MCTS::childValues(PFATreeNode* current) {
     for (unsigned int i = 0; i < current->getChildCount(); i++) {
         current_child = current->getChild(i);
         int visit_count = current_child->getVisitCount();
-        int l1_distance = current->getL1Distance();
-        float survival_frequency = current->getSurvivalFrequency();
-        int min_depth = current->getMinDepthToGoal();
+        int l1_distance = current_child->getL1Distance();
+        float survival_frequency = current_child->getSurvivalFrequency();
+        int min_depth = current_child->getMinDepthToGoal();
 
         if (min_depth == std::numeric_limits<int>::max()) {min_depth = -1;}
 
@@ -252,6 +288,60 @@ void PFA_MCTS::handleEmpty(std::vector<Action> &currentSolution, std::vector<Act
 }
 
 
+void PFA_MCTS::handleEmpty(std::vector<Action> &currentSolution, std::vector<Action> &forwardSolution,
+     std::deque<AbstractNode*> abstract_path, AbstractNode* goal_abstract_node) 
+{
+    currentSolution = forwardSolution;
+    std::string msg = "Resetting MCTS tree.";
+    PLOGD_(logwrap::FileLogger) << msg;
+    PLOGD_(logwrap::ConsolLogger) << msg;
+
+    // current_abstract_node_ = current_abstract_node;
+    // goal_abstract_node_ = goal_abstract_node;
+    AbstractNode* current_abstract_node = abstract_path[0];
+    allowed_cells_.clear();
+    goal_cells_.clear();
+
+    // Set cells which we are restricted to being in
+    for (auto const & node : abstract_path) {
+        for (auto const & cell : node->getRepresentedCells()) {
+            allowed_cells_.push_back(cell);
+        }
+    }
+    if (current_abstract_node != goal_abstract_node) {
+      for (auto const & cell : goal_abstract_node->getRepresentedCells()) {
+            allowed_cells_.push_back(cell);
+        }  
+    }
+
+    // If we are in goal abstract node, then we only care about the goal tile
+    if (current_abstract_node == goal_abstract_node) {
+        assert(goal_abstract_node->representsGoal());
+        for (auto const & grid_cell : goal_abstract_node->getRepresentedCells()) {
+            if (enginehelper::getGridDistanceToGoal(grid_cell) == 0) {
+                goal_cells_.push_back(grid_cell);
+                break;
+            }
+        }
+    }
+    // Otherwise, goal nodes are the nodes which boarder our current abstract node
+    else {
+        std::vector<enginetype::GridCell> current_cells = current_abstract_node->getRepresentedCells();
+        std::vector<enginetype::GridCell> goal_cells = goal_abstract_node->getRepresentedCells();
+        for (auto const & goal_cell : goal_cells) {
+            for (auto const & current_cell : current_cells) {
+                if (enginehelper::checkIfNeighbours(goal_cell, current_cell)) {
+                    goal_cells_.push_back(goal_cell);
+                    break;
+                }
+            }
+        }
+    }
+
+    enginehelper::setAbstractNodeDistances(goal_cells_, allowed_cells_);
+    reset(currentSolution);
+}
+
 
 void PFA_MCTS::logCurrentStats() {
     PLOGD_(logwrap::FileLogger) << "Time remaining: " << timer.getTimeLeft(max_time);
@@ -315,6 +405,9 @@ void PFA_MCTS::run(std::vector<Action> &currentSolution, std::vector<Action> &fo
         rootSavedState.restoreSimulator();
         logCurrentStats();
 
+        // msg = "Child node values:\n" + childValues(root.get());
+        // PLOGD_(logwrap::ConsolLogger) << msg;
+
         // Select child based on policy and forward engine simulator
         while (!current->getTerminalStatusFromEngine() && current->allExpanded()) {
             current = get_best_uct_child(current);
@@ -342,33 +435,43 @@ void PFA_MCTS::run(std::vector<Action> &currentSolution, std::vector<Action> &fo
 
         // Step 3: Simulation
         // The expansion step sets the simulator to the expanded node's state
-        num_simulations = 0;
-        // for (unsigned int i = 0; i < num_simulations; i++) {
-        //     reference_state.restoreSimulator();
+        num_simulations = 5;
+        int min_depth = current->getMinDepthToGoal();
+        for (unsigned int i = 0; i < num_simulations; i++) {
+            reference_state.restoreSimulator();
+            int current_depth = current->getDepth();
+            if (!current->isTerminal()) {
+                max_iterations_depth = 3;
+                for (unsigned int t = 0; t < max_iterations_depth; t++) {
+                    // Terminal condition in simulator
+                    if (enginehelper::engineGameFailed() || enginehelper::engineGameSolved()) {
+                        break;
+                    }
 
-        //     if (!current->isTerminal()) {
-        //         for (unsigned int t = 0; t < max_iterations_depth; t++) {
-        //             // Terminal condition in simulator
-        //             if (enginehelper::engineGameFailed() || enginehelper::engineGameSolved()) {
-        //                 break;
-        //             }
+                    if (!enginehelper::canExpand(current->getActionTaken(), allowed_cells_)) {
+                        break;
+                    }
 
-        //             // Apply random action
-        //             // This is biased but will fix later
-        //             enginehelper::setEngineRandomPlayerAction();
-        //             enginehelper::engineSimulate();
-        //             count_simulated_nodes += 1;
-        //         }
-        //     }
+                    if (enginehelper::getPlayerDistanceToNextNode() == 0) {
+                        break;
+                    }
 
-        //     int min_distance = enginehelper::minDistanceToAllowedCells(goal_cells_);
-        //     times_goal_found += (min_distance == 0);
-
-        //     times_died += enginehelper::engineGameFailed() ? sim_denom : 0;
-        // }
+                    // Apply random action
+                    // This is biased but will fix later
+                    enginehelper::setEnginePlayerAction(current->getActionTaken());
+                    enginehelper::engineSimulate();
+                    current_depth += 1;
+                    count_simulated_nodes += 1;
+                    max_depth = (current_depth > max_depth) ? current_depth : max_depth;
+                }
+                if (enginehelper::getPlayerDistanceToNextNode() == 0) {
+                    min_depth = std::min(min_depth, current_depth);
+                }
+            }
+        }
 
         // Step 4: Backpropagation
-        int min_distance_found = current->getMinDepthToGoal();
+        int min_distance_found = std::min(current->getMinDepthToGoal(), min_depth);
         float survival_frequency = current->getSurvivalFrequency();
         int depth = current->getDepth();
         while (current != nullptr) {
@@ -396,12 +499,15 @@ void PFA_MCTS::run(std::vector<Action> &currentSolution, std::vector<Action> &fo
     // Get best child and its associated action
     rootSavedState.restoreSimulator();
     best_child = selectMostVisitedChild(root.get());
+    // best_child = getBestChild(root.get());
     Action best_action = (best_child == nullptr ? Action::noop : best_child->getActionTaken());
 
     // Log root child nodes along with their current valuation
-    msg = "Child node values:\n" + childValues(root.get());
+    msg = "Max Depth: " + std::to_string(max_depth) + " ";
+    msg += "Child node values:\n" + childValues(root.get());
     PLOGD_(logwrap::FileLogger) << msg;
-    PLOGD_IF_(logwrap::ConsolLogger, calls_since_rest == 8) << msg;
+    // PLOGD_IF_(logwrap::ConsolLogger, calls_since_rest == 8) << msg;
+    PLOGI_IF_(logwrap::ConsolLogger, calls_since_rest == 8) << msg;
 
     // Put simulator back to original state
     startingState.restoreSimulator();
@@ -412,4 +518,17 @@ void PFA_MCTS::run(std::vector<Action> &currentSolution, std::vector<Action> &fo
     for (unsigned int i = 0; i < enginetype::ENGINE_RESOLUTION; i++) {
         forwardSolution.push_back(best_action);
     }
+}
+
+
+enginetype::GridCell PFA_MCTS::getRootPlayerCell() {
+    GameState reference_state;
+    reference_state.setFromSimulator();
+
+    rootSavedState.restoreSimulator();
+    enginetype::GridCell player_cell = enginehelper::getPlayerPosition();
+
+    reference_state.restoreSimulator();
+
+    return player_cell;
 }

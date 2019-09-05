@@ -8,6 +8,7 @@
 #include <array>
 #include <deque>
 #include <map>
+#include <unordered_map>
 #include <set>
 #include <algorithm>
 #include <memory>
@@ -29,10 +30,14 @@ class AbstractGraph {
 private:
     int id_;                // Current ID used for lastly created node (should always increment).
     int top_level_;         // Level number of current abstracted level (should always increment).
+    int level_used_;
     std::map<int, Pointer> current_level_;              // Current level of nodes abstracted.
     std::map<int, Pointer> next_level_;                 // Temporary container while next level is built.
     std::map<enginetype::GridCell, int> rep_map_;       // Fast access node ID who represents given grid cell
 
+    std::unordered_map<int, int> adj_forward_;
+    std::unordered_map<int, int> adj_backward_;
+    std::vector<std::vector<std::array<int, 2>>> adj_matrix_;
 
     /*
      * Make an abstract node representing the given children, and
@@ -50,6 +55,8 @@ private:
      * Helper to recursively get nodes at a g vien level
      */
     void getNodesRecursive(AbstractNode* node, int level, std::vector<AbstractNode*> &nodes_at_level);
+
+    void findCycleFour();
 
     /*
      * Check for cliques of size 3 and create an abstract node.
@@ -117,22 +124,25 @@ public:
      * Get the node at the specified abstraction level which contains the player's 
      * starting position. Used for pathfinding.
      */
-    AbstractNode* getStartNode(int level);
+    AbstractNode* getStartNode(int level = -1);
 
     /*
      * Get the abstract nodes for a given level.
      */
-    std::vector<AbstractNode*> getNodesAtLevel(int level);
+    std::vector<AbstractNode*> getNodesAtLevel(int level = -1);
 
     /*
      * Get the abstract node ID for each gridcell at the specified level
      */
-    std::vector<std::vector<int>> getAbstractRepresentation(int level, bool min_colouring=false);
+    std::vector<std::vector<int>> getAbstractRepresentation(int level = -1, bool min_colouring=false);
 
     /*
      * Get the number of abstracted levels
      */
     int getLevel();
+
+
+    int getLevelUsed();
 
     /*
      * Set the goal location.
@@ -147,7 +157,7 @@ public:
     void logGraph();
 
 
-    void logGraphLevel(int level);
+    void logGraphLevel(int level = -1);
 
 
 };

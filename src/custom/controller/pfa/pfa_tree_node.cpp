@@ -102,6 +102,7 @@ PFATreeNode* PFATreeNode::expand(std::vector<enginetype::GridCell> &allowed_cell
     // Reference to parent state (current), as we will be simulating the child node
     // due to the stochastic nature
     GameState parent_state;
+    GameState alive_state;
     parent_state.setFromSimulator();
 
     // Simulate to child
@@ -110,10 +111,16 @@ PFATreeNode* PFATreeNode::expand(std::vector<enginetype::GridCell> &allowed_cell
         enginehelper::setEnginePlayerAction(child_action);
         enginehelper::engineSimulate();
         if (!getDeadlyStatusFromEngine()) {
+            if (!did_survive) {alive_state.setFromSimulator();}
             child_node->survival_frequency_ += 0.2;
             did_survive = true;
         }
         if (i < 4) {parent_state.restoreSimulator();}
+    }
+
+    // Ensure we are in a alive state if possible
+    if (did_survive && getDeadlyStatusFromEngine()) {
+        alive_state.restoreSimulator();
     }
 
     child_node->survival_frequency_ = child_node->survival_frequency_ / 1.1;
@@ -176,6 +183,10 @@ PFATreeNode::Pointer PFATreeNode::getChildByAction(Action action) {
 
 void PFATreeNode::setParent(PFATreeNode* parent) {
     this->parent = parent;
+}
+
+void PFATreeNode::updateMinDistance(int min_distance_found) {
+    depth_goal_found = std::min(depth_goal_found, min_distance_found);
 }
 
 

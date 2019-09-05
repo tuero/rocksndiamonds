@@ -213,6 +213,17 @@ const std::map<int, AbstractNode*> & AbstractNode::getNeighbours() {
     return neighbours_;
 }
 
+/*
+ * Get the neighbour abstract nodes at the same level of abstraction.
+ */
+std::vector<AbstractNode*> AbstractNode::getNeighboursVec() {
+    std::vector<AbstractNode*> neighbours;
+    for (auto const &neighbour : neighbours_) {
+        neighbours.push_back(neighbour.second);
+    }
+    return neighbours;
+}
+
 
 /*
  * Get the grid cells the current node represents through abstraction.

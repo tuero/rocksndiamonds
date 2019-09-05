@@ -113,7 +113,7 @@ public:
     float getSurvivalFrequency() const;
 
 
-
+    void updateMinDistance(int min_distance_found);
 
     void setParent(PFATreeNode* parent);
 

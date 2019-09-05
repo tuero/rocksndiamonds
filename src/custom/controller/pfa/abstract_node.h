@@ -137,6 +137,11 @@ public:
     const std::map<int, AbstractNode*> & getNeighbours();
 
     /*
+     * Get the neighbour abstract nodes at the same level of abstraction.
+     */
+    std::vector<AbstractNode*> getNeighboursVec();
+
+    /*
      * Get the grid cells the current node represents through abstraction.
      */
     const std::vector<enginetype::GridCell> & getRepresentedCells() const;
@@ -148,7 +153,7 @@ public:
 class CompareAbstractNode {
 public:
     bool operator() (AbstractNode* left, AbstractNode* right) {
-        return left->getValueF() < right->getValueF();
+        return left->getValueF() > right->getValueF();
     }
 };
 

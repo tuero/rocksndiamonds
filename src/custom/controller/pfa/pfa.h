@@ -30,7 +30,7 @@
 
 class PFA : public BaseController {
 private:
-    int abstract_level = 4;
+    int abstract_level;
     Timer timer;
     AbstractGraph abstract_graph;
     PFA_MCTS pfa_mcts;
