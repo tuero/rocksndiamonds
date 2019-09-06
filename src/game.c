@@ -15757,10 +15757,6 @@ static void RedrawGameButtonsExt(boolean on_tape)
   for (i = 0; i < NUM_GAME_BUTTONS; i++)
     if (!on_tape || gamebutton_info[i].allowed_on_tape)
       RedrawGadget(game_gadget[i]);
-
-  // RedrawGadget() may have set REDRAW_ALL if buttons are defined off-area
-  if (redraw_mask & REDRAW_ALL)
-    redraw_mask = REDRAW_FIELD | REDRAW_DOORS;
 }
 
 static void SetGadgetState(struct GadgetInfo *gi, boolean state)

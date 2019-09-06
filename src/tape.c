@@ -1409,10 +1409,6 @@ void RedrawTapeButtons(void)
 
   if (tape.show_game_buttons)
     RedrawGameButtonsOnTape();
-
-  // RedrawGadget() may have set REDRAW_ALL if buttons are defined off-area
-  if (redraw_mask & REDRAW_ALL)
-    redraw_mask = REDRAW_FIELD | REDRAW_DOORS;
 }
 
 void RedrawOrRemapTapeButtons(void)
