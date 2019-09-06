@@ -1411,7 +1411,8 @@ void RedrawTapeButtons(void)
     RedrawGameButtonsOnTape();
 
   // RedrawGadget() may have set REDRAW_ALL if buttons are defined off-area
-  redraw_mask &= ~REDRAW_ALL;
+  if (redraw_mask & REDRAW_ALL)
+    redraw_mask = REDRAW_FIELD | REDRAW_DOORS;
 }
 
 void RedrawOrRemapTapeButtons(void)
