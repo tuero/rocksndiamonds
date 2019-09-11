@@ -28,7 +28,7 @@ clean:
 
 
 .depend: Makefile
-	$(CCP) $(CPPFLAGS) -MM *.cpp $(DEP_OBJ) > .depend
+	$(CCP)  $(CPPFLAGS) -MM *.cpp $(DEP_OBJ) > .depend
 
 -include .depend
 

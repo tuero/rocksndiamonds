@@ -1,8 +1,17 @@
+/**
+ * @file: action.h
+ *
+ * @brief: Action enum following engine specification, with related methods.
+ * 
+ * @author: Jake Tuero
+ * Date: August 2019
+ * Contact: tuero@ualberta.ca
+ */
+
 #ifndef ACTION_H
 #define ACTION_H
 
 
-// ------------- Includes  -------------
 #include <array>
 #include <string>
 
@@ -17,17 +26,23 @@ enum Action {noop=enginetype::ENGINE_NOOP, left=enginetype::ENGINE_LEFT, right=e
 static const Action ALL_ACTIONS[] = {Action::right, Action::down, Action::left, Action::up, Action::noop};
 
 /*
- * Get string representation of action
+ * Get string representation of action.
+ *
+ * @param str The action string
  */
 std::string actionToString(const Action action);
 
 /*
- * Get string representation of action
+ * Get the enum representation of the action.
+ *
+ * @param str The action string
  */
-Action stringToAction(const std::string str);
+Action stringToAction(const std::string &str);
 
 /*
- * Get cardinal direction opposite to the input action
+ * Get cardinal direction opposite to the input action.
+ *
+ * @param action The given action
  */
 Action actionGetOpposite(const Action action);
 

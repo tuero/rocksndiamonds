@@ -955,6 +955,7 @@ void GetOptions(int argc, char *argv[],
   options.debug = FALSE;
   options.controller_type = CONTROLLER_TYPE_DEFAULT;
   options.level_number = 0;
+  options.log_level = 2;
   options.delay = GAME_FRAME_DELAY;
 
 #if 1
@@ -1218,6 +1219,26 @@ void GetOptions(int argc, char *argv[],
         }
         else {
             options.level_number = atoi(option_arg);
+        }
+        if (option_arg == next_option) {
+            options_left++;
+        }
+    }
+    else if (strncmp(option, "-loglevel", option_len) == 0)
+    {
+        if (option_arg == NULL) {
+            Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
+        }
+        else if (!isNumber(option_arg)) {
+            // Additionally check for valid level file if it exists?
+            Error(ERR_EXIT_HELP, "option '%s' argument must be a valid integer", option_str);
+        }
+        else if (atoi(option_arg) < 0 || atoi(option_arg) > 6) {
+            // Valid log levels
+            Error(ERR_EXIT_HELP, "option '%s' argument must be between 0 and 6 inclusive", option_str);
+        }
+        else {
+            options.log_level = atoi(option_arg);
         }
         if (option_arg == next_option) {
             options_left++;

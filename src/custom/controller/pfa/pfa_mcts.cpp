@@ -1,6 +1,8 @@
 
 #include "pfa_mcts.h"
 
+#include <fstream>
+
 
 PFA_MCTS::PFA_MCTS(){
     // Load parameters from file
@@ -52,6 +54,8 @@ PFA_MCTS::PFA_MCTS(){
     catch (const std::ifstream::failure& e) {
         PLOGE_(logwrap::FileLogger) << "Cannot open file.";
     }
+
+    timer.setLimit(max_time);
 
     // Log parameters being used
     PLOGD_(logwrap::FileLogger) << "MCTS parametrs...";
@@ -139,14 +143,9 @@ PFATreeNode* PFA_MCTS::selectMostVisitedChild(PFATreeNode* current) {
 
 float PFA_MCTS::nodeValue(PFATreeNode* current) {
     float value = 0.0;
-    // float visit_count = current->getVisitCount();
-    // float distance = current->getMinDistance();
     int l1_distance = current->getL1Distance();
     float survival_frequency = current->getSurvivalFrequency();
     int min_depth = current->getMinDepthToGoal();
-
-    // if (min_depth == std::numeric_limits<int>::max()) {min_depth = max_depth;}
-    // value += (max_depth - min_depth) * 10;
 
     if (min_depth != std::numeric_limits<int>::max()) {
         value += (max_depth - min_depth) * 10;
@@ -154,17 +153,6 @@ float PFA_MCTS::nodeValue(PFATreeNode* current) {
 
     value += allowed_cells_.size() - l1_distance;
     value += survival_frequency * 50;
-
-    // if (value == 18.00) {
-    //     std::cout << "value: " << value << std::endl;
-    //     std::cout << "max_depth: " << max_depth << ", min_depth: " << min_depth;
-    //     std::cout << ", allowed_cells_: " << allowed_cells_.size() << ", l1_distance: " << l1_distance;
-    //     std::cout << ", survival_frequency: " << survival_frequency << std::endl; 
-    //     std::cout << "A: " << (max_depth - min_depth) * 10;
-    //     std::cout << ", B: " << allowed_cells_.size() - l1_distance;
-    //     std::cout << ", C: " << survival_frequency * 10 << std::endl;
-
-    // }
 
     return value;
 }
@@ -212,7 +200,7 @@ void PFA_MCTS::reset(std::vector<Action> &next_action) {
 
     // Save current state
     GameState reference_state;
-    reference_state.setFromSimulator();
+    reference_state.setFromEngineState();
 
     // step forward to where agent will be after executing current queued move
     enginehelper::setSimulatorFlag(true);
@@ -227,11 +215,11 @@ void PFA_MCTS::reset(std::vector<Action> &next_action) {
 
     // save root state to where we will be when done executing current queued action
     root = std::make_unique<PFATreeNode>(nullptr);
-    rootSavedState.setFromSimulator();
+    rootSavedState.setFromEngineState();
     root.get()->setActions(allowed_cells_);
 
     // reset engine back to reference state
-    reference_state.restoreSimulator();
+    reference_state.restoreEngineState();
     enginehelper::setSimulatorFlag(false);
 }
 
@@ -344,7 +332,7 @@ void PFA_MCTS::handleEmpty(std::vector<Action> &currentSolution, std::vector<Act
 
 
 void PFA_MCTS::logCurrentStats() {
-    PLOGD_(logwrap::FileLogger) << "Time remaining: " << timer.getTimeLeft(max_time);
+    PLOGD_(logwrap::FileLogger) << "Time remaining: " << timer.getTimeLeft();
     PLOGD_(logwrap::FileLogger) << "Current number of expanded nodes: " << count_expanded_nodes 
         << ", simulated nodes: " << count_simulated_nodes;
 }
@@ -370,17 +358,17 @@ void PFA_MCTS::run(std::vector<Action> &currentSolution, std::vector<Action> &fo
     enginehelper::setSimulatorFlag(true);
 
     // Timer gets initialized
-    timer.init();
+    timer.reset();
     int loop_counter = 0;
-    float sim_denom = 1.0 / num_simulations;
+    // float sim_denom = 1.0 / num_simulations;
     calls_since_rest += 1;
 
     // Save the current game state from the simulator
     GameState startingState;
-    startingState.setFromSimulator();
+    startingState.setFromEngineState();
 
     // Set current game state to root state
-    rootSavedState.restoreSimulator();
+    rootSavedState.restoreEngineState();
 
     // MCTS starting configurations
     PFATreeNode* best_child = nullptr;
@@ -399,10 +387,10 @@ void PFA_MCTS::run(std::vector<Action> &currentSolution, std::vector<Action> &fo
         // Starting at root, continuously select best child using policy until leaf node
         // is met. A leaf is any node which no simulation has been initiated
         PFATreeNode* current = root.get();
-        unsigned int current_depth = 0;
+        int current_depth = 0;
 
         // Put simulator back to root state
-        rootSavedState.restoreSimulator();
+        rootSavedState.restoreEngineState();
         logCurrentStats();
 
         // msg = "Child node values:\n" + childValues(root.get());
@@ -421,16 +409,17 @@ void PFA_MCTS::run(std::vector<Action> &currentSolution, std::vector<Action> &fo
         // We exand the node if its not terminal and not already fully expanded
         // Need to consider if state is winning state
         if (!current->getTerminalStatusFromEngine() && !current->allExpanded()) {
-            current = current->expand(allowed_cells_, goal_cells_);
+            // current = current->expand(allowed_cells_, goal_cells_);
+            current = current->expand(allowed_cells_);
             count_expanded_nodes += 1;
         }
 
         float times_goal_found = 0;
-        float times_died = 0;
+        // float times_died = 0;
 
         // Before we simulate, we need to save a reference state to get back to
         GameState reference_state;
-        reference_state.setFromSimulator();
+        reference_state.setFromEngineState();
         
 
         // Step 3: Simulation
@@ -438,7 +427,7 @@ void PFA_MCTS::run(std::vector<Action> &currentSolution, std::vector<Action> &fo
         num_simulations = 5;
         int min_depth = current->getMinDepthToGoal();
         for (unsigned int i = 0; i < num_simulations; i++) {
-            reference_state.restoreSimulator();
+            reference_state.restoreEngineState();
             int current_depth = current->getDepth();
             if (!current->isTerminal()) {
                 max_iterations_depth = 3;
@@ -484,7 +473,7 @@ void PFA_MCTS::run(std::vector<Action> &currentSolution, std::vector<Action> &fo
         // Reached max iterations or max time
         loop_counter += 1;
         float avgTime = timer.getDuration() / loop_counter;
-        if (timer.getTimeLeft(max_time) < avgTime) {break;}
+        if (timer.getTimeLeft() < avgTime) {break;}
     }
 
     timer.stop();
@@ -497,7 +486,7 @@ void PFA_MCTS::run(std::vector<Action> &currentSolution, std::vector<Action> &fo
     statistics[enginetype::MAX_DEPTH] = max_depth;
 
     // Get best child and its associated action
-    rootSavedState.restoreSimulator();
+    rootSavedState.restoreEngineState();
     best_child = selectMostVisitedChild(root.get());
     // best_child = getBestChild(root.get());
     Action best_action = (best_child == nullptr ? Action::noop : best_child->getActionTaken());
@@ -510,7 +499,7 @@ void PFA_MCTS::run(std::vector<Action> &currentSolution, std::vector<Action> &fo
     PLOGI_IF_(logwrap::ConsolLogger, calls_since_rest == 8) << msg;
 
     // Put simulator back to original state
-    startingState.restoreSimulator();
+    startingState.restoreEngineState();
     enginehelper::setSimulatorFlag(false);
 
     // return best action
@@ -523,12 +512,12 @@ void PFA_MCTS::run(std::vector<Action> &currentSolution, std::vector<Action> &fo
 
 enginetype::GridCell PFA_MCTS::getRootPlayerCell() {
     GameState reference_state;
-    reference_state.setFromSimulator();
+    reference_state.setFromEngineState();
 
-    rootSavedState.restoreSimulator();
+    rootSavedState.restoreEngineState();
     enginetype::GridCell player_cell = enginehelper::getPlayerPosition();
 
-    reference_state.restoreSimulator();
+    reference_state.restoreEngineState();
 
     return player_cell;
 }

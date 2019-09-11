@@ -1,3 +1,13 @@
+/**
+ * @file: rng.h
+ *
+ * @brief: Random number generator for both engine and simulation for reproducibility.
+ * 
+ * @author: Jake Tuero
+ * Date: August 2019
+ * Contact: tuero@ualberta.ca
+ */
+
 #ifndef RANDOMGENERATOR_H
 #define RANDOMGENERATOR_H
 
@@ -9,57 +19,45 @@
 
 #include "../engine/engine_helper.h"
 
-class RNG {
-private:
-    static const uint64_t MAX_VALUE = UINT64_MAX;
-    static std::mt19937 gen_engine;
-    static std::mt19937 gen_simulating;
-    static std::uniform_int_distribution<uint64_t> dist_engine;
-    static std::uniform_int_distribution<uint64_t> dist_simulation;
-    static uint64_t seed_engine;
-    static uint64_t seed_simulation;
-public:
+namespace RNG {
+    const uint64_t MAX_VALUE = UINT64_MAX;
 
     /*
-     * Set the seed for the RNG used by the engine in gameplay
-     * Seed is provided as input
+     * Set the seed for the RNG used by the engine in gameplay.
      */
-    static void setEngineSeed(uint64_t seed);
+    void setEngineSeed(uint64_t seed);
 
     /*
-     * Set the seed for the RNG used by the engine in gameplay
-     * Seed used is current time in microseconds
+     * Set the seed to current time in milliseconds for the RNG used by the engine in gameplay.
      */
-    static void setEngineSeed();
+    void setEngineSeed();
 
     /*
-     * Set the seed for the RNG used during search simulation
-     * Seed is provided as input
+     * Set the seed from the input for the RNG used by the simulation in planning.
      */
-    static void setSimulatingSeed(uint64_t seed);
+    void setSimulatingSeed(uint64_t seed);
 
     /*
-     * Set the seed for the RNG used during search simulation
-     * Seed used is current time in microseconds
+     * Set the seed to current time in milliseconds for the RNG used by the simulation in planning.
      */
-    static void setSimulatingSeed();
+    void setSimulatingSeed();
 
     /*
-     * Get a random number from the RNG, from [0, MAX_VALUE)
+     * Get a random number from the engine RNG, from [0, max).
      */
-    static uint64_t getRandomNumber(uint64_t max = MAX_VALUE);
+    uint64_t getRandomNumber(uint64_t max = MAX_VALUE);
 
     /*
      * Get the seed for the RNG used for engine.
      * Normally this is used for saving in replay files to reload games with the same seed
      */
-    static uint64_t getEngineSeed();
+    uint64_t getEngineSeed();
 
     /*
      * Get the seed for the RNG used for engine.
      * Normally this is used for saving in replay files to reload games with the same seed
      */
-    static uint64_t getSimulationSeed();
+    uint64_t getSimulationSeed();
 };
 
 

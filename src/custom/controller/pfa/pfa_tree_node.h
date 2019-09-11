@@ -35,11 +35,6 @@ private:
     float survival_frequency_;                // frequency of deaths when expanded
     int depth_goal_found;
 
-    
-
-    
-    
-
     int distance_sum_;
     float count_goals_found;
     float count_times_died;
@@ -74,7 +69,7 @@ public:
 
     bool isSolved() const;
 
-    PFATreeNode* expand(std::vector<enginetype::GridCell> &allowed_cells, std::vector<enginetype::GridCell> &goal_cells);
+    PFATreeNode* expand(std::vector<enginetype::GridCell> &allowed_cells);
 
     PFATreeNode* getParent();
 

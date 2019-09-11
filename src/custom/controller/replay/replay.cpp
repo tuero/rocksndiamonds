@@ -4,7 +4,7 @@
 
 Replay::Replay(){
     replayFileName = enginehelper::getReplayFileName();
-    replayFileStream.open(replay_dir + replayFileName, std::ifstream::in);
+    replayFileStream.open(REPLAY_DIR + replayFileName, std::ifstream::in);
 
     uint64_t seed;
     std::string level_set;
@@ -37,7 +37,7 @@ void Replay::handleEmpty(std::vector<Action> &currentSolution, std::vector<Actio
     abstract_graph.abstract();
     int abstract_level = abstract_graph.getLevelUsed();
     grid_representation = abstract_graph.getAbstractRepresentation(abstract_level, true);
-    SummaryWindow::grid_representation = grid_representation;
+    summarywindow::updateGridRepresentation(grid_representation);
 }
 
 

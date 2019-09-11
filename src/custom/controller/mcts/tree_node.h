@@ -3,13 +3,10 @@
 #ifndef TREENODEMCTS_H
 #define TREENODEMCTS_H
 
-#include <iostream>
 #include <vector>
-#include <algorithm>
 #include <memory>
-#include <cassert>
 
-#include "../../engine/engine_helper.h"
+// Engine
 #include "../../engine/action.h"
 #include "../../engine/game_state.h"
 
@@ -18,31 +15,26 @@
 class TreeNode {
     typedef std::unique_ptr<TreeNode> Pointer;
 private:
-    TreeNode* parent;                       // Pointer to parent state
-    std::vector<Action> actions_from_start;
-    Action action_taken;                    // Action which led to this state from parent
-    std::vector<Pointer> children;          // current children from this node
-    std::vector<Action> actions;
+    TreeNode* parent_;                       // Pointer to parent state
+    std::vector<Action> actionsFromStart_;
+    Action actionTaken_;                    // Action which led to this state from parent
+    std::vector<Pointer> children_;          // current children from this node
+    std::vector<Action> actions_;
 
     // statistics
-    int visits_count;
-    int depth;
-    float value;
-    int distance_to_goal;
-    float count_goals_found;
-    float count_times_died;
+    int visitCount_;
+    int depth_;
+    float value_;
 
     bool is_terminal;
     bool is_deadly;
     bool is_solved;
 
-    float is_safe;
-
     void addChild(const Action childAction);
 
 public:
 
-    TreeNode(TreeNode* parent, const std::vector<Action> &actions_from_start = {});
+    TreeNode(TreeNode* parent, const std::vector<Action> &actionsFromStart = {});
 
     void setActions();
 
@@ -66,7 +58,7 @@ public:
 
     TreeNode* getParent();
 
-    void updateStats(const float goal_found, const float died, const float countSafe);
+    void updateStats(const float value);
 
     TreeNode* getChild(unsigned index);
 
@@ -75,7 +67,7 @@ public:
 
     // ------------------- Statistic Getters ---------------------
 
-    unsigned int getChildCount() const;
+    std::size_t getChildCount() const;
 
     float getValue() const;
 

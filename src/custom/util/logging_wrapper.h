@@ -1,16 +1,18 @@
-
+/**
+ * @file: logging_wrapper.h
+ *
+ * @brief: Interface for logging and replay file.
+ * 
+ * @author: Jake Tuero
+ * Date: August 2019
+ * Contact: tuero@ualberta.ca
+ */
 
 #ifndef LOGGER_WRAPPER_H
 #define LOGGER_WRAPPER_H
 
-#include <iostream>
 #include <string>
-#include <fstream>
 #include <plog/Log.h>
-#include <plog/Appenders/ConsoleAppender.h>
-
-#include "../engine/engine_helper.h"
-#include "../engine/engine_types.h"
 
 
 extern "C" {
@@ -22,31 +24,23 @@ namespace logwrap {
 
     enum {FileLogger, ConsolLogger};
 
-    static const std::string log_dir = "./src/custom/logs/";
-    static const std::string log_suffix = ".log";
-    static const std::string run_suffix = ".txt";
-    static std::ofstream saved_run_file;
-
+    /*
+     * Initialize loggers for file and std_out
+     */
+    void initLogger(plog::Severity logLevel, std::string &programArgs);
 
     /*
-     * Get the current datetime in string format
-     * Used for naming log files
+     * Initialize the replay file.
      */
-    std::string datetimeToString();
-
-    /*
-     * Initialize loggers 
-     * Loggers for stdout and log file
-     */
-    void initLogger(plog::Severity log_level, std::string &cla_args);
+    void initReplayFile();
 
     /*
      * Set max log level used for both loggers
      */
-    void setLogLevel(plog::Severity log_level);
+    void setLogLevel(plog::Severity logLevel);
 
     /*
-     * Log RNG seed, levelset and level number used 
+     * Log RNG seed, levelset and level number used.
      */
     void saveReplayLevelInfo();
 
@@ -58,40 +52,50 @@ namespace logwrap {
     void logEngineType();
 
     /*
-     * Logs some of the important player fields
+     * Logs some of the important player fields.
      */
     void logPlayerDetails();
 
     /*
-     * Logs the current board state (FELD) at the tile level
+     * Logs the current board state (FELD) at the tile level.
      */
     void logBoardState();
 
     /*
-     * Logs the current board state (MovPos) sprite tile distance offsets
+     * Logs the current board state (MovPos) sprite tile distance offsets.
      */
     void logMovPosState();
 
     /*
-     * Logs the current board state (MovDir) sprite tile direction offsets
+     * Logs the current board state (MovDir) sprite tile direction offsets.
      */
     void logMovDirState();
 
     /*
-     * Logs the current tile distances to goal (used in pathfinding)
+     * Logs the current tile distances to goal (used in pathfinding).
      */
     void logBoardDistances();
 
     /*
-     * Save the players current move.
-     * Used for replays
+     * Log all information at level start
+     * Includes engine type, player position and state, board item positions, and distances.
+     */
+    void logLevelStart();
+
+    /*
+     * Logs the current tile distances to goal (used in pathfinding).
+     */
+    void logState();
+
+    /*
+     * Save the players current move to replay file.
      */
     void savePlayerMove(std::string &action);
 
     /*
      * Close the replay file for cleanup.
      */
-    void closeSaveRunFile();
+    void closeReplayFile();
 
 }
 

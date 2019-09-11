@@ -1,28 +1,27 @@
+/**
+ * @file: level_programming.h
+ *
+ * @brief: Handle custom level programming such as spawning new elements.
+ * 
+ * @author: Jake Tuero
+ * Date: August 2019
+ * Contact: tuero@ualberta.ca
+ */
 
 #ifndef LEVEL_PROGRAMMING_H
 #define LEVEL_PROGRAMMING_H
-
-#include <vector>
-#include <array>
-
-// Engine
-#include "../engine/engine_helper.h"
-#include "../engine/engine_types.h"
-#include "../engine/action.h"
-
-// Logging
-#include "../util/logging_wrapper.h"
-#include <plog/Log.h> 
 
 
 namespace levelprogramming {
 
     /*
-     * Spawn new elements based on level rules
+     * Handle custom level programming for each game tick.
      */
     void customLevelProgrammingUpdate();
 
-
+    /*
+     * Handle custom level programming at level start.
+     */
     void customLevelProgrammingStart();
 
 }

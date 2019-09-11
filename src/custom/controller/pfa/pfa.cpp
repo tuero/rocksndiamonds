@@ -16,6 +16,7 @@ void PFA::logPath() {
 
 
 void PFA::findPath(int abstract_level) {
+    timer.reset();
     timer.start();
 
     // Get start node
@@ -180,7 +181,7 @@ void PFA::sendAbstractPathToSummaryWindow() {
         grid_representation[grid_cell.x][grid_cell.y] = -1;
     }
 
-    SummaryWindow::grid_representation = grid_representation;
+    summarywindow::updateGridRepresentation(grid_representation);
 }
 
 
@@ -212,7 +213,7 @@ void PFA::setNodeFromPath() {
 void PFA::handleEmpty(std::vector<Action> &currentSolution, std::vector<Action> &forwardSolution) {
     // Go to state MCTS is currently in
     GameState reference_state;
-    reference_state.setFromSimulator();
+    reference_state.setFromEngineState();
     enginehelper::setSimulatorFlag(true);
     for (unsigned int i = 0; i < forwardSolution.size(); i++) {
         enginehelper::setEnginePlayerAction(forwardSolution[i]);
@@ -234,7 +235,7 @@ void PFA::handleEmpty(std::vector<Action> &currentSolution, std::vector<Action> 
 
 
     // Restore back to current state
-    reference_state.restoreSimulator();
+    reference_state.restoreEngineState();
     enginehelper::setSimulatorFlag(false);
 
     sendAbstractPathToSummaryWindow();

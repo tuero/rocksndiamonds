@@ -7759,11 +7759,12 @@ int main(int argc, char *argv[])
   InitExitMessageFunction(DisplayExitMessage);
   InitExitFunction(CloseAllAndExit);
 
+    // Handles command line arguments
+    // This was previously done after InitPlatformDependentStuff
+    GetOptions(argc, argv, print_usage, print_version);
+
   // inits SDL (this will need to be removed)
   InitPlatformDependentStuff();
-
-  // Handles command line arguments
-  GetOptions(argc, argv, print_usage, print_version);
 
     // Set level set
     // Complicated to get working nicely, work-around is to set leveldir_current to specified levelset,
@@ -7775,11 +7776,7 @@ int main(int argc, char *argv[])
   OpenAll();
 
     // Init custom logging
-    initController();
-
-    // Save replay level information
-    // This has to be done after level is loaded so level pointers are valid
-    saveReplayLevelInfo();
+    setController();
 
     // Load maps for above mapset, and set current level
     if (options.controller_type == CONTROLLER_TYPE_TEST_SPEED) {

@@ -19,14 +19,14 @@ namespace testenginespeed {
 
         // Save starting state
         GameState start_state;
-        start_state.setFromSimulator();
+        start_state.setFromEngineState();
 
 
         timer.start();
         for (unsigned int i = 0; i < MAX_SIMULATIONS; i++) {
             // If game ending condition, reset to initial
             if (enginehelper::engineGameFailed() || enginehelper::engineGameSolved()) {
-                start_state.restoreSimulator();
+                start_state.restoreEngineState();
             }
             enginehelper::setEngineRandomPlayerAction();
             enginehelper::engineSimulate();
@@ -62,13 +62,13 @@ namespace testenginespeed {
         
         // Save starting state
         GameState start_state;
-        start_state.setFromSimulator();
+        start_state.setFromEngineState();
 
         timer.start();
         for (unsigned int i = 0; i < MAX_SIMULATIONS; i++) {
             // If game ending condition, reset to initial
             if (enginehelper::engineGameFailed() || enginehelper::engineGameSolved()) {
-                start_state.restoreSimulator();
+                start_state.restoreEngineState();
             }
             enginehelper::setEngineRandomPlayerAction();
             enginehelper::engineSimulate();

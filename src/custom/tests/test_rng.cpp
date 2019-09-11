@@ -19,14 +19,14 @@ namespace testrng{
 
         // Save starting state
         GameState start_state;
-        start_state.setFromSimulator();
+        start_state.setFromEngineState();
 
         srand(time(NULL));
         int failedComparisons = 0;
 
         for (int i = 0; i < MAX_SIMULATIONS; i++) {
             GameState referenceState;
-            referenceState.setFromSimulator();
+            referenceState.setFromEngineState();
 
             int depth = rand() % MAX_DEPTH + 1;
             std::vector<Action> actionsTaken;
@@ -41,10 +41,10 @@ namespace testrng{
 
             // save forward state
             GameState forwardState;
-            forwardState.setFromSimulator();
+            forwardState.setFromEngineState();
 
             // Now restore reference state and perform the same actions
-            referenceState.restoreSimulator();
+            referenceState.restoreEngineState();
             for (int j = 0; j < depth; j++) {
                 // RNG::setSeedEngineHash();
                 enginehelper::setEnginePlayerAction(actionsTaken[j]);
@@ -52,14 +52,14 @@ namespace testrng{
             }
 
             // Compare forward and reference states for equality
-            referenceState.setFromSimulator();
+            referenceState.setFromEngineState();
             if (!(referenceState == forwardState)) {
                 failedComparisons += 1;
                 PLOGD_(logwrap::FileLogger) << "States are not equal.";
-                forwardState.restoreSimulator();
+                forwardState.restoreEngineState();
                 logwrap::logBoardState();
 
-                referenceState.restoreSimulator();
+                referenceState.restoreEngineState();
                 logwrap::logBoardState();
 
             }

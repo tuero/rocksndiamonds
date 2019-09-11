@@ -29,7 +29,7 @@
 
 class Replay : public BaseController {
 private:
-    const std::string replay_dir = "./src/custom/logs/";
+    const std::string REPLAY_DIR = "./src/custom/replays/";
     std::string replayFileName;
     std::ifstream replayFileStream;
     AbstractGraph abstract_graph;

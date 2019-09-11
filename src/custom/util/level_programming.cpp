@@ -1,6 +1,26 @@
-
+/**
+ * @file: level_programming.cpp
+ *
+ * @brief: Handle custom level programming such as spawning new elements.
+ * 
+ * @author: Jake Tuero
+ * Date: August 2019
+ * Contact: tuero@ualberta.ca
+ */
 
 #include "level_programming.h"
+
+#include <vector>
+#include <array>
+
+// Engine
+#include "../engine/engine_helper.h"
+#include "../engine/engine_types.h"
+#include "../engine/action.h"
+
+// Logging
+#include "../util/logging_wrapper.h"
+#include <plog/Log.h> 
 
 
 namespace levelprogramming {
@@ -12,8 +32,7 @@ namespace levelprogramming {
  */
 void spawnYamYam() {
     // Get empty grid locations which a diamond can go
-    std::vector<enginetype::GridCell> emptyGridCells;
-    enginehelper::getEmptyGridCells(emptyGridCells);
+    std::vector<enginetype::GridCell> emptyGridCells = enginehelper::getEmptyGridCells();
 
     if (emptyGridCells.empty()) {
         PLOGI_(logwrap::FileLogger) << "No empty cells";
@@ -31,14 +50,6 @@ void spawnYamYam() {
             ++it;
         }
     }
-    // for (auto it = emptyGridCells.begin(); it != emptyGridCells.end(); ) {
-    //     if (enginehelper::checkIfNeighbours(*it, player_cell)) {
-    //         it = emptyGridCells.erase(it);
-    //     }
-    //     else {
-    //         ++it;
-    //     }
-    // }
 
     // Choose gridcell
     enginetype::GridCell emptyGridCell = emptyGridCells[RNG::getRandomNumber(emptyGridCells.size())];
@@ -61,8 +72,7 @@ void spawnYamYam() {
  */
 void spawnDiamond() {
     // Get empty grid locations which a diamond can go
-    std::vector<enginetype::GridCell> emptyGridCells;
-    enginehelper::getEmptyGridCells(emptyGridCells);
+    std::vector<enginetype::GridCell> emptyGridCells = enginehelper::getEmptyGridCells();
 
     if (emptyGridCells.empty()) {
         PLOGI_(logwrap::FileLogger) << "No empty cells";
@@ -79,6 +89,10 @@ void spawnDiamond() {
 }
 
 
+/*
+ * The survival levelset 
+ * For each diamond the agent collects, another yamyam will spawn.
+ */
 void handleSurvivalUpdate() {
     // Check number of diamonds on screen
     int count_diamonds = enginehelper::countNumOfElement(enginetype::FIELD_CUSTOM_1);
@@ -92,9 +106,7 @@ void handleSurvivalUpdate() {
     }
 }
 
-void handleSurvivalLevelStart() {
-    // spawnDiamond();
-    
+void handleSurvivalLevelStart() {   
     // Find diamond and set distances
     for (int y = 0; y < enginehelper::getLevelHeight(); y++) {
         for (int x = 0; x < enginehelper::getLevelWidth(); x++) {
@@ -108,7 +120,9 @@ void handleSurvivalLevelStart() {
 
 
 /*
- * Spawn new elements based on level rules
+ * Handle custom level programming for each game tick.
+ * 
+ * For example, checking whether an item or enemy should be spawned.
  */
 void customLevelProgrammingUpdate() {
     // Add proper level checks
@@ -126,7 +140,7 @@ void customLevelProgrammingUpdate() {
 
 
 /*
- * Spawn new elements based on level rules
+ * Handle custom level programming at level start.
  */
 void customLevelProgrammingStart() {
     // Add proper level checks

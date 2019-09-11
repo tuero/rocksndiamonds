@@ -85,8 +85,7 @@ bool PFATreeNode::isSolved() const {
 }
 
 
-PFATreeNode* PFATreeNode::expand(std::vector<enginetype::GridCell> &allowed_cells,
-    std::vector<enginetype::GridCell> &goal_cells) 
+PFATreeNode* PFATreeNode::expand(std::vector<enginetype::GridCell> &allowed_cells) 
 {
     // Should be non-terminal and not fully expanded. MCTS checks this outside
     assert(!allExpanded() && !getTerminalStatusFromEngine());
@@ -103,7 +102,7 @@ PFATreeNode* PFATreeNode::expand(std::vector<enginetype::GridCell> &allowed_cell
     // due to the stochastic nature
     GameState parent_state;
     GameState alive_state;
-    parent_state.setFromSimulator();
+    parent_state.setFromEngineState();
 
     // Simulate to child
     bool did_survive = false;
@@ -111,16 +110,16 @@ PFATreeNode* PFATreeNode::expand(std::vector<enginetype::GridCell> &allowed_cell
         enginehelper::setEnginePlayerAction(child_action);
         enginehelper::engineSimulate();
         if (!getDeadlyStatusFromEngine()) {
-            if (!did_survive) {alive_state.setFromSimulator();}
+            if (!did_survive) {alive_state.setFromEngineState();}
             child_node->survival_frequency_ += 0.2;
             did_survive = true;
         }
-        if (i < 4) {parent_state.restoreSimulator();}
+        if (i < 4) {parent_state.restoreEngineState();}
     }
 
     // Ensure we are in a alive state if possible
     if (did_survive && getDeadlyStatusFromEngine()) {
-        alive_state.restoreSimulator();
+        alive_state.restoreEngineState();
     }
 
     child_node->survival_frequency_ = child_node->survival_frequency_ / 1.1;

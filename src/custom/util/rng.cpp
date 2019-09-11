@@ -1,60 +1,77 @@
-
+/**
+ * @file: rng.h
+ *
+ * @brief: Random number generator for both engine and simulation for reproducibility.
+ * 
+ * @author: Jake Tuero
+ * Date: August 2019
+ * Contact: tuero@ualberta.ca
+ */
 
 #include "rng.h"
 
-uint64_t RNG::seed_engine = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-uint64_t RNG::seed_simulation = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-std::mt19937 RNG::gen_engine(seed_engine);
-std::mt19937 RNG::gen_simulating(seed_simulation);
-std::uniform_int_distribution<uint64_t> RNG::dist_engine(0, MAX_VALUE);
-std::uniform_int_distribution<uint64_t> RNG::dist_simulation(0, MAX_VALUE);
+namespace RNG {
+
+uint64_t seedEngine_ = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+uint64_t seedSimulation_ = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+
+// Generators
+std::mt19937 genEngine_(seedEngine_);
+std::mt19937 genSimulating_(seedSimulation_);
+
+// Uniform distributions for generator
+std::uniform_int_distribution<uint64_t> distEngine_(0, MAX_VALUE);
+std::uniform_int_distribution<uint64_t> distSimulation_(0, MAX_VALUE);
 
 
 /*
- * Set the seed for the RNG used by the engine in gameplay
- * Seed is provided as input
+ * Set the seed from the input for the RNG used by the engine in gameplay.
+ * 
+ * @param seed Input seed for the game engine RNG.
  */
-void RNG::setEngineSeed(uint64_t seed) {
-    seed_engine = seed;
-    gen_engine.seed(seed);
+void setEngineSeed(uint64_t seed) {
+    seedEngine_ = seed;
+    genEngine_.seed(seed);
 }
 
+
 /*
- * Set the seed for the RNG used by the engine in gameplay
- * Seed used is current time in microseconds
+ * Set the seed to current time in milliseconds for the RNG used by the engine in gameplay.
  */
-void RNG::setEngineSeed() {
+void setEngineSeed() {
     uint64_t seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-    seed_engine = seed;
-    gen_engine.seed(seed);
+    seedEngine_ = seed;
+    genEngine_.seed(seed);
 }
 
 
 /*
- * Set the seed for the RNG used during search simulation
- * Seed is provided as input
+ * Set the seed from the input for the RNG used by the simulation in planning.
+ * 
+ * @param seed Input seed for the game engine RNG.
  */
-void RNG::setSimulatingSeed(uint64_t seed) {
-    seed_simulation = seed;
-    gen_simulating.seed(seed);
+void setSimulatingSeed(uint64_t seed) {
+    seedSimulation_ = seed;
+    genSimulating_.seed(seed);
 }
 
 /*
- * Set the seed for the RNG used during search simulation
- * Seed used is current time in microseconds
+ * Set the seed to current time in milliseconds for the RNG used by the simulation in planning.
  */
-void RNG::setSimulatingSeed() {
+void setSimulatingSeed() {
     uint64_t seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-    seed_simulation = seed;
-    gen_simulating.seed(seed);
+    seedSimulation_ = seed;
+    genSimulating_.seed(seed);
 }
 
 
 /*
- *  Get a random number from the RNG, from [0, MAX_VALUE)
+ * Get a random number from the engine RNG, from [0, max).
+ * 
+ * @param max The endpoint for the range to draw from.
  */
-uint64_t RNG::getRandomNumber(uint64_t max) {
-    uint64_t randnum = (enginehelper::isSimulating() ? dist_simulation(gen_simulating) : dist_engine(gen_engine));
+uint64_t getRandomNumber(uint64_t max) {
+    uint64_t randnum = (enginehelper::isSimulating() ? distSimulation_(genSimulating_) : distEngine_(genEngine_));
     return randnum % max;
 }
 
@@ -63,8 +80,8 @@ uint64_t RNG::getRandomNumber(uint64_t max) {
  * Get the seed for the RNG used for engine.
  * Normally this is used for saving in replay files to reload games with the same seed
  */
-uint64_t RNG::getEngineSeed() {
-    return seed_engine;
+uint64_t getEngineSeed() {
+    return seedEngine_;
 }
 
 
@@ -72,6 +89,8 @@ uint64_t RNG::getEngineSeed() {
  * Get the seed for the RNG used for simulation.
  * Normally this is used for saving in replay files to reload games with the same seed
  */
-uint64_t RNG::getSimulationSeed() {
-    return seed_simulation;
+uint64_t getSimulationSeed() {
+    return seedSimulation_;
 }
+
+} // namespace RNG

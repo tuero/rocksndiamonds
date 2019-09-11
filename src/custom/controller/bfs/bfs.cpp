@@ -42,7 +42,7 @@ void BFS::run(std::vector<Action> &currentSolution, std::vector<Action> &forward
     // simulations will be based from
     typedef std::unique_ptr<TreeNodeBFS> Pointer;
     GameState startingState;
-    startingState.setFromSimulator();
+    startingState.setFromEngineState();
 
     // BFS data structures
     std::vector<Pointer> open;
@@ -67,7 +67,7 @@ void BFS::run(std::vector<Action> &currentSolution, std::vector<Action> &forward
         count_expanded_nodes += 1;
 
         // Set simulator to state off open
-        startingState.restoreSimulator();
+        startingState.restoreEngineState();
         node.get()->setSimulatorToCurrent();
 
         // Game over due to dying?
@@ -92,11 +92,11 @@ void BFS::run(std::vector<Action> &currentSolution, std::vector<Action> &forward
 
         // Each action gets applied, then simulator gets rolled back to stateBeforeActions
         GameState stateBeforeActions;
-        stateBeforeActions.setFromSimulator();
+        stateBeforeActions.setFromEngineState();
 
         for (const Action action : ALL_ACTIONS) {
             // Roll back before action taken
-            stateBeforeActions.restoreSimulator();
+            stateBeforeActions.restoreEngineState();
 
             // Don't add child nodes if player is blocked from moving in that direction
             if (enginehelper::isWall(action)) {continue;}
@@ -132,7 +132,7 @@ void BFS::run(std::vector<Action> &currentSolution, std::vector<Action> &forward
     // }  
 
     // Put simulator back to original state
-    startingState.restoreSimulator();
+    startingState.restoreEngineState();
     enginehelper::setSimulatorFlag(false);
 
     // Print solution

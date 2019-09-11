@@ -1,3 +1,12 @@
+/**
+ * @file: engine_types.h
+ *
+ * @brief: Readable typedefs and enumerations for commonly accessed engine datatypes.
+ * 
+ * @author: Jake Tuero
+ * Date: August 2019
+ * Contact: tuero@ualberta.ca
+ */
 
 
 #ifndef ENGINE_TYPES_H
@@ -20,6 +29,9 @@ namespace enginetype{
     typedef std::array<short, MAX_NUM_AMOEBA> amoeba_short;
 
 
+    /*
+     * Grid cell along with comparison methods for required hashing methods
+     */
     struct GridCell{
         int x; 
         int y;
@@ -42,6 +54,10 @@ namespace enginetype{
 
 
     // ------------- Controller types -------------
+    /*
+     * Controller types 
+     * These are defined in system.h as enum controller_type
+     */
     enum ControllerType{BFS=CONTROLLER_TYPE_BFS, MCTS=CONTROLLER_TYPE_MCTS, 
                         USER=CONTROLLER_TYPE_USER, REPLAY=CONTROLLER_TYPE_REPLAY,
                         PFA=CONTROLLER_TYPE_PFA};
@@ -67,7 +83,7 @@ namespace enginetype{
     static const int FIELD_YAMYAM       = 11;
     static const int FELD_DIAMOND       = 56;
     static const int FIELD_WALL         = 105;
-    static const int FIELD_GOAL         = 107;
+    static const int FIELD_EXIT         = 107;
     static const int FIELD_CUSTOM_1     = 360;      // Diamond, no gravity
     static const int FIELD_CUSTOM_2     = 361;      // Yamyam, normal speed, deterministic delay
     static const int FIELD_CUSTOM_3     = 362;      // Yamyam, normal speed, stochastic delay
@@ -86,7 +102,8 @@ namespace enginetype{
     // ------------- Misc -------------
     static const int ENGINE_RESOLUTION = 8;     // Engine ticks per time step the agent considers
 
-}
+
+} // namespace enginetype
 
 
 

@@ -114,7 +114,7 @@ OPTIONS = -O3 -Wall
 endif
 
 CFLAGS = $(OPTIONS) $(SYS_CFLAGS)  $(EXTRA_CFLAGS) $(CONFIG)
-CPPFLAGS := -Wall -Wextra -g -O3 -std=c++14 $(SYS_CFLAGS)  $(EXTRA_CFLAGS) $(CONFIG)
+CPPFLAGS := -Wall -Wextra -g -O3 -std=c++14 $(SYS_CFLAGS) $(EXTRA_CFLAGS) $(CONFIG)
 CPPFLAGS += -I${CURDIR}/custom/includes
 LDFLAGS =           $(SYS_LDFLAGS) $(EXTRA_LDFLAGS) -lm -lz
 

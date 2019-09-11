@@ -1,21 +1,22 @@
 
 #include "tree_node.h"
 
-// typedef std::unique_ptr<TreeNode> Pointer;
+#include <algorithm>
+#include <iostream>
+#include <cassert>
 
-TreeNode::TreeNode(TreeNode* parent, const std::vector<Action> &actions_from_start)
-    :  parent(parent), actions_from_start(actions_from_start) 
+// Engine
+#include "../../engine/engine_helper.h"
+
+TreeNode::TreeNode(TreeNode* parent, const std::vector<Action> &actionsFromStart) :  
+    parent_(parent), actionsFromStart_(actionsFromStart)
 {
-    action_taken = Action::noop;
+    actionTaken_ = Action::noop;
 
     // Reset statistics
-    visits_count = 0;
-    depth = (parent == nullptr ? 0 : parent->depth + 1);
-    value = 0;
-    distance_to_goal = -1;
-    count_goals_found = 0;
-    count_times_died = 0;
-    is_safe = 0;
+    visitCount_ = 0;
+    depth_ = (parent_ == nullptr ? 0 : parent_->depth_ + 1);
+    value_ = 0;
 
     is_terminal = getTerminalStatusFromEngine();
     is_deadly = getDeadlyStatusFromEngine();
@@ -26,26 +27,26 @@ TreeNode::TreeNode(TreeNode* parent, const std::vector<Action> &actions_from_sta
 void TreeNode::setActions() {
     // Simulator must be in this new state to determine the possible child actions
     // We always keep noop at front so far left of tree is sequence of noops
-    actions.clear();
-    actions.push_back(Action::noop);
+    actions_.clear();
+    actions_.push_back(Action::noop);
 
     for (Action action : ALL_ACTIONS) {
         // Player is blocked by wall
         if (enginehelper::isWall(action) || action == Action::noop) {continue;}
-        actions.push_back(action);
+        actions_.push_back(action);
     }
 
-    std::random_shuffle(std::next(actions.begin()), actions.end());
+    std::random_shuffle(std::next(actions_.begin()), actions_.end());
 }
 
 
 bool TreeNode::allExpanded() const {
-    return children.size() >= actions.size();
+    return children_.size() >= actions_.size();
 }
 
 
 Action TreeNode::getActionTaken() {
-    return action_taken;
+    return actionTaken_;
 }
 
 
@@ -83,76 +84,53 @@ TreeNode* TreeNode::expand() {
     assert(!allExpanded() && !getTerminalStatusFromEngine());
 
     // Create new node
-    Pointer child = std::make_unique<TreeNode>(this, actions_from_start);
-    Action child_action = actions[children.size()];
-    child.get()->action_taken = child_action;
+    Pointer child = std::make_unique<TreeNode>(this, actionsFromStart_);
+    TreeNode* childNode = child.get();
+    Action child_action = actions_[children_.size()];
+    childNode->actionTaken_ = child_action;
 
     // Simulate to child
     enginehelper::setEnginePlayerAction(child_action);
 
-    for (unsigned int i = 0; i < enginetype::ENGINE_RESOLUTION; i++) {
-        child.get()->actions_from_start.push_back(child_action);
+    for (int i = 0; i < enginetype::ENGINE_RESOLUTION; i++) {
+        childNode->actionsFromStart_.push_back(child_action);
         enginehelper::engineSimulateSingle();
     }
 
     // Simulator is set to the child state, so determine what the available actions
     // the child has
-    child.get()->setActions();
-    child.get()->distance_to_goal = enginehelper::getPlayerDistanceToGoal();
+    childNode->setActions();
 
-    child.get()->is_terminal = getTerminalStatusFromEngine();
-    child.get()->is_deadly = getDeadlyStatusFromEngine();
-    child.get()->is_solved = getSolvedStatusFromEngine();
-
-    GameState reference;
-    reference.setFromSimulator();
-    for (unsigned int i = 0; i < enginetype::ENGINE_RESOLUTION - 1; i++) {
-        enginehelper::setEnginePlayerAction(Action::noop);
-        enginehelper::engineSimulateSingle();
-        child.get()->is_terminal = child.get()->is_terminal | getTerminalStatusFromEngine();
-        child.get()->is_deadly = child.get()->is_deadly | getDeadlyStatusFromEngine();
-    }
-    enginehelper::setEnginePlayerAction(Action::noop);
-    enginehelper::engineSimulateSingle();
-
-    // Extra steps to ensure we do not terminate the next tick
-    // child.get()->is_terminal = getTerminalStatusFromEngine();
-    // child.get()->is_deadly = getDeadlyStatusFromEngine();
-    // child.get()->is_solved = getSolvedStatusFromEngine();
-
-    // reference.restoreSimulator();
-    // RNG::setSeedEngineHash();
+    childNode->is_terminal = getTerminalStatusFromEngine();
+    childNode->is_deadly = getDeadlyStatusFromEngine();
+    childNode->is_solved = getSolvedStatusFromEngine();
 
     // Store child
-    children.push_back(std::move(child));
+    children_.push_back(std::move(child));
 
-    return children.back().get();
+    return children_.back().get();
 }
 
 
 TreeNode* TreeNode::getParent() {
-    return parent;
+    return parent_;
 }
 
 
-void TreeNode::updateStats(const float goal_found, const float died, const float countSafe) {
-    visits_count += 1;
-    // count_goals_found += (goal_found ? 1 : 0);
-    // count_times_died += (died ? 1 : 0);
-    count_goals_found += goal_found;
-    count_times_died += died;
-    is_safe += countSafe;
+void TreeNode::updateStats(const float value) {
+    visitCount_ += 1;
+    value_ += value;
 }
 
 TreeNode* TreeNode::getChild(unsigned int index) {
-    assert(index < children.size());
-    return children[index].get();
+    assert(index < children_.size());
+    return children_[index].get();
 }
 
 TreeNode::Pointer TreeNode::getChildByAction(Action action) {
-    for (unsigned int i = 0; i < children.size(); i++) {
-        if (children[i].get()->getActionTaken() == action) {
-            return std::move(children[i]);
+    for (unsigned int i = 0; i < children_.size(); i++) {
+        if (children_[i].get()->getActionTaken() == action) {
+            return std::move(children_[i]);
         }
     }
     return nullptr;
@@ -160,40 +138,40 @@ TreeNode::Pointer TreeNode::getChildByAction(Action action) {
 
 
 void TreeNode::setParent(TreeNode* parent) {
-    this->parent = parent;
+    parent_ = parent;
 }
 
 
 // ------------------- Statistic Getters ---------------------
 
-unsigned int TreeNode::getChildCount() const {
-    return children.size();
+std::size_t TreeNode::getChildCount() const {
+    return children_.size();
 }
 
 float TreeNode::getValue() const {
-    return value;
+    return value_;
 }
 
 int TreeNode::getVisitCount() const {
-    return visits_count;
+    return visitCount_;
 }
 
 int TreeNode::getDepth() const {
-    return depth;
+    return depth_;
 }
 
-int TreeNode::getDistance() const {
-    return distance_to_goal;
-}
+// int TreeNode::getDistance() const {
+//     return distance_to_goal;
+// }
 
-float TreeNode::getGoalCount() const {
-    return count_goals_found;
-}
+// float TreeNode::getGoalCount() const {
+//     return count_goals_found;
+// }
 
-float TreeNode::getDiedCount() const {
-    return count_times_died;
-}
+// float TreeNode::getDiedCount() const {
+//     return count_times_died;
+// }
 
-float TreeNode::getIsSafe() const {
-    return is_safe;
-}
+// float TreeNode::getIsSafe() const {
+//     return is_safe;
+// }

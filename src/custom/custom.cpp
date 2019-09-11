@@ -1,15 +1,20 @@
+/**
+ * @file: custom.cpp
+ *
+ * @brief: Exposed functions which are called in game engine
+ * 
+ * @author: Jake Tuero
+ * Date: June 2019
+ * Contact: tuero@ualberta.ca
+ */
 
 #include "custom.h"
 
 #include <iostream>
 #include <string>
 #include <vector>
-#include <array>
-#include <ctime> 
-#include <random>
 
 // engine
-#include "engine/game_state.h"
 #include "engine/action.h"
 #include "engine/engine_helper.h"
 #include "engine/engine_types.h"
@@ -31,20 +36,18 @@
 #include "tests/test_rng.h"
 
 
-
 // External variables accessible to engine
 boolean is_simulating;
 
 // Global objects which are needed outside local scopes
 std::vector<Action> solution;
-int solution_counter;
 Controller controller;
 
 // Level info
 char *level_bd = (char *)"classic_boulderdash";
 char *level_em = (char *)"classic_emerald_mine";
 char *level_custom = (char *)"tuero";
-std::string levelset_survival = "custom_survival";
+std::string levelsetSurvival = "custom_survival";
 
 
 std::string SEP(30, '-');
@@ -54,79 +57,77 @@ std::string SEP(30, '-');
 // ------------------------ Init Functions --------------------------
 
 /*
- * Called whenever level is started
- * Calculates tile distances to goal for MCTS with goal, initializes Zorbrist Tables
- * for state hashing, and sends starting state information to logger.
+ * Perform all necessary actions at level start.
  */
 extern "C" void handleLevelStart() {
     // Log level
     PLOGI_(logwrap::FileLogger) << "Level being played: " << level.file_info.nr;
 
-    // Calculate tile distances to goal
-    std::string subdir_string(leveldir_current->subdir);
-    if (subdir_string == levelset_survival) {
+    // Calculate tile distances to exit location
+    // If level is a custom programmed level, the respective level start code is called.
+    std::string currentLevelsetSubdir(leveldir_current->subdir);
+    if (currentLevelsetSubdir == levelsetSurvival) {
         levelprogramming::customLevelProgrammingStart();
     }
     else {
-        // Calculate tile distances to goal
-        enginetype::GridCell goal_cell = enginehelper::findGoalLocation();
-        enginehelper::setBoardDistancesDijkstra(goal_cell);
-        // enginehelper::setNeighbours();
+        enginetype::GridCell exitCell = enginehelper::findExitLocation();
+        enginehelper::setBoardDistancesDijkstra(exitCell);
     }
 
     // Initialize zorbrist tables for state hashing
     enginehelper::initZorbristTables();
 
     // Send starting board positions and player into to loggers
-    debugEngineType();
-    debugPlayerDetails();
-    debugBoardState();
-    debugBoardDistances();
+    logwrap::logLevelStart();
 
     // clear solution
-    controller.clearSolution();
+    controller.reset();
 
     // Ensure RNG seeds reset during level start
     RNG::setEngineSeed(RNG::getEngineSeed());
     RNG::setSimulatingSeed(RNG::getSimulationSeed());
 
-    if (options.summary_window) {SummaryWindow::init();}
+    if (options.summary_window) {summarywindow::init();}
+
+    // Initialize and open replay file
+    logwrap::initReplayFile();
 }
 
 
 /*
- * Initialize the controller to be used
- * Controller is supplied by a command line argument
+ * Set the controller to be used.
+ * The controller type is provided by a command line argument, which the 
+ * engine helper grabs.
  */
-extern "C" void initController() {
+extern "C" void setController() {
     controller.setController(enginehelper::getControllerType());
 }
 
 
 /*
- * Initialize the loggers, as well as max log level
- * Two types of loggers: consol and file
+ * Initialize the loggers.
+ * Passes the command line arguments to logwrapper
  */
 extern "C" void initLogger(int argc, char *argv[]) {
     std::vector<std::string> allArgs(argv, argv + argc);
-    std::string cla_args;
+    std::string programArgs;
 
     // Convert args vector to string
-    for (unsigned int i = 0; i < allArgs.size(); i++) {
-        cla_args += allArgs[i] + " ";
+    // args used will be logged
+    for (std::vector<int>::size_type i = 0; i < allArgs.size(); i++) {
+        programArgs += allArgs[i] + " ";
     }
 
     // Set log level depending if debug flag set or if we are in a replay
-    plog::Severity log_level = plog::info;
-    if (options.debug == TRUE) {log_level = plog::verbose;}
-    if (options.controller_type == CONTROLLER_TYPE_REPLAY) {log_level = plog::error;}
+    plog::Severity logLevel = static_cast<plog::Severity>(options.log_level);
+    if (options.controller_type == CONTROLLER_TYPE_REPLAY) {logLevel = plog::error;}
 
-    logwrap::initLogger(log_level, cla_args);
+    logwrap::initLogger(logLevel, programArgs);
 }
 
 
 /*
- * Set the levelset given by the command line argument
+ * Set the levelset given by the command line argument.
  */
 extern "C" void setLevelSet(void) {
     enginehelper::setLevelSet();
@@ -134,7 +135,7 @@ extern "C" void setLevelSet(void) {
 
 
 /*
- * Save the RNG seed, levelset and level used
+ * Save the RNG seed, levelset and level used.
  */
 extern "C" void saveReplayLevelInfo(void) {
     if (options.controller_type == CONTROLLER_TYPE_REPLAY) {return;}
@@ -148,7 +149,7 @@ extern "C" void saveReplayLevelInfo(void) {
  * Close the summary window.
  */
 extern "C" void closeMapWindow() {
-    SummaryWindow::close();
+    summarywindow::close();
 }
 
 // ----------------------- Action Handler --------------------------
@@ -158,7 +159,7 @@ extern "C" void closeMapWindow() {
  * Implementation of solution will depend on controller type.
  */
 extern "C" int getAction() {
-    if (options.summary_window) {SummaryWindow::draw();}
+    if (options.summary_window) {summarywindow::draw();}
     return controller.getAction();
 }
 
@@ -169,59 +170,20 @@ extern "C" int getAction() {
  * in the built in CE programming
  */
 extern "C" void handleCustomLevelProgramming() {
-    std::string subdir_string(leveldir_current->subdir);
-    if (subdir_string == levelset_survival) {
+    std::string currentLevelsetSubdir(leveldir_current->subdir);
+    if (currentLevelsetSubdir == levelsetSurvival) {
         levelprogramming::customLevelProgrammingUpdate();
     }
-}
-
-
-int yamCounter = 0;
-int spaceCounter = 0;
-
-// rowIndex, yamCounter, spaceCounter
-std::vector<std::array<int, 3>> counters = {{6,0,0}, {10,0,0}};
-
-void addElement(std::array<int, 3> &counters) {
-    // create space
-    if (counters[1] == 5) {
-        counters[1] = 0;
-        counters[2] = RNG::getRandomNumber(16) + 16;
-        return;
-    }
-
-    // Spacing decrement
-    if (counters[2] != 0) {
-        counters[2] -= 1;
-        return;
-    }
-
-    // Add new object
-    Feld[0][counters[0]] = enginetype::FIELD_CUSTOM_12;
-    MovDir[0][counters[0]] = 2;
-    counters[1] += 1;
 }
 
 
 // ----------------------------- RNG ------------------------------
 
 /*
- * Wrapper to get random number for engine use
- * Engine already provides RNG, but this allows for reproducibility
- * during simulation.
+ * Wrapper to get random number for engine use.
  */
 extern "C" int getRandomNumber(int max) {
     return RNG::getRandomNumber(max);
-}
-
-/*
- * Sets the random number generator seed
- * Reseeding is used for simulations, as the next state outcomes will
- * be different depending on whether or not simulations are used (as it
- * advances the RNG used by the engine)
- */
-extern "C" void setRandomNumberSeed() {
-    // RNG::setSeedEngineHash();
 }
 
 
@@ -248,8 +210,8 @@ extern "C" void testEngineSpeed() {
  * Results are logged to file
  */
 extern "C" void testBFSSpeed() {
-    enginetype::GridCell goal_cell = enginehelper::findGoalLocation();
-    enginehelper::setBoardDistancesDijkstra(goal_cell);
+    enginetype::GridCell exitCell = enginehelper::findExitLocation();
+    enginehelper::setBoardDistancesDijkstra(exitCell);
     logwrap::setLogLevel(plog::debug);
     testenginespeed::testBfsSpeed();
 }
@@ -262,8 +224,8 @@ extern "C" void testBFSSpeed() {
  * Results are logged to file
  */
 extern "C" void testMCTSSpeed() {
-    enginetype::GridCell goal_cell = enginehelper::findGoalLocation();
-    enginehelper::setBoardDistancesDijkstra(goal_cell);
+    enginetype::GridCell exitCell = enginehelper::findExitLocation();
+    enginehelper::setBoardDistancesDijkstra(exitCell);
     logwrap::setLogLevel(plog::debug);
     testenginespeed::testMctsSpeed();
 }
@@ -288,75 +250,26 @@ extern "C" void testAll() {
     std::string msg = "Running all tests...";
     // Save current game state
     GameState state;
-    state.setFromSimulator();
+    state.setFromEngineState();
 
-    enginetype::GridCell goal_cell = enginehelper::findGoalLocation();
-    enginehelper::setBoardDistancesDijkstra(goal_cell);
+    enginetype::GridCell exitCell = enginehelper::findExitLocation();
+    enginehelper::setBoardDistancesDijkstra(exitCell);
 
     PLOGI_(logwrap::FileLogger) << msg;
 
-    state.restoreSimulator();
+    state.restoreEngineState();
     testenginespeed::testEngineSpeedNoOptimizations();
 
-    state.restoreSimulator();
+    state.restoreEngineState();
     testenginespeed::testEngineSpeedWithOptimizations();
     
-    state.restoreSimulator();
+    state.restoreEngineState();
     testenginespeed::testBfsSpeed();
 
-    state.restoreSimulator();
+    state.restoreEngineState();
     testenginespeed::testMctsSpeed();
 
-    state.restoreSimulator();
+    state.restoreEngineState();
     testrng::testStateAfterSimulations();
 }
 
-
-/*
- * Logs the engine type being used my the simulator
- * Depending on the level set being used, different parts of the simulator
- * are used. In most cases (and in all custom maps), TYPE_RND is used.
- */
-extern "C" void debugEngineType() {
-    logwrap::logEngineType();
-}
-
-
-/*
- * Logs some of the important player fields
- */
-extern "C" void debugPlayerDetails() {
-    logwrap::logPlayerDetails();
-}
-
-
-/*
- * Logs the current board state (FELD) at the tile level
- */
-extern "C" void debugBoardState() {
-    logwrap::logBoardState();
-}
-
-
-/*
- * Logs the current board state (MovPos) sprite tile distance offsets
- */
-extern "C" void debugMovPosState() {
-    logwrap::logMovPosState();
-}
-
-
-/*
- * Logs the current board state (MovDir) sprite tile direction offsets
- */
-extern "C" void debugMovDirState() {
-    logwrap::logMovDirState();
-}
-
-
-/*
- * Logs the current tile distances to goal (used in pathfinding)
- */
-extern "C" void debugBoardDistances() {
-   logwrap::logBoardDistances();
-}

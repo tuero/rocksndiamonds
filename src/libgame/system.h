@@ -1004,6 +1004,7 @@ struct OptionInfo
   controller_type controller_type;       // Solver to act as controller
   int level_number;                      // level number to load
   int delay;                             // SetVideoFrameDelay
+  int log_level;
   boolean summary_window;
   char* replay_file;
   char* level_set;

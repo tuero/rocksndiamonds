@@ -611,16 +611,14 @@ void AbstractGraph::logGraph() {
             // Current node
             msg = "Level: " + std::to_string(node_level) + ", Node: " + std::to_string(node_id); 
             msg += ", value: " + std::to_string(node_value) + ", goal: " + std::to_string(is_goal);
-            // LOGD_(logwrap::FileLogger) << msg;
-            LOGI_(logwrap::FileLogger) << msg;
+            LOGD_(logwrap::FileLogger) << msg;
 
             // Neighbours
             msg = "\tNeighbours: ";
             for (auto const &neighbour : neighbours) {
                 msg += std::to_string(neighbour.first) + ", ";
             }
-            // LOGD_(logwrap::FileLogger) << msg;
-            LOGI_(logwrap::FileLogger) << msg;
+            LOGD_(logwrap::FileLogger) << msg;
 
             // Node Reperesentation
             msg = "\tRepresenting: ";
@@ -628,16 +626,14 @@ void AbstractGraph::logGraph() {
                 msg += "(" + std::to_string(rep.x) + "," + std::to_string(rep.y) + "), ";
                 print_array[rep.y][rep.x] = node_id;
             }
-            // LOGD_(logwrap::FileLogger) << msg;
-            LOGI_(logwrap::FileLogger) << msg;
+            LOGD_(logwrap::FileLogger) << msg;
 
             // Children
             msg = "\tChildren: ";
             for (auto const &child : children) {
                 msg += std::to_string(child->getId()) + ", ";
             }
-            // LOGD_(logwrap::FileLogger) << msg;
-            LOGI_(logwrap::FileLogger) << msg;
+            LOGD_(logwrap::FileLogger) << msg;
         }
         boardPrint(print_array);
     }
@@ -681,16 +677,14 @@ void AbstractGraph::logGraphLevel(int level) {
         // Current node
         msg = "Level: " + std::to_string(node_level) + ", Node: " + std::to_string(node_id); 
         msg += ", value: " + std::to_string(node_value) + ", goal: " + std::to_string(is_goal);
-        // LOGD_(logwrap::FileLogger) << msg;
-        LOGI_(logwrap::FileLogger) << msg;
+        LOGD_(logwrap::FileLogger) << msg;
 
         // Neighbours
         msg = "\tNeighbours: ";
         for (auto const &neighbour : neighbours) {
             msg += std::to_string(neighbour.first) + ", ";
         }
-        // LOGD_(logwrap::FileLogger) << msg;
-        LOGI_(logwrap::FileLogger) << msg;
+        LOGD_(logwrap::FileLogger) << msg;
 
         // Node Reperesentation
         msg = "\tRepresenting: ";
@@ -698,16 +692,14 @@ void AbstractGraph::logGraphLevel(int level) {
             msg += "(" + std::to_string(rep.x) + "," + std::to_string(rep.y) + "), ";
             print_array[rep.y][rep.x] = node_id;
         }
-        // LOGD_(logwrap::FileLogger) << msg;
-        LOGI_(logwrap::FileLogger) << msg;
+        LOGD_(logwrap::FileLogger) << msg;
 
         // Children
         msg = "\tChildren: ";
         for (auto const &child : children) {
             msg += std::to_string(child->getId()) + ", ";
         }
-        // LOGD_(logwrap::FileLogger) << msg;
-        LOGI_(logwrap::FileLogger) << msg;
+        LOGD_(logwrap::FileLogger) << msg;
     }
     boardPrint(print_array);
 }

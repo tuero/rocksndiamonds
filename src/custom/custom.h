@@ -1,7 +1,16 @@
+/**
+ * @file: custom.h
+ *
+ * @brief: Exposed functions which are called in game engine
+ * 
+ * @author: Jake Tuero
+ * Date: June 2019
+ * Contact: tuero@ualberta.ca
+ */
+
 
 #ifndef CUSTOM_H
 #define CUSTOM_H
-
 
 
 #ifdef __cplusplus
@@ -16,31 +25,41 @@ extern "C"
     // ---------------- Init Functions ------------------
 
     /*
-     * Called whenever level is started
-     * Calculates tile distances to goal for MCTS with goal, initializes Zorbrist Tables
-     * for state hashing, and sends starting state information to logger.
+     * Perform all necessary actions at level start.
+     *
+     * Called whenever level is started. Calculates tile distances to goal for 
+     * MCTS with goal, initializes Zorbrist Tables for state hashing, and sends 
+     * starting state information to logger. Levels with custom programming call 
+     * the respective level start actions.
      */
     void handleLevelStart(void);
 
     /*
-     * Initialize the controller to be used
-     * Controller is supplied by a command line argument
+     * Set the controller to be used.
+     * 
+     * The controller is supplied by the -controller command line argument. If none is 
+     * given, then the default user controller is used (user keyboard input)
      */
-    void initController(void);
+    void setController(void);
 
     /*
-     * Initialize the loggers, as well as max log level
-     * Two types of loggers: consol and file
+     * Initialize the loggers.
+     *
+     * A file and consol logger are used. Consol logger only displays partial information
+     * which would be of interest to the user.
+     *
+     * @param argc Number of command line arguments supplied to program
+     * @param argc Char array of command line arguments supplied to program
      */
     void initLogger(int argc, char *argv[]);
 
     /*
-     * Set the levelset given by the command line argument
+     * Set the levelset given by the command line argument.
      */
     void setLevelSet(void); 
 
     /*
-     * Save the RNG seed, levelset and level used
+     * Save the RNG seed, levelset and level used.
      */
     void saveReplayLevelInfo(void);
 
@@ -54,12 +73,15 @@ extern "C"
     // --------------- Action Handler ------------------
 
     /*
-     * Get an action from the controller and send back to engine.
-     * Implementation of solution will depend on controller type.
+     * Get an action from the controller (implementation specific) and send back to engine.
+     *
+     * @return Integer representation of action as defined by the engine.
      */
     int getAction(void);
 
     /*
+     * Call level specific actions for custom programming levels.
+     * 
      * Some custom levels have elements that continuously spawn in
      * Hook needs to be made in event loop, as these features are not supported
      * in the built in CE programming
@@ -70,21 +92,18 @@ extern "C"
     // -------------------- RNG ----------------------
 
     /*
-     * Wrapper to get random number for engine use
+     * Wrapper to get random number for engine use.
+     * 
      * Engine already provides RNG, but this allows for reproducibility
      * during simulation.
+     *
+     * @return Next random number from the uniform generator.
      */
     int getRandomNumber(int max);
 
-    /*
-     * Sets the random number generator seed
-     * Reseeding is used for simulations, as the next state outcomes will
-     * be different depending on whether or not simulations are used (as it
-     * advances the RNG used by the engine)
-     */
-    void setRandomNumberSeed(void);
 
     // ---------------- Tests ----------------------
+
     /*
      * Test the engine simulator speed.
      * These tests will simulate random player actions and progress the environment
@@ -121,39 +140,6 @@ extern "C"
     void testAll(void);
 
 
-    // ------------- Debug Logging ------------------
-
-    /*
-     * Logs the engine type being used my the simulator
-     * Depending on the level set being used, different parts of the simulator
-     * are used. In most cases (and in all custom maps), TYPE_RND is used.
-     */
-    void debugEngineType(void);
-
-    /*
-     * Logs some of the important player fields
-     */
-    void debugPlayerDetails(void);
-
-    /*
-     * Logs the current board state (FELD) at the tile level
-     */
-    void debugBoardState(void);
-
-    /*
-     * Logs the current board state (MovPos) sprite tile distance offsets
-     */
-    void debugMovPosState(void);
-
-    /*
-     * Logs the current board state (MovDir) sprite tile direction offsets
-     */
-    void debugMovDirState(void);
-
-    /*
-     * Logs the current tile distances to goal (used in pathfinding)
-     */
-    void debugBoardDistances(void);
 
 #ifdef __cplusplus
 }
