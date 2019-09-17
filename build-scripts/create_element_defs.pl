@@ -2360,6 +2360,7 @@ sub print_image_config_vars
 	    # --- some prefix replacements ---
 
 	    $var =~ s/^main\./menu.main./;
+	    $var =~ s/^setup\./menu.setup./;
 	    $var =~ s/^\[player\]\./game.player_/;
 	    $var =~ s/^\[title_initial\]/title_initial_default/;
 	    $var =~ s/^\[title\]/title_default/;

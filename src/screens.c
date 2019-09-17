@@ -8330,13 +8330,13 @@ static void getScreenMenuButtonPos(int *x, int *y, int gadget_id)
       break;
 
     case SCREEN_CTRL_ID_PREV_PLAYER:
-      *x = mSX + TILEX * 10;
-      *y = mSY + TILEY * MENU_SCREEN_START_YPOS;
+      *x = mSX + GDI_ACTIVE_POS(menu.setup.button.prev_player.x);
+      *y = mSY + GDI_ACTIVE_POS(menu.setup.button.prev_player.y);
       break;
 
     case SCREEN_CTRL_ID_NEXT_PLAYER:
-      *x = mSX + TILEX * 12;
-      *y = mSY + TILEY * MENU_SCREEN_START_YPOS;
+      *x = mSX + GDI_ACTIVE_POS(menu.setup.button.next_player.x);
+      *y = mSY + GDI_ACTIVE_POS(menu.setup.button.next_player.y);
       break;
 
     case SCREEN_CTRL_ID_INSERT_SOLUTION:

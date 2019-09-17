@@ -2719,6 +2719,17 @@ struct MenuMainInfo
   struct TextPosInfo network_players;
 };
 
+struct MenuSetupButtonInfo
+{
+  struct MenuPosInfo prev_player;
+  struct MenuPosInfo next_player;
+};
+
+struct MenuSetupInfo
+{
+  struct MenuSetupButtonInfo button;
+};
+
 struct TitleFadingInfo
 {
   int fade_mode;
@@ -2807,6 +2818,7 @@ struct MenuInfo
   int music[NUM_SPECIAL_GFX_ARGS];
 
   struct MenuMainInfo main;
+  struct MenuSetupInfo setup;
 };
 
 struct DoorInfo

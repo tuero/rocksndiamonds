@@ -8087,6 +8087,11 @@ struct ConfigInfo image_config[] =
   { "main.preview_players.xoffset",		"-1"			},
   { "main.preview_players.yoffset",		"-1"			},
 
+  { "setup.button.prev_player.x",		"320"			},
+  { "setup.button.prev_player.y",		"64"			},
+  { "setup.button.next_player.x",		"384"			},
+  { "setup.button.next_player.y",		"64"			},
+
   { "preview.x",				"272"			},
   { "preview.y",				"380"			},
   { "preview.align",				"center"		},
