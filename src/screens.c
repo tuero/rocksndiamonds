@@ -8300,64 +8300,10 @@ void HandleGameActions(void)
 
 // ---------- new screen button stuff --------------------------------------
 
-static void getScreenMenuButtonPos(int *x, int *y, int gadget_id)
-{
-  switch (gadget_id)
-  {
-    case SCREEN_CTRL_ID_PREV_LEVEL:
-      *x = mSX + GDI_ACTIVE_POS(menu.main.button.prev_level.x);
-      *y = mSY + GDI_ACTIVE_POS(menu.main.button.prev_level.y);
-      break;
-
-    case SCREEN_CTRL_ID_NEXT_LEVEL:
-      *x = mSX + GDI_ACTIVE_POS(menu.main.button.next_level.x);
-      *y = mSY + GDI_ACTIVE_POS(menu.main.button.next_level.y);
-      break;
-
-    case SCREEN_CTRL_ID_FIRST_LEVEL:
-      *x = mSX + GDI_ACTIVE_POS(menu.main.button.first_level.x);
-      *y = mSY + GDI_ACTIVE_POS(menu.main.button.first_level.y);
-      break;
-
-    case SCREEN_CTRL_ID_LAST_LEVEL:
-      *x = mSX + GDI_ACTIVE_POS(menu.main.button.last_level.x);
-      *y = mSY + GDI_ACTIVE_POS(menu.main.button.last_level.y);
-      break;
-
-    case SCREEN_CTRL_ID_LEVEL_NUMBER:
-      *x = mSX + GDI_ACTIVE_POS(menu.main.button.level_number.x);
-      *y = mSY + GDI_ACTIVE_POS(menu.main.button.level_number.y);
-      break;
-
-    case SCREEN_CTRL_ID_PREV_PLAYER:
-      *x = mSX + GDI_ACTIVE_POS(menu.setup.button.prev_player.x);
-      *y = mSY + GDI_ACTIVE_POS(menu.setup.button.prev_player.y);
-      break;
-
-    case SCREEN_CTRL_ID_NEXT_PLAYER:
-      *x = mSX + GDI_ACTIVE_POS(menu.setup.button.next_player.x);
-      *y = mSY + GDI_ACTIVE_POS(menu.setup.button.next_player.y);
-      break;
-
-    case SCREEN_CTRL_ID_INSERT_SOLUTION:
-      *x = mSX + GDI_ACTIVE_POS(menu.main.button.insert_solution.x);
-      *y = mSY + GDI_ACTIVE_POS(menu.main.button.insert_solution.y);
-      break;
-
-    case SCREEN_CTRL_ID_PLAY_SOLUTION:
-      *x = mSX + GDI_ACTIVE_POS(menu.main.button.play_solution.x);
-      *y = mSY + GDI_ACTIVE_POS(menu.main.button.play_solution.y);
-      break;
-
-    default:
-      Error(ERR_EXIT, "unknown gadget ID %d", gadget_id);
-  }
-}
-
 static struct
 {
   int gfx_unpressed, gfx_pressed;
-  void (*get_gadget_position)(int *, int *, int);
+  struct MenuPosInfo *pos;
   int gadget_id;
   int screen_mask;
   unsigned int event_mask;
@@ -8366,7 +8312,7 @@ static struct
 {
   {
     IMG_MENU_BUTTON_PREV_LEVEL, IMG_MENU_BUTTON_PREV_LEVEL_ACTIVE,
-    getScreenMenuButtonPos,
+    &menu.main.button.prev_level,
     SCREEN_CTRL_ID_PREV_LEVEL,
     SCREEN_MASK_MAIN,
     GD_EVENT_PRESSED | GD_EVENT_REPEATED,
@@ -8374,7 +8320,7 @@ static struct
   },
   {
     IMG_MENU_BUTTON_NEXT_LEVEL, IMG_MENU_BUTTON_NEXT_LEVEL_ACTIVE,
-    getScreenMenuButtonPos,
+    &menu.main.button.next_level,
     SCREEN_CTRL_ID_NEXT_LEVEL,
     SCREEN_MASK_MAIN,
     GD_EVENT_PRESSED | GD_EVENT_REPEATED,
@@ -8382,7 +8328,7 @@ static struct
   },
   {
     IMG_MENU_BUTTON_FIRST_LEVEL, IMG_MENU_BUTTON_FIRST_LEVEL_ACTIVE,
-    getScreenMenuButtonPos,
+    &menu.main.button.first_level,
     SCREEN_CTRL_ID_FIRST_LEVEL,
     SCREEN_MASK_MAIN,
     GD_EVENT_RELEASED,
@@ -8390,7 +8336,7 @@ static struct
   },
   {
     IMG_MENU_BUTTON_LAST_LEVEL, IMG_MENU_BUTTON_LAST_LEVEL_ACTIVE,
-    getScreenMenuButtonPos,
+    &menu.main.button.last_level,
     SCREEN_CTRL_ID_LAST_LEVEL,
     SCREEN_MASK_MAIN,
     GD_EVENT_RELEASED,
@@ -8398,7 +8344,7 @@ static struct
   },
   {
     IMG_MENU_BUTTON_LEVEL_NUMBER, IMG_MENU_BUTTON_LEVEL_NUMBER_ACTIVE,
-    getScreenMenuButtonPos,
+    &menu.main.button.level_number,
     SCREEN_CTRL_ID_LEVEL_NUMBER,
     SCREEN_MASK_MAIN,
     GD_EVENT_RELEASED,
@@ -8406,7 +8352,7 @@ static struct
   },
   {
     IMG_MENU_BUTTON_LEFT, IMG_MENU_BUTTON_LEFT_ACTIVE,
-    getScreenMenuButtonPos,
+    &menu.setup.button.prev_player,
     SCREEN_CTRL_ID_PREV_PLAYER,
     SCREEN_MASK_INPUT,
     GD_EVENT_PRESSED | GD_EVENT_REPEATED,
@@ -8414,7 +8360,7 @@ static struct
   },
   {
     IMG_MENU_BUTTON_RIGHT, IMG_MENU_BUTTON_RIGHT_ACTIVE,
-    getScreenMenuButtonPos,
+    &menu.setup.button.next_player,
     SCREEN_CTRL_ID_NEXT_PLAYER,
     SCREEN_MASK_INPUT,
     GD_EVENT_PRESSED | GD_EVENT_REPEATED,
@@ -8422,7 +8368,7 @@ static struct
   },
   {
     IMG_MENU_BUTTON_INSERT_SOLUTION, IMG_MENU_BUTTON_INSERT_SOLUTION_ACTIVE,
-    getScreenMenuButtonPos,
+    &menu.main.button.insert_solution,
     SCREEN_CTRL_ID_INSERT_SOLUTION,
     SCREEN_MASK_MAIN_HAS_SOLUTION,
     GD_EVENT_RELEASED,
@@ -8430,7 +8376,7 @@ static struct
   },
   {
     IMG_MENU_BUTTON_PLAY_SOLUTION, IMG_MENU_BUTTON_PLAY_SOLUTION_ACTIVE,
-    getScreenMenuButtonPos,
+    &menu.main.button.play_solution,
     SCREEN_CTRL_ID_PLAY_SOLUTION,
     SCREEN_MASK_MAIN_HAS_SOLUTION,
     GD_EVENT_RELEASED,
@@ -8508,6 +8454,7 @@ static void CreateScreenMenubuttons(void)
 
   for (i = 0; i < NUM_SCREEN_MENUBUTTONS; i++)
   {
+    struct MenuPosInfo *pos = menubutton_info[i].pos;
     Bitmap *gd_bitmap_unpressed, *gd_bitmap_pressed;
     int gfx_unpressed, gfx_pressed;
     int x, y, width, height;
@@ -8516,7 +8463,8 @@ static void CreateScreenMenubuttons(void)
 
     event_mask = menubutton_info[i].event_mask;
 
-    menubutton_info[i].get_gadget_position(&x, &y, id);
+    x = mSX + GDI_ACTIVE_POS(pos->x);
+    y = mSY + GDI_ACTIVE_POS(pos->y);
 
     width  = graphic_info[menubutton_info[i].gfx_pressed].width;
     height = graphic_info[menubutton_info[i].gfx_pressed].height;
