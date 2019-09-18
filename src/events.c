@@ -1680,6 +1680,10 @@ void HandleButton(int mx, int my, int button, int button_nr)
      strEqual(setup.touch.control_type, TOUCH_CONTROL_FOLLOW_FINGER) ||
      (strEqual(setup.touch.control_type, TOUCH_CONTROL_VIRTUAL_BUTTONS) &&
       !CheckVirtualButtonPressed(mx, my, button)));
+
+  // always recognize potentially releasing already pressed gadgets
+  if (button == MB_RELEASED)
+    handle_gadgets = TRUE;
 #endif
 
   if (HandleGlobalAnimClicks(mx, my, button, FALSE))
