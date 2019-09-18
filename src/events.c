@@ -466,6 +466,17 @@ static void SetPlayerMouseAction(int mx, int my, int button)
   SetTileCursorXY(lx, ly);
 }
 
+static Key GetKeyFromGridButton(int grid_button)
+{
+  return (grid_button == CHAR_GRID_BUTTON_LEFT  ? setup.input[0].key.left :
+	  grid_button == CHAR_GRID_BUTTON_RIGHT ? setup.input[0].key.right :
+	  grid_button == CHAR_GRID_BUTTON_UP    ? setup.input[0].key.up :
+	  grid_button == CHAR_GRID_BUTTON_DOWN  ? setup.input[0].key.down :
+	  grid_button == CHAR_GRID_BUTTON_SNAP  ? setup.input[0].key.snap :
+	  grid_button == CHAR_GRID_BUTTON_DROP  ? setup.input[0].key.drop :
+	  KSYM_UNDEFINED);
+}
+
 void HandleButtonEvent(ButtonEvent *event)
 {
 #if DEBUG_EVENTS_BUTTON
@@ -669,13 +680,7 @@ static void HandleFingerEvent_VirtualButtons(FingerEvent *event)
   int y = event->y * overlay.grid_ysize;
   int grid_button = overlay.grid_button[x][y];
   int grid_button_action = GET_ACTION_FROM_GRID_BUTTON(grid_button);
-  Key key = (grid_button == CHAR_GRID_BUTTON_LEFT  ? setup.input[0].key.left :
-	     grid_button == CHAR_GRID_BUTTON_RIGHT ? setup.input[0].key.right :
-	     grid_button == CHAR_GRID_BUTTON_UP    ? setup.input[0].key.up :
-	     grid_button == CHAR_GRID_BUTTON_DOWN  ? setup.input[0].key.down :
-	     grid_button == CHAR_GRID_BUTTON_SNAP  ? setup.input[0].key.snap :
-	     grid_button == CHAR_GRID_BUTTON_DROP  ? setup.input[0].key.drop :
-	     KSYM_UNDEFINED);
+  Key key = GetKeyFromGridButton(grid_button);
   int key_status = (event->type == EVENT_FINGERRELEASE ? KEY_RELEASED :
 		    KEY_PRESSED);
   char *key_status_name = (key_status == KEY_RELEASED ? "KEY_RELEASED" :
