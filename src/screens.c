@@ -258,6 +258,7 @@ static void ModifyGameSpeedIfNeeded(void);
 static void DisableVsyncIfNeeded(void);
 
 static void MapScreenMenuGadgets(int);
+static void UnmapScreenMenuGadgets(int);
 static void MapScreenGadgets(int);
 static void MapScreenTreeGadgets(TreeInfo *);
 
@@ -8715,7 +8716,7 @@ void FreeScreenGadgets(void)
     FreeGadget(screen_gadget[i]);
 }
 
-void MapScreenMenuGadgets(int screen_mask)
+static void MapScreenMenuGadgets(int screen_mask)
 {
   int i;
 
@@ -8743,7 +8744,7 @@ static void UnmapScreenMenuGadgets(int screen_mask)
   }
 }
 
-void UpdateScreenMenuGadgets(int screen_mask, boolean map_gadgets)
+static void UpdateScreenMenuGadgets(int screen_mask, boolean map_gadgets)
 {
   if (map_gadgets)
     MapScreenMenuGadgets(screen_mask);
@@ -8751,7 +8752,7 @@ void UpdateScreenMenuGadgets(int screen_mask, boolean map_gadgets)
     UnmapScreenMenuGadgets(screen_mask);
 }
 
-void MapScreenGadgets(int num_entries)
+static void MapScreenGadgets(int num_entries)
 {
   int i;
 
@@ -8765,7 +8766,7 @@ void MapScreenGadgets(int num_entries)
     MapGadget(screen_gadget[scrollbar_info[i].gadget_id]);
 }
 
-void MapScreenTreeGadgets(TreeInfo *ti)
+static void MapScreenTreeGadgets(TreeInfo *ti)
 {
   MapScreenGadgets(numTreeInfoInGroup(ti));
 }
