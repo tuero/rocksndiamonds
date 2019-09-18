@@ -15711,8 +15711,6 @@ void MapUndoRedoButtons(void)
 
   MapGadget(game_gadget[GAME_CTRL_ID_UNDO]);
   MapGadget(game_gadget[GAME_CTRL_ID_REDO]);
-
-  ModifyGadget(game_gadget[GAME_CTRL_ID_PAUSE2], GDI_CHECKED, TRUE, GDI_END);
 }
 
 void UnmapUndoRedoButtons(void)
@@ -15722,8 +15720,21 @@ void UnmapUndoRedoButtons(void)
 
   MapGameButtonsAtSamePosition(GAME_CTRL_ID_UNDO);
   MapGameButtonsAtSamePosition(GAME_CTRL_ID_REDO);
+}
 
-  ModifyGadget(game_gadget[GAME_CTRL_ID_PAUSE2], GDI_CHECKED, FALSE, GDI_END);
+void ModifyPauseButtons(void)
+{
+  static int ids[] =
+  {
+    GAME_CTRL_ID_PAUSE,
+    GAME_CTRL_ID_PAUSE2,
+    GAME_CTRL_ID_PANEL_PAUSE,
+    -1
+  };
+  int i;
+
+  for (i = 0; ids[i] > -1; i++)
+    ModifyGadget(game_gadget[ids[i]], GDI_CHECKED, tape.pausing, GDI_END);
 }
 
 static void MapGameButtonsExt(boolean on_tape)

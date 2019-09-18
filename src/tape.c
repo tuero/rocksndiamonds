@@ -764,14 +764,17 @@ void TapeTogglePause(boolean toggle_mode)
     return;
   }
 
-  if (setup.show_snapshot_buttons &&
-      game_status == GAME_MODE_PLAYING &&
-      CheckEngineSnapshotList())
+  if (game_status == GAME_MODE_PLAYING)
   {
-    if (tape.pausing)
-      MapUndoRedoButtons();
-    else if (!tape.single_step)
-      UnmapUndoRedoButtons();
+    if (setup.show_snapshot_buttons && CheckEngineSnapshotList())
+    {
+      if (tape.pausing)
+	MapUndoRedoButtons();
+      else if (!tape.single_step)
+	UnmapUndoRedoButtons();
+    }
+
+    ModifyPauseButtons();
   }
 }
 
