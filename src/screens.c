@@ -7906,6 +7906,13 @@ static boolean ConfigureVirtualButtonsMain(void)
     CHAR_GRID_BUTTON_SNAP,
     CHAR_GRID_BUTTON_DROP
   };
+  enum
+  {
+    ACTION_NONE,
+    ACTION_ESCAPE,
+    ACTION_BACK,
+    ACTION_NEXT
+  };
   int font_nr = FONT_INPUT_1_ACTIVE;
   int font_height = getFontHeight(font_nr);
   int ypos1 = SYSIZE / 2 - font_height * 2;
@@ -7945,74 +7952,23 @@ static boolean ConfigureVirtualButtonsMain(void)
 
     while (NextValidEvent(&event))
     {
+      int action = ACTION_NONE;
+
+      // ---------- handle events and set the resulting action ----------
+
       switch (event.type)
       {
         case EVENT_KEYPRESS:
 	  {
 	    Key key = GetEventKey((KeyEvent *)&event, FALSE);
 
-	    // press 'Escape' to abort and keep the old key bindings
-	    if (key == KSYM_Escape)
-	    {
-	      for (x = 0; x < MAX_GRID_XSIZE; x++)
-		for (y = 0; y < MAX_GRID_YSIZE; y++)
-		  overlay.grid_button[x][y] = grid_button_old[x][y];
-
-	      FadeSkipNextFadeIn();
-
-	      finished = TRUE;
-
-	      break;
-	    }
-
-	    // press 'Enter' to keep the existing key binding
-	    if (key == KSYM_Return ||
-		key == KSYM_Menu ||
-		key == KSYM_space)
-	    {
-	      step_nr++;
-	    }
-	    else if (key == KSYM_BackSpace ||
-		     key == KSYM_Back)
-	    {
-	      if (step_nr == 0)
-	      {
-		FadeSkipNextFadeIn();
-
-		finished = TRUE;
-
-		break;
-	      }
-
-	      step_nr--;
-	    }
-	    else
-	    {
-	      break;
-	    }
-
-	    // all virtual buttons configured
-	    if (step_nr == 6)
-	    {
-	      finished = TRUE;
-	      success = TRUE;
-
-	      break;
-	    }
-
-	    for (x = 0; x < MAX_GRID_XSIZE; x++)
-	      for (y = 0; y < MAX_GRID_YSIZE; y++)
-		grid_button_tmp[x][y] = overlay.grid_button[x][y];
-
-	    overlay.grid_button_highlight = grid_button[step_nr];
-
-	    // query next virtual button
-
-	    ClearField();
-
-	    DrawTextSCentered(mSY - SY + 16, FONT_TITLE_1, "Virtual Buttons");
-	    DrawTextSCentered(ypos1, font_nr, "Select tiles to");
-	    DrawTextSCentered(ypos2, font_nr, customize_step_text[step_nr]);
+	    action = (key == KSYM_Escape ?	ACTION_ESCAPE :
+		      key == KSYM_BackSpace ||
+		      key == KSYM_Back ?	ACTION_BACK :
+		      key == KSYM_Return ||
+		      key == KSYM_Menu ||
+		      key == KSYM_space ?	ACTION_NEXT :
+		      ACTION_NONE);
 	  }
 	  break;
 
@@ -8025,6 +7981,13 @@ static boolean ConfigureVirtualButtonsMain(void)
 	  {
 	    ButtonEvent *button = (ButtonEvent *)&event;
 
+	    motion_status = FALSE;
+
+	    if (button->type == EVENT_BUTTONPRESS)
+	      button_status = button->button;
+	    else
+	      button_status = MB_RELEASED;
+
 	    button->x += video.screen_xoffset;
 	    button->y += video.screen_yoffset;
 
@@ -8033,17 +7996,11 @@ static boolean ConfigureVirtualButtonsMain(void)
 
 	    if (button->type == EVENT_BUTTONPRESS)
 	    {
-	      button_status = button->button;
-
 	      grid_button_draw =
 		(overlay.grid_button[x][y] != grid_button[step_nr] ?
 		 grid_button[step_nr] : CHAR_GRID_BUTTON_NONE);
 
 	      set_grid_button = TRUE;
-	    }
-	    else
-	    {
-	      button_status = MB_RELEASED;
 	    }
 	  }
 	  break;
@@ -8051,6 +8008,8 @@ static boolean ConfigureVirtualButtonsMain(void)
 	case EVENT_MOTIONNOTIFY:
 	  {
 	    MotionEvent *motion = (MotionEvent *)&event;
+
+	    motion_status = TRUE;
 
 	    motion->x += video.screen_xoffset;
 	    motion->y += video.screen_yoffset;
@@ -8088,6 +8047,64 @@ static boolean ConfigureVirtualButtonsMain(void)
         default:
 	  HandleOtherEvents(&event);
 	  break;
+      }
+
+      // ---------- perform action set by handling events ----------
+
+      if (action == ACTION_ESCAPE)
+      {
+	// abort and restore the old key bindings
+
+	for (x = 0; x < MAX_GRID_XSIZE; x++)
+	  for (y = 0; y < MAX_GRID_YSIZE; y++)
+	    overlay.grid_button[x][y] = grid_button_old[x][y];
+
+	FadeSkipNextFadeIn();
+
+	finished = TRUE;
+      }
+      else if (action == ACTION_BACK)
+      {
+	// keep the configured key bindings and go to previous page
+
+	step_nr--;
+
+	if (step_nr < 0)
+	{
+	  FadeSkipNextFadeIn();
+
+	  finished = TRUE;
+	}
+      }
+      else if (action == ACTION_NEXT)
+      {
+	// keep the configured key bindings and go to next page
+
+	step_nr++;
+
+	// all virtual buttons configured
+	if (step_nr == 6)
+	{
+	  finished = TRUE;
+	  success = TRUE;
+	}
+      }
+
+      if (action != ACTION_NONE && !finished)
+      {
+	for (x = 0; x < MAX_GRID_XSIZE; x++)
+	  for (y = 0; y < MAX_GRID_YSIZE; y++)
+	    grid_button_tmp[x][y] = overlay.grid_button[x][y];
+
+	overlay.grid_button_highlight = grid_button[step_nr];
+
+	// configure next virtual button
+
+	ClearField();
+
+	DrawTextSCentered(mSY - SY + 16, FONT_TITLE_1, "Virtual Buttons");
+	DrawTextSCentered(ypos1, font_nr, "Select tiles to");
+	DrawTextSCentered(ypos2, font_nr, customize_step_text[step_nr]);
       }
 
       if (set_grid_button)
