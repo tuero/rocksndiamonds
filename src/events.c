@@ -39,7 +39,6 @@ static int cursor_mode_last = CURSOR_DEFAULT;
 static unsigned int special_cursor_delay = 0;
 static unsigned int special_cursor_delay_value = 1000;
 
-static boolean virtual_button_pressed = FALSE;
 static boolean stop_processing_events = FALSE;
 
 
@@ -477,6 +476,21 @@ static Key GetKeyFromGridButton(int grid_button)
 	  KSYM_UNDEFINED);
 }
 
+#if defined(PLATFORM_ANDROID)
+static boolean CheckVirtualButtonPressed(int mx, int my, int button)
+{
+  float touch_x = (float)(mx + video.screen_xoffset) / video.screen_width;
+  float touch_y = (float)(my + video.screen_yoffset) / video.screen_height;
+  int x = touch_x * overlay.grid_xsize;
+  int y = touch_y * overlay.grid_ysize;
+  int grid_button = overlay.grid_button[x][y];
+  Key key = GetKeyFromGridButton(grid_button);
+  int key_status = (button == MB_RELEASED ? KEY_RELEASED : KEY_PRESSED);
+
+  return (key_status == KEY_PRESSED && key != KSYM_UNDEFINED);
+}
+#endif
+
 void HandleButtonEvent(ButtonEvent *event)
 {
 #if DEBUG_EVENTS_BUTTON
@@ -686,8 +700,6 @@ static void HandleFingerEvent_VirtualButtons(FingerEvent *event)
   char *key_status_name = (key_status == KEY_RELEASED ? "KEY_RELEASED" :
 			   "KEY_PRESSED");
   int i;
-
-  virtual_button_pressed = (key_status == KEY_PRESSED && key != KSYM_UNDEFINED);
 
   // for any touch input event, enable overlay buttons (if activated)
   SetOverlayEnabled(TRUE);
@@ -1667,7 +1679,7 @@ void HandleButton(int mx, int my, int button, int button_nr)
      level.game_engine_type == GAME_ENGINE_TYPE_MM ||
      strEqual(setup.touch.control_type, TOUCH_CONTROL_FOLLOW_FINGER) ||
      (strEqual(setup.touch.control_type, TOUCH_CONTROL_VIRTUAL_BUTTONS) &&
-      !virtual_button_pressed));
+      !CheckVirtualButtonPressed(mx, my, button)));
 #endif
 
   if (HandleGlobalAnimClicks(mx, my, button, FALSE))
