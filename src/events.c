@@ -665,7 +665,6 @@ static struct
 
 static void HandleFingerEvent_VirtualButtons(FingerEvent *event)
 {
-#if 1
   int x = event->x * overlay.grid_xsize;
   int y = event->y * overlay.grid_ysize;
   int grid_button = overlay.grid_button[x][y];
@@ -677,30 +676,6 @@ static void HandleFingerEvent_VirtualButtons(FingerEvent *event)
 	     grid_button == CHAR_GRID_BUTTON_SNAP  ? setup.input[0].key.snap :
 	     grid_button == CHAR_GRID_BUTTON_DROP  ? setup.input[0].key.drop :
 	     KSYM_UNDEFINED);
-#else
-  float ypos = 1.0 - 1.0 / 3.0 * video.display_width / video.display_height;
-  float event_x = (event->x);
-  float event_y = (event->y - ypos) / (1 - ypos);
-  Key key = (event_x > 0         && event_x < 1.0 / 6.0 &&
-	     event_y > 2.0 / 3.0 && event_y < 1 ?
-	     setup.input[0].key.snap :
-	     event_x > 1.0 / 6.0 && event_x < 1.0 / 3.0 &&
-	     event_y > 2.0 / 3.0 && event_y < 1 ?
-	     setup.input[0].key.drop :
-	     event_x > 7.0 / 9.0 && event_x < 8.0 / 9.0 &&
-	     event_y > 0         && event_y < 1.0 / 3.0 ?
-	     setup.input[0].key.up :
-	     event_x > 6.0 / 9.0 && event_x < 7.0 / 9.0 &&
-	     event_y > 1.0 / 3.0 && event_y < 2.0 / 3.0 ?
-	     setup.input[0].key.left :
-	     event_x > 8.0 / 9.0 && event_x < 1 &&
-	     event_y > 1.0 / 3.0 && event_y < 2.0 / 3.0 ?
-	     setup.input[0].key.right :
-	     event_x > 7.0 / 9.0 && event_x < 8.0 / 9.0 &&
-	     event_y > 2.0 / 3.0 && event_y < 1 ?
-	     setup.input[0].key.down :
-	     KSYM_UNDEFINED);
-#endif
   int key_status = (event->type == EVENT_FINGERRELEASE ? KEY_RELEASED :
 		    KEY_PRESSED);
   char *key_status_name = (key_status == KEY_RELEASED ? "KEY_RELEASED" :
