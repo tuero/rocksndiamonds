@@ -2829,7 +2829,10 @@ static void DrawTouchInputOverlay_ShowGridButtons(int alpha)
 	continue;
 
       if (grid_button == overlay.grid_button_highlight)
-	alpha_draw = alpha_highlight;
+      {
+	draw_outlined = FALSE;
+	alpha_draw = MIN((float)alpha_highlight * 1.5, SDL_ALPHA_OPAQUE);
+      }
 
       if (draw_pressed && overlay.grid_button_action & grid_button_action)
       {
