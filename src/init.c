@@ -275,6 +275,10 @@ static void InitBitmapPointers(void)
 
 void InitImageTextures(void)
 {
+  static int texture_graphics[] =
+  {
+    -1
+  };
   int i, j, k;
 
   FreeAllImageTextures();
@@ -300,6 +304,9 @@ void InitImageTextures(void)
       }
     }
   }
+
+  for (i = 0; texture_graphics[i] > -1; i++)
+    CreateImageTextures(texture_graphics[i]);
 }
 
 #if 1

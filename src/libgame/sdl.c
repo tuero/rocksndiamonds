@@ -14,6 +14,7 @@
 #include "joystick.h"
 #include "misc.h"
 #include "setup.h"
+#include "gadgets.h"
 
 #define ENABLE_UNUSED_CODE	0	// currently unused functions
 
@@ -39,6 +40,7 @@ void sge_Line(SDL_Surface *, Sint16, Sint16, Sint16, Sint16, Uint32);
 #if defined(USE_TOUCH_INPUT_OVERLAY)
 // functions to draw overlay graphics for touch device input
 static void DrawTouchInputOverlay(void);
+static void DrawTouchGadgetsOverlay(void);
 #endif
 
 void SDLLimitScreenUpdates(boolean enable)
@@ -212,6 +214,9 @@ static void UpdateScreenExt(SDL_Rect *rect, boolean with_frame_delay)
 #if defined(USE_TOUCH_INPUT_OVERLAY)
   // draw overlay graphics for touch device input, if needed
   DrawTouchInputOverlay();
+
+  // draw overlay gadgets for touch device input, if needed
+  DrawTouchGadgetsOverlay();
 #endif
 
   // global synchronization point of the game to align video frame delay
@@ -2947,5 +2952,10 @@ static void DrawTouchInputOverlay(void)
     DrawTouchInputOverlay_ShowGrid(alpha);
 
   DrawTouchInputOverlay_ShowGridButtons(alpha);
+}
+
+static void DrawTouchGadgetsOverlay(void)
+{
+  DrawGadgets_OverlayTouchButtons();
 }
 #endif

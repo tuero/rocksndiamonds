@@ -112,7 +112,8 @@
 #define GDI_INFO_TEXT			48
 #define GDI_ACTIVE			49
 #define GDI_DIRECT_DRAW			50
-#define GDI_CALLBACK_ACTION_ALWAYS	51
+#define GDI_OVERLAY_TOUCH_BUTTON	51
+#define GDI_CALLBACK_ACTION_ALWAYS	52
 
 // gadget deactivation hack
 #define GDI_ACTIVE_POS(a)		((a) < 0 ? POS_OFFSCREEN : (a))
@@ -237,6 +238,7 @@ struct GadgetInfo
   int custom_type_id;			// custom gadget type identifier
   char info_text[MAX_INFO_TEXTSIZE + 1];// short popup info text
   int x, y;				// gadget position
+  int orig_x, orig_y;			// gadget position (original)
   int width, height;			// gadget size
   unsigned int type;			// type (button, text input, ...)
   unsigned int state;			// state (pressed, released, ...)
@@ -245,6 +247,8 @@ struct GadgetInfo
   boolean mapped;			// gadget is mapped on the screen
   boolean active;			// gadget is active
   boolean direct_draw;			// directly draw to frontbuffer
+  boolean overlay_touch_button;		// gadget is overlay touch button
+  int overlay_touch_button_alpha;	// overlay touch button alpha value
   boolean callback_action_always;	// also callback if gadget unchanged
   int font;				// font to use when inactive
   int font_active;			// font to use when active
@@ -281,6 +285,10 @@ void MapGadget(struct GadgetInfo *);
 void UnmapGadget(struct GadgetInfo *);
 void UnmapAllGadgets(void);
 void RemapAllGadgets(void);
+
+void SetGadgetsPosition_OverlayTouchButtons(void);
+void DrawGadgets_OverlayTouchButtons(void);
+boolean CheckPosition_OverlayTouchButtons(int, int, int);
 
 boolean anyTextInputGadgetActive(void);
 boolean anyTextAreaGadgetActive(void);

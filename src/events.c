@@ -653,6 +653,7 @@ void HandleWindowEvent(WindowEvent *event)
 	video.display_height = new_display_height;
 
 	SDLSetScreenProperties();
+	SetGadgetsPosition_OverlayTouchButtons();
 
 	// check if screen orientation has changed (should always be true here)
 	if (nr != GRID_ACTIVE_NR())
@@ -1683,6 +1684,10 @@ void HandleButton(int mx, int my, int button, int button_nr)
 
   // always recognize potentially releasing already pressed gadgets
   if (button == MB_RELEASED)
+    handle_gadgets = TRUE;
+
+  // always recognize pressing or releasing overlay touch buttons
+  if (CheckPosition_OverlayTouchButtons(mx, my, button) && !motion_status)
     handle_gadgets = TRUE;
 #endif
 
