@@ -129,6 +129,9 @@ struct GameButtonInfo
   struct XY panel_sound_music;
   struct XY panel_sound_loops;
   struct XY panel_sound_simple;
+
+  struct XY touch_stop;
+  struct XY touch_pause;
 };
 
 struct GameSnapshotInfo
