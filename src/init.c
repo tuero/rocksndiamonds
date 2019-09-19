@@ -277,6 +277,9 @@ void InitImageTextures(void)
 {
   static int texture_graphics[] =
   {
+    IMG_GFX_REQUEST_BUTTON_TOUCH_YES,
+    IMG_GFX_REQUEST_BUTTON_TOUCH_NO,
+    IMG_GFX_REQUEST_BUTTON_TOUCH_CONFIRM,
     -1
   };
   int i, j, k;

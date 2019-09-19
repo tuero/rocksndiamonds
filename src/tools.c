@@ -35,8 +35,11 @@
 #define TOOL_CTRL_ID_PLAYER_2	4
 #define TOOL_CTRL_ID_PLAYER_3	5
 #define TOOL_CTRL_ID_PLAYER_4	6
+#define TOOL_CTRL_ID_TOUCH_YES	7
+#define TOOL_CTRL_ID_TOUCH_NO	8
+#define TOOL_CTRL_ID_TOUCH_CONFIRM 9
 
-#define NUM_TOOL_BUTTONS	7
+#define NUM_TOOL_BUTTONS	10
 
 // constants for number of doors and door parts
 #define NUM_DOORS		2
@@ -3133,10 +3136,13 @@ static void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
     {
       MapGadget(tool_gadget[TOOL_CTRL_ID_YES]);
       MapGadget(tool_gadget[TOOL_CTRL_ID_NO]);
+      MapGadget(tool_gadget[TOOL_CTRL_ID_TOUCH_YES]);
+      MapGadget(tool_gadget[TOOL_CTRL_ID_TOUCH_NO]);
     }
     else if (req_state & REQ_CONFIRM)
     {
       MapGadget(tool_gadget[TOOL_CTRL_ID_CONFIRM]);
+      MapGadget(tool_gadget[TOOL_CTRL_ID_TOUCH_CONFIRM]);
     }
     else if (req_state & REQ_PLAYER)
     {
@@ -4339,12 +4345,15 @@ static int RequestHandleEvents(unsigned int req_state)
 	    switch (request_gadget_id)
 	    {
 	      case TOOL_CTRL_ID_YES:
+	      case TOOL_CTRL_ID_TOUCH_YES:
 		result = TRUE;
 		break;
 	      case TOOL_CTRL_ID_NO:
+	      case TOOL_CTRL_ID_TOUCH_NO:
 		result = FALSE;
 		break;
 	      case TOOL_CTRL_ID_CONFIRM:
+	      case TOOL_CTRL_ID_TOUCH_CONFIRM:
 		result = TRUE | FALSE;
 		break;
 
@@ -4676,10 +4685,13 @@ static boolean RequestDoor(char *text, unsigned int req_state)
   {
     MapGadget(tool_gadget[TOOL_CTRL_ID_YES]);
     MapGadget(tool_gadget[TOOL_CTRL_ID_NO]);
+    MapGadget(tool_gadget[TOOL_CTRL_ID_TOUCH_YES]);
+    MapGadget(tool_gadget[TOOL_CTRL_ID_TOUCH_NO]);
   }
   else if (req_state & REQ_CONFIRM)
   {
     MapGadget(tool_gadget[TOOL_CTRL_ID_CONFIRM]);
+    MapGadget(tool_gadget[TOOL_CTRL_ID_TOUCH_CONFIRM]);
   }
   else if (req_state & REQ_PLAYER)
   {
@@ -5551,36 +5563,49 @@ static struct
   int graphic;
   struct TextPosInfo *pos;
   int gadget_id;
+  boolean is_touch_button;
   char *infotext;
 } toolbutton_info[NUM_TOOL_BUTTONS] =
 {
   {
     IMG_GFX_REQUEST_BUTTON_YES,		&request.button.yes,
-    TOOL_CTRL_ID_YES,			"yes"
+    TOOL_CTRL_ID_YES, FALSE,		"yes"
   },
   {
     IMG_GFX_REQUEST_BUTTON_NO,		&request.button.no,
-    TOOL_CTRL_ID_NO,			"no"
+    TOOL_CTRL_ID_NO, FALSE,		"no"
   },
   {
     IMG_GFX_REQUEST_BUTTON_CONFIRM,	&request.button.confirm,
-    TOOL_CTRL_ID_CONFIRM,		"confirm"
+    TOOL_CTRL_ID_CONFIRM, FALSE,	"confirm"
   },
   {
     IMG_GFX_REQUEST_BUTTON_PLAYER_1,	&request.button.player_1,
-    TOOL_CTRL_ID_PLAYER_1,		"player 1"
+    TOOL_CTRL_ID_PLAYER_1, FALSE,	"player 1"
   },
   {
     IMG_GFX_REQUEST_BUTTON_PLAYER_2,	&request.button.player_2,
-    TOOL_CTRL_ID_PLAYER_2,		"player 2"
+    TOOL_CTRL_ID_PLAYER_2, FALSE,	"player 2"
   },
   {
     IMG_GFX_REQUEST_BUTTON_PLAYER_3,	&request.button.player_3,
-    TOOL_CTRL_ID_PLAYER_3,		"player 3"
+    TOOL_CTRL_ID_PLAYER_3, FALSE,	"player 3"
   },
   {
     IMG_GFX_REQUEST_BUTTON_PLAYER_4,	&request.button.player_4,
-    TOOL_CTRL_ID_PLAYER_4,		"player 4"
+    TOOL_CTRL_ID_PLAYER_4, FALSE,	"player 4"
+  },
+  {
+    IMG_GFX_REQUEST_BUTTON_TOUCH_YES,	&request.button.touch_yes,
+    TOOL_CTRL_ID_TOUCH_YES, TRUE,	"yes"
+  },
+  {
+    IMG_GFX_REQUEST_BUTTON_TOUCH_NO,	&request.button.touch_no,
+    TOOL_CTRL_ID_TOUCH_NO, TRUE,	"no"
+  },
+  {
+    IMG_GFX_REQUEST_BUTTON_TOUCH_CONFIRM, &request.button.touch_confirm,
+    TOOL_CTRL_ID_TOUCH_CONFIRM, TRUE,	"confirm"
   }
 };
 
@@ -5597,8 +5622,9 @@ void CreateToolButtons(void)
     Bitmap *deco_bitmap = None;
     int deco_x = 0, deco_y = 0, deco_xpos = 0, deco_ypos = 0;
     unsigned int event_mask = GD_EVENT_RELEASED;
-    int dx = DX;
-    int dy = DY;
+    boolean is_touch_button = toolbutton_info[i].is_touch_button;
+    int base_x = (is_touch_button ? 0 : DX);
+    int base_y = (is_touch_button ? 0 : DY);
     int gd_x = gfx->src_x;
     int gd_y = gfx->src_y;
     int gd_xp = gfx->src_x + gfx->pressed_xoffset;
@@ -5607,9 +5633,9 @@ void CreateToolButtons(void)
     int y = pos->y;
     int id = i;
 
-    if (global.use_envelope_request)
+    if (global.use_envelope_request && !is_touch_button)
     {
-      setRequestPosition(&dx, &dy, TRUE);
+      setRequestPosition(&base_x, &base_y, TRUE);
 
       // check if request buttons are outside of envelope and fix, if needed
       if (x < 0 || x + gfx->width  > request.width ||
@@ -5656,8 +5682,8 @@ void CreateToolButtons(void)
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_IMAGE_ID, graphic,
 		      GDI_INFO_TEXT, toolbutton_info[i].infotext,
-		      GDI_X, dx + x,
-		      GDI_Y, dy + y,
+		      GDI_X, base_x + x,
+		      GDI_Y, base_y + y,
 		      GDI_WIDTH, gfx->width,
 		      GDI_HEIGHT, gfx->height,
 		      GDI_TYPE, GD_TYPE_NORMAL_BUTTON,
@@ -5669,6 +5695,7 @@ void CreateToolButtons(void)
 		      GDI_DECORATION_SIZE, pos->size, pos->size,
 		      GDI_DECORATION_SHIFTING, 1, 1,
 		      GDI_DIRECT_DRAW, FALSE,
+		      GDI_OVERLAY_TOUCH_BUTTON, is_touch_button,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_ACTION, HandleToolButtons,
 		      GDI_END);

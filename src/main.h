@@ -2649,10 +2649,15 @@ struct RequestButtonInfo
   struct TextPosInfo yes;
   struct TextPosInfo no;
   struct TextPosInfo confirm;
+
   struct TextPosInfo player_1;
   struct TextPosInfo player_2;
   struct TextPosInfo player_3;
   struct TextPosInfo player_4;
+
+  struct TextPosInfo touch_yes;
+  struct TextPosInfo touch_no;
+  struct TextPosInfo touch_confirm;
 };
 
 struct MenuMainButtonInfo

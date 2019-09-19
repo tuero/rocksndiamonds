@@ -40,6 +40,7 @@ FILES = RocksBusy.$(EXT)		\
 	RocksSP.$(EXT)			\
 	RocksScreen.$(EXT)		\
 	RocksToons.$(EXT)		\
+	RocksTouch.$(EXT)		\
 					\
 	RocksCE.$(EXT)			# dynamically generated from template
 
