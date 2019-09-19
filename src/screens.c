@@ -181,14 +181,18 @@
 #define SCREEN_CTRL_ID_NEXT_PLAYER	6
 #define SCREEN_CTRL_ID_INSERT_SOLUTION	7
 #define SCREEN_CTRL_ID_PLAY_SOLUTION	8
-#define SCREEN_CTRL_ID_SCROLL_UP	9
-#define SCREEN_CTRL_ID_SCROLL_DOWN	10
-#define SCREEN_CTRL_ID_SCROLL_VERTICAL	11
-#define SCREEN_CTRL_ID_NETWORK_SERVER	12
+#define SCREEN_CTRL_ID_TOUCH_PREV_PAGE	9
+#define SCREEN_CTRL_ID_TOUCH_NEXT_PAGE	10
+#define SCREEN_CTRL_ID_TOUCH_PREV_PAGE2	11
+#define SCREEN_CTRL_ID_TOUCH_NEXT_PAGE2	12
+#define SCREEN_CTRL_ID_SCROLL_UP	13
+#define SCREEN_CTRL_ID_SCROLL_DOWN	14
+#define SCREEN_CTRL_ID_SCROLL_VERTICAL	15
+#define SCREEN_CTRL_ID_NETWORK_SERVER	16
 
-#define NUM_SCREEN_GADGETS		13
+#define NUM_SCREEN_GADGETS		17
 
-#define NUM_SCREEN_MENUBUTTONS		9
+#define NUM_SCREEN_MENUBUTTONS		13
 #define NUM_SCREEN_SCROLLBUTTONS	2
 #define NUM_SCREEN_SCROLLBARS		1
 #define NUM_SCREEN_TEXTINPUT		1
@@ -196,6 +200,8 @@
 #define SCREEN_MASK_MAIN		(1 << 0)
 #define SCREEN_MASK_MAIN_HAS_SOLUTION	(1 << 1)
 #define SCREEN_MASK_INPUT		(1 << 2)
+#define SCREEN_MASK_TOUCH		(1 << 3)
+#define SCREEN_MASK_TOUCH2		(1 << 4)
 
 // graphic position and size values for buttons and scrollbars
 #define SC_MENUBUTTON_XSIZE		TILEX
@@ -7886,6 +7892,22 @@ void ConfigureJoystick(int player_nr)
   DrawSetupScreen_Input();
 }
 
+static void MapScreenMenuGadgets_OverlayTouchButtons(int y)
+{
+  if (y < video.screen_height / 3)
+  {
+    // remap touch gadgets to access upper part of the screen
+    UnmapScreenMenuGadgets(SCREEN_MASK_TOUCH);
+    MapScreenMenuGadgets(SCREEN_MASK_TOUCH2);
+  }
+  else if (y > 2 * video.screen_height / 3)
+  {
+    // remap touch gadgets to access lower part of the screen
+    MapScreenMenuGadgets(SCREEN_MASK_TOUCH);
+    UnmapScreenMenuGadgets(SCREEN_MASK_TOUCH2);
+  }
+}
+
 static boolean ConfigureVirtualButtonsMain(void)
 {
   static char *customize_step_text[] =
@@ -7946,6 +7968,9 @@ static boolean ConfigureVirtualButtonsMain(void)
 
   SetOverlayShowGrid(TRUE);
 
+  // map gadgets for setup touch buttons menu screen
+  MapScreenMenuGadgets(SCREEN_MASK_TOUCH);
+
   while (!finished)
   {
     Event event;
@@ -7958,6 +7983,19 @@ static boolean ConfigureVirtualButtonsMain(void)
 
       switch (event.type)
       {
+	case EVENT_USER:
+	  {
+	    UserEvent *user = (UserEvent *)&event;
+	    int id = user->value1;
+
+	    action = (id == SCREEN_CTRL_ID_TOUCH_PREV_PAGE ||
+		      id == SCREEN_CTRL_ID_TOUCH_PREV_PAGE2 ? ACTION_BACK :
+		      id == SCREEN_CTRL_ID_TOUCH_NEXT_PAGE ||
+		      id == SCREEN_CTRL_ID_TOUCH_NEXT_PAGE2 ? ACTION_NEXT :
+		      ACTION_NONE);
+	  }
+	  break;
+
         case EVENT_KEYPRESS:
 	  {
 	    Key key = GetEventKey((KeyEvent *)&event, FALSE);
@@ -7988,6 +8026,12 @@ static boolean ConfigureVirtualButtonsMain(void)
 	    else
 	      button_status = MB_RELEASED;
 
+	    if (HandleGadgets(button->x, button->y, button_status))
+	    {
+	      // do not handle this button event anymore
+	      break;
+	    }
+
 	    button->x += video.screen_xoffset;
 	    button->y += video.screen_yoffset;
 
@@ -8002,6 +8046,8 @@ static boolean ConfigureVirtualButtonsMain(void)
 
 	      set_grid_button = TRUE;
 	    }
+
+	    MapScreenMenuGadgets_OverlayTouchButtons(button->y);
 	  }
 	  break;
 
@@ -8011,6 +8057,12 @@ static boolean ConfigureVirtualButtonsMain(void)
 
 	    motion_status = TRUE;
 
+	    if (HandleGadgets(motion->x, motion->y, button_status))
+	    {
+	      // do not handle this button event anymore
+	      break;
+	    }
+
 	    motion->x += video.screen_xoffset;
 	    motion->y += video.screen_yoffset;
 
@@ -8018,6 +8070,8 @@ static boolean ConfigureVirtualButtonsMain(void)
 	    y = motion->y * overlay.grid_ysize / video.screen_height;
 
 	    set_grid_button = TRUE;
+
+	    MapScreenMenuGadgets_OverlayTouchButtons(motion->y);
 	  }
 	  break;
 
@@ -8135,6 +8189,9 @@ static boolean ConfigureVirtualButtonsMain(void)
 void ConfigureVirtualButtons(void)
 {
   boolean success = ConfigureVirtualButtonsMain();
+
+  UnmapScreenMenuGadgets(SCREEN_MASK_TOUCH |
+			 SCREEN_MASK_TOUCH2);
 
   if (success)
   {
@@ -8325,6 +8382,7 @@ static struct
   int gadget_id;
   int screen_mask;
   unsigned int event_mask;
+  boolean is_touch_button;
   char *infotext;
 } menubutton_info[NUM_SCREEN_MENUBUTTONS] =
 {
@@ -8334,7 +8392,7 @@ static struct
     SCREEN_CTRL_ID_PREV_LEVEL,
     SCREEN_MASK_MAIN,
     GD_EVENT_PRESSED | GD_EVENT_REPEATED,
-    "previous level"
+    FALSE, "previous level"
   },
   {
     IMG_MENU_BUTTON_NEXT_LEVEL, IMG_MENU_BUTTON_NEXT_LEVEL_ACTIVE,
@@ -8342,7 +8400,7 @@ static struct
     SCREEN_CTRL_ID_NEXT_LEVEL,
     SCREEN_MASK_MAIN,
     GD_EVENT_PRESSED | GD_EVENT_REPEATED,
-    "next level"
+    FALSE, "next level"
   },
   {
     IMG_MENU_BUTTON_FIRST_LEVEL, IMG_MENU_BUTTON_FIRST_LEVEL_ACTIVE,
@@ -8350,7 +8408,7 @@ static struct
     SCREEN_CTRL_ID_FIRST_LEVEL,
     SCREEN_MASK_MAIN,
     GD_EVENT_RELEASED,
-    "first level"
+    FALSE, "first level"
   },
   {
     IMG_MENU_BUTTON_LAST_LEVEL, IMG_MENU_BUTTON_LAST_LEVEL_ACTIVE,
@@ -8358,7 +8416,7 @@ static struct
     SCREEN_CTRL_ID_LAST_LEVEL,
     SCREEN_MASK_MAIN,
     GD_EVENT_RELEASED,
-    "last level"
+    FALSE, "last level"
   },
   {
     IMG_MENU_BUTTON_LEVEL_NUMBER, IMG_MENU_BUTTON_LEVEL_NUMBER_ACTIVE,
@@ -8366,7 +8424,7 @@ static struct
     SCREEN_CTRL_ID_LEVEL_NUMBER,
     SCREEN_MASK_MAIN,
     GD_EVENT_RELEASED,
-    "level number"
+    FALSE, "level number"
   },
   {
     IMG_MENU_BUTTON_LEFT, IMG_MENU_BUTTON_LEFT_ACTIVE,
@@ -8374,7 +8432,7 @@ static struct
     SCREEN_CTRL_ID_PREV_PLAYER,
     SCREEN_MASK_INPUT,
     GD_EVENT_PRESSED | GD_EVENT_REPEATED,
-    "previous player"
+    FALSE, "previous player"
   },
   {
     IMG_MENU_BUTTON_RIGHT, IMG_MENU_BUTTON_RIGHT_ACTIVE,
@@ -8382,7 +8440,7 @@ static struct
     SCREEN_CTRL_ID_NEXT_PLAYER,
     SCREEN_MASK_INPUT,
     GD_EVENT_PRESSED | GD_EVENT_REPEATED,
-    "next player"
+    FALSE, "next player"
   },
   {
     IMG_MENU_BUTTON_INSERT_SOLUTION, IMG_MENU_BUTTON_INSERT_SOLUTION_ACTIVE,
@@ -8390,7 +8448,7 @@ static struct
     SCREEN_CTRL_ID_INSERT_SOLUTION,
     SCREEN_MASK_MAIN_HAS_SOLUTION,
     GD_EVENT_RELEASED,
-    "insert solution tape"
+    FALSE, "insert solution tape"
   },
   {
     IMG_MENU_BUTTON_PLAY_SOLUTION, IMG_MENU_BUTTON_PLAY_SOLUTION_ACTIVE,
@@ -8398,7 +8456,39 @@ static struct
     SCREEN_CTRL_ID_PLAY_SOLUTION,
     SCREEN_MASK_MAIN_HAS_SOLUTION,
     GD_EVENT_RELEASED,
-    "play solution tape"
+    FALSE, "play solution tape"
+  },
+  {
+    IMG_MENU_BUTTON_TOUCH_BACK, IMG_MENU_BUTTON_TOUCH_BACK,
+    &menu.setup.button.touch_back,
+    SCREEN_CTRL_ID_TOUCH_PREV_PAGE,
+    SCREEN_MASK_TOUCH,
+    GD_EVENT_RELEASED,
+    TRUE, "previous page"
+  },
+  {
+    IMG_MENU_BUTTON_TOUCH_NEXT, IMG_MENU_BUTTON_TOUCH_NEXT,
+    &menu.setup.button.touch_next,
+    SCREEN_CTRL_ID_TOUCH_NEXT_PAGE,
+    SCREEN_MASK_TOUCH,
+    GD_EVENT_RELEASED,
+    TRUE, "next page"
+  },
+  {
+    IMG_MENU_BUTTON_TOUCH_BACK2, IMG_MENU_BUTTON_TOUCH_BACK2,
+    &menu.setup.button.touch_back2,
+    SCREEN_CTRL_ID_TOUCH_PREV_PAGE2,
+    SCREEN_MASK_TOUCH2,
+    GD_EVENT_RELEASED,
+    TRUE, "previous page"
+  },
+  {
+    IMG_MENU_BUTTON_TOUCH_NEXT2, IMG_MENU_BUTTON_TOUCH_NEXT2,
+    &menu.setup.button.touch_next2,
+    SCREEN_CTRL_ID_TOUCH_NEXT_PAGE2,
+    SCREEN_MASK_TOUCH2,
+    GD_EVENT_RELEASED,
+    TRUE, "next page"
   },
 };
 
@@ -8473,6 +8563,7 @@ static void CreateScreenMenubuttons(void)
   for (i = 0; i < NUM_SCREEN_MENUBUTTONS; i++)
   {
     struct MenuPosInfo *pos = menubutton_info[i].pos;
+    boolean is_touch_button = menubutton_info[i].is_touch_button;
     Bitmap *gd_bitmap_unpressed, *gd_bitmap_pressed;
     int gfx_unpressed, gfx_pressed;
     int x, y, width, height;
@@ -8481,8 +8572,8 @@ static void CreateScreenMenubuttons(void)
 
     event_mask = menubutton_info[i].event_mask;
 
-    x = mSX + GDI_ACTIVE_POS(pos->x);
-    y = mSY + GDI_ACTIVE_POS(pos->y);
+    x = (is_touch_button ? pos->x : mSX + GDI_ACTIVE_POS(pos->x));
+    y = (is_touch_button ? pos->y : mSY + GDI_ACTIVE_POS(pos->y));
 
     width  = graphic_info[menubutton_info[i].gfx_pressed].width;
     height = graphic_info[menubutton_info[i].gfx_pressed].height;
@@ -8495,6 +8586,12 @@ static void CreateScreenMenubuttons(void)
     gd_y1 = graphic_info[gfx_unpressed].src_y;
     gd_x2 = graphic_info[gfx_pressed].src_x;
     gd_y2 = graphic_info[gfx_pressed].src_y;
+
+    if (is_touch_button)
+    {
+      gd_x2 += graphic_info[gfx_pressed].pressed_xoffset;
+      gd_y2 += graphic_info[gfx_pressed].pressed_yoffset;
+    }
 
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_CUSTOM_TYPE_ID, i,
@@ -8509,6 +8606,7 @@ static void CreateScreenMenubuttons(void)
 		      GDI_DESIGN_UNPRESSED, gd_bitmap_unpressed, gd_x1, gd_y1,
 		      GDI_DESIGN_PRESSED, gd_bitmap_pressed, gd_x2, gd_y2,
 		      GDI_DIRECT_DRAW, FALSE,
+		      GDI_OVERLAY_TOUCH_BUTTON, is_touch_button,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_ACTION, HandleScreenGadgets,
 		      GDI_END);
@@ -8834,6 +8932,13 @@ static void HandleScreenGadgets(struct GadgetInfo *gi)
 
     case SCREEN_CTRL_ID_PLAY_SOLUTION:
       PlaySolutionTape();
+      break;
+
+    case SCREEN_CTRL_ID_TOUCH_PREV_PAGE:
+    case SCREEN_CTRL_ID_TOUCH_NEXT_PAGE:
+    case SCREEN_CTRL_ID_TOUCH_PREV_PAGE2:
+    case SCREEN_CTRL_ID_TOUCH_NEXT_PAGE2:
+      PushUserEvent(USEREVENT_GADGET_PRESSED, id, 0);
       break;
 
     case SCREEN_CTRL_ID_SCROLL_UP:

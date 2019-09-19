@@ -2728,6 +2728,11 @@ struct MenuSetupButtonInfo
 {
   struct MenuPosInfo prev_player;
   struct MenuPosInfo next_player;
+
+  struct MenuPosInfo touch_back;
+  struct MenuPosInfo touch_next;
+  struct MenuPosInfo touch_back2;
+  struct MenuPosInfo touch_next2;
 };
 
 struct MenuSetupInfo
