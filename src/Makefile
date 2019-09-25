@@ -212,7 +212,14 @@ endif
 
 GRAPHICS_DIR = ../graphics
 
-CCP := g++
+# CCP := g++
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+	CCP := g++-7
+	# EXTRA_LDFLAGS = -lstdc++
+else
+	CCP := g++
+endif
 
 # -----------------------------------------------------------------------------
 # build targets

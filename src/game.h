@@ -43,6 +43,11 @@
 #define SNAPSHOT_MODE_DEFAULT		SNAPSHOT_MODE_OFF
 
 
+// (tuero@ualberta.ca) - September 2019
+// sprite IDs are used for custom controllers for object tracking
+extern int spriteIDs[MAX_PLAYFIELD_WIDTH][MAX_PLAYFIELD_HEIGHT];
+extern int idCounter;
+
 struct GamePanelInfo
 {
   struct TextPosInfo level_number;

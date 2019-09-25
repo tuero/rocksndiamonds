@@ -45,7 +45,7 @@ std::vector<SDL_Rect> textureRects_;                    // Texture for each grid
 const std::string IMG_DIR = "./src/custom/graphics/";   // Graphics directory
 std::map<int, std::string> graphicsMap_ = {             // Feld type to image map
         {-1, "avatar.png"}, 
-        {enginetype::FELD_DIAMOND, "diamond.png"}, 
+        {enginetype::FIELD_DIAMOND, "diamond.png"}, 
         {enginetype::FIELD_CUSTOM_1, "diamond.png"}, 
         {enginetype::FIELD_YAMYAM, "yamyam.png"}, 
         {enginetype::FIELD_CUSTOM_2, "yamyam.png"}, 

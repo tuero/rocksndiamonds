@@ -14,7 +14,7 @@
 /*
  * Get string representation of action.
  */
-std::string actionToString(const Action action) {
+const std::string actionToString(const Action action) {
     std::string action_str = "noop";
     if (action == Action::left) {action_str = "left";}
     else if (action == Action::right) {action_str = "right";}

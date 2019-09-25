@@ -15,7 +15,7 @@
 #include "engine_helper.h"
 
 
-GameState::GameState() {}
+GameState::GameState() : gameFailed_(false), gameSolved_(false) {}
 
 
 /*
@@ -25,6 +25,31 @@ GameState::GameState() {}
  */
 int GameState::getScore() {
     return score_;
+}
+
+
+/*
+ * Check if the saved state is failed.
+ */
+bool GameState::isGameFailed() {
+    return gameFailed_;
+}
+
+/*
+ * Check if the saved state is solved.
+ */
+bool GameState::isGameSolved() {
+    return gameSolved_;
+}
+
+
+/*
+ * Check if the saved state is failed or solved.
+ *
+ * @return True if the saved state is failed or solved.
+ */
+bool GameState::isGameOver() {
+    return gameSolved_ || gameFailed_;
 }
 
 
@@ -87,6 +112,7 @@ void GameState::setFromEngineState() {
 
     // Player info
     player_ = stored_player[0];
+    game_ = game;
 
     // Game status
     allPlayersGone_ = game.all_players_gone;
@@ -115,6 +141,9 @@ void GameState::setFromEngineState() {
     timePlayed_ = TimePlayed;
     timeLeft_ = TimeLeft;
     tapeTime_ = TapeTime;
+
+    gameFailed_ = enginehelper::engineGameFailed();
+    gameSolved_ = enginehelper::engineGameSolved();
 }
 
 
@@ -149,6 +178,7 @@ void GameState::restoreEngineState() {
 
     // Player info
     stored_player[0] = player_;
+    game = game_;
 
     // Game status
     game.all_players_gone = allPlayersGone_;

@@ -78,6 +78,24 @@ std::string getStructRepresentation(short (&data)[MAX_LEV_FIELDX][MAX_LEV_FIELDY
     return os.str();
 }
 
+std::string getStructRepresentation(int (&data)[MAX_LEV_FIELDX][MAX_LEV_FIELDY]) {
+    std::ostringstream os;
+    for (int y = 0; y < level.fieldy; y++) {
+        for (int x = 0; x < level.fieldx; x++) {
+            os.width(5);
+            if (stored_player[0].jx == x && stored_player[0].jy == y && data[x][y] == 0) {
+                os << "X ";
+            }
+            else {
+                os << data[x][y] << " ";
+            }
+            
+        }
+        os << std::endl;
+    }
+    return os.str();
+}
+
 
 namespace logwrap {
     
@@ -229,6 +247,16 @@ namespace logwrap {
 
 
     /*
+     * Logs the sprite IDs
+     */
+    void logBoardSpriteIDs() {
+        std::string msg = "Sprite IDs\n";
+        msg += getStructRepresentation(spriteIDs);
+        PLOGD_(logwrap::FileLogger) << msg;
+    }
+
+
+    /*
      * Log all information at level start.
      *
      * Includes engine type, player position and state, board item positions, and distances.
@@ -257,9 +285,18 @@ namespace logwrap {
 
 
     /*
+     * Log the players current move.
+     */
+    void logPlayerMove(const std::string &action) {
+        PLOGI_(logwrap::FileLogger) << "Controller sending action: " + action;
+        PLOGD_(logwrap::ConsolLogger) << "Controller sending action: " + action;
+    }
+
+
+    /*
      * Save the players current move to replay file.
      */
-    void savePlayerMove(std::string &action) {
+    void savePlayerMove(const std::string &action) {
         // Don't record action if we are already in a replay
         if (options.controller_type == CONTROLLER_TYPE_REPLAY || !replayFile.is_open()) {
             return;

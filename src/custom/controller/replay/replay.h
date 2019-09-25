@@ -13,8 +13,8 @@
 
 #include "../base_controller.h"
 
-#include "../pfa/abstract_graph.h"
-#include "../../util/summary_window.h"
+// #include "../pfa/abstract_graph.h"
+// #include "../../util/summary_window.h"
 
 #include "../../engine/game_state.h"
 #include "../../engine/engine_types.h"
@@ -32,8 +32,8 @@ private:
     const std::string REPLAY_DIR = "./src/custom/replays/";
     std::string replayFileName;
     std::ifstream replayFileStream;
-    AbstractGraph abstract_graph;
-    std::vector<std::vector<int>> grid_representation;
+    // AbstractGraph abstract_graph;
+    // std::vector<std::vector<int>> grid_representation;
 
 public:
 
@@ -41,10 +41,10 @@ public:
 
     void setReplayFile(std::string &file);
 
-    void handleEmpty(std::vector<Action> &currentSolution, std::vector<Action> &forwardSolution) override;
+    void handleEmpty(BaseOption **currentOption, BaseOption **nextOption) override;
 
-    void run(std::vector<Action> &currentSolution, std::vector<Action> &forwardSolution, 
-        std::map<enginetype::Statistics, int> &statistics) override;    
+    void run(BaseOption **currentOption, BaseOption **nextOption, 
+        std::map<enginetype::Statistics, int> &statistics) override; 
 
 };
 

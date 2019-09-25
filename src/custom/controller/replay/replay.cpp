@@ -29,39 +29,52 @@ void Replay::setReplayFile(std::string &file) {
 }
 
 
-void Replay::handleEmpty(std::vector<Action> &currentSolution, std::vector<Action> &forwardSolution) {
+void Replay::handleEmpty(BaseOption **currentOption, BaseOption **nextOption) {
     // Silent compiler warning
-    (void)currentSolution;
-    (void)forwardSolution;
-    abstract_graph.init();
-    abstract_graph.abstract();
-    int abstract_level = abstract_graph.getLevelUsed();
-    grid_representation = abstract_graph.getAbstractRepresentation(abstract_level, true);
-    summarywindow::updateGridRepresentation(grid_representation);
+    (void)currentOption;
+    (void)nextOption;
+
+    *currentOption = *nextOption;
+    // abstract_graph.init();
+    // abstract_graph.abstract();
+    // int abstract_level = abstract_graph.getLevelUsed();
+    // grid_representation = abstract_graph.getAbstractRepresentation(abstract_level, true);
+    // summarywindow::updateGridRepresentation(grid_representation);
 }
 
 
-void Replay::run(std::vector<Action> &currentSolution, std::vector<Action> &forwardSolution, 
+void Replay::run(BaseOption **currentOption, BaseOption **nextOption, 
         std::map<enginetype::Statistics, int> &statistics) 
 {
     // Silent compiler warning
-    (void)forwardSolution;
+    (void)currentOption;
+    (void)nextOption;
     (void)statistics;
 
     // We already have a solution
-    if (!currentSolution.empty()) {
-        return;
-    }
+    // if (!currentSolution.empty()) {
+    //     return;
+    // }
 
     std::string line;
+    std::string optionName = "Single step action: ";
     try{
         std::vector<Action> path;
         if (replayFileStream.is_open()){
-            while (std::getline(replayFileStream,line)){
-                if (line.length() == 0) {continue;}
-                currentSolution.push_back(stringToAction(line));
+            // while (std::getline(replayFileStream,line)){
+            //     if (line.length() == 0) {continue;}
+            //     currentSolution.push_back(stringToAction(line));
+            // }
+            // replayFileStream.close();
+            if (std::getline(replayFileStream,line) && line.length() != 0) {
+                Action action = stringToAction(line);
+                for (BaseOption *option : availableOptions_) {
+                    if ((option->optionToString()).compare(optionName + actionToString(action)) == 0) {
+                        *nextOption = option;
+                        break;
+                    }
+                }
             }
-            replayFileStream.close();
         }
     }
     catch (const std::ifstream::failure& e) {

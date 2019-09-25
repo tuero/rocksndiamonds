@@ -22,6 +22,15 @@ MCTS_DIR 	:= 	$(CTR_DIR)/mcts
 MCTS_OBJ 	:= 	$(MCTS_DIR)/mcts.o 				\
 				$(MCTS_DIR)/tree_node.o		
 
+OPTION_DIR 	:= 	$(CTR_DIR)/options
+OPTION_OBJ 	:= 	$(OPTION_DIR)/option_factory.o 				\
+				$(OPTION_DIR)/base_option.o 				\
+				$(OPTION_DIR)/option_single_step.o 			\
+				$(OPTION_DIR)/option_to_sprite.o 			\
+				$(OPTION_DIR)/option_to_rock.o 				\
+				$(OPTION_DIR)/option_wait_rock.o			\
+				$(OPTION_DIR)/option_push_rock.o	
+
 PFA_DIR 	:= 	$(CTR_DIR)/pfa
 PFA_OBJ 	:= 	$(PFA_DIR)/abstract_graph.o 				\
 				$(PFA_DIR)/abstract_node.o 					\
@@ -61,8 +70,8 @@ TEST_OBJ 	:= 	$(TEST_DIR)/test_engine_speed.o 	\
 all: controller eng util tests $(CUSTOM)
 # all: $(CUSTOM)
 
-$(CUSTOM): $(CTR_OBJ) $(BFS_OBJ) $(MCTS_OBJ) $(PFA_OBJ) $(REPLAY_OBJ) $(USER_OBJ) $(ENG_OBJ) $(UTIL_OBJ) $(TEST_OBJ) $(OBJS)
-	$(AR) cr $(CUSTOM) $(CTR_OBJ) $(BFS_OBJ) $(MCTS_OBJ) $(PFA_OBJ) $(REPLAY_OBJ) $(USER_OBJ) $(ENG_OBJ) $(UTIL_OBJ) $(TEST_OBJ) $(OBJS)
+$(CUSTOM): $(CTR_OBJ) $(MCTS_OBJ) $(OPTION_OBJ) $(ENG_OBJ) $(UTIL_OBJ) $(TEST_OBJ) $(REPLAY_OBJ) $(OBJS)
+	$(AR) cr $(CUSTOM) $(CTR_OBJ) $(MCTS_OBJ) $(OPTION_OBJ) $(ENG_OBJ) $(UTIL_OBJ) $(TEST_OBJ) $(REPLAY_OBJ) $(OBJS)
 	$(RANLIB) $(CUSTOM)
 
 controller:

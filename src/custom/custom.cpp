@@ -69,6 +69,7 @@ extern "C" void handleLevelStart() {
     if (currentLevelsetSubdir == levelsetSurvival) {
         levelprogramming::customLevelProgrammingStart();
     }
+    // <!-- This will not be needed.
     else {
         enginetype::GridCell exitCell = enginehelper::findExitLocation();
         enginehelper::setBoardDistancesDijkstra(exitCell);
@@ -159,6 +160,7 @@ extern "C" void closeMapWindow() {
  * Implementation of solution will depend on controller type.
  */
 extern "C" int getAction() {
+    // <!-- This will not be needed.
     if (options.summary_window) {summarywindow::draw();}
     return controller.getAction();
 }

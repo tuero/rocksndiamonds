@@ -335,6 +335,7 @@ void EventLoop(void)
           options.controller_type != CONTROLLER_TYPE_DEFAULT)
       {
           handleLevelStart();
+          step_counter = 0;
       }
       prev_game_status = game_status;
 
@@ -361,6 +362,10 @@ void EventLoop(void)
             handleCustomLevelProgramming();
             stored_player[0].action = getAction();
         }
+//        stored_player[0].action = 0;
+//        if (step_counter < 48) {stored_player[0].action = 2; step_counter += 1;}
+//        printf("%d\n", stored_player[0].action);
+
         HandleGameActions();
     }
 

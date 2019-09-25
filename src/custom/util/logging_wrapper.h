@@ -17,6 +17,7 @@
 
 extern "C" {
     #include "../../main.h"
+    #include "../../game.h"
 }
 
 
@@ -77,6 +78,11 @@ namespace logwrap {
     void logBoardDistances();
 
     /*
+     * Logs the sprite IDs
+     */
+    void logBoardSpriteIDs();
+
+    /*
      * Log all information at level start
      * Includes engine type, player position and state, board item positions, and distances.
      */
@@ -88,9 +94,14 @@ namespace logwrap {
     void logState();
 
     /*
+     * Log the players current move.
+     */
+    void logPlayerMove(const std::string &action);
+
+    /*
      * Save the players current move to replay file.
      */
-    void savePlayerMove(std::string &action);
+    void savePlayerMove(const std::string &action);
 
     /*
      * Close the replay file for cleanup.

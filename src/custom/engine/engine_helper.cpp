@@ -10,6 +10,9 @@
 
 #include "engine_helper.h"
 
+extern int spriteIDs[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+extern int idCounter;
+
 namespace enginehelper {
 
 // Hashing data structures
@@ -125,6 +128,58 @@ int getLevelWidth() {
 // -------------------------------------------------------
 
 
+void initSpriteIDs() {
+    idCounter = 0;
+    enginetype::GridCell playerCell = getPlayerPosition();
+
+    for (int x = 0; x < level.fieldx; x++) {
+        for (int y = 0; y < level.fieldy; y++) {
+            spriteIDs[x][y] = -1;
+            if (Feld[x][y] > 1 && Feld[x][y] != enginetype::FIELD_TEMP &&
+                !(x == playerCell.x && y == playerCell.y)) 
+            {
+                spriteIDs[x][y] = idCounter++;
+                // idCounter += 1;
+            }
+        }
+    }
+}
+
+
+int getSpriteID(enginetype::GridCell cell) {
+    if (cell.x < 0 || cell.x >= level.fieldx || cell.y < 0 || cell.y >= level.fieldy) {
+        PLOGE_(logwrap::FileLogger) << "Position out of bounds.";
+        return -1;
+    }
+    return spriteIDs[cell.x][cell.y];
+}
+
+
+enginetype::GridCell getSpriteGridCell(int spriteID) {
+    enginetype::GridCell cell = {-1, -1};
+    for (int x = 0; x < level.fieldx; x++) {
+        for (int y = 0; y < level.fieldy; y++) {
+            if (spriteIDs[x][y] == spriteID) {
+                cell.x = x;
+                cell.y = y;
+                break;
+            }
+        }
+    }
+    return cell;
+}
+
+
+bool isSpriteActive(int spriteID) {
+    for (int x = 0; x < level.fieldx; x++) {
+        for (int y = 0; y < level.fieldy; y++) {
+            if (spriteIDs[x][y] == spriteID) {return true;}
+        }
+    }
+    return false;
+}
+
+
 /*
  * Get the item located at the given GridCell (x,y) location.
  */
@@ -139,11 +194,44 @@ int getGridItem(enginetype::GridCell cell) {
 
 
 /*
+ * Get the item MovPos at the given GridCell (x,y) location.
+ */
+int getGridMovPos(enginetype::GridCell cell) {
+    if (cell.x < 0 || cell.x >= level.fieldx || cell.y < 0 || cell.y >= level.fieldy) {
+        PLOGE_(logwrap::FileLogger) << "Position out of bounds.";
+        return 0;
+    }
+
+    return MovPos[cell.x][cell.y];
+}
+
+
+/*
  * Get the grid cell that the player is currently located in.
  */
 enginetype::GridCell getPlayerPosition() {
     enginetype::GridCell gridCell{stored_player[0].jx, stored_player[0].jy};
     return gridCell;
+}
+
+/*
+ * Get the sprite locations on the map.
+ */
+std::vector<enginetype::GridCell> getMapSprites() {
+    std::vector<enginetype::GridCell> mapSprites;
+    enginetype::GridCell playerCell = getPlayerPosition();
+
+    for (int x = 0; x < level.fieldx; x++) {
+        for (int y = 0; y < level.fieldy; y++) {
+            if (Feld[x][y] > 1 && Feld[x][y] != enginetype::FIELD_TEMP &&
+                !(x == playerCell.x && y == playerCell.y)) 
+            {
+                mapSprites.push_back({x,y});
+            }
+        }
+    }
+
+    return mapSprites;
 }
 
 
@@ -189,9 +277,14 @@ bool isGridEmpty(enginetype::GridCell cell) {
 /*
  * Checks if the direction the player wants to move in is a wall.
  */
-bool isWall(Action action) {
-    int playerX = stored_player[0].jx;
-    int playerY = stored_player[0].jy;
+bool isWall(Action action, enginetype::GridCell playerCell) {
+    int playerX = playerCell.x;
+    int playerY = playerCell.y;
+
+    if (playerX == -1 || playerY == -1) {
+        playerX = stored_player[0].jx;
+        playerY = stored_player[0].jy;
+    }
 
     if (action == Action::down && (Feld[playerX][playerY+1] == enginetype::FIELD_WALL || 
         playerY+1 == level.fieldy))
@@ -212,6 +305,46 @@ bool isWall(Action action) {
         playerX == 0)) 
     {
         return true;
+    }
+    return false;
+}
+
+
+/*
+ * Checks if the direction the player wants to move in is walkable.
+ */
+bool isWalkable(Action action, enginetype::GridCell playerCell) {
+    int playerX = playerCell.x;
+    int playerY = playerCell.y;
+
+    if (playerX == -1 || playerY == -1) {
+        playerX = stored_player[0].jx;
+        playerY = stored_player[0].jy;
+    }
+
+    if (action == Action::down && playerY+1 < level.fieldy) {
+        if (enginetype::TYPE_IS_WALKABLE.find(Feld[playerX][playerY+1]) != enginetype::TYPE_IS_WALKABLE.end()) {
+            return enginetype::TYPE_IS_WALKABLE[Feld[playerX][playerY+1]];
+        }
+        // return (Feld[playerX][playerY+1] == enginetype::FIELD_EMPTY || Feld[playerX][playerY+1] == enginetype::FIELD_DIRT || Feld[playerX][playerY+1] == enginetype::FIELD_DIAMOND);
+    }
+    else if (action == Action::right && playerX+1 < level.fieldx) {
+        if (enginetype::TYPE_IS_WALKABLE.find(Feld[playerX+1][playerY]) != enginetype::TYPE_IS_WALKABLE.end()) {
+            return enginetype::TYPE_IS_WALKABLE[Feld[playerX+1][playerY]];
+        }
+        // return (Feld[playerX+1][playerY] == enginetype::FIELD_EMPTY || Feld[playerX+1][playerY] == enginetype::FIELD_DIRT || Feld[playerX+1][playerY] == enginetype::FIELD_DIAMOND);
+    }
+    else if (action == Action::up && playerY-1 >= 0) {
+        if (enginetype::TYPE_IS_WALKABLE.find(Feld[playerX][playerY-1]) != enginetype::TYPE_IS_WALKABLE.end()) {
+            return enginetype::TYPE_IS_WALKABLE[Feld[playerX][playerY-1]];
+        }
+        // return (Feld[playerX][playerY-1] == enginetype::FIELD_EMPTY || Feld[playerX][playerY-1] == enginetype::FIELD_DIRT || Feld[playerX][playerY-1] == enginetype::FIELD_DIAMOND);
+    }
+    else if (action == Action::left && playerX-1 >= 0) {
+        if (enginetype::TYPE_IS_WALKABLE.find(Feld[playerX-1][playerY]) != enginetype::TYPE_IS_WALKABLE.end()) {
+            return enginetype::TYPE_IS_WALKABLE[Feld[playerX-1][playerY]];
+        }
+        // return (Feld[playerX-1][playerY] == enginetype::FIELD_EMPTY || Feld[playerX-1][playerY] == enginetype::FIELD_DIRT || Feld[playerX-1][playerY] == enginetype::FIELD_DIAMOND);
     }
     return false;
 }
@@ -285,6 +418,34 @@ bool checkIfNeighbours(enginetype::GridCell left, enginetype::GridCell right) {
 }
 
 
+/*
+ * Get the action which moves from the first given grid cell to the second. 
+ *
+ * Note: The gridcells must be neighbours.
+ */
+Action getResultingAction(enginetype::GridCell from, enginetype::GridCell to) {
+    if (!checkIfNeighbours(from, to)) {
+        PLOGE_(logwrap::FileLogger) << "Cells are not neighbours.";
+    }
+
+    Action action = Action::noop;
+    if (from.y == to.y && (from.x - to.x) == -1) {
+        action = Action::right;
+    }
+    else if (from.y == to.y && (from.x - to.x) == 1) {
+        action = Action::left;
+    }
+    else if (from.x == to.x && (from.y - to.y) == -1) {
+        action = Action::down;
+    }
+    else if (from.x == to.x && (from.y - to.y) == 1) {
+        action = Action::up;
+    }
+
+    return action;
+}
+
+
 // -------------------------------------------------------
 // ---------------Custom Level Programming----------------
 // -------------------------------------------------------
@@ -348,8 +509,16 @@ bool engineGameFailed() {
  * Check if the current status of the engine is level solved.
  */
 bool engineGameSolved() {
-    return checkGameSolved();
-    // return (game.LevelSolved && !game.LevelSolved_GameEnd);
+    // return checkGameSolved();
+    return (game.LevelSolved && !game.LevelSolved_GameEnd);
+}
+
+
+/*
+ * Check if the current status of the engine is failed or solved
+ */
+bool engineGameOver() {
+    return engineGameFailed() || engineGameSolved();
 }
 
 
@@ -407,6 +576,14 @@ int getEnginePlayerAction() {
  */
 int getCurrentScore() {
     return game.score;
+}
+
+
+/*
+ * Get the Time left in the game.
+ */
+int getTimeLeftScore() {
+    return TimeLeft;
 }
 
 

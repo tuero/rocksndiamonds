@@ -21,6 +21,11 @@
 #include "network.h"
 #include "anim.h"
 
+// (tuero@ualberta.ca) - September 2019
+// sprite IDs are used for custom controllers for object tracking
+int spriteIDs[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+int idCounter;
+
 
 // DEBUG SETTINGS
 #define DEBUG_INIT_PLAYER	1
@@ -5000,6 +5005,12 @@ static void RemoveField(int x, int y)
 {
   Feld[x][y] = EL_EMPTY;
 
+  // (tuero@ualberta.ca) - September 2019
+  // sprite IDs are used for custom controllers for object tracking
+  // If Field is removed, then we remove sprite ID from known list
+  spriteIDs[x][y] = -1;
+
+
   MovPos[x][y] = 0;
   MovDir[x][y] = 0;
   MovDelay[x][y] = 0;
@@ -5602,6 +5613,12 @@ static void Explode(int ex, int ey, int phase, int mode)
     element = Feld[x][y] = Store[x][y];
     Store[x][y] = Store2[x][y] = 0;
     GfxElement[x][y] = EL_UNDEFINED;
+
+    // (tuero@ualberta.ca) - September 2019
+    // sprite IDs are used for custom controllers for object tracking
+    // If Field is removed, then we remove sprite ID from known list
+    // Ensure element being replaced is not empty or dirt
+    if (element > 1) {spriteIDs[x][y] = idCounter++;}
 
     // player can escape from explosions and might therefore be still alive
     if (element >= EL_PLAYER_IS_EXPLODING_1 &&
@@ -8252,6 +8269,14 @@ void ContinueMoving(int x, int y)
 
     return;	// element is still moving
   }
+
+  // (tuero@ualberta.ca) - September 2019
+  // update sprite IDs
+  // sprite IDs are used for custom controllers for object tracking
+  spriteIDs[newx][newy] = spriteIDs[x][y];
+  spriteIDs[x][y] = -1;
+
+
 
   // element reached destination field
 

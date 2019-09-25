@@ -16,6 +16,15 @@ MCTS_DIR 	:= 	mcts
 MCTS_OBJ 	:= 	$(MCTS_DIR)/mcts.o 				\
 				$(MCTS_DIR)/tree_node.o	
 
+OPTION_DIR 	:= 	options
+OPTION_OBJ 	:= 	$(OPTION_DIR)/option_factory.o 				\
+				$(OPTION_DIR)/base_option.o 				\
+				$(OPTION_DIR)/option_single_step.o 			\
+				$(OPTION_DIR)/option_to_sprite.o 			\
+				$(OPTION_DIR)/option_to_rock.o 				\
+				$(OPTION_DIR)/option_wait_rock.o 			\
+				$(OPTION_DIR)/option_push_rock.o 
+
 PFA_DIR 	:= 	pfa
 PFA_OBJ 	:= 	$(PFA_DIR)/abstract_graph.o 				\
 				$(PFA_DIR)/abstract_node.o 					\
@@ -35,9 +44,9 @@ USER_OBJ 	:= 	$(USER_DIR)/user.o
 # build targets
 # -----------------------------------------------------------------------------
 
-.PHONY: all clean bfs mcts pfa replay user
-
-all: bfs mcts pfa replay user $(OBJS)
+.PHONY: all clean mcts option replay
+	
+all: mcts option replay $(OBJS)
 
 bfs:
 	@$(MAKE) -C $(BFS_DIR)
@@ -48,6 +57,11 @@ mcts:
 	@$(MAKE) -C $(MCTS_DIR)
 $(MCTS_OBJ):
 	@$(MAKE) -C $(MCTS_DIR)
+
+option:
+	@$(MAKE) -C $(OPTION_DIR)
+$(OPTION_OBJ):
+	@$(MAKE) -C $(OPTION_DIR)
 
 pfa:
 	@$(MAKE) -C $(PFA_DIR)
@@ -70,6 +84,7 @@ $(USER_OBJ):
 clean:
 	$(MAKE) -C $(BFS_DIR) clean
 	$(MAKE) -C $(MCTS_DIR) clean
+	$(MAKE) -C $(OPTION_DIR) clean
 	$(MAKE) -C $(PFA_DIR) clean
 	$(MAKE) -C $(REPLAY_DIR) clean
 	$(MAKE) -C $(USER_DIR) clean

@@ -1126,6 +1126,9 @@ void GetOptions(int argc, char *argv[],
         else if (strcmp("MCTS", option_arg) == 0 || strcmp("mcts", option_arg) == 0) {
             options.controller_type = CONTROLLER_TYPE_MCTS;
         }
+        else if (strcmp("MCTS_CUSTOM", option_arg) == 0 || strcmp("mcts_custom", option_arg) == 0) {
+            options.controller_type = CONTROLLER_TYPE_MCTS_CUSTOM;
+        }
         else if (strcmp("USER", option_arg) == 0 || strcmp("user", option_arg) == 0) {
             options.controller_type = CONTROLLER_TYPE_USER;
         }

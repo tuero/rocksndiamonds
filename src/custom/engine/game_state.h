@@ -21,6 +21,7 @@ extern "C" {
     #include "../../main.h"
     #include "../../events.h"
     #include "../../screens.h"
+    #include "../../game.h"
 }
 
 
@@ -35,7 +36,7 @@ class GameState {
 private:
     // Number of structs of each type
     static const int NUM_SHORTS = 22;
-    static const int NUM_INTS = 8;
+    static const int NUM_INTS = 9;
     static const int NUM_BOOLS = 2;
     static const int NUM_AMOEBAS = 2;
 
@@ -48,7 +49,8 @@ private:
     };
     int (*pointersToInts_[NUM_INTS])[MAX_LEV_FIELDX][MAX_LEV_FIELDY] = {
         &RunnerVisit, &PlayerVisit, 
-        &GfxFrame, &GfxRandom, &GfxElement, &GfxAction, &GfxDir, &GfxRedraw
+        &GfxFrame, &GfxRandom, &GfxElement, &GfxAction, &GfxDir, &GfxRedraw,
+        &spriteIDs
     };
     boolean (*pointersToBools_[NUM_BOOLS])[MAX_LEV_FIELDX][MAX_LEV_FIELDY] = {
         &Stop, &Pushed
@@ -56,6 +58,9 @@ private:
     short (*pointersToAmoebas_[NUM_AMOEBAS])[MAX_NUM_AMOEBA] = {
         &AmoebaCnt, &AmoebaCnt2
     };
+
+    bool gameFailed_;
+    bool gameSolved_;
 
 public:
     // Containers of saved game state
@@ -66,6 +71,7 @@ public:
 
     // Player info
     struct PlayerInfo player_;
+    struct GameInfo game_;
 
     // Game status
     boolean allPlayersGone_;
@@ -103,6 +109,27 @@ public:
      * @return The saved score.
      */
     int getScore();
+
+    /*
+     * Check if the saved state is failed.
+     *
+     * @return True if the saved state is failed.
+     */
+    bool isGameFailed();
+
+    /*
+     * Check if the saved state is failed or solved.
+     *
+     * @return True if the saved state is failed or solved.
+     */
+    bool isGameOver();
+
+    /*
+     * Check if the saved state is solved.
+     *
+     * @return True if the saved state is solved.
+     */
+    bool isGameSolved();
 
     /*
      * Custom comparison operator, primarily used in testing.

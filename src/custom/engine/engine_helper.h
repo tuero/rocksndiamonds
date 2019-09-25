@@ -35,6 +35,7 @@ extern "C" {
     #include "../../main.h"
     #include "../../files.h"
     #include "../../init.h"
+    #include "../../game.h"
 }
 
 
@@ -135,6 +136,14 @@ namespace enginehelper {
 // -----------------Map Item Information------------------
 // -------------------------------------------------------
 
+    void initSpriteIDs();
+
+    int getSpriteID(enginetype::GridCell cell);
+
+    enginetype::GridCell getSpriteGridCell(int spriteID);
+
+    bool isSpriteActive(int spriteID);
+
 
     /*
      * Get the item located at the given GridCell (x,y) location.
@@ -145,11 +154,26 @@ namespace enginehelper {
     int getGridItem(enginetype::GridCell cell);
 
     /*
+     * Get the item MovPos at the given GridCell (x,y) location.
+     *
+     * @param The grid cell to locate.
+     * @return The integer code for the object offset while moving.
+     */
+    int getGridMovPos(enginetype::GridCell cell);
+
+    /*
      * Get the grid cell that the player is currently located in.
      *
      * @return The GridCell struct containing the player.
      */
     enginetype::GridCell getPlayerPosition();
+
+    /*
+     * Get the sprite locations on the map.
+     *
+     * @return Vector of GridCell locations for each of the sprites.
+     */
+    std::vector<enginetype::GridCell> getMapSprites();
 
     /*
      * Get the current goal location (defined by distance of 0).
@@ -178,12 +202,26 @@ namespace enginehelper {
     /*
      * Checks if the direction the player wants to move in is a wall.
      *
-     * Assumes the current state to check is already set in the engine.
+     * Assumes the current state to check is already set in the engine if no player cell
+     * is given as the second argument.
      *
      * @param action The action the player wants to attempt to make
+     * @param playerCell The cell the player is in.
      * @return True if the action the player wants to take is blocked by a wall.
      */
-    bool isWall(Action action);
+    bool isWall(Action action, enginetype::GridCell playerCell = {-1,-1});
+
+    /*
+     * Checks if the direction the player wants to move in is walkable.
+     *
+     * Assumes the current state to check is already set in the engine if no player cell
+     * is given as the second argument.
+     *
+     * @param action The action the player wants to attempt to make
+     * @param playerCell The cell the player is in.
+     * @return True if the action the player wants to take is walkable.
+     */
+    bool isWalkable(Action action, enginetype::GridCell playerCell = {-1,-1});
 
     /*
      * Checks if action is valid given restricted GridCells player is allowed in.
@@ -205,6 +243,17 @@ namespace enginehelper {
      * @return True if the two GridCells are neighbours.
      */
     bool checkIfNeighbours(enginetype::GridCell left, enginetype::GridCell right);
+
+    /*
+     * Get the action which moves from the first given grid cell to the second. 
+     *
+     * Note: The gridcells must be neighbours.
+     *
+     * @param from The starting gridcell.
+     * @param to The ending gridcell.
+     * @param The action which resulted in going from gridcell from to gridcell to.
+     */
+    Action getResultingAction(enginetype::GridCell from, enginetype::GridCell to);
 
 
 
@@ -247,15 +296,26 @@ namespace enginehelper {
      * Check if the current status of the engine is loss of life.
      *
      * The internal engine checkGameFailed() function is called. 
+     *
+     * @return True if the current status of the engine is failed.
      */
     bool engineGameFailed();
 
     /*
      * Check if the current status of the engine is level solved.
      *
-     * The internal engine checkGameSolved() function is called.
+     * Structs game.LevelSolved and game.LevelSolved_GameEnd need to be checked.
+     *
+     * @return True if the current status of the engine is solved.
      */
     bool engineGameSolved();
+
+    /*
+     * Check if the current status of the engine is failed or solved
+     *
+     * @return True if the current status of engine is failed or solved.
+     */
+    bool engineGameOver();
 
     /*
      * Set the action for the engine to perform on behalf of the player on the next iteration.
@@ -288,6 +348,11 @@ namespace enginehelper {
      * @return The score of the game.
      */
     int getCurrentScore();
+
+    /*
+     * Get the Time left in the game.
+     */
+    int getTimeLeftScore();
 
     /*
      * Simulate the engine ahead a single tick.

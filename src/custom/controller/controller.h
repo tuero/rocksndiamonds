@@ -1,7 +1,7 @@
 /**
  * @file: controller.h
  *
- * @brief: Controller interface which 
+ * @brief: Controller interface which every controller is based on.
  * 
  * @author: Jake Tuero
  * Date: August 2019
@@ -18,6 +18,9 @@
 
 // Controllers
 #include "base_controller.h"
+#include "options/base_option.h"
+#include "options/option_single_step.h"
+#include "options/option_factory.h"
 
 // Engine and typedefs
 #include "../engine/action.h"           // Action enum
@@ -43,7 +46,14 @@ private:
                                                        };
     std::vector<Action> currentSolution_;
     std::vector<Action> forwardSolution_;
+    BaseOption* currentOption_;
+    BaseOption* nextOption_;
     std::unique_ptr<BaseController> baseController_;
+    OptionFactory optionFactory_;
+    bool optionStatusFlag_;
+
+    void logNextOptionDetails();
+
 
 public:
     /*

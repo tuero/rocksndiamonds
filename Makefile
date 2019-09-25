@@ -15,7 +15,13 @@
 
 # command name of your favorite ANSI C compiler
 # (this must be set to "cc" for some systems)
-CC = gcc
+# CC = gcc
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+	CC = gcc-7
+else
+	CC = gcc
+endif
 
 # command name of GNU make on your system
 # (this must be set to "gmake" for some systems)

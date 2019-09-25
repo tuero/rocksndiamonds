@@ -1,7 +1,7 @@
 /**
- * @file: controller.h
+ * @file: controller.cpp
  *
- * @brief: Controller interface which 
+ * @brief: Controller interface which every controller is based on.
  * 
  * @author: Jake Tuero
  * Date: August 2019
@@ -18,11 +18,14 @@
 #include <plog/Log.h>   
 
 // Controllers
-#include "bfs/bfs.h"
+// #include "bfs/bfs.h"
 #include "mcts/mcts.h"
 #include "replay/replay.h"
-#include "user/user.h"
-#include "pfa/pfa.h"
+// #include "user/user.h"
+// #include "pfa/pfa.h"
+
+
+OptionSingleStep noopOption(Action::noop, 1);
 
 
 /*
@@ -89,17 +92,34 @@ void Controller::reset() {
     statistics_[enginetype::COUNT_SIMULATED_NODES] = 0;
     statistics_[enginetype::MAX_DEPTH] = 0;
 
+    // Set sprite IDs
+    enginehelper::initSpriteIDs();
+
+    // !<-- This needs to be fixed? (multiple factories?)
+    baseController_.get()->setAvailableOptions(optionFactory_.createSingleStepOptions());
+    if (enginehelper::getControllerType() == enginetype::MCTS_CUSTOM) {
+        baseController_.get()->setAvailableOptions(optionFactory_.createCustomOptions());
+    }
+
     // Solution is cleared and stored with noops to begin
     currentSolution_.clear();
-    forwardSolution_.clear();
-    for (int i = 0; i < enginetype::ENGINE_RESOLUTION; i++) {
-        forwardSolution_.push_back(Action::noop);
-    }
+    currentOption_ = &noopOption;
+    nextOption_ = &noopOption;
+    optionStatusFlag_ = true;
 
     // Controller specific handler to ensure proper setup
     baseController_.get()->handleLevelStart();
 }
 
+
+void Controller::logNextOptionDetails() {
+    BaseController* baseController = baseController_.get();
+    PLOGI_(logwrap::FileLogger) << "Current option: " << nextOption_->optionToString();
+    PLOGD_(logwrap::ConsolLogger) << "Current option: " << nextOption_->optionToString();
+    PLOGD_(logwrap::FileLogger) << "Controller details:\n" + baseController->controllerDetailsToString();
+    PLOGD_(logwrap::ConsolLogger) << "Controller details:\n" + baseController->controllerDetailsToString();
+
+}
 
 /*
  * Get the action from the controller.
@@ -109,27 +129,32 @@ void Controller::reset() {
  */
 Action Controller::getAction() {
     Action action = Action::noop;
+    BaseController* baseController = baseController_.get();
     std::string msg = "";
 
-    // If current game is over, clean up file handler (if still open)
-    // and send the default action of noop.
-    if (enginehelper::engineGameFailed() || enginehelper::engineGameSolved()) {
+    // If current game is over, clean up file handler and send NOOP action
+    if (enginehelper::engineGameOver()) {
         logwrap::closeReplayFile();
         return action;
     }
 
-
     // Handle empty action solution queue.
-    // Generally, the controller will move forwardSolution_ into currentSolution_.
     if (currentSolution_.empty()) {
-       baseController_.get()->handleEmpty(currentSolution_, forwardSolution_);
+        // If the current option is complete, controller should set current option to 
+        // next option and handle controller specific resets (forward the search tree).
+        if (optionStatusFlag_) {
+            logNextOptionDetails();
+            baseController->handleEmpty(&currentOption_, &nextOption_);
+            optionStatusFlag_ = false;
+        }
+        // Get next action to take from the current option
+        Action tempAction;
+        optionStatusFlag_ = currentOption_->singleStep(tempAction);
+        currentSolution_.assign(enginetype::ENGINE_RESOLUTION, tempAction);
     }
 
-    // Continue to get solution.
-    // Specific implementations will behave slightly different.
-    // MCTS will continue with the current tree, BFS will do nothing if 
-    // currentSolution_ is already populated.
-    baseController_.get()->run(currentSolution_, forwardSolution_, statistics_);
+    // Continue to run controller to find the next option which should be taken.
+    baseController->run(&currentOption_, &nextOption_, statistics_);
     enginehelper::setSimulatorFlag(false);
 
     // Get next action in action-currentSolution_ queue
@@ -138,23 +163,15 @@ Action Controller::getAction() {
         currentSolution_.erase(currentSolution_.begin());
     }
 
-    std::string actionStr = actionToString(action);
-
     // Send action information to logger
     // We only care about information at the engine resolution
-    if (step_counter_ % enginetype::ENGINE_RESOLUTION == 0) {
-        msg = "Controller sending action: " + actionStr;
-        PLOGI_(logwrap::FileLogger) << msg;
-        PLOGD_(logwrap::ConsolLogger) << msg;
-
-        // Log current state of game
+    if (step_counter_++ % enginetype::ENGINE_RESOLUTION == 0) {
+        logwrap::logPlayerMove(actionToString(action));
         logwrap::logState();
     }
 
     // Save action to replay file
-    logwrap::savePlayerMove(actionStr);
-
-    step_counter_ += 1;
+    logwrap::savePlayerMove(actionToString(action));
 
     return action;
 }
@@ -167,22 +184,20 @@ void Controller::setController(enginetype::ControllerType controller) {
     if (controller == enginetype::REPLAY) {
         baseController_ = std::make_unique<Replay>();
     }
-    else if (controller == enginetype::BFS) {
-        baseController_ = std::make_unique<BFS>();
-    }
-    else if (controller == enginetype::MCTS) {
+    // else if (controller == enginetype::BFS) {
+    //     baseController_ = std::make_unique<BFS>();
+    // }
+    else if (controller == enginetype::MCTS || controller == enginetype::MCTS_CUSTOM) {
         baseController_ = std::make_unique<MCTS>();
     }
-    else if (controller == enginetype::USER) {
-        baseController_ = std::make_unique<User>();
-    }
-    else if (controller == enginetype::PFA) {
-        baseController_ = std::make_unique<PFA>();
-    }
-    else {
-        // Throw error
-        std::string msg = "Unknown controller type: " + std::to_string(controller);
-        PLOGE_(logwrap::FileLogger) << msg;
-        PLOGE_(logwrap::ConsolLogger) << msg;
+    // else if (controller == enginetype::USER) {
+    //     baseController_ = std::make_unique<User>();
+    // }
+    // else if (controller == enginetype::PFA) {
+    //     baseController_ = std::make_unique<PFA>();
+    // }
+    else if (controller != enginetype::DEFAULT) {
+        PLOGE_(logwrap::FileLogger) << "Unknown controller type: " + std::to_string(controller);
+        PLOGE_(logwrap::ConsolLogger) << "Unknown controller type: " + std::to_string(controller);
     }
 }
