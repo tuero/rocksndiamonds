@@ -30,7 +30,7 @@
 #include "conf_snd.h"	// include auto-generated data structure definitions
 #include "conf_mus.h"	// include auto-generated data structure definitions
 
-#include "custom/custom.h"
+#include "ai/ai_entry.h"
 
 
 #define IMG_UNDEFINED			(-1)

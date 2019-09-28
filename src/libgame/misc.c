@@ -32,7 +32,7 @@
 #include "text.h"
 #include "image.h"
 
-#include "../custom/custom.h"
+#include "../ai/ai_entry.h"
 
 
 // ============================================================================

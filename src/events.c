@@ -22,7 +22,7 @@
 #include "anim.h"
 #include "network.h"
 
-#include "custom/custom.h"
+#include "ai/ai_entry.h"
 
 
 #define	DEBUG_EVENTS		0
