@@ -1449,6 +1449,9 @@ void HandleKeyEvent(KeyEvent *event)
   {
     // for any other "real" key event, disable virtual buttons
     SetOverlayEnabled(FALSE);
+
+    // for any other "real" key event, disable overlay touch buttons
+    runtime.uses_touch_device = FALSE;
   }
 #endif
 

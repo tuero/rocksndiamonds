@@ -808,7 +808,8 @@ static void DrawGadget_OverlayTouchButton(struct GadgetInfo *gi)
   int alpha_max = SDL_ALPHA_OPAQUE;
   int alpha_step = ALPHA_FADING_STEPSIZE(alpha_max);
 
-  if (gi->mapped)
+  // only show mapped overlay touch buttons if touch screen is really used
+  if (gi->mapped && runtime.uses_touch_device)
   {
     if (alpha < alpha_max)
       alpha = MIN(alpha + alpha_step, alpha_max);
