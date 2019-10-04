@@ -37,7 +37,7 @@ private:
     // Configuration file location
     // !TODO Maybe put dirs into another header
     const std::string mcts_config = "mcts.config";
-    const std::string config_dir = "./src/custom/config/";
+    const std::string config_dir = "./src/ai/config/";
 
     // MCTS runtime configurations
     // These are fallback values in the event configuration file isn't loaded

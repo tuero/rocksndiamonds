@@ -673,12 +673,14 @@ void InitGameActions_MM(void)
 
   for (i = 0; i <= num_init_game_frames; i++)
   {
+#ifndef HEADLESS
     if (i == num_init_game_frames)
       StopSound_MM(SND_MM_GAME_LEVELTIME_CHARGING);
     else if (setup.sound_loops)
       PlaySoundLoop_MM(SND_MM_GAME_LEVELTIME_CHARGING);
     else
       PlaySound_MM(SND_MM_GAME_LEVELTIME_CHARGING);
+#endif
 
     game_mm.energy_left = native_mm_level.time * i / num_init_game_frames;
 
@@ -3849,14 +3851,18 @@ void GameWon_MM(void)
 
   if (game_mm.energy_left)
   {
+#ifndef HEADLESS
     if (setup.sound_loops)
       PlaySoundExt(SND_SIRR, SOUND_MAX_VOLUME, SOUND_MAX_RIGHT,
 		   SND_CTRL_PLAY_LOOP);
+#endif
 
     while (game_mm.energy_left > 0)
     {
+#ifndef HEADLESS
       if (!setup.sound_loops)
 	PlaySoundStereo(SND_SIRR, SOUND_MAX_RIGHT);
+#endif
 
       /*
       if (game_mm.energy_left > 0 && !(game_mm.energy_left % 10))
@@ -3881,19 +3887,25 @@ void GameWon_MM(void)
       Delay_WithScreenUpdates(10);
     }
 
+#ifndef HEADLESS
     if (setup.sound_loops)
       StopSound(SND_SIRR);
+#endif
   }
   else if (native_mm_level.time == 0)		// level without time limit
   {
+#ifndef HEADLESS
     if (setup.sound_loops)
       PlaySoundExt(SND_SIRR, SOUND_MAX_VOLUME, SOUND_MAX_RIGHT,
 		   SND_CTRL_PLAY_LOOP);
+#endif
 
     while (TimePlayed < 999)
     {
+#ifndef HEADLESS
       if (!setup.sound_loops)
 	PlaySoundStereo(SND_SIRR, SOUND_MAX_RIGHT);
+#endif
       if (TimePlayed < 999 && !(TimePlayed % 10))
 	RaiseScore_MM(native_mm_level.score[SC_TIME_BONUS]);
       if (TimePlayed < 900 && !(TimePlayed % 10))
@@ -3909,8 +3921,10 @@ void GameWon_MM(void)
       Delay_WithScreenUpdates(10);
     }
 
+#ifndef HEADLESS
     if (setup.sound_loops)
       StopSound(SND_SIRR);
+#endif
   }
 
   CloseDoor(DOOR_CLOSE_1);
@@ -4109,6 +4123,7 @@ static void RemoveMovingField_MM(int x, int y)
 
 void PlaySoundLevel(int x, int y, int sound_nr)
 {
+#ifndef HEADLESS
   int sx = SCREENX(x), sy = SCREENY(y);
   int volume, stereo;
   int silence_distance = 8;
@@ -4143,6 +4158,7 @@ void PlaySoundLevel(int x, int y, int sound_nr)
   }
 
   PlaySoundExt(sound_nr, volume, stereo, SND_CTRL_PLAY_SOUND);
+#endif
 }
 
 static void RaiseScore_MM(int value)

@@ -12,6 +12,7 @@
 #ifndef INIT_H
 #define INIT_H
 
+#define MAYBE_UNUSED __attribute__((used))
 #include "main.h"
 
 #define setMoveIntoAcidProperty(l, e, v)			\
@@ -44,7 +45,7 @@ void InitGfxBuffers(void);
 void InitGadgets(void);
 void InitImageTextures(void);
 
-void InitNetworkServer(void);
+void InitNetworkServer(void) MAYBE_UNUSED;
 
 void DisplayExitMessage(char *, va_list);
 

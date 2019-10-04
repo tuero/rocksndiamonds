@@ -9,6 +9,8 @@
 // sound.c
 // ============================================================================
 
+#ifndef HEADLESS
+
 #include <sys/types.h>
 #include <sys/time.h>
 #include <string.h>
@@ -1174,3 +1176,5 @@ void FreeAllMusic(void)
 
 // THE STUFF ABOVE IS ONLY USED BY THE MAIN PROCESS
 // ============================================================================
+
+#endif

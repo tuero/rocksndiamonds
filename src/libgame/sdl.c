@@ -2317,6 +2317,7 @@ void SDLSetMouseCursor(struct MouseCursorInfo *cursor_info)
 
 void SDLOpenAudio(void)
 {
+#ifndef HEADLESS
   if (program.headless)
     return;
 
@@ -2345,15 +2346,18 @@ void SDLOpenAudio(void)
   audio.first_sound_channel = FIRST_SOUND_CHANNEL;
 
   Mixer_InitChannels();
+#endif
 }
 
 void SDLCloseAudio(void)
 {
+#ifndef HEADLESS
   Mix_HaltMusic();
   Mix_HaltChannel(-1);
 
   Mix_CloseAudio();
   SDL_QuitSubSystem(SDL_INIT_AUDIO);
+#endif
 }
 
 

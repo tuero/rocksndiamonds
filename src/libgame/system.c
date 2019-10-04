@@ -190,7 +190,9 @@ void InitPlatformDependentStuff(void)
   if (SDL_Init(sdl_init_flags) < 0)
     Error(ERR_EXIT, "SDL_Init() failed: %s", SDL_GetError());
 
+#ifndef HEADLESS
   SDLNet_Init();
+#endif
 }
 
 void ClosePlatformDependentStuff(void)

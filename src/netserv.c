@@ -9,6 +9,8 @@
 // netserv.c
 // ============================================================================
 
+#ifndef HEADLESS
+
 #include <fcntl.h>
 #include <sys/time.h>
 #include <signal.h>
@@ -1035,3 +1037,5 @@ void NetworkServer(int port, int serveronly)
     }
   }
 }
+
+#endif      // HEADLESS

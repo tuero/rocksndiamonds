@@ -339,6 +339,7 @@ void EventLoop(void)
       }
       prev_game_status = game_status;
 
+//#ifndef HEADLESS
       // mouse movement, arrow keys
     if (PendingEvent()){
         HandleEvents();
@@ -350,6 +351,7 @@ void EventLoop(void)
 
     // execute event related actions after pending events have been processed
     HandleEventActions();
+//#endif
 
       // don't use all CPU time when idle; the main loop while playing
     // has its own synchronization and is CPU friendly, too
@@ -370,7 +372,9 @@ void EventLoop(void)
     }
 
     // always copy backbuffer to visible screen for every video frame
+//#ifndef HEADLESS
     BackToFront();
+//#endif
 
     // reset video frame delay to default (may change again while playing)
     SetVideoFrameDelay(MenuFrameDelay);
@@ -1427,6 +1431,7 @@ void HandleTextEvent(TextEvent *event)
 
 void HandlePauseResumeEvent(PauseResumeEvent *event)
 {
+#ifndef HEADLESS
   if (event->type == SDL_APP_WILLENTERBACKGROUND)
   {
     Mix_PauseMusic();
@@ -1435,6 +1440,7 @@ void HandlePauseResumeEvent(PauseResumeEvent *event)
   {
     Mix_ResumeMusic();
   }
+#endif
 }
 
 void HandleKeyEvent(KeyEvent *event)
@@ -2424,8 +2430,10 @@ void HandleEventActions(void)
     HandleJoystick();
   }
 
+#ifndef HEADLESS
   if (network.enabled)
     HandleNetworking();
+#endif
 
   switch (game_status)
   {

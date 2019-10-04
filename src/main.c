@@ -7662,6 +7662,7 @@ static void print_version(void)
 	  sdl_version.minor,
 	  sdl_version.patch);
 
+#ifndef HEADLESS
     SDL_MIXER_VERSION(&sdl_version);
     Print("- SDL_mixer %d.%d.%d\n",
 	  sdl_version.major,
@@ -7673,6 +7674,7 @@ static void print_version(void)
 	  sdl_version.major,
 	  sdl_version.minor,
 	  sdl_version.patch);
+#endif
   }
 }
 
@@ -7817,6 +7819,8 @@ int main(int argc, char *argv[])
     if (options.controller_type != CONTROLLER_TYPE_DEFAULT) {
         StartGameActions(network.enabled, setup.autorecord, level.random_seed);
     }
+
+//    StartGameActions(network.enabled, setup.autorecord, level.random_seed);
 
 
     // normal event loop

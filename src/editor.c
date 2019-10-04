@@ -8547,7 +8547,9 @@ void DrawLevelEd(void)
 {
   int fade_mask = REDRAW_FIELD;
 
+#ifndef HEADLESS
   FadeSoundsAndMusic();
+#endif
 
   if (CheckFadeAll())
     fade_mask = REDRAW_ALL;

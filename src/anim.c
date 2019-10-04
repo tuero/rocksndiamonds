@@ -19,6 +19,8 @@
 #include "screens.h"
 
 
+#define MAYBE_UNUSED __attribute__((used))
+
 #define DEBUG_ANIM_DELAY		0
 #define DEBUG_ANIM_EVENTS		0
 
@@ -945,8 +947,10 @@ static boolean SetGlobalAnimPart_Viewport(struct GlobalAnimPartControlInfo *part
   return changed;
 }
 
+static void PlayGlobalAnimSound(struct GlobalAnimPartControlInfo *part) MAYBE_UNUSED;
 static void PlayGlobalAnimSound(struct GlobalAnimPartControlInfo *part)
 {
+#ifndef HEADLESS
   int sound = part->sound;
 
   if (sound == SND_UNDEFINED)
@@ -961,6 +965,7 @@ static void PlayGlobalAnimSound(struct GlobalAnimPartControlInfo *part)
     PlaySoundLoop(sound);
   else
     PlaySound(sound);
+#endif
 
 #if 0
   printf("::: PLAY SOUND %d.%d.%d: %d\n",
@@ -968,14 +973,17 @@ static void PlayGlobalAnimSound(struct GlobalAnimPartControlInfo *part)
 #endif
 }
 
+static void StopGlobalAnimSound(struct GlobalAnimPartControlInfo *part) MAYBE_UNUSED;
 static void StopGlobalAnimSound(struct GlobalAnimPartControlInfo *part)
 {
+#ifndef HEADLESS
   int sound = part->sound;
 
   if (sound == SND_UNDEFINED)
     return;
 
   StopSound(sound);
+#endif
 
 #if 0
   printf("::: STOP SOUND %d.%d.%d: %d\n",
@@ -983,8 +991,10 @@ static void StopGlobalAnimSound(struct GlobalAnimPartControlInfo *part)
 #endif
 }
 
+static void PlayGlobalAnimMusic(struct GlobalAnimPartControlInfo *part) MAYBE_UNUSED;
 static void PlayGlobalAnimMusic(struct GlobalAnimPartControlInfo *part)
 {
+#ifndef HEADLESS
   int music = part->music;
 
   if (music == MUS_UNDEFINED)
@@ -997,6 +1007,7 @@ static void PlayGlobalAnimMusic(struct GlobalAnimPartControlInfo *part)
     PlayMusicLoop(music);
   else
     PlayMusic(music);
+#endif
 
 #if 0
   printf("::: PLAY MUSIC %d.%d.%d: %d\n",
@@ -1004,14 +1015,17 @@ static void PlayGlobalAnimMusic(struct GlobalAnimPartControlInfo *part)
 #endif
 }
 
+static void StopGlobalAnimMusic(struct GlobalAnimPartControlInfo *part) MAYBE_UNUSED;
 static void StopGlobalAnimMusic(struct GlobalAnimPartControlInfo *part)
 {
+#ifndef HEADLESS
   int music = part->music;
 
   if (music == MUS_UNDEFINED)
     return;
 
   StopMusic();
+#endif
 
 #if 0
   printf("::: STOP MUSIC %d.%d.%d: %d\n",
@@ -1021,22 +1035,27 @@ static void StopGlobalAnimMusic(struct GlobalAnimPartControlInfo *part)
 
 static void PlayGlobalAnimSoundAndMusic(struct GlobalAnimPartControlInfo *part)
 {
+#ifndef HEADLESS
   // when drawing animations to fading buffer, do not play sounds or music
   if (drawing_to_fading_buffer)
     return;
 
   PlayGlobalAnimSound(part);
   PlayGlobalAnimMusic(part);
+#endif
 }
 
 static void StopGlobalAnimSoundAndMusic(struct GlobalAnimPartControlInfo *part)
 {
+#ifndef HEADLESS
   StopGlobalAnimSound(part);
   StopGlobalAnimMusic(part);
+#endif
 }
 
 static void PlayGlobalAnimSoundIfLoop(struct GlobalAnimPartControlInfo *part)
 {
+#ifndef HEADLESS
   // when drawing animations to fading buffer, do not play sounds
   if (drawing_to_fading_buffer)
     return;
@@ -1055,6 +1074,7 @@ static void PlayGlobalAnimSoundIfLoop(struct GlobalAnimPartControlInfo *part)
 
   // prevent expiring loop sounds when playing
   PlayGlobalAnimSound(part);
+#endif
 }
 
 static boolean checkGlobalAnimEvent(int anim_event, int mask)

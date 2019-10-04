@@ -125,7 +125,7 @@ BIN_DIR = ../bin
 BUILD_DIR = ../build
 BUILD_CUSTOM_DIR = $(BUILD_DIR)/custom
 BUILD_HEADLESS_DIR = $(BUILD_DIR)/headless
-PROGNAMES = $(BIN_DIR)/rocksndiamonds $(BIN_DIR)/rocksndiamonds_headless
+PROGNAMES = ../rocksndiamonds ../rocksndiamonds_headless
 
 SRCS =	main.c		\
 	conf_gfx.c	\

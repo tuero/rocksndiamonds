@@ -23,6 +23,8 @@
 #include "screens.h"
 
 
+#define MAYBE_UNUSED __attribute__((used))
+
 // select level set with EMC X11 graphics before activating EM GFX debugging
 #define DEBUG_EM_GFX		FALSE
 #define DEBUG_FRAME_TIME	FALSE
@@ -3612,8 +3614,11 @@ void DrawPreviewLevelAnimation(void)
 }
 
 static void DrawNetworkPlayer(int x, int y, int player_nr, int tile_size,
+                              int border_size, int font_nr) MAYBE_UNUSED;
+static void DrawNetworkPlayer(int x, int y, int player_nr, int tile_size,
 			      int border_size, int font_nr)
 {
+#ifndef HEADLESS
   int graphic = el2img(EL_PLAYER_1 + player_nr);
   int font_height = getFontHeight(font_nr);
   int player_height = MAX(tile_size, font_height);
@@ -3625,10 +3630,12 @@ static void DrawNetworkPlayer(int x, int y, int player_nr, int tile_size,
   DrawSizedGraphicThruMaskExt(drawto, x, y + yoffset_graphic, graphic, 0,
 			      tile_size);
   DrawText(x + xoffset_text, y + yoffset_text, player_name, font_nr);
+#endif
 }
 
 static void DrawNetworkPlayersExt(boolean force)
 {
+#ifndef HEADLESS
   if (game_status != GAME_MODE_MAIN)
     return;
 
@@ -3696,6 +3703,7 @@ static void DrawNetworkPlayersExt(boolean force)
       ypos += player_yoffset;
     }
   }
+#endif
 }
 
 void DrawNetworkPlayers(void)
@@ -4572,11 +4580,13 @@ static boolean RequestDoor(char *text, unsigned int req_state)
   SetMouseCursor(CURSOR_DEFAULT);
 
   // pause network game while waiting for request to answer
+#ifndef HEADLESS
   if (network.enabled &&
       game_status == GAME_MODE_PLAYING &&
       !game.all_players_gone &&
       req_state & REQUEST_WAIT_FOR_INPUT)
     SendToServer_PausePlaying();
+#endif
 
   old_door_state = GetDoorState();
 
@@ -4713,11 +4723,13 @@ static boolean RequestDoor(char *text, unsigned int req_state)
   }
 
   // continue network game after request
+#ifndef HEADLESS
   if (network.enabled &&
       game_status == GAME_MODE_PLAYING &&
       !game.all_players_gone &&
       req_state & REQUEST_WAIT_FOR_INPUT)
     SendToServer_ContinuePlaying();
+#endif
 
   // restore deactivated drawing when quick-loading level tape recording
   if (tape.playing && tape.deactivate_display)
@@ -4740,11 +4752,13 @@ static boolean RequestEnvelope(char *text, unsigned int req_state)
   SetMouseCursor(CURSOR_DEFAULT);
 
   // pause network game while waiting for request to answer
+#ifndef HEADLESS
   if (network.enabled &&
       game_status == GAME_MODE_PLAYING &&
       !game.all_players_gone &&
       req_state & REQUEST_WAIT_FOR_INPUT)
     SendToServer_PausePlaying();
+#endif
 
   // simulate releasing mouse button over last gadget, if still pressed
   if (button_status)
@@ -4798,11 +4812,13 @@ static boolean RequestEnvelope(char *text, unsigned int req_state)
   }
 
   // continue network game after request
+#ifndef HEADLESS
   if (network.enabled &&
       game_status == GAME_MODE_PLAYING &&
       !game.all_players_gone &&
       req_state & REQUEST_WAIT_FOR_INPUT)
     SendToServer_ContinuePlaying();
+#endif
 
   // restore deactivated drawing when quick-loading level tape recording
   if (tape.playing && tape.deactivate_display)
@@ -9160,8 +9176,10 @@ int getGraphicInfo_Delay(int graphic)
   return graphic_info[graphic].anim_delay;
 }
 
+void PlayMenuSoundExt(int sound) MAYBE_UNUSED;
 void PlayMenuSoundExt(int sound)
 {
+#ifndef HEADLESS
   if (sound == SND_UNDEFINED)
     return;
 
@@ -9173,15 +9191,21 @@ void PlayMenuSoundExt(int sound)
     PlaySoundLoop(sound);
   else
     PlaySound(sound);
+#endif
 }
 
+void PlayMenuSound(void) MAYBE_UNUSED;
 void PlayMenuSound(void)
 {
+#ifndef HEADLESS
   PlayMenuSoundExt(menu.sound[game_status]);
+#endif
 }
 
+void PlayMenuSoundStereo(int sound, int stereo_position) MAYBE_UNUSED;
 void PlayMenuSoundStereo(int sound, int stereo_position)
 {
+#ifndef HEADLESS
   if (sound == SND_UNDEFINED)
     return;
 
@@ -9193,10 +9217,13 @@ void PlayMenuSoundStereo(int sound, int stereo_position)
     PlaySoundExt(sound, SOUND_MAX_VOLUME, stereo_position, SND_CTRL_PLAY_LOOP);
   else
     PlaySoundStereo(sound, stereo_position);
+#endif
 }
 
+void PlayMenuSoundIfLoopExt(int sound) MAYBE_UNUSED;
 void PlayMenuSoundIfLoopExt(int sound)
 {
+#ifndef HEADLESS
   if (sound == SND_UNDEFINED)
     return;
 
@@ -9206,15 +9233,21 @@ void PlayMenuSoundIfLoopExt(int sound)
 
   if (IS_LOOP_SOUND(sound))
     PlaySoundLoop(sound);
+#endif
 }
 
+void PlayMenuSoundIfLoop(void) MAYBE_UNUSED;
 void PlayMenuSoundIfLoop(void)
 {
+#ifndef HEADLESS
   PlayMenuSoundIfLoopExt(menu.sound[game_status]);
+#endif
 }
 
+void PlayMenuMusicExt(int music) MAYBE_UNUSED;
 void PlayMenuMusicExt(int music)
 {
+#ifndef HEADLESS
   if (music == MUS_UNDEFINED)
     return;
 
@@ -9225,41 +9258,57 @@ void PlayMenuMusicExt(int music)
     PlayMusicLoop(music);
   else
     PlayMusic(music);
+#endif
 }
 
+void PlayMenuMusic(void) MAYBE_UNUSED;
 void PlayMenuMusic(void)
 {
+#ifndef HEADLESS
   char *curr_music = getCurrentlyPlayingMusicFilename();
   char *next_music = getMusicInfoEntryFilename(menu.music[game_status]);
 
   if (!strEqual(curr_music, next_music))
     PlayMenuMusicExt(menu.music[game_status]);
+#endif
 }
 
+void PlayMenuSoundsAndMusic(void) MAYBE_UNUSED;
 void PlayMenuSoundsAndMusic(void)
 {
+#ifndef HEADLESS
   PlayMenuSound();
   PlayMenuMusic();
+#endif
 }
 
+static void FadeMenuSounds(void) MAYBE_UNUSED;
 static void FadeMenuSounds(void)
 {
+#ifndef HEADLESS
   FadeSounds();
+#endif
 }
 
+static void FadeMenuMusic(void) MAYBE_UNUSED;
 static void FadeMenuMusic(void)
 {
+#ifndef HEADLESS
   char *curr_music = getCurrentlyPlayingMusicFilename();
   char *next_music = getMusicInfoEntryFilename(menu.music[game_status]);
 
   if (!strEqual(curr_music, next_music))
     FadeMusic();
+#endif
 }
 
+void FadeMenuSoundsAndMusic(void) MAYBE_UNUSED;
 void FadeMenuSoundsAndMusic(void)
 {
+#ifndef HEADLESS
   FadeMenuSounds();
   FadeMenuMusic();
+#endif
 }
 
 void PlaySoundActivating(void)

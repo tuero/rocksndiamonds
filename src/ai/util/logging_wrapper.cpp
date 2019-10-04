@@ -21,8 +21,8 @@
 
 
 // Directory locations
-const std::string LOG_DIR = "./src/custom/logs/";
-const std::string REPLAY_DIR = "./src/custom/replays/";
+const std::string LOG_DIR = "./src/ai/logs/";
+const std::string REPLAY_DIR = "./src/ai/replays/";
 const std::string LOG_EXTENSION = ".log";
 const std::string REPLAY_EXTENSION = ".txt";
 static std::ofstream replayFile;

@@ -25,6 +25,10 @@
 // sprite IDs are used for custom controllers for object tracking
 int spriteIDs[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int idCounter;
+#define MAYBE_UNUSED __attribute__((used))
+#ifdef HEADLESS
+#define hasStartedNetworkGame() TRUE
+#endif
 
 
 // DEBUG SETTINGS
@@ -1035,15 +1039,15 @@ static struct GamePanelControlInfo game_panel_controls[] =
 
 static void CreateField(int, int, int);
 
-static void ResetGfxAnimation(int, int);
+static void ResetGfxAnimation(int, int) MAYBE_UNUSED;
 
-static void SetPlayerWaiting(struct PlayerInfo *, boolean);
+static void SetPlayerWaiting(struct PlayerInfo *, boolean) MAYBE_UNUSED;
 static void AdvanceFrameAndPlayerCounters(int);
 
 static boolean MovePlayerOneStep(struct PlayerInfo *, int, int, int, int);
 static boolean MovePlayer(struct PlayerInfo *, int, int);
 static void ScrollPlayer(struct PlayerInfo *, int);
-static void ScrollScreen(struct PlayerInfo *, int);
+static void ScrollScreen(struct PlayerInfo *, int) MAYBE_UNUSED;
 
 static int DigField(struct PlayerInfo *, int, int, int, int, int, int, int);
 static boolean DigFieldByCE(int, int, int);
@@ -1083,15 +1087,15 @@ static boolean CheckElementChangeExt(int, int, int, int, int, int, int);
 #define CheckElementChangeBySide(x, y, e, te, ev, s)			\
 	CheckElementChangeExt(x, y, e, te, ev, CH_PLAYER_ANY, s)
 
-static void PlayLevelSound(int, int, int);
-static void PlayLevelSoundNearest(int, int, int);
-static void PlayLevelSoundAction(int, int, int);
-static void PlayLevelSoundElementAction(int, int, int, int);
-static void PlayLevelSoundElementActionIfLoop(int, int, int, int);
-static void PlayLevelSoundActionIfLoop(int, int, int);
-static void StopLevelSoundActionIfLoop(int, int, int);
-static void PlayLevelMusic(void);
-static void FadeLevelSoundsAndMusic(void);
+static void PlayLevelSound(int, int, int) MAYBE_UNUSED;
+static void PlayLevelSoundNearest(int, int, int) MAYBE_UNUSED;
+static void PlayLevelSoundAction(int, int, int) MAYBE_UNUSED;
+static void PlayLevelSoundElementAction(int, int, int, int) MAYBE_UNUSED;
+static void PlayLevelSoundElementActionIfLoop(int, int, int, int) MAYBE_UNUSED;
+static void PlayLevelSoundActionIfLoop(int, int, int) MAYBE_UNUSED;
+static void StopLevelSoundActionIfLoop(int, int, int) MAYBE_UNUSED;
+static void PlayLevelMusic(void) MAYBE_UNUSED;
+static void FadeLevelSoundsAndMusic(void) MAYBE_UNUSED;
 
 static void HandleGameButtons(struct GadgetInfo *);
 
@@ -2209,6 +2213,7 @@ static void UpdatePlayfieldElementCount(void)
 	  element_info[j].element_count;
 }
 
+static void UpdateGameControlValues(void) MAYBE_UNUSED;
 static void UpdateGameControlValues(void)
 {
     if (is_simulating == FALSE) {
@@ -2519,6 +2524,7 @@ static void UpdateGameControlValues(void)
     }
 }
 
+static void DisplayGameControlValues(void) MAYBE_UNUSED;
 static void DisplayGameControlValues(void)
 {
     if (is_simulating == FALSE) {
@@ -3301,14 +3307,17 @@ void InitGame(void)
   int initial_move_dir = MV_DOWN;
   int i, j, x, y;
 
+#ifndef HEADLESS
   // required here to update video display before fading (FIX THIS)
   DrawMaskedBorder(REDRAW_DOOR_2);
 
   if (!game.restart_level)
     CloseDoor(DOOR_CLOSE_1);
+#endif
 
   SetGameStatus(GAME_MODE_PLAYING);
 
+#ifndef HEADLESS
   if (level_editor_test_game)
     FadeSkipNextFadeOut();
   else
@@ -3334,8 +3343,10 @@ void InitGame(void)
   DrawCompleteVideoDisplay();
 
   OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
+#endif
 
   InitGameEngine();
+  //<!-- This can probably get commented out
   InitGameControlValues();
 
   // don't play tapes over network
@@ -3500,8 +3511,10 @@ void InitGame(void)
   network_player_action_received = FALSE;
 
   // initial null action
+#ifndef HEADLESS
   if (network_playing)
     SendToServer_MovePlayer(MV_NONE);
+#endif
 
   FrameCounter = 0;
   TimeFrames = 0;
@@ -4207,6 +4220,7 @@ void InitGame(void)
   if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
     InitGameActions_MM();
 
+#ifndef HEADLESS
   SaveEngineSnapshotToListInitial();
 
   if (!game.restart_level)
@@ -4216,6 +4230,7 @@ void InitGame(void)
     if (setup.sound_music)
       PlayLevelMusic();
   }
+#endif
 }
 
 void UpdateEngineValues(int actual_scroll_x, int actual_scroll_y,
@@ -4593,8 +4608,9 @@ void GameWon(void)
 	}
       }
     }
-
+#ifndef HEADLESS
     PlaySound(SND_GAME_WINNING);
+#endif
   }
 
   if (game_over_delay_1 > 0)
@@ -4622,13 +4638,14 @@ void GameWon(void)
     game_panel_controls[GAME_PANEL_SCORE].value = score;
 
     DisplayGameControlValues();
-
+#ifndef HEADLESS
     if (time == time_final)
       StopSound(SND_GAME_LEVELTIME_BONUS);
     else if (setup.sound_loops)
       PlaySoundLoop(SND_GAME_LEVELTIME_BONUS);
     else
       PlaySound(SND_GAME_LEVELTIME_BONUS);
+#endif
 
     return;
   }
@@ -4655,12 +4672,14 @@ void GameWon(void)
 
     DisplayGameControlValues();
 
+#ifndef HEADLESS
     if (health == health_final)
       StopSound(SND_GAME_LEVELTIME_BONUS);
     else if (setup.sound_loops)
       PlaySoundLoop(SND_GAME_LEVELTIME_BONUS);
     else
       PlaySound(SND_GAME_LEVELTIME_BONUS);
+#endif
 
     return;
   }
@@ -4857,6 +4876,7 @@ void InitPlayerGfxAnimation(struct PlayerInfo *player, int action, int dir)
   }
 }
 
+static void ResetGfxFrame(int x, int y) MAYBE_UNUSED;
 static void ResetGfxFrame(int x, int y)
 {
   // profiling showed that "autotest" spends 10~20% of its time in this function
@@ -10823,8 +10843,10 @@ static boolean CheckElementChangeExt(int x, int y,
   return change_done;
 }
 
+static void PlayPlayerSound(struct PlayerInfo *player) MAYBE_UNUSED;
 static void PlayPlayerSound(struct PlayerInfo *player)
 {
+#ifndef HEADLESS
   int jx = player->jx, jy = player->jy;
   int sound_element = player->artwork_element;
   int last_action = player->last_action_waiting;
@@ -10845,15 +10867,18 @@ static void PlayPlayerSound(struct PlayerInfo *player)
     if (last_action == ACTION_SLEEPING)
       PlayLevelSoundElementAction(jx, jy, sound_element, ACTION_AWAKENING);
   }
+#endif
 }
 
 static void PlayAllPlayersSound(void)
 {
+#ifndef HEADLESS
   int i;
 
   for (i = 0; i < MAX_PLAYERS; i++)
     if (stored_player[i].active)
       PlayPlayerSound(&stored_player[i]);
+#endif
 }
 
 static void SetPlayerWaiting(struct PlayerInfo *player, boolean is_waiting)
@@ -11204,8 +11229,10 @@ static void CheckLevelTime(void)
       {
 	TimeLeft--;
 
+#ifndef HEADLESS
 	if (TimeLeft <= 10 && setup.time_limit)
 	  PlaySound(SND_GAME_RUNNING_OUT_OF_TIME);
+#endif
 
 	/* this does not make sense: game_panel_controls[GAME_PANEL_TIME].value
 	   is reset from other values in UpdateGameDoorValues() -- FIX THIS */
@@ -11297,6 +11324,7 @@ void StartGameActions(boolean init_network_game, boolean record_tape,
   if (record_tape)
     TapeStartRecording(new_random_seed);
 
+#ifndef HEADLESS
   if (init_network_game)
   {
     SendToServer_LevelFile();
@@ -11304,6 +11332,7 @@ void StartGameActions(boolean init_network_game, boolean record_tape,
 
     return;
   }
+#endif
 
   InitGame();
 }
@@ -11329,7 +11358,9 @@ static void GameActionsExt(void)
     Error(ERR_WARN, "element '%s' caused endless loop in game engine",
 	  EL_NAME(recursion_loop_element));
 
+#ifndef HEADLESS
     RequestQuitGameExt(FALSE, level_editor_test_game, message);
+#endif
 
     recursion_loop_detected = FALSE;	// if game should be continued
 
@@ -11385,6 +11416,7 @@ static void GameActionsExt(void)
 #endif
 #endif
     // --skip this
+#ifndef HEADLESS
   if (network_playing && !network_player_action_received)
   {
     // try to get network player actions in time
@@ -11402,6 +11434,7 @@ static void GameActionsExt(void)
 
     // do not yet reset "network_player_action_received" (for tape.pausing)
   }
+#endif
 
   if (tape.pausing)
     return;
@@ -11438,8 +11471,10 @@ static void GameActionsExt(void)
       stored_player[i].effective_action = stored_player[i].action;
   }
 
+#ifndef HEADLESS
   if (network_playing && !checkGameEnded())
     SendToServer_MovePlayer(summarized_player_action);
+#endif
 
   // summarize all actions at local players mapped input device position
   // (this allows using different input devices in single player mode)
@@ -12774,8 +12809,10 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
       {
 	TimeLeft--;
 
+#ifndef HEADLESS
 	if (TimeLeft <= 10 && setup.time_limit)
 	  PlaySound(SND_GAME_RUNNING_OUT_OF_TIME);
+#endif
 
 	game_panel_controls[GAME_PANEL_TIME].value = TimeLeft;
 
@@ -14529,11 +14566,14 @@ static boolean DropElement(struct PlayerInfo *player)
 // game sound playing functions
 // ----------------------------------------------------------------------------
 
+#ifndef HEADLESS
 static int *loop_sound_frame = NULL;
 static int *loop_sound_volume = NULL;
+#endif
 
 void InitPlayLevelSound(void)
 {
+#ifndef HEADLESS
   int num_sounds = getSoundListSize();
 
   checked_free(loop_sound_frame);
@@ -14541,10 +14581,12 @@ void InitPlayLevelSound(void)
 
   loop_sound_frame  = checked_calloc(num_sounds * sizeof(int));
   loop_sound_volume = checked_calloc(num_sounds * sizeof(int));
+#endif
 }
 
 static void PlayLevelSound(int x, int y, int nr)
 {
+#ifndef HEADLESS
     if (is_simulating == FALSE) {
         int sx = SCREENX(x), sy = SCREENY(y);
         int volume, stereo_position;
@@ -14586,96 +14628,125 @@ static void PlayLevelSound(int x, int y, int nr)
 
         PlaySoundExt(nr, volume, stereo_position, type);
     }
+#endif
 }
 
 static void PlayLevelSoundNearest(int x, int y, int sound_action)
 {
+#ifndef HEADLESS
   PlayLevelSound(x < LEVELX(BX1) ? LEVELX(BX1) :
 		 x > LEVELX(BX2) ? LEVELX(BX2) : x,
 		 y < LEVELY(BY1) ? LEVELY(BY1) :
 		 y > LEVELY(BY2) ? LEVELY(BY2) : y,
 		 sound_action);
+#endif
 }
 
 static void PlayLevelSoundAction(int x, int y, int action)
 {
+#ifndef HEADLESS
   PlayLevelSoundElementAction(x, y, Feld[x][y], action);
+#endif
 }
 
 static void PlayLevelSoundElementAction(int x, int y, int element, int action)
 {
+#ifndef HEADLESS
   int sound_effect = element_info[SND_ELEMENT(element)].sound[action];
 
   if (sound_effect != SND_UNDEFINED)
     PlayLevelSound(x, y, sound_effect);
+#endif
 }
 
 static void PlayLevelSoundElementActionIfLoop(int x, int y, int element,
 					      int action)
 {
+#ifndef HEADLESS
   int sound_effect = element_info[SND_ELEMENT(element)].sound[action];
 
   if (sound_effect != SND_UNDEFINED && IS_LOOP_SOUND(sound_effect))
     PlayLevelSound(x, y, sound_effect);
+#endif
 }
 
 static void PlayLevelSoundActionIfLoop(int x, int y, int action)
 {
+#ifndef HEADLESS
   int sound_effect = element_info[SND_ELEMENT(Feld[x][y])].sound[action];
 
   if (sound_effect != SND_UNDEFINED && IS_LOOP_SOUND(sound_effect))
     PlayLevelSound(x, y, sound_effect);
+#endif
 }
 
 static void StopLevelSoundActionIfLoop(int x, int y, int action)
 {
+#ifndef HEADLESS
   int sound_effect = element_info[SND_ELEMENT(Feld[x][y])].sound[action];
 
   if (sound_effect != SND_UNDEFINED && IS_LOOP_SOUND(sound_effect))
     StopSound(sound_effect);
+#endif
 }
 
+static int getLevelMusicNr(void) MAYBE_UNUSED;
 static int getLevelMusicNr(void)
 {
+#ifndef HEADLESS
   if (levelset.music[level_nr] != MUS_UNDEFINED)
     return levelset.music[level_nr];		// from config file
   else
     return MAP_NOCONF_MUSIC(level_nr);		// from music dir
+#else
+  return 0;
+#endif
 }
 
+static void FadeLevelSounds(void) MAYBE_UNUSED;
 static void FadeLevelSounds(void)
 {
+#ifndef HEADLESS
   FadeSounds();
+#endif
 }
 
+static void FadeLevelMusic(void) MAYBE_UNUSED;
 static void FadeLevelMusic(void)
 {
+#ifndef HEADLESS
   int music_nr = getLevelMusicNr();
   char *curr_music = getCurrentlyPlayingMusicFilename();
   char *next_music = getMusicInfoEntryFilename(music_nr);
 
   if (!strEqual(curr_music, next_music))
     FadeMusic();
+#endif
 }
 
 void FadeLevelSoundsAndMusic(void)
 {
+#ifndef HEADLESS
   FadeLevelSounds();
   FadeLevelMusic();
+#endif
 }
 
 static void PlayLevelMusic(void)
 {
+#ifndef HEADLESS
   int music_nr = getLevelMusicNr();
   char *curr_music = getCurrentlyPlayingMusicFilename();
   char *next_music = getMusicInfoEntryFilename(music_nr);
 
   if (!strEqual(curr_music, next_music))
     PlayMusicLoop(music_nr);
+#endif
 }
 
 void PlayLevelSound_EM(int xx, int yy, int element_em, int sample)
 {
+#ifndef HEADLESS
   int element = (element_em > -1 ? map_element_EM_to_RND(element_em) : 0);
   int offset = (BorderElement == EL_STEELWALL ? 1 : 0);
   int x = xx - 1 - offset;
@@ -14832,10 +14903,12 @@ void PlayLevelSound_EM(int xx, int yy, int element_em, int sample)
       PlayLevelSoundElementAction(x, y, element, ACTION_DEFAULT);
       break;
   }
+#endif
 }
 
 void PlayLevelSound_SP(int xx, int yy, int element_sp, int action_sp)
 {
+#ifndef HEADLESS
   int element = map_element_SP_to_RND(element_sp);
   int action = map_action_SP_to_RND(action_sp);
   int offset = (setup.sp_show_border_elements ? 0 : 1);
@@ -14843,10 +14916,12 @@ void PlayLevelSound_SP(int xx, int yy, int element_sp, int action_sp)
   int y = yy - offset;
 
   PlayLevelSoundElementAction(x, y, element, action);
+#endif
 }
 
 void PlayLevelSound_MM(int xx, int yy, int element_mm, int action_mm)
 {
+#ifndef HEADLESS
   int element = map_element_MM_to_RND(element_mm);
   int action = map_action_MM_to_RND(action_mm);
   int offset = 0;
@@ -14857,45 +14932,54 @@ void PlayLevelSound_MM(int xx, int yy, int element_mm, int action_mm)
     element = EL_MM_DEFAULT;
 
   PlayLevelSoundElementAction(x, y, element, action);
+#endif
 }
 
 void PlaySound_MM(int sound_mm)
 {
+#ifndef HEADLESS
   int sound = map_sound_MM_to_RND(sound_mm);
 
   if (sound == SND_UNDEFINED)
     return;
 
   PlaySound(sound);
+#endif
 }
 
 void PlaySoundLoop_MM(int sound_mm)
 {
+#ifndef HEADLESS
   int sound = map_sound_MM_to_RND(sound_mm);
 
   if (sound == SND_UNDEFINED)
     return;
 
   PlaySoundLoop(sound);
+#endif
 }
 
 void StopSound_MM(int sound_mm)
 {
+#ifndef HEADLESS
   int sound = map_sound_MM_to_RND(sound_mm);
 
   if (sound == SND_UNDEFINED)
     return;
 
   StopSound(sound);
+#endif
 }
 
 void RaiseScore(int value)
 {
+#ifndef HEADLESS
   game.score += value;
 
   game_panel_controls[GAME_PANEL_SCORE].value = game.score;
 
   DisplayGameControlValues();
+#endif
 }
 
 void RaiseScoreElement(int element)
@@ -14991,8 +15075,11 @@ void RequestQuitGameExt(boolean skip_request, boolean quick_quit, char *message)
       CloseDoor(DOOR_CLOSE_1);
     }
 
-    if (network.enabled)
-      SendToServer_StopPlaying(NETWORK_STOP_BY_PLAYER);
+    if (network.enabled) {
+#ifndef HEADLESS
+        SendToServer_StopPlaying(NETWORK_STOP_BY_PLAYER);
+#endif
+    }
     else
     {
       if (quick_quit)
@@ -15856,6 +15943,7 @@ static void HandleGameButtonsExt(int id, int button)
     case GAME_CTRL_ID_PAUSE:
     case GAME_CTRL_ID_PAUSE2:
     case GAME_CTRL_ID_PANEL_PAUSE:
+#ifndef HEADLESS
       if (network.enabled && game_status == GAME_MODE_PLAYING)
       {
 	if (tape.pausing)
@@ -15865,6 +15953,7 @@ static void HandleGameButtonsExt(int id, int button)
       }
       else
 	TapeTogglePause(TAPE_TOGGLE_MANUAL);
+#endif
 
       game_undo_executed = FALSE;
 
@@ -15878,8 +15967,11 @@ static void HandleGameButtonsExt(int id, int button)
       }
       else if (tape.pausing)
       {
-	if (network.enabled)
-	  SendToServer_ContinuePlaying();
+	if (network.enabled) {
+#ifndef HEADLESS
+        SendToServer_ContinuePlaying();
+#endif
+    }
 	else
 	  TapeTogglePause(TAPE_TOGGLE_MANUAL | TAPE_TOGGLE_PLAY_PAUSE);
       }
@@ -15911,7 +16003,7 @@ static void HandleGameButtonsExt(int id, int button)
     case GAME_CTRL_ID_LOAD:
       TapeQuickLoad();
       break;
-
+#ifndef HEADLESS
     case SOUND_CTRL_ID_MUSIC:
     case SOUND_CTRL_ID_PANEL_MUSIC:
       if (setup.sound_music)
@@ -15933,6 +16025,7 @@ static void HandleGameButtonsExt(int id, int button)
       RedrawSoundButtonGadget(id);
 
       break;
+#endif
 
     case SOUND_CTRL_ID_LOOPS:
     case SOUND_CTRL_ID_PANEL_LOOPS:
@@ -15983,3 +16076,94 @@ void HandleSoundButtonKeys(Key key)
   else if (key == setup.shortcut.sound_music)
     ClickOnGadget(game_gadget[SOUND_CTRL_ID_MUSIC], MB_LEFTBUTTON);
 }
+
+
+// --------------------------------------------------
+#ifndef HEADLESS
+#define PlayLevelSound() PlayLevelSound()
+#define PlayLevelSoundNearest() PlayLevelSoundNearest()
+#define PlayLevelSoundAction() PlayLevelSoundAction()
+#define PlayLevelSoundElementAction() PlayLevelSoundElementAction()
+#define PlayLevelSoundElementActionIfLoop() PlayLevelSoundElementActionIfLoop()
+#define PlayLevelSoundActionIfLoop() PlayLevelSoundActionIfLoop()
+#define StopLevelSoundActionIfLoop() StopLevelSoundActionIfLoop()
+#define PlayLevelMusic() PlayLevelMusic()
+#define FadeLevelSoundsAndMusic() FadeLevelSoundsAndMusic()
+#define InitPlayLevelSound() InitPlayLevelSound()
+
+#define UpdateGameControlValues() UpdateGameControlValues()
+#define DisplayGameControlValues() DisplayGameControlValues()
+#define UpdateAndDisplayGameControlValues() UpdateAndDisplayGameControlValues()
+#define DrawGameDoorValues() DrawGameDoorValues()
+#define ResetGfxAnimation() ResetGfxAnimation()
+#define ResetGfxFrame() ResetGfxFrame()
+#define DrawDynamite() DrawDynamite()
+#define DrawRelocateScreen() DrawRelocateScreen()
+#define DrawTwinkleOnField() DrawTwinkleOnField()
+#define PlayPlayerSound() PlayPlayerSound()
+#define PlayAllPlayersSound() PlayAllPlayersSound()
+#define SetPlayerWaiting() SetPlayerWaiting()
+#define ScrollLevel() ScrollLevel()
+#define ScrollScreen() ScrollScreen()
+
+#define FadeLevelSounds() FadeLevelSounds()
+#define FadeLevelMusic() FadeLevelMusic()
+#define PlayLevelSound_EM() PlayLevelSound_EM()
+#define PlayLevelSound_SP() PlayLevelSound_SP()
+#define PlayLevelSound_MM() PlayLevelSound_MM()
+#define PlaySound_MM() PlaySound_MM()
+#define PlaySoundLoop_MM() PlaySoundLoop_MM()
+#define StopSound_MM() StopSound_MM()
+#define SaveEngineSnapshotBuffers() SaveEngineSnapshotBuffers()
+#define SaveEngineSnapshotSingle() SaveEngineSnapshotSingle()
+#define RedrawSoundButtonGadget() RedrawSoundButtonGadget()
+#define RedrawGameButtonsExt() RedrawGameButtonsExt()
+
+#define GameActions_CheckSaveEngineSnapshot() GameActions_CheckSaveEngineSnapshot()
+
+#define hasStartedNetworkGame() hasStartedNetworkGame()
+
+#else
+#define PlayLevelSound() {}
+#define PlayLevelSoundNearest() {}
+#define PlayLevelSoundAction() {}
+#define PlayLevelSoundElementAction() {}
+#define PlayLevelSoundElementActionIfLoop() {}
+#define PlayLevelSoundActionIfLoop() {}
+#define StopLevelSoundActionIfLoop() {}
+#define PlayLevelMusic() {}
+#define FadeLevelSoundsAndMusic() {}
+#define InitPlayLevelSound() {}
+
+#define UpdateGameControlValues() {}
+#define DisplayGameControlValues() {}
+#define UpdateAndDisplayGameControlValues() {}
+#define DrawGameDoorValues() {}
+#define ResetGfxAnimation() {}
+#define ResetGfxFrame() {}
+#define DrawDynamite() {}
+#define DrawRelocateScreen() {}
+#define DrawTwinkleOnField() {}
+#define PlayPlayerSound() {}
+#define PlayAllPlayersSound() {}
+#define SetPlayerWaiting() {}
+#define ScrollLevel() {}
+#define ScrollScreen() {}
+
+#define FadeLevelSounds() {}
+#define FadeLevelMusic() {}
+#define PlayLevelSound_EM() {}
+#define PlayLevelSound_SP() {}
+#define PlayLevelSound_MM() {}
+#define PlaySound_MM() {}
+#define PlaySoundLoop_MM() {}
+#define StopSound_MM() {}
+#define SaveEngineSnapshotBuffers() {}
+#define SaveEngineSnapshotSingle() {}
+#define RedrawSoundButtonGadget() {}
+#define RedrawGameButtonsExt() {}
+
+#define GameActions_CheckSaveEngineSnapshot() {}
+
+#define hasStartedNetworkGame() TRUE
+#endif

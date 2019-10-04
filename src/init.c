@@ -9,6 +9,8 @@
 // init.c
 // ============================================================================
 
+#define MAYBE_UNUSED __attribute__((used))
+
 #include "libgame/libgame.h"
 
 #include "init.h"
@@ -658,8 +660,10 @@ static void InitGlobalAnimGraphicInfo(void)
 #endif
 }
 
+static void InitGlobalAnimSoundInfo(void) MAYBE_UNUSED;
 static void InitGlobalAnimSoundInfo(void)
 {
+#ifndef HEADLESS
   struct PropertyMapping *property_mapping = getSoundListPropertyMapping();
   int num_property_mappings = getSoundListPropertyMappingSize();
   int i, j, k;
@@ -694,6 +698,7 @@ static void InitGlobalAnimSoundInfo(void)
 
     global_anim_info[anim_nr].sound[part_nr][special] = sound;
   }
+#endif
 
 #if 0
   printf("::: InitGlobalAnimSoundInfo\n");
@@ -707,8 +712,10 @@ static void InitGlobalAnimSoundInfo(void)
 #endif
 }
 
+static void InitGlobalAnimMusicInfo(void) MAYBE_UNUSED;
 static void InitGlobalAnimMusicInfo(void)
 {
+#ifndef HEADLESS
   struct PropertyMapping *property_mapping = getMusicListPropertyMapping();
   int num_property_mappings = getMusicListPropertyMappingSize();
   int i, j, k;
@@ -743,7 +750,7 @@ static void InitGlobalAnimMusicInfo(void)
 
     global_anim_info[anim_nr].music[part_nr][special] = music;
   }
-
+#endif
 #if 0
   printf("::: InitGlobalAnimMusicInfo\n");
 
@@ -1889,8 +1896,10 @@ static void InitGraphicCompatibilityInfo(void)
   InitGraphicCompatibilityInfo_Doors();
 }
 
+static void InitElementSoundInfo(void) MAYBE_UNUSED;
 static void InitElementSoundInfo(void)
 {
+#ifndef HEADLESS
   struct PropertyMapping *property_mapping = getSoundListPropertyMapping();
   int num_property_mappings = getSoundListPropertyMappingSize();
   int i, j, act;
@@ -1991,10 +2000,13 @@ static void InitElementSoundInfo(void)
       for (act = 0; act < NUM_ACTIONS; act++)
 	element_info[copy_properties[i][j]].sound[act] =
 	  element_info[copy_properties[i][0]].sound[act];
+#endif
 }
 
+static void InitGameModeSoundInfo(void) MAYBE_UNUSED;
 static void InitGameModeSoundInfo(void)
 {
+#ifndef HEADLESS
   int i;
 
   // set values to -1 to identify later as "uninitialized" values
@@ -2040,10 +2052,13 @@ static void set_sound_parameters(int sound, char **parameter_raw)
 
   // sound priority to give certain sounds a higher or lower priority
   sound_info[sound].priority = parameter[SND_ARG_PRIORITY];
+#endif
 }
 
+static void InitSoundInfo(void) MAYBE_UNUSED;
 static void InitSoundInfo(void)
 {
+#ifndef HEADLESS
   int *sound_effect_properties;
   int num_sounds = getSoundListSize();
   int i, j;
@@ -2107,10 +2122,13 @@ static void InitSoundInfo(void)
   }
 
   free(sound_effect_properties);
+#endif
 }
 
+static void InitGameModeMusicInfo(void) MAYBE_UNUSED;
 static void InitGameModeMusicInfo(void)
 {
+#ifndef HEADLESS
   struct PropertyMapping *property_mapping = getMusicListPropertyMapping();
   int num_property_mappings = getMusicListPropertyMappingSize();
   int default_levelset_music = -1;
@@ -2173,8 +2191,10 @@ static void InitGameModeMusicInfo(void)
   for (i = 0; i < NUM_SPECIAL_GFX_ARGS; i++)
     if (menu.music[i] == -1)
       menu.music[i] = menu.music[GAME_MODE_DEFAULT];
+#endif
 }
 
+static void set_music_parameters(int music, char **parameter_raw) MAYBE_UNUSED;
 static void set_music_parameters(int music, char **parameter_raw)
 {
   int parameter[NUM_MUS_ARGS];
@@ -2192,8 +2212,10 @@ static void set_music_parameters(int music, char **parameter_raw)
     music_info[music].loop = parameter[MUS_ARG_MODE_LOOP];
 }
 
+static void InitMusicInfo(void) MAYBE_UNUSED;
 static void InitMusicInfo(void)
 {
+#ifndef HEADLESS
   int num_music = getMusicListSize();
   int i, j;
 
@@ -2226,6 +2248,7 @@ static void InitMusicInfo(void)
 
     set_music_parameters(i, music->parameter);
   }
+#endif
 }
 
 static void ReinitializeGraphics(void)
@@ -2274,21 +2297,27 @@ static void ReinitializeGraphics(void)
   print_timestamp_done("ReinitializeGraphics");
 }
 
+static void ReinitializeSounds(void) MAYBE_UNUSED;
 static void ReinitializeSounds(void)
 {
+#ifndef HEADLESS
   InitSoundInfo();		// sound properties mapping
   InitElementSoundInfo();	// element game sound mapping
   InitGameModeSoundInfo();	// game mode sound mapping
   InitGlobalAnimSoundInfo();	// global animation sound settings
 
   InitPlayLevelSound();		// internal game sound settings
+#endif
 }
 
+static void ReinitializeMusic(void) MAYBE_UNUSED;
 static void ReinitializeMusic(void)
 {
+#ifndef HEADLESS
   InitMusicInfo();		// music properties mapping
   InitGameModeMusicInfo();	// game mode music mapping
   InitGlobalAnimMusicInfo();	// global animation music settings
+#endif
 }
 
 static int get_special_property_bit(int element, int property_bit_nr)
@@ -5284,19 +5313,23 @@ static void InitArtworkConfig(void)
   InitImageList(image_config, NUM_IMAGE_FILES, image_config_suffix,
 		image_id_prefix, action_id_suffix, direction_id_suffix,
 		special_id_suffix, ignore_image_tokens);
+#ifndef HEADLESS
   InitSoundList(sound_config, NUM_SOUND_FILES, sound_config_suffix,
 		sound_id_prefix, action_id_suffix, dummy,
 		special_id_suffix, ignore_sound_tokens);
   InitMusicList(music_config, NUM_MUSIC_FILES, music_config_suffix,
 		music_id_prefix, action_id_suffix, special_id_suffix,
 		level_id_suffix, ignore_music_tokens);
+#endif
 }
 
 static void InitMixer(void)
 {
+#ifndef HEADLESS
   OpenAudio();
 
   StartMixer();
+#endif
 }
 
 static void InitVideoOverlay(void)
@@ -5613,6 +5646,7 @@ static void InitImages(void)
 
 static void InitSound(char *identifier)
 {
+#ifndef HEADLESS
   print_timestamp_init("InitSound");
 
   if (identifier == NULL)
@@ -5628,10 +5662,13 @@ static void InitSound(char *identifier)
   print_timestamp_time("ReinitializeSounds");
 
   print_timestamp_done("InitSound");
+#endif
 }
 
+static void InitMusic(char *identifier) MAYBE_UNUSED;
 static void InitMusic(char *identifier)
 {
+#ifndef HEADLESS
   print_timestamp_init("InitMusic");
 
   if (identifier == NULL)
@@ -5647,6 +5684,7 @@ static void InitMusic(char *identifier)
   print_timestamp_time("ReinitializeMusic");
 
   print_timestamp_done("InitMusic");
+#endif
 }
 
 static void InitArtworkDone(void)
@@ -5659,6 +5697,7 @@ static void InitArtworkDone(void)
 
 static void InitNetworkSettings(void)
 {
+#ifndef HEADLESS
   boolean network_enabled = (options.network || setup.network_mode);
   char *network_server = (options.server_host != NULL ? options.server_host :
 			  setup.network_server_hostname);
@@ -5671,10 +5710,12 @@ static void InitNetworkSettings(void)
 		  options.serveronly,
 		  network_server,
 		  options.server_port);
+#endif
 }
 
 void InitNetworkServer(void)
 {
+#ifndef HEADLESS
   if (!network.enabled || network.connected)
     return;
 
@@ -5701,6 +5742,7 @@ void InitNetworkServer(void)
   // short time to recognize result of network initialization
   if (game_status == GAME_MODE_LOADING)
     Delay_WithScreenUpdates(1000);
+#endif
 }
 
 static boolean CheckArtworkConfigForCustomElements(char *filename)
@@ -6079,7 +6121,7 @@ void OpenAll(void)
 
   if (network.serveronly)
   {
-#if defined(PLATFORM_UNIX)
+#if defined(PLATFORM_UNIX) && !defined(HEADLESS)
     NetworkServer(network.server_port, TRUE);
 #else
     Error(ERR_WARN, "networking only supported in Unix version");
@@ -6204,10 +6246,12 @@ void OpenAll(void)
 
 void CloseAllAndExit(int exit_value)
 {
+#ifndef HEADLESS
   StopSounds();
   FreeAllSounds();
   FreeAllMusic();
   CloseAudio();		// called after freeing sounds (needed for SDL)
+#endif
 
   em_close_all();
   sp_close_all();
@@ -6237,3 +6281,15 @@ void CloseAllAndExit(int exit_value)
 
   exit(exit_value);
 }
+
+
+#ifndef HEADLESS
+
+#define InitNetworkSettings() InitNetworkSettings()
+#define InitNetworkServer() InitNetworkServer()
+
+#else
+
+#define InitNetworkSettings() {}
+#define InitNetworkServer() {}
+#endif

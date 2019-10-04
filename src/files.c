@@ -23,6 +23,8 @@
 #include "tape.h"
 #include "config.h"
 
+#define MAYBE_UNUSED __attribute__((used))
+
 #define ENABLE_UNUSED_CODE	0	// currently unused functions
 #define ENABLE_HISTORIC_CHUNKS	0	// only for historic reference
 #define ENABLE_RESERVED_CODE	0	// reserved for later use
@@ -11400,11 +11402,13 @@ static struct MusicFileInfo *get_music_file_info_ext(char *basename, int music,
   return new_music_file_info;
 }
 
+static struct MusicFileInfo *get_music_file_info(char *basename, int music) MAYBE_UNUSED;
 static struct MusicFileInfo *get_music_file_info(char *basename, int music)
 {
   return get_music_file_info_ext(basename, music, FALSE);
 }
 
+static struct MusicFileInfo *get_sound_file_info(char *basename, int sound) MAYBE_UNUSED;
 static struct MusicFileInfo *get_sound_file_info(char *basename, int sound)
 {
   return get_music_file_info_ext(basename, sound, TRUE);
@@ -11420,11 +11424,13 @@ static boolean music_info_listed_ext(struct MusicFileInfo *list,
   return FALSE;
 }
 
+static boolean music_info_listed(struct MusicFileInfo *list, char *basename) MAYBE_UNUSED;
 static boolean music_info_listed(struct MusicFileInfo *list, char *basename)
 {
   return music_info_listed_ext(list, basename, FALSE);
 }
 
+static boolean sound_info_listed(struct MusicFileInfo *list, char *basename) MAYBE_UNUSED;
 static boolean sound_info_listed(struct MusicFileInfo *list, char *basename)
 {
   return music_info_listed_ext(list, basename, TRUE);
@@ -11432,6 +11438,7 @@ static boolean sound_info_listed(struct MusicFileInfo *list, char *basename)
 
 void LoadMusicInfo(void)
 {
+#ifndef HEADLESS
   char *music_directory = getCustomMusicDirectory();
   int num_music = getMusicListSize();
   int num_music_noconf = 0;
@@ -11555,6 +11562,7 @@ void LoadMusicInfo(void)
 	new = &(*new)->next;
     }
   }
+#endif
 }
 
 static void add_helpanim_entry(int element, int action, int direction,
