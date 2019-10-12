@@ -36,7 +36,9 @@ struct RuntimeInfo	runtime;
 struct OptionInfo	options;
 struct VideoSystemInfo	video;
 struct AudioSystemInfo	audio;
+#ifndef HEADLESS
 struct GfxInfo		gfx;
+#endif
 struct TileCursorInfo	tile_cursor;
 struct OverlayInfo	overlay;
 struct ArtworkInfo	artwork;
@@ -51,9 +53,11 @@ int			level_nr;
 struct LevelSetInfo	levelset;
 struct LevelStats	level_stats[MAX_LEVELS];
 
+#ifndef HEADLESS
 DrawWindow	       *window = NULL;
 DrawBuffer	       *backbuffer = NULL;
 DrawBuffer	       *drawto = NULL;
+#endif
 
 int			button_status = MB_NOT_PRESSED;
 boolean			motion_status = FALSE;
@@ -149,23 +153,30 @@ void InitScoresInfo(void)
   free(global_scores_dir);
 }
 
+#ifndef HEADLESS
 void SetWindowTitle(void)
 {
   program.window_title = program.window_title_function();
 
   SDLSetWindowTitle();
 }
+#endif
 
+#ifndef HEADLESS
 void InitWindowTitleFunction(char *(*window_title_function)(void))
 {
   program.window_title_function = window_title_function;
 }
+#endif
 
+#ifndef HEADLESS
 void InitExitMessageFunction(void (*exit_message_function)(char *, va_list))
 {
   program.exit_message_function = exit_message_function;
 }
+#endif
 
+#ifndef HEADLESS
 void InitExitFunction(void (*exit_function)(int))
 {
   program.exit_function = exit_function;
@@ -177,7 +188,9 @@ void InitExitFunction(void (*exit_function)(int))
   // set exit function to automatically cleanup SDL stuff after exit()
   atexit(SDL_Quit);
 }
+#endif
 
+#ifndef HEADLESS
 void InitPlatformDependentStuff(void)
 {
   // this is initialized in GetOptions(), but may already be used before
@@ -190,16 +203,18 @@ void InitPlatformDependentStuff(void)
   if (SDL_Init(sdl_init_flags) < 0)
     Error(ERR_EXIT, "SDL_Init() failed: %s", SDL_GetError());
 
-#ifndef HEADLESS
   SDLNet_Init();
-#endif
 }
+#endif
 
+#ifndef HEADLESS
 void ClosePlatformDependentStuff(void)
 {
   CloseLogFiles();
 }
+#endif
 
+#ifndef HEADLESS
 void InitGfxFieldInfo(int sx, int sy, int sxsize, int sysize,
 		      int real_sx, int real_sy,
 		      int full_sxsize, int full_sysize,
@@ -219,13 +234,17 @@ void InitGfxFieldInfo(int sx, int sy, int sxsize, int sysize,
   SetDrawDeactivationMask(REDRAW_NONE);		// do not deactivate drawing
   SetDrawBackgroundMask(REDRAW_NONE);		// deactivate masked drawing
 }
+#endif
 
+#ifndef HEADLESS
 void InitGfxTileSizeInfo(int game_tile_size, int standard_tile_size)
 {
   gfx.game_tile_size = game_tile_size;
   gfx.standard_tile_size = standard_tile_size;
 }
+#endif
 
+#ifndef HEADLESS
 void InitGfxDoor1Info(int dx, int dy, int dxsize, int dysize)
 {
   gfx.dx = dx;
@@ -233,7 +252,9 @@ void InitGfxDoor1Info(int dx, int dy, int dxsize, int dysize)
   gfx.dxsize = dxsize;
   gfx.dysize = dysize;
 }
+#endif
 
+#ifndef HEADLESS
 void InitGfxDoor2Info(int vx, int vy, int vxsize, int vysize)
 {
   gfx.vx = vx;
@@ -241,7 +262,9 @@ void InitGfxDoor2Info(int vx, int vy, int vxsize, int vysize)
   gfx.vxsize = vxsize;
   gfx.vysize = vysize;
 }
+#endif
 
+#ifndef HEADLESS
 void InitGfxDoor3Info(int ex, int ey, int exsize, int eysize)
 {
   gfx.ex = ex;
@@ -249,7 +272,9 @@ void InitGfxDoor3Info(int ex, int ey, int exsize, int eysize)
   gfx.exsize = exsize;
   gfx.eysize = eysize;
 }
+#endif
 
+#ifndef HEADLESS
 void InitGfxWindowInfo(int win_xsize, int win_ysize)
 {
   if (win_xsize != gfx.win_xsize || win_ysize != gfx.win_ysize)
@@ -271,7 +296,9 @@ void InitGfxWindowInfo(int win_xsize, int win_ysize)
 
   gfx.background_bitmap_mask = REDRAW_NONE;
 }
+#endif
 
+#ifndef HEADLESS
 void InitGfxScrollbufferInfo(int scrollbuffer_width, int scrollbuffer_height)
 {
   // currently only used by MSDOS code to alloc VRAM buffer, if available
@@ -279,7 +306,9 @@ void InitGfxScrollbufferInfo(int scrollbuffer_width, int scrollbuffer_height)
   gfx.scrollbuffer_width = scrollbuffer_width;
   gfx.scrollbuffer_height = scrollbuffer_height;
 }
+#endif
 
+#ifndef HEADLESS
 void InitGfxClipRegion(boolean enabled, int x, int y, int width, int height)
 {
   gfx.clipping_enabled = enabled;
@@ -288,27 +317,37 @@ void InitGfxClipRegion(boolean enabled, int x, int y, int width, int height)
   gfx.clip_width = width;
   gfx.clip_height = height;
 }
+#endif
 
+#ifndef HEADLESS
 void InitGfxDrawBusyAnimFunction(void (*draw_busy_anim_function)(void))
 {
   gfx.draw_busy_anim_function = draw_busy_anim_function;
 }
+#endif
 
+#ifndef HEADLESS
 void InitGfxDrawGlobalAnimFunction(void (*draw_global_anim_function)(int, int))
 {
   gfx.draw_global_anim_function = draw_global_anim_function;
 }
+#endif
 
+#ifndef HEADLESS
 void InitGfxDrawGlobalBorderFunction(void (*draw_global_border_function)(int))
 {
   gfx.draw_global_border_function = draw_global_border_function;
 }
+#endif
 
+#ifndef HEADLESS
 void InitGfxDrawTileCursorFunction(void (*draw_tile_cursor_function)(int))
 {
   gfx.draw_tile_cursor_function = draw_tile_cursor_function;
 }
+#endif
 
+#ifndef HEADLESS
 void InitGfxCustomArtworkInfo(void)
 {
   gfx.override_level_graphics = FALSE;
@@ -317,7 +356,9 @@ void InitGfxCustomArtworkInfo(void)
 
   gfx.draw_init_text = TRUE;
 }
+#endif
 
+#ifndef HEADLESS
 void InitGfxOtherSettings(void)
 {
   gfx.cursor_mode = CURSOR_DEFAULT;
@@ -328,7 +369,9 @@ void InitGfxOtherSettings(void)
   gfx.mouse_x = POS_OFFSCREEN;
   gfx.mouse_y = POS_OFFSCREEN;
 }
+#endif
 
+#ifndef HEADLESS
 void InitTileCursorInfo(void)
 {
   tile_cursor.enabled = FALSE;
@@ -345,7 +388,9 @@ void InitTileCursorInfo(void)
   tile_cursor.sx = 0;
   tile_cursor.sy = 0;
 }
+#endif
 
+#ifndef HEADLESS
 void InitOverlayInfo(void)
 {
   int nr = GRID_ACTIVE_NR();
@@ -371,17 +416,23 @@ void InitOverlayInfo(void)
     overlay.enabled = TRUE;
 #endif
 }
+#endif
 
+#ifndef HEADLESS
 void SetTileCursorEnabled(boolean enabled)
 {
   tile_cursor.enabled = enabled;
 }
+#endif
 
+#ifndef HEADLESS
 void SetTileCursorActive(boolean active)
 {
   tile_cursor.active = active;
 }
+#endif
 
+#ifndef HEADLESS
 void SetTileCursorTargetXY(int x, int y)
 {
   // delayed placement of tile selection cursor at target position
@@ -394,7 +445,9 @@ void SetTileCursorTargetXY(int x, int y)
 
   tile_cursor.moving = TRUE;
 }
+#endif
 
+#ifndef HEADLESS
 void SetTileCursorXY(int x, int y)
 {
   // immediate placement of tile selection cursor at target position
@@ -406,23 +459,31 @@ void SetTileCursorXY(int x, int y)
 
   tile_cursor.moving = FALSE;
 }
+#endif
 
+#ifndef HEADLESS
 void SetTileCursorSXSY(int sx, int sy)
 {
   tile_cursor.sx = sx;
   tile_cursor.sy = sy;
 }
+#endif
 
+#ifndef HEADLESS
 void SetOverlayEnabled(boolean enabled)
 {
   overlay.enabled = enabled;
 }
+#endif
 
+#ifndef HEADLESS
 void SetOverlayActive(boolean active)
 {
   overlay.active = active;
 }
+#endif
 
+#ifndef HEADLESS
 void SetOverlayShowGrid(boolean show_grid)
 {
   overlay.show_grid = show_grid;
@@ -432,32 +493,44 @@ void SetOverlayShowGrid(boolean show_grid)
   if (show_grid)
     SetOverlayEnabled(TRUE);
 }
+#endif
 
+#ifndef HEADLESS
 boolean GetOverlayEnabled(void)
 {
   return overlay.enabled;
 }
+#endif
 
+#ifndef HEADLESS
 boolean GetOverlayActive(void)
 {
   return overlay.active;
 }
+#endif
 
+#ifndef HEADLESS
 void SetDrawDeactivationMask(int draw_deactivation_mask)
 {
   gfx.draw_deactivation_mask = draw_deactivation_mask;
 }
+#endif
 
+#ifndef HEADLESS
 int GetDrawDeactivationMask(void)
 {
   return gfx.draw_deactivation_mask;
 }
+#endif
 
+#ifndef HEADLESS
 void SetDrawBackgroundMask(int draw_background_mask)
 {
   gfx.draw_background_mask = draw_background_mask;
 }
+#endif
 
+#ifndef HEADLESS
 static void SetBackgroundBitmap(Bitmap *background_bitmap_tile, int mask)
 {
   if (background_bitmap_tile != NULL)
@@ -478,7 +551,9 @@ static void SetBackgroundBitmap(Bitmap *background_bitmap_tile, int mask)
     BlitBitmapTiled(background_bitmap_tile, gfx.background_bitmap, 0, 0, 0, 0,
 		    gfx.dx, gfx.dy, gfx.dxsize, gfx.dysize);
 }
+#endif
 
+#ifndef HEADLESS
 void SetWindowBackgroundBitmap(Bitmap *background_bitmap_tile)
 {
   // remove every mask before setting mask for window
@@ -486,7 +561,9 @@ void SetWindowBackgroundBitmap(Bitmap *background_bitmap_tile)
   SetBackgroundBitmap(NULL, 0xffff);		// !!! FIX THIS !!!
   SetBackgroundBitmap(background_bitmap_tile, REDRAW_ALL);
 }
+#endif
 
+#ifndef HEADLESS
 void SetMainBackgroundBitmap(Bitmap *background_bitmap_tile)
 {
   // remove window area mask before setting mask for main area
@@ -494,7 +571,9 @@ void SetMainBackgroundBitmap(Bitmap *background_bitmap_tile)
   SetBackgroundBitmap(NULL, REDRAW_ALL);	// !!! FIX THIS !!!
   SetBackgroundBitmap(background_bitmap_tile, REDRAW_FIELD);
 }
+#endif
 
+#ifndef HEADLESS
 void SetDoorBackgroundBitmap(Bitmap *background_bitmap_tile)
 {
   // remove window area mask before setting mask for door area
@@ -502,11 +581,14 @@ void SetDoorBackgroundBitmap(Bitmap *background_bitmap_tile)
   SetBackgroundBitmap(NULL, REDRAW_ALL);	// !!! FIX THIS !!!
   SetBackgroundBitmap(background_bitmap_tile, REDRAW_DOOR_1);
 }
+#endif
 
 
 // ============================================================================
 // video functions
 // ============================================================================
+
+#ifndef HEADLESS
 
 static int GetRealDepth(int depth)
 {
@@ -1426,11 +1508,14 @@ void ScaleBitmap(Bitmap **bitmaps, int zoom_factor)
 {
   CreateScaledBitmaps(bitmaps, zoom_factor, 0, FALSE);
 }
+#endif
 
 
 // ----------------------------------------------------------------------------
 // mouse pointer functions
 // ----------------------------------------------------------------------------
+
+#ifndef HEADLESS
 
 #define USE_ONE_PIXEL_PLAYFIELD_MOUSEPOINTER		0
 
@@ -1603,10 +1688,13 @@ void UpdateMousePosition(void)
   UpdateRawMousePosition(mouse_x, mouse_y);
 }
 
+#endif
 
 // ============================================================================
 // audio functions
 // ============================================================================
+
+#ifndef HEADLESS
 
 void OpenAudio(void)
 {
@@ -1644,11 +1732,14 @@ void SetAudioMode(boolean enabled)
 
   audio.sound_enabled = enabled;
 }
+#endif
 
 
 // ============================================================================
 // event functions
 // ============================================================================
+
+#ifndef HEADLESS
 
 void InitEventFilter(EventFilter filter_function)
 {
@@ -1792,10 +1883,13 @@ void PushUserEvent(int code, int value1, int value2)
   SDL_PushEvent((SDL_Event *)&event);
 }
 
+#endif
 
 // ============================================================================
 // joystick functions
 // ============================================================================
+
+#ifndef HEADLESS
 
 void InitJoysticks(void)
 {
@@ -1827,3 +1921,5 @@ void ClearJoystickState(void)
 {
   SDLClearJoystickState();
 }
+
+#endif

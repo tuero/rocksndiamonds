@@ -65,12 +65,14 @@ extern int			REAL_SX, REAL_SY;
 
 extern struct LevelInfo_MM native_mm_level;
 
+#ifndef HEADLESS
 extern Bitmap *bitmap_db_field_mm;
 
 extern int GfxElementLast[MM_MAX_PLAYFIELD_WIDTH][MM_MAX_PLAYFIELD_HEIGHT];
 extern int GfxGraphicLast[MM_MAX_PLAYFIELD_WIDTH][MM_MAX_PLAYFIELD_HEIGHT];
 extern int GfxGraphic[MM_MAX_PLAYFIELD_WIDTH][MM_MAX_PLAYFIELD_HEIGHT];
 extern int GfxFrame[MM_MAX_PLAYFIELD_WIDTH][MM_MAX_PLAYFIELD_HEIGHT];
+#endif
 
 
 // ----------------------------------------------------------------------------

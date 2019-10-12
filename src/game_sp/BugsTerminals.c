@@ -15,6 +15,7 @@ int TerminalMaxCycles;
 // Animate bugs
 // ==========================================================================
 
+#ifndef HEADLESS
 void subAnimateBugs(int si)
 {
   int bl;
@@ -57,6 +58,7 @@ void subAnimateBugs(int si)
 				    bl == 13 ? aniBug : aniBugActive);
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 }
+#endif
 
 
 // ==========================================================================
@@ -64,6 +66,7 @@ void subAnimateBugs(int si)
 // Animate terminals
 // ==========================================================================
 
+#ifndef HEADLESS
 void subAnimateTerminals(int si)
 {
   int bl;
@@ -114,6 +117,7 @@ void subAnimateTerminals(int si)
 
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 }
+#endif
 
 
 // ==========================================================================

@@ -224,14 +224,17 @@ void mm_close_all(void);
 
 void InitElementProperties_MM(void);
 
+#ifndef HEADLESS
 void InitGfxBuffers_MM(void);
+#endif
 
 void InitGameEngine_MM(void);
 void InitGameActions_MM(void);
 void GameActions_MM(struct MouseActionInfo, boolean);
 
+#ifndef HEADLESS
 void DrawLaser_MM(void);
-
+#endif
 boolean ClickElement(int, int, int);
 
 unsigned int InitEngineRandom_MM(int);
@@ -244,8 +247,10 @@ void SaveNativeLevel_MM(char *);
 int getFieldbufferOffsetX_MM(void);
 int getFieldbufferOffsetY_MM(void);
 
+#ifndef HEADLESS
 void BlitScreenToBitmap_MM(Bitmap *);
 void RedrawPlayfield_MM(void);
+#endif
 
 void LoadEngineSnapshotValues_MM(void);
 void SaveEngineSnapshotValues_MM(ListNode **);

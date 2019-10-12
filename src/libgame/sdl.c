@@ -9,6 +9,8 @@
 // sdl.c
 // ============================================================================
 
+#ifndef HEADLESS
+
 #include "system.h"
 #include "sound.h"
 #include "joystick.h"
@@ -2949,4 +2951,6 @@ static void DrawTouchInputOverlay(void)
 
   DrawTouchInputOverlay_ShowGridButtons(alpha);
 }
+#endif
+
 #endif

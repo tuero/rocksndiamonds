@@ -102,6 +102,8 @@
 #define VIDEO_DISPLAY_SYMBOL_ONLY	-2
 
 
+#ifndef HEADLESS
+
 struct TapeButtonInfo
 {
   struct XY eject;
@@ -250,5 +252,7 @@ void RedrawTapeButtons(void);
 void RedrawOrRemapTapeButtons(void);
 
 void HandleTapeButtonKeys(Key);
+
+#endif
 
 #endif

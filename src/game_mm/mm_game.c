@@ -100,8 +100,10 @@ static void InitMovingField_MM(int, int, int);
 static void ContinueMoving_MM(int, int);
 static void Moving2Blocked_MM(int, int, int *, int *);
 
+#ifndef HEADLESS
 // bitmap for laser beam detection
 static Bitmap *laser_bitmap = NULL;
+#endif
 
 // variables for laser control
 static int last_LX = 0, last_LY = 0, last_hit_mask = 0;
@@ -117,6 +119,7 @@ static unsigned int energy_delay = 0;
 static unsigned int overload_delay = 0;
 
 // element masks for scanning pixels of MM elements
+#ifndef HEADLESS
 static const char mm_masks[10][16][16 + 1] =
 {
   {
@@ -300,6 +303,7 @@ static const char mm_masks[10][16][16 + 1] =
     "                ",
   },
 };
+#endif
 
 static int get_element_angle(int element)
 {
@@ -330,6 +334,7 @@ static int get_mirrored_angle(int laser_angle, int mirror_angle)
   return (reflected_angle + 16) % 16;
 }
 
+#ifndef HEADLESS
 static void DrawLaserLines(struct XY *points, int num_points, int mode)
 {
   Pixel pixel_drawto = (mode == DL_LASER_ENABLED ? pen_ray     : pen_bg);
@@ -343,7 +348,9 @@ static void DrawLaserLines(struct XY *points, int num_points, int mode)
   }
   END_NO_HEADLESS
 }
+#endif
 
+#ifndef HEADLESS
 static boolean CheckLaserPixel(int x, int y)
 {
   Pixel pixel;
@@ -356,6 +363,7 @@ static boolean CheckLaserPixel(int x, int y)
 
   return (pixel == WHITE_PIXEL);
 }
+#endif
 
 static void CheckExitMM(void)
 {
@@ -397,7 +405,11 @@ static void CheckExitMM(void)
 	{
 	  Feld[blocking_x][blocking_y] = EL_EMPTY;
 
+#ifndef HEADLESS
 	  DrawField_MM(blocking_x, blocking_y);
+#else
+        (void)exit_element; (void)exit_x; (void)exit_y;
+#endif
 	}
 
 	exit_element = EL_RECEIVER;
@@ -407,8 +419,10 @@ static void CheckExitMM(void)
     }
   }
 
+#ifndef HEADLESS
   if (exit_element != EL_EMPTY)
     PlayLevelSound_MM(exit_x, exit_y, exit_element, MM_ACTION_OPENING);
+#endif
 }
 
 static void InitMovDir_MM(int x, int y)
@@ -537,7 +551,9 @@ static void InitCycleElements_RotateSingleStep(void)
 
     Feld[x][y] = next_element;
 
+#ifndef HEADLESS
     DrawField_MM(x, y);
+#endif
     game_mm.cycle[i].steps -= step;
   }
 }
@@ -574,16 +590,19 @@ static void InitLaser(void)
 
   AddLaserEdge(LX, LY);		// set laser starting edge
 
+#ifndef HEADLESS
   pen_ray = GetPixelFromRGB(window,
 			    native_mm_level.laser_red   * 0xFF,
 			    native_mm_level.laser_green * 0xFF,
 			    native_mm_level.laser_blue  * 0xFF);
+#endif
 }
 
 void InitGameEngine_MM(void)
 {
   int i, x, y;
 
+#ifndef HEADLESS
   BEGIN_NO_HEADLESS
   {
     // initialize laser bitmap to current playfield (screen) size
@@ -591,6 +610,7 @@ void InitGameEngine_MM(void)
     ClearRectangle(laser_bitmap, 0, 0, drawto->width, drawto->height);
   }
   END_NO_HEADLESS
+#endif
 
   // set global game control values
   game_mm.num_cycle = 0;
@@ -660,7 +680,9 @@ void InitGameEngine_MM(void)
     }
   }
 
+#ifndef HEADLESS
   DrawLevel_MM();
+#endif
 }
 
 void InitGameActions_MM(void)
@@ -684,7 +706,9 @@ void InitGameActions_MM(void)
 
     game_mm.energy_left = native_mm_level.time * i / num_init_game_frames;
 
+#ifndef HEADLESS
     UpdateAndDisplayGameControlValues();
+#endif
 
     while (cycle_steps_done < NUM_INIT_CYCLE_STEPS * i / num_init_game_frames)
     {
@@ -693,7 +717,9 @@ void InitGameActions_MM(void)
       cycle_steps_done++;
     }
 
+#ifndef HEADLESS
     BackToFront();
+#endif
 
     ColorCycling();
 
@@ -708,8 +734,10 @@ void InitGameActions_MM(void)
   if (game_mm.kettles_still_needed == 0)
     CheckExitMM();
 
+#ifndef HEADLESS
   SetTileCursorXY(laser.start_edge.x, laser.start_edge.y);
   SetTileCursorActive(TRUE);
+#endif
 }
 
 void AddLaserEdge(int lx, int ly)
@@ -756,6 +784,7 @@ static boolean StepBehind(void)
   return FALSE;
 }
 
+#ifndef HEADLESS
 static int getMaskFromElement(int element)
 {
   if (IS_GRID(element))
@@ -767,7 +796,9 @@ static int getMaskFromElement(int element)
   else
     return IMG_MM_MASK_CIRCLE;
 }
+#endif
 
+#ifndef HEADLESS
 static int ScanPixel(void)
 {
   int hit_mask = 0;
@@ -844,6 +875,7 @@ static int ScanPixel(void)
 
   return hit_mask;
 }
+#endif
 
 void ScanLaser(void)
 {
@@ -857,7 +889,9 @@ void ScanLaser(void)
   laser.overloaded = FALSE;
   laser.stops_inside_element = FALSE;
 
+#ifndef HEADLESS
   DrawLaser(0, DL_LASER_ENABLED);
+#endif
 
 #if 0
   printf("Start scanning with LX == %d, LY == %d, XS == %d, YS == %d\n",
@@ -876,7 +910,9 @@ void ScanLaser(void)
       break;
     }
 
+#ifndef HEADLESS
     hit_mask = ScanPixel();
+#endif
 
 #if 0
     printf("Hit something at LX == %d, LY == %d, XS == %d, YS == %d\n",
@@ -900,6 +936,7 @@ void ScanLaser(void)
       break;
     }
 
+#ifndef HEADLESS
     if (hit_mask == (HIT_MASK_TOPRIGHT | HIT_MASK_BOTTOMLEFT))
     {
       /* we have hit the top-right and bottom-left element --
@@ -919,6 +956,9 @@ void ScanLaser(void)
       ELX = (LX - 2) / TILEX;
       ELY = (LY - 2) / TILEY;
     }
+#else
+      (void)hit_mask; (void)rf;
+#endif
 
 #if 0
     printf("hit_mask (2) == '%x' (%d, %d) (%d, %d)\n",
@@ -941,6 +981,7 @@ void ScanLaser(void)
       printf("WARNING! (1) %d, %d (%d)\n", ELX, ELY, element);
 #endif
 
+#ifndef HEADLESS
     if (element == EL_EMPTY)
     {
       if (!HitOnlyAnEdge(element, hit_mask))
@@ -999,6 +1040,7 @@ void ScanLaser(void)
     if (rf)
       DrawLaser(rf - 1, DL_LASER_ENABLED);
     rf = laser.num_edges;
+#endif
   }
 
 #if 0
@@ -1021,8 +1063,10 @@ void ScanLaser(void)
     AddLaserEdge(LX, LY);
   }
 
+#ifndef HEADLESS
   if (rf)
     DrawLaser(rf - 1, DL_LASER_ENABLED);
+#endif
 
   Ct = CT = FrameCounter;
 
@@ -1032,6 +1076,7 @@ void ScanLaser(void)
 #endif
 }
 
+#ifndef HEADLESS
 static void DrawLaserExt(int start_edge, int num_edges, int mode)
 {
   int element;
@@ -1063,8 +1108,10 @@ static void DrawLaserExt(int start_edge, int num_edges, int mode)
   }
 #endif
 
+#ifndef HEADLESS
   // now draw the laser to the backbuffer and (if enabled) to the screen
   DrawLaserLines(&laser.edge[start_edge], num_edges, mode);
+#endif
 
   redraw_mask |= REDRAW_FIELD;
 
@@ -1221,15 +1268,18 @@ static void DrawLaserExt(int start_edge, int num_edges, int mode)
 	 LX, LY, element);
 #endif
 }
+#endif
 
 void DrawLaser(int start_edge, int mode)
 {
+#ifndef HEADLESS
   if (laser.num_edges - start_edge < 0)
   {
     Error(ERR_WARN, "DrawLaser: laser.num_edges - start_edge < 0");
 
     return;
   }
+#endif
 
   // check if laser is interrupted by beamer element
   if (laser.num_beamers > 0 &&
@@ -1237,6 +1287,7 @@ void DrawLaser(int start_edge, int mode)
   {
     if (mode == DL_LASER_ENABLED)
     {
+#ifndef HEADLESS
       int i;
       int tmp_start_edge = start_edge;
 
@@ -1261,6 +1312,7 @@ void DrawLaser(int start_edge, int mode)
       // draw last segment from last beamer to the end
       DrawLaserExt(tmp_start_edge, laser.num_edges - tmp_start_edge,
 		   DL_LASER_ENABLED);
+#endif
     }
     else
     {
@@ -1271,14 +1323,17 @@ void DrawLaser(int start_edge, int mode)
       // delete laser segments backward from the end to the first beamer
       for (i = num_beamers - 1; i >= 0; i--)
       {
+#ifndef HEADLESS
 	int tmp_num_edges = last_num_edges - laser.beamer_edge[i];
 
 	if (laser.beamer_edge[i] - start_edge <= 0)
 	  break;
 
 	DrawLaserExt(laser.beamer_edge[i], tmp_num_edges, DL_LASER_DISABLED);
-
 	last_num_edges = laser.beamer_edge[i];
+#else
+          (void)i; (void)last_num_edges; (void)num_beamers;
+#endif
 	laser.num_beamers--;
       }
 
@@ -1287,6 +1342,7 @@ void DrawLaser(int start_edge, int mode)
 	printf("DrawLaser: DL_LASER_DISABLED: %d, %d\n",
 	       last_num_edges, start_edge);
 #endif
+#ifndef HEADLESS
 
       // special case when rotating first beamer: delete laser edge on beamer
       // (but do not start scanning on previous edge to prevent mirror sound)
@@ -1295,20 +1351,25 @@ void DrawLaser(int start_edge, int mode)
 
       // delete first segment from start to the first beamer
       DrawLaserExt(start_edge, last_num_edges - start_edge, DL_LASER_DISABLED);
+#endif
     }
   }
+#ifndef HEADLESS
   else
   {
     DrawLaserExt(start_edge, laser.num_edges - start_edge, mode);
   }
+#endif
 
   game_mm.laser_enabled = mode;
 }
 
+#ifndef HEADLESS
 void DrawLaser_MM(void)
 {
   DrawLaser(0, game_mm.laser_enabled);
 }
+#endif
 
 boolean HitElement(int element, int hit_mask)
 {
@@ -1377,7 +1438,9 @@ boolean HitElement(int element, int hit_mask)
       ((element - EL_POLAR_START) % 2 ||
        (element - EL_POLAR_START) / 2 != laser.current_angle % 8))
   {
+#ifndef HEADLESS
     PlayLevelSound_MM(ELX, ELY, element, MM_ACTION_HITTING);
+#endif
 
     laser.num_damages--;
 
@@ -1387,7 +1450,9 @@ boolean HitElement(int element, int hit_mask)
   if (IS_POLAR_CROSS(element) &&
       (element - EL_POLAR_CROSS_START) != laser.current_angle % 4)
   {
+#ifndef HEADLESS
     PlayLevelSound_MM(ELX, ELY, element, MM_ACTION_HITTING);
+#endif
 
     laser.num_damages--;
 
@@ -1463,9 +1528,13 @@ boolean HitElement(int element, int hit_mask)
     }
 #endif
 
+#ifndef HEADLESS
     if ((!IS_POLAR(element) && !IS_POLAR_CROSS(element)) &&
 	current_angle != laser.current_angle)
       PlayLevelSound_MM(ELX, ELY, element, MM_ACTION_HITTING);
+#else
+      (void)current_angle;
+#endif
 
     laser.overloaded =
       (get_opposite_angle(laser.current_angle) ==
@@ -1483,7 +1552,9 @@ boolean HitElement(int element, int hit_mask)
 
   if (element == EL_BOMB || element == EL_MINE)
   {
+#ifndef HEADLESS
     PlayLevelSound_MM(ELX, ELY, element, MM_ACTION_HITTING);
+#endif
 
     if (element == EL_MINE)
       laser.overloaded = TRUE;
@@ -1513,7 +1584,9 @@ boolean HitElement(int element, int hit_mask)
       {
 	CheckExitMM();
 
+#ifndef HEADLESS
 	DrawLaser(0, DL_LASER_ENABLED);
+#endif
       }
     }
     else if (element == EL_KEY)
@@ -1532,9 +1605,11 @@ boolean HitElement(int element, int hit_mask)
 
   if (element == EL_LIGHTBULB_OFF || element == EL_LIGHTBULB_ON)
   {
+#ifndef HEADLESS
     PlayLevelSound_MM(ELX, ELY, element, MM_ACTION_HITTING);
 
     DrawLaser(0, DL_LASER_ENABLED);
+#endif
 
     if (Feld[ELX][ELY] == EL_LIGHTBULB_OFF)
     {
@@ -1547,8 +1622,10 @@ boolean HitElement(int element, int hit_mask)
       game_mm.lights_still_needed++;
     }
 
+#ifndef HEADLESS
     DrawField_MM(ELX, ELY);
     DrawLaser(0, DL_LASER_ENABLED);
+#endif
 
     /*
     BackToFront();
@@ -1837,7 +1914,9 @@ boolean HitBlock(int element, int hit_mask)
 
     if (element == EL_GATE_STONE && Box[ELX][ELY])
     {
+#ifndef HEADLESS
       DrawLaser(Box[ELX][ELY] - 1, DL_LASER_DISABLED);
+#endif
       /*
       BackToFront();
       */
@@ -1892,7 +1971,9 @@ boolean HitLaserSource(int element, int hit_mask)
   if (HitOnlyAnEdge(element, hit_mask))
     return FALSE;
 
+#ifndef HEADLESS
   PlayLevelSound_MM(ELX, ELY, element, MM_ACTION_HITTING);
+#endif
 
   laser.overloaded = TRUE;
 
@@ -1909,7 +1990,9 @@ boolean HitLaserDestination(int element, int hit_mask)
 	game_mm.kettles_still_needed == 0 &&
 	laser.current_angle == get_opposite_angle(get_element_angle(element))))
   {
+#ifndef HEADLESS
     PlayLevelSound_MM(ELX, ELY, element, MM_ACTION_HITTING);
+#endif
 
     return TRUE;
   }
@@ -1939,7 +2022,9 @@ boolean HitLaserDestination(int element, int hit_mask)
   {
     game_mm.level_solved = TRUE;
 
+#ifndef HEADLESS
     SetTileCursorActive(FALSE);
+#endif
   }
 
   return TRUE;
@@ -1953,7 +2038,9 @@ boolean HitReflectingWalls(int element, int hit_mask)
 					    hit_mask == HIT_MASK_RIGHT ||
 					    hit_mask == HIT_MASK_BOTTOM))
   {
+#ifndef HEADLESS
     PlayLevelSound_MM(ELX, ELY, element, MM_ACTION_HITTING);
+#endif
 
     LX -= XS;
     LY -= YS;
@@ -2052,7 +2139,9 @@ boolean HitReflectingWalls(int element, int hit_mask)
 	(hit_mask == HIT_MASK_TOPRIGHT || hit_mask == HIT_MASK_BOTTOMLEFT ?
 	 ANG_MIRROR_135 : ANG_MIRROR_45);
 
+#ifndef HEADLESS
       PlayLevelSound_MM(ELX, ELY, element, MM_ACTION_HITTING);
+#endif
 
       AddDamagedField(ELX, ELY);
       AddLaserEdge(LX, LY);
@@ -2088,7 +2177,9 @@ boolean HitReflectingWalls(int element, int hit_mask)
 	 hit_mask == (HIT_MASK_ALL ^ HIT_MASK_TOPRIGHT) ?
 	 ANG_MIRROR_135 : ANG_MIRROR_45);
 
+#ifndef HEADLESS
       PlayLevelSound_MM(ELX, ELY, element, MM_ACTION_HITTING);
+#endif
 
       /*
       AddDamagedField(ELX, ELY);
@@ -2179,7 +2270,9 @@ boolean HitAbsorbingWalls(int element, int hit_mask)
       element == EL_BLOCK_WOOD ||
       element == EL_GATE_WOOD)
   {
+#ifndef HEADLESS
     PlayLevelSound_MM(ELX, ELY, element, MM_ACTION_HITTING);
+#endif
 
     return TRUE;
   }
@@ -2263,13 +2356,19 @@ static void OpenExit(int x, int y)
     MovDelay[x][y]--;
     phase = MovDelay[x][y] / delay;
 
+#ifndef HEADLESS
     if (!(MovDelay[x][y] % delay) && IN_SCR_FIELD(x, y))
       DrawGraphicAnimation_MM(x, y, IMG_MM_EXIT_OPENING, 3 - phase);
+#else
+      (void)phase;
+#endif
 
     if (!MovDelay[x][y])
     {
       Feld[x][y] = EL_EXIT_OPEN;
+#ifndef HEADLESS
       DrawField_MM(x, y);
+#endif
     }
   }
 }
@@ -2285,6 +2384,7 @@ static void OpenSurpriseBall(int x, int y)
   {
     MovDelay[x][y]--;
 
+#ifndef HEADLESS
     if (!(MovDelay[x][y] % delay) && IN_SCR_FIELD(x, y))
     {
       Bitmap *bitmap;
@@ -2299,12 +2399,15 @@ static void OpenSurpriseBall(int x, int y)
 
       MarkTileDirty(x, y);
     }
+#endif
 
     if (!MovDelay[x][y])
     {
       Feld[x][y] = Store[x][y];
       Store[x][y] = 0;
+#ifndef HEADLESS
       DrawField_MM(x, y);
+#endif
 
       ScanLaser();
     }
@@ -2335,7 +2438,11 @@ static void MeltIce(int x, int y)
       Feld[x][y] = real_element & (wall_mask ^ 0xFF);
       Store[x][y] = Store2[x][y] = 0;
 
+#ifndef HEADLESS
       DrawWalls_MM(x, y, Feld[x][y]);
+#else
+        (void)phase;
+#endif
 
       if (Feld[x][y] == EL_WALL_ICE)
 	Feld[x][y] = EL_EMPTY;
@@ -2344,16 +2451,20 @@ static void MeltIce(int x, int y)
 	if (laser.damage[i].is_mirror)
 	  break;
 
+#ifndef HEADLESS
       if (i > 0)
 	DrawLaser(laser.damage[i].edge - 1, DL_LASER_DISABLED);
       else
 	DrawLaser(0, DL_LASER_DISABLED);
+#endif
 
       ScanLaser();
     }
     else if (!(MovDelay[x][y] % delay) && IN_SCR_FIELD(x, y))
     {
+#ifndef HEADLESS
       DrawWallsAnimation_MM(x, y, real_element, phase, wall_mask);
+#endif
 
       laser.redraw = TRUE;
     }
@@ -2382,13 +2493,19 @@ static void GrowAmoeba(int x, int y)
       Feld[x][y] = real_element;
       Store[x][y] = Store2[x][y] = 0;
 
+#ifndef HEADLESS
       DrawWalls_MM(x, y, Feld[x][y]);
       DrawLaser(0, DL_LASER_ENABLED);
+#else
+        (void)wall_mask; (void)phase;
+#endif
     }
+#ifndef HEADLESS
     else if (!(MovDelay[x][y] % delay) && IN_SCR_FIELD(x, y))
     {
       DrawWallsAnimation_MM(x, y, real_element, phase, wall_mask);
     }
+#endif
   }
 }
 
@@ -2440,7 +2557,9 @@ static void Explode_MM(int x, int y, int phase, int mode)
   {
     if (Store[x][y] == EL_BOMB)
     {
+#ifndef HEADLESS
       DrawLaser(0, DL_LASER_DISABLED);
+#endif
       InitLaser();
 
       Bang_MM(laser.start_edge.x, laser.start_edge.y);
@@ -2449,7 +2568,9 @@ static void Explode_MM(int x, int y, int phase, int mode)
       game_mm.game_over = TRUE;
       game_mm.game_over_cause = GAME_OVER_BOMB;
 
+#ifndef HEADLESS
       SetTileCursorActive(FALSE);
+#endif
 
       laser.overloaded = FALSE;
     }
@@ -2465,10 +2586,13 @@ static void Explode_MM(int x, int y, int phase, int mode)
     MovDir[x][y] = MovPos[x][y] = MovDelay[x][y] = 0;
 
     InitField(x, y, FALSE);
+#ifndef HEADLESS
     DrawField_MM(x, y);
+#endif
   }
   else if (!(phase % delay) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
   {
+#ifndef HEADLESS
     int graphic = IMG_MM_DEFAULT_EXPLODING;
     int graphic_phase = (phase / delay - 1);
     Bitmap *bitmap;
@@ -2509,6 +2633,7 @@ static void Explode_MM(int x, int y, int phase, int mode)
 	       cFX + x * TILEX, cFY + y * TILEY);
 
     MarkTileDirty(x, y);
+#endif
   }
 }
 
@@ -2537,6 +2662,7 @@ static void Bang_MM(int x, int y)
       break;
   }
 
+#ifndef HEADLESS
   if (IS_PACMAN(element))
     PlayLevelSound_MM(x, y, element, MM_ACTION_EXPLODING);
   else if (element == EL_BOMB || IS_MCDUFFIN(element))
@@ -2545,6 +2671,7 @@ static void Bang_MM(int x, int y)
     PlayLevelSound_MM(x, y, element, MM_ACTION_EXPLODING);
   else
     PlayLevelSound_MM(x, y, element, MM_ACTION_EXPLODING);
+#endif
 
   Explode_MM(x, y, EX_PHASE_START, mode);
 }
@@ -2632,7 +2759,9 @@ static void StartMoving_MM(int x, int y)
       Store[newx][newy] = Feld[newx][newy];
       Feld[newx][newy] = EL_EMPTY;
 
+#ifndef HEADLESS
       DrawField_MM(newx, newy);
+#endif
     }
     else if (!IN_LEV_FIELD(newx, newy) || !IS_FREE(newx, newy) ||
 	     ObjHit(newx, newy, HIT_POS_CENTER))
@@ -2674,8 +2803,10 @@ static void ContinueMoving_MM(int x, int y)
     if (!CAN_MOVE(element))
       MovDir[newx][newy] = 0;
 
+#ifndef HEADLESS
     DrawField_MM(x, y);
     DrawField_MM(newx, newy);
+#endif
 
     Stop[newx][newy] = TRUE;
 
@@ -2693,10 +2824,12 @@ static void ContinueMoving_MM(int x, int y)
       }
     }
   }
+#ifndef HEADLESS
   else				// still moving on
   {
     DrawField_MM(x, y);
   }
+#endif
 
   laser.redraw = TRUE;
 }
@@ -2761,6 +2894,7 @@ boolean ClickElement(int x, int y, int button)
   }
   else if (IS_MCDUFFIN(element))
   {
+#ifndef HEADLESS
     if (!laser.fuse_off)
     {
       DrawLaser(0, DL_LASER_DISABLED);
@@ -2769,6 +2903,7 @@ boolean ClickElement(int x, int y, int button)
       BackToFront();
       */
     }
+#endif
 
     element = get_rotated_element(element, BUTTON_ROTATION(button));
     laser.start_angle = get_element_angle(element);
@@ -2776,7 +2911,9 @@ boolean ClickElement(int x, int y, int button)
     InitLaser();
 
     Feld[x][y] = element;
+#ifndef HEADLESS
     DrawField_MM(x, y);
+#endif
 
     /*
     BackToFront();
@@ -2795,7 +2932,9 @@ boolean ClickElement(int x, int y, int button)
     laser.fuse_off = FALSE;
     laser.fuse_x = laser.fuse_y = -1;
 
+#ifndef HEADLESS
     DrawGraphic_MM(x, y, IMG_MM_FUSE_ACTIVE);
+#endif
     ScanLaser();
 
     element_clicked = TRUE;
@@ -2807,8 +2946,10 @@ boolean ClickElement(int x, int y, int button)
     laser.fuse_y = y;
     laser.overloaded = FALSE;
 
+#ifndef HEADLESS
     DrawLaser(0, DL_LASER_DISABLED);
     DrawGraphic_MM(x, y, IMG_MM_FUSE);
+#endif
 
     element_clicked = TRUE;
   }
@@ -2816,7 +2957,9 @@ boolean ClickElement(int x, int y, int button)
   {
     Bang_MM(x, y);
     RaiseScoreElement_MM(element);
+#ifndef HEADLESS
     DrawLaser(0, DL_LASER_ENABLED);
+#endif
 
     element_clicked = TRUE;
   }
@@ -2867,11 +3010,15 @@ void RotateMirror(int x, int y, int button)
   {
     int edge = Hit[x][y];
 
+#ifndef HEADLESS
     DrawField_MM(x, y);
+#endif
 
     if (edge > 0)
     {
+#ifndef HEADLESS
       DrawLaser(edge - 1, DL_LASER_DISABLED);
+#endif
       ScanLaser();
     }
   }
@@ -2885,7 +3032,9 @@ void RotateMirror(int x, int y, int button)
       edge = 1;
     }
 
+#ifndef HEADLESS
     DrawLaser(edge - 1, DL_LASER_DISABLED);
+#endif
     ScanLaser();
   }
   else
@@ -2895,7 +3044,11 @@ void RotateMirror(int x, int y, int button)
     if (ObjHit(x, y, HIT_POS_EDGE | HIT_POS_BETWEEN))
       check = 2;
 
+#ifndef HEADLESS
     DrawField_MM(x, y);
+#else
+      (void)check;
+#endif
 
     if ((IS_BEAMER(Feld[x][y]) ||
 	 IS_POLAR(Feld[x][y]) ||
@@ -2917,8 +3070,10 @@ void RotateMirror(int x, int y, int button)
       ScanLaser();
     }
 
+#ifndef HEADLESS
     if (check == 2)
       DrawLaser(0, DL_LASER_ENABLED);
+#endif
   }
 }
 
@@ -2957,24 +3112,32 @@ boolean ObjHit(int obx, int oby, int bits)
 
   if (bits & HIT_POS_CENTER)
   {
+#ifndef HEADLESS
     if (CheckLaserPixel(cSX + obx + 15,
 			cSY + oby + 15))
+#else
+          (void)i;
+#endif
       return TRUE;
   }
 
   if (bits & HIT_POS_EDGE)
   {
+#ifndef HEADLESS
     for (i = 0; i < 4; i++)
       if (CheckLaserPixel(cSX + obx + 31 * (i % 2),
 			  cSY + oby + 31 * (i / 2)))
+#endif
 	return TRUE;
   }
 
   if (bits & HIT_POS_BETWEEN)
   {
+#ifndef HEADLESS
     for (i = 0; i < 4; i++)
       if (CheckLaserPixel(cSX + 4 + obx + 22 * (i % 2),
 			  cSY + 4 + oby + 22 * (i / 2)))
+#endif
 	return TRUE;
   }
 
@@ -3039,6 +3202,7 @@ void ColorCycling(void)
 	new = 0x001;
     }
 
+#ifndef HEADLESS
     red   = 0x0e00 * ((color & 0xF00) >> 8);
     green = 0x0e00 * ((color & 0x0F0) >> 4);
     blue  = 0x0e00 * ((color & 0x00F));
@@ -3048,6 +3212,9 @@ void ColorCycling(void)
     green = 0x1111 * ((color & 0x0F0) >> 4);
     blue  = 0x1111 * ((color & 0x00F));
     SetRGB(pen_magicolor[1], red, green, blue);
+#else
+      (void)red; (void)green; (void)blue;
+#endif
   }
 }
 
@@ -3100,7 +3267,9 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
 
     if (laser.num_damages > MAX_LASER_LEN && !laser.fuse_off)
     {
+#ifndef HEADLESS
       DrawLaser(0, DL_LASER_DISABLED);
+#endif
       ScanLaser();
     }
   }
@@ -3115,6 +3284,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
     }
     else if (setup.time_limit && !game_mm.game_over)
     {
+#ifndef HEADLESS
       int i;
 
       for (i = 15; i >= 0; i--)
@@ -3138,10 +3308,13 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
 #endif
 
       DrawLaser(0, DL_LASER_DISABLED);
+#endif
       game_mm.game_over = TRUE;
       game_mm.game_over_cause = GAME_OVER_NO_ENERGY;
 
+#ifndef HEADLESS
       SetTileCursorActive(FALSE);
+#endif
 
       game.restart_game_message = "Out of magic energy! Play it again?";
 
@@ -3201,6 +3374,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
 
     game_mm.laser_overload_value = laser.overload_value;
 
+#ifndef HEADLESS
     if (laser.overload_value < MAX_LASER_OVERLOAD - 8)
     {
       int color_up = 0xFF * laser.overload_value / MAX_LASER_OVERLOAD;
@@ -3225,6 +3399,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
       PlaySoundLoop_MM(SND_MM_GAME_HEALTH_CHARGING);
     else
       PlaySound_MM(SND_MM_GAME_HEALTH_CHARGING);
+#endif
 
     if (laser.overloaded)
     {
@@ -3252,6 +3427,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
 
     if (laser.overload_value == MAX_LASER_OVERLOAD)
     {
+#ifndef HEADLESS
       int i;
 
       UpdateAndDisplayGameControlValues();
@@ -3270,11 +3446,14 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
       }
 
       DrawLaser(0, DL_LASER_DISABLED);
+#endif
 
       game_mm.game_over = TRUE;
       game_mm.game_over_cause = GAME_OVER_OVERLOADED;
 
+#ifndef HEADLESS
       SetTileCursorActive(FALSE);
+#endif
 
       game.restart_game_message = "Magic spell hit Mc Duffin! Play it again?";
 
@@ -3344,8 +3523,10 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
     laser.fuse_x = ELX;
     laser.fuse_y = ELY;
 
+#ifndef HEADLESS
     DrawLaser(0, DL_LASER_DISABLED);
     DrawGraphic_MM(ELX, ELY, IMG_MM_FUSE);
+#endif
   }
 
   if (element == EL_BALL_GRAY && CT > native_mm_level.time_ball)
@@ -3469,7 +3650,9 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
 
   if (IS_WALL_ICE(element) && CT > 50)
   {
+#ifndef HEADLESS
     PlayLevelSound_MM(ELX, ELY, element, MM_ACTION_SHRINKING);
+#endif
 
     {
       Feld[ELX][ELY] = Feld[ELX][ELY] - EL_WALL_ICE + EL_WALL_CHANGING;
@@ -3491,9 +3674,13 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
 	phase = 0;
       }
 
+#ifndef HEADLESS
       DrawWallsAnimation_MM(ELX, ELY, Feld[ELX][ELY], phase, laser.wall_mask);
       BackToFront();
       Delay_WithScreenUpdates(100);
+#else
+        (void)phase;
+#endif
     }
 
     if (Feld[ELX][ELY] == EL_WALL_ICE)
@@ -3509,10 +3696,12 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
       if (laser.damage[i].is_mirror)
 	break;
 
+#ifndef HEADLESS
     if (i > 0)
       DrawLaser(laser.damage[i].edge - 1, DL_LASER_DISABLED);
     else
       DrawLaser(0, DL_LASER_DISABLED);
+#endif
 
     ScanLaser();
 
@@ -3539,22 +3728,33 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
     {
       int x, y;
 
+#ifndef HEADLESS
       DrawLaser(laser.damage[k1].edge - 1, DL_LASER_DISABLED);
+#else
+        (void)dx; (void)dy; (void)de; (void)dm;
+#endif
 
       laser.num_edges++;
+#ifndef HEADLESS
       DrawLaser(0, DL_LASER_ENABLED);
+#endif
       laser.num_edges--;
 
       x = laser.damage[k1].x;
       y = laser.damage[k1].y;
 
+#ifndef HEADLESS
       DrawField_MM(x, y);
+#else
+        (void)x; (void)y;
+#endif
     }
 
     for (i = 0; i < 4; i++)
     {
       if (laser.wall_mask & (1 << i))
       {
+#ifndef HEADLESS
 	if (CheckLaserPixel(cSX + ELX * TILEX + 14 + (i % 2) * 2,
 			    cSY + ELY * TILEY + 31 * (i / 2)))
 	  break;
@@ -3562,6 +3762,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
 	if (CheckLaserPixel(cSX + ELX * TILEX + 31 * (i % 2),
 			    cSY + ELY * TILEY + 14 + (i / 2) * 2))
 	  break;
+#endif
       }
     }
 
@@ -3571,23 +3772,32 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
     {
       if (laser.wall_mask & (1 << i))
       {
+#ifndef HEADLESS
 	if (CheckLaserPixel(cSX + ELX * TILEX + 31 * (i % 2),
 			    cSY + ELY * TILEY + 31 * (i / 2)))
 	  break;
+#endif
       }
     }
 
     k3 = i;
 
+#ifndef HEADLESS
     if (laser.num_beamers > 0 ||
 	k1 < 1 || k2 < 4 || k3 < 4 ||
 	CheckLaserPixel(cSX + ELX * TILEX + 14,
 			cSY + ELY * TILEY + 14))
+#else
+        if (laser.num_beamers > 0 ||
+	k1 < 1 || k2 < 4 || k3 < 4)
+#endif
     {
       laser.num_edges = r;
       laser.num_damages = d;
 
+#ifndef HEADLESS
       DrawLaser(0, DL_LASER_DISABLED);
+#endif
     }
 
     Feld[ELX][ELY] = element | laser.wall_mask;
@@ -3603,9 +3813,11 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
       int wall_mask = laser.wall_mask;
 
       ScanLaser();
+#ifndef HEADLESS
       DrawLaser(0, DL_LASER_ENABLED);
 
       PlayLevelSound_MM(dx, dy, element, MM_ACTION_GROWING);
+#endif
 
       Feld[x][y] = Feld[x][y] - EL_WALL_AMOEBA + EL_WALL_CHANGING;
       Store[x][y] = EL_WALL_AMOEBA;
@@ -3615,8 +3827,11 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
     }
 #endif
 
+#ifndef HEADLESS
     DrawWallsAnimation_MM(dx, dy, de, 4, dm);
+#endif
     ScanLaser();
+#ifndef HEADLESS
     DrawLaser(0, DL_LASER_ENABLED);
 
     PlayLevelSound_MM(dx, dy, element, MM_ACTION_GROWING);
@@ -3630,6 +3845,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
     }
 
     DrawLaser(0, DL_LASER_ENABLED);
+#endif
 
     return;
   }
@@ -3673,11 +3889,14 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
       return;
     }
 
+#ifndef HEADLESS
     PlayLevelSound_MM(ELX, ELY, element, MM_ACTION_PUSHING);
+#endif
 
     Feld[ELX][ELY] = 0;
     Feld[x][y] = element;
 
+#ifndef HEADLESS
     DrawGraphic_MM(ELX, ELY, IMG_EMPTY);
     DrawField_MM(x, y);
 
@@ -3686,6 +3905,7 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
       DrawLaser(Box[ELX][ELY] - 1, DL_LASER_DISABLED);
       DrawLaser(laser.num_edges - 1, DL_LASER_ENABLED);
     }
+#endif
 
     ScanLaser();
 
@@ -3705,16 +3925,20 @@ static void GameActions_MM_Ext(struct MouseActionInfo action, boolean warp_mode)
 #endif
 
       redraw_mask |= REDRAW_DOOR_1;
+#ifndef HEADLESS
       BackToFront();
 
       Delay_WithScreenUpdates(20);
+#endif
     }
 
     game_mm.energy_left = MAX_LASER_ENERGY;
     Feld[ELX][ELY] = EL_FUEL_EMPTY;
+#ifndef HEADLESS
     DrawField_MM(ELX, ELY);
 
     DrawLaser(0, DL_LASER_ENABLED);
+#endif
 
     return;
   }
@@ -3729,7 +3953,9 @@ void GameActions_MM(struct MouseActionInfo action, boolean warp_mode)
 
   GameActions_MM_Ext(action, warp_mode);
 
+#ifndef HEADLESS
   CheckSingleStepMode_MM(element_clicked, button_released);
+#endif
 }
 
 void MovePacMen(void)
@@ -3785,10 +4011,13 @@ void MovePacMen(void)
     game_mm.pacman[pacman_nr].x = nx;
     game_mm.pacman[pacman_nr].y = ny;
 
+#ifndef HEADLESS
     DrawGraphic_MM(ox, oy, IMG_EMPTY);
+#endif
 
     if (element != EL_EMPTY)
     {
+#ifndef HEADLESS
       int graphic = el2gfx(Feld[nx][ny]);
       Bitmap *bitmap;
       int src_x, src_y;
@@ -3805,14 +4034,19 @@ void MovePacMen(void)
 		   src_x, src_y, TILEX, TILEY,
 		   ox + i * mx, oy + i * my);
       Ct = Ct + FrameCounter - CT;
+#endif
     }
 
+#ifndef HEADLESS
     DrawField_MM(nx, ny);
     BackToFront();
+#endif
 
     if (!laser.fuse_off)
     {
+#ifndef HEADLESS
       DrawLaser(0, DL_LASER_ENABLED);
+#endif
 
       if (ObjHit(nx, ny, HIT_POS_BETWEEN))
       {
@@ -3883,8 +4117,10 @@ void GameWon_MM(void)
 	redraw_mask |= REDRAW_DOOR_1;
       }
 
+#ifndef HEADLESS
       BackToFront();
       Delay_WithScreenUpdates(10);
+#endif
     }
 
 #ifndef HEADLESS
@@ -3917,8 +4153,10 @@ void GameWon_MM(void)
       DrawText(DX_TIME, DY_TIME, int2str(TimePlayed, 3), FONT_TEXT_2);
       */
 
+#ifndef HEADLESS
       BackToFront();
       Delay_WithScreenUpdates(10);
+#endif
     }
 
 #ifndef HEADLESS
@@ -3927,9 +4165,11 @@ void GameWon_MM(void)
 #endif
   }
 
+#ifndef HEADLESS
   CloseDoor(DOOR_CLOSE_1);
 
   Request("Level solved!", REQ_CONFIRM);
+#endif
 
   if (level_nr == leveldir_current->handicap_level)
   {
@@ -3961,7 +4201,9 @@ void GameWon_MM(void)
     // DrawMainMenu();
   }
 
+#ifndef HEADLESS
   BackToFront();
+#endif
 }
 
 int NewHiScore_MM(void)
@@ -4117,8 +4359,10 @@ static void RemoveMovingField_MM(int x, int y)
   MovPos[oldx][oldy] = MovDir[oldx][oldy] = MovDelay[oldx][oldy] = 0;
   MovPos[newx][newy] = MovDir[newx][newy] = MovDelay[newx][newy] = 0;
 
+#ifndef HEADLESS
   DrawLevelField_MM(oldx, oldy);
   DrawLevelField_MM(newx, newy);
+#endif
 }
 
 void PlaySoundLevel(int x, int y, int sound_nr)
@@ -4284,7 +4528,9 @@ void LoadEngineSnapshotValues_MM(void)
   energy_delay   = engine_snapshot_mm.energy_delay;
   overload_delay = engine_snapshot_mm.overload_delay;
 
+#ifndef HEADLESS
   RedrawPlayfield_MM();
+#endif
 }
 
 static int getAngleFromTouchDelta(int dx, int dy,  int base)

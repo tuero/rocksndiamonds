@@ -75,6 +75,7 @@ int correctLevelPosY_EM(int);
 int getLevelFromScreenX(int);
 int getLevelFromScreenY(int);
 
+#ifndef HEADLESS
 void DumpTile(int, int);
 void DumpTileFromScreen(int, int);
 
@@ -122,12 +123,14 @@ void DrawBackgroundForFont(int, int, int, int, int);
 void DrawBackgroundForGraphic(int, int, int, int, int);
 boolean CheckIfGlobalBorderHasChanged(void);
 void RedrawGlobalBorder(void);
+#endif
 
 void MarkTileDirty(int, int);
 void SetBorderElement(void);
 void FloodFillLevel(int, int, int, short[][MAX_LEV_FIELDY], int, int);
 void FloodFillLevelExt(int, int, int, int, int y, short field[][y], int, int);
 
+#ifndef HEADLESS
 void SetRandomAnimationValue(int, int);
 int getGraphicAnimationFrame(int, int);
 
@@ -220,6 +223,7 @@ void UndrawSpecialEditorDoor(void);
 
 void CreateToolButtons(void);
 void FreeToolButtons(void);
+#endif
 
 int map_element_RND_to_EM(int);
 int map_element_EM_to_RND(int);
@@ -266,6 +270,7 @@ int getBeltSwitchElementFromBeltNrAndBeltDir(int, int);
 unsigned int InitRND(int);
 void InitGraphicInfo_EM(void);
 
+#ifndef HEADLESS
 void PlayMenuSoundExt(int);
 void PlayMenuSound(void);
 void PlayMenuSoundStereo(int, int);
@@ -277,6 +282,7 @@ void PlayMenuSoundsAndMusic(void);
 void FadeMenuSoundsAndMusic(void);
 void PlaySoundActivating(void);
 void PlaySoundSelecting(void);
+#endif
 
 void SetAnimStatus(int);
 void SetGameStatus(int);

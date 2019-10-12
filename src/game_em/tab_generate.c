@@ -4432,11 +4432,13 @@ unsigned short map_spr[2][8][13];
 /* map ascii to coords */
 unsigned short map_ttl[128];
 
+#ifndef HEADLESS
 /* map tiles and frames to graphic info */
 struct GraphicInfo_EM graphic_info_em_object[TILE_MAX][8];
 
 /* map player number, frames and action to graphic info */
 struct GraphicInfo_EM graphic_info_em_player[MAX_PLAYERS][SPR_MAX][8];
+#endif
 
 static void create_tab(int *invert, unsigned char *array)
 {
@@ -4507,6 +4509,7 @@ static void create_obj(void)
       map_obj[i][j] = buffer[7 - i][j];
 }
 
+#ifndef HEADLESS
 static void create_obj_graphics_info_em(void)
 {
   int i, j;
@@ -4542,6 +4545,7 @@ static void create_obj_graphics_info_em(void)
     }
   }
 }
+#endif
 
 static void create_spr(void)
 {
@@ -4564,6 +4568,7 @@ static void create_spr(void)
 	map_spr[i][j][k] = buffer[i][7 - j][k];
 }
 
+#ifndef HEADLESS
 static void create_spr_graphics_info_em(void)
 {
   int i, j, k;
@@ -4598,6 +4603,7 @@ static void create_spr_graphics_info_em(void)
     }
   }
 }
+#endif
 
 void tab_generate(void)
 {
@@ -4612,8 +4618,10 @@ void tab_generate(void)
 
 void tab_generate_graphics_info_em(void)
 {
+#ifndef HEADLESS
   create_obj_graphics_info_em();
   create_spr_graphics_info_em();
 
   InitGraphicInfo_EM();
+#endif
 }

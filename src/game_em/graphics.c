@@ -33,9 +33,11 @@
 int frame;				/* current screen frame */
 int screen_x, screen_y;			/* current scroll position */
 
+#ifndef HEADLESS
 /* tiles currently on screen */
 static int screentiles[MAX_PLAYFIELD_HEIGHT + 2][MAX_PLAYFIELD_WIDTH + 2];
 static int crumbled_state[MAX_PLAYFIELD_HEIGHT + 2][MAX_PLAYFIELD_WIDTH + 2];
+#endif
 
 int getFieldbufferOffsetX_EM(void)
 {
@@ -47,6 +49,7 @@ int getFieldbufferOffsetY_EM(void)
   return screen_y % TILEY;
 }
 
+#ifndef HEADLESS
 void BlitScreenToBitmap_EM(Bitmap *target_bitmap)
 {
   /* blit all (up to four) parts of the scroll buffer to the target bitmap */
@@ -280,12 +283,13 @@ static void DrawLevelPlayer_EM(int x1, int y1, int player_nr, int anim,
 	       g->src_x, g->src_y, TILEX, TILEY, dst_x, dst_y);
   }
 }
+#endif
 
 /* draw differences between game tiles and screen tiles
  *
  * implicitly handles scrolling and restoring background under the sprites
  */
-
+#ifndef HEADLESS
 static void animscreen(void)
 {
   int x, y, i;
@@ -352,13 +356,14 @@ static void animscreen(void)
     }
   }
 }
+#endif
 
 
 /* blit players to the screen
  *
  * handles transparency and movement
  */
-
+#ifndef HEADLESS
 static void blitplayer(struct PLAYER *ply)
 {
   int x1, y1, x2, y2;
@@ -420,6 +425,7 @@ static void blitplayer(struct PLAYER *ply)
     screentiles[new_sy][new_sx] = -1;
   }
 }
+#endif
 
 void game_initscreen(void)
 {
@@ -433,6 +439,7 @@ void game_initscreen(void)
   screen_x = VALID_SCREEN_X(PLAYER_SCREEN_X(player_nr));
   screen_y = VALID_SCREEN_Y(PLAYER_SCREEN_Y(player_nr));
 
+#ifndef HEADLESS
   for (y = 0; y < MAX_BUF_YSIZE; y++)
   {
     for (x = 0; x < MAX_BUF_XSIZE; x++)
@@ -441,8 +448,13 @@ void game_initscreen(void)
       crumbled_state[y][x] = 0;
     }
   }
+#else
+    (void)x; (void)y;
+#endif
 }
 
+
+#ifndef HEADLESS
 static int getMaxCenterDistancePlayerNr(int center_x, int center_y)
 {
   int max_dx = 0, max_dy = 0;
@@ -470,6 +482,7 @@ static int getMaxCenterDistancePlayerNr(int center_x, int center_y)
 
   return player_nr;
 }
+#endif
 
 static void setMinimalPlayerBoundaries(int *sx1, int *sy1, int *sx2, int *sy2)
 {
@@ -511,6 +524,7 @@ boolean checkIfAllPlayersFitToScreen(void)
 	  sy2 - sy1 <= SCR_FIELDY * TILEY);
 }
 
+#ifndef HEADLESS
 static void setScreenCenteredToAllPlayers(int *sx, int *sy)
 {
   int sx1 = screen_x, sy1 = screen_y, sx2 = screen_x, sy2 = screen_y;
@@ -520,7 +534,9 @@ static void setScreenCenteredToAllPlayers(int *sx, int *sy)
   *sx = (sx1 + sx2) / 2;
   *sy = (sy1 + sy2) / 2;
 }
+#endif
 
+#ifndef HEADLESS
 static void setMaxCenterDistanceForAllPlayers(int *max_dx, int *max_dy,
 					      int center_x, int center_y)
 {
@@ -531,7 +547,9 @@ static void setMaxCenterDistanceForAllPlayers(int *max_dx, int *max_dy,
   *max_dx = MAX(ABS(sx1 - center_x), ABS(sx2 - center_x));
   *max_dy = MAX(ABS(sy1 - center_y), ABS(sy2 - center_y));
 }
+#endif
 
+#ifndef HEADLESS
 static boolean checkIfAllPlayersAreVisible(int center_x, int center_y)
 {
   int max_dx, max_dy;
@@ -541,7 +559,9 @@ static boolean checkIfAllPlayersAreVisible(int center_x, int center_y)
   return (max_dx <= SCR_FIELDX * TILEX / 2 &&
 	  max_dy <= SCR_FIELDY * TILEY / 2);
 }
+#endif
 
+#ifndef HEADLESS
 void RedrawPlayfield_EM(boolean force_redraw)
 {
   boolean draw_new_player_location = FALSE;
@@ -769,3 +789,4 @@ void RedrawPlayfield_EM(boolean force_redraw)
   for (i = 0; i < MAX_PLAYERS; i++)
     blitplayer(&ply[i]);
 }
+#endif

@@ -12,6 +12,8 @@
 #ifndef SCREENS_H
 #define SCREENS_H
 
+#ifndef HEADLESS
+
 #include "main.h"
 
 // (arbitrary, but unique) values for HandleChooseTree()
@@ -36,8 +38,10 @@ void HandleHallOfFame(int, int, int, int, int);
 void HandleInfoScreen(int, int, int, int, int);
 void HandleSetupScreen(int, int, int, int, int);
 void HandleTypeName(int, Key);
+#endif
 void HandleGameActions(void);
 
+#ifndef HEADLESS
 void CreateScreenGadgets(void);
 void FreeScreenGadgets(void);
 
@@ -45,5 +49,7 @@ void setHideRelatedSetupEntries(void);
 
 void DumpScreenIdentifiers(void);
 boolean DoScreenAction(int);
+
+#endif
 
 #endif	// SCREENS_H

@@ -3933,6 +3933,7 @@ static void CopyNativeLevel_SP_to_RND(struct LevelInfo *level)
 	level->yamyam_content[i].e[x][y] = EL_EMPTY;
 }
 
+#ifndef HEADLESS
 static void CopyNativeTape_RND_to_SP(struct LevelInfo *level)
 {
   struct LevelInfo_SP *level_sp = level->native_sp_level;
@@ -3975,9 +3976,13 @@ static void CopyNativeTape_RND_to_SP(struct LevelInfo *level)
 
   demo->is_available = TRUE;
 }
+#endif
 
+#ifndef HEADLESS
 static void setTapeInfoToDefaults(void);
+#endif
 
+#ifndef HEADLESS
 static void CopyNativeTape_SP_to_RND(struct LevelInfo *level)
 {
   struct LevelInfo_SP *level_sp = level->native_sp_level;
@@ -4023,6 +4028,7 @@ static void CopyNativeTape_SP_to_RND(struct LevelInfo *level)
 
   TapeHaltRecording();
 }
+#endif
 
 
 // ----------------------------------------------------------------------------
@@ -6172,7 +6178,9 @@ void SaveNativeLevel(struct LevelInfo *level)
     char *filename = getLevelFilenameFromBasename(basename);
 
     CopyNativeLevel_RND_to_SP(level);
+#ifndef HEADLESS
     CopyNativeTape_RND_to_SP(level);
+#endif
 
     SaveNativeLevel_SP(filename);
   }
@@ -6591,7 +6599,9 @@ static void LoadLevel_InitElements(struct LevelInfo *level)
 
   // initialize element properties for level editor etc.
   InitElementPropertiesEngine(level->game_version);
+#ifndef HEADLESS
   InitElementPropertiesGfxElement();
+#endif
 }
 
 static void LoadLevel_InitPlayfield(struct LevelInfo *level)
@@ -6622,8 +6632,10 @@ static void LoadLevel_InitPlayfield(struct LevelInfo *level)
   // determine border element for this level
   if (level->file_info.type == LEVEL_FILE_TYPE_DC)
     BorderElement = EL_EMPTY;	// (in editor, SetBorderElement() is used)
+#ifndef HEADLESS
   else
     SetBorderElement();
+#endif
 }
 
 static void LoadLevel_InitNativeEngines(struct LevelInfo *level)
@@ -7549,6 +7561,7 @@ void SaveLevelTemplate(void)
   SaveLevelFromFilename(&level, filename, TRUE);
 }
 
+#ifndef HEADLESS
 boolean SaveLevelChecked(int nr)
 {
   char *filename = getDefaultLevelFilename(nr);
@@ -7567,6 +7580,7 @@ boolean SaveLevelChecked(int nr)
 
   return level_saved;
 }
+#endif
 
 void DumpLevel(struct LevelInfo *level)
 {
@@ -7612,6 +7626,7 @@ void DumpLevel(struct LevelInfo *level)
 // tape file functions
 // ============================================================================
 
+#ifndef HEADLESS
 static void setTapeInfoToDefaults(void)
 {
   int i;
@@ -8258,6 +8273,7 @@ void DumpTape(struct TapeInfo *tape)
 
   PrintLine("-", 79);
 }
+#endif
 
 
 // ============================================================================
@@ -9259,6 +9275,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
 
   si->editor.use_template_for_new_levels = TRUE;
 
+#ifndef HEADLESS
   si->shortcut.save_game	= DEFAULT_KEY_SAVE_GAME;
   si->shortcut.load_game	= DEFAULT_KEY_LOAD_GAME;
   si->shortcut.toggle_pause	= DEFAULT_KEY_TOGGLE_PAUSE;
@@ -9284,7 +9301,9 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->shortcut.snap_right	= DEFAULT_KEY_SNAP_RIGHT;
   si->shortcut.snap_up		= DEFAULT_KEY_SNAP_UP;
   si->shortcut.snap_down	= DEFAULT_KEY_SNAP_DOWN;
+#endif
 
+#ifndef HEADLESS
   for (i = 0; i < MAX_PLAYERS; i++)
   {
     si->input[i].use_joystick = FALSE;
@@ -9304,6 +9323,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
     si->input[i].key.snap  = (i == 0 ? DEFAULT_KEY_SNAP  : KSYM_UNDEFINED);
     si->input[i].key.drop  = (i == 0 ? DEFAULT_KEY_DROP  : KSYM_UNDEFINED);
   }
+#endif
 
   si->system.sdl_videodriver = getStringCopy(ARG_DEFAULT);
   si->system.sdl_audiodriver = getStringCopy(ARG_DEFAULT);
@@ -9335,6 +9355,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->internal.default_window_width  = WIN_XSIZE_DEFAULT;
   si->internal.default_window_height = WIN_YSIZE_DEFAULT;
 
+#ifndef HEADLESS
   si->debug.frame_delay[0] = DEFAULT_FRAME_DELAY_0;
   si->debug.frame_delay[1] = DEFAULT_FRAME_DELAY_1;
   si->debug.frame_delay[2] = DEFAULT_FRAME_DELAY_2;
@@ -9356,6 +9377,7 @@ static void setSetupInfoToDefaults(struct SetupInfo *si)
   si->debug.frame_delay_key[7] = DEFAULT_KEY_FRAME_DELAY_7;
   si->debug.frame_delay_key[8] = DEFAULT_KEY_FRAME_DELAY_8;
   si->debug.frame_delay_key[9] = DEFAULT_KEY_FRAME_DELAY_9;
+#endif
 
   si->debug.frame_delay_use_mod_key = DEFAULT_FRAME_DELAY_USE_MOD_KEY;
   si->debug.frame_delay_game_only   = DEFAULT_FRAME_DELAY_GAME_ONLY;
@@ -9535,7 +9557,9 @@ static void decodeSetupFileHash(SetupFileHash *setup_file_hash)
   for (i = 0; i < ARRAY_SIZE(options_setup_tokens); i++)
     setSetupInfoFromTokenInfo(setup_file_hash, options_setup_tokens, i);
 
+#ifndef HEADLESS
   setHideRelatedSetupEntries();
+#endif
 }
 
 static void decodeSetupFileHash_AutoSetup(SetupFileHash *setup_file_hash)
@@ -9937,6 +9961,7 @@ void LoadCustomElementDescriptions(void)
   freeSetupFileHash(setup_file_hash);
 }
 
+#ifndef HEADLESS
 static int getElementFromToken(char *token)
 {
   char *value = getHashEntry(element_token_hash, token);
@@ -9948,7 +9973,9 @@ static int getElementFromToken(char *token)
 
   return EL_UNDEFINED;
 }
+#endif
 
+#ifndef HEADLESS
 void FreeGlobalAnimEventInfo(void)
 {
   struct GlobalAnimEventInfo *gaei = &global_anim_event_info;
@@ -9969,7 +9996,9 @@ void FreeGlobalAnimEventInfo(void)
   gaei->event_list = NULL;
   gaei->num_event_lists = 0;
 }
+#endif
 
+#ifndef HEADLESS
 static int AddGlobalAnimEventList(void)
 {
   struct GlobalAnimEventInfo *gaei = &global_anim_event_info;
@@ -9988,7 +10017,9 @@ static int AddGlobalAnimEventList(void)
 
   return list_pos;
 }
+#endif
 
+#ifndef HEADLESS
 static int AddGlobalAnimEventValue(int list_pos, int event_value)
 {
   // do not add empty global animation events
@@ -10010,7 +10041,9 @@ static int AddGlobalAnimEventValue(int list_pos, int event_value)
 
   return list_pos;
 }
+#endif
 
+#ifndef HEADLESS
 int GetGlobalAnimEventValue(int list_pos, int value_pos)
 {
   if (list_pos == ANIM_EVENT_UNDEFINED)
@@ -10021,7 +10054,9 @@ int GetGlobalAnimEventValue(int list_pos, int value_pos)
 
   return gaeli->event_value[value_pos];
 }
+#endif
 
+#ifndef HEADLESS
 int GetGlobalAnimEventValueCount(int list_pos)
 {
   if (list_pos == ANIM_EVENT_UNDEFINED)
@@ -10032,6 +10067,7 @@ int GetGlobalAnimEventValueCount(int list_pos)
 
   return gaeli->num_event_values;
 }
+#endif
 
 // This function checks if a string <s> of the format "string1, string2, ..."
 // exactly contains a string <s_contained>.
@@ -10070,6 +10106,7 @@ static boolean string_has_parameter(char *s, char *s_contained)
   return string_has_parameter(substring, s_contained);
 }
 
+#ifndef HEADLESS
 static int get_anim_parameter_value(char *s)
 {
   int event_value[] =
@@ -10162,7 +10199,9 @@ static int get_anim_parameter_value(char *s)
 
   return result;
 }
+#endif
 
+#ifndef HEADLESS
 static int get_anim_parameter_values(char *s)
 {
   int list_pos = ANIM_EVENT_UNDEFINED;
@@ -10198,7 +10237,9 @@ static int get_anim_parameter_values(char *s)
 
   return list_pos;
 }
+#endif
 
+#ifndef HEADLESS
 static int get_anim_action_parameter_value(char *token)
 {
   int result = getImageIDFromToken(token);
@@ -10225,6 +10266,7 @@ static int get_anim_action_parameter_value(char *token)
 
   return result;
 }
+#endif
 
 int get_parameter_value(char *value_raw, char *suffix, int type)
 {
@@ -10293,11 +10335,14 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
     if (string_has_parameter(value, "static_panel"))
       result |= ANIM_STATIC_PANEL;
   }
+#ifndef HEADLESS
   else if (strEqual(suffix, ".init_event") ||
 	   strEqual(suffix, ".anim_event"))
   {
     result = get_anim_parameter_values(value);
   }
+#endif
+#ifndef HEADLESS
   else if (strEqual(suffix, ".init_delay_action") ||
 	   strEqual(suffix, ".anim_delay_action") ||
 	   strEqual(suffix, ".post_delay_action") ||
@@ -10306,6 +10351,7 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
   {
     result = get_anim_action_parameter_value(value_raw);
   }
+#endif
   else if (strEqual(suffix, ".class"))
   {
     result = (strEqual(value, ARG_UNDEFINED) ? ARG_UNDEFINED_VALUE :
@@ -10345,10 +10391,12 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
 	      string_has_parameter(value, "frames") ? AUTO_DELAY_UNIT_FRAMES :
 	      AUTO_DELAY_UNIT_DEFAULT);
   }
+#ifndef HEADLESS
   else if (strPrefix(suffix, ".font"))		// (may also be ".font_xyz")
   {
     result = gfx.get_font_from_token_function(value);
   }
+#endif
   else		// generic parameter of type integer or boolean
   {
     result = (strEqual(value, ARG_UNDEFINED) ? ARG_UNDEFINED_VALUE :
@@ -10362,6 +10410,7 @@ int get_parameter_value(char *value_raw, char *suffix, int type)
   return result;
 }
 
+#ifndef HEADLESS
 static int get_token_parameter_value(char *token, char *value_raw)
 {
   char *suffix;
@@ -10379,7 +10428,9 @@ static int get_token_parameter_value(char *token, char *value_raw)
   // !!! USE CORRECT VALUE TYPE (currently works also for TYPE_BOOLEAN) !!!
   return get_parameter_value(value_raw, suffix, TYPE_INTEGER);
 }
+#endif
 
+#ifndef HEADLESS
 void InitMenuDesignSettings_Static(void)
 {
   int i;
@@ -10394,7 +10445,9 @@ void InitMenuDesignSettings_Static(void)
 	get_token_parameter_value(image_config_vars[i].token, value);
   }
 }
+#endif
 
+#ifndef HEADLESS
 static void InitMenuDesignSettings_SpecialPreProcessing(void)
 {
   int i;
@@ -10499,7 +10552,9 @@ static void InitMenuDesignSettings_SpecialPreProcessing(void)
     viewport.door_2[i] = viewport.door_2[GFX_SPECIAL_ARG_DEFAULT];
   }
 }
+#endif
 
+#ifndef HEADLESS
 static void InitMenuDesignSettings_SpecialPostProcessing(void)
 {
   static struct
@@ -10759,7 +10814,9 @@ static void InitMenuDesignSettings_SpecialPostProcessing(void)
     }
   }
 }
+#endif
 
+#ifndef HEADLESS
 static void InitMenuDesignSettings_SpecialPostProcessing_AfterGraphics(void)
 {
   static struct
@@ -10834,7 +10891,9 @@ static void InitMenuDesignSettings_SpecialPostProcessing_AfterGraphics(void)
     }
   }
 }
+#endif
 
+#ifndef HEADLESS
 static void LoadMenuDesignSettingsFromFilename(char *filename)
 {
   static struct TitleFadingInfo tfi;
@@ -11205,7 +11264,9 @@ static void LoadMenuDesignSettingsFromFilename(char *filename)
 
   freeSetupFileHash(setup_file_hash);
 }
+#endif
 
+#ifndef HEADLESS
 void LoadMenuDesignSettings(void)
 {
   char *filename_base = UNDEFINED_FILENAME, *filename_local;
@@ -11229,12 +11290,17 @@ void LoadMenuDesignSettings(void)
 
   InitMenuDesignSettings_SpecialPostProcessing();
 }
+#endif
+
+#ifndef HEADLESS
 
 void LoadMenuDesignSettings_AfterGraphics(void)
 {
   InitMenuDesignSettings_SpecialPostProcessing_AfterGraphics();
 }
+#endif
 
+#ifndef HEADLESS
 void LoadUserDefinedEditorElementList(int **elements, int *num_elements)
 {
   char *filename = getEditorSetupFilename();
@@ -11316,7 +11382,9 @@ void LoadUserDefinedEditorElementList(int **elements, int *num_elements)
 	   element_info[(*elements)[i]].token_name, (*elements)[i]);
 #endif
 }
+#endif
 
+#ifndef HEADLESS
 static struct MusicFileInfo *get_music_file_info_ext(char *basename, int music,
 						     boolean is_sound)
 {
@@ -11401,19 +11469,23 @@ static struct MusicFileInfo *get_music_file_info_ext(char *basename, int music,
 
   return new_music_file_info;
 }
+#endif
 
-static struct MusicFileInfo *get_music_file_info(char *basename, int music) MAYBE_UNUSED;
+#ifndef HEADLESS
 static struct MusicFileInfo *get_music_file_info(char *basename, int music)
 {
   return get_music_file_info_ext(basename, music, FALSE);
 }
+#endif
 
-static struct MusicFileInfo *get_sound_file_info(char *basename, int sound) MAYBE_UNUSED;
+#ifndef HEADLESS
 static struct MusicFileInfo *get_sound_file_info(char *basename, int sound)
 {
   return get_music_file_info_ext(basename, sound, TRUE);
 }
+#endif
 
+#ifndef HEADLESS
 static boolean music_info_listed_ext(struct MusicFileInfo *list,
 				     char *basename, boolean is_sound)
 {
@@ -11423,18 +11495,21 @@ static boolean music_info_listed_ext(struct MusicFileInfo *list,
 
   return FALSE;
 }
+#endif
 
-static boolean music_info_listed(struct MusicFileInfo *list, char *basename) MAYBE_UNUSED;
+#ifndef HEADLESS
 static boolean music_info_listed(struct MusicFileInfo *list, char *basename)
 {
   return music_info_listed_ext(list, basename, FALSE);
 }
+#endif
 
-static boolean sound_info_listed(struct MusicFileInfo *list, char *basename) MAYBE_UNUSED;
+#ifndef HEADLESS
 static boolean sound_info_listed(struct MusicFileInfo *list, char *basename)
 {
   return music_info_listed_ext(list, basename, TRUE);
 }
+#endif
 
 void LoadMusicInfo(void)
 {
@@ -11565,6 +11640,7 @@ void LoadMusicInfo(void)
 #endif
 }
 
+#ifndef HEADLESS
 static void add_helpanim_entry(int element, int action, int direction,
 			       int delay, int *num_list_entries)
 {
@@ -11581,7 +11657,9 @@ static void add_helpanim_entry(int element, int action, int direction,
   new_list_entry->direction = direction;
   new_list_entry->delay = delay;
 }
+#endif
 
+#ifndef HEADLESS
 static void print_unknown_token(char *filename, char *token, int token_nr)
 {
   if (token_nr == 0)
@@ -11593,13 +11671,17 @@ static void print_unknown_token(char *filename, char *token, int token_nr)
 
   Error(ERR_INFO, "- token: '%s'", token);
 }
+#endif
 
+#ifndef HEADLESS
 static void print_unknown_token_end(int token_nr)
 {
   if (token_nr > 0)
     Error(ERR_INFO_LINE, "-");
 }
+#endif
 
+#ifndef HEADLESS
 void LoadHelpAnimInfo(void)
 {
   char *filename = getHelpAnimFilename();
@@ -11809,7 +11891,9 @@ void LoadHelpAnimInfo(void)
 	   helpanim_info[i].delay);
 #endif
 }
+#endif
 
+#ifndef HEADLESS
 void LoadHelpTextInfo(void)
 {
   char *filename = getHelpTextFilename();
@@ -11844,6 +11928,7 @@ void LoadHelpTextInfo(void)
   END_HASH_ITERATION(hash, itr)
 #endif
 }
+#endif
 
 
 // ----------------------------------------------------------------------------
@@ -11964,6 +12049,7 @@ void ConvertLevels(void)
 // create and save images for use in level sketches (raw BMP format)
 // ----------------------------------------------------------------------------
 
+#ifndef HEADLESS
 void CreateLevelSketchImages(void)
 {
   Bitmap *bitmap1;
@@ -12029,12 +12115,14 @@ void CreateLevelSketchImages(void)
 
   CloseAllAndExit(0);
 }
+#endif
 
 
 // ----------------------------------------------------------------------------
 // create and save images for custom and group elements (raw BMP format)
 // ----------------------------------------------------------------------------
 
+#ifndef HEADLESS
 void CreateCustomElementImages(char *directory)
 {
   char *src_basename = "RocksCE-template.ilbm";
@@ -12129,3 +12217,4 @@ void CreateCustomElementImages(char *directory)
 
   CloseAllAndExit(0);
 }
+#endif

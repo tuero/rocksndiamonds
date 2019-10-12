@@ -20,8 +20,10 @@ void subInitGameConditions(void)
 
   YawnSleepCounter = 0;			// Wake up sleeping Murphy
 
+#ifndef HEADLESS
   ExplosionShake = 0;			// Force explosion flag off
   ExplosionShakeMurphy = 0;		// Force explosion flag off
+#endif
 
   TerminalMaxCycles = 0x7F;
   YellowDisksExploded = 0;
@@ -59,11 +61,14 @@ void InitMurphyPosB(int si)
   MurphyScreenXPos = MurphyXPos = GetStretchX(si); // Murphy's screen x-position
   MurphyScreenYPos = MurphyYPos = GetStretchY(si); // Murphy's screen y-position
 
+#ifndef HEADLESS
   // To Do: draw Murphy in location ax
   DDSpriteBuffer_BltImg(MurphyScreenXPos, MurphyScreenYPos, aniMurphy, 0);
+#endif
 
   subCalculateScreenScrollPos();           // calculate screen start addrs
 
+#ifndef HEADLESS
   if (AutoScrollFlag)
   {
     if (bPlaying)
@@ -71,6 +76,7 @@ void InitMurphyPosB(int si)
     else
       ScrollTo(ScreenScrollXPos, ScreenScrollYPos);
   }
+#endif
 }
 
 
@@ -249,7 +255,9 @@ void subFetchAndInitLevel(void)
   InfoCountInLevel = subConvertToEasySymbols();	// convert to easy symbols
   GameBusyFlag = -GameBusyFlag;			// restore
 
+#ifndef HEADLESS
   subDisplayLevel();				// paint (init) game field
+#endif
 
   ResetInfotronsNeeded(InfoCountInLevel);	// and reset Infotron count
 

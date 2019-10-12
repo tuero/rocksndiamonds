@@ -6,17 +6,23 @@
 struct GameInfo_SP game_sp;
 struct LevelInfo_SP native_sp_level;
 
+#ifndef HEADLESS
 int GfxElementLast[SP_MAX_PLAYFIELD_WIDTH][SP_MAX_PLAYFIELD_HEIGHT];
 int GfxGraphicLast[SP_MAX_PLAYFIELD_WIDTH][SP_MAX_PLAYFIELD_HEIGHT];
 int GfxGraphic[SP_MAX_PLAYFIELD_WIDTH][SP_MAX_PLAYFIELD_HEIGHT];
 int GfxFrame[SP_MAX_PLAYFIELD_WIDTH][SP_MAX_PLAYFIELD_HEIGHT];
+#endif
 
 
 void InitGameEngine_SP(void)
 {
   int x, y;
 
+#ifndef HEADLESS
   gfx.anim_random_frame = -1;	// (use simple, ad-hoc random numbers)
+#else
+    (void)x; (void)y;
+#endif
 
   game_sp.level_solved = FALSE;
   game_sp.game_over = FALSE;
@@ -36,6 +42,7 @@ void InitGameEngine_SP(void)
   if (native_sp_level.height <= SCR_FIELDY)
     game_sp.scroll_yoffset = TILEY / 2;
 
+#ifndef HEADLESS
   for (x = 0; x < SP_MAX_PLAYFIELD_WIDTH; x++)
   {
     for (y = 0; y < SP_MAX_PLAYFIELD_HEIGHT; y++)
@@ -46,12 +53,14 @@ void InitGameEngine_SP(void)
       GfxFrame[x][y] = 0;
     }
   }
+#endif
 
   InitScrollPlayfield();
 
   menPlay_Click();
 }
 
+#ifndef HEADLESS
 void RedrawPlayfield_SP(boolean force_redraw)
 {
   // skip redrawing playfield in warp mode or when testing tapes with "autotest"
@@ -63,6 +72,7 @@ void RedrawPlayfield_SP(boolean force_redraw)
 
   UpdatePlayfield(force_redraw);
 }
+#endif
 
 static void UpdateGameDoorValues_SP(void)
 {
@@ -82,16 +92,22 @@ void GameActions_SP(byte action[MAX_PLAYERS], boolean warp_mode)
 
   subMainGameLoop_Main(single_player_action, warp_mode);
 
+#ifndef HEADLESS
   RedrawPlayfield_SP(FALSE);
+#endif
 
   UpdateGameDoorValues_SP();
 
+#ifndef HEADLESS
   CheckSingleStepMode_SP(PlayField16[MurphyPosIndex] == fiMurphy,
 			 HighByte(PlayField16[MurphyPosIndex]) == 0x2A);
 
   for (x = DisplayMinX; x <= DisplayMaxX; x++)
     for (y = DisplayMinY; y <= DisplayMaxY; y++)
       GfxFrame[x][y]++;
+#else
+    (void)x; (void)y;
+#endif
 }
 
 int getRedDiskReleaseFlag_SP(void)

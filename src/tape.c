@@ -9,6 +9,7 @@
 // tape.c
 // ============================================================================
 
+#ifndef HEADLESS
 #include "libgame/libgame.h"
 
 #include "tape.h"
@@ -1582,3 +1583,4 @@ void HandleTapeButtonKeys(Key key)
   else if (key == setup.shortcut.tape_play)
     HandleTapeButtonsExt(TAPE_CTRL_ID_PLAY);
 }
+#endif

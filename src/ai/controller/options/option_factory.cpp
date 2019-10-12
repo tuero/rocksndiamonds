@@ -67,9 +67,9 @@ std::vector<BaseOption*> OptionFactory::createCustomOptions() {
     // Single step option for each available 
     for (Action action : ALL_ACTIONS) {
         if (action != Action::noop) {
-            // std::unique_ptr<OptionSingleStep> option = std::make_unique<OptionSingleStep>(action, 1);
-            // options_.push_back(std::move(option));
-            // optionPointers.push_back(options_.back().get());
+            std::unique_ptr<OptionSingleStep> option = std::make_unique<OptionSingleStep>(action, 1);
+            options_.push_back(std::move(option));
+            optionPointers.push_back(options_.back().get());
         }
         else {
             std::unique_ptr<OptionSingleStep> option = std::make_unique<OptionSingleStep>(action, 4);

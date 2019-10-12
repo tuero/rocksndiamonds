@@ -9,6 +9,7 @@
 // anim.c
 // ============================================================================
 
+
 #include "libgame/libgame.h"
 
 #include "anim.h"
@@ -18,8 +19,6 @@
 #include "events.h"
 #include "screens.h"
 
-
-#define MAYBE_UNUSED __attribute__((used))
 
 #define DEBUG_ANIM_DELAY		0
 #define DEBUG_ANIM_EVENTS		0
@@ -82,7 +81,7 @@
 #define ANIM_CONTINUE			2
 #define ANIM_STOP			3
 
-
+#ifndef HEADLESS
 struct GlobalAnimPartControlInfo
 {
   int old_nr;		// position before mapping animation parts linearly
@@ -234,6 +233,7 @@ static boolean drawing_to_fading_buffer = FALSE;
 
 static boolean handle_click = FALSE;
 
+#endif
 
 // ============================================================================
 // generic animation frame calculation
@@ -275,10 +275,14 @@ int getAnimationFrame(int num_frames, int delay, int mode, int start_frame,
   {
     // note: expect different frames for the same delay cycle!
 
+#ifndef HEADLESS
     if (gfx.anim_random_frame < 0)
       frame = GetSimpleRandom(num_frames);
     else
       frame = gfx.anim_random_frame % num_frames;
+#else
+      frame = GetSimpleRandom(num_frames);
+#endif
   }
   else if (mode & (ANIM_CE_VALUE | ANIM_CE_SCORE | ANIM_CE_DELAY))
   {
@@ -291,7 +295,7 @@ int getAnimationFrame(int num_frames, int delay, int mode, int start_frame,
   return frame;
 }
 
-
+#ifndef HEADLESS
 // ============================================================================
 // global animation functions
 // ============================================================================
@@ -947,10 +951,8 @@ static boolean SetGlobalAnimPart_Viewport(struct GlobalAnimPartControlInfo *part
   return changed;
 }
 
-static void PlayGlobalAnimSound(struct GlobalAnimPartControlInfo *part) MAYBE_UNUSED;
 static void PlayGlobalAnimSound(struct GlobalAnimPartControlInfo *part)
 {
-#ifndef HEADLESS
   int sound = part->sound;
 
   if (sound == SND_UNDEFINED)
@@ -965,7 +967,6 @@ static void PlayGlobalAnimSound(struct GlobalAnimPartControlInfo *part)
     PlaySoundLoop(sound);
   else
     PlaySound(sound);
-#endif
 
 #if 0
   printf("::: PLAY SOUND %d.%d.%d: %d\n",
@@ -973,17 +974,14 @@ static void PlayGlobalAnimSound(struct GlobalAnimPartControlInfo *part)
 #endif
 }
 
-static void StopGlobalAnimSound(struct GlobalAnimPartControlInfo *part) MAYBE_UNUSED;
 static void StopGlobalAnimSound(struct GlobalAnimPartControlInfo *part)
 {
-#ifndef HEADLESS
   int sound = part->sound;
 
   if (sound == SND_UNDEFINED)
     return;
 
   StopSound(sound);
-#endif
 
 #if 0
   printf("::: STOP SOUND %d.%d.%d: %d\n",
@@ -991,10 +989,8 @@ static void StopGlobalAnimSound(struct GlobalAnimPartControlInfo *part)
 #endif
 }
 
-static void PlayGlobalAnimMusic(struct GlobalAnimPartControlInfo *part) MAYBE_UNUSED;
 static void PlayGlobalAnimMusic(struct GlobalAnimPartControlInfo *part)
 {
-#ifndef HEADLESS
   int music = part->music;
 
   if (music == MUS_UNDEFINED)
@@ -1007,7 +1003,6 @@ static void PlayGlobalAnimMusic(struct GlobalAnimPartControlInfo *part)
     PlayMusicLoop(music);
   else
     PlayMusic(music);
-#endif
 
 #if 0
   printf("::: PLAY MUSIC %d.%d.%d: %d\n",
@@ -1015,17 +1010,14 @@ static void PlayGlobalAnimMusic(struct GlobalAnimPartControlInfo *part)
 #endif
 }
 
-static void StopGlobalAnimMusic(struct GlobalAnimPartControlInfo *part) MAYBE_UNUSED;
 static void StopGlobalAnimMusic(struct GlobalAnimPartControlInfo *part)
 {
-#ifndef HEADLESS
   int music = part->music;
 
   if (music == MUS_UNDEFINED)
     return;
 
   StopMusic();
-#endif
 
 #if 0
   printf("::: STOP MUSIC %d.%d.%d: %d\n",
@@ -1035,27 +1027,22 @@ static void StopGlobalAnimMusic(struct GlobalAnimPartControlInfo *part)
 
 static void PlayGlobalAnimSoundAndMusic(struct GlobalAnimPartControlInfo *part)
 {
-#ifndef HEADLESS
   // when drawing animations to fading buffer, do not play sounds or music
   if (drawing_to_fading_buffer)
     return;
 
   PlayGlobalAnimSound(part);
   PlayGlobalAnimMusic(part);
-#endif
 }
 
 static void StopGlobalAnimSoundAndMusic(struct GlobalAnimPartControlInfo *part)
 {
-#ifndef HEADLESS
   StopGlobalAnimSound(part);
   StopGlobalAnimMusic(part);
-#endif
 }
 
 static void PlayGlobalAnimSoundIfLoop(struct GlobalAnimPartControlInfo *part)
 {
-#ifndef HEADLESS
   // when drawing animations to fading buffer, do not play sounds
   if (drawing_to_fading_buffer)
     return;
@@ -1074,7 +1061,6 @@ static void PlayGlobalAnimSoundIfLoop(struct GlobalAnimPartControlInfo *part)
 
   // prevent expiring loop sounds when playing
   PlayGlobalAnimSound(part);
-#endif
 }
 
 static boolean checkGlobalAnimEvent(int anim_event, int mask)
@@ -1930,3 +1916,5 @@ boolean HandleGlobalAnimClicks(int mx, int my, int button, boolean force_click)
 
   return click_consumed_current;
 }
+
+#endif

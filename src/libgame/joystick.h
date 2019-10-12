@@ -12,6 +12,8 @@
 #ifndef JOYSTICK_H
 #define JOYSTICK_H
 
+#ifndef HEADLESS
+
 #include "system.h"
 
 #define JOYSTICK_NOT_AVAILABLE	0
@@ -48,6 +50,7 @@
 #define JOYSTICK_YLOWER		+JOYSTICK_MAX_AXIS_POS
 
 #define JOYSTICK_PERCENT	25
+#endif
 
 #define JOY_NO_ACTION		0
 #define JOY_LEFT		MV_LEFT
@@ -67,6 +70,7 @@
 #define JOY_BUTTON_NEW_PRESSED	2
 #define JOY_BUTTON_NEW_RELEASED	3
 
+#ifndef HEADLESS
 char *getJoyNameFromJoySymbol(int);
 int getJoySymbolFromJoyName(char *);
 int getJoystickNrFromDeviceName(char *);
@@ -82,5 +86,7 @@ int AnyJoystickButton(void);
 
 void DeactivateJoystick(void);
 void ActivateJoystick(void);
+
+#endif
 
 #endif	// JOYSTICK_H

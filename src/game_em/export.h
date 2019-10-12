@@ -657,10 +657,12 @@ struct PLAYER
   int joy_spin:1;
 };
 
+#ifndef HEADLESS
 struct GlobalInfo_EM
 {
   Bitmap *screenbuffer;
 };
+#endif
 
 struct GameInfo_EM
 {
@@ -690,6 +692,7 @@ struct LevelInfo_EM
   struct GameInfo_EM *game_em;
 };
 
+#ifndef HEADLESS
 struct GraphicInfo_EM
 {
   Bitmap *bitmap;
@@ -708,6 +711,7 @@ struct GraphicInfo_EM
 
   int unique_identifier;	/* used to identify needed screen updates */
 };
+#endif
 
 struct EngineSnapshotInfo_EM
 {
@@ -730,17 +734,23 @@ struct EngineSnapshotInfo_EM
 // exported functions
 // ----------------------------------------------------------------------------
 
+#ifndef HEADLESS
 extern struct GlobalInfo_EM global_em_info;
+#endif
 extern struct GameInfo_EM game_em;
 extern struct LevelInfo_EM native_em_level;
+#ifndef HEADLESS
 extern struct GraphicInfo_EM graphic_info_em_object[TILE_MAX][8];
 extern struct GraphicInfo_EM graphic_info_em_player[MAX_PLAYERS][SPR_MAX][8];
+#endif
 extern struct EngineSnapshotInfo_EM engine_snapshot_em;
 
 void em_open_all(void);
 void em_close_all(void);
 
+#ifndef HEADLESS
 void InitGfxBuffers_EM(void);
+#endif
 
 void InitGameEngine_EM(void);
 void GameActions_EM(byte *, boolean);
@@ -753,9 +763,11 @@ boolean LoadNativeLevel_EM(char *, boolean);
 int getFieldbufferOffsetX_EM(void);
 int getFieldbufferOffsetY_EM(void);
 
+#ifndef HEADLESS
 void BackToFront_EM(void);
 void BlitScreenToBitmap_EM(Bitmap *);
 void RedrawPlayfield_EM(boolean);
+#endif
 
 void LoadEngineSnapshotValues_EM(void);
 void SaveEngineSnapshotValues_EM(void);

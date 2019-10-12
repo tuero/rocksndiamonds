@@ -5,12 +5,14 @@
 #include "SnikSnaks.h"
 
 
+#ifndef HEADLESS
 static void subDrawSnikSnakFromAbove(int, int);
 static void subDrawSnikSnakFromBelow(int, int);
 static void subDrawSnikSnakFromLeft(int, int);
 static void subDrawSnikSnakFromRight(int, int);
 static void subDrawSnikSnakTurnLeft(int, int);
 static void subDrawSnikSnakTurnRight(int, int);
+#endif
 static void subSnikSnakFromAbove(int, int);
 static void subSnikSnakFromBelow(int, int);
 static void subSnikSnakFromLeft(int, int);
@@ -74,6 +76,7 @@ void subAnimateSnikSnaks(int si)
   }
 }
 
+#ifndef HEADLESS
 void subDrawAnimatedSnikSnaks(int si)
 {
   int bx, Tmp;
@@ -112,6 +115,7 @@ void subDrawAnimatedSnikSnaks(int si)
       break;
   }
 }
+#endif
 
 static void subSnikSnakTurnLeft(int si, int bx)
 {
@@ -126,9 +130,11 @@ static void subSnikSnakTurnLeft(int si, int bx)
     return;
   } // loc_g_75E0:
 
+#ifndef HEADLESS
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   subDrawSnikSnakTurnLeft(si, bx);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
+#endif
 
   bx = (bx + 1) & 0x7;
   MovHighByte(&PlayField16[si], bx);
@@ -249,9 +255,11 @@ static void subSnikSnakTurnRight(int si, int bx)
     return;
   } // loc_g_76DB:
 
+#ifndef HEADLESS
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   subDrawSnikSnakTurnRight(si, bx);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
+#endif
 
   bx = ((bx + 1) & 0x7) | 8;
   MovHighByte(&PlayField16[si], bx);
@@ -363,9 +371,11 @@ static void subSnikSnakFromBelow(int si, int bx)
 {
   int ax, bl;
 
+#ifndef HEADLESS
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   subDrawSnikSnakFromBelow(si, bx);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
+#endif
   bx = bx - 0xF;  // get and increment sequence#
 
   bl = LowByte(bx);
@@ -424,9 +434,11 @@ static void subSnikSnakFromRight(int si, int bx)
 {
   int ax, bl;
 
+#ifndef HEADLESS
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   subDrawSnikSnakFromRight(si, bx);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
+#endif
   bx = bx - 0x17;  // get and increment sequence#
 
   bl = LowByte(bx);
@@ -484,9 +496,11 @@ static void subSnikSnakFromAbove(int si, int bx)
 {
   int ax, bl;
 
+#ifndef HEADLESS
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   subDrawSnikSnakFromAbove(si, bx);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
+#endif
   bx = bx - 0x1F;  // get and increment sequence#
 
   bl = LowByte(bx);
@@ -544,9 +558,11 @@ static void subSnikSnakFromLeft(int si, int bx)
 {
   int ax, bl;
 
+#ifndef HEADLESS
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   subDrawSnikSnakFromLeft(si, bx);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
+#endif
   bx = bx - 0x27;  // get and increment sequence#
 
   bl = LowByte(bx);
@@ -600,6 +616,7 @@ static void subSnikSnakFromLeft(int si, int bx)
   MovHighByte(&PlayField16[si], 7);
 }
 
+#ifndef HEADLESS
 static void subDrawSnikSnakTurnLeft(int si, int bx)
 {
   int pos = ((bx + 7) % 8) / 2;
@@ -673,3 +690,4 @@ static void subDrawSnikSnakFromLeft(int si, int bx)
   DDSpriteBuffer_BltImg(X + bx * TwoPixels, Y, aniSnikSnakRight, bx);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
 }
+#endif

@@ -15,6 +15,7 @@
 #include "mm_tools.h"
 
 
+#ifndef HEADLESS
 void SetDrawtoField_MM(int mode)
 {
   int full_xsize = lev_fieldx * TILESIZE_VAR;
@@ -639,6 +640,7 @@ Pixel ReadPixel(DrawBuffer *bitmap, int x, int y)
 {
   return GetPixel(bitmap, x, y);
 }
+#endif
 
 void SetRGB(unsigned int pixel,
 	    unsigned short red, unsigned short green, unsigned short blue)
@@ -741,6 +743,7 @@ int get_rotated_element(int element, int step)
   return base_element + (element_phase + step + num_elements) % num_elements;
 }
 
+#ifndef HEADLESS
 static int map_element(int element)
 {
   switch (element)
@@ -755,7 +758,9 @@ static int map_element(int element)
     default:			return element;
   }
 }
+#endif
 
+#ifndef HEADLESS
 int el2gfx(int element)
 {
   element = map_element(element);
@@ -770,6 +775,7 @@ int el2gfx(int element)
   }
 }
 
+
 void RedrawPlayfield_MM(void)
 {
   DrawLevel_MM();
@@ -781,3 +787,4 @@ void BlitScreenToBitmap_MM(Bitmap *target_bitmap)
   BlitBitmap(drawto_field, target_bitmap,
 	     REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE, REAL_SX, REAL_SY);
 }
+#endif

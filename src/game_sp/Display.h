@@ -5,6 +5,7 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
+
 #include "global.h"
 
 
@@ -16,9 +17,12 @@ extern boolean NoDisplayFlag;
 extern int DisplayMinX, DisplayMaxX;
 extern int DisplayMinY, DisplayMaxY;
 
+#ifndef HEADLESS
 void subDisplayLevel(void);
 void ScrollTo(int, int);
 void ScrollTowards(int, int);
 void SoftScrollTo(int, int, int, int);
+
+#endif
 
 #endif // DISPLAY_H

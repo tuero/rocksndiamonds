@@ -2,6 +2,8 @@
 // Display.c
 // ----------------------------------------------------------------------------
 
+#ifndef HEADLESS
+
 #include "Display.h"
 
 
@@ -66,3 +68,5 @@ void SoftScrollTo(int X, int Y, int TimeMS, int FPS)
 
   DDScrollBuffer_SoftScrollTo(X, Y, TimeMS, FPS);
 }
+
+#endif

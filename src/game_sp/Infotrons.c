@@ -115,8 +115,12 @@ loc_g_1242: // infotron comes falling from above
   X = GetStretchX(si);
   Y = GetStretchY(si - FieldWidth);
   dx = bl & 0x7;
+#ifndef HEADLESS
   DDSpriteBuffer_BltImg(X, Y, aniSpace, 0);
   DDSpriteBuffer_BltImg(X, Y + TwoPixels * (dx + 1), aniInfotron, dx);
+#else
+    (void)dx; (void)X; (void)Y;
+#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   bl = HighByte(PlayField16[si]) + 1;
@@ -165,7 +169,9 @@ loc_g_1242: // infotron comes falling from above
     goto loc_g_1386;
 
   // play the infotron sound, 'cause infotron hits something "hard"
+#ifndef HEADLESS
   subSoundFX(si, fiInfotron, actImpact);
+#endif
 
   if (! (ax == fiZonk || ax == fiInfotron || ax == fiRAM))
     return;
@@ -228,8 +234,12 @@ loc_g_138D: // infotron comes rolling from right to left
   X = GetStretchX(si + 1);
   Y = GetStretchY(si);
   dx = (bl & 0x7) + 1;
+#ifndef HEADLESS
   DDSpriteBuffer_BltImg(X, Y, aniSpace, 0);
   DDSpriteBuffer_BltImg(X - (TwoPixels * dx), Y, aniInfotronRollLeft, dx - 1);
+#else
+    (void)dx; (void)X; (void)Y;
+#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   bl = HighByte(PlayField16[si]) + 1; // get and increment sequence#
@@ -259,8 +269,12 @@ loc_g_13E9: // infotron comes rolling from left to right
   X = GetStretchX(si - 1);
   Y = GetStretchY(si);
   dx = (bl & 0x7) + 1;
+#ifndef HEADLESS
   DDSpriteBuffer_BltImg(X, Y, aniSpace, 0);
   DDSpriteBuffer_BltImg(X + (TwoPixels * dx), Y, aniInfotronRollRight, dx - 1);
+#else
+    (void)dx; (void)X; (void)Y;
+#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   bl = HighByte(PlayField16[si]) + 1;
@@ -310,8 +324,12 @@ loc_g_1472: // infotron rolls left
   X = GetStretchX(si);
   Y = GetStretchY(si);
   dx = (bl & 0xF) + 1;
+#ifndef HEADLESS
   DDSpriteBuffer_BltImg(X, Y, aniSpace, 0);
   DDSpriteBuffer_BltImg(X - (TwoPixels * dx), Y, aniInfotronRollLeft, dx - 1);
+#else
+    (void)dx; (void)X; (void)Y;
+#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   bl = HighByte(PlayField16[si]) + 1; // retrieve and increment sequence#
@@ -351,8 +369,12 @@ loc_g_14E0: // infotron rolls right
   X = GetStretchX(si);
   Y = GetStretchY(si);
   dx = (bl & 0x7) + 1;
+#ifndef HEADLESS
   DDSpriteBuffer_BltImg(X, Y, aniSpace, 0);
   DDSpriteBuffer_BltImg(X + (TwoPixels * dx), Y, aniInfotronRollRight, dx - 1);
+#else
+    (void)dx; (void)X; (void)Y;
+#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   bl = HighByte(PlayField16[si]) + 1;

@@ -36,7 +36,9 @@ int		cSX, cSY;
 int		cSX2, cSY2;
 int		cFX, cFY;
 
+#ifndef HEADLESS
 Pixel		pen_fg, pen_bg, pen_ray, pen_magicolor[2];
+#endif
 int		color_status;
 
 struct XY	Step[16] =

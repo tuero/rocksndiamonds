@@ -359,7 +359,7 @@ void MCTS::run(BaseOption **currentOption, BaseOption **nextOption,
 
         // Step 3: Simulation
         // The expansion step sets the simulator to the expanded node's state
-        numSimulations_ = 0;
+        numSimulations_ = 5;
         maxIterationsDepth_ = 5;
         for (int i = 0; i < numSimulations_; i++) {
             reference_state.restoreEngineState();

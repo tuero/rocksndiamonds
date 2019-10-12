@@ -19,11 +19,13 @@
 #define USEREVENT_ANIM_DELAY_ACTION	1
 #define USEREVENT_ANIM_EVENT_ACTION	2
 
-
+#ifndef HEADLESS
 int FilterMouseMotionEvents(void *, Event *);
 boolean NextValidEvent(Event *);
+#endif
 
 void EventLoop(void);
+#ifndef HEADLESS
 void HandleOtherEvents(Event *);
 void ClearAutoRepeatKeyEvents(void);
 void ClearEventQueue(void);
@@ -54,5 +56,6 @@ boolean DoKeysymAction(int);
 void HandleEvents(void);
 void HandleNoEvent(void);
 void HandleEventActions(void);
+#endif
 
 #endif

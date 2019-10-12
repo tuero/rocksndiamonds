@@ -217,8 +217,10 @@ void PrepareLevel(void)
 {
   copyInternalEngineVars_SP();
 
+#ifndef HEADLESS
   SetDisplayRegion();
   SetScrollEdges();
+#endif
 
   LevelLoaded = True;
 }

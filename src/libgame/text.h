@@ -72,6 +72,7 @@
 #define DEFAULT_NUM_CHARS_PER_FONT		(MIN_NUM_CHARS_PER_FONT + 6 +1)
 #define DEFAULT_NUM_CHARS_PER_LINE		16
 
+#ifndef HEADLESS
 
 // font structure definitions
 
@@ -109,5 +110,7 @@ int DrawTextBufferVA(int, int, char *, va_list, int, int, int, int, int, int,
 		     boolean, boolean, boolean);
 int DrawTextFile(int, int, char *, int, int, int, int, int, int,
 		 boolean, boolean, boolean);
+
+#endif
 
 #endif	// TEXT_H

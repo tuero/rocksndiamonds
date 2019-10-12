@@ -128,17 +128,21 @@ static void CallAnimation(int si, byte bl)
       subAnimateSnikSnaks(si);
       break;
 
+#ifndef HEADLESS
     case fiTerminal:
       subAnimateTerminals(si);
       break;
+#endif
 
     case fiElectron:
       subAnimateElectrons(si);
       break;
 
+#ifndef HEADLESS
     case fiBug:
       subAnimateBugs(si);
       break;
+#endif
 
     case fiExplosion:
       subAnimateExplosion(si);

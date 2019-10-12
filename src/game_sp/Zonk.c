@@ -133,8 +133,12 @@ loc_g_0DE8: // zonk comes falling from above
   X = GetStretchX(si);
   Y = GetStretchY(si - FieldWidth);
   dx = bl & 0x7;
+#ifndef HEADLESS
   DDSpriteBuffer_BltImg(X, Y, aniSpace, 0);
   DDSpriteBuffer_BltImg(X, Y + TwoPixels * (dx + 1), aniZonk, dx);
+#else
+    (void)dx; (void)X; (void)Y;
+#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   bl = HighByte(PlayField16[si]) + 1;
@@ -182,7 +186,9 @@ loc_g_0DE8: // zonk comes falling from above
     goto loc_g_0F75;
 
   // play the zonk sound, 'cause zonk hits something "hard"
+#ifndef HEADLESS
   subSoundFX(si, fiZonk, actImpact);
+#endif
 
   if (! (ax == fiZonk || ax == fiInfotron || ax == fiRAM))
     return;
@@ -266,8 +272,12 @@ loc_g_0F83: // zonk comes rolling from right to left
   X = GetStretchX(si + 1);
   Y = GetStretchY(si);
   dx = (bl & 0x7) + 1;
+#ifndef HEADLESS
   DDSpriteBuffer_BltImg(X, Y, aniSpace, 0);
   DDSpriteBuffer_BltImg(X - (TwoPixels * dx), Y, aniZonkRollLeft, dx - 1);
+#else
+    (void)dx; (void)X; (void)Y;
+#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   bl = HighByte(PlayField16[si]) + 1; // get and increment sequence#
@@ -299,8 +309,12 @@ loc_g_0FE8: // zonk comes rolling from left to right
   X = GetStretchX(si - 1);
   Y = GetStretchY(si);
   dx = (bl & 0x7) + 1;
+#ifndef HEADLESS
   DDSpriteBuffer_BltImg(X, Y, aniSpace, 0);
   DDSpriteBuffer_BltImg(X + (TwoPixels * dx), Y, aniZonkRollRight, dx - 1);
+#else
+    (void)dx; (void)X; (void)Y;
+#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   bl = HighByte(PlayField16[si]) + 1;
@@ -352,8 +366,12 @@ loc_g_107B: // zonk rolls left
   X = GetStretchX(si);
   Y = GetStretchY(si);
   dx = (bl & 0xF) + 1;
+#ifndef HEADLESS
   DDSpriteBuffer_BltImg(X, Y, aniSpace, 0);
   DDSpriteBuffer_BltImg(X - (TwoPixels * dx), Y, aniZonkRollLeft, dx - 1);
+#else
+    (void)dx; (void)X; (void)Y;
+#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   bl = HighByte(PlayField16[si]) + 1; // retrieve and increment sequence#
@@ -390,8 +408,12 @@ loc_g_10E9: // zonk rolls right
   X = GetStretchX(si);
   Y = GetStretchY(si);
   dx = (bl & 0x7) + 1;
+#ifndef HEADLESS
   DDSpriteBuffer_BltImg(X, Y, aniSpace, 0);
   DDSpriteBuffer_BltImg(X + (TwoPixels * dx), Y, aniZonkRollRight, dx - 1);
+#else
+    (void)dx; (void)X; (void)Y;
+#endif
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   bl = HighByte(PlayField16[si]) + 1;

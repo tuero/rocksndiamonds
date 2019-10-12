@@ -20,6 +20,7 @@
 #include "events.h"
 #include "config.h"
 
+#ifndef HEADLESS
 Bitmap		       *bitmap_db_field;
 Bitmap		       *bitmap_db_panel;
 Bitmap		       *bitmap_db_door_1;
@@ -28,13 +29,16 @@ Bitmap		       *bitmap_db_store_1;
 Bitmap		       *bitmap_db_store_2;
 DrawBuffer	       *fieldbuffer;
 DrawBuffer	       *drawto_field;
+#endif
 
 int			game_status = -1;
 boolean			game_status_last_screen = -1;
 boolean			level_editor_test_game = FALSE;
 boolean			network_playing = FALSE;
 boolean			network_server = FALSE;
+#ifndef HEADLESS
 SDL_Thread	       *server_thread;
+#endif
 
 int			key_joystick_mapping = 0;
 
@@ -67,16 +71,20 @@ short			ExplodeDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int			RunnerVisit[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int			PlayerVisit[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 
+#ifndef HEADLESS
 int			GfxFrame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int 			GfxRandom[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int 			GfxElement[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int			GfxAction[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int 			GfxDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int 			GfxRedraw[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+#endif
 
 int			ActiveElement[MAX_NUM_ELEMENTS];
+#ifndef HEADLESS
 int			ActiveButton[NUM_IMAGE_FILES];
 int			ActiveFont[NUM_FONTS];
+#endif
 
 int			lev_fieldx, lev_fieldy;
 int			scroll_x, scroll_y;
@@ -131,10 +139,13 @@ boolean			network_player_action_received = FALSE;
 struct LevelInfo	level, level_template;
 struct PlayerInfo	stored_player[MAX_PLAYERS], *local_player = NULL;
 struct HiScore		highscore[MAX_SCORE_ENTRIES];
+#ifndef HEADLESS
 struct TapeInfo		tape;
+#endif
 struct SetupInfo	setup;
 struct GameInfo		game;
 struct GlobalInfo	global;
+#ifndef HEADLESS
 struct BorderInfo	border;
 struct ViewportInfo	viewport;
 struct TitleFadingInfo	fading;
@@ -171,6 +182,7 @@ struct SoundInfo       *sound_info = NULL;
 struct MusicInfo       *music_info = NULL;
 struct MusicFileInfo   *music_file_info = NULL;
 struct HelpAnimInfo    *helpanim_info = NULL;
+#endif
 
 SetupFileHash          *helptext_info = NULL;
 SetupFileHash	       *image_config_hash = NULL;
@@ -7386,6 +7398,7 @@ struct ElementDirectionInfo element_direction_info[NUM_DIRECTIONS_FULL + 1] =
   { NULL,			0					}
 };
 
+#ifndef HEADLESS
 struct SpecialSuffixInfo special_suffix_info[NUM_SPECIAL_GFX_ARGS + 1 + 1] =
 {
   { ".[DEFAULT]",		GFX_SPECIAL_ARG_DEFAULT,		},
@@ -7431,8 +7444,11 @@ struct SpecialSuffixInfo special_suffix_info[NUM_SPECIAL_GFX_ARGS + 1 + 1] =
 
   { NULL,			0,					}
 };
+#endif
 
+#ifndef HEADLESS
 #include "conf_var.c"	// include auto-generated data structure definitions
+#endif
 
 
 // ----------------------------------------------------------------------------
@@ -7443,6 +7459,7 @@ struct SpecialSuffixInfo special_suffix_info[NUM_SPECIAL_GFX_ARGS + 1 + 1] =
 // must come first, because the dynamic configuration does prefix matching!
 // (These definitions must match the corresponding definitions in "main.h"!)
 
+#ifndef HEADLESS
 struct FontInfo font_info[NUM_FONTS + 1] =
 {
   { "font.initial_1"		},
@@ -7491,7 +7508,9 @@ struct FontInfo font_info[NUM_FONTS + 1] =
 
   { NULL			}
 };
+#endif
 
+#ifndef HEADLESS
 struct GlobalAnimInfo global_anim_info[NUM_GLOBAL_ANIM_TOKENS + 1];
 
 // this contains predefined structure elements to init "global_anim_info"
@@ -7572,18 +7591,21 @@ struct GlobalAnimEventInfo global_anim_event_info =
 {
   NULL, 0
 };
+#endif
 
 
 // ----------------------------------------------------------------------------
 // music token prefix definitions
 // ----------------------------------------------------------------------------
 
+#ifndef HEADLESS
 struct MusicPrefixInfo music_prefix_info[NUM_MUSIC_PREFIXES + 1] =
 {
   { "background",		TRUE	},
 
   { NULL,			0	}
 };
+#endif
 
 
 // ============================================================================
@@ -7648,6 +7670,7 @@ static void print_version(void)
 
   if (options.debug)
   {
+#ifndef HEADLESS
     SDL_version sdl_version;
 
     SDL_VERSION(&sdl_version);
@@ -7662,7 +7685,6 @@ static void print_version(void)
 	  sdl_version.minor,
 	  sdl_version.patch);
 
-#ifndef HEADLESS
     SDL_MIXER_VERSION(&sdl_version);
     Print("- SDL_mixer %d.%d.%d\n",
 	  sdl_version.major,
@@ -7756,17 +7778,21 @@ int main(int argc, char *argv[])
     // Find files/directories
   InitProgramConfig(argv[0]);
 
+#ifndef HEADLESS
   // This just sets functions
   InitWindowTitleFunction(getWindowTitleString);
   InitExitMessageFunction(DisplayExitMessage);
   InitExitFunction(CloseAllAndExit);
+#endif
 
     // Handles command line arguments
     // This was previously done after InitPlatformDependentStuff
     GetOptions(argc, argv, print_usage, print_version);
 
+#ifndef HEADLESS
   // inits SDL (this will need to be removed)
   InitPlatformDependentStuff();
+#endif
 
     // Set level set
     // Complicated to get working nicely, work-around is to set leveldir_current to specified levelset,

@@ -337,6 +337,7 @@ boolean getTokenValueFromString(char *string, char **token, char **value)
 // maximal allowed length of a command line option
 #define MAX_OPTION_LEN		256
 
+#ifndef HEADLESS
 static unsigned int getCurrentMS(void)
 {
   return SDL_GetTicks();
@@ -377,6 +378,7 @@ void Delay(unsigned int delay)	// Sleep specified number of milliseconds
 {
   sleep_milliseconds(delay);
 }
+#endif
 
 boolean DelayReachedExt(unsigned int *counter_var, unsigned int delay,
 			unsigned int actual_counter)
@@ -395,6 +397,7 @@ boolean FrameReached(unsigned int *frame_counter_var, unsigned int frame_delay)
   return DelayReachedExt(frame_counter_var, frame_delay, FrameCounter);
 }
 
+#ifndef HEADLESS
 boolean DelayReached(unsigned int *counter_var, unsigned int delay)
 {
   return DelayReachedExt(counter_var, delay, Counter());
@@ -425,9 +428,9 @@ int WaitUntilDelayReached(unsigned int *counter_var, unsigned int delay)
   {
     actual_counter = Counter();
 
-    if (actual_counter >= *counter_var &&
-	actual_counter < *counter_var + delay)
-      sleep_milliseconds((*counter_var + delay - actual_counter) / 2);
+    if (actual_counter >= *counter_var && actual_counter < *counter_var + delay) {
+        sleep_milliseconds((*counter_var + delay - actual_counter) / 2);
+    }
     else
       break;
   }
@@ -482,7 +485,7 @@ void SkipUntilDelayReached(unsigned int *counter_var, unsigned int delay,
       *loop_var = last_loop_value;
   }
 }
-
+#endif
 
 // ----------------------------------------------------------------------------
 // random generator functions
@@ -490,6 +493,7 @@ void SkipUntilDelayReached(unsigned int *counter_var, unsigned int delay,
 
 unsigned int init_random_number(int nr, int seed)
 {
+#ifndef HEADLESS
   if (seed == NEW_RANDOMIZE)
   {
     // default random seed
@@ -510,6 +514,7 @@ unsigned int init_random_number(int nr, int seed)
     // add some more randomness
     seed += GetSimpleRandom(1000000);
   }
+#endif
 
   srandom_linux_libc(nr, (unsigned int) seed);
 
@@ -1679,6 +1684,7 @@ void WriteUnusedBytesToFile(FILE *file, unsigned int bytes)
 #define TRANSLATE_KEYNAME_TO_KEYSYM	2
 #define TRANSLATE_X11KEYNAME_TO_KEYSYM	3
 
+#ifndef HEADLESS
 static void translate_keyname(Key *keysym, char **x11name, char **name, int mode)
 {
   static struct
@@ -2090,7 +2096,9 @@ char getCharFromKey(Key key)
 
   return c;
 }
+#endif
 
+#ifndef HEADLESS
 char getValidConfigValueChar(char c)
 {
   if (c == '#' ||	// used to mark comments
@@ -2099,6 +2107,7 @@ char getValidConfigValueChar(char c)
 
   return c;
 }
+#endif
 
 
 // ----------------------------------------------------------------------------
@@ -3512,8 +3521,10 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
   char *filename_base = UNDEFINED_FILENAME, *filename_local;
   int i, j;
 
+#ifndef HEADLESS
   DrawInitText("Loading artwork config", 120, FC_GREEN);
   DrawInitText(ARTWORKINFO_FILENAME(artwork_info->type), 150, FC_YELLOW);
+#endif
 
   // always start with reliable default values
   for (i = 0; i < num_file_list_entries; i++)
@@ -3553,6 +3564,7 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
     artwork_info->num_property_mapping_entries = 0;
   }
 
+#ifndef HEADLESS
   if (!GFX_OVERRIDE_ARTWORK(artwork_info->type))
   {
     // first look for special artwork configured in level series config
@@ -3561,6 +3573,7 @@ void LoadArtworkConfig(struct ArtworkListInfo *artwork_info)
     if (fileExists(filename_base))
       LoadArtworkConfigFromFilename(artwork_info, filename_base);
   }
+#endif
 
   filename_local = getCustomArtworkConfigFilename(artwork_info->type);
 
@@ -3587,12 +3600,14 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
 				    struct ListNodeInfo **listnode,
 				    struct FileInfo *file_list_entry)
 {
+#ifndef HEADLESS
   char *init_text[] =
   {
     "Loading graphics",
     "Loading sounds",
     "Loading music"
   };
+#endif
 
   ListNode *node;
   char *basename = file_list_entry->filename;
@@ -3666,8 +3681,10 @@ static void replaceArtworkListEntry(struct ArtworkListInfo *artwork_info,
       return;
   }
 
+#ifndef HEADLESS
   DrawInitText(init_text[artwork_info->type], 120, FC_GREEN);
   DrawInitText(basename, 150, FC_YELLOW);
+#endif
 
   if ((*listnode = artwork_info->load_artwork(filename)) != NULL)
   {

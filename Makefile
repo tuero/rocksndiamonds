@@ -51,13 +51,6 @@ CROSS_PATH_WIN32 = /usr/local/cross-tools/i386-mingw32msvc
 
 
 # -----------------------------------------------------------------------------
-# CPP configurations
-# -----------------------------------------------------------------------------
-CPPFLAGS := -Wall -Wextra -g -O3 -std=c++14 $(SYS_CFLAGS)  $(EXTRA_CFLAGS) $(CONFIG)
-CPPFLAGS += -I${CURDIR}/ai/includes
-
-
-# -----------------------------------------------------------------------------
 # there should be no need to change anything below
 # -----------------------------------------------------------------------------
 

@@ -12,6 +12,8 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
+#ifndef HEADLESS
+
 #include "system.h"
 
 
@@ -73,5 +75,7 @@ void FreeAllImageTextures(void);
 void ScaleImage(int, int);
 
 void FreeAllImages(void);
+
+#endif
 
 #endif	// IMAGE_H

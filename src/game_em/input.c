@@ -64,7 +64,9 @@ void InitGameEngine_EM(void)
 
   game_initscreen();
 
+#ifndef HEADLESS
   RedrawPlayfield_EM(FALSE);
+#endif
 }
 
 static void UpdateGameDoorValues_EM(void)
@@ -94,7 +96,9 @@ void GameActions_EM(byte action[MAX_PLAYERS], boolean warp_mode)
   if (frame == 6)
   {
     synchro_3();
+#ifndef HEADLESS
     sound_play();
+#endif
 
     UpdateGameDoorValues_EM();
   }
@@ -106,10 +110,16 @@ void GameActions_EM(byte action[MAX_PLAYERS], boolean warp_mode)
 	ply[i].dynamite_cnt < 5)
       any_player_dropping = TRUE;
 
+#ifndef HEADLESS
   CheckSingleStepMode_EM(action, frame, game_em.any_player_moving,
 			 game_em.any_player_snapping, any_player_dropping);
+#else
+    (void)any_player_dropping;
+#endif
 
+#ifndef HEADLESS
   RedrawPlayfield_EM(FALSE);
+#endif
 }
 
 /* read input device for players */

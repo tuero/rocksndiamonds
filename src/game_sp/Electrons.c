@@ -51,6 +51,7 @@ void subAnimateElectrons(int si)
   }
 }
 
+#ifndef HEADLESS
 void subDrawAnimatedElectrons(int si)
 {
   int bx, Tmp;
@@ -89,6 +90,7 @@ void subDrawAnimatedElectrons(int si)
       break;
   }
 }
+#endif
 
 void subElectronTurnLeft(int si, int bx)
 {
@@ -103,9 +105,11 @@ void subElectronTurnLeft(int si, int bx)
     return;
   } // loc_g_7A9F:
 
+#ifndef HEADLESS
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   subDrawElectronTurnLeft(si, bx);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
+#endif
 
   bx = (bx + 1) & 0x7;
   MovHighByte(&PlayField16[si], bx);
@@ -208,9 +212,11 @@ void subElectronTurnRight(int si, int bx)
     return;
   } // loc_g_7B73:
 
+#ifndef HEADLESS
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   subDrawElectronTurnRight(si, bx);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
+#endif
 
   bx = ((bx + 1) & 0x7) | 8;
   MovHighByte(&PlayField16[si], bx);
@@ -304,9 +310,11 @@ void subElectronFromBelow(int si, int bx)
 {
   int ax, bl;
 
+#ifndef HEADLESS
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   subDrawElectronFromBelow(si, bx);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
+#endif
   bx = bx - 0xF;  // get and increment sequence#
 
   bl = LowByte(bx);
@@ -365,9 +373,11 @@ void subElectronFromRight(int si, int bx)
 {
   int ax, bl;
 
+#ifndef HEADLESS
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   subDrawElectronFromRight(si, bx);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
+#endif
   bx = bx - 0x17;  // get and increment sequence#
 
   bl = LowByte(bx);
@@ -425,9 +435,11 @@ void subElectronFromAbove(int si, int bx)
 {
   int ax, bl;
 
+#ifndef HEADLESS
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   subDrawElectronFromAbove(si, bx);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
+#endif
   bx = bx - 0x1F;  // get and increment sequence#
 
   bl = LowByte(bx);
@@ -485,9 +497,11 @@ void subElectronFromLeft(int si, int bx)
 {
   int ax, bl;
 
+#ifndef HEADLESS
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
   subDrawElectronFromLeft(si, bx);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
+#endif
   bx = bx - 0x27;  // get and increment sequence#
 
   bl = LowByte(bx);
@@ -541,6 +555,7 @@ void subElectronFromLeft(int si, int bx)
   MovHighByte(&PlayField16[si], 7);
 }
 
+#ifndef HEADLESS
 void subDrawElectronTurnLeft(int si, int bx)
 {
   int X, Y;
@@ -618,3 +633,4 @@ void subDrawElectronFromLeft(int si, int bx)
   DDSpriteBuffer_BltImg(X + bx * TwoPixels, Y, aniElectron, bx);
   // +++++++++++++++++++++++++++++++++++++++++++++++++++++
 }
+#endif

@@ -225,12 +225,14 @@ void WriteUnusedBytesToFile(FILE *, unsigned int);
 #define putFileChunkBE(f,s,x) putFileChunk(f,s,x,BYTE_ORDER_BIG_ENDIAN)
 #define putFileChunkLE(f,s,x) putFileChunk(f,s,x,BYTE_ORDER_LITTLE_ENDIAN)
 
+#ifndef HEADLESS
 char *getKeyNameFromKey(Key);
 char *getX11KeyNameFromKey(Key);
 Key getKeyFromKeyName(char *);
 Key getKeyFromX11KeyName(char *);
 char getCharFromKey(Key);
 char getValidConfigValueChar(char);
+#endif
 
 int get_integer_from_string(char *);
 boolean get_boolean_from_string(char *);

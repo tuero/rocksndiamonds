@@ -12,6 +12,8 @@
 #ifndef EDITOR_H
 #define EDITOR_H
 
+#ifndef HEADLESS
+
 #include "main.h"
 
 void CreateLevelEditorGadgets(void);
@@ -30,5 +32,7 @@ void DumpBrush_Small(void);
 void CopyClipboardToBrush(void);
 void CopyBrushToClipboard(void);
 void CopyBrushToClipboard_Small(void);
+
+#endif
 
 #endif

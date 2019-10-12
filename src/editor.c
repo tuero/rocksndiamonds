@@ -9,6 +9,8 @@
 // editor.c
 // ============================================================================
 
+#ifndef HEADLESS
+
 #include <math.h>
 
 #include "libgame/libgame.h"
@@ -14522,3 +14524,5 @@ void RequestExitLevelEditor(boolean ask_if_level_has_changed,
     }
   }
 }
+
+#endif

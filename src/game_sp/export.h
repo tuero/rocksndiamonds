@@ -132,6 +132,7 @@ struct LevelInfo_SP
   struct GameInfo_SP *game_sp;
 };
 
+#ifndef HEADLESS
 struct GraphicInfo_SP
 {
   Bitmap *bitmap;
@@ -149,6 +150,7 @@ struct GraphicInfo_SP
 
   int unique_identifier;	// used to identify needed screen updates
 };
+#endif
 
 struct EngineSnapshotInfo_SP
 {
@@ -171,15 +173,19 @@ struct EngineSnapshotInfo_SP
 extern struct GlobalInfo_SP global_sp_info;
 extern struct GameInfo_SP game_sp;
 extern struct LevelInfo_SP native_sp_level;
+#ifndef HEADLESS
 extern struct GraphicInfo_SP graphic_info_sp_object[TILE_MAX][8];
 extern struct GraphicInfo_SP graphic_info_sp_player[MAX_PLAYERS][SPR_MAX][8];
+#endif
 extern struct EngineSnapshotInfo_SP engine_snapshot_sp;
 
 void sp_open_all(void);
 void sp_close_all(void);
 
 void InitPrecedingPlayfieldMemory(void);
+#ifndef HEADLESS
 void InitGfxBuffers_SP(void);
+#endif
 
 void InitGameEngine_SP(void);
 void GameActions_SP(byte *, boolean);
@@ -194,8 +200,10 @@ void SaveNativeLevel_SP(char *);
 int getFieldbufferOffsetX_SP(void);
 int getFieldbufferOffsetY_SP(void);
 
+#ifndef HEADLESS
 void BlitScreenToBitmap_SP(Bitmap *);
 void RedrawPlayfield_SP(boolean);
+#endif
 
 void LoadEngineSnapshotValues_SP(void);
 void SaveEngineSnapshotValues_SP(ListNode **);
