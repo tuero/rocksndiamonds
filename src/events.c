@@ -342,8 +342,6 @@ static void HandleMouseCursor(void)
 
 void EventLoop(void)
 {
-    step_counter = 0;
-//    clock_t t = clock();
     int prev_game_status = GAME_MODE_MAIN;
 
   while (1)
@@ -353,7 +351,6 @@ void EventLoop(void)
           options.controller_type != CONTROLLER_TYPE_DEFAULT)
       {
           handleLevelStart();
-          step_counter = 0;
       }
       prev_game_status = game_status;
 
@@ -382,12 +379,16 @@ void EventLoop(void)
             handleCustomLevelProgramming();
             stored_player[0].action = getAction();
         }
-//        stored_player[0].action = 0;
-//        if (step_counter < 48) {stored_player[0].action = 2; step_counter += 1;}
-//        printf("%d\n", stored_player[0].action);
 
         HandleGameActions();
     }
+
+    // If level is complete during headless, we set end status and log output
+#ifdef HEADLESS
+    if ((game.LevelSolved && !game.LevelSolved_GameEnd) || checkGameFailed()) {
+        game_status = GAME_MODE_QUIT;
+    }
+#endif
 
     // always copy backbuffer to visible screen for every video frame
 #ifndef HEADLESS
@@ -400,7 +401,6 @@ void EventLoop(void)
     if (game_status == GAME_MODE_QUIT)
       return;
 
-    step_counter += 1;
   }
 }
 

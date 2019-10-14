@@ -12100,6 +12100,7 @@ static void GameActionsExt(void)
   }
 #endif
 
+//    printf("%d\n", recorded_player_action[0]);
   if (recorded_player_action != NULL)
     for (i = 0; i < MAX_PLAYERS; i++)
       stored_player[i].effective_action = recorded_player_action[i];
