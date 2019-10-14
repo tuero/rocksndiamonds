@@ -30,7 +30,7 @@
 #include "conf_snd.h"	// include auto-generated data structure definitions
 #include "conf_mus.h"	// include auto-generated data structure definitions
 
-#include "custom/custom.h"
+#include "ai/ai_entry.h"
 
 
 #define IMG_UNDEFINED			(-1)
@@ -2640,6 +2640,7 @@ enum
 #define AUTOPLAY_MODE_WARP_NO_DISPLAY	AUTOPLAY_MODE_TEST
 
 
+#ifndef HEADLESS
 struct BorderInfo
 {
   boolean draw_masked[NUM_SPECIAL_GFX_ARGS];
@@ -2980,6 +2981,7 @@ struct ViewportInfo
   struct RectWithBorder door_1[NUM_SPECIAL_GFX_ARGS];
   struct RectWithBorder door_2[NUM_SPECIAL_GFX_ARGS];
 };
+#endif
 
 struct HiScore
 {
@@ -3308,10 +3310,12 @@ struct ElementInfo
   int direction_crumbled[NUM_ACTIONS][NUM_DIRECTIONS_FULL];
 				// crumbled graphics for left/right/up/down
 
+#ifndef HEADLESS
   int special_graphic[NUM_SPECIAL_GFX_ARGS];
 				// special graphics for certain screens
 
   int sound[NUM_ACTIONS];	// default sounds for several actions
+#endif
 
   // ---------- special element property values ----------
 
@@ -3392,6 +3396,7 @@ struct ElementInfo
   boolean modified_settings;	// set for all modified custom elements
 };
 
+#ifndef HEADLESS
 struct FontInfo
 {
   char *token_name;		// font token used in config files
@@ -3554,6 +3559,7 @@ struct MusicFileInfo
 
   struct MusicFileInfo *next;
 };
+#endif
 
 struct ElementActionInfo
 {
@@ -3584,6 +3590,7 @@ struct HelpAnimInfo
 };
 
 
+#ifndef HEADLESS
 extern Bitmap		       *bitmap_db_field;
 extern Bitmap		       *bitmap_db_panel;
 extern Bitmap		       *bitmap_db_door_1;
@@ -3592,15 +3599,18 @@ extern Bitmap		       *bitmap_db_store_1;
 extern Bitmap		       *bitmap_db_store_2;
 extern DrawBuffer	       *fieldbuffer;
 extern DrawBuffer	       *drawto_field;
+#endif
 
 extern int			game_status;
 extern boolean			game_status_last_screen;
 extern boolean			level_editor_test_game;
 extern boolean			network_playing;
+#ifndef HEADLESS
 extern boolean			network_server;
 extern SDL_Thread	       *server_thread;
 
 extern int			key_joystick_mapping;
+#endif
 
 extern short			Feld[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern short			Last[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
@@ -3631,16 +3641,20 @@ extern short			ExplodeDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int			RunnerVisit[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int			PlayerVisit[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 
+#ifndef HEADLESS
 extern int			GfxFrame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int			GfxRandom[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int 			GfxElement[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int			GfxAction[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int 			GfxDir[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int 			GfxRedraw[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+#endif
 
 extern int			ActiveElement[MAX_NUM_ELEMENTS];
+#ifndef HEADLESS
 extern int			ActiveButton[NUM_IMAGE_FILES];
 extern int			ActiveFont[NUM_FONTS];
+#endif
 
 extern int			lev_fieldx, lev_fieldy;
 extern int			scroll_x, scroll_y;
@@ -3687,6 +3701,7 @@ extern struct TapeInfo		tape;
 extern struct GlobalInfo	global;
 extern struct BorderInfo	border;
 extern struct ViewportInfo	viewport;
+#ifndef HEADLESS
 extern struct TitleFadingInfo	fading;
 extern struct TitleFadingInfo	fading_none;
 extern struct TitleFadingInfo	title_initial_first_default;
@@ -3710,6 +3725,7 @@ extern struct TitleMessageInfo	titlemessage_first[];
 extern struct TitleMessageInfo	titlemessage_default;
 extern struct TitleMessageInfo	titlemessage[];
 extern struct TitleMessageInfo	readme;
+#endif
 extern struct InitInfo		init, init_last;
 extern struct MenuInfo		menu;
 extern struct DoorInfo		door_1, door_2;
@@ -3722,6 +3738,7 @@ extern struct ElementActionInfo	element_action_info[];
 extern struct ElementDirectionInfo element_direction_info[];
 extern struct SpecialSuffixInfo special_suffix_info[];
 extern struct TokenIntPtrInfo	image_config_vars[];
+#ifndef HEADLESS
 extern struct FontInfo		font_info[];
 extern struct GlobalAnimInfo	global_anim_info[];
 extern struct GlobalAnimNameInfo global_anim_name_info[];
@@ -3734,10 +3751,14 @@ extern struct MusicFileInfo    *music_file_info;
 extern struct HelpAnimInfo     *helpanim_info;
 extern SetupFileHash           *helptext_info;
 extern SetupFileHash	       *image_config_hash;
+#endif
 extern SetupFileHash	       *element_token_hash;
+#ifndef HEADLESS
 extern SetupFileHash	       *graphic_token_hash;
 extern SetupFileHash	       *font_token_hash;
+#endif
 extern SetupFileHash	       *hide_setup_hash;
+#ifndef HEADLESS
 extern struct ConfigTypeInfo	image_config_suffix[];
 extern struct ConfigTypeInfo	sound_config_suffix[];
 extern struct ConfigTypeInfo	music_config_suffix[];
@@ -3746,6 +3767,7 @@ extern struct ConfigInfo	sound_config[];
 extern struct ConfigInfo	music_config[];
 extern struct ConfigInfo	helpanim_config[];
 extern struct ConfigInfo	helptext_config[];
+#endif
 
 extern boolean is_simulating;
 extern int step_counter;

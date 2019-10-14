@@ -12,6 +12,8 @@
 #ifndef NETSERV_H
 #define NETSERV_H
 
+#ifndef HEADLESS
+
 #include "main.h"
 
 #define DEFAULT_SERVER_PORT	19504
@@ -82,4 +84,6 @@ void dumpNetworkBuffer(struct NetworkBuffer *);
 int NetworkServerThread(void *);
 void NetworkServer(int, int);
 
+
+#endif      // HEADLESS
 #endif

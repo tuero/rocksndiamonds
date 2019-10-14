@@ -1,6 +1,7 @@
 // ----------------------------------------------------------------------------
 // DDSpriteBuffer.c
 // ----------------------------------------------------------------------------
+#ifndef HEADLESS
 
 #include "DDSpriteBuffer.h"
 
@@ -44,3 +45,5 @@ void DDSpriteBuffer_BltImg(int pX, int pY, int graphic, int sync_frame)
 
   Blt(pX, pY, g.bitmap, g.src_x, g.src_y);
 }
+
+#endif

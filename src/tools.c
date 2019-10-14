@@ -23,6 +23,8 @@
 #include "screens.h"
 
 
+#define MAYBE_UNUSED __attribute__((used))
+
 // select level set with EMC X11 graphics before activating EM GFX debugging
 #define DEBUG_EM_GFX		FALSE
 #define DEBUG_FRAME_TIME	FALSE
@@ -47,6 +49,7 @@
 #define DOOR_PART_IS_PANEL(i)	((i) >= NUM_DOORS * MAX_PARTS_PER_DOOR)
 
 
+#ifndef HEADLESS
 struct DoorPartOrderInfo
 {
   int nr;
@@ -163,17 +166,23 @@ static struct DoorPartControlInfo door_part_controls[] =
     NULL
   }
 };
+#endif
 
 
 // forward declaration for internal use
+#ifndef HEADLESS
 static void UnmapToolButtons(void);
 static void HandleToolButtons(struct GadgetInfo *);
 static int el_act_dir2crm(int, int, int);
 static int el_act2crm(int, int);
+#endif
 
+#ifndef HEADLESS
 static struct GadgetInfo *tool_gadget[NUM_TOOL_BUTTONS];
 static int request_gadget_id = -1;
+#endif
 
+#ifndef HEADLESS
 static char *print_if_not_empty(int element)
 {
   static char *s = NULL;
@@ -191,6 +200,7 @@ static char *print_if_not_empty(int element)
 
   return s;
 }
+#endif
 
 int correctLevelPosX_EM(int lx)
 {
@@ -208,6 +218,7 @@ int correctLevelPosY_EM(int ly)
   return ly;
 }
 
+#ifndef HEADLESS
 int getFieldbufferOffsetX_RND(int dir, int pos)
 {
   int full_lev_fieldx = lev_fieldx + (BorderElement != EL_EMPTY ? 2 : 0);
@@ -240,7 +251,9 @@ int getFieldbufferOffsetX_RND(int dir, int pos)
 
   return fx;
 }
+#endif
 
+#ifndef HEADLESS
 int getFieldbufferOffsetY_RND(int dir, int pos)
 {
   int full_lev_fieldy = lev_fieldy + (BorderElement != EL_EMPTY ? 2 : 0);
@@ -273,7 +286,9 @@ int getFieldbufferOffsetY_RND(int dir, int pos)
 
   return fy;
 }
+#endif
 
+#ifndef HEADLESS
 static int getLevelFromScreenX_RND(int sx)
 {
   int fx = getFieldbufferOffsetX_RND(ScreenMovDir, ScreenGfxPos);
@@ -283,7 +298,9 @@ static int getLevelFromScreenX_RND(int sx)
 
   return lx;
 }
+#endif
 
+#ifndef HEADLESS
 static int getLevelFromScreenY_RND(int sy)
 {
   int fy = getFieldbufferOffsetY_RND(ScreenMovDir, ScreenGfxPos);
@@ -293,7 +310,9 @@ static int getLevelFromScreenY_RND(int sy)
 
   return ly;
 }
+#endif
 
+#ifndef HEADLESS
 static int getLevelFromScreenX_EM(int sx)
 {
   int level_xsize = level.native_em_level->lev->width;
@@ -310,7 +329,9 @@ static int getLevelFromScreenX_EM(int sx)
 
   return lx;
 }
+#endif
 
+#ifndef HEADLESS
 static int getLevelFromScreenY_EM(int sy)
 {
   int level_ysize = level.native_em_level->lev->height;
@@ -327,7 +348,9 @@ static int getLevelFromScreenY_EM(int sy)
 
   return ly;
 }
+#endif
 
+#ifndef HEADLESS
 static int getLevelFromScreenX_SP(int sx)
 {
   int menBorder = setup.sp_show_border_elements;
@@ -343,7 +366,9 @@ static int getLevelFromScreenX_SP(int sx)
 
   return lx;
 }
+#endif
 
+#ifndef HEADLESS
 static int getLevelFromScreenY_SP(int sy)
 {
   int menBorder = setup.sp_show_border_elements;
@@ -359,7 +384,9 @@ static int getLevelFromScreenY_SP(int sy)
 
   return ly;
 }
+#endif
 
+#ifndef HEADLESS
 static int getLevelFromScreenX_MM(int sx)
 {
   int level_xsize = level.native_mm_level->fieldx;
@@ -372,7 +399,9 @@ static int getLevelFromScreenX_MM(int sx)
 
   return lx;
 }
+#endif
 
+#ifndef HEADLESS
 static int getLevelFromScreenY_MM(int sy)
 {
   int level_ysize = level.native_mm_level->fieldy;
@@ -385,7 +414,9 @@ static int getLevelFromScreenY_MM(int sy)
 
   return ly;
 }
+#endif
 
+#ifndef HEADLESS
 int getLevelFromScreenX(int x)
 {
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
@@ -397,7 +428,9 @@ int getLevelFromScreenX(int x)
   else
     return getLevelFromScreenX_RND(x);
 }
+#endif
 
+#ifndef HEADLESS
 int getLevelFromScreenY(int y)
 {
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
@@ -409,7 +442,9 @@ int getLevelFromScreenY(int y)
   else
     return getLevelFromScreenY_RND(y);
 }
+#endif
 
+#ifndef HEADLESS
 void DumpTile(int x, int y)
 {
   int sx = SCREENX(x);
@@ -446,7 +481,9 @@ void DumpTile(int x, int y)
   printf("  Player x/y:  %d, %d\n", local_player->jx, local_player->jy);
   printf("\n");
 }
+#endif
 
+#ifndef HEADLESS
 void DumpTileFromScreen(int sx, int sy)
 {
   int lx = getLevelFromScreenX(sx);
@@ -454,7 +491,9 @@ void DumpTileFromScreen(int sx, int sy)
 
   DumpTile(lx, ly);
 }
+#endif
 
+#ifndef HEADLESS
 void SetDrawtoField(int mode)
 {
   if (mode == DRAW_TO_FIELDBUFFER)
@@ -480,7 +519,9 @@ void SetDrawtoField(int mode)
     drawto_field = backbuffer;
   }
 }
+#endif
 
+#ifndef HEADLESS
 static void RedrawPlayfield_RND(void)
 {
   if (game.envelope_active)
@@ -489,7 +530,9 @@ static void RedrawPlayfield_RND(void)
   DrawLevel(REDRAW_ALL);
   DrawAllPlayers();
 }
+#endif
 
+#ifndef HEADLESS
 void RedrawPlayfield(void)
 {
   if (game_status != GAME_MODE_PLAYING)
@@ -509,7 +552,9 @@ void RedrawPlayfield(void)
   BlitBitmap(drawto, window, gfx.sx, gfx.sy, gfx.sxsize, gfx.sysize,
 	     gfx.sx, gfx.sy);
 }
+#endif
 
+#ifndef HEADLESS
 static void DrawMaskedBorderExt_Rect(int x, int y, int width, int height,
 				     int draw_target)
 {
@@ -524,7 +569,9 @@ static void DrawMaskedBorderExt_Rect(int x, int y, int width, int height,
   else
     BlitBitmapMasked(src_bitmap, dst_bitmap, x, y, width, height, x, y);
 }
+#endif
 
+#ifndef HEADLESS
 static void DrawMaskedBorderExt_FIELD(int draw_target)
 {
   if (global.border_status >= GAME_MODE_MAIN &&
@@ -533,7 +580,9 @@ static void DrawMaskedBorderExt_FIELD(int draw_target)
     DrawMaskedBorderExt_Rect(REAL_SX, REAL_SY, FULL_SXSIZE, FULL_SYSIZE,
 			     draw_target);
 }
+#endif
 
+#ifndef HEADLESS
 static void DrawMaskedBorderExt_DOOR_1(int draw_target)
 {
   // when drawing to backbuffer, never draw border over open doors
@@ -546,7 +595,9 @@ static void DrawMaskedBorderExt_DOOR_1(int draw_target)
        border.draw_masked[GFX_SPECIAL_ARG_EDITOR]))
     DrawMaskedBorderExt_Rect(DX, DY, DXSIZE, DYSIZE, draw_target);
 }
+#endif
 
+#ifndef HEADLESS
 static void DrawMaskedBorderExt_DOOR_2(int draw_target)
 {
   // when drawing to backbuffer, never draw border over open doors
@@ -558,12 +609,16 @@ static void DrawMaskedBorderExt_DOOR_2(int draw_target)
       global.border_status != GAME_MODE_EDITOR)
     DrawMaskedBorderExt_Rect(VX, VY, VXSIZE, VYSIZE, draw_target);
 }
+#endif
 
+#ifndef HEADLESS
 static void DrawMaskedBorderExt_DOOR_3(int draw_target)
 {
   // currently not available
 }
+#endif
 
+#ifndef HEADLESS
 static void DrawMaskedBorderExt_ALL(int draw_target)
 {
   DrawMaskedBorderExt_FIELD(draw_target);
@@ -571,7 +626,9 @@ static void DrawMaskedBorderExt_ALL(int draw_target)
   DrawMaskedBorderExt_DOOR_2(draw_target);
   DrawMaskedBorderExt_DOOR_3(draw_target);
 }
+#endif
 
+#ifndef HEADLESS
 static void DrawMaskedBorderExt(int redraw_mask, int draw_target)
 {
   // never draw masked screen borders on borderless screens
@@ -593,17 +650,23 @@ static void DrawMaskedBorderExt(int redraw_mask, int draw_target)
       DrawMaskedBorderExt_DOOR_3(draw_target);
   }
 }
+#endif
 
+#ifndef HEADLESS
 void DrawMaskedBorder_FIELD(void)
 {
   DrawMaskedBorderExt_FIELD(DRAW_TO_BACKBUFFER);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawMaskedBorder(int redraw_mask)
 {
   DrawMaskedBorderExt(redraw_mask, DRAW_TO_BACKBUFFER);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawMaskedBorderToTarget(int draw_target)
 {
   if (draw_target == DRAW_TO_BACKBUFFER ||
@@ -632,7 +695,9 @@ void DrawMaskedBorderToTarget(int draw_target)
     gfx.masked_border_bitmap_ptr = backbuffer;
   }
 }
+#endif
 
+#ifndef HEADLESS
 void DrawTileCursor(int draw_target)
 {
   Bitmap *fade_bitmap;
@@ -690,12 +755,16 @@ void DrawTileCursor(int draw_target)
     BlitBitmapMasked(src_bitmap, fade_bitmap, src_x, src_y, width, height,
 		     dst_x, dst_y);
 }
+#endif
 
+#ifndef HEADLESS
 void BlitScreenToBitmapExt_RND(Bitmap *target_bitmap, int fx, int fy)
 {
   BlitBitmap(drawto_field, target_bitmap, fx, fy, SXSIZE, SYSIZE, SX, SY);
 }
+#endif
 
+#ifndef HEADLESS
 void BlitScreenToBitmap_RND(Bitmap *target_bitmap)
 {
   int fx = getFieldbufferOffsetX_RND(ScreenMovDir, ScreenGfxPos);
@@ -703,7 +772,9 @@ void BlitScreenToBitmap_RND(Bitmap *target_bitmap)
 
   BlitScreenToBitmapExt_RND(target_bitmap, fx, fy);
 }
+#endif
 
+#ifndef HEADLESS
 void BlitScreenToBitmap(Bitmap *target_bitmap)
 {
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
@@ -717,7 +788,9 @@ void BlitScreenToBitmap(Bitmap *target_bitmap)
 
   redraw_mask |= REDRAW_FIELD;
 }
+#endif
 
+#ifndef HEADLESS
 static void DrawFramesPerSecond(void)
 {
   char text[100];
@@ -742,6 +815,7 @@ static void DrawFramesPerSecond(void)
   // force full-screen redraw in this frame
   redraw_mask = REDRAW_ALL;
 }
+#endif
 
 #if DEBUG_FRAME_TIME
 static void PrintFrameTimeDebugging(void)
@@ -781,6 +855,7 @@ static void PrintFrameTimeDebugging(void)
 }
 #endif
 
+#ifndef HEADLESS
 static int unifiedRedrawMask(int mask)
 {
   if (mask & REDRAW_ALL)
@@ -791,12 +866,16 @@ static int unifiedRedrawMask(int mask)
 
   return mask;
 }
+#endif
 
+#ifndef HEADLESS
 static boolean equalRedrawMasks(int mask_1, int mask_2)
 {
   return unifiedRedrawMask(mask_1) == unifiedRedrawMask(mask_2);
 }
+#endif
 
+#ifndef HEADLESS
 void BackToFront(void)
 {
     if (is_simulating == FALSE) {
@@ -883,7 +962,9 @@ void BackToFront(void)
 #endif
     }
 }
+#endif
 
+#ifndef HEADLESS
 void BackToFront_WithFrameDelay(unsigned int frame_delay_value)
 {
   unsigned int frame_delay_value_old = GetVideoFrameDelay();
@@ -894,9 +975,13 @@ void BackToFront_WithFrameDelay(unsigned int frame_delay_value)
 
   SetVideoFrameDelay(is_simulating ? 0 : frame_delay_value_old);
 }
+#endif
 
+#ifndef HEADLESS
 static int fade_type_skip = FADE_TYPE_NONE;
+#endif
 
+#ifndef HEADLESS
 static void FadeExt(int fade_mask, int fade_mode, int fade_type)
 {
   void (*draw_border_function)(void) = NULL;
@@ -985,7 +1070,9 @@ static void FadeExt(int fade_mask, int fade_mode, int fade_type)
 
   ClearAutoRepeatKeyEvents();
 }
+#endif
 
+#ifndef HEADLESS
 static void SetScreenStates_BeforeFadingIn(void)
 {
   // temporarily set screen mode for animations to screen after fading in
@@ -998,7 +1085,9 @@ static void SetScreenStates_BeforeFadingIn(void)
   // set screen mode for animations back to fading
   global.anim_status = GAME_MODE_PSEUDO_FADING;
 }
+#endif
 
+#ifndef HEADLESS
 static void SetScreenStates_AfterFadingIn(void)
 {
   // store new source screen (to use correct masked border for fading)
@@ -1006,7 +1095,9 @@ static void SetScreenStates_AfterFadingIn(void)
 
   global.anim_status = global.anim_status_next;
 }
+#endif
 
+#ifndef HEADLESS
 static void SetScreenStates_BeforeFadingOut(void)
 {
   // store new target screen (to use correct masked border for fading)
@@ -1019,12 +1110,16 @@ static void SetScreenStates_BeforeFadingOut(void)
   if (fade_type_skip != FADE_MODE_SKIP_FADE_OUT)
     PrepareFadeBitmap(DRAW_TO_FADE_SOURCE);
 }
+#endif
 
+#ifndef HEADLESS
 static void SetScreenStates_AfterFadingOut(void)
 {
   global.border_status = game_status;
 }
+#endif
 
+#ifndef HEADLESS
 void FadeIn(int fade_mask)
 {
   SetScreenStates_BeforeFadingIn();
@@ -1054,7 +1149,9 @@ void FadeIn(int fade_mask)
   redraw_mask = REDRAW_ALL;
   BackToFront();
 }
+#endif
 
+#ifndef HEADLESS
 void FadeOut(int fade_mask)
 {
   // update screen if areas covered by "fade_mask" and "redraw_mask" differ
@@ -1078,7 +1175,9 @@ void FadeOut(int fade_mask)
 
   SetScreenStates_AfterFadingOut();
 }
+#endif
 
+#ifndef HEADLESS
 static void FadeSetLeaveNext(struct TitleFadingInfo fading_leave, boolean set)
 {
   static struct TitleFadingInfo fading_leave_stored;
@@ -1088,28 +1187,36 @@ static void FadeSetLeaveNext(struct TitleFadingInfo fading_leave, boolean set)
   else
     fading = fading_leave_stored;
 }
+#endif
 
+#ifndef HEADLESS
 void FadeSetEnterMenu(void)
 {
   fading = menu.enter_menu;
 
   FadeSetLeaveNext(fading, TRUE);	// (keep same fade mode)
 }
+#endif
 
+#ifndef HEADLESS
 void FadeSetLeaveMenu(void)
 {
   fading = menu.leave_menu;
 
   FadeSetLeaveNext(fading, TRUE);	// (keep same fade mode)
 }
+#endif
 
+#ifndef HEADLESS
 void FadeSetEnterScreen(void)
 {
   fading = menu.enter_screen[game_status];
 
   FadeSetLeaveNext(menu.leave_screen[game_status], TRUE);	// store
 }
+#endif
 
+#ifndef HEADLESS
 void FadeSetNextScreen(void)
 {
   fading = menu.next_screen[game_status];
@@ -1117,12 +1224,16 @@ void FadeSetNextScreen(void)
   // (do not overwrite fade mode set by FadeSetEnterScreen)
   // FadeSetLeaveNext(fading, TRUE);	// (keep same fade mode)
 }
+#endif
 
+#ifndef HEADLESS
 void FadeSetLeaveScreen(void)
 {
   FadeSetLeaveNext(menu.leave_screen[game_status], FALSE);	// recall
 }
+#endif
 
+#ifndef HEADLESS
 void FadeSetFromType(int type)
 {
   if (type & TYPE_ENTER_SCREEN)
@@ -1132,24 +1243,32 @@ void FadeSetFromType(int type)
   else if (type & TYPE_LEAVE)
     FadeSetLeaveMenu();
 }
+#endif
 
+#ifndef HEADLESS
 void FadeSetDisabled(void)
 {
   static struct TitleFadingInfo fading_none = { FADE_MODE_NONE, -1, -1, -1 };
 
   fading = fading_none;
 }
+#endif
 
+#ifndef HEADLESS
 void FadeSkipNextFadeIn(void)
 {
   FadeExt(0, FADE_MODE_SKIP_FADE_IN, FADE_TYPE_SKIP);
 }
+#endif
 
+#ifndef HEADLESS
 void FadeSkipNextFadeOut(void)
 {
   FadeExt(0, FADE_MODE_SKIP_FADE_OUT, FADE_TYPE_SKIP);
 }
+#endif
 
+#ifndef HEADLESS
 static Bitmap *getBitmapFromGraphicOrDefault(int graphic, int default_graphic)
 {
   if (graphic == IMG_UNDEFINED)
@@ -1161,17 +1280,23 @@ static Bitmap *getBitmapFromGraphicOrDefault(int graphic, int default_graphic)
 	  graphic_info[graphic].bitmap :
 	  graphic_info[default_graphic].bitmap);
 }
+#endif
 
+#ifndef HEADLESS
 static Bitmap *getBackgroundBitmap(int graphic)
 {
   return getBitmapFromGraphicOrDefault(graphic, IMG_BACKGROUND);
 }
+#endif
 
+#ifndef HEADLESS
 static Bitmap *getGlobalBorderBitmap(int graphic)
 {
   return getBitmapFromGraphicOrDefault(graphic, IMG_GLOBAL_BORDER);
 }
+#endif
 
+#ifndef HEADLESS
 Bitmap *getGlobalBorderBitmapFromStatus(int status)
 {
   int graphic =
@@ -1184,40 +1309,54 @@ Bitmap *getGlobalBorderBitmapFromStatus(int status)
 
   return getGlobalBorderBitmap(graphic);
 }
+#endif
 
+#ifndef HEADLESS
 void SetWindowBackgroundImageIfDefined(int graphic)
 {
   if (graphic_info[graphic].bitmap)
     SetWindowBackgroundBitmap(graphic_info[graphic].bitmap);
 }
+#endif
 
+#ifndef HEADLESS
 void SetMainBackgroundImageIfDefined(int graphic)
 {
   if (graphic_info[graphic].bitmap)
     SetMainBackgroundBitmap(graphic_info[graphic].bitmap);
 }
+#endif
 
+#ifndef HEADLESS
 void SetDoorBackgroundImageIfDefined(int graphic)
 {
   if (graphic_info[graphic].bitmap)
     SetDoorBackgroundBitmap(graphic_info[graphic].bitmap);
 }
+#endif
 
+#ifndef HEADLESS
 void SetWindowBackgroundImage(int graphic)
 {
   SetWindowBackgroundBitmap(getBackgroundBitmap(graphic));
 }
+#endif
 
+#ifndef HEADLESS
 void SetMainBackgroundImage(int graphic)
 {
   SetMainBackgroundBitmap(getBackgroundBitmap(graphic));
 }
+#endif
 
+#ifndef HEADLESS
 void SetDoorBackgroundImage(int graphic)
 {
   SetDoorBackgroundBitmap(getBackgroundBitmap(graphic));
 }
+#endif
 
+#ifndef HEADLESS
 void SetPanelBackground(void)
 {
   struct GraphicInfo *gfx = &graphic_info[IMG_BACKGROUND_PANEL];
@@ -1227,7 +1366,9 @@ void SetPanelBackground(void)
 
   SetDoorBackgroundBitmap(bitmap_db_panel);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawBackground(int x, int y, int width, int height)
 {
   // "drawto" might still point to playfield buffer here (hall of fame)
@@ -1242,7 +1383,9 @@ void DrawBackground(int x, int y, int width, int height)
   else if (IN_GFX_DOOR_3(x, y))
     redraw_mask |= REDRAW_DOOR_3;
 }
+#endif
 
+#ifndef HEADLESS
 void DrawBackgroundForFont(int x, int y, int width, int height, int font_nr)
 {
   struct FontBitmapInfo *font = getFontBitmapInfo(font_nr);
@@ -1252,7 +1395,9 @@ void DrawBackgroundForFont(int x, int y, int width, int height, int font_nr)
 
   DrawBackground(x, y, width, height);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawBackgroundForGraphic(int x, int y, int width, int height, int graphic)
 {
   struct GraphicInfo *g = &graphic_info[graphic];
@@ -1262,7 +1407,9 @@ void DrawBackgroundForGraphic(int x, int y, int width, int height, int graphic)
 
   DrawBackground(x, y, width, height);
 }
+#endif
 
+#ifndef HEADLESS
 static int game_status_last = -1;
 static Bitmap *global_border_bitmap_last = NULL;
 static Bitmap *global_border_bitmap = NULL;
@@ -1274,7 +1421,9 @@ static int vx_last = -1, vy_last = -1;
 static int vxsize_last = -1, vysize_last = -1;
 static int ex_last = -1, ey_last = -1;
 static int exsize_last = -1, eysize_last = -1;
+#endif
 
+#ifndef HEADLESS
 boolean CheckIfGlobalBorderHasChanged(void)
 {
   // if game status has not changed, global border has not changed either
@@ -1286,6 +1435,7 @@ boolean CheckIfGlobalBorderHasChanged(void)
 
   return (global_border_bitmap_last != global_border_bitmap);
 }
+#endif
 
 #define ONLY_REDRAW_GLOBAL_BORDER_IF_NEEDED		0
 
@@ -1328,6 +1478,7 @@ static boolean CheckIfGlobalBorderRedrawIsNeeded(void)
 }
 #endif
 
+#ifndef HEADLESS
 static void RedrawGlobalBorderFromBitmap(Bitmap *bitmap)
 {
   if (bitmap)
@@ -1335,7 +1486,9 @@ static void RedrawGlobalBorderFromBitmap(Bitmap *bitmap)
   else
     ClearRectangle(backbuffer, 0, 0, WIN_XSIZE, WIN_YSIZE);
 }
+#endif
 
+#ifndef HEADLESS
 void RedrawGlobalBorder(void)
 {
   Bitmap *bitmap = getGlobalBorderBitmapFromStatus(game_status);
@@ -1344,7 +1497,9 @@ void RedrawGlobalBorder(void)
 
   redraw_mask = REDRAW_ALL;
 }
+#endif
 
+#ifndef HEADLESS
 static void RedrawGlobalBorderIfNeeded(void)
 {
 #if ONLY_REDRAW_GLOBAL_BORDER_IF_NEEDED
@@ -1423,7 +1578,9 @@ static void RedrawGlobalBorderIfNeeded(void)
   exsize_last = EXSIZE;
   eysize_last = EYSIZE;
 }
+#endif
 
+#ifndef HEADLESS
 void ClearField(void)
 {
   RedrawGlobalBorderIfNeeded();
@@ -1443,12 +1600,16 @@ void ClearField(void)
     SetDrawtoField(DRAW_TO_BACKBUFFER);
   }
 }
+#endif
 
+#ifndef HEADLESS
 void MarkTileDirty(int x, int y)
 {
   redraw_mask |= REDRAW_FIELD;
 }
+#endif
 
+#ifndef HEADLESS
 void SetBorderElement(void)
 {
   int x, y;
@@ -1471,6 +1632,7 @@ void SetBorderElement(void)
     }
   }
 }
+#endif
 
 void FloodFillLevelExt(int from_x, int from_y, int fill_element,
 		       int max_array_fieldx, int max_array_fieldy,
@@ -1516,11 +1678,14 @@ void FloodFillLevel(int from_x, int from_y, int fill_element,
 		    max_fieldx, max_fieldy);
 }
 
+#ifndef HEADLESS
 void SetRandomAnimationValue(int x, int y)
 {
   gfx.anim_random_frame = GfxRandom[x][y];
 }
+#endif
 
+#ifndef HEADLESS
 int getGraphicAnimationFrame(int graphic, int sync_frame)
 {
   // animation synchronized with global frame counter, not move position
@@ -1533,7 +1698,9 @@ int getGraphicAnimationFrame(int graphic, int sync_frame)
 			   graphic_info[graphic].anim_start_frame,
 			   sync_frame);
 }
+#endif
 
+#ifndef HEADLESS
 void getGraphicSourceBitmap(int graphic, int tilesize, Bitmap **bitmap)
 {
   struct GraphicInfo *g = &graphic_info[graphic];
@@ -1546,7 +1713,9 @@ void getGraphicSourceBitmap(int graphic, int tilesize, Bitmap **bitmap)
   else
     *bitmap = g->bitmaps[IMG_BITMAP_1x1 - log_2(tilesize_capped)];
 }
+#endif
 
+#ifndef HEADLESS
 void getGraphicSourceXY(int graphic, int frame, int *x, int *y,
 			boolean get_backside)
 {
@@ -1576,7 +1745,9 @@ void getGraphicSourceXY(int graphic, int frame, int *x, int *y,
     *y = src_y + frame * g->offset_y;
   }
 }
+#endif
 
+#ifndef HEADLESS
 void getSizedGraphicSourceExt(int graphic, int frame, int tilesize,
 			      Bitmap **bitmap, int *x, int *y,
 			      boolean get_backside)
@@ -1597,36 +1768,48 @@ void getSizedGraphicSourceExt(int graphic, int frame, int tilesize,
   *x = *x * tilesize / g->tile_size;
   *y = *y * tilesize / g->tile_size;
 }
+#endif
 
+#ifndef HEADLESS
 void getSizedGraphicSource(int graphic, int frame, int tilesize,
 			   Bitmap **bitmap, int *x, int *y)
 {
   getSizedGraphicSourceExt(graphic, frame, tilesize, bitmap, x, y, FALSE);
 }
+#endif
 
+#ifndef HEADLESS
 void getFixedGraphicSource(int graphic, int frame,
 			   Bitmap **bitmap, int *x, int *y)
 {
   getSizedGraphicSourceExt(graphic, frame, TILESIZE, bitmap, x, y, FALSE);
 }
+#endif
 
+#ifndef HEADLESS
 void getMiniGraphicSource(int graphic, Bitmap **bitmap, int *x, int *y)
 {
   getSizedGraphicSource(graphic, 0, MINI_TILESIZE, bitmap, x, y);
 }
+#endif
 
+#ifndef HEADLESS
 static void getGraphicSourceExt(int graphic, int frame, Bitmap **bitmap,
 				int *x, int *y, boolean get_backside)
 {
   getSizedGraphicSourceExt(graphic, frame, TILESIZE_VAR, bitmap, x, y,
 			   get_backside);
 }
+#endif
 
+#ifndef HEADLESS
 void getGraphicSource(int graphic, int frame, Bitmap **bitmap, int *x, int *y)
 {
   getGraphicSourceExt(graphic, frame, bitmap, x, y, FALSE);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawGraphic(int x, int y, int graphic, int frame)
 {
 #if DEBUG
@@ -1644,7 +1827,9 @@ void DrawGraphic(int x, int y, int graphic, int frame)
       MarkTileDirty(x, y);
   }
 }
+#endif
 
+#ifndef HEADLESS
 void DrawFixedGraphic(int x, int y, int graphic, int frame)
 {
 #if DEBUG
@@ -1660,7 +1845,9 @@ void DrawFixedGraphic(int x, int y, int graphic, int frame)
 		      frame);
   MarkTileDirty(x, y);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawGraphicExt(DrawBuffer *dst_bitmap, int x, int y, int graphic,
 		    int frame)
 {
@@ -1673,7 +1860,9 @@ void DrawGraphicExt(DrawBuffer *dst_bitmap, int x, int y, int graphic,
         BlitBitmap(src_bitmap, dst_bitmap, src_x, src_y, TILEX_VAR, TILEY_VAR, x, y);
     }
 }
+#endif
 
+#ifndef HEADLESS
 void DrawFixedGraphicExt(DrawBuffer *dst_bitmap, int x, int y, int graphic,
 			 int frame)
 {
@@ -1685,7 +1874,9 @@ void DrawFixedGraphicExt(DrawBuffer *dst_bitmap, int x, int y, int graphic,
         BlitBitmap(src_bitmap, dst_bitmap, src_x, src_y, TILEX, TILEY, x, y);
     }
 }
+#endif
 
+#ifndef HEADLESS
 void DrawGraphicThruMask(int x, int y, int graphic, int frame)
 {
 #if DEBUG
@@ -1702,7 +1893,9 @@ void DrawGraphicThruMask(int x, int y, int graphic, int frame)
 
   MarkTileDirty(x, y);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawFixedGraphicThruMask(int x, int y, int graphic, int frame)
 {
 #if DEBUG
@@ -1718,7 +1911,9 @@ void DrawFixedGraphicThruMask(int x, int y, int graphic, int frame)
 			      graphic, frame);
   MarkTileDirty(x, y);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawGraphicThruMaskExt(DrawBuffer *d, int dst_x, int dst_y, int graphic,
 			    int frame)
 {
@@ -1730,7 +1925,9 @@ void DrawGraphicThruMaskExt(DrawBuffer *d, int dst_x, int dst_y, int graphic,
   BlitBitmapMasked(src_bitmap, d, src_x, src_y, TILEX_VAR, TILEY_VAR,
 		   dst_x, dst_y);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawFixedGraphicThruMaskExt(DrawBuffer *d, int dst_x, int dst_y,
 				 int graphic, int frame)
 {
@@ -1742,14 +1939,18 @@ void DrawFixedGraphicThruMaskExt(DrawBuffer *d, int dst_x, int dst_y,
   BlitBitmapMasked(src_bitmap, d, src_x, src_y, TILEX, TILEY,
 		   dst_x, dst_y);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawSizedGraphic(int x, int y, int graphic, int frame, int tilesize)
 {
   DrawSizedGraphicExt(drawto, SX + x * tilesize, SY + y * tilesize, graphic,
 		      frame, tilesize);
   MarkTileDirty(x / tilesize, y / tilesize);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawSizedGraphicThruMask(int x, int y, int graphic, int frame,
 			      int tilesize)
 {
@@ -1757,7 +1958,9 @@ void DrawSizedGraphicThruMask(int x, int y, int graphic, int frame,
 			      graphic, frame, tilesize);
   MarkTileDirty(x / tilesize, y / tilesize);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawSizedGraphicExt(DrawBuffer *d, int x, int y, int graphic, int frame,
 			 int tilesize)
 {
@@ -1767,7 +1970,9 @@ void DrawSizedGraphicExt(DrawBuffer *d, int x, int y, int graphic, int frame,
   getSizedGraphicSource(graphic, frame, tilesize, &src_bitmap, &src_x, &src_y);
   BlitBitmap(src_bitmap, d, src_x, src_y, tilesize, tilesize, x, y);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawSizedGraphicThruMaskExt(DrawBuffer *d, int x, int y, int graphic,
 				 int frame, int tilesize)
 {
@@ -1777,13 +1982,17 @@ void DrawSizedGraphicThruMaskExt(DrawBuffer *d, int x, int y, int graphic,
   getSizedGraphicSource(graphic, frame, tilesize, &src_bitmap, &src_x, &src_y);
   BlitBitmapMasked(src_bitmap, d, src_x, src_y, tilesize, tilesize, x, y);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawMiniGraphic(int x, int y, int graphic)
 {
   DrawMiniGraphicExt(drawto, SX + x * MINI_TILEX,SY + y * MINI_TILEY, graphic);
   MarkTileDirty(x / 2, y / 2);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawMiniGraphicExt(DrawBuffer *d, int x, int y, int graphic)
 {
   Bitmap *src_bitmap;
@@ -1792,7 +2001,9 @@ void DrawMiniGraphicExt(DrawBuffer *d, int x, int y, int graphic)
   getMiniGraphicSource(graphic, &src_bitmap, &src_x, &src_y);
   BlitBitmap(src_bitmap, d, src_x, src_y, MINI_TILEX, MINI_TILEY, x, y);
 }
+#endif
 
+#ifndef HEADLESS
 static void DrawGraphicShiftedNormal(int x, int y, int dx, int dy,
 				     int graphic, int frame,
 				     int cut_mode, int mask_mode)
@@ -1903,7 +2114,9 @@ static void DrawGraphicShiftedNormal(int x, int y, int dx, int dy,
     MarkTileDirty(x, y);
   }
 }
+#endif
 
+#ifndef HEADLESS
 static void DrawGraphicShiftedDouble(int x, int y, int dx, int dy,
 				     int graphic, int frame,
 				     int cut_mode, int mask_mode)
@@ -1968,7 +2181,9 @@ static void DrawGraphicShiftedDouble(int x, int y, int dx, int dy,
     MarkTileDirty(x2, y2);
   }
 }
+#endif
 
+#ifndef HEADLESS
 static void DrawGraphicShifted(int x, int y, int dx, int dy,
 			       int graphic, int frame,
 			       int cut_mode, int mask_mode)
@@ -1985,13 +2200,17 @@ static void DrawGraphicShifted(int x, int y, int dx, int dy,
   else
     DrawGraphicShiftedNormal(x, y, dx, dy, graphic, frame, cut_mode,mask_mode);
 }
+#endif
 
+#ifndef HEADLESS
 static void DrawGraphicShiftedThruMask(int x, int y, int dx, int dy,
 				       int graphic, int frame, int cut_mode)
 {
   DrawGraphicShifted(x, y, dx, dy, graphic, frame, cut_mode, USE_MASKING);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
 			  int cut_mode, int mask_mode)
 {
@@ -2044,7 +2263,9 @@ void DrawScreenElementExt(int x, int y, int dx, int dy, int element,
             DrawGraphic(x, y, graphic, frame);
     }
 }
+#endif
 
+#ifndef HEADLESS
 void DrawLevelElementExt(int x, int y, int dx, int dy, int element,
 			 int cut_mode, int mask_mode)
 {
@@ -2052,28 +2273,37 @@ void DrawLevelElementExt(int x, int y, int dx, int dy, int element,
     DrawScreenElementExt(SCREENX(x), SCREENY(y), dx, dy, element,
 			 cut_mode, mask_mode);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawScreenElementShifted(int x, int y, int dx, int dy, int element,
 			      int cut_mode)
 {
   DrawScreenElementExt(x, y, dx, dy, element, cut_mode, NO_MASKING);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawLevelElementShifted(int x, int y, int dx, int dy, int element,
 			     int cut_mode)
 {
   DrawLevelElementExt(x, y, dx, dy, element, cut_mode, NO_MASKING);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawLevelElementThruMask(int x, int y, int element)
 {
   DrawLevelElementExt(x, y, 0, 0, element, NO_CUTTING, USE_MASKING);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawLevelFieldThruMask(int x, int y)
 {
   DrawLevelElementExt(x, y, 0, 0, Feld[x][y], NO_CUTTING, USE_MASKING);
 }
+#endif
 
 // !!! implementation of quicksand is totally broken !!!
 #define IS_CRUMBLED_TILE(x, y, e)					\
@@ -2082,6 +2312,7 @@ void DrawLevelFieldThruMask(int x, int y)
 			     (e) == EL_QUICKSAND_EMPTYING ||		\
 			     (e) == EL_QUICKSAND_FAST_EMPTYING))
 
+#ifndef HEADLESS
 static void DrawLevelFieldCrumbledInnerCorners(int x, int y, int dx, int dy,
 					       int graphic)
 {
@@ -2128,7 +2359,9 @@ static void DrawLevelFieldCrumbledInnerCorners(int x, int y, int dx, int dy,
   BlitBitmap(src_bitmap, drawto_field, src_x + cx, src_y + cy,
 	     width, height, FX + sx * TILEX_VAR + cx, FY + sy * TILEY_VAR + cy);
 }
+#endif
 
+#ifndef HEADLESS
 static void DrawLevelFieldCrumbledBorders(int x, int y, int graphic, int frame,
 					  int dir)
 {
@@ -2207,7 +2440,9 @@ static void DrawLevelFieldCrumbledBorders(int x, int y, int graphic, int frame,
     }
   }
 }
+#endif
 
+#ifndef HEADLESS
 static void DrawLevelFieldCrumbledExt(int x, int y, int graphic, int frame)
 {
   int sx = SCREENX(x), sy = SCREENY(y);
@@ -2327,7 +2562,9 @@ static void DrawLevelFieldCrumbledExt(int x, int y, int graphic, int frame)
     }
   }
 }
+#endif
 
+#ifndef HEADLESS
 void DrawLevelFieldCrumbled(int x, int y)
 {
   int graphic;
@@ -2348,7 +2585,9 @@ void DrawLevelFieldCrumbled(int x, int y)
 
   DrawLevelFieldCrumbledExt(x, y, graphic, 0);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawLevelFieldCrumbledDigging(int x, int y, int direction,
 				   int step_frame)
 {
@@ -2362,7 +2601,9 @@ void DrawLevelFieldCrumbledDigging(int x, int y, int direction,
   DrawGraphic(sx, sy, graphic1, frame1);
   DrawLevelFieldCrumbledExt(x, y, graphic2, frame2);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawLevelFieldCrumbledNeighbours(int x, int y)
 {
   int sx = SCREENX(x), sy = SCREENY(y);
@@ -2416,7 +2657,9 @@ void DrawLevelFieldCrumbledNeighbours(int x, int y)
       DrawLevelField(xx, yy);
   }
 }
+#endif
 
+#ifndef HEADLESS
 static int getBorderElement(int x, int y)
 {
   int border[7][2] =
@@ -2439,19 +2682,25 @@ static int getBorderElement(int x, int y)
 
   return border[steel_position][steel_type];
 }
+#endif
 
+#ifndef HEADLESS
 void DrawScreenElement(int x, int y, int element)
 {
   DrawScreenElementExt(x, y, 0, 0, element, NO_CUTTING, NO_MASKING);
   DrawLevelFieldCrumbled(LEVELX(x), LEVELY(y));
 }
+#endif
 
+#ifndef HEADLESS
 void DrawLevelElement(int x, int y, int element)
 {
   if (IN_LEV_FIELD(x, y) && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
     DrawScreenElement(SCREENX(x), SCREENY(y), element);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawScreenField(int x, int y)
 {
     if (is_simulating == TRUE) {return;}
@@ -2565,7 +2814,9 @@ void DrawScreenField(int x, int y)
   else
     DrawScreenElement(x, y, EL_EMPTY);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawLevelField(int x, int y)
 {
     if (is_simulating == TRUE) {return;}
@@ -2585,7 +2836,9 @@ void DrawLevelField(int x, int y)
             DrawScreenField(SCREENX(oldx), SCREENY(oldy));
     }
 }
+#endif
 
+#ifndef HEADLESS
 static void DrawSizedWallExt_MM(int dst_x, int dst_y, int element, int tilesize,
 				int (*el2img_function)(int), boolean masked,
 				int element_bits_draw)
@@ -2628,21 +2881,27 @@ static void DrawSizedWallExt_MM(int dst_x, int dst_y, int element, int tilesize,
     }
   }
 }
+#endif
 
+#ifndef HEADLESS
 void DrawSizedWallParts_MM(int x, int y, int element, int tilesize,
 			   boolean masked, int element_bits_draw)
 {
   DrawSizedWallExt_MM(SX + x * tilesize, SY + y * tilesize,
 		      element, tilesize, el2edimg, masked, element_bits_draw);
 }
+#endif
 
+#ifndef HEADLESS
 static void DrawSizedWall_MM(int dst_x, int dst_y, int element, int tilesize,
 			     int (*el2img_function)(int))
 {
   DrawSizedWallExt_MM(dst_x, dst_y, element, tilesize, el2img_function, FALSE,
 		      0x000f);
 }
+#endif
 
+#ifndef HEADLESS
 static void DrawSizedElementExt(int x, int y, int element, int tilesize,
 				boolean masked)
 {
@@ -2661,17 +2920,23 @@ static void DrawSizedElementExt(int x, int y, int element, int tilesize,
       DrawSizedGraphic(x, y, graphic, 0, tilesize);
   }
 }
+#endif
 
+#ifndef HEADLESS
 void DrawSizedElement(int x, int y, int element, int tilesize)
 {
   DrawSizedElementExt(x, y, element, tilesize, FALSE);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawSizedElementThruMask(int x, int y, int element, int tilesize)
 {
   DrawSizedElementExt(x, y, element, tilesize, TRUE);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawMiniElement(int x, int y, int element)
 {
   int graphic;
@@ -2679,7 +2944,9 @@ void DrawMiniElement(int x, int y, int element)
   graphic = el2edimg(element);
   DrawMiniGraphic(x, y, graphic);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawSizedElementOrWall(int sx, int sy, int scroll_x, int scroll_y,
 			    int tilesize)
 {
@@ -2692,7 +2959,9 @@ void DrawSizedElementOrWall(int sx, int sy, int scroll_x, int scroll_y,
   else
     DrawSizedGraphic(sx, sy, el2edimg(getBorderElement(x, y)), 0, tilesize);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawMiniElementOrWall(int sx, int sy, int scroll_x, int scroll_y)
 {
   int x = sx + scroll_x, y = sy + scroll_y;
@@ -2704,7 +2973,9 @@ void DrawMiniElementOrWall(int sx, int sy, int scroll_x, int scroll_y)
   else
     DrawMiniGraphic(sx, sy, el2edimg(getBorderElement(x, y)));
 }
+#endif
 
+#ifndef HEADLESS
 static void DrawEnvelopeBackgroundTiles(int graphic, int startx, int starty,
 					int x, int y, int xsize, int ysize,
 					int tile_width, int tile_height)
@@ -2743,7 +3014,9 @@ static void DrawEnvelopeBackgroundTiles(int graphic, int startx, int starty,
     BlitBitmap(src_bitmap, drawto, src_x, src_y, tile_width, tile_height,
 	       dst_x, dst_y);
 }
+#endif
 
+#ifndef HEADLESS
 static void DrawEnvelopeBackground(int graphic, int startx, int starty,
 				   int x, int y, int xsize, int ysize,
 				   int font_nr)
@@ -2754,7 +3027,9 @@ static void DrawEnvelopeBackground(int graphic, int startx, int starty,
   DrawEnvelopeBackgroundTiles(graphic, startx, starty, x, y, xsize, ysize,
 			      font_width, font_height);
 }
+#endif
 
+#ifndef HEADLESS
 static void AnimateEnvelope(int envelope_nr, int anim_mode, int action)
 {
   int graphic = IMG_BACKGROUND_ENVELOPE_1 + envelope_nr;
@@ -2815,7 +3090,9 @@ static void AnimateEnvelope(int envelope_nr, int anim_mode, int action)
 
   ClearAutoRepeatKeyEvents();
 }
+#endif
 
+#ifndef HEADLESS
 void ShowEnvelope(int envelope_nr)
 {
   int element = EL_ENVELOPE_1 + envelope_nr;
@@ -2859,7 +3136,9 @@ void ShowEnvelope(int envelope_nr)
   redraw_mask |= REDRAW_FIELD;
   BackToFront();
 }
+#endif
 
+#ifndef HEADLESS
 static void setRequestBasePosition(int *x, int *y)
 {
   int sx_base, sy_base;
@@ -2885,7 +3164,9 @@ static void setRequestBasePosition(int *x, int *y)
   *x = sx_base;
   *y = sy_base;
 }
+#endif
 
+#ifndef HEADLESS
 static void setRequestPositionExt(int *x, int *y, int width, int height,
 				  boolean add_border_size)
 {
@@ -2921,12 +3202,16 @@ static void setRequestPositionExt(int *x, int *y, int width, int height,
   *x = sx;
   *y = sy;
 }
+#endif
 
+#ifndef HEADLESS
 static void setRequestPosition(int *x, int *y, boolean add_border_size)
 {
   setRequestPositionExt(x, y, request.width, request.height, add_border_size);
 }
+#endif
 
+#ifndef HEADLESS
 static void DrawEnvelopeRequest(char *text)
 {
   char *text_final = text;
@@ -3013,7 +3298,9 @@ static void DrawEnvelopeRequest(char *text)
   if (text_door_style)
     free(text_door_style);
 }
+#endif
 
+#ifndef HEADLESS
 static void AnimateEnvelopeRequest(int anim_mode, int action)
 {
   int graphic = IMG_BACKGROUND_REQUEST;
@@ -3100,7 +3387,9 @@ static void AnimateEnvelopeRequest(int anim_mode, int action)
 
   ClearAutoRepeatKeyEvents();
 }
+#endif
 
+#ifndef HEADLESS
 static void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
 {
   int graphic = IMG_BACKGROUND_REQUEST;
@@ -3181,7 +3470,9 @@ static void ShowEnvelopeRequest(char *text, unsigned int req_state, int action)
       level.game_engine_type == GAME_ENGINE_TYPE_RND)
     SetDrawtoField(DRAW_TO_FIELDBUFFER);
 }
+#endif
 
+#ifndef HEADLESS
 static void DrawPreviewElement(int dst_x, int dst_y, int element, int tilesize)
 {
   if (IS_MM_WALL(element))
@@ -3199,7 +3490,9 @@ static void DrawPreviewElement(int dst_x, int dst_y, int element, int tilesize)
 	       dst_x, dst_y);
   }
 }
+#endif
 
+#ifndef HEADLESS
 void DrawLevel(int draw_background_mask)
 {
   int x,y;
@@ -3216,7 +3509,9 @@ void DrawLevel(int draw_background_mask)
         redraw_mask |= REDRAW_FIELD;
     }
 }
+#endif
 
+#ifndef HEADLESS
 void DrawSizedLevel(int size_x, int size_y, int scroll_x, int scroll_y,
 		    int tilesize)
 {
@@ -3228,7 +3523,9 @@ void DrawSizedLevel(int size_x, int size_y, int scroll_x, int scroll_y,
 
   redraw_mask |= REDRAW_FIELD;
 }
+#endif
 
+#ifndef HEADLESS
 void DrawMiniLevel(int size_x, int size_y, int scroll_x, int scroll_y)
 {
   int x,y;
@@ -3239,7 +3536,9 @@ void DrawMiniLevel(int size_x, int size_y, int scroll_x, int scroll_y)
 
   redraw_mask |= REDRAW_FIELD;
 }
+#endif
 
+#ifndef HEADLESS
 static void DrawPreviewLevelPlayfield(int from_x, int from_y)
 {
   boolean show_level_border = (BorderElement != EL_EMPTY);
@@ -3280,6 +3579,7 @@ static void DrawPreviewLevelPlayfield(int from_x, int from_y)
 
   redraw_mask |= REDRAW_FIELD;
 }
+#endif
 
 #define MICROLABEL_EMPTY		0
 #define MICROLABEL_LEVEL_NAME		1
@@ -3290,6 +3590,7 @@ static void DrawPreviewLevelPlayfield(int from_x, int from_y)
 #define MICROLABEL_IMPORTED_BY_HEAD	6
 #define MICROLABEL_IMPORTED_BY		7
 
+#ifndef HEADLESS
 static int getMaxTextLength(struct TextPosInfo *pos, int font_nr)
 {
   int max_text_width = SXSIZE;
@@ -3304,7 +3605,9 @@ static int getMaxTextLength(struct TextPosInfo *pos, int font_nr)
 
   return max_text_width / font_width;
 }
+#endif
 
+#ifndef HEADLESS
 static void DrawPreviewLevelLabelExt(int mode, struct TextPosInfo *pos)
 {
   char label_text[MAX_OUTPUT_LINESIZE + 1];
@@ -3348,12 +3651,16 @@ static void DrawPreviewLevelLabelExt(int mode, struct TextPosInfo *pos)
 
   redraw_mask |= REDRAW_FIELD;
 }
+#endif
 
+#ifndef HEADLESS
 static void DrawPreviewLevelLabel(int mode)
 {
   DrawPreviewLevelLabelExt(mode, &menu.main.text.level_info_2);
 }
+#endif
 
+#ifndef HEADLESS
 static void DrawPreviewLevelInfo(int mode)
 {
   if (mode == MICROLABEL_LEVEL_NAME)
@@ -3361,7 +3668,9 @@ static void DrawPreviewLevelInfo(int mode)
   else if (mode == MICROLABEL_LEVEL_AUTHOR)
     DrawPreviewLevelLabelExt(mode, &menu.main.text.level_author);
 }
+#endif
 
+#ifndef HEADLESS
 static void DrawPreviewLevelExt(boolean restart)
 {
   static unsigned int scroll_delay = 0;
@@ -3520,7 +3829,9 @@ static void DrawPreviewLevelExt(boolean restart)
     DrawPreviewLevelLabel(label_state);
   }
 }
+#endif
 
+#ifndef HEADLESS
 void DrawPreviewPlayers(void)
 {
   if (game_status != GAME_MODE_MAIN)
@@ -3599,18 +3910,24 @@ void DrawPreviewPlayers(void)
     }
   }
 }
+#endif
 
+#ifndef HEADLESS
 void DrawPreviewLevelInitial(void)
 {
   DrawPreviewLevelExt(TRUE);
   DrawPreviewPlayers();
 }
+#endif
 
+#ifndef HEADLESS
 void DrawPreviewLevelAnimation(void)
 {
   DrawPreviewLevelExt(FALSE);
 }
+#endif
 
+#ifndef HEADLESS
 static void DrawNetworkPlayer(int x, int y, int player_nr, int tile_size,
 			      int border_size, int font_nr)
 {
@@ -3626,7 +3943,9 @@ static void DrawNetworkPlayer(int x, int y, int player_nr, int tile_size,
 			      tile_size);
   DrawText(x + xoffset_text, y + yoffset_text, player_name, font_nr);
 }
+#endif
 
+#ifndef HEADLESS
 static void DrawNetworkPlayersExt(boolean force)
 {
   if (game_status != GAME_MODE_MAIN)
@@ -3697,17 +4016,23 @@ static void DrawNetworkPlayersExt(boolean force)
     }
   }
 }
+#endif
 
+#ifndef HEADLESS
 void DrawNetworkPlayers(void)
 {
   DrawNetworkPlayersExt(FALSE);
 }
+#endif
 
+#ifndef HEADLESS
 void ClearNetworkPlayers(void)
 {
   DrawNetworkPlayersExt(TRUE);
 }
+#endif
 
+#ifndef HEADLESS
 static void DrawGraphicAnimationExt(DrawBuffer *dst_bitmap, int x, int y,
 				    int graphic, int sync_frame,
 				    int mask_mode)
@@ -3719,7 +4044,9 @@ static void DrawGraphicAnimationExt(DrawBuffer *dst_bitmap, int x, int y,
   else
     DrawGraphicExt(dst_bitmap, x, y, graphic, frame);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawFixedGraphicAnimationExt(DrawBuffer *dst_bitmap, int x, int y,
 				  int graphic, int sync_frame, int mask_mode)
 {
@@ -3730,7 +4057,9 @@ void DrawFixedGraphicAnimationExt(DrawBuffer *dst_bitmap, int x, int y,
   else
     DrawFixedGraphicExt(dst_bitmap, x, y, graphic, frame);
 }
+#endif
 
+#ifndef HEADLESS
 static void DrawGraphicAnimation(int x, int y, int graphic)
 {
     if (is_simulating == FALSE) {
@@ -3745,7 +4074,9 @@ static void DrawGraphicAnimation(int x, int y, int graphic)
         MarkTileDirty(x, y);
     }
 }
+#endif
 
+#ifndef HEADLESS
 void DrawFixedGraphicAnimation(int x, int y, int graphic)
 {
   int lx = LEVELX(x), ly = LEVELY(y);
@@ -3757,19 +4088,25 @@ void DrawFixedGraphicAnimation(int x, int y, int graphic)
 			  graphic, GfxFrame[lx][ly], NO_MASKING);
   MarkTileDirty(x, y);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawLevelGraphicAnimation(int x, int y, int graphic)
 {
   DrawGraphicAnimation(SCREENX(x), SCREENY(y), graphic);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawLevelElementAnimation(int x, int y, int element)
 {
   int graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
 
   DrawGraphicAnimation(SCREENX(x), SCREENY(y), graphic);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawLevelGraphicAnimationIfNeeded(int x, int y, int graphic)
 {
     if (is_simulating == FALSE) {
@@ -3792,7 +4129,9 @@ void DrawLevelGraphicAnimationIfNeeded(int x, int y, int graphic)
 #endif
     }
 }
+#endif
 
+#ifndef HEADLESS
 void DrawLevelElementAnimationIfNeeded(int x, int y, int element)
 {
   int sx = SCREENX(x), sy = SCREENY(y);
@@ -3811,7 +4150,9 @@ void DrawLevelElementAnimationIfNeeded(int x, int y, int element)
   if (GFX_CRUMBLED(element))
     DrawLevelFieldCrumbled(x, y);
 }
+#endif
 
+#ifndef HEADLESS
 static int getPlayerGraphic(struct PlayerInfo *player, int move_dir)
 {
   if (player->use_murphy)
@@ -3835,7 +4176,9 @@ static int getPlayerGraphic(struct PlayerInfo *player, int move_dir)
   else
     return el_act_dir2img(player->artwork_element, player->GfxAction,move_dir);
 }
+#endif
 
+#ifndef HEADLESS
 static boolean equalGraphics(int graphic1, int graphic2)
 {
   struct GraphicInfo *g1 = &graphic_info[graphic1];
@@ -3848,6 +4191,7 @@ static boolean equalGraphics(int graphic1, int graphic2)
 	  g1->anim_delay  == g2->anim_delay &&
 	  g1->anim_mode   == g2->anim_mode);
 }
+#endif
 
 #define DRAW_PLAYER_OVER_PUSHED_ELEMENT	1
 
@@ -3869,6 +4213,7 @@ enum
   NUM_DRAW_PLAYER_STAGES
 };
 
+#ifndef HEADLESS
 static void DrawPlayerExt(struct PlayerInfo *player, int drawing_stage)
 {
     if (is_simulating == FALSE) {
@@ -4150,7 +4495,9 @@ static void DrawPlayerExt(struct PlayerInfo *player, int drawing_stage)
         }
     }
 }
+#endif
 
+#ifndef HEADLESS
 void DrawPlayer(struct PlayerInfo *player)
 {
   int i;
@@ -4158,7 +4505,9 @@ void DrawPlayer(struct PlayerInfo *player)
   for (i = 0; i < NUM_DRAW_PLAYER_STAGES; i++)
     DrawPlayerExt(player, i);
 }
+#endif
 
+#ifndef HEADLESS
 void DrawAllPlayers(void)
 {
     if (is_simulating == FALSE) {
@@ -4170,7 +4519,9 @@ void DrawAllPlayers(void)
                     DrawPlayerExt(&stored_player[j], i);
     }
 }
+#endif
 
+#ifndef HEADLESS
 void DrawPlayerField(int x, int y)
 {
   if (!IS_PLAYER(x, y))
@@ -4178,9 +4529,11 @@ void DrawPlayerField(int x, int y)
 
   DrawPlayer(PLAYERINFO(x, y));
 }
+#endif
 
 // ----------------------------------------------------------------------------
 
+#ifndef HEADLESS
 void WaitForEventToContinue(void)
 {
   boolean still_wait = TRUE;
@@ -4228,11 +4581,13 @@ void WaitForEventToContinue(void)
     BackToFront();
   }
 }
+#endif
 
 #define MAX_REQUEST_LINES		13
 #define MAX_REQUEST_LINE_FONT1_LEN	7
 #define MAX_REQUEST_LINE_FONT2_LEN	10
 
+#ifndef HEADLESS
 static int RequestHandleEvents(unsigned int req_state)
 {
   boolean game_just_ended = (game_status == GAME_MODE_PLAYING &&
@@ -4546,7 +4901,9 @@ static int RequestHandleEvents(unsigned int req_state)
 
   return result;
 }
+#endif
 
+#ifndef HEADLESS
 static boolean RequestDoor(char *text, unsigned int req_state)
 {
   unsigned int old_door_state;
@@ -4725,7 +5082,9 @@ static boolean RequestDoor(char *text, unsigned int req_state)
 
   return result;
 }
+#endif
 
+#ifndef HEADLESS
 static boolean RequestEnvelope(char *text, unsigned int req_state)
 {
   int result;
@@ -4810,7 +5169,9 @@ static boolean RequestEnvelope(char *text, unsigned int req_state)
 
   return result;
 }
+#endif
 
+#ifndef HEADLESS
 boolean Request(char *text, unsigned int req_state)
 {
   boolean overlay_enabled = GetOverlayEnabled();
@@ -4827,7 +5188,9 @@ boolean Request(char *text, unsigned int req_state)
 
   return result;
 }
+#endif
 
+#ifndef HEADLESS
 static int compareDoorPartOrderInfo(const void *object1, const void *object2)
 {
   const struct DoorPartOrderInfo *dpo1 = (struct DoorPartOrderInfo *)object1;
@@ -4841,7 +5204,9 @@ static int compareDoorPartOrderInfo(const void *object1, const void *object2)
 
   return compare_result;
 }
+#endif
 
+#ifndef HEADLESS
 void InitGraphicCompatibilityInfo_Doors(void)
 {
   struct
@@ -4998,7 +5363,9 @@ void InitGraphicCompatibilityInfo_Doors(void)
     }
   }
 }
+#endif
 
+#ifndef HEADLESS
 void InitDoors(void)
 {
   int i;
@@ -5025,7 +5392,9 @@ void InitDoors(void)
   qsort(door_part_order, MAX_DOOR_PARTS,
         sizeof(struct DoorPartOrderInfo), compareDoorPartOrderInfo);
 }
+#endif
 
+#ifndef HEADLESS
 unsigned int OpenDoor(unsigned int door_state)
 {
   if (door_state & DOOR_COPY_BACK)
@@ -5043,7 +5412,9 @@ unsigned int OpenDoor(unsigned int door_state)
 
   return MoveDoor(door_state);
 }
+#endif
 
+#ifndef HEADLESS
 unsigned int CloseDoor(unsigned int door_state)
 {
   unsigned int old_door_state = GetDoorState();
@@ -5063,22 +5434,30 @@ unsigned int CloseDoor(unsigned int door_state)
 
   return MoveDoor(door_state);
 }
+#endif
 
+#ifndef HEADLESS
 unsigned int GetDoorState(void)
 {
   return MoveDoor(DOOR_GET_STATE);
 }
+#endif
 
+#ifndef HEADLESS
 unsigned int SetDoorState(unsigned int door_state)
 {
   return MoveDoor(door_state | DOOR_SET_STATE);
 }
+#endif
 
+#ifndef HEADLESS
 static int euclid(int a, int b)
 {
   return (b ? euclid(b, a % b) : a);
 }
+#endif
 
+#ifndef HEADLESS
 unsigned int MoveDoor(unsigned int door_state)
 {
   struct Rect door_rect_list[] =
@@ -5437,7 +5816,9 @@ unsigned int MoveDoor(unsigned int door_state)
 
   return (door1 | door2);
 }
+#endif
 
+#ifndef HEADLESS
 static boolean useSpecialEditorDoor(void)
 {
   int graphic = IMG_GLOBAL_BORDER_EDITOR;
@@ -5460,7 +5841,9 @@ static boolean useSpecialEditorDoor(void)
 
   return TRUE;
 }
+#endif
 
+#ifndef HEADLESS
 void DrawSpecialEditorDoor(void)
 {
   struct GraphicInfo *gfx1 = &graphic_info[IMG_DOOR_2_TOP_BORDER_CORRECTION];
@@ -5483,7 +5866,9 @@ void DrawSpecialEditorDoor(void)
 
   redraw_mask |= REDRAW_ALL;
 }
+#endif
 
+#ifndef HEADLESS
 void UndrawSpecialEditorDoor(void)
 {
   struct GraphicInfo *gfx1 = &graphic_info[IMG_DOOR_2_TOP_BORDER_CORRECTION];
@@ -5517,10 +5902,12 @@ void UndrawSpecialEditorDoor(void)
 
   redraw_mask |= REDRAW_ALL;
 }
+#endif
 
 
 // ---------- new tool button stuff -------------------------------------------
 
+#ifndef HEADLESS
 static struct
 {
   int graphic;
@@ -5558,7 +5945,9 @@ static struct
     TOOL_CTRL_ID_PLAYER_4,		"player 4"
   }
 };
+#endif
 
+#ifndef HEADLESS
 void CreateToolButtons(void)
 {
   int i;
@@ -5654,7 +6043,9 @@ void CreateToolButtons(void)
     tool_gadget[id] = gi;
   }
 }
+#endif
 
+#ifndef HEADLESS
 void FreeToolButtons(void)
 {
   int i;
@@ -5662,7 +6053,9 @@ void FreeToolButtons(void)
   for (i = 0; i < NUM_TOOL_BUTTONS; i++)
     FreeGadget(tool_gadget[i]);
 }
+#endif
 
+#ifndef HEADLESS
 static void UnmapToolButtons(void)
 {
   int i;
@@ -5670,11 +6063,14 @@ static void UnmapToolButtons(void)
   for (i = 0; i < NUM_TOOL_BUTTONS; i++)
     UnmapGadget(tool_gadget[i]);
 }
+#endif
 
+#ifndef HEADLESS
 static void HandleToolButtons(struct GadgetInfo *gi)
 {
   request_gadget_id = gi->custom_id;
 }
+#endif
 
 static struct Mapping_EM_to_RND_object
 {
@@ -7368,6 +7764,7 @@ em_object_mapping_list[] =
   }
 };
 
+#ifndef HEADLESS
 static struct Mapping_EM_to_RND_player
 {
   int action_em;
@@ -7593,6 +7990,7 @@ em_player_mapping_list[] =
     -1,					-1, -1
   }
 };
+#endif
 
 int map_element_RND_to_EM(int element_rnd)
 {
@@ -7914,11 +8312,14 @@ int get_next_element(int element)
   }
 }
 
+#ifndef HEADLESS
 int el2img_mm(int element_mm)
 {
   return el2img(map_element_MM_to_RND(element_mm));
 }
+#endif
 
+#ifndef HEADLESS
 int el_act_dir2img(int element, int action, int direction)
 {
   element = GFX_ELEMENT(element);
@@ -7927,7 +8328,9 @@ int el_act_dir2img(int element, int action, int direction)
   // direction_graphic[][] == graphic[] for undefined direction graphics
   return element_info[element].direction_graphic[action][direction];
 }
+#endif
 
+#ifndef HEADLESS
 static int el_act_dir2crm(int element, int action, int direction)
 {
   element = GFX_ELEMENT(element);
@@ -7936,65 +8339,84 @@ static int el_act_dir2crm(int element, int action, int direction)
   // direction_graphic[][] == graphic[] for undefined direction graphics
   return element_info[element].direction_crumbled[action][direction];
 }
+#endif
 
+#ifndef HEADLESS
 int el_act2img(int element, int action)
 {
   element = GFX_ELEMENT(element);
 
   return element_info[element].graphic[action];
 }
+#endif
 
+#ifndef HEADLESS
 int el_act2crm(int element, int action)
 {
   element = GFX_ELEMENT(element);
 
   return element_info[element].crumbled[action];
 }
+#endif
 
+#ifndef HEADLESS
 int el_dir2img(int element, int direction)
 {
   element = GFX_ELEMENT(element);
 
   return el_act_dir2img(element, ACTION_DEFAULT, direction);
 }
+#endif
 
+#ifndef HEADLESS
 int el2baseimg(int element)
 {
   return element_info[element].graphic[ACTION_DEFAULT];
 }
+#endif
 
+#ifndef HEADLESS
 int el2img(int element)
 {
   element = GFX_ELEMENT(element);
 
   return element_info[element].graphic[ACTION_DEFAULT];
 }
+#endif
 
+#ifndef HEADLESS
 int el2edimg(int element)
 {
   element = GFX_ELEMENT(element);
 
   return element_info[element].special_graphic[GFX_SPECIAL_ARG_EDITOR];
 }
+#endif
 
+#ifndef HEADLESS
 int el2preimg(int element)
 {
   element = GFX_ELEMENT(element);
 
   return element_info[element].special_graphic[GFX_SPECIAL_ARG_PREVIEW];
 }
+#endif
 
+#ifndef HEADLESS
 int el2panelimg(int element)
 {
   element = GFX_ELEMENT(element);
 
   return element_info[element].special_graphic[GFX_SPECIAL_ARG_PANEL];
 }
+#endif
 
+#ifndef HEADLESS
 int font2baseimg(int font_nr)
 {
   return font_info[font_nr].special_graphic[GFX_SPECIAL_ARG_DEFAULT];
 }
+#endif
 
 int getBeltNrFromBeltElement(int element)
 {
@@ -8122,6 +8544,7 @@ boolean getTeamMode_EM(void)
   return game.team_mode || network_playing;
 }
 
+#ifndef HEADLESS
 int getGameFrameDelay_EM(int native_em_game_frame_delay)
 {
   int game_frame_delay_value;
@@ -8136,6 +8559,7 @@ int getGameFrameDelay_EM(int native_em_game_frame_delay)
 
   return game_frame_delay_value;
 }
+#endif
 
 unsigned int InitRND(int seed)
 {
@@ -8149,9 +8573,12 @@ unsigned int InitRND(int seed)
     return InitEngineRandom_RND(seed);
 }
 
+#ifndef HEADLESS
 static struct Mapping_EM_to_RND_object object_mapping[TILE_MAX];
 static struct Mapping_EM_to_RND_player player_mapping[MAX_PLAYERS][SPR_MAX];
+#endif
 
+#ifndef HEADLESS
 static int get_effective_element_EM(int tile, int frame_em)
 {
   int element             = object_mapping[tile].element_rnd;
@@ -8218,7 +8645,9 @@ static int get_effective_element_EM(int tile, int frame_em)
     }
   }
 }
+#endif
 
+#ifndef HEADLESS
 static boolean check_linear_animation_EM(int tile)
 {
   switch (tile)
@@ -8254,7 +8683,9 @@ static boolean check_linear_animation_EM(int tile)
 
   return FALSE;
 }
+#endif
 
+#ifndef HEADLESS
 static void set_crumbled_graphics_EM(struct GraphicInfo_EM *g_em,
 				     boolean has_crumbled_graphics,
 				     int crumbled, int sync_frame)
@@ -8293,6 +8724,7 @@ static void set_crumbled_graphics_EM(struct GraphicInfo_EM *g_em,
     g_em->has_crumbled_graphics = FALSE;
   }
 }
+#endif
 
 #if 0
 void ResetGfxAnimation_EM(int x, int y, int tile)
@@ -8301,6 +8733,7 @@ void ResetGfxAnimation_EM(int x, int y, int tile)
 }
 #endif
 
+#ifndef HEADLESS
 void SetGfxAnimation_EM(struct GraphicInfo_EM *g_em,
 			int tile, int frame_em, int x, int y)
 {
@@ -8397,7 +8830,9 @@ void SetGfxAnimation_EM(struct GraphicInfo_EM *g_em,
   g_em->unique_identifier =
     (graphic << 16) | ((frame % 8) << 12) | (g_em->width << 6) | g_em->height;
 }
+#endif
 
+#ifndef HEADLESS
 void getGraphicSourceObjectExt_EM(struct GraphicInfo_EM *g_em,
 				  int tile, int frame_em, int x, int y)
 {
@@ -8461,7 +8896,9 @@ void getGraphicSourceObjectExt_EM(struct GraphicInfo_EM *g_em,
   set_crumbled_graphics_EM(g_em, has_crumbled_graphics, crumbled,
 			   sync_frame);
 }
+#endif
 
+#ifndef HEADLESS
 void getGraphicSourcePlayerExt_EM(struct GraphicInfo_EM *g_em,
 				  int player_nr, int anim, int frame_em)
 {
@@ -8489,7 +8926,9 @@ void getGraphicSourcePlayerExt_EM(struct GraphicInfo_EM *g_em,
   getGraphicSourceExt(graphic, frame, &g_em->bitmap,
 		      &g_em->src_x, &g_em->src_y, FALSE);
 }
+#endif
 
+#ifndef HEADLESS
 void InitGraphicInfo_EM(void)
 {
   int i, j, p;
@@ -9044,7 +9483,9 @@ void InitGraphicInfo_EM(void)
   exit(0);
 #endif
 }
+#endif
 
+#ifndef HEADLESS
 static void CheckSaveEngineSnapshot_EM(byte action[MAX_PLAYERS], int frame,
 				       boolean any_player_moving,
 				       boolean any_player_snapping,
@@ -9065,7 +9506,9 @@ static void CheckSaveEngineSnapshot_EM(byte action[MAX_PLAYERS], int frame,
     local_player->was_waiting = FALSE;
   }
 }
+#endif
 
+#ifndef HEADLESS
 static void CheckSaveEngineSnapshot_SP(boolean murphy_is_waiting,
 				       boolean murphy_is_dropping)
 {
@@ -9084,7 +9527,9 @@ static void CheckSaveEngineSnapshot_SP(boolean murphy_is_waiting,
     local_player->was_waiting = FALSE;
   }
 }
+#endif
 
+#ifndef HEADLESS
 static void CheckSaveEngineSnapshot_MM(boolean element_clicked,
 				       boolean button_released)
 {
@@ -9101,7 +9546,9 @@ static void CheckSaveEngineSnapshot_MM(boolean element_clicked,
     game.snapshot.changed_action = TRUE;
   }
 }
+#endif
 
+#ifndef HEADLESS
 void CheckSingleStepMode_EM(byte action[MAX_PLAYERS], int frame,
 			    boolean any_player_moving,
 			    boolean any_player_snapping,
@@ -9114,7 +9561,9 @@ void CheckSingleStepMode_EM(byte action[MAX_PLAYERS], int frame,
   CheckSaveEngineSnapshot_EM(action, frame, any_player_moving,
 			     any_player_snapping, any_player_dropping);
 }
+#endif
 
+#ifndef HEADLESS
 void CheckSingleStepMode_SP(boolean murphy_is_waiting,
 			    boolean murphy_is_dropping)
 {
@@ -9131,7 +9580,9 @@ void CheckSingleStepMode_SP(boolean murphy_is_waiting,
 
   CheckSaveEngineSnapshot_SP(murphy_is_waiting, murphy_is_dropping);
 }
+#endif
 
+#ifndef HEADLESS
 void CheckSingleStepMode_MM(boolean element_clicked,
 			    boolean button_released)
 {
@@ -9141,7 +9592,9 @@ void CheckSingleStepMode_MM(boolean element_clicked,
 
   CheckSaveEngineSnapshot_MM(element_clicked, button_released);
 }
+#endif
 
+#ifndef HEADLESS
 void getGraphicSource_SP(struct GraphicInfo_SP *g_sp,
 			 int graphic, int sync_frame, int x, int y)
 {
@@ -9149,17 +9602,23 @@ void getGraphicSource_SP(struct GraphicInfo_SP *g_sp,
 
   getGraphicSource(graphic, frame, &g_sp->bitmap, &g_sp->src_x, &g_sp->src_y);
 }
+#endif
 
+#ifndef HEADLESS
 boolean isNextAnimationFrame_SP(int graphic, int sync_frame)
 {
   return (IS_NEXT_FRAME(sync_frame, graphic));
 }
+#endif
 
+#ifndef HEADLESS
 int getGraphicInfo_Delay(int graphic)
 {
   return graphic_info[graphic].anim_delay;
 }
+#endif
 
+#ifndef HEADLESS
 void PlayMenuSoundExt(int sound)
 {
   if (sound == SND_UNDEFINED)
@@ -9174,12 +9633,16 @@ void PlayMenuSoundExt(int sound)
   else
     PlaySound(sound);
 }
+#endif
 
+#ifndef HEADLESS
 void PlayMenuSound(void)
 {
   PlayMenuSoundExt(menu.sound[game_status]);
 }
+#endif
 
+#ifndef HEADLESS
 void PlayMenuSoundStereo(int sound, int stereo_position)
 {
   if (sound == SND_UNDEFINED)
@@ -9194,7 +9657,9 @@ void PlayMenuSoundStereo(int sound, int stereo_position)
   else
     PlaySoundStereo(sound, stereo_position);
 }
+#endif
 
+#ifndef HEADLESS
 void PlayMenuSoundIfLoopExt(int sound)
 {
   if (sound == SND_UNDEFINED)
@@ -9207,12 +9672,16 @@ void PlayMenuSoundIfLoopExt(int sound)
   if (IS_LOOP_SOUND(sound))
     PlaySoundLoop(sound);
 }
+#endif
 
+#ifndef HEADLESS
 void PlayMenuSoundIfLoop(void)
 {
   PlayMenuSoundIfLoopExt(menu.sound[game_status]);
 }
+#endif
 
+#ifndef HEADLESS
 void PlayMenuMusicExt(int music)
 {
   if (music == MUS_UNDEFINED)
@@ -9226,7 +9695,9 @@ void PlayMenuMusicExt(int music)
   else
     PlayMusic(music);
 }
+#endif
 
+#ifndef HEADLESS
 void PlayMenuMusic(void)
 {
   char *curr_music = getCurrentlyPlayingMusicFilename();
@@ -9235,18 +9706,24 @@ void PlayMenuMusic(void)
   if (!strEqual(curr_music, next_music))
     PlayMenuMusicExt(menu.music[game_status]);
 }
+#endif
 
+#ifndef HEADLESS
 void PlayMenuSoundsAndMusic(void)
 {
   PlayMenuSound();
   PlayMenuMusic();
 }
+#endif
 
+#ifndef HEADLESS
 static void FadeMenuSounds(void)
 {
   FadeSounds();
 }
+#endif
 
+#ifndef HEADLESS
 static void FadeMenuMusic(void)
 {
   char *curr_music = getCurrentlyPlayingMusicFilename();
@@ -9255,27 +9732,35 @@ static void FadeMenuMusic(void)
   if (!strEqual(curr_music, next_music))
     FadeMusic();
 }
+#endif
 
+#ifndef HEADLESS
 void FadeMenuSoundsAndMusic(void)
 {
   FadeMenuSounds();
   FadeMenuMusic();
 }
+#endif
 
+#ifndef HEADLESS
 void PlaySoundActivating(void)
 {
 #if 0
   PlaySound(SND_MENU_ITEM_ACTIVATING);
 #endif
 }
+#endif
 
+#ifndef HEADLESS
 void PlaySoundSelecting(void)
 {
 #if 0
   PlaySound(SND_MENU_ITEM_SELECTING);
 #endif
 }
+#endif
 
+#ifndef HEADLESS
 void ToggleFullscreenOrChangeWindowScalingIfNeeded(void)
 {
   boolean change_fullscreen = (setup.fullscreen !=
@@ -9335,7 +9820,9 @@ void ToggleFullscreenOrChangeWindowScalingIfNeeded(void)
     BlitBitmap(backbuffer, window, 0, 0, WIN_XSIZE, WIN_YSIZE, 0, 0);
   }
 }
+#endif
 
+#ifndef HEADLESS
 static void JoinRectangles(int *x, int *y, int *width, int *height,
 			   int x2, int y2, int width2, int height2)
 {
@@ -9348,6 +9835,7 @@ static void JoinRectangles(int *x, int *y, int *width, int *height,
   *width = MAX(*width, width2);
   *height = MAX(*height, height2);
 }
+#endif
 
 void SetAnimStatus(int anim_status_new)
 {
@@ -9376,6 +9864,7 @@ void SetGameStatus(int game_status_new)
   SetAnimStatus(game_status_new);
 }
 
+#ifndef HEADLESS
 void SetFontStatus(int game_status_new)
 {
   static int last_game_status = -1;
@@ -9392,11 +9881,14 @@ void SetFontStatus(int game_status_new)
     game_status = last_game_status;
   }
 }
+#endif
 
+#ifndef HEADLESS
 void ResetFontStatus(void)
 {
   SetFontStatus(-1);
 }
+#endif
 
 void SetLevelSetInfo(char *identifier, int level_nr)
 {
@@ -9405,6 +9897,7 @@ void SetLevelSetInfo(char *identifier, int level_nr)
   levelset.level_nr = level_nr;
 }
 
+#ifndef HEADLESS
 boolean CheckIfAllViewportsHaveChanged(void)
 {
   // if game status has not changed, viewports have not changed either
@@ -9452,13 +9945,17 @@ boolean CheckIfAllViewportsHaveChanged(void)
 	  door_1_viewport_has_changed &&
 	  door_2_viewport_has_changed);
 }
+#endif
 
+#ifndef HEADLESS
 boolean CheckFadeAll(void)
 {
   return (CheckIfGlobalBorderHasChanged() ||
 	  CheckIfAllViewportsHaveChanged());
 }
+#endif
 
+#ifndef HEADLESS
 void ChangeViewportPropertiesIfNeeded(void)
 {
   boolean use_mini_tilesize = (level.game_engine_type == GAME_ENGINE_TYPE_MM ?
@@ -9677,3 +10174,4 @@ void ChangeViewportPropertiesIfNeeded(void)
       InitGraphicInfo_EM();
   }
 }
+#endif

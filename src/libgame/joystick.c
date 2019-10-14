@@ -8,6 +8,7 @@
 // ----------------------------------------------------------------------------
 // joystick.c
 // ============================================================================
+#ifndef HEADLESS
 
 #if defined(PLATFORM_FREEBSD)
 #include <machine/joystick.h>
@@ -325,3 +326,5 @@ void ActivateJoystick(void)
   if (joystick.status & JOYSTICK_AVAILABLE)
     joystick.status |= JOYSTICK_ACTIVE;
 }
+
+#endif

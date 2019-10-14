@@ -65,12 +65,14 @@ extern int			REAL_SX, REAL_SY;
 
 extern struct LevelInfo_SP native_sp_level;
 
+#ifndef HEADLESS
 extern Bitmap *bitmap_db_field_sp;
 
 extern int GfxElementLast[SP_MAX_PLAYFIELD_WIDTH][SP_MAX_PLAYFIELD_HEIGHT];
 extern int GfxGraphicLast[SP_MAX_PLAYFIELD_WIDTH][SP_MAX_PLAYFIELD_HEIGHT];
 extern int GfxGraphic[SP_MAX_PLAYFIELD_WIDTH][SP_MAX_PLAYFIELD_HEIGHT];
 extern int GfxFrame[SP_MAX_PLAYFIELD_WIDTH][SP_MAX_PLAYFIELD_HEIGHT];
+#endif
 
 
 // ----------------------------------------------------------------------------

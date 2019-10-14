@@ -9,6 +9,8 @@
 // editor.c
 // ============================================================================
 
+#ifndef HEADLESS
+
 #include <math.h>
 
 #include "libgame/libgame.h"
@@ -8547,7 +8549,9 @@ void DrawLevelEd(void)
 {
   int fade_mask = REDRAW_FIELD;
 
+#ifndef HEADLESS
   FadeSoundsAndMusic();
+#endif
 
   if (CheckFadeAll())
     fade_mask = REDRAW_ALL;
@@ -14520,3 +14524,5 @@ void RequestExitLevelEditor(boolean ask_if_level_has_changed,
     }
   }
 }
+
+#endif

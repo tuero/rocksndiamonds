@@ -118,11 +118,13 @@
 #define SCREEN_KEYBOARD_POS(h)		((h) / 2)
 #endif
 
+#ifndef HEADLESS
 // values for drag-and-drop support (some parts not added before SDL 2.0.5)
 #if !SDL_VERSION_ATLEAST(2,0,5)
 #define SDL_DROPTEXT			(SDL_DROPFILE + 1)
 #define SDL_DROPBEGIN			(SDL_DROPFILE + 2)
 #define SDL_DROPCOMPLETE		(SDL_DROPFILE + 3)
+#endif
 #endif
 
 // default input keys
@@ -1062,6 +1064,7 @@ struct AudioSystemInfo
   int first_sound_channel;
 };
 
+#ifndef HEADLESS
 struct FontBitmapInfo
 {
   Bitmap *bitmap;
@@ -1146,6 +1149,7 @@ struct GfxInfo
   int cursor_mode_final;
   int mouse_x, mouse_y;
 };
+#endif
 
 struct TileCursorInfo
 {
@@ -1193,8 +1197,13 @@ struct SetupJoystickInfo
 
 struct SetupKeyboardInfo
 {
+#ifndef HEADLESS
   Key left, right, up, down;
   Key snap, drop;
+#else
+    uint left, right, up, down;
+  uint snap, drop;
+#endif
 };
 
 struct SetupTouchInfo
@@ -1282,6 +1291,7 @@ struct SetupEditorCascadeInfo
 
 struct SetupShortcutInfo
 {
+#ifndef HEADLESS
   Key save_game;
   Key load_game;
   Key toggle_pause;
@@ -1304,8 +1314,31 @@ struct SetupShortcutInfo
   Key snap_right;
   Key snap_up;
   Key snap_down;
-};
+#else
+    uint save_game;
+  uint load_game;
+  uint toggle_pause;
 
+  uint focus_player[MAX_PLAYERS];
+  uint focus_player_all;
+
+  uint tape_eject;
+  uint tape_extra;
+  uint tape_stop;
+  uint tape_pause;
+  uint tape_record;
+  uint tape_play;
+
+  uint sound_simple;
+  uint sound_loops;
+  uint sound_music;
+
+  uint snap_left;
+  uint snap_right;
+  uint snap_up;
+  uint snap_down;
+#endif
+};
 struct SetupSystemInfo
 {
   char *sdl_videodriver;
@@ -1357,7 +1390,11 @@ struct SetupInternalInfo
 struct SetupDebugInfo
 {
   int frame_delay[10];
+#ifndef HEADLESS
   Key frame_delay_key[10];
+#else
+  uint frame_delay_key[10];
+#endif
   boolean frame_delay_use_mod_key;
   boolean frame_delay_game_only;
   boolean show_frames_per_second;
@@ -1428,7 +1465,6 @@ struct SetupInfo
   struct SetupSystemInfo system;
   struct SetupInternalInfo internal;
   struct SetupDebugInfo debug;
-
   struct OptionInfo options;
 };
 
@@ -1741,7 +1777,9 @@ extern struct RuntimeInfo	runtime;
 extern struct OptionInfo	options;
 extern struct VideoSystemInfo	video;
 extern struct AudioSystemInfo	audio;
+#ifndef HEADLESS
 extern struct GfxInfo		gfx;
+#endif
 extern struct TileCursorInfo	tile_cursor;
 extern struct OverlayInfo	overlay;
 extern struct AnimInfo		anim;
@@ -1757,9 +1795,11 @@ extern int			level_nr;
 extern struct LevelSetInfo	levelset;
 extern struct LevelStats	level_stats[];
 
+#ifndef HEADLESS
 extern DrawWindow	       *window;
 extern DrawBuffer	       *backbuffer;
 extern DrawBuffer	       *drawto;
+#endif
 
 extern int			button_status;
 extern boolean			motion_status;
@@ -1787,6 +1827,7 @@ void InitExitFunction(void (*exit_function)(int));
 void InitPlatformDependentStuff(void);
 void ClosePlatformDependentStuff(void);
 
+#ifndef HEADLESS
 void InitGfxFieldInfo(int, int, int, int, int, int, int, int, Bitmap *);
 void InitGfxTileSizeInfo(int, int);
 void InitGfxDoor1Info(int, int, int, int);
@@ -1898,5 +1939,6 @@ void InitJoysticks(void);
 boolean ReadJoystick(int, int *, int *, boolean *, boolean *);
 boolean CheckJoystickOpened(int);
 void ClearJoystickState(void);
+#endif
 
 #endif // SYSTEM_H

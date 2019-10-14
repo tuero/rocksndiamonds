@@ -9,6 +9,8 @@
 // text.c
 // ============================================================================
 
+#ifndef HEADLESS
+
 #include <stdio.h>
 #include <stdarg.h>
 
@@ -662,3 +664,5 @@ int DrawTextFile(int x, int y, char *filename, int font_nr,
 
   return num_lines_printed;
 }
+
+#endif

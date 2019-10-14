@@ -9,6 +9,8 @@
 // image.c
 // ============================================================================
 
+#ifndef HEADLESS
+
 #include "image.h"
 #include "misc.h"
 #include "setup.h"
@@ -408,3 +410,5 @@ void FreeAllImages(void)
 {
   FreeCustomArtworkLists(image_info);
 }
+
+#endif

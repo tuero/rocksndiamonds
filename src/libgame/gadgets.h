@@ -12,6 +12,8 @@
 #ifndef GADGETS_H
 #define GADGETS_H
 
+#ifndef HEADLESS
+
 #include "system.h"
 
 
@@ -295,5 +297,7 @@ boolean HandleGadgetsKeyInput(Key);
 
 void DumpGadgetIdentifiers(void);
 boolean DoGadgetAction(int);
+
+#endif
 
 #endif	// GADGETS_H

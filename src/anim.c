@@ -9,6 +9,7 @@
 // anim.c
 // ============================================================================
 
+
 #include "libgame/libgame.h"
 
 #include "anim.h"
@@ -80,7 +81,7 @@
 #define ANIM_CONTINUE			2
 #define ANIM_STOP			3
 
-
+#ifndef HEADLESS
 struct GlobalAnimPartControlInfo
 {
   int old_nr;		// position before mapping animation parts linearly
@@ -232,6 +233,7 @@ static boolean drawing_to_fading_buffer = FALSE;
 
 static boolean handle_click = FALSE;
 
+#endif
 
 // ============================================================================
 // generic animation frame calculation
@@ -273,10 +275,14 @@ int getAnimationFrame(int num_frames, int delay, int mode, int start_frame,
   {
     // note: expect different frames for the same delay cycle!
 
+#ifndef HEADLESS
     if (gfx.anim_random_frame < 0)
       frame = GetSimpleRandom(num_frames);
     else
       frame = gfx.anim_random_frame % num_frames;
+#else
+      frame = GetSimpleRandom(num_frames);
+#endif
   }
   else if (mode & (ANIM_CE_VALUE | ANIM_CE_SCORE | ANIM_CE_DELAY))
   {
@@ -289,7 +295,7 @@ int getAnimationFrame(int num_frames, int delay, int mode, int start_frame,
   return frame;
 }
 
-
+#ifndef HEADLESS
 // ============================================================================
 // global animation functions
 // ============================================================================
@@ -1910,3 +1916,5 @@ boolean HandleGlobalAnimClicks(int mx, int my, int button, boolean force_click)
 
   return click_consumed_current;
 }
+
+#endif

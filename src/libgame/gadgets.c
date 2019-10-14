@@ -9,6 +9,8 @@
 // gadgets.c
 // ============================================================================
 
+#ifndef HEADLESS
+
 #include <stdarg.h>
 #include <string.h>
 
@@ -2338,3 +2340,5 @@ boolean DoGadgetAction(int image_id)
 
   return FALSE;
 }
+
+#endif

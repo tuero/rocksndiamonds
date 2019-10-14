@@ -9,6 +9,8 @@
 // network.c
 // ============================================================================
 
+#ifndef HEADLESS
+
 #include <signal.h>
 #include <sys/time.h>
 
@@ -39,7 +41,6 @@ static struct NetworkClientPlayerInfo first_player =
 };
 
 // server stuff
-
 static TCPsocket sfd;		// TCP server socket
 static UDPsocket udp;		// UDP server socket
 static SDLNet_SocketSet rfds;	// socket set
@@ -1096,3 +1097,35 @@ void DisconnectFromNetworkServer(void)
 
   DrawNetworkText_Success("Successfully disconnected!");
 }
+
+#endif     // HEADLESS
+//#ifndef HEADLESS
+//
+//#define SendNetworkBufferToServer() SendNetworkBufferToServer()
+//#define SendToServer_PlayerName() SendToServer_PlayerName()
+//#define SendToServer_ProtocolVersion() SendToServer_ProtocolVersion()
+//#define SendToServer_NrWanted() SendToServer_NrWanted()
+//#define SendToServer_LevelFile() SendToServer_LevelFile()
+//#define SendToServer_StartPlaying() SendToServer_StartPlaying()
+//#define SendToServer_PausePlaying() SendToServer_PausePlaying()
+//#define SendToServer_ContinuePlaying() SendToServer_ContinuePlaying()
+//#define SendToServer_StopPlaying() SendToServer_StopPlaying()
+//#define SendToServer_MovePlayer() SendToServer_MovePlayer()
+//#define HandleNetworking() HandleNetworking()
+//#define DisconnectFromNetworkServer() DisconnectFromNetworkServer()
+//
+//#else
+//
+//#define SendNetworkBufferToServer() {}
+//#define SendToServer_PlayerName() {}
+//#define SendToServer_ProtocolVersion() {}
+//#define SendToServer_NrWanted() {}
+//#define SendToServer_LevelFile() {}
+//#define SendToServer_StartPlaying() {}
+//#define SendToServer_PausePlaying() {}
+//#define SendToServer_ContinuePlaying() {}
+//#define SendToServer_StopPlaying() {}
+//#define SendToServer_MovePlayer() {}
+//#define HandleNetworking() {}
+//#define DisconnectFromNetworkServer() {}
+//#endif

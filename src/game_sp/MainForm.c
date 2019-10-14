@@ -5,13 +5,16 @@
 #include "MainForm.h"
 
 
+#ifndef HEADLESS
 static void DrawFrame(int Delta);
 static void ReStretch(void);
+#endif
 
 void DrawField(int X, int Y);
 void DrawFieldAnimated(int X, int Y);
 void DrawFieldNoAnimated(int X, int Y);
 
+#ifndef HEADLESS
 void DrawFrameIfNeeded(void)
 {
   DrawFrame(0);
@@ -20,7 +23,9 @@ void DrawFrameIfNeeded(void)
   if (! menBorder)
     DrawFrame(1);
 }
+#endif
 
+#ifndef HEADLESS
 void DisplayLevel(void)
 {
   int X, Y;
@@ -52,14 +57,18 @@ void DisplayLevel(void)
         DrawField(X, Y);
   }
 }
+#endif
 
 void Form_Load(void)
 {
   InitGlobals();
 
+#ifndef HEADLESS
   ReStretch();
+#endif
 }
 
+#ifndef HEADLESS
 static void DrawFrame(int Delta)
 {
   int i, LX, tY, RX, BY;
@@ -92,7 +101,9 @@ static void DrawFrame(int Delta)
     // ClearRectangle(bitmap_db_field_sp, 
   }
 }
+#endif
 
+#ifndef HEADLESS
 static void RestoreFrame(void)
 {
   int i, LX, tY, RX, BY;
@@ -114,7 +125,9 @@ static void RestoreFrame(void)
     DrawField(RX, i);
   }
 }
+#endif
 
+#ifndef HEADLESS
 void SetDisplayRegion(void)
 {
   if (! menBorder)
@@ -138,6 +151,7 @@ void SetDisplayRegion(void)
       RestoreFrame();
   }
 }
+#endif
 
 void menPlay_Click(void)
 {
@@ -145,11 +159,14 @@ void menPlay_Click(void)
 
   subFetchAndInitLevelB();
 
+#ifndef HEADLESS
   ReStretch();
+#endif
 
   subMainGameLoop_Init();
 }
 
+#ifndef HEADLESS
 static void ReStretch(void)
 {
   if (LevelLoaded)
@@ -167,7 +184,9 @@ static void ReStretch(void)
 
   ScrollTo(ScreenScrollXPos, ScreenScrollYPos);
 }
+#endif
 
+#ifndef HEADLESS
 void SetScrollEdges(void)
 {
   int border1_offset = (menBorder ? 1 : 2);
@@ -191,7 +210,9 @@ void SetScrollEdges(void)
   ScrollMinY -= game_sp.scroll_yoffset;
   ScrollMaxY -= game_sp.scroll_yoffset;
 }
+#endif
 
+#ifndef HEADLESS
 void DrawField(int X, int Y)
 {
   int tsi = GetSI(X, Y);
@@ -213,7 +234,9 @@ void DrawField(int X, int Y)
       Tmp != fiElectron)
     GfxGraphic[X][Y] = fiGraphic[Tmp];
 }
+#endif
 
+#ifndef HEADLESS
 void DrawFieldAnimated(int X, int Y)
 {
   int tsi = GetSI(X, Y);
@@ -233,7 +256,9 @@ void DrawFieldAnimated(int X, int Y)
       break;
   }
 }
+#endif
 
+#ifndef HEADLESS
 void DrawFieldNoAnimated(int X, int Y)
 {
   int tsi = GetSI(X, Y);
@@ -254,8 +279,11 @@ void DrawFieldNoAnimated(int X, int Y)
       break;
   }
 }
+#endif
 
+#ifndef HEADLESS
 void DrawImage(int X, int Y, int graphic)
 {
   DDSpriteBuffer_BltImg(StretchWidth * X, StretchWidth * Y, graphic, 0);
 }
+#endif

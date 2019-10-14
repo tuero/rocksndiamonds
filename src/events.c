@@ -22,7 +22,7 @@
 #include "anim.h"
 #include "network.h"
 
-#include "custom/custom.h"
+#include "ai/ai_entry.h"
 
 
 #define	DEBUG_EVENTS		0
@@ -36,12 +36,14 @@
 #define DEBUG_EVENTS_KEY	(DEBUG_EVENTS	* 1)
 
 
+#ifndef HEADLESS
 static boolean cursor_inside_playfield = FALSE;
 static int cursor_mode_last = CURSOR_DEFAULT;
 static unsigned int special_cursor_delay = 0;
 static unsigned int special_cursor_delay_value = 1000;
 
 static boolean virtual_button_pressed = FALSE;
+#endif
 
 
 // forward declarations for internal use
@@ -54,6 +56,7 @@ static boolean virtual_button_pressed = FALSE;
 // movement when the screen is updated without handling events; this can happen
 // when drawing door/envelope request animations, for example)
 
+#ifndef HEADLESS
 int FilterMouseMotionEvents(void *userdata, Event *event)
 {
   if (event->type == EVENT_MOTIONNOTIFY)
@@ -66,6 +69,7 @@ int FilterMouseMotionEvents(void *userdata, Event *event)
 
   return 1;
 }
+#endif
 
 // event filter especially needed for SDL event filtering due to
 // delay problems with lots of mouse motion events when mouse button
@@ -74,6 +78,7 @@ int FilterMouseMotionEvents(void *userdata, Event *event)
 // event filter addition for SDL2: as SDL2 does not have a function to enable
 // or disable keyboard auto-repeat, filter repeated keyboard events instead
 
+#ifndef HEADLESS
 static int FilterEvents(const Event *event)
 {
   MotionEvent *motion;
@@ -125,11 +130,13 @@ static int FilterEvents(const Event *event)
 
   return 1;
 }
+#endif
 
 // to prevent delay problems, skip mouse motion events if the very next
 // event is also a mouse motion event (and therefore effectively only
 // handling the last of a row of mouse motion events in the event queue)
 
+#ifndef HEADLESS
 static boolean SkipPressedMouseMotionEvent(const Event *event)
 {
   // nothing to do if the current event is not a mouse motion event
@@ -153,7 +160,9 @@ static boolean SkipPressedMouseMotionEvent(const Event *event)
 
   return FALSE;
 }
+#endif
 
+#ifndef HEADLESS
 static boolean WaitValidEvent(Event *event)
 {
   WaitEvent(event);
@@ -166,6 +175,7 @@ static boolean WaitValidEvent(Event *event)
 
   return TRUE;
 }
+#endif
 
 /* this is especially needed for event modifications for the Android target:
    if mouse coordinates should be modified in the event filter function,
@@ -175,6 +185,7 @@ static boolean WaitValidEvent(Event *event)
    has to be handled at a later stage in the event processing functions
    (when device pixel positions are already converted to screen positions) */
 
+#ifndef HEADLESS
 boolean NextValidEvent(Event *event)
 {
   while (PendingEvent())
@@ -183,7 +194,9 @@ boolean NextValidEvent(Event *event)
 
   return FALSE;
 }
+#endif
 
+#ifndef HEADLESS
 void HandleEvents(void)
 {
   Event event;
@@ -249,7 +262,9 @@ void HandleEvents(void)
       break;
   }
 }
+#endif
 
+#ifndef HEADLESS
 void HandleOtherEvents(Event *event)
 {
   switch (event->type)
@@ -286,7 +301,9 @@ void HandleOtherEvents(Event *event)
       break;
   }
 }
+#endif
 
+#ifndef HEADLESS
 static void HandleMouseCursor(void)
 {
   if (game_status == GAME_MODE_TITLE)
@@ -321,11 +338,10 @@ static void HandleMouseCursor(void)
   // this is set after all pending events have been processed
   cursor_mode_last = gfx.cursor_mode;
 }
+#endif
 
 void EventLoop(void)
 {
-    step_counter = 0;
-//    clock_t t = clock();
     int prev_game_status = GAME_MODE_MAIN;
 
   while (1)
@@ -335,10 +351,10 @@ void EventLoop(void)
           options.controller_type != CONTROLLER_TYPE_DEFAULT)
       {
           handleLevelStart();
-          step_counter = 0;
       }
       prev_game_status = game_status;
 
+#ifndef HEADLESS
       // mouse movement, arrow keys
     if (PendingEvent()){
         HandleEvents();
@@ -350,6 +366,7 @@ void EventLoop(void)
 
     // execute event related actions after pending events have been processed
     HandleEventActions();
+#endif
 
       // don't use all CPU time when idle; the main loop while playing
     // has its own synchronization and is CPU friendly, too
@@ -362,26 +379,32 @@ void EventLoop(void)
             handleCustomLevelProgramming();
             stored_player[0].action = getAction();
         }
-//        stored_player[0].action = 0;
-//        if (step_counter < 48) {stored_player[0].action = 2; step_counter += 1;}
-//        printf("%d\n", stored_player[0].action);
 
         HandleGameActions();
     }
 
+    // If level is complete during headless, we set end status and log output
+#ifdef HEADLESS
+    if ((game.LevelSolved && !game.LevelSolved_GameEnd) || checkGameFailed()) {
+        game_status = GAME_MODE_QUIT;
+    }
+#endif
+
     // always copy backbuffer to visible screen for every video frame
+#ifndef HEADLESS
     BackToFront();
 
     // reset video frame delay to default (may change again while playing)
     SetVideoFrameDelay(MenuFrameDelay);
+#endif
 
     if (game_status == GAME_MODE_QUIT)
       return;
 
-    step_counter += 1;
   }
 }
 
+#ifndef HEADLESS
 void ClearAutoRepeatKeyEvents(void)
 {
   while (PendingEvent())
@@ -398,7 +421,9 @@ void ClearAutoRepeatKeyEvents(void)
       break;
   }
 }
+#endif
 
+#ifndef HEADLESS
 void ClearEventQueue(void)
 {
   Event event;
@@ -426,14 +451,18 @@ void ClearEventQueue(void)
     }
   }
 }
+#endif
 
+#ifndef HEADLESS
 static void ClearPlayerMouseAction(void)
 {
   local_player->mouse_action.lx = 0;
   local_player->mouse_action.ly = 0;
   local_player->mouse_action.button = 0;
 }
+#endif
 
+#ifndef HEADLESS
 void ClearPlayerAction(void)
 {
   int i;
@@ -449,7 +478,9 @@ void ClearPlayerAction(void)
   ClearJoystickState();
   ClearPlayerMouseAction();
 }
+#endif
 
+#ifndef HEADLESS
 static void SetPlayerMouseAction(int mx, int my, int button)
 {
   int lx = getLevelFromScreenX(mx);
@@ -477,7 +508,9 @@ static void SetPlayerMouseAction(int mx, int my, int button)
 
   SetTileCursorXY(lx, ly);
 }
+#endif
 
+#ifndef HEADLESS
 void HandleButtonEvent(ButtonEvent *event)
 {
 #if DEBUG_EVENTS_BUTTON
@@ -504,7 +537,9 @@ void HandleButtonEvent(ButtonEvent *event)
 
   HandleButton(event->x, event->y, button_status, event->button);
 }
+#endif
 
+#ifndef HEADLESS
 void HandleMotionEvent(MotionEvent *event)
 {
   if (button_status == MB_RELEASED && game_status != GAME_MODE_EDITOR)
@@ -519,7 +554,9 @@ void HandleMotionEvent(MotionEvent *event)
 
   HandleButton(event->x, event->y, button_status, button_status);
 }
+#endif
 
+#ifndef HEADLESS
 void HandleWheelEvent(WheelEvent *event)
 {
   int button_nr;
@@ -558,7 +595,9 @@ void HandleWheelEvent(WheelEvent *event)
   button_status = MB_RELEASED;
   HandleButton(0, 0, button_status, -button_nr);
 }
+#endif
 
+#ifndef HEADLESS
 void HandleWindowEvent(WindowEvent *event)
 {
 #if DEBUG_EVENTS_WINDOW
@@ -666,9 +705,11 @@ void HandleWindowEvent(WindowEvent *event)
 #endif
   }
 }
+#endif
 
 #define NUM_TOUCH_FINGERS		3
 
+#ifndef HEADLESS
 static struct
 {
   boolean touched;
@@ -677,7 +718,9 @@ static struct
   Key key;
   byte action;
 } touch_info[NUM_TOUCH_FINGERS];
+#endif
 
+#ifndef HEADLESS
 static void HandleFingerEvent_VirtualButtons(FingerEvent *event)
 {
 #if 1
@@ -844,7 +887,9 @@ static void HandleFingerEvent_VirtualButtons(FingerEvent *event)
     }
   }
 }
+#endif
 
+#ifndef HEADLESS
 static void HandleFingerEvent_WipeGestures(FingerEvent *event)
 {
   static Key motion_key_x = KSYM_UNDEFINED;
@@ -993,7 +1038,9 @@ static void HandleFingerEvent_WipeGestures(FingerEvent *event)
     }
   }
 }
+#endif
 
+#ifndef HEADLESS
 void HandleFingerEvent(FingerEvent *event)
 {
 #if DEBUG_EVENTS_FINGER
@@ -1029,7 +1076,9 @@ void HandleFingerEvent(FingerEvent *event)
   else if (strEqual(setup.touch.control_type, TOUCH_CONTROL_WIPE_GESTURES))
     HandleFingerEvent_WipeGestures(event);
 }
+#endif
 
+#ifndef HEADLESS
 static void HandleButtonOrFinger_WipeGestures_MM(int mx, int my, int button)
 {
   static int old_mx = 0, old_my = 0;
@@ -1115,7 +1164,9 @@ static void HandleButtonOrFinger_WipeGestures_MM(int mx, int my, int button)
     }
   }
 }
+#endif
 
+#ifndef HEADLESS
 static void HandleButtonOrFinger_FollowFinger_MM(int mx, int my, int button)
 {
   static int old_mx = 0, old_my = 0;
@@ -1205,7 +1256,9 @@ static void HandleButtonOrFinger_FollowFinger_MM(int mx, int my, int button)
     }
   }
 }
+#endif
 
+#ifndef HEADLESS
 static void HandleButtonOrFinger_FollowFinger(int mx, int my, int button)
 {
   static int old_mx = 0, old_my = 0;
@@ -1367,7 +1420,9 @@ static void HandleButtonOrFinger_FollowFinger(int mx, int my, int button)
     motion_key_y = new_motion_key_y;
   }
 }
+#endif
 
+#ifndef HEADLESS
 static void HandleButtonOrFinger(int mx, int my, int button)
 {
   if (game_status != GAME_MODE_PLAYING)
@@ -1388,7 +1443,9 @@ static void HandleButtonOrFinger(int mx, int my, int button)
       HandleButtonOrFinger_FollowFinger(mx, my, button);
   }
 }
+#endif
 
+#ifndef HEADLESS
 static boolean checkTextInputKeyModState(void)
 {
   // when playing, only handle raw key events and ignore text input
@@ -1397,7 +1454,9 @@ static boolean checkTextInputKeyModState(void)
 
   return ((GetKeyModState() & KMOD_TextInput) != KMOD_None);
 }
+#endif
 
+#ifndef HEADLESS
 void HandleTextEvent(TextEvent *event)
 {
   char *text = event->text;
@@ -1424,7 +1483,9 @@ void HandleTextEvent(TextEvent *event)
   HandleKey(key, KEY_PRESSED);
   HandleKey(key, KEY_RELEASED);
 }
+#endif
 
+#ifndef HEADLESS
 void HandlePauseResumeEvent(PauseResumeEvent *event)
 {
   if (event->type == SDL_APP_WILLENTERBACKGROUND)
@@ -1436,7 +1497,9 @@ void HandlePauseResumeEvent(PauseResumeEvent *event)
     Mix_ResumeMusic();
   }
 }
+#endif
 
+#ifndef HEADLESS
 void HandleKeyEvent(KeyEvent *event)
 {
   int key_status = (event->type == EVENT_KEYPRESS ? KEY_PRESSED : KEY_RELEASED);
@@ -1480,7 +1543,9 @@ void HandleKeyEvent(KeyEvent *event)
   if (!checkTextInputKeyModState())
     HandleKey(key, key_status);
 }
+#endif
 
+#ifndef HEADLESS
 static int HandleDropFileEvent(char *filename)
 {
   Error(ERR_DEBUG, "DROP FILE EVENT: '%s'", filename);
@@ -1538,12 +1603,16 @@ static int HandleDropFileEvent(char *filename)
 
   return tree_type;
 }
+#endif
 
+#ifndef HEADLESS
 static void HandleDropTextEvent(char *text)
 {
   Error(ERR_DEBUG, "DROP TEXT EVENT: '%s'", text);
 }
+#endif
 
+#ifndef HEADLESS
 static void HandleDropCompleteEvent(int num_level_sets_succeeded,
 				    int num_artwork_sets_succeeded,
 				    int num_files_failed)
@@ -1584,7 +1653,9 @@ static void HandleDropCompleteEvent(int num_level_sets_succeeded,
 
   Request(message, REQ_CONFIRM);
 }
+#endif
 
+#ifndef HEADLESS
 void HandleDropEvent(Event *event)
 {
   static boolean confirm_on_drop_complete = FALSE;
@@ -1655,7 +1726,9 @@ void HandleDropEvent(Event *event)
   if (event->drop.file != NULL)
     SDL_free(event->drop.file);
 }
+#endif
 
+#ifndef HEADLESS
 void HandleUserEvent(UserEvent *event)
 {
   switch (event->code)
@@ -1673,7 +1746,9 @@ void HandleUserEvent(UserEvent *event)
       break;
   }
 }
+#endif
 
+#ifndef HEADLESS
 void HandleButton(int mx, int my, int button, int button_nr)
 {
   static int old_mx = 0, old_my = 0;
@@ -1780,7 +1855,9 @@ void HandleButton(int mx, int my, int button, int button_nr)
       break;
   }
 }
+#endif
 
+#ifndef HEADLESS
 static boolean is_string_suffix(char *string, char *suffix)
 {
   int string_len = strlen(string);
@@ -1791,9 +1868,11 @@ static boolean is_string_suffix(char *string, char *suffix)
 
   return (strEqual(&string[string_len - suffix_len], suffix));
 }
+#endif
 
 #define MAX_CHEAT_INPUT_LEN	32
 
+#ifndef HEADLESS
 static void HandleKeysSpecial(Key key)
 {
   static char cheat_input[2 * MAX_CHEAT_INPUT_LEN + 1] = "";
@@ -1937,7 +2016,9 @@ static void HandleKeysSpecial(Key key)
     DumpScreenIdentifiers();
   }
 }
+#endif
 
+#ifndef HEADLESS
 boolean HandleKeysDebug(Key key, int key_status)
 {
 #ifdef DEBUG
@@ -2000,9 +2081,12 @@ boolean HandleKeysDebug(Key key, int key_status)
 
   return FALSE;
 }
+#endif
 
+#ifndef HEADLESS
 void HandleKey(Key key, int key_status)
 {
+#ifndef HEADLESS
   boolean anyTextGadgetActiveOrJustFinished = anyTextGadgetActive();
   static boolean ignore_repeated_key = FALSE;
   static struct SetupKeyboardInfo ski;
@@ -2396,8 +2480,11 @@ void HandleKey(Key key, int key_status)
 	return;
       }
   }
+#endif
 }
+#endif
 
+#ifndef HEADLESS
 void HandleNoEvent(void)
 {
   HandleMouseCursor();
@@ -2409,7 +2496,9 @@ void HandleNoEvent(void)
       break;
   }
 }
+#endif
 
+#ifndef HEADLESS
 void HandleEventActions(void)
 {
   // if (button_status && game_status != GAME_MODE_PLAYING)
@@ -2441,7 +2530,9 @@ void HandleEventActions(void)
       break;
   }
 }
+#endif
 
+#ifndef HEADLESS
 static void HandleTileCursor(int dx, int dy, int button)
 {
   if (!dx || !button)
@@ -2472,7 +2563,9 @@ static void HandleTileCursor(int dx, int dy, int button)
     SetTileCursorTargetXY(new_xpos, new_ypos);
   }
 }
+#endif
 
+#ifndef HEADLESS
 static int HandleJoystickForAllPlayers(void)
 {
   int i;
@@ -2505,7 +2598,9 @@ static int HandleJoystickForAllPlayers(void)
 
   return result;
 }
+#endif
 
+#ifndef HEADLESS
 void HandleJoystick(void)
 {
   static unsigned int joytest_delay = 0;
@@ -2641,7 +2736,9 @@ void HandleJoystick(void)
       break;
   }
 }
+#endif
 
+#ifndef HEADLESS
 void HandleSpecialGameControllerButtons(Event *event)
 {
   int key_status;
@@ -2677,7 +2774,9 @@ void HandleSpecialGameControllerButtons(Event *event)
 
   HandleKey(key, key_status);
 }
+#endif
 
+#ifndef HEADLESS
 void HandleSpecialGameControllerKeys(Key key, int key_status)
 {
 #if defined(KSYM_Rewind) && defined(KSYM_FastForward)
@@ -2705,7 +2804,9 @@ void HandleSpecialGameControllerKeys(Key key, int key_status)
   }
 #endif
 }
+#endif
 
+#ifndef HEADLESS
 boolean DoKeysymAction(int keysym)
 {
   if (keysym < 0)
@@ -2720,3 +2821,4 @@ boolean DoKeysymAction(int keysym)
 
   return FALSE;
 }
+#endif

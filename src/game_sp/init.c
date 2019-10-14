@@ -53,7 +53,9 @@ char *preceding_playfield_memory[] =
 };
 
 
+#ifndef HEADLESS
 Bitmap *bitmap_db_field_sp;
+#endif
 
 struct EngineSnapshotInfo_SP engine_snapshot_sp;
 
@@ -79,10 +81,12 @@ void InitPrecedingPlayfieldMemory(void)
   game_sp.preceding_buffer_size = preceding_buffer_size;
 }
 
+#ifndef HEADLESS
 void InitGfxBuffers_SP(void)
 {
   ReCreateBitmap(&bitmap_db_field_sp, FXSIZE, FYSIZE);
 }
+#endif
 
 unsigned int InitEngineRandom_SP(int seed)
 {
@@ -144,12 +148,14 @@ void SaveEngineSnapshotValues_SP(ListNode **buffers)
   SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(mScrollX_last));
   SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(mScrollY_last));
 
+#ifndef HEADLESS
   SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(ScreenScrollXPos));
   SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(ScreenScrollYPos));
   SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(DisplayMinX));
   SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(DisplayMinY));
   SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(DisplayMaxX));
   SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(DisplayMaxY));
+#endif
 
   SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(InfotronsNeeded));
   SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(KillMurphyFlag));
@@ -175,10 +181,12 @@ void SaveEngineSnapshotValues_SP(ListNode **buffers)
 
   SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(LeadOutCounter));
 
+#ifndef HEADLESS
   SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(GfxElementLast));
   SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(GfxGraphicLast));
   SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(GfxGraphic));
   SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(GfxFrame));
+#endif
 
   SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(ScrollMinX));
   SaveSnapshotBuffer(buffers, ARGS_ADDRESS_AND_SIZEOF(ScrollMinY));
@@ -217,5 +225,7 @@ void LoadEngineSnapshotValues_SP(void)
   for (i = 0; i < FieldWidth * FieldHeight + HeaderSize; i++)
     TerminalState[i] = engine_snapshot_sp.TerminalState[i];
 
+#ifndef HEADLESS
   RedrawPlayfield_SP(TRUE);
+#endif
 }

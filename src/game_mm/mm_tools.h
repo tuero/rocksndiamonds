@@ -56,6 +56,7 @@ void ClearWindow(void);
 
 void MarkTileDirty(int, int);
 
+#ifndef HEADLESS
 void DrawAllPlayers_MM(void);
 void DrawPlayerField_MM(int, int);
 void DrawPlayer_MM(struct PlayerInfo *);
@@ -94,15 +95,18 @@ void DrawWalls_MM(int, int, int);
 void DrawWallsAnimation_MM(int, int, int, int, int);
 void DrawMiniLevel_MM(int, int, int, int);
 void DrawMicroLevel_MM(int, int, boolean);
+#endif
 
 boolean Request(char *, unsigned int);
 unsigned int OpenDoor(unsigned int);
 unsigned int CloseDoor(unsigned int);
 unsigned int GetDoorState(void);
 unsigned int MoveDoor(unsigned int);
+#ifndef HEADLESS
 void DrawSpecialEditorDoor_MM(void);
 void UndrawSpecialEditorDoor(void);
 Pixel ReadPixel(DrawBuffer *, int, int);
+#endif
 void SetRGB(unsigned int, unsigned short, unsigned short, unsigned short);
 
 void CreateToolButtons(void);
@@ -112,6 +116,8 @@ int get_element_phase(int);
 int get_num_elements(int);
 int get_rotated_element(int, int);
 
+#ifndef HEADLESS
 int el2gfx(int);
+#endif
 
 #endif

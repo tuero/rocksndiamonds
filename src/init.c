@@ -9,6 +9,8 @@
 // init.c
 // ============================================================================
 
+#define MAYBE_UNUSED __attribute__((used))
+
 #include "libgame/libgame.h"
 
 #include "init.h"
@@ -24,12 +26,14 @@
 #include "anim.h"
 #include "config.h"
 
+#ifndef HEADLESS
 #include "conf_e2g.c"	// include auto-generated data structure definitions
 #include "conf_esg.c"	// include auto-generated data structure definitions
 #include "conf_e2s.c"	// include auto-generated data structure definitions
 #include "conf_fnt.c"	// include auto-generated data structure definitions
 #include "conf_g2s.c"	// include auto-generated data structure definitions
 #include "conf_g2m.c"	// include auto-generated data structure definitions
+#endif
 #include "conf_act.c"	// include auto-generated data structure definitions
 
 
@@ -37,8 +41,10 @@
 #define CONFIG_TOKEN_GLOBAL_BUSY		"global.busy"
 
 
+#ifndef HEADLESS
 static struct FontBitmapInfo font_initial[NUM_INITIAL_FONTS];
 static struct GraphicInfo    anim_initial;
+#endif
 
 static int copy_properties[][5] =
 {
@@ -84,10 +90,13 @@ static int copy_properties[][5] =
 };
 
 
+#ifndef HEADLESS
 // forward declaration for internal use
 static int get_graphic_parameter_value(char *, char *, int);
+#endif
 
 
+#ifndef HEADLESS
 static void DrawInitAnim(void)
 {
   struct GraphicInfo *graphic_info_last = graphic_info;
@@ -135,7 +144,9 @@ static void DrawInitAnim(void)
 
   FrameCounter++;
 }
+#endif
 
+#ifndef HEADLESS
 static void DrawProgramInfo(void)
 {
   int font1_nr = FC_YELLOW;
@@ -149,7 +160,9 @@ static void DrawProgramInfo(void)
   DrawInitText(setup.internal.program_copyright, ypos2, font2_nr);
   DrawInitText(setup.internal.program_website,   ypos3, font2_nr);
 }
+#endif
 
+#ifndef HEADLESS
 static void FreeGadgets(void)
 {
   FreeLevelEditorGadgets();
@@ -158,7 +171,9 @@ static void FreeGadgets(void)
   FreeToolButtons();
   FreeScreenGadgets();
 }
+#endif
 
+#ifndef HEADLESS
 void InitGadgets(void)
 {
   static boolean gadgets_initialized = FALSE;
@@ -176,7 +191,9 @@ void InitGadgets(void)
 
   gadgets_initialized = TRUE;
 }
+#endif
 
+#ifndef HEADLESS
 static void InitElementSmallImagesScaledUp(int graphic)
 {
   struct GraphicInfo *g = &graphic_info[graphic];
@@ -184,7 +201,9 @@ static void InitElementSmallImagesScaledUp(int graphic)
   // create small and game tile sized bitmaps (and scale up, if needed)
   CreateImageWithSmallImages(graphic, g->scale_up_factor, g->tile_size);
 }
+#endif
 
+#ifndef HEADLESS
 static void InitElementSmallImages(void)
 {
   print_timestamp_init("InitElementSmallImages");
@@ -239,14 +258,18 @@ static void InitElementSmallImages(void)
 
   print_timestamp_done("InitElementSmallImages");
 }
+#endif
 
+#ifndef HEADLESS
 static void InitScaledImagesScaledUp(int graphic)
 {
   struct GraphicInfo *g = &graphic_info[graphic];
 
   ScaleImage(graphic, g->scale_up_factor);
 }
+#endif
 
+#ifndef HEADLESS
 static void InitScaledImages(void)
 {
   struct PropertyMapping *property_mapping = getImageListPropertyMapping();
@@ -261,7 +284,9 @@ static void InitScaledImages(void)
   for (i = 0; i < num_property_mappings; i++)
     InitScaledImagesScaledUp(property_mapping[i].artwork_index);
 }
+#endif
 
+#ifndef HEADLESS
 static void InitBitmapPointers(void)
 {
   int num_images = getImageListSize();
@@ -272,7 +297,9 @@ static void InitBitmapPointers(void)
     if (graphic_info[i].bitmaps)
       graphic_info[i].bitmap = graphic_info[i].bitmaps[IMG_BITMAP_STANDARD];
 }
+#endif
 
+#ifndef HEADLESS
 void InitImageTextures(void)
 {
   int i, j, k;
@@ -301,7 +328,9 @@ void InitImageTextures(void)
     }
   }
 }
+#endif
 
+#ifndef HEADLESS
 #if 1
 // !!! FIX THIS (CHANGE TO USING NORMAL ELEMENT GRAPHIC DEFINITIONS) !!!
 void SetBitmaps_EM(Bitmap **em_bitmap)
@@ -309,6 +338,7 @@ void SetBitmaps_EM(Bitmap **em_bitmap)
   em_bitmap[0] = graphic_info[IMG_EMC_OBJECT].bitmap;
   em_bitmap[1] = graphic_info[IMG_EMC_SPRITE].bitmap;
 }
+#endif
 #endif
 
 #if 0
@@ -319,6 +349,7 @@ void SetBitmaps_SP(Bitmap **sp_bitmap)
 }
 #endif
 
+#ifndef HEADLESS
 static int getFontBitmapID(int font_nr)
 {
   int special = -1;
@@ -335,7 +366,9 @@ static int getFontBitmapID(int font_nr)
   else
     return font_nr;
 }
+#endif
 
+#ifndef HEADLESS
 static int getFontFromToken(char *token)
 {
   char *value = getHashEntry(font_token_hash, token);
@@ -346,7 +379,9 @@ static int getFontFromToken(char *token)
   // if font not found, use reliable default value
   return FONT_INITIAL_1;
 }
+#endif
 
+#ifndef HEADLESS
 static void InitFontGraphicInfo(void)
 {
   static struct FontBitmapInfo *font_bitmap_info = NULL;
@@ -585,7 +620,9 @@ static void InitFontGraphicInfo(void)
   InitFontInfo(font_bitmap_info, num_font_bitmaps,
 	       getFontBitmapID, getFontFromToken);
 }
+#endif
 
+#ifndef HEADLESS
 static void InitGlobalAnimGraphicInfo(void)
 {
   struct PropertyMapping *property_mapping = getImageListPropertyMapping();
@@ -657,9 +694,12 @@ static void InitGlobalAnimGraphicInfo(void)
 		 i, j, k, global_anim_info[i].graphic[j][k]);
 #endif
 }
+#endif
 
+static void InitGlobalAnimSoundInfo(void) MAYBE_UNUSED;
 static void InitGlobalAnimSoundInfo(void)
 {
+#ifndef HEADLESS
   struct PropertyMapping *property_mapping = getSoundListPropertyMapping();
   int num_property_mappings = getSoundListPropertyMappingSize();
   int i, j, k;
@@ -694,6 +734,7 @@ static void InitGlobalAnimSoundInfo(void)
 
     global_anim_info[anim_nr].sound[part_nr][special] = sound;
   }
+#endif
 
 #if 0
   printf("::: InitGlobalAnimSoundInfo\n");
@@ -707,8 +748,10 @@ static void InitGlobalAnimSoundInfo(void)
 #endif
 }
 
+static void InitGlobalAnimMusicInfo(void) MAYBE_UNUSED;
 static void InitGlobalAnimMusicInfo(void)
 {
+#ifndef HEADLESS
   struct PropertyMapping *property_mapping = getMusicListPropertyMapping();
   int num_property_mappings = getMusicListPropertyMappingSize();
   int i, j, k;
@@ -743,7 +786,7 @@ static void InitGlobalAnimMusicInfo(void)
 
     global_anim_info[anim_nr].music[part_nr][special] = music;
   }
-
+#endif
 #if 0
   printf("::: InitGlobalAnimMusicInfo\n");
 
@@ -758,6 +801,7 @@ static void InitGlobalAnimMusicInfo(void)
 
 static void InitElementGraphicInfo(void)
 {
+#ifndef HEADLESS
   struct PropertyMapping *property_mapping = getImageListPropertyMapping();
   int num_property_mappings = getImageListPropertyMappingSize();
   int i, act, dir;
@@ -1135,8 +1179,10 @@ static void InitElementGraphicInfo(void)
   }
 
   UPDATE_BUSY_STATE();
+#endif
 }
 
+#ifndef HEADLESS
 static void InitElementSpecialGraphicInfo(void)
 {
   struct PropertyMapping *property_mapping = getImageListPropertyMapping();
@@ -1205,7 +1251,9 @@ static void InitElementSpecialGraphicInfo(void)
 	element_info[i].special_graphic[j] =
 	  element_info[i].graphic[ACTION_DEFAULT];
 }
+#endif
 
+#ifndef HEADLESS
 static int get_graphic_parameter_value(char *value_raw, char *suffix, int type)
 {
   if (type != TYPE_ELEMENT && type != TYPE_GRAPHIC)
@@ -1252,7 +1300,9 @@ static int get_graphic_parameter_value(char *value_raw, char *suffix, int type)
 
   return -1;
 }
+#endif
 
+#ifndef HEADLESS
 static int get_scaled_graphic_width(int graphic)
 {
   int original_width = getOriginalImageWidthFromImageID(graphic);
@@ -1260,7 +1310,9 @@ static int get_scaled_graphic_width(int graphic)
 
   return original_width * scale_up_factor;
 }
+#endif
 
+#ifndef HEADLESS
 static int get_scaled_graphic_height(int graphic)
 {
   int original_height = getOriginalImageHeightFromImageID(graphic);
@@ -1268,7 +1320,9 @@ static int get_scaled_graphic_height(int graphic)
 
   return original_height * scale_up_factor;
 }
+#endif
 
+#ifndef HEADLESS
 static void set_graphic_parameters_ext(int graphic, int *parameter,
 				       Bitmap **src_bitmaps)
 {
@@ -1602,7 +1656,9 @@ static void set_graphic_parameters_ext(int graphic, int *parameter,
   g->pressed_xoffset = parameter[GFX_ARG_PRESSED_XOFFSET];
   g->pressed_yoffset = parameter[GFX_ARG_PRESSED_YOFFSET];
 }
+#endif
 
+#ifndef HEADLESS
 static void set_graphic_parameters(int graphic)
 {
   struct FileInfo *image = getImageListEntryFromImageID(graphic);
@@ -1625,7 +1681,9 @@ static void set_graphic_parameters(int graphic)
 
   UPDATE_BUSY_STATE();
 }
+#endif
 
+#ifndef HEADLESS
 static void set_cloned_graphic_parameters(int graphic)
 {
   int fallback_graphic = IMG_CHAR_EXCLAM;
@@ -1664,7 +1722,9 @@ static void set_cloned_graphic_parameters(int graphic)
     graphic_info[graphic].clone_from = clone_graphic;
   }
 }
+#endif
 
+#ifndef HEADLESS
 static void InitGraphicInfo(void)
 {
   int fallback_graphic = IMG_CHAR_EXCLAM;
@@ -1846,7 +1906,9 @@ static void InitGraphicInfo(void)
     }
   }
 }
+#endif
 
+#ifndef HEADLESS
 static void InitGraphicCompatibilityInfo(void)
 {
   struct FileInfo *fi_global_door =
@@ -1888,7 +1950,9 @@ static void InitGraphicCompatibilityInfo(void)
 
   InitGraphicCompatibilityInfo_Doors();
 }
+#endif
 
+#ifndef HEADLESS
 static void InitElementSoundInfo(void)
 {
   struct PropertyMapping *property_mapping = getSoundListPropertyMapping();
@@ -1992,7 +2056,9 @@ static void InitElementSoundInfo(void)
 	element_info[copy_properties[i][j]].sound[act] =
 	  element_info[copy_properties[i][0]].sound[act];
 }
+#endif
 
+#ifndef HEADLESS
 static void InitGameModeSoundInfo(void)
 {
   int i;
@@ -2018,7 +2084,9 @@ static void InitGameModeSoundInfo(void)
     if (menu.sound[i] == -1)
       menu.sound[i] = menu.sound[GAME_MODE_DEFAULT];
 }
+#endif
 
+#ifndef HEADLESS
 static void set_sound_parameters(int sound, char **parameter_raw)
 {
   int parameter[NUM_SND_ARGS];
@@ -2041,7 +2109,9 @@ static void set_sound_parameters(int sound, char **parameter_raw)
   // sound priority to give certain sounds a higher or lower priority
   sound_info[sound].priority = parameter[SND_ARG_PRIORITY];
 }
+#endif
 
+#ifndef HEADLESS
 static void InitSoundInfo(void)
 {
   int *sound_effect_properties;
@@ -2108,7 +2178,9 @@ static void InitSoundInfo(void)
 
   free(sound_effect_properties);
 }
+#endif
 
+#ifndef HEADLESS
 static void InitGameModeMusicInfo(void)
 {
   struct PropertyMapping *property_mapping = getMusicListPropertyMapping();
@@ -2174,7 +2246,9 @@ static void InitGameModeMusicInfo(void)
     if (menu.music[i] == -1)
       menu.music[i] = menu.music[GAME_MODE_DEFAULT];
 }
+#endif
 
+#ifndef HEADLESS
 static void set_music_parameters(int music, char **parameter_raw)
 {
   int parameter[NUM_MUS_ARGS];
@@ -2191,7 +2265,9 @@ static void set_music_parameters(int music, char **parameter_raw)
   if (parameter[MUS_ARG_MODE_LOOP] != ARG_UNDEFINED_VALUE)
     music_info[music].loop = parameter[MUS_ARG_MODE_LOOP];
 }
+#endif
 
+#ifndef HEADLESS
 static void InitMusicInfo(void)
 {
   int num_music = getMusicListSize();
@@ -2227,7 +2303,9 @@ static void InitMusicInfo(void)
     set_music_parameters(i, music->parameter);
   }
 }
+#endif
 
+#ifndef HEADLESS
 static void ReinitializeGraphics(void)
 {
   print_timestamp_init("ReinitializeGraphics");
@@ -2273,7 +2351,9 @@ static void ReinitializeGraphics(void)
 
   print_timestamp_done("ReinitializeGraphics");
 }
+#endif
 
+#ifndef HEADLESS
 static void ReinitializeSounds(void)
 {
   InitSoundInfo();		// sound properties mapping
@@ -2283,13 +2363,16 @@ static void ReinitializeSounds(void)
 
   InitPlayLevelSound();		// internal game sound settings
 }
+#endif
 
+#ifndef HEADLESS
 static void ReinitializeMusic(void)
 {
   InitMusicInfo();		// music properties mapping
   InitGameModeMusicInfo();	// game mode music mapping
   InitGlobalAnimMusicInfo();	// global animation music settings
 }
+#endif
 
 static int get_special_property_bit(int element, int property_bit_nr)
 {
@@ -4753,6 +4836,7 @@ void InitElementPropertiesEngine(int engine_version)
     InitElementGraphicInfo();
 }
 
+#ifndef HEADLESS
 void InitElementPropertiesGfxElement(void)
 {
   int i;
@@ -4764,10 +4848,13 @@ void InitElementPropertiesGfxElement(void)
     ei->gfx_element = (ei->use_gfx_element ? ei->gfx_element_initial : i);
   }
 }
+#endif
 
 static void InitGlobal(void)
 {
+#ifndef HEADLESS
   int graphic;
+#endif
   int i;
 
   for (i = 0; i < MAX_NUM_ELEMENTS + 1; i++)
@@ -4781,6 +4868,7 @@ static void InitGlobal(void)
     element_info[i].editor_description= element_name_info[i].editor_description;
   }
 
+#ifndef HEADLESS
   for (i = 0; i < NUM_GLOBAL_ANIM_TOKENS + 1; i++)
   {
     // check if global_anim_name_info defined for each entry in "main.h"
@@ -4797,6 +4885,7 @@ static void InitGlobal(void)
     setHashEntry(image_config_hash,
 		 image_config[i].token,
 		 image_config[i].value);
+#endif
 
   // create hash from element token list
   element_token_hash = newSetupFileHash();
@@ -4805,6 +4894,7 @@ static void InitGlobal(void)
 		 element_name_info[i].token_name,
 		 int2str(i, 0));
 
+#ifndef HEADLESS
   // create hash from graphic token list
   graphic_token_hash = newSetupFileHash();
   for (graphic = 0, i = 0; image_config[i].token != NULL; i++)
@@ -4849,6 +4939,7 @@ static void InitGlobal(void)
       free(token_clone_from);
     }
   }
+#endif
 
   // always start with reliable default values (all elements)
   for (i = 0; i < MAX_NUM_ELEMENTS; i++)
@@ -4863,6 +4954,7 @@ static void InitGlobal(void)
     ActiveElement[element] = element_active;
   }
 
+#ifndef HEADLESS
   // always start with reliable default values (all buttons)
   for (i = 0; i < NUM_IMAGE_FILES; i++)
     ActiveButton[i] = i;
@@ -4888,6 +4980,11 @@ static void InitGlobal(void)
 
     ActiveFont[font] = font_active;
   }
+#else
+    // Added to silence compiler warnings
+    (void)font_with_active_state;
+    (void)button_with_active_state;
+#endif
 
   global.autoplay_leveldir = NULL;
   global.convert_leveldir = NULL;
@@ -4904,6 +5001,7 @@ static void InitGlobal(void)
 
 static void Execute_Command(char *command)
 {
+#ifndef HEADLESS
   int i;
 
   if (strEqual(command, "print graphicsinfo.conf"))
@@ -5107,6 +5205,7 @@ static void Execute_Command(char *command)
 
   // disable networking if any valid command was recognized
   options.network = setup.network_mode = FALSE;
+#endif
 }
 
 static void InitSetup(void)
@@ -5116,11 +5215,13 @@ static void InitSetup(void)
 
   // set some options from setup file
 
+#ifndef HEADLESS
   if (setup.options.verbose)
     options.verbose = TRUE;
 
   if (setup.debug.show_frames_per_second)
     global.show_frames_per_second = TRUE;
+#endif
 }
 
 static void InitGameInfo(void)
@@ -5146,11 +5247,14 @@ static void InitPlayerInfo(void)
   local_player->connected_locally = TRUE;
 }
 
+#ifndef HEADLESS
 static void InitArtworkInfo(void)
 {
   LoadArtworkInfo();
 }
+#endif
 
+#ifndef HEADLESS
 static char *get_string_in_brackets(char *string)
 {
   char *string_in_brackets = checked_malloc(strlen(string) + 3);
@@ -5159,7 +5263,9 @@ static char *get_string_in_brackets(char *string)
 
   return string_in_brackets;
 }
+#endif
 
+#ifndef HEADLESS
 static char *get_level_id_suffix(int id_nr)
 {
   char *id_suffix = checked_malloc(1 + 3 + 1);
@@ -5171,7 +5277,9 @@ static char *get_level_id_suffix(int id_nr)
 
   return id_suffix;
 }
+#endif
 
+#ifndef HEADLESS
 static void InitArtworkConfig(void)
 {
   static char *image_id_prefix[MAX_NUM_ELEMENTS +
@@ -5291,14 +5399,18 @@ static void InitArtworkConfig(void)
 		music_id_prefix, action_id_suffix, special_id_suffix,
 		level_id_suffix, ignore_music_tokens);
 }
+#endif
 
+#ifndef HEADLESS
 static void InitMixer(void)
 {
   OpenAudio();
 
   StartMixer();
 }
+#endif
 
+#ifndef HEADLESS
 static void InitVideoOverlay(void)
 {
   // if virtual buttons are not loaded from setup file, repeat initializing
@@ -5309,7 +5421,9 @@ static void InitVideoOverlay(void)
   InitTileCursorInfo();
   InitOverlayInfo();
 }
+#endif
 
+#ifndef HEADLESS
 void InitGfxBuffers(void)
 {
   static int win_xsize_last = -1;
@@ -5349,7 +5463,9 @@ void InitGfxBuffers(void)
   InitGfxBuffers_EM();
   InitGfxBuffers_SP();
 }
+#endif
 
+#ifndef HEADLESS
 static void InitGfx(void)
 {
   struct GraphicInfo *graphic_info_last = graphic_info;
@@ -5512,7 +5628,9 @@ static void InitGfx(void)
   // use copy of busy animation to prevent change while reloading artwork
   init_last = init;
 }
+#endif
 
+#ifndef HEADLESS
 static void InitGfxBackground(void)
 {
   fieldbuffer = bitmap_db_field;
@@ -5522,6 +5640,7 @@ static void InitGfxBackground(void)
 
   redraw_mask = REDRAW_ALL;
 }
+#endif
 
 static void InitLevelInfo(void)
 {
@@ -5541,11 +5660,14 @@ static void InitLevelInfo(void)
   SetLevelSetInfo(leveldir_current->identifier, level_nr);
 }
 
+#ifndef HEADLESS
 static void InitLevelArtworkInfo(void)
 {
   LoadLevelArtworkInfo();
 }
+#endif
 
+#ifndef HEADLESS
 static void InitImages(void)
 {
   print_timestamp_init("InitImages");
@@ -5610,7 +5732,9 @@ static void InitImages(void)
 
   print_timestamp_done("InitImages");
 }
+#endif
 
+#ifndef HEADLESS
 static void InitSound(char *identifier)
 {
   print_timestamp_init("InitSound");
@@ -5629,7 +5753,9 @@ static void InitSound(char *identifier)
 
   print_timestamp_done("InitSound");
 }
+#endif
 
+#ifndef HEADLESS
 static void InitMusic(char *identifier)
 {
   print_timestamp_init("InitMusic");
@@ -5648,7 +5774,9 @@ static void InitMusic(char *identifier)
 
   print_timestamp_done("InitMusic");
 }
+#endif
 
+#ifndef HEADLESS
 static void InitArtworkDone(void)
 {
   if (program.headless)
@@ -5656,7 +5784,9 @@ static void InitArtworkDone(void)
 
   InitGlobalAnimations();
 }
+#endif
 
+#ifndef HEADLESS
 static void InitNetworkSettings(void)
 {
   boolean network_enabled = (options.network || setup.network_mode);
@@ -5672,7 +5802,9 @@ static void InitNetworkSettings(void)
 		  network_server,
 		  options.server_port);
 }
+#endif
 
+#ifndef HEADLESS
 void InitNetworkServer(void)
 {
   if (!network.enabled || network.connected)
@@ -5702,7 +5834,9 @@ void InitNetworkServer(void)
   if (game_status == GAME_MODE_LOADING)
     Delay_WithScreenUpdates(1000);
 }
+#endif
 
+#ifndef HEADLESS
 static boolean CheckArtworkConfigForCustomElements(char *filename)
 {
   SetupFileHash *setup_file_hash;
@@ -5730,7 +5864,9 @@ static boolean CheckArtworkConfigForCustomElements(char *filename)
 
   return redefined_ce_found;
 }
+#endif
 
+#ifndef HEADLESS
 static boolean CheckArtworkTypeForRedefinedCustomElements(int type)
 {
   char *filename_base, *filename_local;
@@ -5775,7 +5911,9 @@ static boolean CheckArtworkTypeForRedefinedCustomElements(int type)
 
   return redefined_ce_found;
 }
+#endif
 
+#ifndef HEADLESS
 static void InitOverrideArtwork(void)
 {
   boolean redefined_ce_found = FALSE;
@@ -5820,7 +5958,9 @@ static void InitOverrideArtwork(void)
 	 gfx.override_level_music);
 #endif
 }
+#endif
 
+#ifndef HEADLESS
 static char *getNewArtworkIdentifier(int type)
 {
   static char *leveldir_current_identifier[3] = { NULL, NULL, NULL };
@@ -5891,7 +6031,9 @@ static char *getNewArtworkIdentifier(int type)
 
   return artwork_new_identifier;
 }
+#endif
 
+#ifndef HEADLESS
 void ReloadCustomArtwork(int force_reload)
 {
   int last_game_status = game_status;	// save current game status
@@ -5976,13 +6118,17 @@ void ReloadCustomArtwork(int force_reload)
 
   LimitScreenUpdates(FALSE);
 }
+#endif
 
+#ifndef HEADLESS
 void KeyboardAutoRepeatOffUnlessAutoplay(void)
 {
   if (global.autoplay_leveldir == NULL)
     KeyboardAutoRepeatOff();
 }
+#endif
 
+#ifndef HEADLESS
 void DisplayExitMessage(char *format, va_list ap)
 {
   // also check for initialized video (headless flag may be temporarily unset)
@@ -6046,6 +6192,7 @@ void DisplayExitMessage(char *format, va_list ap)
 
   WaitForEventToContinue();
 }
+#endif
 
 
 // ============================================================================
@@ -6059,7 +6206,9 @@ void OpenAll(void)
   SetGameStatus(GAME_MODE_LOADING);
 
   // Need these 2
+#ifndef HEADLESS
   InitCounter();
+#endif
   InitGlobal();			// initialize some global variables
 
   print_timestamp_time("[init global stuff]");
@@ -6073,13 +6222,15 @@ void OpenAll(void)
   if (options.execute_command)
     Execute_Command(options.execute_command);
 
+#ifndef HEADLESS
   InitNetworkSettings();
+#endif
 
   InitRuntimeInfo();
 
   if (network.serveronly)
   {
-#if defined(PLATFORM_UNIX)
+#if defined(PLATFORM_UNIX) && !defined(HEADLESS)
     NetworkServer(network.server_port, TRUE);
 #else
     Error(ERR_WARN, "networking only supported in Unix version");
@@ -6093,43 +6244,59 @@ void OpenAll(void)
   print_timestamp_time("[init setup/config stuff (2)]");
   InitPlayerInfo();
   print_timestamp_time("[init setup/config stuff (3)]");
+#ifndef HEADLESS
   InitArtworkInfo();		// needed before loading gfx, sound & music
+#endif
   print_timestamp_time("[init setup/config stuff (4)]");
+#ifndef HEADLESS
   InitArtworkConfig();		// needed before forking sound child process
+#endif
   print_timestamp_time("[init setup/config stuff (5)]");
+#ifndef HEADLESS
   InitMixer();
+#endif
   print_timestamp_time("[init setup/config stuff (6)]");
 
   InitRND(NEW_RANDOMIZE);
   InitSimpleRandom(NEW_RANDOMIZE);
 
+#ifndef HEADLESS
   InitJoysticks();
+#endif
 
   print_timestamp_time("[init setup/config stuff]");
 
-  // sets SDL functions, will need to comment out?
+#ifndef HEADLESS
   InitVideoDefaults();
   InitVideoDisplay();
   InitVideoBuffer(WIN_XSIZE, WIN_YSIZE, DEFAULT_DEPTH, setup.fullscreen);
   InitVideoOverlay();
+#endif
 
+#ifndef HEADLESS
   InitEventFilter(FilterMouseMotionEvents);
+#endif
 
   print_timestamp_time("[init video stuff]");
 
   InitElementPropertiesStatic();
   InitElementPropertiesEngine(GAME_VERSION_ACTUAL);
+#ifndef HEADLESS
   InitElementPropertiesGfxElement();
+#endif
 
   print_timestamp_time("[init element properties stuff]");
 
+#ifndef HEADLESS
   InitGfx();
+#endif
 
   print_timestamp_time("InitGfx");
 
   InitLevelInfo();
   print_timestamp_time("InitLevelInfo");
 
+#ifndef HEADLESS
   InitLevelArtworkInfo();
   print_timestamp_time("InitLevelArtworkInfo");
 
@@ -6148,11 +6315,13 @@ void OpenAll(void)
   InitArtworkDone();
 
   InitGfxBackground();
+#endif
 
   em_open_all();
   sp_open_all();
   mm_open_all();
 
+#ifndef HEADLESS
   if (global.autoplay_leveldir)
   {
     AutoPlayTape();
@@ -6168,11 +6337,15 @@ void OpenAll(void)
     CreateLevelSketchImages();
     return;
   }
+#endif
 
+#ifndef HEADLESS
   InitNetworkServer();
+#endif
 
   SetGameStatus(GAME_MODE_MAIN);
 
+#ifndef HEADLESS
   FadeSetEnterScreen();
   if (!(fading.fade_mode & FADE_TYPE_TRANSFORM))
     FadeSkipNextFadeOut();
@@ -6182,6 +6355,7 @@ void OpenAll(void)
   print_timestamp_done("OpenAll");
 
   DrawMainMenu();
+#endif
 
 #if 0
   Error(ERR_DEBUG, "::: SDL_GetBasePath() == '%s'",
@@ -6204,15 +6378,19 @@ void OpenAll(void)
 
 void CloseAllAndExit(int exit_value)
 {
+#ifndef HEADLESS
   StopSounds();
   FreeAllSounds();
   FreeAllMusic();
   CloseAudio();		// called after freeing sounds (needed for SDL)
+#endif
 
   em_close_all();
   sp_close_all();
 
+#ifndef HEADLESS
   FreeAllImages();
+#endif
 
   // !!! TODO !!!
   // set a flag to tell the network server thread to quit and wait for it
@@ -6222,8 +6400,10 @@ void CloseAllAndExit(int exit_value)
   // if (network_server)	// terminate network server
   //   SDL_KillThread(server_thread);
 
+#ifndef HEADLESS
   CloseVideoDisplay();
   ClosePlatformDependentStuff();
+#endif
 
   if (exit_value != 0 && !options.execute_command)
   {

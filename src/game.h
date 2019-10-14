@@ -392,22 +392,30 @@ int GetElementFromGroupElement(int);
 
 int getPlayerInventorySize(int);
 
+#ifndef HEADLESS
 void DrawGameValue_Time(int);
 void DrawGameDoorValues(void);
+#endif
 
 void UpdateAndDisplayGameControlValues(void);
 
+#ifndef HEADLESS
 void InitGameSound(void);
+#endif
 void InitGame(void);
 
 void UpdateEngineValues(int, int, int, int);
 void GameWon(void);
 void GameEnd(void);
 
+#ifndef HEADLESS
 void InitPlayerGfxAnimation(struct PlayerInfo *, int, int);
+#endif
 void Moving2Blocked(int, int, int *, int *);
 void Blocked2Moving(int, int, int *, int *);
+#ifndef HEADLESS
 void DrawDynamite(int, int);
+#endif
 
 void StartGameActions(boolean, boolean, int);
 
@@ -418,6 +426,7 @@ void GameActions_MM_Main(void);
 void GameActions_RND_Main(void);
 void GameActions_RND(void);
 
+#ifndef HEADLESS
 void ScrollLevel(int, int);
 
 void InitPlayLevelSound(void);
@@ -427,6 +436,7 @@ void PlayLevelSound_MM(int, int, int, int);
 void PlaySound_MM(int);
 void PlaySoundLoop_MM(int);
 void StopSound_MM(int);
+#endif
 
 void RaiseScore(int);
 void RaiseScoreElement(int);
@@ -443,6 +453,7 @@ boolean checkGameEnded(void);
 unsigned int InitEngineRandom_RND(int);
 unsigned int RND(int);
 
+#ifndef HEADLESS
 void FreeEngineSnapshotSingle(void);
 void FreeEngineSnapshotList(void);
 void LoadEngineSnapshotSingle(void);
@@ -465,5 +476,6 @@ void UnmapGameButtonsOnTape(void);
 void RedrawGameButtonsOnTape(void);
 
 void HandleSoundButtonKeys(Key);
+#endif
 
 #endif

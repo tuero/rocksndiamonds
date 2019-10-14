@@ -12,11 +12,15 @@
 #ifndef SDL_H
 #define SDL_H
 
+#ifndef HEADLESS
+
 #include <SDL.h>
 #include <SDL_image.h>
+//#ifndef HEADLESS
 #include <SDL_mixer.h>
 #include <SDL_net.h>
 #include <SDL_thread.h>
+//#endif
 #if defined(PLATFORM_WIN32)
 #include <SDL_syswm.h>
 #endif
@@ -436,5 +440,7 @@ void SDLCloseJoystick(int);
 void PrepareFadeBitmap(int);
 
 void Delay_WithScreenUpdates(unsigned int);
+
+#endif
 
 #endif // SDL_H

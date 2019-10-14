@@ -25,6 +25,10 @@
 // sprite IDs are used for custom controllers for object tracking
 int spriteIDs[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int idCounter;
+#define MAYBE_UNUSED __attribute__((used))
+#ifdef HEADLESS
+#define hasStartedNetworkGame() TRUE
+#endif
 
 
 // DEBUG SETTINGS
@@ -40,6 +44,7 @@ int idCounter;
 #define USE_DELAYED_GFX_REDRAW		0
 #define USE_NEW_PLAYER_ASSIGNMENTS	1
 
+#ifndef HEADLESS
 #if USE_DELAYED_GFX_REDRAW
 #define TEST_DrawLevelField(x, y)				\
 	GfxRedraw[x][y] |= GFX_REDRAW_TILE
@@ -58,6 +63,7 @@ int idCounter;
 	     DrawLevelFieldCrumbledNeighbours(x, y)
 #define TEST_DrawTwinkleOnField(x, y)				\
 	     DrawTwinkleOnField(x, y)
+#endif
 #endif
 
 
@@ -218,7 +224,9 @@ struct GamePanelOrderInfo
   int sort_priority;
 };
 
+#ifndef HEADLESS
 static struct GamePanelOrderInfo game_panel_order[NUM_GAME_PANEL_CONTROLS];
+#endif
 
 struct GamePanelControlInfo
 {
@@ -1035,7 +1043,9 @@ static struct GamePanelControlInfo game_panel_controls[] =
 
 static void CreateField(int, int, int);
 
+#ifndef HEADLESS
 static void ResetGfxAnimation(int, int);
+#endif
 
 static void SetPlayerWaiting(struct PlayerInfo *, boolean);
 static void AdvanceFrameAndPlayerCounters(int);
@@ -1043,7 +1053,9 @@ static void AdvanceFrameAndPlayerCounters(int);
 static boolean MovePlayerOneStep(struct PlayerInfo *, int, int, int, int);
 static boolean MovePlayer(struct PlayerInfo *, int, int);
 static void ScrollPlayer(struct PlayerInfo *, int);
+#ifndef HEADLESS
 static void ScrollScreen(struct PlayerInfo *, int);
+#endif
 
 static int DigField(struct PlayerInfo *, int, int, int, int, int, int, int);
 static boolean DigFieldByCE(int, int, int);
@@ -1083,6 +1095,7 @@ static boolean CheckElementChangeExt(int, int, int, int, int, int, int);
 #define CheckElementChangeBySide(x, y, e, te, ev, s)			\
 	CheckElementChangeExt(x, y, e, te, ev, CH_PLAYER_ANY, s)
 
+#ifndef HEADLESS
 static void PlayLevelSound(int, int, int);
 static void PlayLevelSoundNearest(int, int, int);
 static void PlayLevelSoundAction(int, int, int);
@@ -1092,8 +1105,11 @@ static void PlayLevelSoundActionIfLoop(int, int, int);
 static void StopLevelSoundActionIfLoop(int, int, int);
 static void PlayLevelMusic(void);
 static void FadeLevelSoundsAndMusic(void);
+#endif
 
+#ifndef HEADLESS
 static void HandleGameButtons(struct GadgetInfo *);
+#endif
 
 int AmoebeNachbarNr(int, int);
 void AmoebeUmwandeln(int, int);
@@ -1122,7 +1138,9 @@ void ExitPlayer(struct PlayerInfo *);
 static int getInvisibleActiveFromInvisibleElement(int);
 static int getInvisibleFromInvisibleActiveElement(int);
 
+#ifndef HEADLESS
 static struct GadgetInfo *game_gadget[NUM_GAME_BUTTONS];
+#endif
 
 // for detection of endless loops, caused by custom element programming
 // (using maximal playfield width x 10 is just a rough approximation)
@@ -1659,7 +1677,9 @@ void GetPlayerConfig(void)
 
   setup.sound = (setup.sound_simple || setup.sound_loops || setup.sound_music);
 
+#ifndef HEADLESS
   SetAudioMode(setup.sound);
+#endif
 }
 
 int GetElementFromGroupElement(int element)
@@ -1667,18 +1687,24 @@ int GetElementFromGroupElement(int element)
   if (IS_GROUP_ELEMENT(element))
   {
     struct ElementGroupInfo *group = element_info[element].group;
+#ifndef HEADLESS
     int last_anim_random_frame = gfx.anim_random_frame;
+#endif
     int element_pos;
 
+#ifndef HEADLESS
     if (group->choice_mode == ANIM_RANDOM)
       gfx.anim_random_frame = RND(group->num_elements_resolved);
+#endif
 
     element_pos = getAnimationFrame(group->num_elements_resolved, 1,
 				    group->choice_mode, 0,
 				    group->choice_pos);
 
+#ifndef HEADLESS
     if (group->choice_mode == ANIM_RANDOM)
       gfx.anim_random_frame = last_anim_random_frame;
+#endif
 
     group->choice_pos++;
 
@@ -1919,7 +1945,12 @@ static void InitField(int x, int y, boolean init_game)
 
     case EL_PIG:
     case EL_DRAGON:
+#ifndef HEADLESS
       GfxDir[x][y] = MovDir[x][y] = 1 << RND(4);
+#endif
+#ifdef HEADLESS
+          MovDir[x][y] = 1 << RND(4);
+#endif
       break;
 
     case EL_CONVEYOR_BELT_1_SWITCH_LEFT:
@@ -2057,6 +2088,7 @@ static void InitField_WithBug2(int x, int y, boolean init_game)
   */
 }
 
+#ifndef HEADLESS
 static int get_key_element_from_nr(int key_nr)
 {
   int key_base_element = (key_nr >= STD_NUM_KEYS ? EL_EMC_KEY_5 - STD_NUM_KEYS :
@@ -2065,6 +2097,7 @@ static int get_key_element_from_nr(int key_nr)
 
   return key_base_element + key_nr;
 }
+#endif
 
 static int get_next_dropped_element(struct PlayerInfo *player)
 {
@@ -2077,6 +2110,7 @@ static int get_next_dropped_element(struct PlayerInfo *player)
 	  EL_UNDEFINED);
 }
 
+#ifndef HEADLESS
 static int get_inventory_element_from_pos(struct PlayerInfo *player, int pos)
 {
   // pos >= 0: get element from bottom of the stack;
@@ -2111,7 +2145,9 @@ static int get_inventory_element_from_pos(struct PlayerInfo *player, int pos)
 	    EL_UNDEFINED);
   }
 }
+#endif
 
+#ifndef HEADLESS
 static int compareGamePanelOrderInfo(const void *object1, const void *object2)
 {
   const struct GamePanelOrderInfo *gpo1 = (struct GamePanelOrderInfo *)object1;
@@ -2125,6 +2161,7 @@ static int compareGamePanelOrderInfo(const void *object1, const void *object2)
 
   return compare_result;
 }
+#endif
 
 int getPlayerInventorySize(int player_nr)
 {
@@ -2136,6 +2173,7 @@ int getPlayerInventorySize(int player_nr)
     return stored_player[player_nr].inventory_size;
 }
 
+#ifndef HEADLESS
 static void InitGameControlValues(void)
 {
   int i;
@@ -2180,6 +2218,7 @@ static void InitGameControlValues(void)
   qsort(game_panel_order, NUM_GAME_PANEL_CONTROLS,
 	sizeof(struct GamePanelOrderInfo), compareGamePanelOrderInfo);
 }
+#endif
 
 static void UpdatePlayfieldElementCount(void)
 {
@@ -2211,6 +2250,9 @@ static void UpdatePlayfieldElementCount(void)
 
 static void UpdateGameControlValues(void)
 {
+#ifdef HEADLESS
+    UpdatePlayfieldElementCount();
+#else
     if (is_simulating == FALSE) {
         int i, k;
         int time = (game.LevelSolved ?
@@ -2517,8 +2559,10 @@ static void UpdateGameControlValues(void)
             }
         }
     }
+#endif
 }
 
+#ifndef HEADLESS
 static void DisplayGameControlValues(void)
 {
     if (is_simulating == FALSE) {
@@ -2742,14 +2786,19 @@ static void DisplayGameControlValues(void)
 
   SetGameStatus(GAME_MODE_PLAYING);
 }
+#endif
 
 void UpdateAndDisplayGameControlValues(void)
 {
+#ifndef HEADLESS
   if (tape.deactivate_display)
     return;
+#endif
 
   UpdateGameControlValues();
+#ifndef HEADLESS
   DisplayGameControlValues();
+#endif
 }
 
 #if 0
@@ -2759,10 +2808,12 @@ static void UpdateGameDoorValues(void)
 }
 #endif
 
+#ifndef HEADLESS
 void DrawGameDoorValues(void)
 {
   DisplayGameControlValues();
 }
+#endif
 
 
 // ============================================================================
@@ -2775,13 +2826,18 @@ static void InitGameEngine(void)
 {
   int i, j, k, l, x, y;
 
+#ifndef HEADLESS
   // set game engine from tape file when re-playing, else from level file
   game.engine_version = (tape.playing ? tape.engine_version :
 			 level.game_version);
+#else
+    game.engine_version = level.game_version;
+#endif
 
   // set single or multi-player game mode (needed for re-playing tapes)
   game.team_mode = setup.team_mode;
 
+#ifndef HEADLESS
   if (tape.playing)
   {
     int num_players = 0;
@@ -2793,6 +2849,7 @@ static void InitGameEngine(void)
     // multi-player tapes contain input data for more than one player
     game.team_mode = (num_players > 1);
   }
+#endif
 
   // --------------------------------------------------------------------------
   // set flags for bugs and changes according to active game engine version
@@ -2826,11 +2883,15 @@ static void InitGameEngine(void)
     Machine" by Juergen Bonhagen.
   */
 
+#ifndef HEADLESS
   game.use_change_when_pushing_bug =
     (game.engine_version < VERSION_IDENT(3,1,0,0) &&
      !(tape.playing &&
        tape.game_version >= VERSION_IDENT(3,1,0,0) &&
        tape.game_version <  VERSION_IDENT(3,1,1,0)));
+#else
+    game.use_change_when_pushing_bug = game.engine_version < VERSION_IDENT(3,1,0,0);
+#endif
 
   /*
     Summary of bugfix/change:
@@ -3238,10 +3299,15 @@ static int get_num_special_action(int element, int action_first,
   {
     boolean found = FALSE;
 
+    // NEED TO TEST, THIS MAY BREAK THINGS
+#ifndef HEADLESS
     for (j = 0; j < NUM_DIRECTIONS; j++)
       if (el_act_dir2img(element, i, j) !=
 	  el_act_dir2img(element, ACTION_DEFAULT, j))
 	found = TRUE;
+#else
+      (void)j;
+#endif
 
     if (found)
       num_special_action++;
@@ -3293,7 +3359,9 @@ void InitGame(void)
 {
   int full_lev_fieldx = lev_fieldx + (BorderElement != EL_EMPTY ? 2 : 0);
   int full_lev_fieldy = lev_fieldy + (BorderElement != EL_EMPTY ? 2 : 0);
+#ifndef HEADLESS
   int fade_mask = REDRAW_FIELD;
+#endif
 
   boolean emulate_bd = TRUE;	// unless non-BOULDERDASH elements found
   boolean emulate_sb = TRUE;	// unless non-SOKOBAN     elements found
@@ -3301,14 +3369,17 @@ void InitGame(void)
   int initial_move_dir = MV_DOWN;
   int i, j, x, y;
 
+#ifndef HEADLESS
   // required here to update video display before fading (FIX THIS)
   DrawMaskedBorder(REDRAW_DOOR_2);
 
   if (!game.restart_level)
     CloseDoor(DOOR_CLOSE_1);
+#endif
 
   SetGameStatus(GAME_MODE_PLAYING);
 
+#ifndef HEADLESS
   if (level_editor_test_game)
     FadeSkipNextFadeOut();
   else
@@ -3334,12 +3405,18 @@ void InitGame(void)
   DrawCompleteVideoDisplay();
 
   OpenDoor(GetDoorState() | DOOR_NO_DELAY | DOOR_FORCE_REDRAW);
+#endif
 
   InitGameEngine();
-  InitGameControlValues();
 
+#ifndef HEADLESS
+  InitGameControlValues();
+#endif
+
+#ifndef HEADLESS
   // don't play tapes over network
   network_playing = (network.enabled && !tape.playing);
+#endif
 
   for (i = 0; i < MAX_PLAYERS; i++)
   {
@@ -3500,8 +3577,10 @@ void InitGame(void)
   network_player_action_received = FALSE;
 
   // initial null action
+#ifndef HEADLESS
   if (network_playing)
     SendToServer_MovePlayer(MV_NONE);
+#endif
 
   FrameCounter = 0;
   TimeFrames = 0;
@@ -3526,7 +3605,11 @@ void InitGame(void)
   game.LevelSolved = FALSE;
   game.GameOver = FALSE;
 
+#ifndef HEADLESS
   game.GamePlayed = !tape.playing;
+#else
+  game.GamePlayed = TRUE;
+#endif
 
   game.LevelSolved_GameWon = FALSE;
   game.LevelSolved_GameEnd = FALSE;
@@ -3613,12 +3696,14 @@ void InitGame(void)
     RunnerVisit[x][y] = 0;
     PlayerVisit[x][y] = 0;
 
+#ifndef HEADLESS
     GfxFrame[x][y] = 0;
     GfxRandom[x][y] = INIT_GFX_RANDOM();
     GfxElement[x][y] = EL_UNDEFINED;
     GfxAction[x][y] = ACTION_DEFAULT;
     GfxDir[x][y] = MV_NONE;
     GfxRedraw[x][y] = GFX_REDRAW_NONE;
+#endif
   }
 
   SCAN_PLAYFIELD(x, y)
@@ -3632,7 +3717,9 @@ void InitGame(void)
 
     InitField(x, y, TRUE);
 
+#ifndef HEADLESS
     ResetGfxAnimation(x, y);
+#endif
   }
 
   InitBeltMovement();
@@ -3723,6 +3810,7 @@ void InitGame(void)
   if (!network.enabled)
     local_player->connected = TRUE;
 
+#ifndef HEADLESS
   if (tape.playing)
   {
     for (i = 0; i < MAX_PLAYERS; i++)
@@ -3747,6 +3835,7 @@ void InitGame(void)
 	  setup.input[i].key.left != KSYM_UNDEFINED)
 	stored_player[i].connected = TRUE;
   }
+#endif
 
 #if DEBUG_INIT_PLAYER
   DebugPrintPlayerStatus("Player status after level initialization");
@@ -3889,13 +3978,16 @@ void InitGame(void)
   game.centered_player_nr_next = game.centered_player_nr;
   game.set_centered_player = FALSE;
 
+#ifndef HEADLESS
   if (network_playing && tape.recording)
   {
     // store client dependent player focus when recording network games
     tape.centered_player_nr_next = game.centered_player_nr_next;
     tape.set_centered_player = TRUE;
   }
+#endif
 
+#ifndef HEADLESS
   if (tape.playing)
   {
     // when playing a tape, eliminate all players who do not participate
@@ -3941,7 +4033,9 @@ void InitGame(void)
     }
 #endif
   }
-  else if (!network.enabled && !game.team_mode)		// && !tape.playing
+  else
+#endif
+  if (!network.enabled && !game.team_mode)		// && !tape.playing
   {
     // when in single player mode, eliminate all but the local player
 
@@ -3970,6 +4064,7 @@ void InitGame(void)
     game.players_still_needed = 1;
 
   // when recording the game, store which players take part in the game
+#ifndef HEADLESS
   if (tape.recording)
   {
 #if USE_NEW_PLAYER_ASSIGNMENTS
@@ -3982,6 +4077,7 @@ void InitGame(void)
 	tape.player_participates[i] = TRUE;
 #endif
   }
+#endif
 
 #if DEBUG_INIT_PLAYER
   DebugPrintPlayerStatus("Player status after player assignment (final stage)");
@@ -4126,14 +4222,17 @@ void InitGame(void)
   }
   else
   {
+#ifndef HEADLESS
     DrawLevel(REDRAW_FIELD);
     DrawAllPlayers();
+#endif
 
     // after drawing the level, correct some elements
     if (game.timegate_time_left == 0)
       CloseAllOpenTimegates();
   }
 
+#ifndef HEADLESS
   // blit playfield from scroll buffer to normal back buffer for fading in
   BlitScreenToBitmap(backbuffer);
   // !!! FIX THIS (END) !!!
@@ -4149,24 +4248,30 @@ void InitGame(void)
   redraw_mask = REDRAW_ALL;
   BackToFront();
 #endif
+#endif
 
   if (!game.restart_level)
   {
+#ifndef HEADLESS
     // copy default game door content to main double buffer
 
     // !!! CHECK AGAIN !!!
     SetPanelBackground();
     // SetDoorBackgroundImage(IMG_BACKGROUND_PANEL);
     DrawBackground(DX, DY, DXSIZE, DYSIZE);
+#endif
   }
 
+#ifndef HEADLESS
   SetPanelBackground();
   SetDrawBackgroundMask(REDRAW_DOOR_1);
 
   UpdateAndDisplayGameControlValues();
+#endif
 
   if (!game.restart_level)
   {
+#ifndef HEADLESS
     UnmapGameButtons();
     UnmapTapeButtons();
 
@@ -4182,23 +4287,35 @@ void InitGame(void)
     OpenDoor(DOOR_OPEN_ALL);
 
     KeyboardAutoRepeatOffUnlessAutoplay();
+#endif
 
 #if DEBUG_INIT_PLAYER
     DebugPrintPlayerStatus("Player status (final)");
 #endif
   }
 
+#ifndef HEADLESS
   UnmapAllGadgets();
 
   MapGameButtons();
   MapTapeButtons();
+#endif
 
+#ifndef HEADLESS
   if (!game.restart_level && !tape.playing)
   {
     LevelStats_incPlayed(level_nr);
 
     SaveLevelSetup_SeriesInfo();
   }
+#else
+    if (!game.restart_level)
+  {
+    LevelStats_incPlayed(level_nr);
+
+    SaveLevelSetup_SeriesInfo();
+  }
+#endif
 
   game.restart_level = FALSE;
   game.restart_game_message = NULL;
@@ -4207,6 +4324,7 @@ void InitGame(void)
   if (level.game_engine_type == GAME_ENGINE_TYPE_MM)
     InitGameActions_MM();
 
+#ifndef HEADLESS
   SaveEngineSnapshotToListInitial();
 
   if (!game.restart_level)
@@ -4216,6 +4334,7 @@ void InitGame(void)
     if (setup.sound_music)
       PlayLevelMusic();
   }
+#endif
 }
 
 void UpdateEngineValues(int actual_scroll_x, int actual_scroll_y,
@@ -4411,7 +4530,9 @@ void InitMovDir(int x, int y)
       break;
   }
 
+#ifndef HEADLESS
   GfxDir[x][y] = MovDir[x][y];
+#endif
 }
 
 void InitAmoebaNr(int x, int y)
@@ -4481,20 +4602,28 @@ void GameWon(void)
       return;
 
     game.LevelSolved_GameWon = TRUE;
+#ifndef HEADLESS
     game.LevelSolved_SaveTape = tape.recording;
     game.LevelSolved_SaveScore = !tape.playing;
+#endif
 
+#ifndef HEADLESS
     if (!tape.playing)
     {
+#endif
       LevelStats_incSolved(level_nr);
 
       SaveLevelSetup_SeriesInfo();
+#ifndef HEADLESS
     }
+#endif
 
+#ifndef HEADLESS
     if (tape.auto_play)		// tape might already be stopped here
       tape.auto_play_level_solved = TRUE;
 
     TapeStop();
+#endif
 
     game_over_delay_1 = 0;
     game_over_delay_2 = 0;
@@ -4544,7 +4673,9 @@ void GameWon(void)
       game_panel_controls[GAME_PANEL_TIME].value = time;
       game_panel_controls[GAME_PANEL_SCORE].value = score;
 
+#ifndef HEADLESS
       DisplayGameControlValues();
+#endif
     }
 
     if (level.game_engine_type == GAME_ENGINE_TYPE_RND)
@@ -4573,11 +4704,15 @@ void GameWon(void)
 	     element == EL_STEEL_EXIT_OPEN	? EL_STEEL_EXIT_CLOSING:
 	     EL_EM_STEEL_EXIT_CLOSING);
 
+#ifndef HEADLESS
 	  PlayLevelSoundElementAction(x, y, element, ACTION_CLOSING);
+#endif
 	}
 
 	// player disappears
+#ifndef HEADLESS
 	DrawLevelField(x, y);
+#endif
       }
 
       for (i = 0; i < MAX_PLAYERS; i++)
@@ -4589,12 +4724,15 @@ void GameWon(void)
 	  RemovePlayer(player);
 
 	  // player disappears
+#ifndef HEADLESS
 	  DrawLevelField(player->jx, player->jy);
+#endif
 	}
       }
     }
-
+#ifndef HEADLESS
     PlaySound(SND_GAME_WINNING);
+#endif
   }
 
   if (game_over_delay_1 > 0)
@@ -4621,14 +4759,15 @@ void GameWon(void)
     game_panel_controls[GAME_PANEL_TIME].value = time;
     game_panel_controls[GAME_PANEL_SCORE].value = score;
 
+#ifndef HEADLESS
     DisplayGameControlValues();
-
     if (time == time_final)
       StopSound(SND_GAME_LEVELTIME_BONUS);
     else if (setup.sound_loops)
       PlaySoundLoop(SND_GAME_LEVELTIME_BONUS);
     else
       PlaySound(SND_GAME_LEVELTIME_BONUS);
+#endif
 
     return;
   }
@@ -4653,6 +4792,7 @@ void GameWon(void)
     game_panel_controls[GAME_PANEL_HEALTH].value = health;
     game_panel_controls[GAME_PANEL_SCORE].value = score;
 
+#ifndef HEADLESS
     DisplayGameControlValues();
 
     if (health == health_final)
@@ -4661,6 +4801,7 @@ void GameWon(void)
       PlaySoundLoop(SND_GAME_LEVELTIME_BONUS);
     else
       PlaySound(SND_GAME_LEVELTIME_BONUS);
+#endif
 
     return;
   }
@@ -4680,11 +4821,14 @@ void GameWon(void)
 void GameEnd(void)
 {
   // used instead of "level_nr" (needed for network games)
+#ifndef HEADLESS
   int last_level_nr = levelset.level_nr;
   int hi_pos;
+#endif
 
   game.LevelSolved_GameEnd = TRUE;
 
+#ifndef HEADLESS
   if (game.LevelSolved_SaveTape)
   {
     // make sure that request dialog to save tape does not open door again
@@ -4757,8 +4901,10 @@ void GameEnd(void)
 
     DrawMainMenu();
   }
+#endif
 }
 
+#ifndef HEADLESS
 int NewHiScore(int level_nr)
 {
   int k, l;
@@ -4818,6 +4964,7 @@ int NewHiScore(int level_nr)
 
   return position;
 }
+#endif
 
 static int getElementMoveStepsizeExt(int x, int y, int direction)
 {
@@ -4846,6 +4993,7 @@ static int getElementMoveStepsize(int x, int y)
   return getElementMoveStepsizeExt(x, y, MovDir[x][y]);
 }
 
+#ifndef HEADLESS
 void InitPlayerGfxAnimation(struct PlayerInfo *player, int action, int dir)
 {
   if (player->GfxAction != action || player->GfxDir != dir)
@@ -4856,7 +5004,9 @@ void InitPlayerGfxAnimation(struct PlayerInfo *player, int action, int dir)
     player->StepFrame = 0;
   }
 }
+#endif
 
+#ifndef HEADLESS
 static void ResetGfxFrame(int x, int y)
 {
   // profiling showed that "autotest" spends 10~20% of its time in this function
@@ -4875,7 +5025,9 @@ static void ResetGfxFrame(int x, int y)
   else if (ANIM_MODE(graphic) == ANIM_CE_DELAY)
     GfxFrame[x][y] = ChangeDelay[x][y];
 }
+#endif
 
+#ifndef HEADLESS
 static void ResetGfxAnimation(int x, int y)
 {
   GfxAction[x][y] = ACTION_DEFAULT;
@@ -4884,15 +5036,20 @@ static void ResetGfxAnimation(int x, int y)
 
   ResetGfxFrame(x, y);
 }
+#endif
 
+#ifndef HEADLESS
 static void ResetRandomAnimationValue(int x, int y)
 {
   GfxRandom[x][y] = INIT_GFX_RANDOM();
 }
+#endif
 
 static void InitMovingField(int x, int y, int direction)
 {
+#ifndef HEADLESS
   int element = Feld[x][y];
+#endif
   int dx = (direction == MV_LEFT ? -1 : direction == MV_RIGHT ? +1 : 0);
   int dy = (direction == MV_UP   ? -1 : direction == MV_DOWN  ? +1 : 0);
   int newx = x + dx;
@@ -4906,16 +5063,22 @@ static void InitMovingField(int x, int y, int direction)
   // reset animation only for moving elements which change direction of moving
   // or which just started or stopped moving
   // (else CEs with property "can move" / "not moving" are reset each frame)
+#ifndef HEADLESS
   if (is_moving_before != is_moving_after ||
       direction != MovDir[x][y])
     ResetGfxAnimation(x, y);
+#else
+    (void)is_moving_before;
+#endif
 
   MovDir[x][y] = direction;
+#ifndef HEADLESS
   GfxDir[x][y] = direction;
 
   GfxAction[x][y] = (!is_moving_after ? ACTION_WAITING :
 		     direction == MV_DOWN && CAN_FALL(element) ?
 		     ACTION_FALLING : ACTION_MOVING);
+#endif
 
   // this is needed for CEs with property "can move" / "not moving"
 
@@ -4928,10 +5091,12 @@ static void InitMovingField(int x, int y, int direction)
 
     CustomValue[newx][newy] = CustomValue[x][y];
 
+#ifndef HEADLESS
     GfxFrame[newx][newy] = GfxFrame[x][y];
     GfxRandom[newx][newy] = GfxRandom[x][y];
     GfxAction[newx][newy] = GfxAction[x][y];
     GfxDir[newx][newy] = GfxDir[x][y];
+#endif
   }
 }
 
@@ -5022,9 +5187,11 @@ static void RemoveField(int x, int y)
   ChangePage[x][y] = -1;
   Pushed[x][y] = FALSE;
 
+#ifndef HEADLESS
   GfxElement[x][y] = EL_UNDEFINED;
   GfxAction[x][y] = ACTION_DEFAULT;
   GfxDir[x][y] = MV_NONE;
+#endif
 }
 
 static void RemoveMovingField(int x, int y)
@@ -5050,7 +5217,9 @@ static void RemoveMovingField(int x, int y)
 
       Store[oldx][oldy] = Store2[oldx][oldy] = 0;
 
+#ifndef HEADLESS
       TEST_DrawLevelField(oldx, oldy);
+#endif
 
       return;
     }
@@ -5079,10 +5248,13 @@ static void RemoveMovingField(int x, int y)
   if (next_element != EL_UNDEFINED)
     Feld[oldx][oldy] = next_element;
 
+#ifndef HEADLESS
   TEST_DrawLevelField(oldx, oldy);
   TEST_DrawLevelField(newx, newy);
+#endif
 }
 
+#ifndef HEADLESS
 void DrawDynamite(int x, int y)
 {
   int sx = SCREENX(x), sy = SCREENY(y);
@@ -5107,6 +5279,7 @@ void DrawDynamite(int x, int y)
   else
     DrawGraphic(sx, sy, graphic, frame);
 }
+#endif
 
 static void CheckDynamite(int x, int y)
 {
@@ -5114,6 +5287,7 @@ static void CheckDynamite(int x, int y)
   {
     MovDelay[x][y]--;
 
+#ifndef HEADLESS
     if (MovDelay[x][y] != 0)
     {
       DrawDynamite(x, y);
@@ -5121,9 +5295,12 @@ static void CheckDynamite(int x, int y)
 
       return;
     }
+#endif
   }
 
+#ifndef HEADLESS
   StopLevelSoundActionIfLoop(x, y, ACTION_ACTIVE);
+#endif
 
   Bang(x, y);
 }
@@ -5178,6 +5355,7 @@ static void setScreenCenteredToAllPlayers(int *sx, int *sy)
   *sy = (sy1 + sy2) / 2;
 }
 
+#ifndef HEADLESS
 static void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
 			       boolean center_screen, boolean quick_relocation)
 {
@@ -5270,16 +5448,19 @@ static void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
 
   SetVideoFrameDelay(is_simulating ? 0 : frame_delay_value_old);
 }
+#endif
 
 static void RelocatePlayer(int jx, int jy, int el_player_raw)
 {
   int el_player = GET_PLAYER_ELEMENT(el_player_raw);
   int player_nr = GET_PLAYER_NR(el_player);
   struct PlayerInfo *player = &stored_player[player_nr];
+#ifndef HEADLESS
   boolean ffwd_delay = (tape.playing && tape.fast_forward);
   boolean no_delay = (tape.warp_forward);
   int frame_delay_value = (ffwd_delay ? FfwdFrameDelay : GameFrameDelay);
   int wait_delay_value = (no_delay ? 0 : frame_delay_value);
+#endif
   int old_jx = player->jx;
   int old_jy = player->jy;
   int old_element = Feld[old_jx][old_jy];
@@ -5301,29 +5482,37 @@ static void RelocatePlayer(int jx, int jy, int el_player_raw)
   if (!player_relocated)	// no need to relocate the player
     return;
 
-  if (IS_PLAYER(jx, jy) && is_simulating == FALSE)	// player already placed at new position
+  if (IS_PLAYER(jx, jy))	// player already placed at new position
   {
     RemoveField(jx, jy);	// temporarily remove newly placed player
-    DrawLevelField(jx, jy);
+#ifndef HEADLESS
+    if (is_simulating == FALSE) {DrawLevelField(jx, jy);}
+#endif
   }
 
   if (player->present)
   {
-    while (player->MovPos && is_simulating == FALSE)
+    while (player->MovPos)
     {
       ScrollPlayer(player, SCROLL_GO_ON);
-      ScrollScreen(NULL, SCROLL_GO_ON);
+#ifndef HEADLESS
+      if (is_simulating == FALSE) {ScrollScreen(NULL, SCROLL_GO_ON);}
+#endif
 
       AdvanceFrameAndPlayerCounters(player->index_nr);
 
-      DrawPlayer(player);
+#ifndef HEADLESS
+      if (is_simulating == FALSE) {DrawPlayer(player);}
 
-      BackToFront_WithFrameDelay(wait_delay_value);
+      if (is_simulating == FALSE) {BackToFront_WithFrameDelay(wait_delay_value);}
+#endif
     }
+#ifndef HEADLESS
     if (is_simulating == FALSE) {
         DrawPlayer(player);        // needed here only to cleanup last field
         DrawLevelField(player->jx, player->jy);    // remove player graphic
     }
+#endif
 
     player->is_moving = FALSE;
   }
@@ -5350,8 +5539,10 @@ static void RelocatePlayer(int jx, int jy, int el_player_raw)
   }
 
   // only visually relocate centered player
+#ifndef HEADLESS
   if (is_simulating == FALSE){DrawRelocateScreen(old_jx, old_jy, player->jx, player->jy, player->MovDir,
 		     FALSE, level.instant_relocation);}
+#endif
 
   TestIfPlayerTouchesBadThing(jx, jy);
   TestIfPlayerTouchesCustomElement(jx, jy);
@@ -5383,8 +5574,9 @@ static void Explode(int ex, int ey, int phase, int mode)
   int last_phase;
   int border_element;
 
-  // !!! eliminate this variable !!!
+#ifndef HEADLESS
   int delay = (game.emulation == EMU_SUPAPLEX ? 3 : 2);
+#endif
 
   if (game.explosions_delayed)
   {
@@ -5417,19 +5609,27 @@ static void Explode(int ex, int ey, int phase, int mode)
     {
       int player_nr = GET_PLAYER_NR(StorePlayer[ex][ey]);
 
+#ifndef HEADLESS
       artwork_element = stored_player[player_nr].artwork_element;
+#else
+      (void)artwork_element;
+#endif
 
       if (level.use_explosion_element[player_nr])
       {
 	explosion_element = level.explosion_element[player_nr];
+#ifndef HEADLESS
 	artwork_element = explosion_element;
+#endif
       }
     }
 
+#ifndef HEADLESS
     if (mode == EX_TYPE_NORMAL ||
 	mode == EX_TYPE_CENTER ||
 	mode == EX_TYPE_CROSS)
       PlayLevelSoundElementAction(ex, ey, artwork_element, ACTION_EXPLODING);
+#endif
 
     last_phase = element_info[explosion_element].explosion_delay + 1;
 
@@ -5538,7 +5738,9 @@ static void Explode(int ex, int ey, int phase, int mode)
 	Store2[x][y] = element;
 
       Feld[x][y] = EL_EXPLOSION;
+#ifndef HEADLESS
       GfxElement[x][y] = artwork_element;
+#endif
 
       ExplodePhase[x][y] = 1;
       ExplodeDelay[x][y] = last_phase;
@@ -5559,16 +5761,20 @@ static void Explode(int ex, int ey, int phase, int mode)
   x = ex;
   y = ey;
 
+#ifndef HEADLESS
   if (phase == 1)
     GfxFrame[x][y] = 0;		// restart explosion animation
+#endif
 
   last_phase = ExplodeDelay[x][y];
 
   ExplodePhase[x][y] = (phase < last_phase ? phase + 1 : 0);
 
+#ifndef HEADLESS
   // this can happen if the player leaves an explosion just in time
   if (GfxElement[x][y] == EL_UNDEFINED)
     GfxElement[x][y] = EL_EMPTY;
+#endif
 
   border_element = Store2[x][y];
   if (IS_PLAYER(x, y) && !PLAYER_EXPLOSION_PROTECTED(x, y))
@@ -5612,7 +5818,9 @@ static void Explode(int ex, int ey, int phase, int mode)
 
     element = Feld[x][y] = Store[x][y];
     Store[x][y] = Store2[x][y] = 0;
+#ifndef HEADLESS
     GfxElement[x][y] = EL_UNDEFINED;
+#endif
 
     // (tuero@ualberta.ca) - September 2019
     // sprite IDs are used for custom controllers for object tracking
@@ -5642,7 +5850,9 @@ static void Explode(int ex, int ey, int phase, int mode)
     Back[x][y] = 0;
 
     MovDir[x][y] = MovPos[x][y] = MovDelay[x][y] = 0;
+#ifndef HEADLESS
     GfxDir[x][y] = MV_NONE;
+#endif
     ChangeDelay[x][y] = 0;
     ChangePage[x][y] = -1;
 
@@ -5650,12 +5860,16 @@ static void Explode(int ex, int ey, int phase, int mode)
 
     InitField_WithBug2(x, y, FALSE);
 
+#ifndef HEADLESS
     TEST_DrawLevelField(x, y);
+#endif
 
     TestIfElementTouchesCustomElement(x, y);
 
+#ifndef HEADLESS
     if (GFX_CRUMBLED(element))
       TEST_DrawLevelFieldCrumbledNeighbours(x, y);
+#endif
 
     if (IS_PLAYER(x, y) && !PLAYERINFO(x, y)->present)
       StorePlayer[x][y] = 0;
@@ -5663,6 +5877,7 @@ static void Explode(int ex, int ey, int phase, int mode)
     if (ELEM_IS_PLAYER(element))
       RelocatePlayer(x, y, element);
   }
+#ifndef HEADLESS
   else if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
   {
     int graphic = el_act2img(GfxElement[x][y], ACTION_EXPLODING);
@@ -5684,6 +5899,7 @@ static void Explode(int ex, int ey, int phase, int mode)
     else if (!IS_WALKABLE_INSIDE(Back[x][y]))
       DrawGraphic(SCREENX(x), SCREENY(y), graphic, frame);
   }
+#endif
 }
 
 static void DynaExplode(int ex, int ey)
@@ -5823,7 +6039,9 @@ static void SplashAcid(int x, int y)
        !CAN_FALL(MovingOrBlocked2Element(x + 1, y - 2))))
     Feld[x + 1][y - 1] = EL_ACID_SPLASH_RIGHT;
 
+#ifndef HEADLESS
   PlayLevelSound(x, y, SND_ACID_SPLASHING);
+#endif
 }
 
 static void InitBeltMovement(void)
@@ -5846,6 +6064,7 @@ static void InitBeltMovement(void)
   int x, y, i, j;
 
   // set frame order for belt animation graphic according to belt direction
+#ifndef HEADLESS
   for (i = 0; i < NUM_BELTS; i++)
   {
     int belt_nr = i;
@@ -5868,6 +6087,10 @@ static void InitBeltMovement(void)
       }
     }
   }
+#else
+  (void)i;
+  (void)j;
+#endif
 
   SCAN_PLAYFIELD(x, y)
   {
@@ -5938,6 +6161,7 @@ static void ToggleBeltSwitch(int x, int y)
     belt_dir_nr = 1;
 
   // set frame order for belt animation graphic according to belt direction
+#ifndef HEADLESS
   for (i = 0; i < NUM_BELT_PARTS; i++)
   {
     int element = belt_base_active_element[belt_nr] + i;
@@ -5955,6 +6179,9 @@ static void ToggleBeltSwitch(int x, int y)
       graphic_info[graphic_2].anim_mode |=  ANIM_REVERSE;
     }
   }
+#else
+  (void)i;
+#endif
 
   SCAN_PLAYFIELD(xx, yy)
   {
@@ -5967,7 +6194,9 @@ static void ToggleBeltSwitch(int x, int y)
       if (e_belt_nr == belt_nr)
       {
 	Feld[xx][yy] = belt_base_switch_element[belt_nr] + belt_dir_nr;
+#ifndef HEADLESS
 	TEST_DrawLevelField(xx, yy);
+#endif
       }
     }
     else if (IS_BELT(element) && belt_dir != MV_NONE)
@@ -5979,7 +6208,9 @@ static void ToggleBeltSwitch(int x, int y)
 	int belt_part = Feld[xx][yy] - belt_base_element[belt_nr];
 
 	Feld[xx][yy] = belt_base_active_element[belt_nr] + belt_part;
+#ifndef HEADLESS
 	TEST_DrawLevelField(xx, yy);
+#endif
       }
     }
     else if (IS_BELT_ACTIVE(element) && belt_dir == MV_NONE)
@@ -5991,7 +6222,9 @@ static void ToggleBeltSwitch(int x, int y)
 	int belt_part = Feld[xx][yy] - belt_base_active_element[belt_nr];
 
 	Feld[xx][yy] = belt_base_element[belt_nr] + belt_part;
+#ifndef HEADLESS
 	TEST_DrawLevelField(xx, yy);
+#endif
       }
     }
   }
@@ -6010,36 +6243,48 @@ static void ToggleSwitchgateSwitch(int x, int y)
     if (element == EL_SWITCHGATE_SWITCH_UP)
     {
       Feld[xx][yy] = EL_SWITCHGATE_SWITCH_DOWN;
+#ifndef HEADLESS
       TEST_DrawLevelField(xx, yy);
+#endif
     }
     else if (element == EL_SWITCHGATE_SWITCH_DOWN)
     {
       Feld[xx][yy] = EL_SWITCHGATE_SWITCH_UP;
+#ifndef HEADLESS
       TEST_DrawLevelField(xx, yy);
+#endif
     }
     else if (element == EL_DC_SWITCHGATE_SWITCH_UP)
     {
       Feld[xx][yy] = EL_DC_SWITCHGATE_SWITCH_DOWN;
+#ifndef HEADLESS
       TEST_DrawLevelField(xx, yy);
+#endif
     }
     else if (element == EL_DC_SWITCHGATE_SWITCH_DOWN)
     {
       Feld[xx][yy] = EL_DC_SWITCHGATE_SWITCH_UP;
+#ifndef HEADLESS
       TEST_DrawLevelField(xx, yy);
+#endif
     }
     else if (element == EL_SWITCHGATE_OPEN ||
 	     element == EL_SWITCHGATE_OPENING)
     {
       Feld[xx][yy] = EL_SWITCHGATE_CLOSING;
 
+#ifndef HEADLESS
       PlayLevelSoundAction(xx, yy, ACTION_CLOSING);
+#endif
     }
     else if (element == EL_SWITCHGATE_CLOSED ||
 	     element == EL_SWITCHGATE_CLOSING)
     {
       Feld[xx][yy] = EL_SWITCHGATE_OPENING;
 
+#ifndef HEADLESS
       PlayLevelSoundAction(xx, yy, ACTION_OPENING);
+#endif
     }
   }
 }
@@ -6072,25 +6317,33 @@ static void RedrawAllLightSwitchesAndInvisibleElements(void)
 	game.light_time_left > 0)
     {
       Feld[x][y] = EL_LIGHT_SWITCH_ACTIVE;
+#ifndef HEADLESS
       TEST_DrawLevelField(x, y);
+#endif
     }
     else if (element == EL_LIGHT_SWITCH_ACTIVE &&
 	     game.light_time_left == 0)
     {
       Feld[x][y] = EL_LIGHT_SWITCH;
+#ifndef HEADLESS
       TEST_DrawLevelField(x, y);
+#endif
     }
     else if (element == EL_EMC_DRIPPER &&
 	     game.light_time_left > 0)
     {
       Feld[x][y] = EL_EMC_DRIPPER_ACTIVE;
+#ifndef HEADLESS
       TEST_DrawLevelField(x, y);
+#endif
     }
     else if (element == EL_EMC_DRIPPER_ACTIVE &&
 	     game.light_time_left == 0)
     {
       Feld[x][y] = EL_EMC_DRIPPER;
+#ifndef HEADLESS
       TEST_DrawLevelField(x, y);
+#endif
     }
     else if (element == EL_INVISIBLE_STEELWALL ||
 	     element == EL_INVISIBLE_WALL ||
@@ -6099,11 +6352,13 @@ static void RedrawAllLightSwitchesAndInvisibleElements(void)
       if (game.light_time_left > 0)
 	Feld[x][y] = getInvisibleActiveFromInvisibleElement(element);
 
+#ifndef HEADLESS
       TEST_DrawLevelField(x, y);
 
       // uncrumble neighbour fields, if needed
       if (element == EL_INVISIBLE_SAND)
 	TEST_DrawLevelFieldCrumbledNeighbours(x, y);
+#endif
     }
     else if (element == EL_INVISIBLE_STEELWALL_ACTIVE ||
 	     element == EL_INVISIBLE_WALL_ACTIVE ||
@@ -6112,11 +6367,13 @@ static void RedrawAllLightSwitchesAndInvisibleElements(void)
       if (game.light_time_left == 0)
 	Feld[x][y] = getInvisibleFromInvisibleActiveElement(element);
 
+#ifndef HEADLESS
       TEST_DrawLevelField(x, y);
 
       // re-crumble neighbour fields, if needed
       if (element == EL_INVISIBLE_SAND)
 	TEST_DrawLevelFieldCrumbledNeighbours(x, y);
+#endif
     }
   }
 }
@@ -6133,13 +6390,17 @@ static void RedrawAllInvisibleElementsForLenses(void)
 	game.lenses_time_left > 0)
     {
       Feld[x][y] = EL_EMC_DRIPPER_ACTIVE;
+#ifndef HEADLESS
       TEST_DrawLevelField(x, y);
+#endif
     }
     else if (element == EL_EMC_DRIPPER_ACTIVE &&
 	     game.lenses_time_left == 0)
     {
       Feld[x][y] = EL_EMC_DRIPPER;
+#ifndef HEADLESS
       TEST_DrawLevelField(x, y);
+#endif
     }
     else if (element == EL_INVISIBLE_STEELWALL ||
 	     element == EL_INVISIBLE_WALL ||
@@ -6148,11 +6409,13 @@ static void RedrawAllInvisibleElementsForLenses(void)
       if (game.lenses_time_left > 0)
 	Feld[x][y] = getInvisibleActiveFromInvisibleElement(element);
 
+#ifndef HEADLESS
       TEST_DrawLevelField(x, y);
 
       // uncrumble neighbour fields, if needed
       if (element == EL_INVISIBLE_SAND)
 	TEST_DrawLevelFieldCrumbledNeighbours(x, y);
+#endif
     }
     else if (element == EL_INVISIBLE_STEELWALL_ACTIVE ||
 	     element == EL_INVISIBLE_WALL_ACTIVE ||
@@ -6161,11 +6424,13 @@ static void RedrawAllInvisibleElementsForLenses(void)
       if (game.lenses_time_left == 0)
 	Feld[x][y] = getInvisibleFromInvisibleActiveElement(element);
 
+#ifndef HEADLESS
       TEST_DrawLevelField(x, y);
 
       // re-crumble neighbour fields, if needed
       if (element == EL_INVISIBLE_SAND)
 	TEST_DrawLevelFieldCrumbledNeighbours(x, y);
+#endif
     }
   }
 }
@@ -6182,13 +6447,17 @@ static void RedrawAllInvisibleElementsForMagnifier(void)
 	game.magnify_time_left > 0)
     {
       Feld[x][y] = EL_EMC_FAKE_GRASS_ACTIVE;
+#ifndef HEADLESS
       TEST_DrawLevelField(x, y);
+#endif
     }
     else if (element == EL_EMC_FAKE_GRASS_ACTIVE &&
 	     game.magnify_time_left == 0)
     {
       Feld[x][y] = EL_EMC_FAKE_GRASS;
+#ifndef HEADLESS
       TEST_DrawLevelField(x, y);
+#endif
     }
     else if (IS_GATE_GRAY(element) &&
 	     game.magnify_time_left > 0)
@@ -6202,7 +6471,9 @@ static void RedrawAllInvisibleElementsForMagnifier(void)
 		    IS_DC_GATE_GRAY(element) ?
 		    EL_DC_GATE_WHITE_GRAY_ACTIVE :
 		    element);
+#ifndef HEADLESS
       TEST_DrawLevelField(x, y);
+#endif
     }
     else if (IS_GATE_GRAY_ACTIVE(element) &&
 	     game.magnify_time_left == 0)
@@ -6216,7 +6487,9 @@ static void RedrawAllInvisibleElementsForMagnifier(void)
 		    IS_DC_GATE_GRAY_ACTIVE(element) ?
 		    EL_DC_GATE_WHITE_GRAY :
 		    element);
+#ifndef HEADLESS
       TEST_DrawLevelField(x, y);
+#endif
     }
   }
 }
@@ -6246,7 +6519,9 @@ static void ActivateTimegateSwitch(int x, int y)
 	element == EL_TIMEGATE_CLOSING)
     {
       Feld[xx][yy] = EL_TIMEGATE_OPENING;
+#ifndef HEADLESS
       PlayLevelSound(xx, yy, SND_CLASS_TIMEGATE_OPENING);
+#endif
     }
 
     /*
@@ -6321,12 +6596,14 @@ static void Impact(int x, int y)
 
   // !!! not sufficient for all cases -- see EL_PEARL below !!!
   // only reset graphic animation if graphic really changes after impact
+#ifndef HEADLESS
   if (impact &&
       el_act_dir2img(element, GfxAction[x][y], MV_DOWN) != el2img(element))
   {
     ResetGfxAnimation(x, y);
     TEST_DrawLevelField(x, y);
   }
+#endif
 
   if (impact && CAN_EXPLODE_IMPACT(element))
   {
@@ -6336,15 +6613,21 @@ static void Impact(int x, int y)
   else if (impact && element == EL_PEARL &&
 	   smashed != EL_DC_MAGIC_WALL && smashed != EL_DC_MAGIC_WALL_ACTIVE)
   {
+#ifndef HEADLESS
     ResetGfxAnimation(x, y);
+#endif
 
     Feld[x][y] = EL_PEARL_BREAKING;
+#ifndef HEADLESS
     PlayLevelSound(x, y, SND_PEARL_BREAKING);
+#endif
     return;
   }
   else if (impact && CheckElementChange(x, y, element, smashed, CE_IMPACT))
   {
+#ifndef HEADLESS
     PlayLevelSoundElementAction(x, y, element, ACTION_IMPACT);
+#endif
 
     return;
   }
@@ -6360,7 +6643,9 @@ static void Impact(int x, int y)
       Feld[x][y] = EL_AMOEBA_GROWING;
       Store[x][y] = EL_AMOEBA_WET;
 
+#ifndef HEADLESS
       ResetRandomAnimationValue(x, y);
+#endif
     }
     return;
   }
@@ -6389,11 +6674,13 @@ static void Impact(int x, int y)
       game.magic_wall_time_left = level.time_magic_wall * FRAMES_PER_SECOND;
       game.magic_wall_active = TRUE;
 
+#ifndef HEADLESS
       PlayLevelSound(x, y, (smashed == EL_MAGIC_WALL ?
 			    SND_MAGIC_WALL_ACTIVATING :
 			    smashed == EL_BD_MAGIC_WALL ?
 			    SND_BD_MAGIC_WALL_ACTIVATING :
 			    SND_DC_MAGIC_WALL_ACTIVATING));
+#endif
     }
 
     if (IS_PLAYER(x, y + 1))
@@ -6450,22 +6737,30 @@ static void Impact(int x, int y)
 	else if (smashed == EL_NUT)
 	{
 	  Feld[x][y + 1] = EL_NUT_BREAKING;
+#ifndef HEADLESS
 	  PlayLevelSound(x, y, SND_NUT_BREAKING);
+#endif
 	  RaiseScoreElement(EL_NUT);
 	  return;
 	}
 	else if (smashed == EL_PEARL)
 	{
+#ifndef HEADLESS
 	  ResetGfxAnimation(x, y);
+#endif
 
 	  Feld[x][y + 1] = EL_PEARL_BREAKING;
+#ifndef HEADLESS
 	  PlayLevelSound(x, y, SND_PEARL_BREAKING);
+#endif
 	  return;
 	}
 	else if (smashed == EL_DIAMOND)
 	{
 	  Feld[x][y + 1] = EL_DIAMOND_BREAKING;
+#ifndef HEADLESS
 	  PlayLevelSound(x, y, SND_DIAMOND_BREAKING);
+#endif
 	  return;
 	}
 	else if (IS_BELT_SWITCH(smashed))
@@ -6502,6 +6797,7 @@ static void Impact(int x, int y)
   }
 
   // play sound of magic wall / mill
+#ifndef HEADLESS
   if (!last_line &&
       (Feld[x][y + 1] == EL_MAGIC_WALL_ACTIVE ||
        Feld[x][y + 1] == EL_BD_MAGIC_WALL_ACTIVE ||
@@ -6520,6 +6816,7 @@ static void Impact(int x, int y)
   // play sound of object that hits the ground
   if (last_line || object_hit)
     PlayLevelSoundElementAction(x, y, element, ACTION_IMPACT);
+#endif
 }
 
 static void TurnRoundExt(int x, int y)
@@ -6793,8 +7090,10 @@ static void TurnRoundExt(int x, int y)
 	  !SPRING_CAN_ENTER_FIELD(element, x, y + 1))
       {
 	Feld[move_x][move_y] = EL_EMC_SPRING_BUMPER_ACTIVE;
+#ifndef HEADLESS
 	ResetGfxAnimation(move_x, move_y);
 	TEST_DrawLevelField(move_x, move_y);
+#endif
 
 	MovDir[x][y] = back_dir;
       }
@@ -7333,10 +7632,13 @@ static void TurnRoundExt(int x, int y)
 
 static void TurnRound(int x, int y)
 {
+#ifndef HEADLESS
   int direction = MovDir[x][y];
+#endif
 
   TurnRoundExt(x, y);
 
+#ifndef HEADLESS
   GfxDir[x][y] = MovDir[x][y];
 
   if (direction != MovDir[x][y])
@@ -7346,6 +7648,7 @@ static void TurnRound(int x, int y)
     GfxAction[x][y] = ACTION_TURNING_FROM_LEFT + MV_DIR_TO_BIT(direction);
 
   ResetGfxFrame(x, y);
+#endif
 }
 
 static boolean JustBeingPushed(int x, int y)
@@ -7377,8 +7680,10 @@ static void StartMoving(int x, int y)
   if (Stop[x][y])
     return;
 
+#ifndef HEADLESS
   if (MovDelay[x][y] == 0)
     GfxAction[x][y] = ACTION_DEFAULT;
+#endif
 
   if (CAN_FALL(element) && y < lev_fieldy - 1)
   {
@@ -7402,7 +7707,9 @@ static void StartMoving(int x, int y)
 	Store[x][y] = EL_ROCK;
 #endif
 
+#ifndef HEADLESS
 	PlayLevelSoundAction(x, y, ACTION_EMPTYING);
+#endif
       }
       else if (Feld[x][y + 1] == EL_QUICKSAND_EMPTY)
       {
@@ -7410,14 +7717,18 @@ static void StartMoving(int x, int y)
 	{
 	  MovDelay[x][y] = TILEY + 1;
 
+#ifndef HEADLESS
 	  ResetGfxAnimation(x, y);
 	  ResetGfxAnimation(x, y + 1);
+#endif
 	}
 
 	if (MovDelay[x][y])
 	{
+#ifndef HEADLESS
 	  DrawLevelElement(x, y, EL_QUICKSAND_EMPTYING);
 	  DrawLevelElement(x, y + 1, EL_QUICKSAND_FILLING);
+#endif
 
 	  MovDelay[x][y]--;
 	  if (MovDelay[x][y])
@@ -7429,7 +7740,9 @@ static void StartMoving(int x, int y)
 	Store[x][y + 1] = Store[x][y];
 	Store[x][y] = 0;
 
+#ifndef HEADLESS
 	PlayLevelSoundAction(x, y, ACTION_FILLING);
+#endif
       }
       else if (Feld[x][y + 1] == EL_QUICKSAND_FAST_EMPTY)
       {
@@ -7437,14 +7750,18 @@ static void StartMoving(int x, int y)
 	{
 	  MovDelay[x][y] = TILEY + 1;
 
+#ifndef HEADLESS
 	  ResetGfxAnimation(x, y);
 	  ResetGfxAnimation(x, y + 1);
+#endif
 	}
 
 	if (MovDelay[x][y])
 	{
+#ifndef HEADLESS
 	  DrawLevelElement(x, y, EL_QUICKSAND_EMPTYING);
 	  DrawLevelElement(x, y + 1, EL_QUICKSAND_FAST_FILLING);
+#endif
 
 	  MovDelay[x][y]--;
 	  if (MovDelay[x][y])
@@ -7456,7 +7773,9 @@ static void StartMoving(int x, int y)
 	Store[x][y + 1] = Store[x][y];
 	Store[x][y] = 0;
 
+#ifndef HEADLESS
 	PlayLevelSoundAction(x, y, ACTION_FILLING);
+#endif
       }
     }
     else if (element == EL_QUICKSAND_FAST_FULL)
@@ -7474,7 +7793,9 @@ static void StartMoving(int x, int y)
 	Store[x][y] = EL_ROCK;
 #endif
 
+#ifndef HEADLESS
 	PlayLevelSoundAction(x, y, ACTION_EMPTYING);
+#endif
       }
       else if (Feld[x][y + 1] == EL_QUICKSAND_FAST_EMPTY)
       {
@@ -7482,14 +7803,18 @@ static void StartMoving(int x, int y)
 	{
 	  MovDelay[x][y] = TILEY + 1;
 
+#ifndef HEADLESS
 	  ResetGfxAnimation(x, y);
 	  ResetGfxAnimation(x, y + 1);
+#endif
 	}
 
 	if (MovDelay[x][y])
 	{
+#ifndef HEADLESS
 	  DrawLevelElement(x, y, EL_QUICKSAND_FAST_EMPTYING);
 	  DrawLevelElement(x, y + 1, EL_QUICKSAND_FAST_FILLING);
+#endif
 
 	  MovDelay[x][y]--;
 	  if (MovDelay[x][y])
@@ -7501,7 +7826,9 @@ static void StartMoving(int x, int y)
 	Store[x][y + 1] = Store[x][y];
 	Store[x][y] = 0;
 
+#ifndef HEADLESS
 	PlayLevelSoundAction(x, y, ACTION_FILLING);
+#endif
       }
       else if (Feld[x][y + 1] == EL_QUICKSAND_EMPTY)
       {
@@ -7509,14 +7836,18 @@ static void StartMoving(int x, int y)
 	{
 	  MovDelay[x][y] = TILEY + 1;
 
+#ifndef HEADLESS
 	  ResetGfxAnimation(x, y);
 	  ResetGfxAnimation(x, y + 1);
+#endif
 	}
 
 	if (MovDelay[x][y])
 	{
+#ifndef HEADLESS
 	  DrawLevelElement(x, y, EL_QUICKSAND_FAST_EMPTYING);
 	  DrawLevelElement(x, y + 1, EL_QUICKSAND_FILLING);
+#endif
 
 	  MovDelay[x][y]--;
 	  if (MovDelay[x][y])
@@ -7528,7 +7859,9 @@ static void StartMoving(int x, int y)
 	Store[x][y + 1] = Store[x][y];
 	Store[x][y] = 0;
 
+#ifndef HEADLESS
 	PlayLevelSoundAction(x, y, ACTION_FILLING);
+#endif
       }
     }
     else if ((element == EL_ROCK || element == EL_BD_ROCK) &&
@@ -7540,7 +7873,9 @@ static void StartMoving(int x, int y)
       Feld[x][y] = EL_QUICKSAND_FILLING;
       Store[x][y] = element;
 
+#ifndef HEADLESS
       PlayLevelSoundAction(x, y, ACTION_FILLING);
+#endif
     }
     else if ((element == EL_ROCK || element == EL_BD_ROCK) &&
 	     Feld[x][y + 1] == EL_QUICKSAND_FAST_EMPTY)
@@ -7551,7 +7886,9 @@ static void StartMoving(int x, int y)
       Feld[x][y] = EL_QUICKSAND_FAST_FILLING;
       Store[x][y] = element;
 
+#ifndef HEADLESS
       PlayLevelSoundAction(x, y, ACTION_FILLING);
+#endif
     }
     else if (element == EL_MAGIC_WALL_FULL)
     {
@@ -7774,7 +8111,9 @@ static void StartMoving(int x, int y)
 	Pushed[x][y] = TRUE;
 	Pushed[nextx][y] = TRUE;
 
+#ifndef HEADLESS
 	GfxAction[x][y] = ACTION_DEFAULT;
+#endif
       }
       else
       {
@@ -7823,12 +8162,14 @@ static void StartMoving(int x, int y)
       {
 	TurnRound(x, y);
 
+#ifndef HEADLESS
 	if (MovDelay[x][y] && (element == EL_BUG ||
 			       element == EL_SPACESHIP ||
 			       element == EL_SP_SNIKSNAK ||
 			       element == EL_SP_ELECTRON ||
 			       element == EL_MOLE))
 	  TEST_DrawLevelField(x, y);
+#endif
       }
     }
 
@@ -7840,17 +8181,22 @@ static void StartMoving(int x, int y)
 	  element == EL_YAMYAM ||
 	  element == EL_DARK_YAMYAM)
       {
+#ifndef HEADLESS
 	DrawLevelElementAnimationIfNeeded(x, y, element);
 	PlayLevelSoundAction(x, y, ACTION_WAITING);
+#endif
       }
+#ifndef HEADLESS
       else if (element == EL_SP_ELECTRON)
 	DrawLevelElementAnimationIfNeeded(x, y, element);
+#endif
       else if (element == EL_DRAGON)
       {
 	int i;
 	int dir = MovDir[x][y];
 	int dx = (dir == MV_LEFT ? -1 : dir == MV_RIGHT ? +1 : 0);
 	int dy = (dir == MV_UP   ? -1 : dir == MV_DOWN  ? +1 : 0);
+#ifndef HEADLESS
 	int graphic = (dir == MV_LEFT	? IMG_FLAMES_1_LEFT :
 		       dir == MV_RIGHT	? IMG_FLAMES_1_RIGHT :
 		       dir == MV_UP	? IMG_FLAMES_1_UP :
@@ -7865,14 +8211,17 @@ static void StartMoving(int x, int y)
 	  TEST_DrawLevelField(x, y);
 
 	PlayLevelSoundActionIfLoop(x, y, ACTION_ATTACKING);
+#endif
 
 	for (i = 1; i <= 3; i++)
 	{
 	  int xx = x + i * dx;
 	  int yy = y + i * dy;
+#ifndef HEADLESS
 	  int sx = SCREENX(xx);
 	  int sy = SCREENY(yy);
 	  int flame_graphic = graphic + (i - 1);
+#endif
 
 	  if (!IN_LEV_FIELD(xx, yy) || IS_DRAGONFIRE_PROOF(Feld[xx][yy]))
 	    break;
@@ -7890,24 +8239,30 @@ static void StartMoving(int x, int y)
 
 	    Feld[xx][yy] = EL_FLAMES;
 
+#ifndef HEADLESS
 	    if (IN_SCR_FIELD(sx, sy))
 	    {
 	      TEST_DrawLevelFieldCrumbled(xx, yy);
 	      DrawGraphic(sx, sy, flame_graphic, frame);
 	    }
+#endif
 	  }
+#ifndef HEADLESS
 	  else
 	  {
 	    if (Feld[xx][yy] == EL_FLAMES)
 	      Feld[xx][yy] = EL_EMPTY;
 	    TEST_DrawLevelField(xx, yy);
 	  }
+#endif
 	}
       }
 
       if (MovDelay[x][y])	// element still has to wait some time
       {
+#ifndef HEADLESS
 	PlayLevelSoundAction(x, y, ACTION_WAITING);
+#endif
 
 	return;
       }
@@ -7943,11 +8298,13 @@ static void StartMoving(int x, int y)
 	  Feld[newx][newy] == EL_EM_STEEL_EXIT_OPEN)
       {
 	RemoveField(x, y);
+#ifndef HEADLESS
 	TEST_DrawLevelField(x, y);
 
 	PlayLevelSound(newx, newy, SND_PENGUIN_PASSING);
 	if (IN_SCR_FIELD(SCREENX(newx), SCREENY(newy)))
 	  DrawGraphicThruMask(SCREENX(newx),SCREENY(newy), el2img(element), 0);
+#endif
 
 	game.friends_still_needed--;
 	if (!game.friends_still_needed &&
@@ -7957,6 +8314,7 @@ static void StartMoving(int x, int y)
 
 	return;
       }
+#ifndef HEADLESS
       else if (IS_FOOD_PENGUIN(Feld[newx][newy]))
       {
 	if (DigField(local_player, x, y, newx, newy, 0,0, DF_DIG) == MP_MOVING)
@@ -7975,6 +8333,7 @@ static void StartMoving(int x, int y)
 
 	return;
       }
+#endif
     }
     else if (element == EL_PIG && IN_LEV_FIELD(newx, newy))
     {
@@ -7985,17 +8344,23 @@ static void StartMoving(int x, int y)
 	else
 	{
 	  Feld[newx][newy] = EL_EMPTY;
+#ifndef HEADLESS
 	  TEST_DrawLevelField(newx, newy);
+#endif
 	}
 
+#ifndef HEADLESS
 	PlayLevelSound(x, y, SND_PIG_DIGGING);
+#endif
       }
       else if (!IS_FREE(newx, newy))
       {
+#ifndef HEADLESS
 	if (IS_PLAYER(x, y))
 	  DrawPlayerField(x, y);
 	else
 	  TEST_DrawLevelField(x, y);
+#endif
 
 	return;
       }
@@ -8027,26 +8392,34 @@ static void StartMoving(int x, int y)
       {
 	if (IS_MV_DIAGONAL(MovDir[x][y]))
 	{
+#ifndef HEADLESS
 	  int diagonal_move_dir = MovDir[x][y];
+#endif
 	  int stored = Store[x][y];
 	  int change_delay = 8;
+#ifndef HEADLESS
 	  int graphic;
+#endif
 
 	  // android is moving diagonally
 
 	  CreateField(x, y, EL_DIAGONAL_SHRINKING);
 
 	  Store[x][y] = (stored == EL_ACID ? EL_EMPTY : stored);
+#ifndef HEADLESS
 	  GfxElement[x][y] = EL_EMC_ANDROID;
 	  GfxAction[x][y] = ACTION_SHRINKING;
 	  GfxDir[x][y] = diagonal_move_dir;
+#endif
 	  ChangeDelay[x][y] = change_delay;
 
+#ifndef HEADLESS
 	  graphic = el_act_dir2img(GfxElement[x][y], GfxAction[x][y],
 				   GfxDir[x][y]);
 
 	  DrawLevelGraphicAnimation(x, y, graphic);
 	  PlayLevelSoundAction(x, y, ACTION_SHRINKING);
+#endif
 
 	  if (Feld[newx][newy] == EL_ACID)
 	  {
@@ -8058,25 +8431,31 @@ static void StartMoving(int x, int y)
 	  CreateField(newx, newy, EL_DIAGONAL_GROWING);
 
 	  Store[newx][newy] = EL_EMC_ANDROID;
+#ifndef HEADLESS
 	  GfxElement[newx][newy] = EL_EMC_ANDROID;
 	  GfxAction[newx][newy] = ACTION_GROWING;
 	  GfxDir[newx][newy] = diagonal_move_dir;
+#endif
 	  ChangeDelay[newx][newy] = change_delay;
 
+#ifndef HEADLESS
 	  graphic = el_act_dir2img(GfxElement[newx][newy],
 				   GfxAction[newx][newy], GfxDir[newx][newy]);
 
 	  DrawLevelGraphicAnimation(newx, newy, graphic);
 	  PlayLevelSoundAction(newx, newy, ACTION_GROWING);
+#endif
 
 	  return;
 	}
 	else
 	{
 	  Feld[newx][newy] = EL_EMPTY;
+#ifndef HEADLESS
 	  TEST_DrawLevelField(newx, newy);
 
 	  PlayLevelSoundAction(x, y, ACTION_DIGGING);
+#endif
 	}
       }
       else if (!IS_FREE(newx, newy))
@@ -8100,10 +8479,12 @@ static void StartMoving(int x, int y)
     {
       if (!IS_FREE(newx, newy))
       {
+#ifndef HEADLESS
 	if (IS_PLAYER(x, y))
 	  DrawPlayerField(x, y);
 	else
 	  TEST_DrawLevelField(x, y);
+#endif
 
 	return;
       }
@@ -8124,6 +8505,7 @@ static void StartMoving(int x, int y)
 	    element1 != EL_DRAGON && element2 != EL_DRAGON &&
 	    element1 != EL_FLAMES && element2 != EL_FLAMES)
 	{
+#ifndef HEADLESS
 	  ResetGfxAnimation(x, y);
 	  GfxAction[x][y] = ACTION_ATTACKING;
 
@@ -8133,6 +8515,7 @@ static void StartMoving(int x, int y)
 	    TEST_DrawLevelField(x, y);
 
 	  PlayLevelSound(x, y, SND_DRAGON_ATTACKING);
+#endif
 
 	  MovDelay[x][y] = 50;
 
@@ -8154,10 +8537,14 @@ static void StartMoving(int x, int y)
       else
       {
 	Feld[newx][newy] = EL_EMPTY;
+#ifndef HEADLESS
 	TEST_DrawLevelField(newx, newy);
+#endif
       }
 
+#ifndef HEADLESS
       PlayLevelSound(x, y, SND_YAMYAM_DIGGING);
+#endif
     }
     else if (element == EL_DARK_YAMYAM && IN_LEV_FIELD(newx, newy) &&
 	     IS_FOOD_DARK_YAMYAM(Feld[newx][newy]))
@@ -8177,10 +8564,14 @@ static void StartMoving(int x, int y)
       else
       {
 	Feld[newx][newy] = EL_EMPTY;
+#ifndef HEADLESS
 	TEST_DrawLevelField(newx, newy);
+#endif
       }
 
+#ifndef HEADLESS
       PlayLevelSound(x, y, SND_DARK_YAMYAM_DIGGING);
+#endif
     }
     else if ((element == EL_PACMAN || element == EL_MOLE)
 	     && IN_LEV_FIELD(newx, newy) && IS_AMOEBOID(Feld[newx][newy]))
@@ -8196,11 +8587,13 @@ static void StartMoving(int x, int y)
       if (element == EL_MOLE)
       {
 	Feld[newx][newy] = EL_AMOEBA_SHRINKING;
+#ifndef HEADLESS
 	PlayLevelSound(x, y, SND_MOLE_DIGGING);
 
 	ResetGfxAnimation(x, y);
 	GfxAction[x][y] = ACTION_DIGGING;
 	TEST_DrawLevelField(x, y);
+#endif
 
 	MovDelay[newx][newy] = 0;	// start amoeba shrinking delay
 
@@ -8209,8 +8602,10 @@ static void StartMoving(int x, int y)
       else	// element == EL_PACMAN
       {
 	Feld[newx][newy] = EL_EMPTY;
+#ifndef HEADLESS
 	TEST_DrawLevelField(newx, newy);
 	PlayLevelSound(x, y, SND_PACMAN_DIGGING);
+#endif
       }
     }
     else if (element == EL_MOLE && IN_LEV_FIELD(newx, newy) &&
@@ -8226,8 +8621,10 @@ static void StartMoving(int x, int y)
 
       TurnRound(x, y);
 
+#ifndef HEADLESS
       if (GFX_ELEMENT(element) != EL_SAND)     // !!! FIX THIS (crumble) !!!
 	DrawLevelElementAnimation(x, y, element);
+#endif
 
       if (DONT_TOUCH(element))
 	TestIfBadThingTouchesPlayer(x, y);
@@ -8237,7 +8634,9 @@ static void StartMoving(int x, int y)
 
     InitMovingField(x, y, MovDir[x][y]);
 
+#ifndef HEADLESS
     PlayLevelSoundAction(x, y, ACTION_MOVING);
+#endif
   }
 
   if (MovDir[x][y])
@@ -8265,7 +8664,9 @@ void ContinueMoving(int x, int y)
 
   if (ABS(MovPos[x][y]) < TILEX)
   {
+#ifndef HEADLESS
     TEST_DrawLevelField(x, y);
+#endif
 
     return;	// element is still moving
   }
@@ -8292,7 +8693,9 @@ void ContinueMoving(int x, int y)
   {
     Feld[x][y] = EL_SAND;
 
+#ifndef HEADLESS
     TEST_DrawLevelFieldCrumbledNeighbours(x, y);
+#endif
   }
   else if (element == EL_QUICKSAND_FILLING)
   {
@@ -8404,10 +8807,12 @@ void ContinueMoving(int x, int y)
   CustomValue[x][y] = 0;
 
   // copy animation control values to new field
+#ifndef HEADLESS
   GfxFrame[newx][newy]  = GfxFrame[x][y];
   GfxRandom[newx][newy] = GfxRandom[x][y];	// keep same random value
   GfxAction[newx][newy] = GfxAction[x][y];	// keep action one frame
   GfxDir[newx][newy]    = GfxDir[x][y];		// keep element direction
+#endif
 
   Pushed[x][y] = Pushed[newx][newy] = FALSE;
 
@@ -8429,16 +8834,21 @@ void ContinueMoving(int x, int y)
 
     InitField(x, y, FALSE);
 
+#ifndef HEADLESS
     if (GFX_CRUMBLED(Feld[x][y]))
       TEST_DrawLevelFieldCrumbledNeighbours(x, y);
+#endif
 
     if (ELEM_IS_PLAYER(move_leave_element))
       RelocatePlayer(x, y, move_leave_element);
   }
 
   // do this after checking for left-behind element
+#ifndef HEADLESS
   ResetGfxAnimation(x, y);	// reset animation values for old field
+#endif
 
+#ifndef HEADLESS
   if (!CAN_MOVE(element) ||
       (CAN_FALL(element) && direction == MV_DOWN &&
        (element == EL_SPRING ||
@@ -8448,6 +8858,14 @@ void ContinueMoving(int x, int y)
 
   TEST_DrawLevelField(x, y);
   TEST_DrawLevelField(newx, newy);
+#else
+    if (!CAN_MOVE(element) ||
+      (CAN_FALL(element) && direction == MV_DOWN &&
+       (element == EL_SPRING ||
+	element_info[element].move_pattern == MV_WHEN_PUSHED ||
+	element_info[element].move_pattern == MV_WHEN_DROPPED)))
+    MovDir[newx][newy] = 0;
+#endif
 
   Stop[newx][newy] = TRUE;	// ignore this element until the next frame
 
@@ -8630,9 +9048,11 @@ void AmoebeUmwandeln(int ax, int ay)
       }
     }
 
+#ifndef HEADLESS
     PlayLevelSound(ax, ay, (IS_GEM(level.amoeba_content) ?
 			    SND_AMOEBA_TURNING_TO_GEM :
 			    SND_AMOEBA_TURNING_TO_ROCK));
+#endif
     Bang(ax, ay);
   }
   else
@@ -8655,9 +9075,11 @@ void AmoebeUmwandeln(int ax, int ay)
 
       if (Feld[x][y] == EL_AMOEBA_TO_DIAMOND)
       {
+#ifndef HEADLESS
 	PlayLevelSound(x, y, (IS_GEM(level.amoeba_content) ?
 			      SND_AMOEBA_TURNING_TO_GEM :
 			      SND_AMOEBA_TURNING_TO_ROCK));
+#endif
 	Bang(x, y);
       }
     }
@@ -8668,7 +9090,9 @@ static void AmoebeUmwandelnBD(int ax, int ay, int new_element)
 {
   int x, y;
   int group_nr = AmoebaNr[ax][ay];
+#ifndef HEADLESS
   boolean done = FALSE;
+#endif
 
 #ifdef DEBUG
   if (group_nr == 0)
@@ -8689,36 +9113,45 @@ static void AmoebeUmwandelnBD(int ax, int ay, int new_element)
       AmoebaNr[x][y] = 0;
       Feld[x][y] = new_element;
       InitField(x, y, FALSE);
+#ifndef HEADLESS
       TEST_DrawLevelField(x, y);
       done = TRUE;
+#endif
     }
   }
 
+#ifndef HEADLESS
   if (done)
     PlayLevelSound(ax, ay, (new_element == EL_BD_ROCK ?
 			    SND_BD_AMOEBA_TURNING_TO_ROCK :
 			    SND_BD_AMOEBA_TURNING_TO_GEM));
+#endif
 }
 
 static void AmoebeWaechst(int x, int y)
 {
+#ifndef HEADLESS
   static unsigned int sound_delay = 0;
   static unsigned int sound_delay_value = 0;
+#endif
 
   if (!MovDelay[x][y])		// start new growing cycle
   {
     MovDelay[x][y] = 7;
 
+#ifndef HEADLESS
     if (DelayReached(&sound_delay, sound_delay_value))
     {
       PlayLevelSoundElementAction(x, y, Store[x][y], ACTION_GROWING);
       sound_delay_value = 30;
     }
+#endif
   }
 
   if (MovDelay[x][y])		// wait some time before growing bigger
   {
     MovDelay[x][y]--;
+#ifndef HEADLESS
     if (MovDelay[x][y]/2 && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
     {
       int frame = getGraphicAnimationFrame(IMG_AMOEBA_GROWING,
@@ -8726,32 +9159,40 @@ static void AmoebeWaechst(int x, int y)
 
       DrawGraphic(SCREENX(x), SCREENY(y), IMG_AMOEBA_GROWING, frame);
     }
+#endif
 
     if (!MovDelay[x][y])
     {
       Feld[x][y] = Store[x][y];
       Store[x][y] = 0;
+#ifndef HEADLESS
       TEST_DrawLevelField(x, y);
+#endif
     }
   }
 }
 
 static void AmoebaDisappearing(int x, int y)
 {
+#ifndef HEADLESS
   static unsigned int sound_delay = 0;
   static unsigned int sound_delay_value = 0;
+#endif
 
   if (!MovDelay[x][y])		// start new shrinking cycle
   {
     MovDelay[x][y] = 7;
 
+#ifndef HEADLESS
     if (DelayReached(&sound_delay, sound_delay_value))
       sound_delay_value = 30;
+#endif
   }
 
   if (MovDelay[x][y])		// wait some time before shrinking
   {
     MovDelay[x][y]--;
+#ifndef HEADLESS
     if (MovDelay[x][y]/2 && IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
     {
       int frame = getGraphicAnimationFrame(IMG_AMOEBA_SHRINKING,
@@ -8759,11 +9200,14 @@ static void AmoebaDisappearing(int x, int y)
 
       DrawGraphic(SCREENX(x), SCREENY(y), IMG_AMOEBA_SHRINKING, frame);
     }
+#endif
 
     if (!MovDelay[x][y])
     {
       Feld[x][y] = EL_EMPTY;
+#ifndef HEADLESS
       TEST_DrawLevelField(x, y);
+#endif
 
       // don't let mole enter this field in this cycle;
       // (give priority to objects falling to this field from above)
@@ -8776,7 +9220,9 @@ static void AmoebeAbleger(int ax, int ay)
 {
   int i;
   int element = Feld[ax][ay];
+#ifndef HEADLESS
   int graphic = el2img(element);
+#endif
   int newax = ax, neway = ay;
   boolean can_drop = (element == EL_AMOEBA_WET || element == EL_EMC_DRIPPER);
   static int xy[4][2] =
@@ -8790,12 +9236,16 @@ static void AmoebeAbleger(int ax, int ay)
   if (!level.amoeba_speed && element != EL_EMC_DRIPPER)
   {
     Feld[ax][ay] = EL_AMOEBA_DEAD;
+#ifndef HEADLESS
     TEST_DrawLevelField(ax, ay);
+#endif
     return;
   }
 
+#ifndef HEADLESS
   if (IS_ANIMATED(graphic))
     DrawLevelGraphicAnimationIfNeeded(ax, ay, graphic);
+#endif
 
   if (!MovDelay[ax][ay])	// start making new amoeba field
     MovDelay[ax][ay] = RND(FRAMES_PER_SECOND * 25 / (1 + level.amoeba_speed));
@@ -8860,7 +9310,9 @@ static void AmoebeAbleger(int ax, int ay)
       if (i == 4 && (!waiting_for_player || element == EL_BD_AMOEBA))
       {
 	Feld[ax][ay] = EL_AMOEBA_DEAD;
+#ifndef HEADLESS
 	TEST_DrawLevelField(ax, ay);
+#endif
 	AmoebaCnt[AmoebaNr[ax][ay]]--;
 
 	if (AmoebaCnt[AmoebaNr[ax][ay]] <= 0)	// amoeba is completely dead
@@ -8913,7 +9365,9 @@ static void AmoebeAbleger(int ax, int ay)
   {
     Feld[newax][neway] = EL_AMOEBA_DROP;	// drop left/right of amoeba
 
+#ifndef HEADLESS
     PlayLevelSoundAction(newax, neway, ACTION_GROWING);
+#endif
   }
   else
   {
@@ -8924,7 +9378,9 @@ static void AmoebeAbleger(int ax, int ay)
     return;
   }
 
+#ifndef HEADLESS
   TEST_DrawLevelField(newax, neway);
+#endif
 }
 
 static void Life(int ax, int ay)
@@ -8932,13 +9388,17 @@ static void Life(int ax, int ay)
   int x1, y1, x2, y2;
   int life_time = 40;
   int element = Feld[ax][ay];
+#ifndef HEADLESS
   int graphic = el2img(element);
+#endif
   int *life_parameter = (element == EL_GAME_OF_LIFE ? level.game_of_life :
 			 level.biomaze);
   boolean changed = FALSE;
 
+#ifndef HEADLESS
   if (IS_ANIMATED(graphic))
     DrawLevelGraphicAnimationIfNeeded(ax, ay, graphic);
+#endif
 
   if (Stop[ax][ay])
     return;
@@ -8956,7 +9416,9 @@ static void Life(int ax, int ay)
   for (y1 = -1; y1 < 2; y1++) for (x1 = -1; x1 < 2; x1++)
   {
     int xx = ax+x1, yy = ay+y1;
+#ifndef HEADLESS
     int old_element = Feld[xx][yy];
+#endif
     int num_neighbours = 0;
 
     if (!IN_LEV_FIELD(xx, yy))
@@ -8997,8 +9459,12 @@ static void Life(int ax, int ay)
 	  num_neighbours > life_parameter[1])
       {
 	Feld[xx][yy] = EL_EMPTY;
+#ifndef HEADLESS
 	if (Feld[xx][yy] != old_element)
 	  TEST_DrawLevelField(xx, yy);
+#else
+	(void)changed;
+#endif
 	Stop[xx][yy] = TRUE;
 	changed = TRUE;
       }
@@ -9010,17 +9476,21 @@ static void Life(int ax, int ay)
       {
 	Feld[xx][yy] = element;
 	MovDelay[xx][yy] = (element == EL_GAME_OF_LIFE ? 0 : life_time-1);
+#ifndef HEADLESS
 	if (Feld[xx][yy] != old_element)
 	  TEST_DrawLevelField(xx, yy);
+#endif
 	Stop[xx][yy] = TRUE;
 	changed = TRUE;
       }
     }
   }
 
+#ifndef HEADLESS
   if (changed)
     PlayLevelSound(ax, ay, element == EL_BIOMAZE ? SND_BIOMAZE_GROWING :
 		   SND_GAME_OF_LIFE_GROWING);
+#endif
 }
 
 static void InitRobotWheel(int x, int y)
@@ -9030,7 +9500,9 @@ static void InitRobotWheel(int x, int y)
 
 static void RunRobotWheel(int x, int y)
 {
+#ifndef HEADLESS
   PlayLevelSound(x, y, SND_ROBOT_WHEEL_ACTIVE);
+#endif
 }
 
 static void StopRobotWheel(int x, int y)
@@ -9051,7 +9523,9 @@ static void InitTimegateWheel(int x, int y)
 
 static void RunTimegateWheel(int x, int y)
 {
+#ifndef HEADLESS
   PlayLevelSound(x, y, SND_CLASS_TIMEGATE_SWITCH_ACTIVE);
+#endif
 }
 
 static void InitMagicBallDelay(int x, int y)
@@ -9098,11 +9572,13 @@ static void CheckExit(int x, int y)
       game.sokoban_objects_still_needed > 0 ||
       game.lights_still_needed > 0)
   {
+#ifndef HEADLESS
     int element = Feld[x][y];
     int graphic = el2img(element);
 
     if (IS_ANIMATED(graphic))
       DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
+#endif
 
     return;
   }
@@ -9113,7 +9589,9 @@ static void CheckExit(int x, int y)
 
   Feld[x][y] = EL_EXIT_OPENING;
 
+#ifndef HEADLESS
   PlayLevelSoundNearest(x, y, SND_CLASS_EXIT_OPENING);
+#endif
 }
 
 static void CheckExitEM(int x, int y)
@@ -9123,11 +9601,13 @@ static void CheckExitEM(int x, int y)
       game.sokoban_objects_still_needed > 0 ||
       game.lights_still_needed > 0)
   {
+#ifndef HEADLESS
     int element = Feld[x][y];
     int graphic = el2img(element);
 
     if (IS_ANIMATED(graphic))
       DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
+#endif
 
     return;
   }
@@ -9138,7 +9618,9 @@ static void CheckExitEM(int x, int y)
 
   Feld[x][y] = EL_EM_EXIT_OPENING;
 
+#ifndef HEADLESS
   PlayLevelSoundNearest(x, y, SND_CLASS_EM_EXIT_OPENING);
+#endif
 }
 
 static void CheckExitSteel(int x, int y)
@@ -9148,11 +9630,13 @@ static void CheckExitSteel(int x, int y)
       game.sokoban_objects_still_needed > 0 ||
       game.lights_still_needed > 0)
   {
+#ifndef HEADLESS
     int element = Feld[x][y];
     int graphic = el2img(element);
 
     if (IS_ANIMATED(graphic))
       DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
+#endif
 
     return;
   }
@@ -9163,7 +9647,9 @@ static void CheckExitSteel(int x, int y)
 
   Feld[x][y] = EL_STEEL_EXIT_OPENING;
 
+#ifndef HEADLESS
   PlayLevelSoundNearest(x, y, SND_CLASS_STEEL_EXIT_OPENING);
+#endif
 }
 
 static void CheckExitSteelEM(int x, int y)
@@ -9173,11 +9659,13 @@ static void CheckExitSteelEM(int x, int y)
       game.sokoban_objects_still_needed > 0 ||
       game.lights_still_needed > 0)
   {
+#ifndef HEADLESS
     int element = Feld[x][y];
     int graphic = el2img(element);
 
     if (IS_ANIMATED(graphic))
       DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
+#endif
 
     return;
   }
@@ -9188,18 +9676,22 @@ static void CheckExitSteelEM(int x, int y)
 
   Feld[x][y] = EL_EM_STEEL_EXIT_OPENING;
 
+#ifndef HEADLESS
   PlayLevelSoundNearest(x, y, SND_CLASS_EM_STEEL_EXIT_OPENING);
+#endif
 }
 
 static void CheckExitSP(int x, int y)
 {
   if (game.gems_still_needed > 0)
   {
+#ifndef HEADLESS
     int element = Feld[x][y];
     int graphic = el2img(element);
 
     if (IS_ANIMATED(graphic))
       DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
+#endif
 
     return;
   }
@@ -9210,7 +9702,9 @@ static void CheckExitSP(int x, int y)
 
   Feld[x][y] = EL_SP_EXIT_OPENING;
 
+#ifndef HEADLESS
   PlayLevelSoundNearest(x, y, SND_CLASS_SP_EXIT_OPENING);
+#endif
 }
 
 static void CloseAllOpenTimegates(void)
@@ -9225,11 +9719,14 @@ static void CloseAllOpenTimegates(void)
     {
       Feld[x][y] = EL_TIMEGATE_CLOSING;
 
+#ifndef HEADLESS
       PlayLevelSoundAction(x, y, ACTION_CLOSING);
+#endif
     }
   }
 }
 
+#ifndef HEADLESS
 static void DrawTwinkleOnField(int x, int y)
 {
   if (!IN_SCR_FIELD(SCREENX(x), SCREENY(y)) || IS_MOVING(x, y))
@@ -9256,6 +9753,7 @@ static void DrawTwinkleOnField(int x, int y)
     }
   }
 }
+#endif
 
 static void MauerWaechst(int x, int y)
 {
@@ -9268,6 +9766,7 @@ static void MauerWaechst(int x, int y)
   {
     MovDelay[x][y]--;
 
+#ifndef HEADLESS
     if (IN_SCR_FIELD(SCREENX(x), SCREENY(y)))
     {
       int graphic = el_dir2img(Feld[x][y], GfxDir[x][y]);
@@ -9275,9 +9774,11 @@ static void MauerWaechst(int x, int y)
 
       DrawGraphic(SCREENX(x), SCREENY(y), graphic, frame);
     }
+#endif
 
     if (!MovDelay[x][y])
     {
+#ifndef HEADLESS
       if (MovDir[x][y] == MV_LEFT)
       {
 	if (IN_LEV_FIELD(x - 1, y) && IS_WALL(Feld[x - 1][y]))
@@ -9298,11 +9799,14 @@ static void MauerWaechst(int x, int y)
 	if (IN_LEV_FIELD(x, y + 1) && IS_WALL(Feld[x][y + 1]))
 	  TEST_DrawLevelField(x, y + 1);
       }
+#endif
 
       Feld[x][y] = Store[x][y];
       Store[x][y] = 0;
+#ifndef HEADLESS
       GfxDir[x][y] = MovDir[x][y] = MV_NONE;
       TEST_DrawLevelField(x, y);
+#endif
     }
   }
 }
@@ -9310,15 +9814,19 @@ static void MauerWaechst(int x, int y)
 static void MauerAbleger(int ax, int ay)
 {
   int element = Feld[ax][ay];
+#ifndef HEADLESS
   int graphic = el2img(element);
+#endif
   boolean oben_frei = FALSE, unten_frei = FALSE;
   boolean links_frei = FALSE, rechts_frei = FALSE;
   boolean oben_massiv = FALSE, unten_massiv = FALSE;
   boolean links_massiv = FALSE, rechts_massiv = FALSE;
   boolean new_wall = FALSE;
 
+#ifndef HEADLESS
   if (IS_ANIMATED(graphic))
     DrawLevelGraphicAnimationIfNeeded(ax, ay, graphic);
+#endif
 
   if (!MovDelay[ax][ay])	// start building new wall
     MovDelay[ax][ay] = 6;
@@ -9346,20 +9854,26 @@ static void MauerAbleger(int ax, int ay)
     {
       Feld[ax][ay-1] = EL_EXPANDABLE_WALL_GROWING;
       Store[ax][ay-1] = element;
+#ifndef HEADLESS
       GfxDir[ax][ay-1] = MovDir[ax][ay-1] = MV_UP;
       if (IN_SCR_FIELD(SCREENX(ax), SCREENY(ay-1)))
   	DrawGraphic(SCREENX(ax), SCREENY(ay - 1),
 		    IMG_EXPANDABLE_WALL_GROWING_UP, 0);
+#else
+      (void)new_wall;
+#endif
       new_wall = TRUE;
     }
     if (unten_frei)
     {
       Feld[ax][ay+1] = EL_EXPANDABLE_WALL_GROWING;
       Store[ax][ay+1] = element;
+#ifndef HEADLESS
       GfxDir[ax][ay+1] = MovDir[ax][ay+1] = MV_DOWN;
       if (IN_SCR_FIELD(SCREENX(ax), SCREENY(ay+1)))
   	DrawGraphic(SCREENX(ax), SCREENY(ay + 1),
 		    IMG_EXPANDABLE_WALL_GROWING_DOWN, 0);
+#endif
       new_wall = TRUE;
     }
   }
@@ -9373,10 +9887,12 @@ static void MauerAbleger(int ax, int ay)
     {
       Feld[ax-1][ay] = EL_EXPANDABLE_WALL_GROWING;
       Store[ax-1][ay] = element;
+#ifndef HEADLESS
       GfxDir[ax-1][ay] = MovDir[ax-1][ay] = MV_LEFT;
       if (IN_SCR_FIELD(SCREENX(ax-1), SCREENY(ay)))
   	DrawGraphic(SCREENX(ax - 1), SCREENY(ay),
 		    IMG_EXPANDABLE_WALL_GROWING_LEFT, 0);
+#endif
       new_wall = TRUE;
     }
 
@@ -9384,16 +9900,20 @@ static void MauerAbleger(int ax, int ay)
     {
       Feld[ax+1][ay] = EL_EXPANDABLE_WALL_GROWING;
       Store[ax+1][ay] = element;
+#ifndef HEADLESS
       GfxDir[ax+1][ay] = MovDir[ax+1][ay] = MV_RIGHT;
       if (IN_SCR_FIELD(SCREENX(ax+1), SCREENY(ay)))
   	DrawGraphic(SCREENX(ax + 1), SCREENY(ay),
 		    IMG_EXPANDABLE_WALL_GROWING_RIGHT, 0);
+#endif
       new_wall = TRUE;
     }
   }
 
+#ifndef HEADLESS
   if (element == EL_EXPANDABLE_WALL && (links_frei || rechts_frei))
     TEST_DrawLevelField(ax, ay);
+#endif
 
   if (!IN_LEV_FIELD(ax, ay-1) || IS_WALL(Feld[ax][ay-1]))
     oben_massiv = TRUE;
@@ -9411,22 +9931,28 @@ static void MauerAbleger(int ax, int ay)
        element == EL_EXPANDABLE_WALL_VERTICAL))
     Feld[ax][ay] = EL_WALL;
 
+#ifndef HEADLESS
   if (new_wall)
     PlayLevelSoundAction(ax, ay, ACTION_GROWING);
+#endif
 }
 
 static void MauerAblegerStahl(int ax, int ay)
 {
   int element = Feld[ax][ay];
+#ifndef HEADLESS
   int graphic = el2img(element);
+#endif
   boolean oben_frei = FALSE, unten_frei = FALSE;
   boolean links_frei = FALSE, rechts_frei = FALSE;
   boolean oben_massiv = FALSE, unten_massiv = FALSE;
   boolean links_massiv = FALSE, rechts_massiv = FALSE;
   boolean new_wall = FALSE;
 
+#ifndef HEADLESS
   if (IS_ANIMATED(graphic))
     DrawLevelGraphicAnimationIfNeeded(ax, ay, graphic);
+#endif
 
   if (!MovDelay[ax][ay])	// start building new wall
     MovDelay[ax][ay] = 6;
@@ -9454,20 +9980,26 @@ static void MauerAblegerStahl(int ax, int ay)
     {
       Feld[ax][ay-1] = EL_EXPANDABLE_STEELWALL_GROWING;
       Store[ax][ay-1] = element;
+#ifndef HEADLESS
       GfxDir[ax][ay-1] = MovDir[ax][ay-1] = MV_UP;
       if (IN_SCR_FIELD(SCREENX(ax), SCREENY(ay-1)))
   	DrawGraphic(SCREENX(ax), SCREENY(ay - 1),
 		    IMG_EXPANDABLE_STEELWALL_GROWING_UP, 0);
+#else
+      (void)new_wall;
+#endif
       new_wall = TRUE;
     }
     if (unten_frei)
     {
       Feld[ax][ay+1] = EL_EXPANDABLE_STEELWALL_GROWING;
       Store[ax][ay+1] = element;
+#ifndef HEADLESS
       GfxDir[ax][ay+1] = MovDir[ax][ay+1] = MV_DOWN;
       if (IN_SCR_FIELD(SCREENX(ax), SCREENY(ay+1)))
   	DrawGraphic(SCREENX(ax), SCREENY(ay + 1),
 		    IMG_EXPANDABLE_STEELWALL_GROWING_DOWN, 0);
+#endif
       new_wall = TRUE;
     }
   }
@@ -9479,10 +10011,12 @@ static void MauerAblegerStahl(int ax, int ay)
     {
       Feld[ax-1][ay] = EL_EXPANDABLE_STEELWALL_GROWING;
       Store[ax-1][ay] = element;
+#ifndef HEADLESS
       GfxDir[ax-1][ay] = MovDir[ax-1][ay] = MV_LEFT;
       if (IN_SCR_FIELD(SCREENX(ax-1), SCREENY(ay)))
   	DrawGraphic(SCREENX(ax - 1), SCREENY(ay),
 		    IMG_EXPANDABLE_STEELWALL_GROWING_LEFT, 0);
+#endif
       new_wall = TRUE;
     }
 
@@ -9490,10 +10024,12 @@ static void MauerAblegerStahl(int ax, int ay)
     {
       Feld[ax+1][ay] = EL_EXPANDABLE_STEELWALL_GROWING;
       Store[ax+1][ay] = element;
+#ifndef HEADLESS
       GfxDir[ax+1][ay] = MovDir[ax+1][ay] = MV_RIGHT;
       if (IN_SCR_FIELD(SCREENX(ax+1), SCREENY(ay)))
   	DrawGraphic(SCREENX(ax + 1), SCREENY(ay),
 		    IMG_EXPANDABLE_STEELWALL_GROWING_RIGHT, 0);
+#endif
       new_wall = TRUE;
     }
   }
@@ -9513,8 +10049,10 @@ static void MauerAblegerStahl(int ax, int ay)
        element == EL_EXPANDABLE_STEELWALL_VERTICAL))
     Feld[ax][ay] = EL_STEELWALL;
 
+#ifndef HEADLESS
   if (new_wall)
     PlayLevelSoundAction(ax, ay, ACTION_GROWING);
+#endif
 }
 
 static void CheckForDragon(int x, int y)
@@ -9557,7 +10095,9 @@ static void CheckForDragon(int x, int y)
   	if (IN_LEV_FIELD(xx, yy) && Feld[xx][yy] == EL_FLAMES)
   	{
 	  Feld[xx][yy] = EL_EMPTY;
+#ifndef HEADLESS
 	  TEST_DrawLevelField(xx, yy);
+#endif
   	}
   	else
   	  break;
@@ -9598,7 +10138,9 @@ static void WarnBuggyBase(int x, int y)
 
     if (IN_LEV_FIELD(xx, yy) && IS_PLAYER(xx, yy))
     {
+#ifndef HEADLESS
       PlayLevelSound(x, y, SND_SP_BUGGY_BASE_ACTIVE);
+#endif
 
       break;
     }
@@ -9612,16 +10154,20 @@ static void InitTrap(int x, int y)
 
 static void ActivateTrap(int x, int y)
 {
+#ifndef HEADLESS
   PlayLevelSound(x, y, SND_TRAP_ACTIVATING);
+#endif
 }
 
 static void ChangeActiveTrap(int x, int y)
 {
+#ifndef HEADLESS
   int graphic = IMG_TRAP_ACTIVE;
 
   // if new animation frame was drawn, correct crumbled sand border
   if (IS_NEW_FRAME(GfxFrame[x][y], graphic))
     TEST_DrawLevelFieldCrumbled(x, y);
+#endif
 }
 
 static int getSpecialActionElement(int element, int number, int base_element)
@@ -9791,11 +10337,13 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
     {
       if (level.time > 0)	// only modify limited time value
       {
+#ifndef HEADLESS
 	TimeLeft = action_arg_number_new;
 
 	game_panel_controls[GAME_PANEL_TIME].value = TimeLeft;
 
 	DisplayGameControlValues();
+#endif
 
 	if (!TimeLeft && setup.time_limit)
 	  for (i = 0; i < MAX_PLAYERS; i++)
@@ -9809,9 +10357,11 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
     {
       game.score = action_arg_number_new;
 
+#ifndef HEADLESS
       game_panel_controls[GAME_PANEL_SCORE].value = game.score;
 
       DisplayGameControlValues();
+#endif
 
       break;
     }
@@ -9822,9 +10372,11 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 
       game.snapshot.collected_item = TRUE;
 
+#ifndef HEADLESS
       game_panel_controls[GAME_PANEL_GEMS].value = game.gems_still_needed;
 
       DisplayGameControlValues();
+#endif
 
       break;
     }
@@ -9890,8 +10442,10 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 	  if (trigger_player_bits & (1 << i))
 	  {
 	    stored_player[i].key[KEY_NR(element)] = key_state;
+#ifndef HEADLESS
 
 	    DrawGameDoorValues();
+#endif
 	  }
 	}
       }
@@ -10191,6 +10745,7 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 
       ei->gfx_element = artwork_element;
 
+#ifndef HEADLESS
       SCAN_PLAYFIELD(xx, yy)
       {
 	if (Feld[xx][yy] == element)
@@ -10204,6 +10759,10 @@ static void ExecuteCustomElementAction(int x, int y, int element, int page)
 	  TEST_DrawLevelField(xx, yy);
 	}
       }
+#else
+      (void)reset_frame;
+      (void)xx; (void)yy;
+#endif
 
       break;
     }
@@ -10253,6 +10812,7 @@ static void CreateFieldExt(int x, int y, int element, boolean is_change)
 
     new_element = Feld[x][y];	// element may have changed
 
+#ifndef HEADLESS
     ResetGfxAnimation(x, y);
     ResetRandomAnimationValue(x, y);
 
@@ -10260,6 +10820,7 @@ static void CreateFieldExt(int x, int y, int element, boolean is_change)
 
     if (GFX_CRUMBLED(new_element))
       TEST_DrawLevelFieldCrumbledNeighbours(x, y);
+#endif
   }
 
   // check if element under the player changes from accessible to unaccessible
@@ -10447,11 +11008,15 @@ static boolean ChangeElement(int x, int y, int element, int page)
 	}
       }
 
+#ifndef HEADLESS
       if (something_has_changed)
       {
 	PlayLevelSoundElementAction(x, y, element, ACTION_CHANGING);
 	PlayLevelSoundElementAction(x, y, element, ACTION_PAGE_1 + page);
       }
+#else
+        (void)something_has_changed;
+#endif
     }
   }
   else
@@ -10469,8 +11034,10 @@ static boolean ChangeElement(int x, int y, int element, int page)
 
     CreateElementFromChange(x, y, target_element);
 
+#ifndef HEADLESS
     PlayLevelSoundElementAction(x, y, element, ACTION_CHANGING);
     PlayLevelSoundElementAction(x, y, element, ACTION_PAGE_1 + page);
+#endif
   }
 
   // this uses direct change before indirect change
@@ -10554,12 +11121,14 @@ static void HandleElementChange(int x, int y, int page)
 
       // when a custom element is about to change (for example by change delay),
       // do not reset graphic animation when the custom element is moving
+#ifndef HEADLESS
       if (game.graphics_engine_version < 4 &&
 	  !IS_MOVING(x, y))
       {
 	ResetGfxAnimation(x, y);
 	ResetRandomAnimationValue(x, y);
       }
+#endif
 
       if (change->pre_change_function)
 	change->pre_change_function(x, y);
@@ -10572,10 +11141,12 @@ static void HandleElementChange(int x, int y, int page)
   {
     if (change->can_change)
     {
+#ifndef HEADLESS
       int graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
 
       if (IS_ANIMATED(graphic))
 	DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
+#endif
 
       if (change->change_function)
 	change->change_function(x, y);
@@ -10698,7 +11269,9 @@ static boolean CheckTriggeredElementChangeExt(int trigger_x, int trigger_y,
 		  continue;
 
 		ExecuteCustomElementAction(x, y, element, p);
+#ifndef HEADLESS
 		PlayLevelSoundElementAction(x, y, element, ACTION_PAGE_1 + p);
+#endif
 	      }
 	    }
 	  }
@@ -10813,7 +11386,9 @@ static boolean CheckElementChangeExt(int x, int y,
       else if (change->has_action)
       {
 	ExecuteCustomElementAction(x, y, element, p);
+#ifndef HEADLESS
 	PlayLevelSoundElementAction(x, y, element, ACTION_PAGE_1 + p);
+#endif
       }
     }
   }
@@ -10823,6 +11398,7 @@ static boolean CheckElementChangeExt(int x, int y,
   return change_done;
 }
 
+#ifndef HEADLESS
 static void PlayPlayerSound(struct PlayerInfo *player)
 {
   int jx = player->jx, jy = player->jy;
@@ -10846,7 +11422,9 @@ static void PlayPlayerSound(struct PlayerInfo *player)
       PlayLevelSoundElementAction(jx, jy, sound_element, ACTION_AWAKENING);
   }
 }
+#endif
 
+#ifndef HEADLESS
 static void PlayAllPlayersSound(void)
 {
   int i;
@@ -10855,6 +11433,7 @@ static void PlayAllPlayersSound(void)
     if (stored_player[i].active)
       PlayPlayerSound(&stored_player[i]);
 }
+#endif
 
 static void SetPlayerWaiting(struct PlayerInfo *player, boolean is_waiting)
 {
@@ -10879,7 +11458,9 @@ static void SetPlayerWaiting(struct PlayerInfo *player, boolean is_waiting)
 	game.player_sleeping_delay_fixed +
 	GetSimpleRandom(game.player_sleeping_delay_random);
 
+#ifndef HEADLESS
       InitPlayerGfxAnimation(player, ACTION_WAITING, move_dir);
+#endif
     }
 
     if (game.player_sleeping_delay_fixed +
@@ -10928,15 +11509,19 @@ static void SetPlayerWaiting(struct PlayerInfo *player, boolean is_waiting)
 	     last_special_action == ACTION_SLEEPING ? ACTION_SLEEPING :
 	     last_special_action < ACTION_SLEEPING_1 + num_special_action - 1 ?
 	     last_special_action + 1 : ACTION_SLEEPING);
+#ifndef HEADLESS
 	  int special_graphic =
 	    el_act_dir2img(player->artwork_element, special_action, move_dir);
+#endif
 
+#ifndef HEADLESS
 	  player->anim_delay_counter =
 	    graphic_info[special_graphic].anim_delay_fixed +
 	    GetSimpleRandom(graphic_info[special_graphic].anim_delay_random);
 	  player->post_delay_counter =
 	    graphic_info[special_graphic].post_delay_fixed +
 	    GetSimpleRandom(graphic_info[special_graphic].post_delay_random);
+#endif
 
 	  player->special_action_sleeping = special_action;
 	}
@@ -10960,15 +11545,19 @@ static void SetPlayerWaiting(struct PlayerInfo *player, boolean is_waiting)
 	{
 	  int special_action =
 	    ACTION_BORING_1 + GetSimpleRandom(player->num_special_action_bored);
+#ifndef HEADLESS
 	  int special_graphic =
 	    el_act_dir2img(player->artwork_element, special_action, move_dir);
+#endif
 
+#ifndef HEADLESS
 	  player->anim_delay_counter =
 	    graphic_info[special_graphic].anim_delay_fixed +
 	    GetSimpleRandom(graphic_info[special_graphic].anim_delay_random);
 	  player->post_delay_counter =
 	    graphic_info[special_graphic].post_delay_fixed +
 	    GetSimpleRandom(graphic_info[special_graphic].post_delay_random);
+#endif
 
 	  player->special_action_bored = special_action;
 	}
@@ -11005,6 +11594,7 @@ static void SetPlayerWaiting(struct PlayerInfo *player, boolean is_waiting)
   }
 }
 
+#ifndef HEADLESS
 static void CheckSaveEngineSnapshot(struct PlayerInfo *player)
 {
   if ((!player->is_moving  && player->was_moving) ||
@@ -11031,7 +11621,9 @@ static void CheckSaveEngineSnapshot(struct PlayerInfo *player)
       player->was_dropping = FALSE;
   }
 }
+#endif
 
+#ifndef HEADLESS
 static void CheckSingleStepMode(struct PlayerInfo *player)
 {
   if (tape.single_step && tape.recording && !tape.pausing)
@@ -11046,6 +11638,7 @@ static void CheckSingleStepMode(struct PlayerInfo *player)
 
   CheckSaveEngineSnapshot(player);
 }
+#endif
 
 static byte PlayerActions(struct PlayerInfo *player, byte player_action)
 {
@@ -11058,8 +11651,12 @@ static byte PlayerActions(struct PlayerInfo *player, byte player_action)
   int dx	= (left ? -1 : right ? 1 : 0);
   int dy	= (up   ? -1 : down  ? 1 : 0);
 
+#ifndef HEADLESS
   if (!player->active || tape.pausing)
     return 0;
+#else
+  if (!player->active) {return 0;}
+#endif
 
   if (player_action)
   {
@@ -11073,7 +11670,9 @@ static byte PlayerActions(struct PlayerInfo *player, byte player_action)
       MovePlayer(player, dx, dy);
     }
 
+#ifndef HEADLESS
     CheckSingleStepMode(player);
+#endif
 
     SetPlayerWaiting(player, FALSE);
 
@@ -11097,12 +11696,15 @@ static byte PlayerActions(struct PlayerInfo *player, byte player_action)
     player->is_dropping_pressed = FALSE;
     player->drop_pressed_delay = 0;
 
+#ifndef HEADLESS
     CheckSingleStepMode(player);
+#endif
 
     return 0;
   }
 }
 
+#ifndef HEADLESS
 static void SetMouseActionFromTapeAction(struct MouseActionInfo *mouse_action,
 					 byte *tape_action)
 {
@@ -11113,7 +11715,9 @@ static void SetMouseActionFromTapeAction(struct MouseActionInfo *mouse_action,
   mouse_action->ly     = tape_action[TAPE_ACTION_LY];
   mouse_action->button = tape_action[TAPE_ACTION_BUTTON];
 }
+#endif
 
+#ifndef HEADLESS
 static void SetTapeActionFromMouseAction(byte *tape_action,
 					 struct MouseActionInfo *mouse_action)
 {
@@ -11124,6 +11728,7 @@ static void SetTapeActionFromMouseAction(byte *tape_action,
   tape_action[TAPE_ACTION_LY]     = mouse_action->ly;
   tape_action[TAPE_ACTION_BUTTON] = mouse_action->button;
 }
+#endif
 
 static void CheckLevelSolved(void)
 {
@@ -11204,8 +11809,10 @@ static void CheckLevelTime(void)
       {
 	TimeLeft--;
 
+#ifndef HEADLESS
 	if (TimeLeft <= 10 && setup.time_limit)
 	  PlaySound(SND_GAME_RUNNING_OUT_OF_TIME);
+#endif
 
 	/* this does not make sense: game_panel_controls[GAME_PANEL_TIME].value
 	   is reset from other values in UpdateGameDoorValues() -- FIX THIS */
@@ -11230,14 +11837,18 @@ static void CheckLevelTime(void)
 	(game.no_time_limit ? TimePlayed : TimeLeft);
     }
 
+#ifndef HEADLESS
     if (tape.recording || tape.playing)
       DrawVideoDisplay(VIDEO_STATE_TIME_ON, TapeTime);
+#endif
   }
 
+#ifndef HEADLESS
   if (tape.recording || tape.playing)
     DrawVideoDisplay(VIDEO_STATE_FRAME_ON, FrameCounter);
 
   UpdateAndDisplayGameControlValues();
+#endif
 }
 
 void AdvanceFrameAndPlayerCounters(int player_nr)
@@ -11292,6 +11903,7 @@ void AdvanceFrameAndPlayerCounters(int player_nr)
 void StartGameActions(boolean init_network_game, boolean record_tape,
 		      int random_seed)
 {
+#ifndef HEADLESS
   unsigned int new_random_seed = InitRND(random_seed);
 
   if (record_tape)
@@ -11304,6 +11916,7 @@ void StartGameActions(boolean init_network_game, boolean record_tape,
 
     return;
   }
+#endif
 
   InitGame();
 }
@@ -11319,6 +11932,7 @@ static void GameActionsExt(void)
   byte tape_action[MAX_PLAYERS];
   int i;
 
+#ifndef HEADLESS
   // detect endless loops, caused by custom element programming
   if (recursion_loop_detected && recursion_loop_depth == 0)
   {
@@ -11329,7 +11943,12 @@ static void GameActionsExt(void)
     Error(ERR_WARN, "element '%s' caused endless loop in game engine",
 	  EL_NAME(recursion_loop_element));
 
+#ifndef HEADLESS
     RequestQuitGameExt(FALSE, level_editor_test_game, message);
+#else
+      (void)tape_action;
+      (void)game_frame_delay_value;
+#endif
 
     recursion_loop_detected = FALSE;	// if game should be continued
 
@@ -11337,7 +11956,9 @@ static void GameActionsExt(void)
 
     return;
   }
+#endif
 
+#ifndef HEADLESS
   if (game.restart_level)
     StartGameActions(network.enabled, setup.autorecord, level.random_seed);
 
@@ -11345,13 +11966,17 @@ static void GameActionsExt(void)
 
   if (game.LevelSolved && !game.LevelSolved_GameEnd)
     GameWon();
+#endif
 
+#ifndef HEADLESS
   if (game.all_players_gone && !TAPE_IS_STOPPED(tape))
     TapeStop();
+#endif
 
   if (game_status != GAME_MODE_PLAYING)		// status might have changed
     return;
 
+#ifndef HEADLESS
   game_frame_delay_value =
     (tape.playing && tape.fast_forward ? FfwdFrameDelay : GameFrameDelay);
 
@@ -11360,8 +11985,10 @@ static void GameActionsExt(void)
 
   if (checkGameFailed() || options.delay != 20 || (game.LevelSolved && !game.LevelSolved_GameEnd)) {game_frame_delay_value = options.delay;}
   SetVideoFrameDelay((game_frame_delay_value == 0 || is_simulating) ? 0 : game_frame_delay_value);
+#endif
 
   // (de)activate virtual buttons depending on current game status
+#ifndef HEADLESS
   if (strEqual(setup.touch.control_type, TOUCH_CONTROL_VIRTUAL_BUTTONS))
   {
     if (game.all_players_gone)	// if no players there to be controlled anymore
@@ -11369,6 +11996,7 @@ static void GameActionsExt(void)
     else if (!tape.playing)	// if game continues after tape stopped playing
       SetOverlayActive(TRUE);
   }
+#endif
 
 #if 0
 #if 0
@@ -11384,7 +12012,8 @@ static void GameActionsExt(void)
   WaitUntilDelayReached(&game_frame_delay, game_frame_delay_value);
 #endif
 #endif
-    // --skip this
+
+#ifndef HEADLESS
   if (network_playing && !network_player_action_received)
   {
     // try to get network player actions in time
@@ -11405,14 +12034,20 @@ static void GameActionsExt(void)
 
   if (tape.pausing)
     return;
+#endif
 
   // at this point we know that we really continue executing the game
 
   network_player_action_received = FALSE;
 
   // when playing tape, read previously recorded player input from tape data
+#ifndef HEADLESS
   recorded_player_action = (tape.playing ? TapePlayAction() : NULL);
+#else
+    recorded_player_action = NULL;
+#endif
 
+#ifndef HEADLESS
   local_player->effective_mouse_action = local_player->mouse_action;
 
   if (recorded_player_action != NULL)
@@ -11428,18 +12063,23 @@ static void GameActionsExt(void)
     game.centered_player_nr_next = tape.centered_player_nr_next;
     game.set_centered_player = TRUE;
   }
+#endif
 
   // -- get player actions ?
   for (i = 0; i < MAX_PLAYERS; i++)
   {
     summarized_player_action |= stored_player[i].action;
 
+#ifndef HEADLESS
     if (!network_playing && (game.team_mode || tape.playing))
       stored_player[i].effective_action = stored_player[i].action;
+#endif
   }
 
+#ifndef HEADLESS
   if (network_playing && !checkGameEnded())
     SendToServer_MovePlayer(summarized_player_action);
+#endif
 
   // summarize all actions at local players mapped input device position
   // (this allows using different input devices in single player mode)
@@ -11448,6 +12088,7 @@ static void GameActionsExt(void)
       summarized_player_action;
 
   // summarize all actions at centered player in local team mode
+#ifndef HEADLESS
   if (tape.recording &&
       setup.team_mode && !network.enabled &&
       setup.input_on_focus &&
@@ -11457,11 +12098,14 @@ static void GameActionsExt(void)
       stored_player[map_player_action[i]].effective_action =
 	(i == game.centered_player_nr ? summarized_player_action : 0);
   }
+#endif
 
+//    printf("%d\n", recorded_player_action[0]);
   if (recorded_player_action != NULL)
     for (i = 0; i < MAX_PLAYERS; i++)
       stored_player[i].effective_action = recorded_player_action[i];
 
+#ifndef HEADLESS
   for (i = 0; i < MAX_PLAYERS; i++)
   {
     tape_action[i] = stored_player[i].effective_action;
@@ -11481,10 +12125,15 @@ static void GameActionsExt(void)
   // only record actions from input devices, but not programmed actions
   if (tape.recording)
     TapeRecordAction(tape_action);
+#endif
 
   // remember if game was played (especially after tape stopped playing)
+#ifndef HEADLESS
   if (!tape.playing && summarized_player_action)
     game.GamePlayed = TRUE;
+#else
+  if (summarized_player_action) {game.GamePlayed = TRUE;}
+#endif
 
 #if USE_NEW_PLAYER_ASSIGNMENTS
   // !!! also map player actions in single player mode !!!
@@ -11523,6 +12172,7 @@ static void GameActionsExt(void)
 #endif
 #endif
 
+#ifndef HEADLESS
   for (i = 0; i < MAX_PLAYERS; i++)
   {
     // allow engine snapshot in case of changed movement attempt
@@ -11537,6 +12187,7 @@ static void GameActionsExt(void)
 
     game.snapshot.last_action[i] = stored_player[i].effective_action;
   }
+#endif
 
   if (level.game_engine_type == GAME_ENGINE_TYPE_EM)
   {
@@ -11555,13 +12206,16 @@ static void GameActionsExt(void)
     GameActions_RND_Main();
   }
 
+#ifndef HEADLESS
   if (is_simulating == FALSE) { BlitScreenToBitmap(backbuffer);}
+#endif
 
   CheckLevelSolved();
   CheckLevelTime();
 
   AdvanceFrameAndPlayerCounters(-1);	// advance counters for all players
 
+#ifndef HEADLESS
   if (global.show_frames_per_second)
   {
     static unsigned int fps_counter = 0;
@@ -11585,10 +12239,13 @@ static void GameActionsExt(void)
     if (GetDrawDeactivationMask() == REDRAW_NONE)
       redraw_mask |= REDRAW_FPS;
   }
+#endif
 }
 
+#ifndef HEADLESS
 static void GameActions_CheckSaveEngineSnapshot(void)
 {
+
   if (!game.snapshot.save_snapshot)
     return;
 
@@ -11597,18 +12254,25 @@ static void GameActions_CheckSaveEngineSnapshot(void)
 
   SaveEngineSnapshotToList();
 }
+#endif
 
 void GameActions(void)
 {
   GameActionsExt();
 
+#ifndef HEADLESS
   GameActions_CheckSaveEngineSnapshot();
+#endif
 }
 
 void GameActions_EM_Main(void)
 {
   byte effective_action[MAX_PLAYERS];
+#ifndef HEADLESS
   boolean warp_mode = (tape.playing && tape.warp_forward && !tape.pausing);
+#else
+  boolean warp_mode = FALSE;
+#endif
   int i;
 
   for (i = 0; i < MAX_PLAYERS; i++)
@@ -11620,7 +12284,11 @@ void GameActions_EM_Main(void)
 void GameActions_SP_Main(void)
 {
   byte effective_action[MAX_PLAYERS];
+#ifndef HEADLESS
   boolean warp_mode = (tape.playing && tape.warp_forward && !tape.pausing);
+#else
+  boolean warp_mode = FALSE;
+#endif
   int i;
 
   for (i = 0; i < MAX_PLAYERS; i++)
@@ -11639,7 +12307,11 @@ void GameActions_SP_Main(void)
 
 void GameActions_MM_Main(void)
 {
+#ifndef HEADLESS
   boolean warp_mode = (tape.playing && tape.warp_forward && !tape.pausing);
+#else
+  boolean warp_mode = FALSE;
+#endif
 
   GameActions_MM(local_player->effective_mouse_action, warp_mode);
 }
@@ -11665,6 +12337,7 @@ void GameActions_RND(void)
     }
   }
 
+#ifndef HEADLESS
   // -- Isn't used in custom/EM
   if (game.set_centered_player)
   {
@@ -11705,9 +12378,15 @@ void GameActions_RND(void)
     game.centered_player_nr = game.centered_player_nr_next;
     game.set_centered_player = FALSE;
 
+#ifndef HEADLESS
     DrawRelocateScreen(0, 0, sx, sy, MV_NONE, TRUE, setup.quick_switch);
     DrawGameDoorValues();
+#else
+      (void)graphic;
+      (void)last_gfx_frame;
+#endif
   }
+#endif
 
   for (i = 0; i < MAX_PLAYERS; i++)
   {
@@ -11733,7 +12412,9 @@ void GameActions_RND(void)
 
     ScrollPlayer(&stored_player[i], SCROLL_GO_ON);
   }
+#ifndef HEADLESS
   ScrollScreen(NULL, SCROLL_GO_ON);
+#endif
 
   /* for backwards compatibility, the following code emulates a fixed bug that
      occured when pushing elements (causing elements that just made their last
@@ -11786,7 +12467,9 @@ void GameActions_RND(void)
       if (MovDelay[x][y] <= 0)
       {
 	RemoveField(x, y);
+#ifndef HEADLESS
 	TEST_DrawLevelField(x, y);
+#endif
 
 	TestIfElementTouchesCustomElement(x, y);	// for empty space
       }
@@ -11812,15 +12495,19 @@ void GameActions_RND(void)
     if (CheckImpact[x][y] > 0)
       CheckImpact[x][y]--;
 
+#ifndef HEADLESS
     GfxFrame[x][y]++;
+#endif
 
     /* reset finished pushing action (not done in ContinueMoving() to allow
        continuous pushing animation for elements with zero push delay) */
+#ifndef HEADLESS
     if (GfxAction[x][y] == ACTION_PUSHING && !IS_MOVING(x, y))
     {
       ResetGfxAnimation(x, y);
       TEST_DrawLevelField(x, y);
     }
+#endif
 
 #if DEBUG
     if (IS_BLOCKED(x, y))
@@ -11841,6 +12528,7 @@ void GameActions_RND(void)
 
         SCAN_PLAYFIELD(x, y) {
                 element = Feld[x][y];
+#ifndef HEADLESS
                 graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
                 last_gfx_frame = GfxFrame[x][y];
 
@@ -11863,6 +12551,7 @@ void GameActions_RND(void)
 
                     continue;
                 }
+#endif
 
                 // this may take place after moving, so 'element' may have changed
                 if (IS_CHANGING(x, y) &&
@@ -11872,13 +12561,16 @@ void GameActions_RND(void)
                     HandleElementChange(x, y, page);
 
                     element = Feld[x][y];
+#ifndef HEADLESS
                     graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
+#endif
                 }
 
                 if (!IS_MOVING(x, y) && (CAN_FALL(element) || CAN_MOVE(element))) {
                     StartMoving(x, y);
 
                     element = Feld[x][y];
+#ifndef HEADLESS
                     graphic = el_act_dir2img(element, GfxAction[x][y], GfxDir[x][y]);
 
                     if (IS_ANIMATED(graphic) &&
@@ -11888,10 +12580,16 @@ void GameActions_RND(void)
 
                     if (IS_GEM(element) || element == EL_SP_INFOTRON)
                         TEST_DrawTwinkleOnField(x, y);
-                } else if (element == EL_ACID) {
+#endif
+                }
+#ifndef HEADLESS
+                else if (element == EL_ACID) {
                     if (!Stop[x][y])
                         DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
-                } else if ((element == EL_EXIT_OPEN ||
+                }
+#endif
+#ifndef HEADLESS
+                else if ((element == EL_EXIT_OPEN ||
                             element == EL_EM_EXIT_OPEN ||
                             element == EL_SP_EXIT_OPEN ||
                             element == EL_STEEL_EXIT_OPEN ||
@@ -11903,6 +12601,7 @@ void GameActions_RND(void)
                             element == EL_SHIELD_DEADLY) &&
                            IS_ANIMATED(graphic))
                     DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
+#endif
                 else if (IS_MOVING(x, y))
                     ContinueMoving(x, y);
                 else if (IS_ACTIVE_BOMB(element))
@@ -11944,6 +12643,7 @@ void GameActions_RND(void)
                     MauerAblegerStahl(x, y);
                 else if (element == EL_FLAMES)
                     CheckForDragon(x, y);
+#ifndef HEADLESS
                 else if (element == EL_EXPLOSION);    // drawing of correct explosion animation is handled separately
                 else if (element == EL_ELEMENT_SNAPPING ||
                          element == EL_DIAGONAL_SHRINKING ||
@@ -11953,9 +12653,11 @@ void GameActions_RND(void)
                     DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
                 } else if (IS_ANIMATED(graphic) && !IS_CHANGING(x, y))
                     DrawLevelGraphicAnimationIfNeeded(x, y, graphic);
-
+#endif
+#ifndef HEADLESS
                 if (IS_BELT_ACTIVE(element))
                     PlayLevelSoundAction(x, y, ACTION_ACTIVE);
+#endif
 
                 if (game.magic_wall_active) {
                     int jx = local_player->jx, jy = local_player->jy;
@@ -12028,6 +12730,7 @@ void GameActions_RND(void)
 
   if (game.magic_wall_active)
   {
+#ifndef HEADLESS
     if (!(game.magic_wall_time_left % 4))
     {
       int element = Feld[magic_wall_x][magic_wall_y];
@@ -12043,6 +12746,7 @@ void GameActions_RND(void)
       else
 	PlayLevelSound(magic_wall_x, magic_wall_y, SND_MAGIC_WALL_ACTIVE);
     }
+#endif
 
     if (game.magic_wall_time_left > 0)
     {
@@ -12058,19 +12762,25 @@ void GameActions_RND(void)
 	      element == EL_MAGIC_WALL_FULL)
 	  {
 	    Feld[x][y] = EL_MAGIC_WALL_DEAD;
+#ifndef HEADLESS
 	    TEST_DrawLevelField(x, y);
+#endif
 	  }
 	  else if (element == EL_BD_MAGIC_WALL_ACTIVE ||
 		   element == EL_BD_MAGIC_WALL_FULL)
 	  {
 	    Feld[x][y] = EL_BD_MAGIC_WALL_DEAD;
+#ifndef HEADLESS
 	    TEST_DrawLevelField(x, y);
+#endif
 	  }
 	  else if (element == EL_DC_MAGIC_WALL_ACTIVE ||
 		   element == EL_DC_MAGIC_WALL_FULL)
 	  {
 	    Feld[x][y] = EL_DC_MAGIC_WALL_DEAD;
+#ifndef HEADLESS
 	    TEST_DrawLevelField(x, y);
+#endif
 	  }
 	}
 
@@ -12111,6 +12821,7 @@ void GameActions_RND(void)
       RedrawAllInvisibleElementsForMagnifier();
   }
 
+#ifndef HEADLESS
   for (i = 0; i < MAX_PLAYERS; i++)
   {
     struct PlayerInfo *player = &stored_player[i];
@@ -12123,6 +12834,7 @@ void GameActions_RND(void)
 	PlayLevelSound(player->jx, player->jy, SND_SHIELD_NORMAL_ACTIVE);
     }
   }
+#endif
 
 #if USE_DELAYED_GFX_REDRAW
   SCAN_PLAYFIELD(x, y)
@@ -12148,11 +12860,14 @@ void GameActions_RND(void)
     GfxRedraw[x][y] = GFX_REDRAW_NONE;
   }
 #endif
+#ifndef HEADLESS
     if (is_simulating == FALSE) {
         DrawAllPlayers();
         PlayAllPlayersSound();
     }
+#endif
 
+#ifndef HEADLESS
   for (i = 0; i < MAX_PLAYERS; i++)
   {
     struct PlayerInfo *player = &stored_player[i];
@@ -12165,6 +12880,7 @@ void GameActions_RND(void)
       player->show_envelope = 0;
     }
   }
+#endif
 
   // use random number generator in every frame to make it less predictable
   if (game.engine_version >= VERSION_IDENT(3,1,1,0))
@@ -12210,6 +12926,7 @@ static boolean AllPlayersInVisibleScreen(void)
   return TRUE;
 }
 
+#ifndef HEADLESS
 void ScrollLevel(int dx, int dy)
 {
   int scroll_offset = 2 * TILEX_VAR;
@@ -12239,6 +12956,7 @@ void ScrollLevel(int dx, int dy)
 
   redraw_mask |= REDRAW_FIELD;
 }
+#endif
 
 static boolean canFallDown(struct PlayerInfo *player)
 {
@@ -12442,9 +13160,11 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
 
     int original_move_delay_value = player->move_delay_value;
 
+#ifndef HEADLESS
 #if DEBUG
     printf("THIS SHOULD ONLY HAPPEN WITH PRE-1.2 LEVEL TAPES. [%d]\n",
 	   tape.counter);
+#endif
 #endif
 
     // scroll remaining steps with finest movement resolution
@@ -12453,12 +13173,16 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
     while (player->MovPos)
     {
       ScrollPlayer(player, SCROLL_GO_ON);
+#ifndef HEADLESS
       ScrollScreen(NULL, SCROLL_GO_ON);
+#endif
 
       AdvanceFrameAndPlayerCounters(player->index_nr);
 
+#ifndef HEADLESS
       DrawAllPlayers();
       BackToFront_WithFrameDelay(0);
+#endif
     }
 
     player->move_delay_value = original_move_delay_value;
@@ -12561,8 +13285,10 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
       }
       else
       {
+#ifndef HEADLESS
 	ScrollScreen(player, SCROLL_INIT);
 	ScrollLevel(old_scroll_x - scroll_x, old_scroll_y - scroll_y);
+#endif
       }
     }
   }
@@ -12576,7 +13302,9 @@ boolean MovePlayer(struct PlayerInfo *player, int dx, int dy)
     else if (old_jx == jx && old_jy != jy)
       player->MovDir = (old_jy < jy ? MV_DOWN : MV_UP);
 
+#ifndef HEADLESS
     TEST_DrawLevelField(jx, jy);	// for "crumbled sand"
+#endif
 
     player->last_move_dir = player->MovDir;
     player->is_moving = TRUE;
@@ -12637,7 +13365,9 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
   if (mode == SCROLL_INIT)
   {
     player->actual_frame_counter = FrameCounter;
+#ifndef HEADLESS
     player->GfxPos = move_stepsize * (player->MovPos / move_stepsize);
+#endif
 
     // Not sure how we get into this loop
     if ((player->block_last_field || player->block_delay_adjustment > 0) &&
@@ -12675,7 +13405,9 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
   if (player->MovPos != 0)
   {
     player->MovPos += (player->MovPos > 0 ? -1 : 1) * move_stepsize;
+#ifndef HEADLESS
     player->GfxPos = move_stepsize * (player->MovPos / move_stepsize);
+#endif
 
     // before DrawPlayer() to draw correct player graphic for this case
     if (player->MovPos == 0)
@@ -12774,12 +13506,14 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
       {
 	TimeLeft--;
 
+#ifndef HEADLESS
 	if (TimeLeft <= 10 && setup.time_limit)
 	  PlaySound(SND_GAME_RUNNING_OUT_OF_TIME);
 
 	game_panel_controls[GAME_PANEL_TIME].value = TimeLeft;
 
 	DisplayGameControlValues();
+#endif
 
 	if (!TimeLeft && setup.time_limit)
 	  for (i = 0; i < MAX_PLAYERS; i++)
@@ -12787,21 +13521,26 @@ void ScrollPlayer(struct PlayerInfo *player, int mode)
       }
       else if (game.no_time_limit && !game.all_players_gone)
       {
+#ifndef HEADLESS
 	game_panel_controls[GAME_PANEL_TIME].value = TimePlayed;
 
 	DisplayGameControlValues();
+#endif
       }
     }
 
+#ifndef HEADLESS
     if (tape.single_step && tape.recording && !tape.pausing &&
 	!player->programmed_action)
       TapeTogglePause(TAPE_TOGGLE_AUTOMATIC);
 
     if (!player->programmed_action)
       CheckSaveEngineSnapshot(player);
+#endif
   }
 }
 
+#ifndef HEADLESS
 void ScrollScreen(struct PlayerInfo *player, int mode)
 {
   static unsigned int screen_frame_counter = 0;
@@ -12829,6 +13568,7 @@ void ScrollScreen(struct PlayerInfo *player, int mode)
   else
     ScreenMovDir = MV_NONE;
 }
+#endif
 
 void TestIfPlayerTouchesCustomElement(int x, int y)
 {
@@ -13435,13 +14175,17 @@ static void KillPlayerUnlessExplosionProtected(int x, int y)
 
 void BuryPlayer(struct PlayerInfo *player)
 {
+#ifndef HEADLESS
   int jx = player->jx, jy = player->jy;
+#endif
 
   if (!player->active)
     return;
 
+#ifndef HEADLESS
   PlayLevelSoundElementAction(jx, jy, player->artwork_element, ACTION_DYING);
   PlayLevelSound(jx, jy, SND_GAME_LOSING);
+#endif
 
   RemovePlayer(player);
 
@@ -13465,8 +14209,10 @@ void RemovePlayer(struct PlayerInfo *player)
   if (!ExplodeField[jx][jy])
     StorePlayer[jx][jy] = 0;
 
+#ifndef HEADLESS
   if (player->is_moving)
     TEST_DrawLevelField(player->last_jx, player->last_jy);
+#endif
 
   for (i = 0; i < MAX_PLAYERS; i++)
     if (stored_player[i].active)
@@ -13484,7 +14230,9 @@ void RemovePlayer(struct PlayerInfo *player)
 
 void ExitPlayer(struct PlayerInfo *player)
 {
+#ifndef HEADLESS
   DrawPlayer(player);	// needed here only to cleanup last field
+#endif
   RemovePlayer(player);
 
   if (game.players_still_needed > 0)
@@ -13493,21 +14241,25 @@ void ExitPlayer(struct PlayerInfo *player)
 
 static void setFieldForSnapping(int x, int y, int element, int direction)
 {
+#ifndef HEADLESS
   struct ElementInfo *ei = &element_info[element];
   int direction_bit = MV_DIR_TO_BIT(direction);
   int graphic_snapping = ei->direction_graphic[ACTION_SNAPPING][direction_bit];
   int action = (graphic_snapping != IMG_EMPTY_SPACE ? ACTION_SNAPPING :
 		IS_DIGGABLE(element) ? ACTION_DIGGING : ACTION_COLLECTING);
+#endif
 
   Feld[x][y] = EL_ELEMENT_SNAPPING;
   MovDelay[x][y] = MOVE_DELAY_NORMAL_SPEED + 1 - 1;
 
+#ifndef HEADLESS
   ResetGfxAnimation(x, y);
 
   GfxElement[x][y] = element;
   GfxAction[x][y] = action;
   GfxDir[x][y] = direction;
   GfxFrame[x][y] = -1;
+#endif
 }
 
 /*
@@ -13692,11 +14444,16 @@ static int DigField(struct PlayerInfo *player,
       sound_action = ACTION_MOVING;		// nothing to walk on
     }
 
+#ifndef HEADLESS
     // play sound from background or player, whatever is available
     if (element_info[sound_element].sound[sound_action] != SND_UNDEFINED)
       PlayLevelSoundElementAction(x, y, sound_element, sound_action);
     else
       PlayLevelSoundElementAction(x, y, player->artwork_element, sound_action);
+#else
+      (void)sound_action;
+      (void)sound_element;
+#endif
   }
   else if (player_can_move &&
 	   IS_PASSABLE(element) && canPassField(x, y, move_direction))
@@ -13775,7 +14532,9 @@ static int DigField(struct PlayerInfo *player,
       DOUBLE_PLAYER_SPEED(player);
     }
 
+#ifndef HEADLESS
     PlayLevelSoundAction(x, y, ACTION_PASSING);
+#endif
   }
   else if (player_can_move_or_snap && IS_DIGGABLE(element))
   {
@@ -13783,11 +14542,15 @@ static int DigField(struct PlayerInfo *player,
 
     if (mode != DF_SNAP)
     {
+#ifndef HEADLESS
       GfxElement[x][y] = GFX_ELEMENT(element);
+#endif
       player->is_digging = TRUE;
     }
 
+#ifndef HEADLESS
     PlayLevelSoundElementAction(x, y, element, ACTION_DIGGING);
+#endif
 
     CheckTriggeredElementChangeByPlayer(x, y, element, CE_PLAYER_DIGS_X,
 					player->index_bit, dig_side);
@@ -13809,7 +14572,9 @@ static int DigField(struct PlayerInfo *player,
 
     if (is_player && mode != DF_SNAP)
     {
+#ifndef HEADLESS
       GfxElement[x][y] = element;
+#endif
       player->is_collecting = TRUE;
     }
 
@@ -13821,9 +14586,11 @@ static int DigField(struct PlayerInfo *player,
     {
       TimeLeft += level.extra_time;
 
+#ifndef HEADLESS
       game_panel_controls[GAME_PANEL_TIME].value = TimeLeft;
 
       DisplayGameControlValues();
+#endif
     }
     else if (element == EL_SHIELD_NORMAL || element == EL_SHIELD_DEADLY)
     {
@@ -13838,7 +14605,9 @@ static int DigField(struct PlayerInfo *player,
       if (player->inventory_size < MAX_INVENTORY_SIZE)
 	player->inventory_element[player->inventory_size++] = element;
 
+#ifndef HEADLESS
       DrawGameDoorValues();
+#endif
     }
     else if (element == EL_DYNABOMB_INCREASE_NUMBER)
     {
@@ -13857,7 +14626,9 @@ static int DigField(struct PlayerInfo *player,
     {
       player->key[KEY_NR(element)] = TRUE;
 
+#ifndef HEADLESS
       DrawGameDoorValues();
+#endif
     }
     else if (element == EL_DC_KEY_WHITE)
     {
@@ -13894,7 +14665,9 @@ static int DigField(struct PlayerInfo *player,
 	  if (player->inventory_size < MAX_INVENTORY_SIZE)
 	    player->inventory_element[player->inventory_size++] = element;
 
+#ifndef HEADLESS
       DrawGameDoorValues();
+#endif
     }
     else if (collect_count > 0)
     {
@@ -13902,15 +14675,19 @@ static int DigField(struct PlayerInfo *player,
       if (game.gems_still_needed < 0)
 	game.gems_still_needed = 0;
 
+#ifndef HEADLESS
       game.snapshot.collected_item = TRUE;
 
       game_panel_controls[GAME_PANEL_GEMS].value = game.gems_still_needed;
 
       DisplayGameControlValues();
+#endif
     }
 
     RaiseScoreElement(element);
+#ifndef HEADLESS
     PlayLevelSoundElementAction(x, y, element, ACTION_COLLECTING);
+#endif
 
     if (is_player)
       CheckTriggeredElementChangeByPlayer(x, y, element, CE_PLAYER_COLLECTS_X,
@@ -13990,6 +14767,7 @@ static int DigField(struct PlayerInfo *player,
     if (player->push_delay == -1)	// new pushing; restart delay
       player->push_delay = 0;
 
+#ifndef HEADLESS
     if (player->push_delay < player->push_delay_value &&
 	!(tape.playing && tape.file_version < FILE_VERSION_2_0) &&
 	element != EL_SPRING && element != EL_BALLOON)
@@ -14000,6 +14778,17 @@ static int DigField(struct PlayerInfo *player,
 
       return MP_NO_ACTION;
     }
+#else
+      if (player->push_delay < player->push_delay_value &&
+	element != EL_SPRING && element != EL_BALLOON)
+    {
+      // make sure that there is no move delay before next try to push
+      if (game.engine_version >= VERSION_IDENT(3,0,7,1))
+	player->move_delay = 0;
+
+      return MP_NO_ACTION;
+    }
+#endif
 
     if (IS_CUSTOM_ELEMENT(element) &&
 	CUSTOM_ELEMENT_CAN_ENTER_FIELD(element, nextx, nexty))
@@ -14034,6 +14823,7 @@ static int DigField(struct PlayerInfo *player,
 
       Feld[x][y] = EL_SOKOBAN_OBJECT;
 
+#ifndef HEADLESS
       if (Back[x][y] == Back[nextx][nexty])
 	PlayLevelSoundAction(x, y, ACTION_PUSHING);
       else if (Back[x][y] != 0)
@@ -14042,6 +14832,7 @@ static int DigField(struct PlayerInfo *player,
       else
 	PlayLevelSoundElementAction(nextx, nexty, EL_SOKOBAN_FIELD_EMPTY,
 				    ACTION_FILLING);
+#endif
 
       if (sokoban_task_solved &&
 	  game.sokoban_fields_still_needed == 0 &&
@@ -14052,14 +14843,20 @@ static int DigField(struct PlayerInfo *player,
 
 	LevelSolved();
 
+#ifndef HEADLESS
 	PlayLevelSound(x, y, SND_GAME_SOKOBAN_SOLVING);
+#endif
       }
     }
+#ifndef HEADLESS
     else
       PlayLevelSoundElementAction(x, y, element, ACTION_PUSHING);
+#endif
 
     InitMovingField(x, y, move_direction);
+#ifndef HEADLESS
     GfxAction[x][y] = ACTION_PUSHING;
+#endif
 
     if (mode == DF_SNAP)
       ContinueMoving(x, y);
@@ -14097,7 +14894,9 @@ static int DigField(struct PlayerInfo *player,
     player->switch_x = x;
     player->switch_y = y;
 
+#ifndef HEADLESS
     PlayLevelSoundElementAction(x, y, element, ACTION_ACTIVATING);
+#endif
 
     if (element == EL_ROBOT_WHEEL)
     {
@@ -14107,7 +14906,9 @@ static int DigField(struct PlayerInfo *player,
       game.robot_wheel_y = y;
       game.robot_wheel_active = TRUE;
 
+#ifndef HEADLESS
       TEST_DrawLevelField(x, y);
+#endif
     }
     else if (element == EL_SP_TERMINAL)
     {
@@ -14123,8 +14924,10 @@ static int DigField(struct PlayerInfo *player,
 	{
 	  Feld[xx][yy] = EL_SP_TERMINAL_ACTIVE;
 
+#ifndef HEADLESS
 	  ResetGfxAnimation(xx, yy);
 	  TEST_DrawLevelField(xx, yy);
+#endif
 	}
       }
     }
@@ -14168,8 +14971,10 @@ static int DigField(struct PlayerInfo *player,
       Feld[x][y] = EL_LAMP_ACTIVE;
       game.lights_still_needed--;
 
+#ifndef HEADLESS
       ResetGfxAnimation(x, y);
       TEST_DrawLevelField(x, y);
+#endif
     }
     else if (element == EL_TIME_ORB_FULL)
     {
@@ -14180,13 +14985,17 @@ static int DigField(struct PlayerInfo *player,
 	TimeLeft += level.time_orb_time;
 	game.no_time_limit = FALSE;
 
+#ifndef HEADLESS
 	game_panel_controls[GAME_PANEL_TIME].value = TimeLeft;
 
 	DisplayGameControlValues();
+#endif
       }
 
+#ifndef HEADLESS
       ResetGfxAnimation(x, y);
       TEST_DrawLevelField(x, y);
+#endif
     }
     else if (element == EL_EMC_MAGIC_BALL_SWITCH ||
 	     element == EL_EMC_MAGIC_BALL_SWITCH_ACTIVE)
@@ -14274,9 +15083,11 @@ static boolean DigFieldByCE(int x, int y, int digging_element)
 
   if (!IS_FREE(x, y))
   {
+#ifndef HEADLESS
     int action = (IS_DIGGABLE(element) ? ACTION_DIGGING :
 		  IS_COLLECTIBLE(element) ? ACTION_COLLECTING :
 		  ACTION_BREAKING);
+#endif
 
     // no element can dig solid indestructible elements
     if (IS_INDESTRUCTIBLE(element) &&
@@ -14298,13 +15109,17 @@ static boolean DigFieldByCE(int x, int y, int digging_element)
     else
     {
       RemoveField(x, y);
+#ifndef HEADLESS
       TEST_DrawLevelField(x, y);
+#endif
     }
 
     // if digged element was about to explode, prevent the explosion
     ExplodeField[x][y] = EX_TYPE_NONE;
 
+#ifndef HEADLESS
     PlayLevelSoundAction(x, y, action);
+#endif
   }
 
   Store[x][y] = EL_EMPTY;
@@ -14383,10 +15198,12 @@ static boolean SnapField(struct PlayerInfo *player, int dx, int dy)
     player->is_collecting = FALSE;
   }
 
+#ifndef HEADLESS
   if (player->MovPos != 0)	// prevent graphic bugs in versions < 2.2.0
     TEST_DrawLevelField(player->last_jx, player->last_jy);
 
   TEST_DrawLevelField(x, y);
+#endif
 
   return TRUE;
 }
@@ -14444,8 +15261,10 @@ static boolean DropElement(struct PlayerInfo *player)
   if (old_element != EL_EMPTY)
     Back[dropx][dropy] = old_element;	// store old element on this field
 
+#ifndef HEADLESS
   ResetGfxAnimation(dropx, dropy);
   ResetRandomAnimationValue(dropx, dropy);
+#endif
 
   if (player->inventory_size > 0 ||
       player->inventory_infinite_element != EL_UNDEFINED)
@@ -14454,7 +15273,9 @@ static boolean DropElement(struct PlayerInfo *player)
     {
       player->inventory_size--;
 
+#ifndef HEADLESS
       DrawGameDoorValues();
+#endif
 
       if (new_element == EL_DYNAMITE)
 	new_element = EL_DYNAMITE_ACTIVE;
@@ -14466,11 +15287,13 @@ static boolean DropElement(struct PlayerInfo *player)
 
     Feld[dropx][dropy] = new_element;
 
+#ifndef HEADLESS
     if (IN_SCR_FIELD(SCREENX(dropx), SCREENY(dropy)))
       DrawGraphicThruMask(SCREENX(dropx), SCREENY(dropy),
 			  el2img(Feld[dropx][dropy]), 0);
 
     PlayLevelSoundAction(dropx, dropy, ACTION_DROPPING);
+#endif
 
     // needed if previous element just changed to "empty" in the last frame
     ChangeCount[dropx][dropy] = 0;	// allow at least one more change
@@ -14489,11 +15312,13 @@ static boolean DropElement(struct PlayerInfo *player)
 
     Feld[dropx][dropy] = new_element;
 
+#ifndef HEADLESS
     if (IN_SCR_FIELD(SCREENX(dropx), SCREENY(dropy)))
       DrawGraphicThruMask(SCREENX(dropx), SCREENY(dropy),
 			  el2img(Feld[dropx][dropy]), 0);
 
     PlayLevelSoundAction(dropx, dropy, ACTION_DROPPING);
+#endif
   }
 
   if (Feld[dropx][dropy] == new_element) // uninitialized unless CE change
@@ -14529,6 +15354,7 @@ static boolean DropElement(struct PlayerInfo *player)
 // game sound playing functions
 // ----------------------------------------------------------------------------
 
+#ifndef HEADLESS
 static int *loop_sound_frame = NULL;
 static int *loop_sound_volume = NULL;
 
@@ -14888,14 +15714,17 @@ void StopSound_MM(int sound_mm)
 
   StopSound(sound);
 }
+#endif
 
 void RaiseScore(int value)
 {
   game.score += value;
+#ifndef HEADLESS
 
   game_panel_controls[GAME_PANEL_SCORE].value = game.score;
 
   DisplayGameControlValues();
+#endif
 }
 
 void RaiseScoreElement(int element)
@@ -14980,6 +15809,7 @@ void RaiseScoreElement(int element)
 
 void RequestQuitGameExt(boolean skip_request, boolean quick_quit, char *message)
 {
+#ifndef HEADLESS
   if (skip_request || Request(message, REQ_ASK | REQ_STAY_CLOSED))
   {
     // closing door required in case of envelope style request dialogs
@@ -14991,8 +15821,9 @@ void RequestQuitGameExt(boolean skip_request, boolean quick_quit, char *message)
       CloseDoor(DOOR_CLOSE_1);
     }
 
-    if (network.enabled)
-      SendToServer_StopPlaying(NETWORK_STOP_BY_PLAYER);
+    if (network.enabled) {
+        SendToServer_StopPlaying(NETWORK_STOP_BY_PLAYER);
+    }
     else
     {
       if (quick_quit)
@@ -15013,19 +15844,23 @@ void RequestQuitGameExt(boolean skip_request, boolean quick_quit, char *message)
     if (tape.playing && tape.deactivate_display)
       TapeDeactivateDisplayOn();
   }
+#endif
 }
 
 void RequestQuitGame(boolean ask_if_really_quit)
 {
+#ifndef HEADLESS
   boolean quick_quit = (!ask_if_really_quit || level_editor_test_game);
   boolean skip_request = game.all_players_gone || quick_quit;
 
   RequestQuitGameExt(skip_request, quick_quit,
 		     "Do you really want to quit the game?");
+#endif
 }
 
 void RequestRestartGame(char *message)
 {
+#ifndef HEADLESS
   game.restart_game_message = NULL;
 
   boolean has_started_game = hasStartedNetworkGame();
@@ -15041,6 +15876,7 @@ void RequestRestartGame(char *message)
 
     DrawMainMenu();
   }
+#endif
 }
 
 void CheckGameOver(void)
@@ -15133,6 +15969,7 @@ unsigned int RND(int max)
 // game engine snapshot handling functions
 // ----------------------------------------------------------------------------
 
+#ifndef HEADLESS
 struct EngineSnapshotInfo
 {
   // runtime values for custom element collect score
@@ -15442,10 +16279,12 @@ boolean CheckEngineSnapshotList(void)
 {
   return CheckSnapshotList();
 }
+#endif
 
 
 // ---------- new game button stuff -------------------------------------------
 
+#ifndef HEADLESS
 static struct
 {
   int graphic;
@@ -15878,8 +16717,9 @@ static void HandleGameButtonsExt(int id, int button)
       }
       else if (tape.pausing)
       {
-	if (network.enabled)
-	  SendToServer_ContinuePlaying();
+	if (network.enabled) {
+        SendToServer_ContinuePlaying();
+    }
 	else
 	  TapeTogglePause(TAPE_TOGGLE_MANUAL | TAPE_TOGGLE_PLAY_PAUSE);
       }
@@ -15911,7 +16751,6 @@ static void HandleGameButtonsExt(int id, int button)
     case GAME_CTRL_ID_LOAD:
       TapeQuickLoad();
       break;
-
     case SOUND_CTRL_ID_MUSIC:
     case SOUND_CTRL_ID_PANEL_MUSIC:
       if (setup.sound_music)
@@ -15983,3 +16822,7 @@ void HandleSoundButtonKeys(Key key)
   else if (key == setup.shortcut.sound_music)
     ClickOnGadget(game_gadget[SOUND_CTRL_ID_MUSIC], MB_LEFTBUTTON);
 }
+#endif
+
+
+// --------------------------------------------------

@@ -34,19 +34,25 @@ void subAnimateExplosion(int si)
   bl = bl + 1;
   MovHighByte(&PlayField16[si], bl);
 
+#ifndef HEADLESS
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   GfxGraphic[GetX(si)][GetY(si)] = aniDefaultExplosion;
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#endif
 
   if (bl == 8)
   {
     PlayField16[si] = 0;
+#ifndef HEADLESS
     ExplosionShake = 0;		// nothing explodes
+#endif
     // ExplosionShakeMurphy = 0;	// nothing explodes
 
+#ifndef HEADLESS
     // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     GfxGraphic[GetX(si)][GetY(si)] = aniSpace;
     // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#endif
   } // loc_ret_g_28CF:
 
   return;
@@ -56,21 +62,27 @@ loc_g_28D0: // explosion produces infotron
   if (bl == 0x89)
   {
     PlayField16[si] = fiInfotron;
+#ifndef HEADLESS
     MovLowByte(&ExplosionShake, 0);		// nothing explodes
+#endif
     // MovLowByte(&ExplosionShakeMurphy, 0);	// nothing explodes
 
+#ifndef HEADLESS
     // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     GfxGraphic[GetX(si)][GetY(si)] = aniInfotron;
     // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#endif
 
     return;
   } // loc_g_28E3:
 
   MovHighByte(&PlayField16[si], bl);
 
+#ifndef HEADLESS
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   GfxGraphic[GetX(si)][GetY(si)] = aniElectronExplosion;
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#endif
 }
 
 // ==========================================================================
@@ -86,13 +98,17 @@ void ExplodeFieldSP(int si)
   if (ax == fiHardWare)
     return;
 
+#ifndef HEADLESS
   ExplosionShake = 1;		// something explodes
+#endif
 
   if (ax == fiMurphy)
   {
     KillMurphyFlag = 1;
 
+#ifndef HEADLESS
     ExplosionShakeMurphy = 30;	// Murphy explodes
+#endif
   }
 
   if (ax == fiElectron)
@@ -116,10 +132,12 @@ void ExplodeFieldSP(int si)
   LetExplodeFieldSP(si + FieldWidth, cx, dl);
   LetExplodeFieldSP(si + FieldWidth + 1, cx, dl);
 
+#ifndef HEADLESS
   GfxGraphic[GetX(si)][GetY(si)] = -1;		// restart for chain-explosions
 
   // loc_g_2C3B:
   subSoundFX(si, ax, actExploding);
+#endif
 }
 
 static void LetExplodeFieldSP(int tsi, int cx, int dh)
@@ -168,7 +186,9 @@ static void LetExplodeFieldSP(int tsi, int cx, int dh)
       break;
   }
 
+#ifndef HEADLESS
   GfxGraphic[GetX(tsi)][GetY(tsi)] = -1;	// restart for chain-explosions
+#endif
 }
 
 static void subExplodeZonk(int tsi, int cx)
@@ -265,9 +285,11 @@ void subClearFieldDueToExplosion(int si)
     return;
 
   PlayField16[si] = 0;
+#ifndef HEADLESS
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   GfxGraphic[GetX(si)][GetY(si)] = aniSpace;
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#endif
 }
 
 void subRedDiskReleaseExplosion(void)
@@ -282,11 +304,15 @@ void subRedDiskReleaseExplosion(void)
   if (PlayField16[si] == 0) // Release red disk
     PlayField16[si] = fiRedDisk;
 
+#ifndef HEADLESS
   // +++++++++++++++++++++++++++++++++++++++++
   X = GetStretchX(si);
   Y = GetStretchY(si);
   DDSpriteBuffer_BltImg(X, Y, aniRedDisk, 0);
   // +++++++++++++++++++++++++++++++++++++++++
+#else
+    (void)X; (void)Y;
+#endif
 
   RedDiskReleasePhase = RedDiskReleasePhase + 1;
   if (RedDiskReleasePhase >= 0x28)

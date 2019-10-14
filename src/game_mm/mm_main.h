@@ -186,7 +186,9 @@ struct HiScore_MM
   int Score;
 };
 
+#ifndef HEADLESS
 extern DrawBuffer      *drawto_field;
+#endif
 
 extern int		game_status;
 extern boolean		level_editor_test_game;
@@ -240,7 +242,9 @@ extern int		cSX, cSY;
 extern int		cSX2, cSY2;
 extern int		cFX, cFY;
 
+#ifndef HEADLESS
 extern Pixel		pen_fg, pen_bg, pen_ray, pen_magicolor[2];
+#endif
 extern int		color_status;
 
 extern struct XY	Step[];

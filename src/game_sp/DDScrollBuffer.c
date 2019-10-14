@@ -13,6 +13,7 @@ int mScrollX_last, mScrollY_last;
 int ScreenBuffer[2 + MAX_PLAYFIELD_WIDTH + 2][2 + MAX_PLAYFIELD_HEIGHT + 2];
 
 
+#ifndef HEADLESS
 int getFieldbufferOffsetX_SP(void)
 {
   int px = 2 * TILEX + (mScrollX - mScrollX_last) % TILEX;
@@ -27,7 +28,9 @@ int getFieldbufferOffsetX_SP(void)
 
   return px;
 }
+#endif
 
+#ifndef HEADLESS
 int getFieldbufferOffsetY_SP(void)
 {
   int py = 2 * TILEY + (mScrollY - mScrollY_last) % TILEY;
@@ -42,7 +45,9 @@ int getFieldbufferOffsetY_SP(void)
 
   return py;
 }
+#endif
 
+#ifndef HEADLESS
 void RestorePlayfield(void)
 {
   int x1 = mScrollX / TILEX - 2;
@@ -65,7 +70,9 @@ void RestorePlayfield(void)
     }
   }
 }
+#endif
 
+#ifndef HEADLESS
 static void ScrollPlayfield(int dx, int dy)
 {
   int x1 = mScrollX_last / TILEX - 2;
@@ -111,6 +118,7 @@ static void ScrollPlayfield(int dx, int dy)
     }
   }
 }
+#endif
 
 static void ScrollPlayfieldIfNeededExt(boolean reset)
 {
@@ -144,14 +152,18 @@ static void ScrollPlayfieldIfNeededExt(boolean reset)
     mScrollX_last -= dx * TILEX;
     mScrollY_last -= dy * TILEY;
 
+#ifndef HEADLESS
     ScrollPlayfield(dx, dy);
+#endif
   }
 }
 
+#ifndef HEADLESS
 static void ScrollPlayfieldIfNeeded(void)
 {
   ScrollPlayfieldIfNeededExt(FALSE);
 }
+#endif
 
 void InitScrollPlayfield(void)
 {
@@ -160,6 +172,7 @@ void InitScrollPlayfield(void)
 
 #define DEBUG_REDRAW	0
 
+#ifndef HEADLESS
 void UpdatePlayfield(boolean force_redraw)
 {
   int x, y;
@@ -237,7 +250,9 @@ void UpdatePlayfield(boolean force_redraw)
   printf("::: FRAME %d: %d redrawn\n", FrameCounter, num_redrawn);
 #endif
 }
+#endif
 
+#ifndef HEADLESS
 void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
 {
   // copy playfield buffer to target bitmap at scroll position
@@ -255,7 +270,9 @@ void BlitScreenToBitmap_SP(Bitmap *target_bitmap)
 
   BlitBitmap(bitmap_db_field_sp, target_bitmap, px, py, sxsize, sysize, sx, sy);
 }
+#endif
 
+#ifndef HEADLESS
 void DDScrollBuffer_ScrollTo(int X, int Y)
 {
   if (NoDisplayFlag)
@@ -266,7 +283,9 @@ void DDScrollBuffer_ScrollTo(int X, int Y)
 
   ScrollPlayfieldIfNeeded();
 }
+#endif
 
+#ifndef HEADLESS
 void DDScrollBuffer_ScrollTowards(int X, int Y, double Step)
 {
   double dx, dY, r;
@@ -291,7 +310,9 @@ void DDScrollBuffer_ScrollTowards(int X, int Y, double Step)
 
   ScrollPlayfieldIfNeeded();
 }
+#endif
 
+#ifndef HEADLESS
 void DDScrollBuffer_SoftScrollTo(int X, int Y, int TimeMS, int FPS)
 {
   double dx, dY;
@@ -336,3 +357,4 @@ void DDScrollBuffer_SoftScrollTo(int X, int Y, int TimeMS, int FPS)
 
   ScrollPlayfieldIfNeeded();
 }
+#endif

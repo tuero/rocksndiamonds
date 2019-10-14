@@ -19,8 +19,10 @@
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
 	CC = gcc-7
+	CXX = g++-7
 else
 	CC = gcc
+	CXX = g++
 endif
 
 # command name of GNU make on your system
@@ -46,13 +48,6 @@ MAKE = make
 
 # path for cross-compiling (only needed for non-native Windows build)
 CROSS_PATH_WIN32 = /usr/local/cross-tools/i386-mingw32msvc
-
-
-# -----------------------------------------------------------------------------
-# CPP configurations
-# -----------------------------------------------------------------------------
-CPPFLAGS := -Wall -Wextra -g -O3 -std=c++14 $(SYS_CFLAGS)  $(EXTRA_CFLAGS) $(CONFIG)
-CPPFLAGS += -I${CURDIR}/custom/includes
 
 
 # -----------------------------------------------------------------------------

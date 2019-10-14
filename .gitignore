@@ -1,6 +1,7 @@
 # ignore temporary development files
 *.o
 *.a
+*.d
 .depend
 
 # ignore automatically generated files
@@ -29,6 +30,7 @@ src/conf_act.c
 # ignore compiled executable files
 rocksndiamonds
 rocksndiamonds.exe
+rocksndiamonds_headless
 
 .DS_Store
 

@@ -8,17 +8,21 @@
 #include <signal.h>
 
 
+#ifndef HEADLESS
 Bitmap *objBitmap;
 Bitmap *sprBitmap;
 
 Bitmap *screenBitmap;
+#endif
 
 char play[SAMPLE_MAX];
 int play_x[SAMPLE_MAX];
 int play_y[SAMPLE_MAX];
 int play_element[SAMPLE_MAX];
 
+#ifndef HEADLESS
 struct GlobalInfo_EM global_em_info;
+#endif
 struct GameInfo_EM game_em;
 
 char *progname;
@@ -26,22 +30,25 @@ char *arg_basedir;
 
 int open_all(void)
 {
+#ifndef HEADLESS
   Bitmap *emc_bitmaps[2];
 
   SetBitmaps_EM(emc_bitmaps);
 
   objBitmap = emc_bitmaps[0];
   sprBitmap = emc_bitmaps[1];
-
+#endif
   return 0;
 }
 
+#ifndef HEADLESS
 void InitGfxBuffers_EM(void)
 {
   ReCreateBitmap(&screenBitmap, MAX_BUF_XSIZE * TILEX, MAX_BUF_YSIZE * TILEY);
 
   global_em_info.screenbuffer = screenBitmap;
 }
+#endif
 
 void em_open_all(void)
 {
@@ -70,12 +77,16 @@ extern int screen_y;
 
 void play_element_sound(int x, int y, int sample, int element)
 {
+#ifndef HEADLESS
   PlayLevelSound_EM(x, y, element, sample);
+#endif
 }
 
 void play_sound(int x, int y, int sample)
 {
+#ifndef HEADLESS
   play_element_sound(x, y, sample, -1);
+#endif
 }
 
 void sound_play(void)

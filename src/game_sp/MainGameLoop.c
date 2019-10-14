@@ -46,13 +46,17 @@ void subMainGameLoop_Main(byte action, boolean warp_mode)
 
   subCalculateScreenScrollPos();	// calculate screen start addrs
 
+#ifndef HEADLESS
   if (AutoScrollFlag)
     ScrollTowards(ScreenScrollXPos, ScreenScrollYPos);
+#endif
 
   TimerVar = TimerVar + 1;
 
+#ifndef HEADLESS
   if (ExplosionShakeMurphy > 0)
     ExplosionShakeMurphy--;
+#endif
 
   if (ExitToMenuFlag == 1)
   {
@@ -95,6 +99,7 @@ void subCalculateScreenScrollPos(void)
     MurphyScreenYPos += TILEY;
   }
 
+#ifndef HEADLESS
   if (ExplosionShake != 0)
   {
     subGetRandomNumber();
@@ -104,4 +109,5 @@ void subCalculateScreenScrollPos(void)
 
   ScreenScrollXPos = MurphyScreenXPos - (SCR_FIELDX / 2) * TILESIZE;
   ScreenScrollYPos = MurphyScreenYPos - (SCR_FIELDY / 2) * TILESIZE;
+#endif
 }

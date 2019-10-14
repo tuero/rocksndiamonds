@@ -9,6 +9,7 @@
 // screens.c
 // ============================================================================
 
+
 #include "libgame/libgame.h"
 
 #include "screens.h"
@@ -23,6 +24,7 @@
 #include "init.h"
 #include "config.h"
 
+#ifndef HEADLESS
 
 #define DEBUG_JOYSTICKS		0
 
@@ -902,6 +904,7 @@ static int getTitleBackground(int nr, boolean initial, boolean is_image)
   return IMG_UNDEFINED;
 }
 
+static int getTitleSound(struct TitleControlInfo *tci) MAYBE_UNUSED;
 static int getTitleSound(struct TitleControlInfo *tci)
 {
   boolean is_image = tci->is_image;
@@ -932,6 +935,7 @@ static int getTitleSound(struct TitleControlInfo *tci)
   return SND_UNDEFINED;
 }
 
+static int getTitleMusic(struct TitleControlInfo *tci) MAYBE_UNUSED;
 static int getTitleMusic(struct TitleControlInfo *tci)
 {
   boolean is_image = tci->is_image;
@@ -1534,6 +1538,7 @@ static boolean CheckTitleScreen(boolean levelset_has_changed)
   return (show_titlescreen && num_title_screens > 0);
 }
 
+void DrawMainMenu(void) MAYBE_UNUSED;
 void DrawMainMenu(void)
 {
   static LevelDirTree *leveldir_last_valid = NULL;
@@ -1724,6 +1729,7 @@ static void ResetTitleAutoDelay(unsigned int *counter_var,
   *counter_var = getAutoDelayCounter(fi);
 }
 
+void HandleTitleScreen(int mx, int my, int dx, int dy, int button) MAYBE_UNUSED;
 void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 {
   static unsigned int title_delay = 0;
@@ -1896,6 +1902,8 @@ void HandleTitleScreen(int mx, int my, int dx, int dy, int button)
 }
 
 static void HandleMainMenu_SelectLevel(int step, int direction,
+                                       int selected_level_nr) MAYBE_UNUSED;
+static void HandleMainMenu_SelectLevel(int step, int direction,
 				       int selected_level_nr)
 {
   int old_level_nr = level_nr;
@@ -1952,6 +1960,7 @@ static void HandleMainMenu_SelectLevel(int step, int direction,
   }
 }
 
+void HandleMainMenu(int mx, int my, int dx, int dy, int button) MAYBE_UNUSED;
 void HandleMainMenu(int mx, int my, int dx, int dy, int button)
 {
   static int choice = MAIN_CONTROL_GAME;
@@ -2415,6 +2424,9 @@ static void DrawInfoScreen_Main(void)
 static void changeSetupValue(int, int, int);
 
 static void HandleMenuScreen(int mx, int my, int dx, int dy, int button,
+                             int mode, int num_page_entries,
+                             int max_page_entries) MAYBE_UNUSED;
+static void HandleMenuScreen(int mx, int my, int dx, int dy, int button,
 			     int mode, int num_page_entries,
 			     int max_page_entries)
 {
@@ -2723,6 +2735,7 @@ static void HandleMenuScreen(int mx, int my, int dx, int dy, int button,
   }
 }
 
+void HandleInfoScreen_Main(int mx, int my, int dx, int dy, int button) MAYBE_UNUSED;
 void HandleInfoScreen_Main(int mx, int my, int dx, int dy, int button)
 {
   menu_info = info_info;
@@ -2750,6 +2763,7 @@ static int getMenuTextStep(int spacing_height, int font_nr)
   return getFontHeight(font_nr) + getMenuTextSpacing(spacing_height, font_nr);
 }
 
+void DrawInfoScreen_NotAvailable(char *text_title, char *text_error) MAYBE_UNUSED;
 void DrawInfoScreen_NotAvailable(char *text_title, char *text_error)
 {
   int font_title = MENU_INFO_FONT_TITLE;
@@ -2777,6 +2791,7 @@ void DrawInfoScreen_NotAvailable(char *text_title, char *text_error)
   FadeIn(REDRAW_FIELD);
 }
 
+void DrawInfoScreen_HelpAnim(int start, int max_anims, boolean init) MAYBE_UNUSED;
 void DrawInfoScreen_HelpAnim(int start, int max_anims, boolean init)
 {
   static int infoscreen_step[MAX_INFO_ELEMENTS_ON_SCREEN];
@@ -2907,6 +2922,7 @@ static char *getHelpText(int element, int action, int direction)
   return getHashEntry(helptext_info, token);
 }
 
+void DrawInfoScreen_HelpText(int element, int action, int direction, int ypos) MAYBE_UNUSED;
 void DrawInfoScreen_HelpText(int element, int action, int direction, int ypos)
 {
   int font_nr = FONT_INFO_ELEMENTS;
@@ -2945,6 +2961,7 @@ void DrawInfoScreen_HelpText(int element, int action, int direction, int ypos)
 		 TRUE, FALSE, FALSE);
 }
 
+static void DrawInfoScreen_TitleScreen(void) MAYBE_UNUSED;
 static void DrawInfoScreen_TitleScreen(void)
 {
   SetGameStatus(GAME_MODE_TITLE);
@@ -2952,11 +2969,13 @@ static void DrawInfoScreen_TitleScreen(void)
   DrawTitleScreen();
 }
 
+void HandleInfoScreen_TitleScreen(int button) MAYBE_UNUSED;
 void HandleInfoScreen_TitleScreen(int button)
 {
   HandleTitleScreen(0, 0, 0, 0, button);
 }
 
+static void DrawInfoScreen_Elements(void) MAYBE_UNUSED;
 static void DrawInfoScreen_Elements(void)
 {
   SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_ELEMENTS);
@@ -2971,6 +2990,7 @@ static void DrawInfoScreen_Elements(void)
   FadeIn(REDRAW_FIELD);
 }
 
+void HandleInfoScreen_Elements(int button) MAYBE_UNUSED;
 void HandleInfoScreen_Elements(int button)
 {
   static unsigned int info_delay = 0;
@@ -3050,6 +3070,7 @@ void HandleInfoScreen_Elements(int button)
   }
 }
 
+static void DrawInfoScreen_Music(void) MAYBE_UNUSED;
 static void DrawInfoScreen_Music(void)
 {
   SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_MUSIC);
@@ -3066,6 +3087,7 @@ static void DrawInfoScreen_Music(void)
   FadeIn(REDRAW_FIELD);
 }
 
+void HandleInfoScreen_Music(int button) MAYBE_UNUSED;
 void HandleInfoScreen_Music(int button)
 {
   static struct MusicFileInfo *list = NULL;
@@ -3230,6 +3252,7 @@ void HandleInfoScreen_Music(int button)
     PlaySoundLoop(list->music);
 }
 
+static void DrawInfoScreen_CreditsScreen(int screen_nr) MAYBE_UNUSED;
 static void DrawInfoScreen_CreditsScreen(int screen_nr)
 {
   int font_title = MENU_INFO_FONT_TITLE;
@@ -3461,6 +3484,7 @@ static void DrawInfoScreen_CreditsScreen(int screen_nr)
 		    "Press any key or button for next page");
 }
 
+static void DrawInfoScreen_Credits(void) MAYBE_UNUSED;
 static void DrawInfoScreen_Credits(void)
 {
   SetMainBackgroundImageIfDefined(IMG_BACKGROUND_INFO_CREDITS);
@@ -3474,6 +3498,7 @@ static void DrawInfoScreen_Credits(void)
   FadeIn(REDRAW_FIELD);
 }
 
+void HandleInfoScreen_Credits(int button) MAYBE_UNUSED;
 void HandleInfoScreen_Credits(int button)
 {
   static int screen_nr = 0;
@@ -3531,6 +3556,7 @@ void HandleInfoScreen_Credits(int button)
   }
 }
 
+static void DrawInfoScreen_Program(void) MAYBE_UNUSED;
 static void DrawInfoScreen_Program(void)
 {
   int font_title = MENU_INFO_FONT_TITLE;
@@ -3590,6 +3616,7 @@ static void DrawInfoScreen_Program(void)
   FadeIn(REDRAW_FIELD);
 }
 
+void HandleInfoScreen_Program(int button) MAYBE_UNUSED;
 void HandleInfoScreen_Program(int button)
 {
   if (button == MB_MENU_LEAVE)
@@ -3616,6 +3643,7 @@ void HandleInfoScreen_Program(int button)
   }
 }
 
+static void DrawInfoScreen_Version(void) MAYBE_UNUSED;
 static void DrawInfoScreen_Version(void)
 {
   int font_title = MENU_INFO_FONT_TITLE;
@@ -3771,6 +3799,7 @@ static void DrawInfoScreen_Version(void)
   FadeIn(REDRAW_FIELD);
 }
 
+void HandleInfoScreen_Version(int button) MAYBE_UNUSED;
 void HandleInfoScreen_Version(int button)
 {
   if (button == MB_MENU_LEAVE)
@@ -3797,6 +3826,7 @@ void HandleInfoScreen_Version(int button)
   }
 }
 
+static void DrawInfoScreen_LevelSet(void) MAYBE_UNUSED;
 static void DrawInfoScreen_LevelSet(void)
 {
   struct TitleMessageInfo *tmi = &readme;
@@ -3859,6 +3889,7 @@ static void DrawInfoScreen_LevelSet(void)
   FadeIn(REDRAW_FIELD);
 }
 
+static void HandleInfoScreen_LevelSet(int button) MAYBE_UNUSED;
 static void HandleInfoScreen_LevelSet(int button)
 {
   if (button == MB_MENU_LEAVE)
@@ -3885,6 +3916,7 @@ static void HandleInfoScreen_LevelSet(int button)
   }
 }
 
+static void DrawInfoScreen(void) MAYBE_UNUSED;
 static void DrawInfoScreen(void)
 {
   if (info_mode == INFO_MODE_TITLE)
@@ -3910,6 +3942,7 @@ static void DrawInfoScreen(void)
     PlayMenuSoundsAndMusic();
 }
 
+void HandleInfoScreen(int mx, int my, int dx, int dy, int button) MAYBE_UNUSED;
 void HandleInfoScreen(int mx, int my, int dx, int dy, int button)
 {
   if (info_mode == INFO_MODE_TITLE)
@@ -4059,6 +4092,7 @@ static int getAlignYOffsetFromTreeInfo(TreeInfo *ti)
   return align_yoffset;
 }
 
+static void DrawChooseTree(TreeInfo **ti_ptr) MAYBE_UNUSED;
 static void DrawChooseTree(TreeInfo **ti_ptr)
 {
   int fade_mask = REDRAW_FIELD;
@@ -4102,6 +4136,8 @@ static void DrawChooseTree(TreeInfo **ti_ptr)
   FadeIn(fade_mask);
 }
 
+static void drawChooseTreeList(int first_entry, int num_page_entries,
+                               TreeInfo *ti) MAYBE_UNUSED;
 static void drawChooseTreeList(int first_entry, int num_page_entries,
 			       TreeInfo *ti)
 {
@@ -4157,6 +4193,7 @@ static void drawChooseTreeList(int first_entry, int num_page_entries,
   redraw_mask |= REDRAW_FIELD;
 }
 
+static void drawChooseTreeInfo(int entry_pos, TreeInfo *ti) MAYBE_UNUSED;
 static void drawChooseTreeInfo(int entry_pos, TreeInfo *ti)
 {
   TreeInfo *node, *node_first;
@@ -4192,6 +4229,8 @@ static void drawChooseTreeInfo(int entry_pos, TreeInfo *ti)
     MarkTileDirty(x, 1);
 }
 
+static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
+                             TreeInfo **ti_ptr) MAYBE_UNUSED;
 static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
 			     TreeInfo **ti_ptr)
 {
@@ -4523,6 +4562,7 @@ static void HandleChooseTree(int mx, int my, int dx, int dy, int button,
   }
 }
 
+void DrawChooseLevelSet(void) MAYBE_UNUSED;
 void DrawChooseLevelSet(void)
 {
   FadeMenuSoundsAndMusic();
@@ -4532,11 +4572,13 @@ void DrawChooseLevelSet(void)
   PlayMenuSoundsAndMusic();
 }
 
+void HandleChooseLevelSet(int mx, int my, int dx, int dy, int button) MAYBE_UNUSED;
 void HandleChooseLevelSet(int mx, int my, int dx, int dy, int button)
 {
   HandleChooseTree(mx, my, dx, dy, button, &leveldir_current);
 }
 
+void DrawChooseLevelNr(void) MAYBE_UNUSED;
 void DrawChooseLevelNr(void)
 {
   int i;
@@ -4592,11 +4634,13 @@ void DrawChooseLevelNr(void)
   PlayMenuSoundsAndMusic();
 }
 
+void HandleChooseLevelNr(int mx, int my, int dx, int dy, int button) MAYBE_UNUSED;
 void HandleChooseLevelNr(int mx, int my, int dx, int dy, int button)
 {
   HandleChooseTree(mx, my, dx, dy, button, &level_number_current);
 }
 
+void DrawHallOfFame(int level_nr, int highlight_position) MAYBE_UNUSED;
 void DrawHallOfFame(int level_nr, int highlight_position)
 {
   int fade_mask = REDRAW_FIELD;
@@ -4637,6 +4681,8 @@ void DrawHallOfFame(int level_nr, int highlight_position)
   FadeIn(fade_mask);
 }
 
+static void drawHallOfFameList(int level_nr, int first_entry,
+                               int highlight_position) MAYBE_UNUSED;
 static void drawHallOfFameList(int level_nr, int first_entry,
 			       int highlight_position)
 {
@@ -4679,6 +4725,7 @@ static void drawHallOfFameList(int level_nr, int first_entry,
   redraw_mask |= REDRAW_FIELD;
 }
 
+void HandleHallOfFame(int mx, int my, int dx, int dy, int button) MAYBE_UNUSED;
 void HandleHallOfFame(int mx, int my, int dx, int dy, int button)
 {
   static int level_nr = 0;
@@ -8278,29 +8325,34 @@ void HandleSetupScreen(int mx, int my, int dx, int dy, int button)
   else
     HandleSetupScreen_Generic(mx, my, dx, dy, button);
 }
+#endif
 
 void HandleGameActions(void)
 {
   if (setup.ask_on_game_over)
     CheckGameOver();
 
+#ifndef HEADLESS
   if (game.restart_game_message != NULL)
   {
     RequestRestartGame(game.restart_game_message);
 
     return;
   }
+#endif
 
   if (game_status != GAME_MODE_PLAYING)
     return;
 
   GameActions();	// main game loop
 
+#ifndef HEADLESS
   if (tape.auto_play && !tape.playing)
     AutoPlayTape();	// continue automatically playing next tape
+#endif
 }
 
-
+#ifndef HEADLESS
 // ---------- new screen button stuff --------------------------------------
 
 static void getScreenMenuButtonPos(int *x, int *y, int gadget_id)
@@ -9050,3 +9102,5 @@ void DrawScreenAfterAddingSet(char *tree_subdir_new, int tree_type)
     }
   }
 }
+
+#endif

@@ -2,6 +2,8 @@
 // Sound.c
 // ----------------------------------------------------------------------------
 
+#ifndef HEADLESS
+
 #include "Sound.h"
 
 
@@ -12,3 +14,5 @@ void subSoundFX(int si, int element, int action)
 
   PlayLevelSound_SP(x, y, element, action);
 }
+
+#endif

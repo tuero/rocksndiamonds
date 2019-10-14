@@ -95,7 +95,9 @@ static TreeInfo *getTreeInfoCopy(TreeInfo *ti);
 static int compareTreeInfoEntries(const void *, const void *);
 
 static int token_value_position   = TOKEN_VALUE_POSITION_DEFAULT;
+#ifndef HEADLESS
 static int token_comment_position = TOKEN_COMMENT_POSITION_DEFAULT;
+#endif
 
 static SetupFileHash *artworkinfo_cache_old = NULL;
 static SetupFileHash *artworkinfo_cache_new = NULL;
@@ -437,6 +439,7 @@ char *setLevelArtworkDir(TreeInfo *ti)
   return *artwork_set_ptr;
 }
 
+#ifndef HEADLESS
 static char *getLevelArtworkSet(int type)
 {
   if (leveldir_current == NULL)
@@ -444,6 +447,7 @@ static char *getLevelArtworkSet(int type)
 
   return LEVELDIR_ARTWORK_SET(leveldir_current, type);
 }
+#endif
 
 static char *getLevelArtworkDir(int type)
 {
@@ -679,6 +683,7 @@ char *getLevelSetInfoFilename(void)
   return NULL;
 }
 
+#ifndef HEADLESS
 static char *getLevelSetTitleMessageBasename(int nr, boolean initial)
 {
   static char basename[32];
@@ -688,9 +693,11 @@ static char *getLevelSetTitleMessageBasename(int nr, boolean initial)
 
   return basename;
 }
+#endif
 
 char *getLevelSetTitleMessageFilename(int nr, boolean initial)
 {
+#ifndef HEADLESS
   static char *filename = NULL;
   char *basename;
   boolean skip_setup_artwork = FALSE;
@@ -751,17 +758,21 @@ char *getLevelSetTitleMessageFilename(int nr, boolean initial)
   filename = getPath2(options.graphics_directory, basename);
   if (fileExists(filename))
     return filename;
+#endif
 
   return NULL;		// cannot find specified artwork file anywhere
 }
 
+#ifndef HEADLESS
 static char *getCorrectedArtworkBasename(char *basename)
 {
   return basename;
 }
+#endif
 
 char *getCustomImageFilename(char *basename)
 {
+#ifndef HEADLESS
   static char *filename = NULL;
   boolean skip_setup_artwork = FALSE;
 
@@ -829,12 +840,14 @@ char *getCustomImageFilename(char *basename)
     if (fileExists(filename))
       return filename;
   }
+#endif
 
   return NULL;		// cannot find specified artwork file anywhere
 }
 
 char *getCustomSoundFilename(char *basename)
 {
+#ifndef HEADLESS
   static char *filename = NULL;
   boolean skip_setup_artwork = FALSE;
 
@@ -902,12 +915,14 @@ char *getCustomSoundFilename(char *basename)
     if (fileExists(filename))
       return filename;
   }
+#endif
 
   return NULL;		// cannot find specified artwork file anywhere
 }
 
 char *getCustomMusicFilename(char *basename)
 {
+#ifndef HEADLESS
   static char *filename = NULL;
   boolean skip_setup_artwork = FALSE;
 
@@ -975,6 +990,7 @@ char *getCustomMusicFilename(char *basename)
     if (fileExists(filename))
       return filename;
   }
+#endif
 
   return NULL;		// cannot find specified artwork file anywhere
 }
@@ -1009,6 +1025,7 @@ char *getCustomArtworkLevelConfigFilename(int type)
 
 char *getCustomMusicDirectory(void)
 {
+#ifndef HEADLESS
   static char *directory = NULL;
   boolean skip_setup_artwork = FALSE;
 
@@ -1059,6 +1076,7 @@ char *getCustomMusicDirectory(void)
   directory = getStringCopy(options.music_directory);
   if (directoryExists(directory))
     return directory;
+#endif
 
   return NULL;		// cannot find specified artwork file anywhere
 }
@@ -2675,13 +2693,17 @@ void setSetupInfo(struct TokenInfo *token_info,
       *(int *)setup_value = get_switch3_from_string(token_value);
       break;
 
+#ifndef HEADLESS
     case TYPE_KEY:
       *(Key *)setup_value = getKeyFromKeyName(token_value);
       break;
+#endif
 
+#ifndef HEADLESS
     case TYPE_KEY_X11:
       *(Key *)setup_value = getKeyFromX11KeyName(token_value);
       break;
+#endif
 
     case TYPE_INTEGER:
       *(int *)setup_value = get_integer_from_string(token_value);
@@ -3320,7 +3342,9 @@ static boolean LoadLevelInfoFromLevelConf(TreeInfo **node_first,
     (leveldir_new->user_defined || !leveldir_new->handicap ?
      leveldir_new->last_level : leveldir_new->first_level);
 
+#ifndef HEADLESS
   DrawInitText(leveldir_new->name, 150, FC_YELLOW);
+#endif
 
   pushTreeInfo(node_first, leveldir_new);
 
@@ -3426,7 +3450,9 @@ void LoadLevelInfo(void)
 {
   InitUserLevelDirectory(getLoginName());
 
+#ifndef HEADLESS
   DrawInitText("Loading level series", 120, FC_GREEN);
+#endif
 
   LoadLevelInfoFromLevelDir(&leveldir_first, NULL, options.level_directory);
   LoadLevelInfoFromLevelDir(&leveldir_first, NULL, getUserLevelDir(NULL));
@@ -3440,7 +3466,9 @@ void LoadLevelInfo(void)
   leveldir_first_all = leveldir_first;
   cloneTree(&leveldir_first, leveldir_first_all, TRUE);
 
+#ifndef HEADLESS
   AdjustGraphicsForEMC();
+#endif
 
   // before sorting, the first entries will be from the user directory
   leveldir_current = getFirstValidTreeInfoEntry(leveldir_first);
@@ -3677,7 +3705,9 @@ void LoadArtworkInfo(void)
 {
   LoadArtworkInfoCache();
 
+#ifndef HEADLESS
   DrawInitText("Looking for custom artwork", 120, FC_GREEN);
+#endif
 
   LoadArtworkInfoFromArtworkDir(&artwork.gfx_first, NULL,
 				options.graphics_directory,
@@ -3800,7 +3830,9 @@ static void LoadArtworkInfoFromLevelInfo(ArtworkDirTree **artwork_node,
 	setArtworkInfoCacheEntry(artwork_new, level_node, type);
     }
 
+#ifndef HEADLESS
     DrawInitText(level_node->name, 150, FC_YELLOW);
+#endif
 
     if (level_node->node_group != NULL)
       LoadArtworkInfoFromLevelInfo(artwork_node, level_node->node_group);
@@ -3813,7 +3845,9 @@ void LoadLevelArtworkInfo(void)
 {
   print_timestamp_init("LoadLevelArtworkInfo");
 
+#ifndef HEADLESS
   DrawInitText("Looking for custom level artwork", 120, FC_GREEN);
+#endif
 
   print_timestamp_time("DrawTimeText");
 
@@ -3905,10 +3939,12 @@ static boolean AddTreeSetToTreeInfoExt(TreeInfo *tree_node_old, char *tree_dir,
       tree_subdir_new == NULL)		// should not happen
     return FALSE;
 
+#ifndef HEADLESS
   int draw_deactivation_mask = GetDrawDeactivationMask();
 
   // override draw deactivation mask (temporarily disable drawing)
   SetDrawDeactivationMask(REDRAW_ALL);
+#endif
 
   if (type == TREE_TYPE_LEVEL_DIR)
   {
@@ -3925,8 +3961,10 @@ static boolean AddTreeSetToTreeInfoExt(TreeInfo *tree_node_old, char *tree_dir,
 				   tree_dir, tree_subdir_new, type);
   }
 
+#ifndef HEADLESS
   // set draw deactivation mask to previous value
   SetDrawDeactivationMask(draw_deactivation_mask);
+#endif
 
   // get first node of level or artwork info tree
   TreeInfo **tree_node_first = TREE_FIRST_NODE_PTR(type);
@@ -4199,13 +4237,17 @@ char *getSetupValue(int type, void *value)
       strcpy(value_string, (*(boolean *)value ? "AGA" : "ECS"));
       break;
 
+#ifndef HEADLESS
     case TYPE_KEY:
       strcpy(value_string, getKeyNameFromKey(*(Key *)value));
       break;
+#endif
 
+#ifndef HEADLESS
     case TYPE_KEY_X11:
       strcpy(value_string, getX11KeyNameFromKey(*(Key *)value));
       break;
+#endif
 
     case TYPE_INTEGER:
       sprintf(value_string, "%d", *(int *)value);
@@ -4249,6 +4291,7 @@ char *getSetupLine(struct TokenInfo *token_info, char *prefix, int token_nr)
   // build setup entry line
   line = getFormattedSetupEntry(token_string, value_string);
 
+#ifndef HEADLESS
   if (token_type == TYPE_KEY_X11)
   {
     Key key = *(Key *)setup_value;
@@ -4267,6 +4310,9 @@ char *getSetupLine(struct TokenInfo *token_info, char *prefix, int token_nr)
       strcat(line, keyname);
     }
   }
+#else
+    (void)i;
+#endif
 
   return line;
 }
