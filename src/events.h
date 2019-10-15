@@ -22,6 +22,7 @@
 #ifndef HEADLESS
 int FilterMouseMotionEvents(void *, Event *);
 boolean NextValidEvent(Event *);
+void StopProcessingEvents(void);
 #endif
 
 void EventLoop(void);

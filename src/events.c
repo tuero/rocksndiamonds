@@ -43,6 +43,7 @@ static unsigned int special_cursor_delay = 0;
 static unsigned int special_cursor_delay_value = 1000;
 
 static boolean virtual_button_pressed = FALSE;
+static boolean stop_processing_events = FALSE;
 #endif
 
 
@@ -108,6 +109,15 @@ static int FilterEvents(const Event *event)
   motion = (MotionEvent *)event;
   cursor_inside_playfield = (motion->x >= SX && motion->x < SX + SXSIZE &&
 			     motion->y >= SY && motion->y < SY + SYSIZE);
+
+  // set correct mouse x/y position (for pointer class global animations)
+  // (this is required in rare cases where the mouse x/y position calculated
+  // from raw values (to apply logical screen size scaling corrections) does
+  // not match the final mouse event x/y position -- this may happen because
+  // the SDL renderer's viewport position is internally represented as float,
+  // but only accessible as integer, which may lead to rounding errors)
+  gfx.mouse_x = motion->x;
+  gfx.mouse_y = motion->y;
 
   // do no reset mouse cursor before all pending events have been processed
   if (gfx.cursor_mode == cursor_mode_last &&
@@ -194,6 +204,11 @@ boolean NextValidEvent(Event *event)
 
   return FALSE;
 }
+
+void StopProcessingEvents(void)
+{
+  stop_processing_events = TRUE;
+}
 #endif
 
 #ifndef HEADLESS
@@ -204,6 +219,8 @@ void HandleEvents(void)
   unsigned int event_frame_delay_value = GAME_FRAME_DELAY;
 
   ResetDelayCounter(&event_frame_delay);
+
+  stop_processing_events = FALSE;
 
   while (NextValidEvent(&event))
   {
@@ -259,6 +276,10 @@ void HandleEvents(void)
 
     // do not handle events for longer than standard frame delay period
     if (DelayReached(&event_frame_delay, event_frame_delay_value))
+      break;
+
+    // do not handle any further events if triggered by a special flag
+    if (stop_processing_events)
       break;
   }
 }

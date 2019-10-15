@@ -244,6 +244,9 @@ int getAnimationFrame(int num_frames, int delay, int mode, int start_frame,
 {
   int frame = 0;
 
+  if (delay < 1)			// delay must be at least 1
+    delay = 1;
+
   sync_frame += start_frame * delay;
 
   if (mode & ANIM_LOOP)			// looping animation
@@ -1140,7 +1143,7 @@ static boolean clickConsumed(struct GlobalAnimPartControlInfo *part)
 }
 
 static void InitGlobalAnim_Triggered(struct GlobalAnimPartControlInfo *part,
-				     boolean *anything_clicked,
+				     boolean *click_consumed,
 				     boolean *any_event_action,
 				     int event_value, char *info_text)
 {
@@ -1164,13 +1167,13 @@ static void InitGlobalAnim_Triggered(struct GlobalAnimPartControlInfo *part,
     {
       struct GlobalAnimPartControlInfo *part2 = &anim2->part[part2_nr];
 
-      if (part2->state != ANIM_STATE_RUNNING)
+      if (!(part2->state & ANIM_STATE_RUNNING))
 	continue;
 
       if (isClickablePart(part2, mask))
       {
 	part2->triggered = TRUE;
-	*anything_clicked = clickConsumed(part); 	// click was on "part"!
+	*click_consumed |= clickConsumed(part); 	// click was on "part"!
 
 #if DEBUG_ANIM_EVENTS
 	printf("::: => %d.%d TRIGGERED BY %s OF %d.%d\n",
@@ -1220,11 +1223,11 @@ static void HandleGlobalAnimEvent(struct GlobalAnimPartControlInfo *part,
   printf("::: %d.%d %s\n", part->old_anim_nr + 1, part->old_nr + 1, info_text);
 #endif
 
-  boolean anything_clicked = FALSE;
+  boolean click_consumed = FALSE;
   boolean any_event_action = FALSE;
 
   // check if this event is defined to trigger other animations
-  InitGlobalAnim_Triggered(part, &anything_clicked, &any_event_action,
+  InitGlobalAnim_Triggered(part, &click_consumed, &any_event_action,
 			   event_value, info_text);
 }
 
@@ -1765,10 +1768,12 @@ static void InitGlobalAnim_Clickable(void)
 
 static boolean InitGlobalAnim_Clicked(int mx, int my, int clicked_event)
 {
+  boolean click_consumed = FALSE;
   boolean anything_clicked = FALSE;
   boolean any_part_clicked = FALSE;
   boolean any_event_action = FALSE;
   int mode_nr;
+  int i;
 
   // check game modes in reverse draw order (to stop when clicked)
   for (mode_nr = NUM_GAME_MODES - 1; mode_nr >= 0; mode_nr--)
@@ -1797,7 +1802,7 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, int clicked_event)
 	if (!part->clickable)
 	  continue;
 
-	if (part->state != ANIM_STATE_RUNNING)
+	if (!(part->state & ANIM_STATE_RUNNING))
 	  continue;
 
 	// always handle "any" click events (clicking anywhere on screen) ...
@@ -1809,8 +1814,8 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, int clicked_event)
 		 part->old_anim_nr + 1, part->old_nr + 1);
 #endif
 
-	  part->clicked = TRUE;
-	  anything_clicked = clickConsumed(part);
+	  anything_clicked = part->clicked = TRUE;
+	  click_consumed |= clickConsumed(part);
 	}
 
 	// always handle "unclick:any" events (releasing anywhere on screen) ...
@@ -1822,8 +1827,8 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, int clicked_event)
 		 part->old_anim_nr + 1, part->old_nr + 1);
 #endif
 
-	  part->clicked = TRUE;
-	  anything_clicked = clickConsumed(part);
+	  anything_clicked = part->clicked = TRUE;
+	  click_consumed |= clickConsumed(part);
 	}
 
 	// ... but only handle the first (topmost) clickable animation
@@ -1843,7 +1848,7 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, int clicked_event)
 	    any_event_action = TRUE;
 
 	  // determine if mouse clicks should be blocked from other animations
-	  any_part_clicked = clickConsumed(part);
+	  any_part_clicked |= clickConsumed(part);
 
 	  if (isClickablePart(part, ANIM_EVENT_SELF))
 	  {
@@ -1852,12 +1857,12 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, int clicked_event)
 		   part->old_anim_nr + 1, part->old_nr + 1);
 #endif
 
-	    part->clicked = TRUE;
-	    anything_clicked = clickConsumed(part);
+	    anything_clicked = part->clicked = TRUE;
+	    click_consumed |= clickConsumed(part);
 	  }
 
 	  // check if this click is defined to trigger other animations
-	  InitGlobalAnim_Triggered(part, &anything_clicked, &any_event_action,
+	  InitGlobalAnim_Triggered(part, &click_consumed, &any_event_action,
 				   ANIM_EVENT_CLICK, "CLICK");
 	}
       }
@@ -1868,12 +1873,16 @@ static boolean InitGlobalAnim_Clicked(int mx, int my, int clicked_event)
   {
     handle_click = TRUE;
 
-    HandleGlobalAnim(ANIM_CONTINUE, game_status);
+    for (i = 0; i < NUM_GAME_MODES; i++)
+      HandleGlobalAnim(ANIM_CONTINUE, i);
 
     handle_click = FALSE;
+
+    // prevent ignoring release event if processed within same game frame
+    StopProcessingEvents();
   }
 
-  return (anything_clicked || any_event_action);
+  return (click_consumed || any_event_action);
 }
 
 static void ResetGlobalAnim_Clickable(void)
