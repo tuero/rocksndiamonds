@@ -35,12 +35,12 @@ extern "C"
     void handleLevelStart(void);
 
     /*
-     * Set the controller to be used.
+     * Initalizes the controller to be used.
      * 
      * The controller is supplied by the -controller command line argument. If none is 
      * given, then the default user controller is used (user keyboard input)
      */
-    void setController(void);
+    void initController(void);
 
     /*
      * Initialize the loggers.

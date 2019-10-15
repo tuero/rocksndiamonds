@@ -98,11 +98,12 @@ public:
     int getMaxDepth();
 
     /*
-     * Set the controller.
+     * Inits the controller.
+     * Controller type is determined by command line argument.
      *
-     * @param controller Controller enum type
+     * @param controller Controller enum type 
      */
-    void setController(enginetype::ControllerType controller);
+    void initController(enginetype::ControllerType controller = enginetype::ControllerType::DEFAULT);
 
 };
 

@@ -49,7 +49,7 @@ public:
 
     bool singleStep(Action &action) override;
 
-    bool isValid() override;
+    bool isValid_() override;
 
     std::string optionToString() override;
 

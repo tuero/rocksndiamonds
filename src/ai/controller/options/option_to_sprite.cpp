@@ -80,7 +80,7 @@ bool OptionToSprite::singleStep(Action &action) {
 }
 
 
-bool OptionToSprite::isValid() {
+bool OptionToSprite::isValid_() {
     if (!enginehelper::isSpriteActive(spriteID_)) {return false;}
 
     enginetype::GridCell playerCell = enginehelper::getPlayerPosition();

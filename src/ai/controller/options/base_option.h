@@ -20,6 +20,7 @@
 // Engine
 #include "../../engine/action.h"
 #include "../../engine/engine_types.h"
+#include "../../engine/engine_helper.h"
 
 
 /**
@@ -34,7 +35,7 @@ class BaseOption {
 protected:
     OptionType optionType_ = OptionType::Misc;
     enginetype::GridCell goalCell_;
-    int spriteID_;
+    int spriteID_ = -1;
     std::deque<enginetype::GridCell> solutionPath;
     int timesCalled_ = 0;
     int counter_ = 0;
@@ -75,7 +76,9 @@ public:
     // On true, necessary internal variables should be reset.
     virtual bool singleStep(Action &action) = 0;
 
-    virtual bool isValid() = 0;
+    virtual bool isValid_() = 0;
+
+    bool isValid() {return isValid_() && enginehelper::isSpriteActive(spriteID_);}
 
     virtual int getTimesCalled() {return timesCalled_;}
 
@@ -86,6 +89,10 @@ public:
     virtual std::ostream& toString(std::ostream& o) const {
         return o << "";
     }
+
+    void setSpriteID(int spriteID) {spriteID_ = spriteID;}
+
+    int getSpriteID() {return spriteID_;}
 
 };
 

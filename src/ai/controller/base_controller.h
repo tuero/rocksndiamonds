@@ -54,10 +54,10 @@ protected:
         PLOGD_(logwrap::FileLogger) << msg;
         PLOGD_IF_(logwrap::ConsolLogger, sendToConsol) << msg;
 
-        logwrap::logPlayerDetails();
-        logwrap::logBoardState();
-        logwrap::logMovPosState();
-        logwrap::logBoardSpriteIDs();
+        // logwrap::logPlayerDetails();
+        // logwrap::logBoardState();
+        // logwrap::logMovPosState();
+        // logwrap::logBoardSpriteIDs();
     }
 
 public:

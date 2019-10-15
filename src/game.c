@@ -24,7 +24,7 @@
 // (tuero@ualberta.ca) - September 2019
 // sprite IDs are used for custom controllers for object tracking
 int spriteIDs[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-int idCounter;
+int spriteIDCounter;
 #define MAYBE_UNUSED __attribute__((used))
 #ifdef HEADLESS
 #define hasStartedNetworkGame() TRUE
@@ -5826,7 +5826,7 @@ static void Explode(int ex, int ey, int phase, int mode)
     // sprite IDs are used for custom controllers for object tracking
     // If Field is removed, then we remove sprite ID from known list
     // Ensure element being replaced is not empty or dirt
-    if (element > 1) {spriteIDs[x][y] = idCounter++;}
+    if (element > 1) {spriteIDs[x][y] = spriteIDCounter++;}
 
     // player can escape from explosions and might therefore be still alive
     if (element >= EL_PLAYER_IS_EXPLODING_1 &&

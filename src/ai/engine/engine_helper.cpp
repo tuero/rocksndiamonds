@@ -11,7 +11,7 @@
 #include "engine_helper.h"
 
 extern int spriteIDs[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-extern int idCounter;
+extern int spriteIDCounter;
 
 namespace enginehelper {
 
@@ -129,7 +129,7 @@ int getLevelWidth() {
 
 
 void initSpriteIDs() {
-    idCounter = 0;
+    spriteIDCounter = 0;
     enginetype::GridCell playerCell = getPlayerPosition();
 
     for (int x = 0; x < level.fieldx; x++) {
@@ -138,8 +138,8 @@ void initSpriteIDs() {
             if (Feld[x][y] > 1 && Feld[x][y] != enginetype::FIELD_TEMP &&
                 !(x == playerCell.x && y == playerCell.y)) 
             {
-                spriteIDs[x][y] = idCounter++;
-                // idCounter += 1;
+                spriteIDs[x][y] = spriteIDCounter++;
+                // spriteIDCounter += 1;
             }
         }
     }
@@ -171,6 +171,7 @@ enginetype::GridCell getSpriteGridCell(int spriteID) {
 
 
 bool isSpriteActive(int spriteID) {
+    if (spriteID == -1) {return true;}
     for (int x = 0; x < level.fieldx; x++) {
         for (int y = 0; y < level.fieldy; y++) {
             if (spriteIDs[x][y] == spriteID) {return true;}

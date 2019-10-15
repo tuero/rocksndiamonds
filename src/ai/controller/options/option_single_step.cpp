@@ -43,7 +43,7 @@ bool OptionSingleStep::singleStep(Action &action) {
 }
 
 
-bool OptionSingleStep::isValid() {
+bool OptionSingleStep::isValid_() {
     return !enginehelper::isWall(action_);
 }
 

@@ -32,7 +32,7 @@ OptionSingleStep noopOption(Action::noop, 1);
  * Default constructor which gets the controller type from the engine
  */
 Controller::Controller() {
-    setController(enginehelper::getControllerType());
+    initController();
     step_counter_ = 0;
 }
 
@@ -42,7 +42,7 @@ Controller::Controller() {
  * Used for testing
  */
 Controller::Controller(enginetype::ControllerType controller) {
-    setController(controller);
+    initController(controller);
     step_counter_ = 0;
 }
 
@@ -168,6 +168,7 @@ Action Controller::getAction() {
     if (step_counter_++ % enginetype::ENGINE_RESOLUTION == 0) {
         logwrap::logPlayerMove(actionToString(action));
         logwrap::logState();
+        logwrap::logBoardSpriteIDs();
     }
 
     // Save action to replay file
@@ -178,9 +179,15 @@ Action Controller::getAction() {
 
 
 /*
- * Set the controller.
+ * Inits the controller.
+ * Controller type is determined by command line argument.
  */
-void Controller::setController(enginetype::ControllerType controller) {
+void Controller::initController(enginetype::ControllerType controller) {
+    // No controller type passed, check if set by user command line argumetn
+    if (controller == enginetype::ControllerType::DEFAULT) {
+        controller = enginehelper::getControllerType();
+    }
+
     if (controller == enginetype::REPLAY) {
         baseController_ = std::make_unique<Replay>();
     }

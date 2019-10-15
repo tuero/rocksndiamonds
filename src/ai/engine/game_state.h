@@ -136,6 +136,7 @@ public:
     int timePlayed_;
     int timeLeft_;
     int tapeTime_;
+    int spriteIDCounter_;
 
     GameState();
 

@@ -174,6 +174,8 @@ void GameState::setFromEngineState() {
     timeLeft_ = TimeLeft;
     tapeTime_ = TapeTime;
 
+    spriteIDCounter_ = spriteIDCounter;
+
     gameFailed_ = enginehelper::engineGameFailed();
     gameSolved_ = enginehelper::engineGameSolved();
 }
@@ -270,5 +272,7 @@ void GameState::restoreEngineState() {
     TimePlayed = timePlayed_;
     TimeLeft = timeLeft_;
     TapeTime = tapeTime_;
+
+    spriteIDCounter = spriteIDCounter_;
 }
 

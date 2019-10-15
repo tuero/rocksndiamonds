@@ -37,21 +37,14 @@
 
 
 // External variables accessible to engine
+// Used disable screenbuffer writing while not in headless mode
+// (speeds up engine simulation)
 boolean is_simulating;
 
 // Global objects which are needed outside local scopes
-std::vector<Action> solution;
 Controller controller;
 
-// Level info
-char *level_bd = (char *)"classic_boulderdash";
-char *level_em = (char *)"classic_emerald_mine";
-char *level_custom = (char *)"tuero";
 std::string levelsetSurvival = "custom_survival";
-
-
-std::string SEP(30, '-');
-
 
 
 // ------------------------ Init Functions --------------------------
@@ -63,17 +56,8 @@ extern "C" void handleLevelStart() {
     // Log level
     PLOGI_(logwrap::FileLogger) << "Level being played: " << level.file_info.nr;
 
-    // Calculate tile distances to exit location
     // If level is a custom programmed level, the respective level start code is called.
-    std::string currentLevelsetSubdir(leveldir_current->subdir);
-    if (currentLevelsetSubdir == levelsetSurvival) {
-        levelprogramming::customLevelProgrammingStart();
-    }
-    // <!-- This will not be needed.
-    else {
-        enginetype::GridCell exitCell = enginehelper::findExitLocation();
-        enginehelper::setBoardDistancesDijkstra(exitCell);
-    }
+    levelprogramming::customLevelProgrammingStart();
 
     // Initialize zorbrist tables for state hashing
     enginehelper::initZorbristTables();
@@ -88,7 +72,7 @@ extern "C" void handleLevelStart() {
     RNG::setEngineSeed(RNG::getEngineSeed());
     RNG::setSimulatingSeed(RNG::getSimulationSeed());
 
-    if (options.summary_window) {summarywindow::init();}
+    // if (options.summary_window) {summarywindow::init();}
 
     // Initialize and open replay file
     logwrap::initReplayFile();
@@ -96,12 +80,12 @@ extern "C" void handleLevelStart() {
 
 
 /*
- * Set the controller to be used.
+ * Initalizes the controller to be used.
  * The controller type is provided by a command line argument, which the 
  * engine helper grabs.
  */
-extern "C" void setController() {
-    controller.setController(enginehelper::getControllerType());
+extern "C" void initController() {
+    controller.initController();
 }
 
 
