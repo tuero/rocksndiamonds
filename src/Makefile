@@ -378,10 +378,10 @@ dir:
 
 custom: rocksndiamonds rocksndiamonds_headless
 
-rocksndiamonds: $(RNDLIBS_CUSTOM) $(TIMESTAMP_FILE) $(ICON)
+rocksndiamonds: $(TIMESTAMP_FILE) $(RNDLIBS_CUSTOM) $(ICON)
 	@$(CXX) $(PROFILING) $(ICON) $(RNDLIBS_CUSTOM) $(LDFLAGS) -o ../$@
 
-rocksndiamonds_headless: $(RNDLIBS_HEADLESS) $(TIMESTAMP_FILE) $(ICON)
+rocksndiamonds_headless: $(TIMESTAMP_FILE) $(RNDLIBS_HEADLESS) $(ICON)
 	@$(CXX) $(PROFILING) $(ICON) $(RNDLIBS_HEADLESS) $(LDFLAGS_HEADLESS) -o ../$@
 
 
