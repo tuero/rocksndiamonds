@@ -57,6 +57,7 @@ bool GameState::isGameOver() {
  * Custom comparison operator, primarily used in testing.
  */
 bool GameState::operator==(const GameState &other){ 
+    (void)other;
     return false;
     // return  (arrayShorts_ == other.arrayShorts_) && 
     //         (arrayShorts_ == other.arrayShorts_) && 

@@ -14,8 +14,10 @@
 #include <string>
 #include <map>
 #include <array>
+#ifndef HEADLESS
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#endif
 
 // Engine access
 #include "../engine/engine_types.h"
@@ -28,6 +30,7 @@
 
 namespace summarywindow {
 
+#ifndef HEADLESS
 // Grid sizes/metrics
 int TILE_SIZE = 20;                                     // Tile size in pixels
 int TILES_ROWS;                                         // Number of tile rows
@@ -59,7 +62,7 @@ std::vector<std::array<int, 3>> gridColors_ = {         // Colour for abstract g
     {102, 0, 102},           // majenta
     {0, 0, 102}              // deep blue
 };
-
+#endif
 
 /*
  * Initialize the summary window.
@@ -68,6 +71,7 @@ std::vector<std::array<int, 3>> gridColors_ = {         // Colour for abstract g
  * images representing objects on the summary window.
  */
 bool init() {
+    #ifndef HEADLESS
     TILES_ROWS = enginehelper::getLevelHeight();
     TILES_COLS = enginehelper::getLevelWidth();
     TOTAL_TILES = TILES_ROWS * TILES_COLS;
@@ -121,6 +125,7 @@ bool init() {
     SDL_RenderPresent(renderer_);
     setFlag = true;
 
+    #endif
     return true;
 }
 
@@ -129,8 +134,10 @@ bool init() {
  * Close the summary window and cleanup renderer.
  */
 void close() {
+    #ifndef HEADLESS
     SDL_DestroyRenderer(renderer_); 
     SDL_DestroyWindow(window_);
+    #endif
 }
 
 
@@ -140,7 +147,11 @@ void close() {
  * @param gridRepresentation Vector array of abstract nodes/objects
  */
 void updateGridRepresentation(std::vector<std::vector<int>> &gridRepresentation) {
+    #ifndef HEADLESS
     gridRepresentation_ = gridRepresentation;
+    #else
+    (void)gridRepresentation;
+    #endif
 }
 
 
@@ -152,6 +163,7 @@ void updateGridRepresentation(std::vector<std::vector<int>> &gridRepresentation)
  * the same colour.
  */
 void draw() {
+    #ifndef HEADLESS
     if (!setFlag) {return;}
 
     SDL_SetRenderDrawColor(renderer_, 0, 0, 0, 255);
@@ -201,6 +213,7 @@ void draw() {
     }
 
     SDL_RenderPresent(renderer_);
+    #endif
 }
 
 } // namespace summarywindow

@@ -5305,6 +5305,7 @@ static void CheckDynamite(int x, int y)
   Bang(x, y);
 }
 
+#ifndef HEADLESS
 static void setMinimalPlayerBoundaries(int *sx1, int *sy1, int *sx2, int *sy2)
 {
   boolean num_checked_players = 0;
@@ -5355,7 +5356,6 @@ static void setScreenCenteredToAllPlayers(int *sx, int *sy)
   *sy = (sy1 + sy2) / 2;
 }
 
-#ifndef HEADLESS
 static void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
 			       boolean center_screen, boolean quick_relocation)
 {
@@ -11932,7 +11932,6 @@ static void GameActionsExt(void)
   byte tape_action[MAX_PLAYERS];
   int i;
 
-#ifndef HEADLESS
   // detect endless loops, caused by custom element programming
   if (recursion_loop_detected && recursion_loop_depth == 0)
   {
@@ -11956,7 +11955,6 @@ static void GameActionsExt(void)
 
     return;
   }
-#endif
 
 #ifndef HEADLESS
   if (game.restart_level)
@@ -12125,6 +12123,8 @@ static void GameActionsExt(void)
   // only record actions from input devices, but not programmed actions
   if (tape.recording)
     TapeRecordAction(tape_action);
+#else
+    (void)tape_action;
 #endif
 
   // remember if game was played (especially after tape stopped playing)
@@ -12378,14 +12378,11 @@ void GameActions_RND(void)
     game.centered_player_nr = game.centered_player_nr_next;
     game.set_centered_player = FALSE;
 
-#ifndef HEADLESS
     DrawRelocateScreen(0, 0, sx, sy, MV_NONE, TRUE, setup.quick_switch);
     DrawGameDoorValues();
-#else
-      (void)graphic;
-      (void)last_gfx_frame;
-#endif
   }
+#else
+    (void)graphic; (void)last_gfx_frame;
 #endif
 
   for (i = 0; i < MAX_PLAYERS; i++)

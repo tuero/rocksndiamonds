@@ -114,12 +114,13 @@ OPTIONS = -O3 -Wall
 endif
 
 
-CFLAGS = $(OPTIONS) -MMD $(SYS_CFLAGS)  $(EXTRA_CFLAGS) $(CONFIG)
-# CPPFLAGS := -Wall -Wextra -g -O3 -std=c++14 $(SYS_CFLAGS) $(EXTRA_CFLAGS) $(CONFIG)
-# CPPFLAGS += -I${CURDIR}/ai/includes
+CFLAGS = $(OPTIONS) -MMD $(SYS_CFLAGS) $(EXTRA_CFLAGS) $(CONFIG)
+CFLAGS_HEADLESS = $(OPTIONS) -MMD -DHEADLESS $(EXTRA_CFLAGS) $(CONFIG)
 CXXFLAGS := -Wall -Wextra -g -O3 -std=c++14 -MMD $(SYS_CFLAGS) $(EXTRA_CFLAGS) $(CONFIG)
 CXXFLAGS += -I${CURDIR}/ai/includes
+CXXFLAGS_HEADLESS := -Wall -Wextra -g -O3 -std=c++14 -MMD -DHEADLESS -I${CURDIR}/ai/includes $(EXTRA_CFLAGS) $(CONFIG)
 LDFLAGS =           $(SYS_LDFLAGS) $(EXTRA_LDFLAGS) -lm -lz
+LDFLAGS_HEADLESS = -lm -lz
 
 BIN_DIR = ../bin
 BUILD_DIR = ../build
@@ -381,44 +382,44 @@ rocksndiamonds: $(RNDLIBS_CUSTOM) $(TIMESTAMP_FILE) $(ICON)
 	@$(CXX) $(PROFILING) $(ICON) $(RNDLIBS_CUSTOM) $(LDFLAGS) -o ../$@
 
 rocksndiamonds_headless: $(RNDLIBS_HEADLESS) $(TIMESTAMP_FILE) $(ICON)
-	@$(CXX) $(PROFILING) $(ICON) $(RNDLIBS_HEADLESS) $(LDFLAGS) -o ../$@
+	@$(CXX) $(PROFILING) $(ICON) $(RNDLIBS_HEADLESS) $(LDFLAGS_HEADLESS) -o ../$@
 
 
 # Libgame
 $(BUILD_CUSTOM_DIR)/$(LIBGAME_DIR)/%.o: $(LIBGAME_DIR)/%.c
 	$(CC) $(PROFILING) $(CFLAGS) -c $< -o $@
 $(BUILD_HEADLESS_DIR)/$(LIBGAME_DIR)/%.o: $(LIBGAME_DIR)/%.c
-	$(CC) $(PROFILING) $(CFLAGS) -DHEADLESS -c $< -o $@
+	$(CC) $(PROFILING) $(CFLAGS_HEADLESS) -c $< -o $@
 
 # Game EM
 $(BUILD_CUSTOM_DIR)/$(GAME_EM_DIR)/%.o: $(GAME_EM_DIR)/%.c
 	$(CC) $(PROFILING) $(CFLAGS) -c $< -o $@
 $(BUILD_HEADLESS_DIR)/$(GAME_EM_DIR)/%.o: $(GAME_EM_DIR)/%.c
-	$(CC) $(PROFILING) $(CFLAGS) -DHEADLESS -c $< -o $@
+	$(CC) $(PROFILING) $(CFLAGS_HEADLESS) -c $< -o $@
 
 # Game MM
 $(BUILD_CUSTOM_DIR)/$(GAME_MM_DIR)/%.o: $(GAME_MM_DIR)/%.c
 	$(CC) $(PROFILING) $(CFLAGS) -c $< -o $@
 $(BUILD_HEADLESS_DIR)/$(GAME_MM_DIR)/%.o: $(GAME_MM_DIR)/%.c
-	$(CC) $(PROFILING) $(CFLAGS) -DHEADLESS -c $< -o $@
+	$(CC) $(PROFILING) $(CFLAGS_HEADLESS) -c $< -o $@
 
 # Game SP
 $(BUILD_CUSTOM_DIR)/$(GAME_SP_DIR)/%.o: $(GAME_SP_DIR)/%.c
 	$(CC) $(PROFILING) $(CFLAGS) -c $< -o $@
 $(BUILD_HEADLESS_DIR)/$(GAME_SP_DIR)/%.o: $(GAME_SP_DIR)/%.c
-	$(CC) $(PROFILING) $(CFLAGS) -DHEADLESS -c $< -o $@
+	$(CC) $(PROFILING) $(CFLAGS_HEADLESS) -c $< -o $@
 
 # AI
 $(BUILD_CUSTOM_DIR)/$(AI_DIR)/%.o: $(AI_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 $(BUILD_HEADLESS_DIR)/$(AI_DIR)/%.o: $(AI_DIR)/%.cpp
-	$(CXX) $(CXXFLAGS) -DHEADLESS -c $< -o $@
+	$(CXX) $(CXXFLAGS_HEADLESS) -c $< -o $@
 
 # root
 $(BUILD_CUSTOM_DIR)/%.o: %.c
 	$(CC) $(PROFILING) $(CFLAGS) -c $< -o $@
 $(BUILD_HEADLESS_DIR)/%.o: %.c
-	$(CC) $(PROFILING) $(CFLAGS) -DHEADLESS -c $< -o $@
+	$(CC) $(PROFILING) $(CFLAGS_HEADLESS) -c $< -o $@
 
 auto-conf:
 	@for i in $(CNFS); do			\
@@ -441,7 +442,7 @@ conf_snd.h: conf_snd.c $(CNFS_CMD)
 conf_mus.h: conf_mus.c $(CNFS_CMD)
 	@$(MAKE) auto-conf
 
-$(TIMESTAMP_FILE): $(SRCS) $(RNDLIBS_CUSTOM) $(RNDLIBS_HEADLESS)
+$(TIMESTAMP_FILE): $(SRCS)
 	@echo '#define SOURCE_DATE_STRING "$(SOURCE_DATE_STRING)"' \
 	> $(TIMESTAMP_FILE)
 
@@ -450,8 +451,8 @@ $(ICON):
 	echo "$(ICONBASE) ICON $(ICONBASE).ico" | $(WINDRES) -o $(ICON)
 	#	$(CONVERT) $(ICON32X32) $(CONVERT_ICON_ARGS) $(ICONBASE).ico
 
-.c.o:
-	$(CC) $(PROFILING) $(CFLAGS) -c $*.c
+# .c.o:
+# 	$(CC) $(PROFILING) $(CFLAGS) -c $*.c
 
 graphics_dir:
 	@test -f $(GRAPHICS_DIR)/Makefile && $(MAKE) -C $(GRAPHICS_DIR) || true

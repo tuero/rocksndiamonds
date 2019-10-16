@@ -3955,6 +3955,8 @@ void GameActions_MM(struct MouseActionInfo action, boolean warp_mode)
 
 #ifndef HEADLESS
   CheckSingleStepMode_MM(element_clicked, button_released);
+#else
+    (void)element_clicked; (void)button_released;
 #endif
 }
 
