@@ -79,7 +79,7 @@ struct ConfigTypeInfo image_config_suffix[] =
   { ".align",				ARG_UNDEFINED,	TYPE_INTEGER	},
   { ".valign",				ARG_UNDEFINED,	TYPE_INTEGER	},
   { ".sort_priority",			ARG_UNDEFINED,	TYPE_INTEGER	},
-  { ".class",				ARG_UNDEFINED,	TYPE_STRING	},
+  { ".class_",				ARG_UNDEFINED,	TYPE_STRING	},
   { ".style",				ARG_UNDEFINED,	TYPE_STRING	},
   { ".active_xoffset",			"0",		TYPE_INTEGER	},
   { ".active_yoffset",			"0",		TYPE_INTEGER	},
@@ -8518,7 +8518,7 @@ struct ConfigInfo image_config[] =
   { "game.panel.time_anim.x",			"5"			},
   { "game.panel.time_anim.y",			"72"			},
   { "game.panel.time_anim.direction",		"right"			},
-  { "game.panel.time_anim.class",		"mm_engine_only"	},
+  { "game.panel.time_anim.class_",		"mm_engine_only"	},
 
   { "game.panel.health.x",			"-1"			},
   { "game.panel.health.y",			"-1"			},
@@ -8533,7 +8533,7 @@ struct ConfigInfo image_config[] =
   { "game.panel.health_anim.x",			"5"			},
   { "game.panel.health_anim.y",			"107"			},
   { "game.panel.health_anim.direction",		"right"			},
-  { "game.panel.health_anim.class",		"mm_engine_only"	},
+  { "game.panel.health_anim.class_",		"mm_engine_only"	},
   { "game.panel.health_anim.style",		"reverse"		},
 
   { "game.panel.frame.x",			"-1"			},

@@ -5571,7 +5571,7 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.time_anim.direction
   },
   {
-    "game.panel.time_anim.class",
+    "game.panel.time_anim.class_",
     &game.panel.time_anim.class_
   },
   {
@@ -5623,7 +5623,7 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.panel.health_anim.direction
   },
   {
-    "game.panel.health_anim.class",
+    "game.panel.health_anim.class_",
     &game.panel.health_anim.class_
   },
   {
