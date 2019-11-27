@@ -13,7 +13,7 @@
 #include "../engine/action.h"
 #include "../engine/game_state.h"
 #include "../util/rng.h"
-#include "../util/logging_wrapper.h"
+#include "../util/logger.h"
 #include "../controller/controller.h"
 
 extern "C" {

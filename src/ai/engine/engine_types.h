@@ -17,6 +17,7 @@
 #include <array>
 #include <string>
 #include <unordered_map>
+#include <set>
 
 extern "C" {
     #include "../../main.h"
@@ -45,6 +46,10 @@ namespace enginetype{
         bool operator==(const GridCell& rhs) const {
             return (x == rhs.x && y == rhs.y);
         }
+
+        bool operator!=(const GridCell& rhs) const {
+            return (x != rhs.x || y != rhs.y);
+        }
     };
 
     class GridCellHash {
@@ -55,18 +60,6 @@ namespace enginetype{
     };
 
 
-    // ------------- Controller types -------------
-    /*
-     * Controller types 
-     * These are defined in system.h as enum controller_type
-     */
-    enum ControllerType{DEFAULT=CONTROLLER_TYPE_DEFAULT, BFS=CONTROLLER_TYPE_BFS, MCTS=CONTROLLER_TYPE_MCTS, 
-                        MCTS_CUSTOM=CONTROLLER_TYPE_MCTS_CUSTOM, USER=CONTROLLER_TYPE_USER, 
-                        REPLAY=CONTROLLER_TYPE_REPLAY, PFA=CONTROLLER_TYPE_PFA};
-
-    enum Statistics{RUN_TIME, COUNT_EXPANDED_NODES, COUNT_SIMULATED_NODES, MAX_DEPTH};
-
-
     // ------------- Action values -------------
     static const int ENGINE_NOOP    = 0;
     static const int ENGINE_LEFT    = 1;
@@ -74,9 +67,11 @@ namespace enginetype{
     static const int ENGINE_UP      = 4;
     static const int ENGINE_DOWN    = 8;
     static const int NUM_ACTIONS    = 5;
+    static const int ENGINE_RESOLUTION = 8;     // Engine ticks per time step the agent considers
 
 
-    // ------------- Field Values -------------
+    // ------------- Element Values -------------
+    // Get rid of this eventually
     static const int FIELD_EMPTY            = 0;
     static const int FIELD_DIRT             = 1;
     static const int FIELD_BOULDER          = 106;
@@ -104,54 +99,6 @@ namespace enginetype{
     static const int FIELD_DOOR_OPENING     = 1241;
     static const int FIELD_TEMP             = 1296;
     static const int FIELD_EXPLOSION        = 1297;
-
-
-
-    static std::unordered_map<int, std::string> TYPE_TO_STRING = {
-        {FIELD_EMPTY, "empty"},
-        {FIELD_DIRT, "dirt"},
-        {FIELD_BOULDER, "boulder"},
-        {FIELD_DOOR_CLOSED, "door closed"},
-        {FIELD_YAMYAM, "yamyam"},
-        {FIELD_DIAMOND, "diamond"},
-        {FIELD_EXIT, "exit"},
-        {FIELD_DOOR_OPENING, "door opening"}
-    };
-
-    static std::unordered_map<int, bool> TYPE_IS_WALKABLE = {
-        {FIELD_EMPTY, true},
-        {FIELD_DIRT, true},
-        {FIELD_BOULDER, false},
-        {FIELD_DOOR_CLOSED, false},
-        {FIELD_BD_STEEL_WALL, false},
-        {FIELD_BD_NORMAL_WALL, false},
-        {FIELD_EM_STEEL_WALL, false},
-        {FIELD_EM_NORMAL_WALL, false},
-        {FIELD_YAMYAM, true},
-        {FIELD_DIAMOND, true},
-        {FIELD_WALL, false},
-        {FIELD_EXIT, true},
-        {FIELD_CUSTOM_1, true},
-        {FIELD_CUSTOM_2, true},
-        {FIELD_CUSTOM_3, true},
-        {FIELD_CUSTOM_4, false},
-        {FIELD_CUSTOM_5, true},
-        {FIELD_CUSTOM_6, true},
-        {FIELD_CUSTOM_7, true},
-        {FIELD_CUSTOM_8, true},
-        {FIELD_CUSTOM_9, true},
-        {FIELD_CUSTOM_10, true},
-        {FIELD_CUSTOM_11, true},
-        {FIELD_CUSTOM_12, true},
-        {FIELD_DOOR_OPENING, true},
-        {FIELD_TEMP, true}
-    };
-
-
-
-
-    // ------------- Misc -------------
-    static const int ENGINE_RESOLUTION = 8;     // Engine ticks per time step the agent considers
 
 
 } // namespace enginetype

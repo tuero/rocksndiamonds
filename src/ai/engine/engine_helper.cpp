@@ -10,6 +10,16 @@
 
 #include "engine_helper.h"
 
+#include <iostream>
+#include <array>
+#include <algorithm>
+#include <random>
+#include <map>
+
+//Logging
+#include "../util/logger.h"
+#include <plog/Log.h>
+
 extern int spriteIDs[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int spriteIDCounter;
 
@@ -26,8 +36,8 @@ auto rng = std::default_random_engine {};
 /*
  * Get the controller type defined by user command line argument.
  */
-enginetype::ControllerType getControllerType() {
-    return static_cast<enginetype::ControllerType>(options.controller_type);
+ControllerType getControllerType() {
+    return options.controller_type;
 }
 
 /*
@@ -36,6 +46,14 @@ enginetype::ControllerType getControllerType() {
 std::string getReplayFileName() {
     std::string replay_file(options.replay_file);
     return replay_file;
+}
+
+
+/**
+ * Get the option CLA for general use.
+ */
+int getOptParam() {
+    return options.opt;
 }
 
 
@@ -60,13 +78,14 @@ void setLevelSet() {
     try{
         // Initialize leveldir_current and related objects
         LoadLevelInfo();
-
-        PLOGI_(logwrap::FileLogger) << "Setting levelset " << level_set;
+        PLOGI_(logger::FileLogger) << "Setting levelset: \"" << level_set << "\"";
+        PLOGI_(logger::ConsoleLogger) << "Setting levelset: \"" << level_set << "\"";
 
         // Set levelset to save
         leveldir_current->fullpath = options.level_set;
         leveldir_current->subdir = options.level_set;
         leveldir_current->identifier = options.level_set;
+        leveldir_current->in_user_dir = false;
 
         // Save the levelset
         // We save because on startup, the previously saved levelset is loaded
@@ -74,8 +93,8 @@ void setLevelSet() {
         OpenAll(); 
     }
     catch (...){
-        PLOGE_(logwrap::FileLogger) << "Something went wrong trying to load levelset " << level_set;
-        PLOGE_(logwrap::ConsolLogger) << "Something went wrong trying to load levelset " << level_set;
+        PLOGE_(logger::FileLogger) << "Something went wrong trying to load levelset " << level_set;
+        PLOGE_(logger::ConsoleLogger) << "Something went wrong trying to load levelset " << level_set;
         CloseAllAndExit(1);
     }
 }
@@ -83,9 +102,8 @@ void setLevelSet() {
 /*
  * Get the levelset currently set in the engine.
  */
-std::string getLevelSet() {
-    std::string level_set(leveldir_current->subdir);
-    return level_set;
+const std::string getLevelSet() {
+    return leveldir_current->subdir;
 }
 
 
@@ -94,16 +112,29 @@ std::string getLevelSet() {
  */
 void loadLevel(int level_num) {
     options.level_number = level_num;
-    PLOGI_(logwrap::FileLogger) << "Loading level " << level_num;
+    PLOGI_(logger::FileLogger) << "Loading level: " << level_num;
+    PLOGI_(logger::ConsoleLogger) << "Loading level: " << level_num;
     LoadLevel(level_num);
 }
 
 
 /*
- * Get the level number from command line argument.
+ * Get the level number loaded in the level struct
  */
 int getLevelNumber() {
-    return options.level_number;
+    return level.file_info.nr;
+}
+
+
+/**
+ * Restart the level.
+ * Game is reinitialized using the current loaded level.
+ */
+void restartLevel() {
+    PLOGI_(logger::FileLogger) << "Restarting level: " << getLevelNumber();
+    PLOGI_(logger::ConsoleLogger) << "Restarting level: " << getLevelNumber();
+    
+    InitGame();
 }
 
 
@@ -123,38 +154,152 @@ int getLevelWidth() {
 }
 
 
+/**
+ * Get the number of gems needed to open the exit.
+ */
+int getLevelGemsNeeded() {
+    return level.gems_needed;
+}
+
+
+/**
+ * Get the number of remaining gems needed to open the exit.
+ */
+int getLevelRemainingGemsNeeded() {
+    return game.gems_still_needed;
+}
+
+
+// -------------------------------------------------------
+// ---------------Grid Action Information-----------------
+// -------------------------------------------------------
+
+/*
+ * Check if two grid cells are neighbours, defined by being separated by Euclidean distance of 1.
+ */
+bool checkIfNeighbours(enginetype::GridCell left, enginetype::GridCell right) {
+    return std::abs(left.x - right.x) + std::abs(left.y - right.y) == 1;
+}
+
+
+// Fast access mappings
+const std::map<std::array<int, 2>, Action> DELTA_ACTION_MAP = 
+{
+    {{0,0}, Action::noop},
+    {{-1,0}, Action::left},
+    {{1,0}, Action::right},
+    {{0,-1}, Action::up},
+    {{0,1}, Action::down}
+};
+
+const std::map<Action, std::array<int, 2>> ACTION_DELTA_MAP = 
+{
+    {Action::noop, {0,0}},
+    {Action::left, {-1,0}},
+    {Action::right, {1,0}},
+    {Action::up, {0,-1}},
+    {Action::down, {0,1}}
+};
+
+/*
+ * Get the action which moves from the first given grid cell to the second. 
+ *
+ * Note: The gridcells must be neighbours.
+ */
+Action getActionFromNeighbours(enginetype::GridCell from, enginetype::GridCell to) {
+    if (!checkIfNeighbours(from, to) && !(from == to)) {
+        return Action::noop;
+    }
+    return DELTA_ACTION_MAP.at({to.x - from.x, to.y - from.y});
+}
+
+
+/*
+ * Get the resulting cell from applying the action in the given cell.
+ */
+enginetype::GridCell getCellFromAction(Action action, const enginetype::GridCell from) {
+    std::array<int, 2> delta = ACTION_DELTA_MAP.at(action);
+    return {from.x + delta[0], from.y + delta[1]};
+}
+
+
 // -------------------------------------------------------
 // -----------------Map Item Information------------------
 // -------------------------------------------------------
 
 
+/**
+ * Convert a gridcell to a flat index
+ */
+int cellToIndex(const enginetype::GridCell &cell) {
+    return (cell.y * getLevelWidth() + cell.x);
+}
+
+/*
+ * Checks if the given gridcell is in bounds of the level field.
+ */
+bool inBounds(const enginetype::GridCell &cell) {
+    return (cell.x >= 0 && cell.x < level.fieldx && cell.y >= 0 && cell.y < level.fieldy);
+}
+
+
+/*
+ * Check if the element in the gridcell is a temporary element.
+ * For internal use when bound-check is implicitly done.
+ */
+bool _isTemporaryElement(const enginetype::GridCell &cell) {
+    return Feld[cell.x][cell.y] >= NUM_DRAWABLE_ELEMENTS;
+}
+
+
+/*
+ * Check if the element in the gridcell is a temporary element.
+ */
+bool isTemporaryElement(const enginetype::GridCell &cell) {
+    return inBounds(cell) && _isTemporaryElement(cell);
+}
+
+
+/*
+ * Checks if a given cell contains a valid sprite.
+ * For internal use when bound-check is implicitly done.
+ */
+bool _isValidSprite(const enginetype::GridCell &cell) {
+    int element = Feld[cell.x][cell.y];
+    return (element != EL_EMPTY && element != EL_SAND) && !_isTemporaryElement(cell);
+}
+
+
+/*
+ * Initialize the unique sprite IDs
+ */
 void initSpriteIDs() {
     spriteIDCounter = 0;
-    enginetype::GridCell playerCell = getPlayerPosition();
 
     for (int x = 0; x < level.fieldx; x++) {
         for (int y = 0; y < level.fieldy; y++) {
             spriteIDs[x][y] = -1;
-            if (Feld[x][y] > 1 && Feld[x][y] != enginetype::FIELD_TEMP &&
-                !(x == playerCell.x && y == playerCell.y)) 
-            {
+            enginetype::GridCell cell = {x, y};
+            // Non-player non-temporary sprite
+            if (!isPlayerPosition(cell) && _isValidSprite(cell)) {
                 spriteIDs[x][y] = spriteIDCounter++;
-                // spriteIDCounter += 1;
             }
         }
     }
 }
 
 
-int getSpriteID(enginetype::GridCell cell) {
-    if (cell.x < 0 || cell.x >= level.fieldx || cell.y < 0 || cell.y >= level.fieldy) {
-        PLOGE_(logwrap::FileLogger) << "Position out of bounds.";
-        return -1;
-    }
-    return spriteIDs[cell.x][cell.y];
+/*
+ * Get the sprite ID (if one exists) for the given cell.
+ */
+int getSpriteID(const enginetype::GridCell &cell) {
+    return inBounds(cell) ? spriteIDs[cell.x][cell.y] : -1;
 }
 
 
+/*
+ * Get the grid cell the given sprite resides in.
+ */
 enginetype::GridCell getSpriteGridCell(int spriteID) {
     enginetype::GridCell cell = {-1, -1};
     for (int x = 0; x < level.fieldx; x++) {
@@ -170,7 +315,11 @@ enginetype::GridCell getSpriteGridCell(int spriteID) {
 }
 
 
+/*
+ * Checks if the given sprite ID is active. 
+ */
 bool isSpriteActive(int spriteID) {
+    // Non-identifiable sprite
     if (spriteID == -1) {return true;}
     for (int x = 0; x < level.fieldx; x++) {
         for (int y = 0; y < level.fieldy; y++) {
@@ -182,15 +331,28 @@ bool isSpriteActive(int spriteID) {
 
 
 /*
- * Get the item located at the given GridCell (x,y) location.
+ * Get the sprite locations on the level map.
  */
-int getGridItem(enginetype::GridCell cell) {
-    if (cell.x < 0 || cell.x >= level.fieldx || cell.y < 0 || cell.y >= level.fieldy) {
-        PLOGE_(logwrap::FileLogger) << "Position out of bounds.";
-        return enginetype::FIELD_EMPTY;
-    }
+std::vector<enginetype::GridCell> getMapSprites() {
+    std::vector<enginetype::GridCell> mapSprites;
 
-    return Feld[cell.x][cell.y];
+    for (int x = 0; x < level.fieldx; x++) {
+        for (int y = 0; y < level.fieldy; y++) {
+            enginetype::GridCell cell = {x, y};
+            if (!isPlayerPosition(cell) && _isValidSprite(cell)) {
+                mapSprites.push_back({x,y});
+            }
+        }
+    }
+    return mapSprites;
+}
+
+
+/*
+ * Get the item element located at the given GridCell (x,y) location.
+ */
+int getGridElement(enginetype::GridCell cell) {
+    return inBounds(cell) ? Feld[cell.x][cell.y] : EL_EMPTY;
 }
 
 
@@ -198,12 +360,7 @@ int getGridItem(enginetype::GridCell cell) {
  * Get the item MovPos at the given GridCell (x,y) location.
  */
 int getGridMovPos(enginetype::GridCell cell) {
-    if (cell.x < 0 || cell.x >= level.fieldx || cell.y < 0 || cell.y >= level.fieldy) {
-        PLOGE_(logwrap::FileLogger) << "Position out of bounds.";
-        return 0;
-    }
-
-    return MovPos[cell.x][cell.y];
+    return inBounds(cell) ? MovPos[cell.x][cell.y] : 0;
 }
 
 
@@ -211,28 +368,34 @@ int getGridMovPos(enginetype::GridCell cell) {
  * Get the grid cell that the player is currently located in.
  */
 enginetype::GridCell getPlayerPosition() {
-    enginetype::GridCell gridCell{stored_player[0].jx, stored_player[0].jy};
+    enginetype::GridCell gridCell = {stored_player[0].jx, stored_player[0].jy};
     return gridCell;
 }
 
+
 /*
- * Get the sprite locations on the map.
+ * Check if the player resides in the current cell.
  */
-std::vector<enginetype::GridCell> getMapSprites() {
-    std::vector<enginetype::GridCell> mapSprites;
-    enginetype::GridCell playerCell = getPlayerPosition();
+bool isPlayerPosition(const enginetype::GridCell &cell) {
+    return (cell.x == stored_player[0].jx && cell.y == stored_player[0].jy);
+}
 
-    for (int x = 0; x < level.fieldx; x++) {
-        for (int y = 0; y < level.fieldy; y++) {
-            if (Feld[x][y] > 1 && Feld[x][y] != enginetype::FIELD_TEMP &&
-                !(x == playerCell.x && y == playerCell.y)) 
-            {
-                mapSprites.push_back({x,y});
-            }
-        }
-    }
 
-    return mapSprites;
+/**
+ * Check if the player is currently in the middle of executing an action.
+ */
+bool isPlayerDoneAction() {
+    return stored_player[0].MovPos == 0;
+}
+
+
+/*
+ * Check if the grid cell at location (x,y) is empty.
+ */
+bool isGridEmpty(enginetype::GridCell cell) {
+    // If not in bounds, occupied by player or temporary element then false
+    // Then check if Feld structure at cell corresponds to empty sprite
+    return (!inBounds(cell) || isPlayerPosition(cell) || isTemporaryElement(cell)) ? false : Feld[cell.x][cell.y] == EL_EMPTY;
 }
 
 
@@ -250,200 +413,348 @@ enginetype::GridCell getCurrentGoalLocation() {
 }
 
 
-/*
- * Check if the grid cell at location (x,y) is empty.
+// -------------------------------------------------------
+// -------------Element Property Information--------------
+// -------------------------------------------------------
+
+
+/**
+ * Get a readable description name (as defined in the engine config) for the given item.
  */
-bool isGridEmpty(enginetype::GridCell cell) {
-    // Check bounds (this shouldn't happen but best to be safe)
-    if (cell.x < 0 || cell.x >= level.fieldx || cell.y < 0 || cell.y >= level.fieldy) {
-        PLOGE_(logwrap::FileLogger) << "Location (" << cell.x << "," << cell.y << ") is out of bounds.";
-        return false;
+std::string getItemReadableDescription(int item) {
+    try{
+        std::string elementDescription(element_name_info[item].editor_description);
+        return elementDescription;
+    }
+    catch (...) {
+        PLOGE_(logger::FileLogger) << "Unknown item type: " << item;
+    }
+    return "UNKNOWN";
+}
+
+
+/**
+ * Check if the item in the gridcell is moving.
+ * 
+ * Moving is defined as not being completely inside a single grid cell
+ * i.e. it is moving between gridcells. This means that if an item is free
+ * falling between multiple cells, there will be a single game step where is 
+ * check is false.
+ */
+bool isMoving(const enginetype::GridCell cell) {
+    return inBounds(cell) && MovPos[cell.x][cell.y] != 0;
+}
+
+
+/**
+ * Checks if the grid cell contains the exit.
+ * Exit can be either open, closed, or in the process of opening/closing.
+ */
+bool isExit(const enginetype::GridCell cell) {
+    int item = getGridElement(cell);
+    return item == EL_EXIT_CLOSED || item == EL_EXIT_OPEN || item == EL_EXIT_OPENING || item == EL_EXIT_CLOSING;
+}
+
+
+/**
+ * Checks if the grid cell contains the open exit.
+ */
+bool isExitOpen(const enginetype::GridCell cell) {
+    int item = getGridElement(cell);
+    return item == EL_EXIT_OPEN;
+}
+
+
+/**
+ * Checks if the grid cell contains the closed exit.
+ */
+bool isExitClosed(const enginetype::GridCell cell) {
+    int item = getGridElement(cell);
+    return item == EL_EXIT_CLOSED;
+}
+
+
+/**
+ * Checks if the grid cell contains the exit which is in the 
+ * process of opening.
+ */
+bool isExitOpening(const enginetype::GridCell cell) {
+    int item = getGridElement(cell);
+    return item == EL_EXIT_OPENING;
+}
+
+
+/**
+ * Checks if the grid cell contains the exit which is in the 
+ * process of closing.
+ */
+bool isExitClosing(const enginetype::GridCell cell) {
+    int item = getGridElement(cell);
+    return item == EL_EXIT_CLOSING;
+}
+
+
+/**
+ * Get the number of gems the item in the grid cell counts towards.
+ */
+int getItemGemCount(const enginetype::GridCell cell) {
+    int item = getGridElement(cell);
+    return element_info[item].collect_count_initial;
+}
+
+
+/**
+ * Get the score the item in the grid cell will give the player.
+ * If the grid cell is invalid, the returned score is 0.
+ */
+int getItemScore(const enginetype::GridCell cell) {
+    int item = getGridElement(cell);
+    int score = 0;
+
+    if (item == EL_EMPTY) {return score;}
+
+    switch (item) {
+        case EL_EMERALD :
+        case EL_BD_DIAMOND :
+        case EL_EMERALD_YELLOW :
+        case EL_EMERALD_RED :
+        case EL_EMERALD_PURPLE :
+        case EL_SP_INFOTRON :
+            score = level.score[SC_EMERALD];
+            break;
+        case EL_DIAMOND :
+            score = level.score[SC_DIAMOND];
+            break;
+        case EL_CRYSTAL :
+            score = level.score[SC_CRYSTAL];
+            break;
+        case EL_PEARL :
+            score = level.score[SC_PEARL];
+            break;
+        case EL_BUG :
+        case EL_BD_BUTTERFLY :
+        case EL_SP_ELECTRON :
+            score = level.score[SC_BUG];
+            break;
+        case EL_SPACESHIP :
+        case EL_BD_FIREFLY :
+        case EL_SP_SNIKSNAK :
+            score = level.score[SC_SPACESHIP];
+            break;
+        case EL_YAMYAM :
+        case EL_DARK_YAMYAM :
+            score = level.score[SC_YAMYAM];
+            break;
+        case EL_ROBOT :
+            score = level.score[SC_ROBOT];
+            break;
+        case EL_PACMAN :
+            score = level.score[SC_PACMAN];
+            break;
+        case EL_NUT :
+            score = level.score[SC_NUT];
+            break;
+        case EL_DYNAMITE :
+        case EL_EM_DYNAMITE :
+        case EL_SP_DISK_RED :
+        case EL_DYNABOMB_INCREASE_NUMBER :
+        case EL_DYNABOMB_INCREASE_SIZE :
+        case EL_DYNABOMB_INCREASE_POWER :
+            score = level.score[SC_DYNAMITE];
+            break;
+        case EL_SHIELD_NORMAL :
+        case EL_SHIELD_DEADLY :
+            score = level.score[SC_SHIELD];
+            break;
+        case EL_EXTRA_TIME :
+            score = level.extra_time_score;
+            break;
+        case EL_KEY_1 :
+        case EL_KEY_2 :
+        case EL_KEY_3 :
+        case EL_KEY_4 :
+        case EL_EM_KEY_1 :
+        case EL_EM_KEY_2 :
+        case EL_EM_KEY_3 :
+        case EL_EM_KEY_4 :
+        case EL_EMC_KEY_5 :
+        case EL_EMC_KEY_6 :
+        case EL_EMC_KEY_7 :
+        case EL_EMC_KEY_8 :
+        case EL_DC_KEY_WHITE :
+            score = level.score[SC_KEY];
+            break;
+        default :
+            score = element_info[item].collect_score;
+            break;
     }
 
-    // Player position is not indicated in Feld, so check first
-    if (stored_player[0].jx == cell.x && stored_player[0].jy == cell.y) {
-        return false;
-    }
+    return score;
+}
 
-    // Element is currently attempting to move to grid (x,y)
-    if (MovDir[cell.x][cell.y] != 0) {
-        return false;
-    }
 
-    // Grid now empty if Feld is empty
-    return Feld[cell.x][cell.y] == enginetype::FIELD_EMPTY;
+/*
+ * Internal check (doesn't valid bounds), check if player can perform action 
+ * and walk into cell cellTo.
+ */
+bool _isWalkable(Action action, const enginetype::GridCell cellTo) {
+    int element = Feld[cellTo.x][cellTo.y];
+    bool isAccessibleFromDirection = (element_info[element].access_direction &(getOppositeDirection(action)));
+    return IS_WALKABLE(element) && isAccessibleFromDirection;
+}
+
+/*
+ * Checks if the direction the player wants to move in is walkable.
+ * Walkable means that the player is able to stand in the cell which results
+ * in the action being applied.
+ */
+bool isWalkable(Action action, const enginetype::GridCell cellFrom) {
+    // Skipp no action.
+    if (action == Action::noop) {return true;}
+
+    enginetype::GridCell cellTo = getCellFromAction(action, 
+        (cellFrom.x == -1 || cellFrom.y == -1) ? getPlayerPosition() : cellFrom);
+
+    return inBounds(cellTo) && _isWalkable(action, cellTo);
+}
+
+
+/*
+ * Checks if the GridCell cellTo is diggable.
+ * For internal use, assumes bounds are validated elsewhere.
+ */
+bool _isDigable(const enginetype::GridCell cellTo) {
+    int element = Feld[cellTo.x][cellTo.y];
+    return IS_DIGGABLE(element);
+}
+
+/*
+ * Checks if the direction the player wants to move in is diggable.
+ * Diggable means that the player is able to stand in the cell which results
+ * in the action being applied.
+ */
+bool isDigable(Action action, const enginetype::GridCell cellFrom) {
+    enginetype::GridCell cellTo = getCellFromAction(action, 
+        (cellFrom.x == -1 || cellFrom.y == -1) ? getPlayerPosition() : cellFrom);
+
+    return inBounds(cellTo) && _isDigable(cellTo);
+}
+
+
+/*
+ * Checks if the GridCell cellTo is a wall.
+ * IS_WALL is a predefined macro for the default game wall types.
+ * For internal use, assumes bounds are validated elsewhere.
+ */
+bool _isWall(const enginetype::GridCell cellTo) {
+    int element = Feld[cellTo.x][cellTo.y];
+    return IS_WALL(element);
 }
 
 
 /*
  * Checks if the direction the player wants to move in is a wall.
+ * This works for predefined wall objects from the default game objects. A custom
+ * non-passible object (which acts as a wall) won't be caught here.
  */
-bool isWall(Action action, enginetype::GridCell playerCell) {
-    int playerX = playerCell.x;
-    int playerY = playerCell.y;
+bool isWall(Action action, const enginetype::GridCell cellFrom) {
+    enginetype::GridCell cellTo = getCellFromAction(action, 
+        (cellFrom.x == -1 || cellFrom.y == -1) ? getPlayerPosition() : cellFrom);
 
-    if (playerX == -1 || playerY == -1) {
-        playerX = stored_player[0].jx;
-        playerY = stored_player[0].jy;
-    }
-
-    if (action == Action::down && (Feld[playerX][playerY+1] == enginetype::FIELD_WALL || 
-        playerY+1 == level.fieldy))
-    {
-        return true;
-    }
-    else if (action == Action::right && (Feld[playerX+1][playerY] == enginetype::FIELD_WALL || 
-        playerX+1 == level.fieldx))
-    {
-        return true;
-    }
-    else if (action == Action::up && (Feld[playerX][playerY-1] == enginetype::FIELD_WALL || 
-        playerY == 0))
-    {
-        return true;
-    }
-    else if (action == Action::left && (Feld[playerX-1][playerY] == enginetype::FIELD_WALL || 
-        playerX == 0)) 
-    {
-        return true;
-    }
-    return false;
+    return inBounds(cellTo) && _isWall(cellTo);
 }
 
 
 /*
- * Checks if the direction the player wants to move in is walkable.
+ * Checks if the GridCell cellTo is contains a collectible element.
+ * For internal use, assumes bounds are validated elsewhere.
  */
-bool isWalkable(Action action, enginetype::GridCell playerCell) {
-    int playerX = playerCell.x;
-    int playerY = playerCell.y;
+bool _isCollectable(const enginetype::GridCell cellTo) {
+    int element = Feld[cellTo.x][cellTo.y];
+    return IS_COLLECTIBLE(element);
+}
 
-    if (playerX == -1 || playerY == -1) {
-        playerX = stored_player[0].jx;
-        playerY = stored_player[0].jy;
-    }
+/*
+ * Checks if resulting GridCell the player wants to move to contains a collectible element.
+ */
+bool isCollectable(Action action, const enginetype::GridCell cellFrom) {
+    enginetype::GridCell cellTo = getCellFromAction(action, 
+        (cellFrom.x == -1 || cellFrom.y == -1) ? getPlayerPosition() : cellFrom);
 
-    if (action == Action::down && playerY+1 < level.fieldy) {
-        if (enginetype::TYPE_IS_WALKABLE.find(Feld[playerX][playerY+1]) != enginetype::TYPE_IS_WALKABLE.end()) {
-            return enginetype::TYPE_IS_WALKABLE[Feld[playerX][playerY+1]];
-        }
-        // return (Feld[playerX][playerY+1] == enginetype::FIELD_EMPTY || Feld[playerX][playerY+1] == enginetype::FIELD_DIRT || Feld[playerX][playerY+1] == enginetype::FIELD_DIAMOND);
-    }
-    else if (action == Action::right && playerX+1 < level.fieldx) {
-        if (enginetype::TYPE_IS_WALKABLE.find(Feld[playerX+1][playerY]) != enginetype::TYPE_IS_WALKABLE.end()) {
-            return enginetype::TYPE_IS_WALKABLE[Feld[playerX+1][playerY]];
-        }
-        // return (Feld[playerX+1][playerY] == enginetype::FIELD_EMPTY || Feld[playerX+1][playerY] == enginetype::FIELD_DIRT || Feld[playerX+1][playerY] == enginetype::FIELD_DIAMOND);
-    }
-    else if (action == Action::up && playerY-1 >= 0) {
-        if (enginetype::TYPE_IS_WALKABLE.find(Feld[playerX][playerY-1]) != enginetype::TYPE_IS_WALKABLE.end()) {
-            return enginetype::TYPE_IS_WALKABLE[Feld[playerX][playerY-1]];
-        }
-        // return (Feld[playerX][playerY-1] == enginetype::FIELD_EMPTY || Feld[playerX][playerY-1] == enginetype::FIELD_DIRT || Feld[playerX][playerY-1] == enginetype::FIELD_DIAMOND);
-    }
-    else if (action == Action::left && playerX-1 >= 0) {
-        if (enginetype::TYPE_IS_WALKABLE.find(Feld[playerX-1][playerY]) != enginetype::TYPE_IS_WALKABLE.end()) {
-            return enginetype::TYPE_IS_WALKABLE[Feld[playerX-1][playerY]];
-        }
-        // return (Feld[playerX-1][playerY] == enginetype::FIELD_EMPTY || Feld[playerX-1][playerY] == enginetype::FIELD_DIRT || Feld[playerX-1][playerY] == enginetype::FIELD_DIAMOND);
-    }
-    return false;
+    return inBounds(cellTo) && _isCollectable(cellTo);
 }
 
 
 /*
- * Helper function to check if cell is in bounds and in allowed area.
- *
- * @param playerCell The GridCell which the agent wants to be in
- * @param playerBounds The map bounds for the agent given its direction
- * @param mapBounds The 
+ * Checks if the GridCell cellPassed can be passed through from 
+ * using the given action.
+ * This mirrors an internal engine function logic. 
+ * For internal use, assumes bounds are validated elsewhere.
  */
-// bool _canExpandDirection(enginetype::GridCell playerCell, int playerBounds, int mapBounds, 
-//     std::vector<enginetype::GridCell> &allowedCells) 
-bool _canExpandDirection(enginetype::GridCell playerCell, std::vector<enginetype::GridCell> &allowedCells) 
-{
-    // Check if direction is blocked by map mounds/wall
-    // if (Feld[playerCell.x][playerCell.y] == enginetype::FIELD_WALL || playerBounds == mapBounds) {
-    //     return false;
-    // }
-    if (Feld[playerCell.x][playerCell.y] == enginetype::FIELD_WALL) {
-        return false;
-    }
+bool _canPassField(const enginetype::GridCell cellPassed, Action action) {
+    int opposite_dir = MV_DIR_OPPOSITE(action);
+    int dx = (action & MV_LEFT ? -1 : action & MV_RIGHT ? +1 : 0);
+    int dy = (action & MV_UP   ? -1 : action & MV_DOWN  ? +1 : 0);
+    int nextx = cellPassed.x + dx;
+    int nexty = cellPassed.y + dy;
+    int element = Feld[cellPassed.x][cellPassed.y];
 
-    // Check if direction is in allowed cells
-    for (auto const & cell : allowedCells) {
-        if (cell.x == playerCell.x && cell.y == playerCell.y) {
-            return true;
-        }
-    }
-    return false;
+    return ((IS_PASSABLE(element) && (element_info[element].access_direction &(opposite_dir))) &&
+        !CAN_MOVE(element) &&
+        IN_LEV_FIELD(nextx, nexty) && !IS_PLAYER(nextx, nexty) &&
+        (IS_WALKABLE(Feld[nextx][nexty]) && (element_info[Feld[nextx][nexty]].access_direction &(action))) &&
+        (level.can_pass_to_walkable || IS_FREE(nextx, nexty)));
 }
 
 
 /*
- * Checks if action is valid given restricted GridCells player is allowed in.
+ * Checks if the GridCell cellPassed is passable
+ * For internal use, assumes bounds are validated elsewhere.
  */
-bool canExpand(Action action, std::vector<enginetype::GridCell> &allowedCells) {
-    int playerX = stored_player[0].jx;
-    int playerY = stored_player[0].jy;
+bool _isPassable(Action action, const enginetype::GridCell cellPassed) {
+    int element = Feld[cellPassed.x][cellPassed.y];
+    return IS_PASSABLE(element) && _canPassField(cellPassed, action);
+}
 
-    if (action == Action::down) {
-        // return _canExpandDirection({playerX, playerY+1}, playerY+1, level.fieldy, allowedCells);
-        return _canExpandDirection({playerX, playerY+1}, allowedCells);
-    }
-    else if (action == Action::up) {
-        // return _canExpandDirection({playerX, playerY-1}, playerY, 0, allowedCells);
-        return _canExpandDirection({playerX, playerY-1}, allowedCells);
-    }
-    else if (action == Action::right) {
-        // return _canExpandDirection({playerX+1, playerY}, playerX+1, level.fieldx, allowedCells);
-        return _canExpandDirection({playerX+1, playerY}, allowedCells);
-    }
-    else if (action == Action::left) {
-        // return _canExpandDirection({playerX-1, playerY}, playerX, 0, allowedCells);
-        return _canExpandDirection({playerX-1, playerY}, allowedCells);
-    }
+/*
+ * Checks if the direction the player wants to move in is passable.
+ * Passable means that the player walks through the cell which results in the
+ * action being applied, and into the next cell.
+ */
+bool isPassable(Action action, const enginetype::GridCell cellFrom) {
+    // Skip no action.
+    if (action == Action::noop) {return true;}
 
-    // Otherwise, we have a noop which is always allowed
-    return true;
+    enginetype::GridCell cellPassed = getCellFromAction(action, 
+        (cellFrom.x == -1 || cellFrom.y == -1) ? getPlayerPosition() : cellFrom);
+
+    return inBounds(cellPassed) && _isPassable(action, cellPassed);
 }
 
 
 /*
- * Check if two grid cells are neighbours, defined by being separated by Euclidean distance of 1.
+ * Checks if the action will move the player.
+ * For internal use, assumes bounds are validated elsewhere.
  */
-bool checkIfNeighbours(enginetype::GridCell left, enginetype::GridCell right) {
-    if (left.x == right.x && std::abs(left.y - right.y) == 1) {return true;}
-    if (left.y == right.y && std::abs(left.x - right.x) == 1) {return true;}
-    return false;
+bool _isActionMoveable(Action action, const enginetype::GridCell cellTo) {
+    return !_isWall(cellTo) && (_isWalkable(action, cellTo) || _isCollectable(cellTo) || _isPassable(action, cellTo) ||
+         _isDigable(cellTo) || isGridEmpty(cellTo));
 }
 
 
 /*
- * Get the action which moves from the first given grid cell to the second. 
- *
- * Note: The gridcells must be neighbours.
+ * Checks if the action will move the player.
+ * Player can move if they are not walking into a wall, and the GridCell in the direction
+ * the player wants to move is either walkable, passable, or contains a collectable item.
  */
-Action getResultingAction(enginetype::GridCell from, enginetype::GridCell to) {
-    if (!checkIfNeighbours(from, to)) {
-        PLOGE_(logwrap::FileLogger) << "Cells are not neighbours.";
-    }
+bool isActionMoveable(Action action, const enginetype::GridCell cellFrom) {
+    // Skip no action.
+    if (action == Action::noop) {return true;}
 
-    Action action = Action::noop;
-    if (from.y == to.y && (from.x - to.x) == -1) {
-        action = Action::right;
-    }
-    else if (from.y == to.y && (from.x - to.x) == 1) {
-        action = Action::left;
-    }
-    else if (from.x == to.x && (from.y - to.y) == -1) {
-        action = Action::down;
-    }
-    else if (from.x == to.x && (from.y - to.y) == 1) {
-        action = Action::up;
-    }
+    enginetype::GridCell cellTo = getCellFromAction(action, 
+        (cellFrom.x == -1 || cellFrom.y == -1) ? getPlayerPosition() : cellFrom);
 
-    return action;
+    return inBounds(cellTo) && _isActionMoveable(action, cellTo);
 }
 
 
@@ -471,6 +782,9 @@ int countNumOfElement(int element) {
  * Add the specified element to the level.
  */
 void spawnElement(int element, int dir, enginetype::GridCell gridCell) {
+    if (!inBounds(gridCell)) {
+        return;
+    }
     Feld[gridCell.x][gridCell.y] = element;
     MovDir[gridCell.x][gridCell.y] = dir;
 }
@@ -488,7 +802,6 @@ std::vector<enginetype::GridCell> getEmptyGridCells() {
             }
         }
     }
-
     return emptyGridCells;
 }
 
@@ -510,7 +823,6 @@ bool engineGameFailed() {
  * Check if the current status of the engine is level solved.
  */
 bool engineGameSolved() {
-    // return checkGameSolved();
     return (game.LevelSolved && !game.LevelSolved_GameEnd);
 }
 
@@ -520,6 +832,23 @@ bool engineGameSolved() {
  */
 bool engineGameOver() {
     return engineGameFailed() || engineGameSolved();
+}
+
+
+/**
+ * Set the game engine mode status to GAME_MODE_QUIT.
+ * This will trigger the program to end after cleanup. 
+ */
+void setEngineGameStatusModeQuit() {
+    game_status = GAME_MODE_QUIT;
+}
+
+/**
+ * Set the game engine mode status to GAME_MODE_PLAYING.
+ * This will allow the game loop to query actions from controller. 
+ */
+void setEngineGameStatusModePlaying() {
+    game_status = GAME_MODE_PLAYING;
 }
 
 
@@ -535,32 +864,12 @@ void setEnginePlayerAction(Action action) {
  * Set the stored player's action as a valid random action.
  */
 void setEngineRandomPlayerAction() {
-    std::vector<Action> availableActions;
+    static std::random_device rand_dev;
+    static std::mt19937 gen(rand_dev());
+    static std::uniform_int_distribution<int> dist(0, NUM_ACTIONS-1);
 
-    int playerX = stored_player[0].jx;
-    int playerY = stored_player[0].jy;
-
-    // Won't select actions which player won't be able to move due
-    // to being blocked by walls
-    availableActions.push_back(Action::noop);
-    if (Feld[playerX][playerY+1] != enginetype::FIELD_WALL) {
-        availableActions.push_back(Action::down);
-    }
-    else if (Feld[playerX+1][playerY] != enginetype::FIELD_WALL) {
-        availableActions.push_back(Action::right);
-    }
-    else if (Feld[playerX][playerY-1] != enginetype::FIELD_WALL) {
-        availableActions.push_back(Action::up);
-    }
-    else if (Feld[playerX-1][playerY] != enginetype::FIELD_WALL) {
-        availableActions.push_back(Action::left);
-    }
-
-    // Linear complexity but guaranteed max size is 5
-    std::shuffle(std::begin(availableActions), std::end(availableActions), rng);
-    
-    // There is always at least 1 action (NOOP), so should be safe.
-    stored_player[0].action = availableActions[0];
+    int action = dist(gen);
+    stored_player[0].action = (action == NUM_ACTIONS-1) ? 0 : (1 << action);
 }
 
 
@@ -635,10 +944,20 @@ void initZorbristTables() {
         for (int k = 0; k < MAX_NUM_ELEMENTS; k++) {
             zobristElement[i][k] = RNG::getRandomNumber();
         }
-        for (int k = 0; k < MAX_DIR; k++) {
-            zobristDir[i][k] = RNG::getRandomNumber();
-        }
+        // for (int k = 0; k < MAX_DIR; k++) {
+        //     zobristDir[i][k] = RNG::getRandomNumber();
+        // }
     }
+}
+
+
+uint64_t gridcellPathToHash(const std::deque<enginetype::GridCell> &path) {
+    uint64_t hashValue = 0; 
+    for (auto const & cell : path) {
+        hashValue ^= zobristElement[cellToIndex(cell)][EL_EMPTY];
+    }
+
+    return hashValue;
 }
 
 
@@ -648,19 +967,19 @@ void initZorbristTables() {
 uint64_t stateToHash() {
     int px = stored_player[0].jx;
     int py = stored_player[0].jy;
-    int pMov = stored_player[0].MovDir;
+    // int pMov = stored_player[0].MovDir;
     uint64_t hashValue = 0; 
 
     // Set initial hash
     for (int x = 0; x < level.fieldx; x++) {
         for (int y = 0; y < level.fieldy; y++) {
             hashValue ^= zobristElement[y*level.fieldx + x][Feld[x][y]];
-            hashValue ^= zobristDir[y*level.fieldx + x][MovDir[x][y]];
+            // hashValue ^= zobristDir[y*level.fieldx + x][MovDir[x][y]];
         }
     }
 
     hashValue ^= zobristElement[py*level.fieldx + px][80];
-    hashValue ^= zobristDir[py*level.fieldx + px][pMov];
+    // hashValue ^= zobristDir[py*level.fieldx + px][pMov];
 
     return hashValue;
 }
@@ -680,319 +999,75 @@ int getL1Distance(enginetype::GridCell left, enginetype::GridCell right) {
 
 
 /*
- * Get the minimum player distance in reference to given list of gridcells
- */
-int minDistanceToAllowedCells(std::vector<enginetype::GridCell> &goal_cells) {
-    int playerX = stored_player[0].jx;
-    int playerY = stored_player[0].jy;
-    int min_distance = std::numeric_limits<int>::max();
-
-    PLOGE_IF_(logwrap::FileLogger, goal_cells.empty()) << "No goal nodes.";
-    assert(goal_cells.size() > 0);
-
-    for (auto const & grid : goal_cells) {
-        int distance = std::abs(grid.x - playerX) + std::abs(grid.y - playerY);
-        if (distance < min_distance) {min_distance = distance;}
-    }
-
-    return min_distance;
-}
-
-
-// Data types/structures for Dijkstra
-typedef std::array<int, 2> Point;
-short INF = std::numeric_limits<short>::max();
-short distances[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-short abstract_node_distances[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-short max_distance = -1;
-
-/*
- * Get the players current shortest path distance to goal
- * This uses distance tile maps pre-calculated using Dijkstra algorithm,
- * NOT Euclidean distance.
- */
-float getPlayerDistanceToGoal() {
-    int playerX = stored_player[0].jx;
-    int playerY = stored_player[0].jy;
-    return (float)distances[playerX][playerY];
-}
-
-
-/*
- * Get the distance to goal from given gridcell
+ * Get the distance to goal from given GridCell
  * This is set by distance metric, usually L1
  */
-int getGridDistanceToGoal(enginetype::GridCell gridCell) {
-    return distances[gridCell.x][gridCell.y];
+int getGridDistanceToGoal(const enginetype::GridCell goalCell) {
+    if (!inBounds(goalCell)) {
+        return -1;
+    }
+    return distances[goalCell.x][goalCell.y];
 }
 
 
 /*
- * Get the player distance to the next abstract node
- * Internal abstract node distances are set by Dijsktra, used to help
- * player get around corners that fails by L1 shortest distance
+ * Set the distance to goal manually for more exotic distance functions.
  */
-int getPlayerDistanceToNextNode() {
-    int playerX = stored_player[0].jx;
-    int playerY = stored_player[0].jy;
-    return abstract_node_distances[playerX][playerY];
+void setGridDistanceToGoal(const enginetype::GridCell cell, short value) {
+    if (!inBounds(cell)) {
+        return;
+    }
+    distances[cell.x][cell.y] = value;
 }
 
 
 /*
- * Find the next min index point from point queue Q
- */
-void _getMinDistanceIndex(std::vector<Point> &Q, int &index) {
-    int min_index = -1;
-    short min_value = INF;
-    for (int i = 0; i < (int)Q.size(); i++) {
-        int x = Q[i][0]; 
-        int y = Q[i][1];
-        if (distances[x][y] <= min_value) {
-            min_index = i;
-            min_value = distances[x][y];
-        }
-    }
-    index = min_index;
-}
-
-void _getMinDistanceIndexAbstract(std::vector<Point> &Q, int &index) {
-    int min_index = -1;
-    short min_value = INF;
-    for (int i = 0; i < (int)Q.size(); i++) {
-        int x = Q[i][0]; 
-        int y = Q[i][1];
-        if (abstract_node_distances[x][y] <= min_value) {
-            min_index = i;
-            min_value = abstract_node_distances[x][y];
-        }
-    }
-    index = min_index;
-}
-
-
-/*
- * Get the neighbours of point u from queue Q and insert into neighbours
- */
-void _getNeighboursDijkstra(Point u, std::vector<Point> &neighbours, std::vector<Point> &Q) {
-    int x = u[0];
-    int y = u[1];
-
-    if (x-1 >= 0 && Feld[x-1][y] != enginetype::FIELD_WALL 
-        && std::find(Q.begin(), Q.end(), (Point){x-1,y}) != Q.end()) 
-    {
-        neighbours.push_back((Point){x-1,y});
-    }
-    if (x+1 < level.fieldx && Feld[x+1][y] != enginetype::FIELD_WALL && 
-        std::find(Q.begin(), Q.end(), (Point){x+1,y}) != Q.end()) 
-    {
-        neighbours.push_back((Point){x+1,y});
-    }
-
-    if (y-1 >= 0 && Feld[x][y-1] != enginetype::FIELD_WALL 
-        && std::find(Q.begin(), Q.end(), (Point){x,y-1}) != Q.end()) 
-    {
-        neighbours.push_back((Point){x,y-1});
-    }
-    if (y+1 < level.fieldy && Feld[x][y+1] != enginetype::FIELD_WALL && 
-        std::find(Q.begin(), Q.end(), (Point){x,y+1}) != Q.end()) 
-    {
-        neighbours.push_back((Point){x,y+1});
-    }
-}
-
-
-/*
- * Find the grid location of the goal, given by enginetype::FIELD_EXIT
+ * Find the grid location of the goal, given by EL_EXIT_OPEN
  */
 enginetype::GridCell findExitLocation() {
     enginetype::GridCell goal_cell = {-1, -1};
     for (int y = 0; y < level.fieldy; y++) {
         for (int x = 0; x < level.fieldx; x++) {
-            if (Feld[x][y] == enginetype::FIELD_EXIT) {
+            if (Feld[x][y] == EL_EXIT_OPEN) {
                 goal_cell.x = x;
                 goal_cell.y = y;
-                PLOGI_(logwrap::FileLogger) << "Found goal at x=" << x << ", y=" << y << ".";
                 return goal_cell;
             }
         }
     }
-
     return goal_cell;
 }
 
 
 /*
- * Set the grid distances to goal using Dijkstra's algorithm (shortest path)
- */
-void setBoardDistancesDijkstra(enginetype::GridCell goal_cell) {
-    int x, y;
-    std::vector<Point> Q;       // Queue of points 
-
-    PLOGI_(logwrap::FileLogger) << "Setting board distances.";
-
-    // Initialize distances
-    for (y = 0; y < level.fieldy; y++) {
-        for (x = 0; x < level.fieldx; x++) {
-            distances[x][y] = INF;
-            if (Feld[x][y] != enginetype::FIELD_WALL) {Q.push_back({x, y});}
-        }
-    }
-
-    // If no goal, then break
-    if (goal_cell.x == -1 || goal_cell.y == -1) {
-        PLOGI_(logwrap::FileLogger) << "Level has no goal.";
-        return;
-    }
-
-    // Check goal in bounds
-    if (goal_cell.x < 0 || goal_cell.x >= level.fieldx || goal_cell.y < 0 || goal_cell.y >= level.fieldy) {
-        PLOGI_(logwrap::FileLogger) << "Provided goal is out of level bounds.";
-        return;
-    }
-
-    // Set goal distance
-    distances[goal_cell.x][goal_cell.y] = 0;
-
-    // Calc distances
-    Point u;
-    int index;
-    while (!Q.empty()) {
-        // Get min distance from vertex set and remove
-        _getMinDistanceIndex(Q, index);
-        u = Q[index];
-        Q.erase(Q.begin() + index);
-
-        // Get neighbours
-        std::vector<Point> neighbours;
-        _getNeighboursDijkstra(u, neighbours, Q);
-
-        // For each neighbour, update distance
-        for (Point v : neighbours) {
-            int alt = distances[u[0]][u[1]] + 1;
-            if (alt < distances[v[0]][v[1]]) {
-                distances[v[0]][v[1]] = alt;
-            }
-        }
-    }
-
-    // Set max distances to neg
-    for (y = 0; y < level.fieldy; y++) {
-        for (x = 0; x < level.fieldx; x++) {
-            distances[x][y] = (distances[x][y] == INF ? -1 : distances[x][y]);
-            max_distance = (max_distance < distances[x][y]) ? distances[x][y] : max_distance;
-        }
-    }
-}
-
-/*
  * Set the grid distances to goal using L1 distance
  */
-void setBoardDistancesL1(enginetype::GridCell goal_cell) {
-    PLOGI_(logwrap::FileLogger) << "Setting board distances.";
-
-    if (goal_cell.x == -1 && goal_cell.y == -1) {
-        goal_cell = findExitLocation();
-    }
+void setBoardDistancesL1(const enginetype::GridCell goalCell) {
+    // PLOGI_(logger::FileLogger) << "Setting board distances.";
 
     // Initialize distances
-    max_distance = -1;
     for (int y = 0; y < level.fieldy; y++) {
         for (int x = 0; x < level.fieldx; x++) {
             distances[x][y] = -1;
         }
     }
 
-    // If no goal, then break
-    if (goal_cell.x == -1 || goal_cell.y == -1) {
-        PLOGI_(logwrap::FileLogger) << "Level has no goal.";
-        return;
-    }
-
-    // Check goal in bounds
-    if (goal_cell.x < 0 || goal_cell.x >= level.fieldx || goal_cell.y < 0 || goal_cell.y >= level.fieldy) {
-        PLOGI_(logwrap::FileLogger) << "Provided goal is out of level bounds.";
+    // Goal cell not explicitly given, so try to find the exit location.
+    enginetype::GridCell goalCell_ = (inBounds(goalCell)) ? goalCell : findExitLocation();
+    if (!inBounds(goalCell_)) {
+        // PLOGI_(logger::FileLogger) << "Can't determine goal.";
         return;
     }
 
     // Set goal distance
-    distances[goal_cell.x][goal_cell.y] = 0;
+    distances[goalCell_.x][goalCell_.y] = 0;
 
     // Set other grid distances
     for (int y = 0; y < level.fieldy; y++) {
         for (int x = 0; x < level.fieldx; x++) {
-            if (Feld[x][y] != enginetype::FIELD_WALL) {
-                distances[x][y] = std::abs(goal_cell.x - x) + std::abs(goal_cell.y - y);
-                max_distance = (max_distance < distances[x][y]) ? distances[x][y] : max_distance;
+            if (!_isWall({x, y})) {
+                distances[x][y] = std::abs(goalCell_.x - x) + std::abs(goalCell_.y - y);
             }
-        }
-    }
-}
-
-
-/*
- * Used in PFA_MCST
- * Set the internal grid cell distances to goal in abstract node
- * This helps MCTS get around corners that fails with just L1
- */
-void setAbstractNodeDistances(std::vector<enginetype::GridCell> goal_cells,
-    std::vector<enginetype::GridCell> allowedCells) 
-{
-    int x, y;
-    std::vector<Point> Q;       // Queue of points 
-
-    // Initialize distances
-    for (y = 0; y < level.fieldy; y++) {
-        for (x = 0; x < level.fieldx; x++) {
-            abstract_node_distances[x][y] = INF;
-        }
-    }
-    for (auto const & allowed_cell : allowedCells) {
-        if (std::find(goal_cells.begin(), goal_cells.end(), allowed_cell) != goal_cells.end()) {
-            continue;
-        }
-        Q.push_back({allowed_cell.x, allowed_cell.y});
-    }
-
-    // If no goal, then break
-    if (goal_cells.empty()) {
-        PLOGI_(logwrap::FileLogger) << "Level has no goal.";
-        return;
-    }
-
-    // Set goal distance
-    for (auto const & goal_cell : goal_cells) {
-        abstract_node_distances[goal_cell.x][goal_cell.y] = 0;
-        Q.push_back({goal_cell.x, goal_cell.y});
-    }
-
-    // Calc distances
-    Point u;
-    int index;
-    while (!Q.empty()) {
-        // Get min distance from vertex set and remove
-        _getMinDistanceIndexAbstract(Q, index);
-        u = Q[index];
-        Q.erase(Q.begin() + index);
-
-        // Get neighbours
-        std::vector<Point> neighbours;
-        _getNeighboursDijkstra(u, neighbours, Q);
-
-        // For each neighbour, update distance
-        for (Point v : neighbours) {
-            int alt = abstract_node_distances[u[0]][u[1]] + 1;
-            if (alt < abstract_node_distances[v[0]][v[1]]) {
-                abstract_node_distances[v[0]][v[1]] = alt;
-            }
-        }
-    }
-
-    // Set max distances to neg
-    for (y = 0; y < level.fieldy; y++) {
-        for (x = 0; x < level.fieldx; x++) {
-            abstract_node_distances[x][y] = (abstract_node_distances[x][y] == INF ? -1 : abstract_node_distances[x][y]);
-            max_distance = (max_distance < abstract_node_distances[x][y]) ? abstract_node_distances[x][y] : max_distance;
         }
     }
 }

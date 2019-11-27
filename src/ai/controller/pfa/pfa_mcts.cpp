@@ -18,7 +18,7 @@ PFA_MCTS::PFA_MCTS(){
         while (std::getline(configFile,line)){
             std::istringstream iss(line);
             if (!(iss >> parameter_name >> parameter_value)) {
-                PLOGE_(logwrap::FileLogger) << "Bad line in config file, skipping.";
+                PLOGE_(logger::FileLogger) << "Bad line in config file, skipping.";
                 continue;
             }
 
@@ -52,21 +52,21 @@ PFA_MCTS::PFA_MCTS(){
         configFile.close();
     }
     catch (const std::ifstream::failure& e) {
-        PLOGE_(logwrap::FileLogger) << "Cannot open file.";
+        PLOGE_(logger::FileLogger) << "Cannot open file.";
     }
 
     timer.setLimit(max_time);
 
     // Log parameters being used
-    PLOGD_(logwrap::FileLogger) << "MCTS parametrs...";
-    PLOGD_(logwrap::FileLogger) << "max_time: " << max_time;
-    PLOGD_(logwrap::FileLogger) << "max_iterations_depth: " << max_iterations_depth;
-    PLOGD_(logwrap::FileLogger) << "num_simulations: " << num_simulations;
-    PLOGD_(logwrap::FileLogger) << "w_distance: " << w_distance;
-    PLOGD_(logwrap::FileLogger) << "w_goals_count: " << w_goals_count;
-    PLOGD_(logwrap::FileLogger) << "w_died_count: " << w_died_count;
-    PLOGD_(logwrap::FileLogger) << "w_safe_count: " << w_safe_count;
-    PLOGD_(logwrap::FileLogger) << "w_visit_count: " << w_visit_count;
+    PLOGD_(logger::FileLogger) << "MCTS parametrs...";
+    PLOGD_(logger::FileLogger) << "max_time: " << max_time;
+    PLOGD_(logger::FileLogger) << "max_iterations_depth: " << max_iterations_depth;
+    PLOGD_(logger::FileLogger) << "num_simulations: " << num_simulations;
+    PLOGD_(logger::FileLogger) << "w_distance: " << w_distance;
+    PLOGD_(logger::FileLogger) << "w_goals_count: " << w_goals_count;
+    PLOGD_(logger::FileLogger) << "w_died_count: " << w_died_count;
+    PLOGD_(logger::FileLogger) << "w_safe_count: " << w_safe_count;
+    PLOGD_(logger::FileLogger) << "w_visit_count: " << w_visit_count;
 }
 
 
@@ -224,55 +224,62 @@ void PFA_MCTS::reset(std::vector<Action> &next_action) {
 }
 
 
-void PFA_MCTS::handleEmpty(std::vector<Action> &currentSolution, std::vector<Action> &forwardSolution,
-     AbstractNode* current_abstract_node, AbstractNode* goal_abstract_node) 
+// void PFA_MCTS::handleEmpty(std::vector<Action> &currentSolution, std::vector<Action> &forwardSolution,
+//      AbstractNode* current_abstract_node, AbstractNode* goal_abstract_node) 
+// {
+//     currentSolution = forwardSolution;
+//     std::string msg = "Resetting MCTS tree.";
+//     PLOGD_(logger::FileLogger) << msg;
+//     PLOGD_(logger::ConsolLogger) << msg;
+
+//     // current_abstract_node_ = current_abstract_node;
+//     // goal_abstract_node_ = goal_abstract_node;
+//     allowed_cells_.clear();
+//     goal_cells_.clear();
+
+//     // Set cells which we are restricted to being in
+//     for (auto const & cell : current_abstract_node->getRepresentedCells()) {
+//         allowed_cells_.push_back(cell);
+//     }
+//     if (current_abstract_node != goal_abstract_node) {
+//       for (auto const & cell : goal_abstract_node->getRepresentedCells()) {
+//             allowed_cells_.push_back(cell);
+//         }  
+//     }
+
+//     // If we are in goal abstract node, then we only care about the goal tile
+//     if (current_abstract_node == goal_abstract_node) {
+//         assert(goal_abstract_node->representsGoal());
+//         for (auto const & grid_cell : goal_abstract_node->getRepresentedCells()) {
+//             if (enginehelper::getGridDistanceToGoal(grid_cell) == 0) {
+//                 goal_cells_.push_back(grid_cell);
+//                 break;
+//             }
+//         }
+//     }
+//     // Otherwise, goal nodes are the nodes which boarder our current abstract node
+//     else {
+//         std::vector<enginetype::GridCell> current_cells = current_abstract_node->getRepresentedCells();
+//         std::vector<enginetype::GridCell> goal_cells = goal_abstract_node->getRepresentedCells();
+//         for (auto const & goal_cell : goal_cells) {
+//             for (auto const & current_cell : current_cells) {
+//                 if (enginehelper::checkIfNeighbours(goal_cell, current_cell)) {
+//                     goal_cells_.push_back(goal_cell);
+//                     break;
+//                 }
+//             }
+//         }
+//     }
+
+//     enginehelper::setAbstractNodeDistances(goal_cells_, allowed_cells_);
+//     reset(currentSolution);
+// }
+
+
+void PFA_MCTS::setAbstractNodeDistances(std::vector<enginetype::GridCell> goal_cells,
+    std::vector<enginetype::GridCell> allowedCells) 
 {
-    currentSolution = forwardSolution;
-    std::string msg = "Resetting MCTS tree.";
-    PLOGD_(logwrap::FileLogger) << msg;
-    PLOGD_(logwrap::ConsolLogger) << msg;
 
-    // current_abstract_node_ = current_abstract_node;
-    // goal_abstract_node_ = goal_abstract_node;
-    allowed_cells_.clear();
-    goal_cells_.clear();
-
-    // Set cells which we are restricted to being in
-    for (auto const & cell : current_abstract_node->getRepresentedCells()) {
-        allowed_cells_.push_back(cell);
-    }
-    if (current_abstract_node != goal_abstract_node) {
-      for (auto const & cell : goal_abstract_node->getRepresentedCells()) {
-            allowed_cells_.push_back(cell);
-        }  
-    }
-
-    // If we are in goal abstract node, then we only care about the goal tile
-    if (current_abstract_node == goal_abstract_node) {
-        assert(goal_abstract_node->representsGoal());
-        for (auto const & grid_cell : goal_abstract_node->getRepresentedCells()) {
-            if (enginehelper::getGridDistanceToGoal(grid_cell) == 0) {
-                goal_cells_.push_back(grid_cell);
-                break;
-            }
-        }
-    }
-    // Otherwise, goal nodes are the nodes which boarder our current abstract node
-    else {
-        std::vector<enginetype::GridCell> current_cells = current_abstract_node->getRepresentedCells();
-        std::vector<enginetype::GridCell> goal_cells = goal_abstract_node->getRepresentedCells();
-        for (auto const & goal_cell : goal_cells) {
-            for (auto const & current_cell : current_cells) {
-                if (enginehelper::checkIfNeighbours(goal_cell, current_cell)) {
-                    goal_cells_.push_back(goal_cell);
-                    break;
-                }
-            }
-        }
-    }
-
-    enginehelper::setAbstractNodeDistances(goal_cells_, allowed_cells_);
-    reset(currentSolution);
 }
 
 
@@ -281,8 +288,8 @@ void PFA_MCTS::handleEmpty(std::vector<Action> &currentSolution, std::vector<Act
 {
     currentSolution = forwardSolution;
     std::string msg = "Resetting MCTS tree.";
-    PLOGD_(logwrap::FileLogger) << msg;
-    PLOGD_(logwrap::ConsolLogger) << msg;
+    PLOGD_(logger::FileLogger) << msg;
+    PLOGD_(logger::ConsolLogger) << msg;
 
     // current_abstract_node_ = current_abstract_node;
     // goal_abstract_node_ = goal_abstract_node;
@@ -326,25 +333,25 @@ void PFA_MCTS::handleEmpty(std::vector<Action> &currentSolution, std::vector<Act
         }
     }
 
-    enginehelper::setAbstractNodeDistances(goal_cells_, allowed_cells_);
+    // enginehelper::setAbstractNodeDistances(goal_cells_, allowed_cells_);
     reset(currentSolution);
 }
 
 
 void PFA_MCTS::logCurrentStats() {
-    PLOGD_(logwrap::FileLogger) << "Time remaining: " << timer.getTimeLeft();
-    PLOGD_(logwrap::FileLogger) << "Current number of expanded nodes: " << count_expanded_nodes 
+    PLOGD_(logger::FileLogger) << "Time remaining: " << timer.getTimeLeft();
+    PLOGD_(logger::FileLogger) << "Current number of expanded nodes: " << count_expanded_nodes 
         << ", simulated nodes: " << count_simulated_nodes;
 }
 
 
 void PFA_MCTS::logCurrentState(std::string msg, bool send_to_consol) {
-    PLOGD_(logwrap::FileLogger) << msg;
-    PLOGD_IF_(logwrap::ConsolLogger, send_to_consol) << msg;
+    PLOGD_(logger::FileLogger) << msg;
+    PLOGD_IF_(logger::ConsolLogger, send_to_consol) << msg;
 
-    logwrap::logPlayerDetails();
-    logwrap::logBoardState();
-    logwrap::logMovPosState();
+    logger::logPlayerDetails();
+    logger::logBoardState();
+    logger::logMovPosState();
 }
 
 
@@ -394,7 +401,7 @@ void PFA_MCTS::run(std::vector<Action> &currentSolution, std::vector<Action> &fo
         logCurrentStats();
 
         // msg = "Child node values:\n" + childValues(root.get());
-        // PLOGD_(logwrap::ConsolLogger) << msg;
+        // PLOGD_(logger::ConsolLogger) << msg;
 
         // Select child based on policy and forward engine simulator
         while (!current->getTerminalStatusFromEngine() && current->allExpanded()) {
@@ -494,9 +501,9 @@ void PFA_MCTS::run(std::vector<Action> &currentSolution, std::vector<Action> &fo
     // Log root child nodes along with their current valuation
     msg = "Max Depth: " + std::to_string(max_depth) + " ";
     msg += "Child node values:\n" + childValues(root.get());
-    PLOGD_(logwrap::FileLogger) << msg;
-    // PLOGD_IF_(logwrap::ConsolLogger, calls_since_rest == 8) << msg;
-    PLOGI_IF_(logwrap::ConsolLogger, calls_since_rest == 8) << msg;
+    PLOGD_(logger::FileLogger) << msg;
+    // PLOGD_IF_(logger::ConsolLogger, calls_since_rest == 8) << msg;
+    PLOGI_IF_(logger::ConsolLogger, calls_since_rest == 8) << msg;
 
     // Put simulator back to original state
     startingState.restoreEngineState();

@@ -6,7 +6,7 @@
 //                  info@artsoft.org
 //                  http://www.artsoft.org/
 // ----------------------------------------------------------------------------
-// conf_var.c 
+// conf_var.c
 // ============================================================================
 
 // ------- this file was automatically generated -- do not edit by hand -------

@@ -52,7 +52,7 @@ bool OptionPushRock::run() {
 }
 
 
-bool OptionPushRock::singleStep(Action &action) {
+bool OptionPushRock::getNextAction(Action &action) {
     action = action_;
     // enginetype::GridCell goalCell_ = enginehelper::getSpriteGridCell(spriteID_);
 
@@ -94,25 +94,25 @@ bool OptionPushRock::isValid_() {
     enginetype::GridCell cell = enginehelper::getPlayerPosition();
     enginetype::GridCell goalCell_ = enginehelper::getSpriteGridCell(spriteID_);
 
-    // std::cout << enginehelper::getGridItem((enginetype::GridCell){cell.x, cell.y}) << " ";
-    // std::cout << enginehelper::getGridItem((enginetype::GridCell){cell.x+1, cell.y}) << " ";
-    // std::cout << enginehelper::getGridItem((enginetype::GridCell){cell.x+2, cell.y}) << " ";
+    // std::cout << enginehelper::getGridElement((enginetype::GridCell){cell.x, cell.y}) << " ";
+    // std::cout << enginehelper::getGridElement((enginetype::GridCell){cell.x+1, cell.y}) << " ";
+    // std::cout << enginehelper::getGridElement((enginetype::GridCell){cell.x+2, cell.y}) << " ";
     // std::cout << std::endl;
 
     if (action_ == Action::left) {
         valid = ((enginetype::GridCell){cell.x-1, cell.y} == goalCell_ && 
-                 enginehelper::getGridItem((enginetype::GridCell){cell.x-2, cell.y}) == enginetype::FIELD_EMPTY &&
+                 enginehelper::getGridElement((enginetype::GridCell){cell.x-2, cell.y}) == enginetype::FIELD_EMPTY &&
                  enginehelper::getGridMovPos((enginetype::GridCell){cell.x-1, cell.y}) == 0);
-        // valid = (enginehelper::getGridItem((enginetype::GridCell){cell.x-1, cell.y}) == enginetype::FIELD_BOULDER && 
-        //          enginehelper::getGridItem((enginetype::GridCell){cell.x-2, cell.y}) == enginetype::FIELD_EMPTY &&
+        // valid = (enginehelper::getGridElement((enginetype::GridCell){cell.x-1, cell.y}) == enginetype::FIELD_BOULDER && 
+        //          enginehelper::getGridElement((enginetype::GridCell){cell.x-2, cell.y}) == enginetype::FIELD_EMPTY &&
         //          enginehelper::getGridMovPos((enginetype::GridCell){cell.x-1, cell.y}) == 0);
     }
     else if (action_ == Action::right) {
         valid = ((enginetype::GridCell){cell.x+1, cell.y} == goalCell_ && 
-                 enginehelper::getGridItem((enginetype::GridCell){cell.x+2, cell.y}) == enginetype::FIELD_EMPTY &&
+                 enginehelper::getGridElement((enginetype::GridCell){cell.x+2, cell.y}) == enginetype::FIELD_EMPTY &&
                  enginehelper::getGridMovPos((enginetype::GridCell){cell.x+1, cell.y}) == 0);
-        // valid = (enginehelper::getGridItem((enginetype::GridCell){cell.x+1, cell.y}) == enginetype::FIELD_BOULDER && 
-        //          enginehelper::getGridItem((enginetype::GridCell){cell.x+2, cell.y}) == enginetype::FIELD_EMPTY &&
+        // valid = (enginehelper::getGridElement((enginetype::GridCell){cell.x+1, cell.y}) == enginetype::FIELD_BOULDER && 
+        //          enginehelper::getGridElement((enginetype::GridCell){cell.x+2, cell.y}) == enginetype::FIELD_EMPTY &&
         //          enginehelper::getGridMovPos((enginetype::GridCell){cell.x+1, cell.y}) == 0);
     }
 
@@ -120,12 +120,6 @@ bool OptionPushRock::isValid_() {
 }
 
 
-std::string OptionPushRock::optionToString() {
+std::string OptionPushRock::toString() const {
     return optionStringName + actionToString(action_);
-}
-
-
-// https://stackoverflow.com/questions/1549930/c-equivalent-of-javas-tostring
-std::ostream& OptionPushRock::toString(std::ostream& o) const {
-    return o << "Push boulder: " << actionToString(action_);
 }

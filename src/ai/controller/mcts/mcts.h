@@ -19,6 +19,7 @@
 
 #include "tree_node.h"
 #include "../options/base_option.h"
+#include "../options/option_factory.h"
 
 #include "../../engine/game_state.h"
 #include "../../engine/action.h"
@@ -61,6 +62,10 @@ private:
 
     Pointer root = nullptr;
     GameState rootSavedState;
+    BaseOption *currentOption_;
+    BaseOption *nextOption_;
+    Action actionToSend;
+    bool optionStatusFlag_ = true;
 
 
     /*
@@ -95,18 +100,26 @@ private:
     float getNodeValue();
 
     /*
-     * Stringify root child nodes with option, value, and visit count for logging.
+     * Reset the MCTS controller.
      *
-     * @param node The node to get its child information.
+     * MCTS search tree is reset to one state forward following nextOption. This lets us
+     * search for the second option while we are currently executing the first option. By
+     * default, the starting options is a single step noop.
+     *
+     * @param nextOption The planned next option, which the tree will be reset to.
      */
-    // std::string childrenToString(TreeNode* node);
-    std::string controllerDetailsToString() override;
+    void reset();
 
 
 public:
 
-    MCTS();
+    MCTS() {}
 
+    MCTS(OptionFactoryType optionType) : BaseController(optionType) {}
+
+
+    void handleLevelStart() override;
+    
     /*
      * Set option the agent will now take, and reset the MCTS search tree.
      * 
@@ -117,18 +130,9 @@ public:
      * @param currentOption Option which the agent gets to execute.
      * @param nextOption Planned option for the agent to take at the future state.
      */
-    void handleEmpty(BaseOption **currentOption, BaseOption **nextOption) override;
+    // void handleEmpty() override;
+    Action getAction() override;
 
-    /*
-     * Reset the MCTS controller.
-     *
-     * MCTS search tree is reset to one state forward following nextOption. This lets us
-     * search for the second option while we are currently executing the first option. By
-     * default, the starting options is a single step noop.
-     *
-     * @param nextOption The planned next option, which the tree will be reset to.
-     */
-    void reset(BaseOption *nextOption);
 
     /*
      * Continue to find the next option the agent should take.
@@ -140,10 +144,11 @@ public:
      *
      * @param currentOption Option which the agent gets to execute.
      * @param nextOption Planned option for the agent to take at the future state.
-     * @param statistics Statistic information of the search performed by the controller.
      */
-    void run(BaseOption **currentOption, BaseOption **nextOption, 
-        std::map<enginetype::Statistics, int> &statistics) override;
+    // Action run() override;
+    void plan() override;
+
+    std::string controllerDetailsToString() override;
 
 };
 

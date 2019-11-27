@@ -13,7 +13,7 @@
 
 
 
-enum OptionType {SingleStep, ToSprite, ToRock, PushRock, Misc};
+enum OptionType {SingleAction, ToSprite, ToRock, PushRock, ToCollectibleSprite, ToExit, Misc};
 
 
 #endif  //OPTION_TYPES_H

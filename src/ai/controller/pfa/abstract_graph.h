@@ -21,8 +21,7 @@
 #include "../../util/timer.h"
 
 //Logging
-#include "../../util/logging_wrapper.h"
-#include <plog/Log.h>   
+#include "../../util/logger.h"
 
 
 class AbstractGraph {

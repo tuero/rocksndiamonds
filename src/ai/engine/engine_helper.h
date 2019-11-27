@@ -13,12 +13,8 @@
 
 
 // ------------- Includes  -------------
-#include <iostream>
-#include <chrono>
-#include <array>
 #include <vector>
-#include <map>
-#include <algorithm>
+#include <deque>
 #include <limits>
 #include <cstdint>
 #include <cstdlib>              // abs
@@ -26,10 +22,6 @@
 #include "engine_types.h"
 #include "action.h"
 #include "../util/rng.h"
-
-//Logging
-#include "../util/logging_wrapper.h"
-#include <plog/Log.h> 
 
 extern "C" {
     #include "../../main.h"
@@ -40,11 +32,6 @@ extern "C" {
 
 
 namespace enginehelper {
-
-    extern short distances[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
-    extern short max_distance;
-
-    static std::map<enginetype::GridCell, std::vector<enginetype::GridCell>> grid_neighbours_;
 
     static const uint64_t MAX_HASH = UINT64_MAX;
     static const int MAX_DIR = 32;
@@ -58,7 +45,7 @@ namespace enginehelper {
      *
      * @return Contoller enum type.
      */
-    enginetype::ControllerType getControllerType();
+    ControllerType getControllerType();
 
     /*
      * Get the replay file name.
@@ -68,6 +55,13 @@ namespace enginehelper {
      * @return Replay file name string.
      */
     std::string getReplayFileName();
+
+    /**
+     * Get the optional CLA for general use.
+     * 
+     * @return Integer optional CLA.
+     */
+    int getOptParam();
 
 
 // -------------------------------------------------------
@@ -93,7 +87,7 @@ namespace enginehelper {
      *
      * @return The string name of the levelset.
      */
-    std::string getLevelSet();
+    const std::string getLevelSet();
 
     /*
      * Call engine function to load the given level.
@@ -110,11 +104,17 @@ namespace enginehelper {
     void loadLevel(int level_num);
 
     /*
-     * Get the level number from command line argument.
+     * Get the level number loaded in the level struct
      *
-     * @return The level number as set in the command line argument.
+     * @return The level number
      */
     int getLevelNumber();
+
+    /**
+     * Restart the level.
+     * Game is reinitialized using the current loaded level.
+     */
+    void restartLevel();
 
     /*
      * Get the level height of the level currently loaded in the engine.
@@ -130,110 +130,20 @@ namespace enginehelper {
      */
     int getLevelWidth();
 
+    /**
+     * Get the number of gems needed to open the exit.
+     */
+    int getLevelGemsNeeded();
+
+    /**
+     * Get the number of remaining gems needed to open the exit.
+     */
+    int getLevelRemainingGemsNeeded();
 
 
 // -------------------------------------------------------
-// -----------------Map Item Information------------------
+// ---------------Grid Action Information-----------------
 // -------------------------------------------------------
-
-    void initSpriteIDs();
-
-    int getSpriteID(enginetype::GridCell cell);
-
-    enginetype::GridCell getSpriteGridCell(int spriteID);
-
-    bool isSpriteActive(int spriteID);
-
-
-    /*
-     * Get the item located at the given GridCell (x,y) location.
-     *
-     * @param The grid cell to locate.
-     * @return The integer code for the object at the grid location, or empty if gridcell out of bounds.
-     */
-    int getGridItem(enginetype::GridCell cell);
-
-    /*
-     * Get the item MovPos at the given GridCell (x,y) location.
-     *
-     * @param The grid cell to locate.
-     * @return The integer code for the object offset while moving.
-     */
-    int getGridMovPos(enginetype::GridCell cell);
-
-    /*
-     * Get the grid cell that the player is currently located in.
-     *
-     * @return The GridCell struct containing the player.
-     */
-    enginetype::GridCell getPlayerPosition();
-
-    /*
-     * Get the sprite locations on the map.
-     *
-     * @return Vector of GridCell locations for each of the sprites.
-     */
-    std::vector<enginetype::GridCell> getMapSprites();
-
-    /*
-     * Get the current goal location (defined by distance of 0).
-     *
-     * If no grid location has distance 0, then (-1, -1) is returned and the calling method
-     * must deal with this.
-     *
-     * @return The GridCell struct containing the goal.
-     */
-    enginetype::GridCell getCurrentGoalLocation();
-
-    /*
-     * Check if the grid cell at location (x,y) is empty.
-     *
-     * This only checks if the cell is designated by the empty integer ID, not whether
-     * the grid cell is also dirt. A cell is empty if no object is currently in that
-     * cell. Since it takes multiple ticks for objects to move betwene cells, there is 
-     * also a temporary ID used for objects to claim GirdCells they are on route to travel
-     * next to. 
-     * 
-     * @param cell The GridCell struct to check if empty.
-     * @return True if the GirdCell is designated by the empty int code.
-     */
-    bool isGridEmpty(enginetype::GridCell cell);
-
-    /*
-     * Checks if the direction the player wants to move in is a wall.
-     *
-     * Assumes the current state to check is already set in the engine if no player cell
-     * is given as the second argument.
-     *
-     * @param action The action the player wants to attempt to make
-     * @param playerCell The cell the player is in.
-     * @return True if the action the player wants to take is blocked by a wall.
-     */
-    bool isWall(Action action, enginetype::GridCell playerCell = {-1,-1});
-
-    /*
-     * Checks if the direction the player wants to move in is walkable.
-     *
-     * Assumes the current state to check is already set in the engine if no player cell
-     * is given as the second argument.
-     *
-     * @param action The action the player wants to attempt to make
-     * @param playerCell The cell the player is in.
-     * @return True if the action the player wants to take is walkable.
-     */
-    bool isWalkable(Action action, enginetype::GridCell playerCell = {-1,-1});
-
-    /*
-     * Checks if action is valid given restricted GridCells player is allowed in.
-     *
-     * Used in PFA_MCTS during the tree search. The allowed_cells is an abstraction of the
-     * next abstract node to travel. This reduces the search tree for faster searches. 
-     *
-     * @param action The action the player wants to perform.
-     * @param allowedCells A vector of cells which the player is restricted too.
-     * @return True if the player the action want to perform stays in an allowed cell.
-     */
-    bool canExpand(Action action, std::vector<enginetype::GridCell> &allowed_cells);
 
     /*
      * Check if two grid cells are neighbours, defined by being separated by Euclidean distance of 1.
@@ -253,14 +163,325 @@ namespace enginehelper {
      * @param to The ending gridcell.
      * @param The action which resulted in going from gridcell from to gridcell to.
      */
-    Action getResultingAction(enginetype::GridCell from, enginetype::GridCell to);
+    Action getActionFromNeighbours(enginetype::GridCell from, enginetype::GridCell to);
 
+    /*
+    * Get the resulting cell from applying the action in the given cell.
+    * 
+    * @param action The action to apply.
+    * @param from The reference GridCell.
+    * @return The resulting GridCell after applying the given action.
+    */
+    enginetype::GridCell getCellFromAction(Action action, const enginetype::GridCell from);
+
+
+// -------------------------------------------------------
+// -----------------Map Item Information------------------
+// -------------------------------------------------------
+
+    /**
+     * Convert a gridcell to a flat index (left to right, top to bottom).
+     * 
+     * @param cell The gridcell to convert
+     * @return Integer index representing cell location
+     */
+    int cellToIndex(const enginetype::GridCell &cell);
+
+    /*
+     * Checks if the given GridCell is in bounds of the level field.
+     *
+     * @param The GridCell to check.
+     * @return True if the GridCell coordinates are valid for the map size.
+     */
+    bool inBounds(const enginetype::GridCell &cell);
+
+    /*
+     * Check if the element in the GridCell is a temporary element.
+     * A temporary element are usually for placeholders and do not represent
+     * actual elements. As an example, EL_BLOCKED is used to signify an object
+     * has claimed that GridCell and is currently moving into that cell.
+     *
+     * @param The GridCell to check
+     * @return True if the element in the given cell is a temporary element.
+     */
+    bool isTemporaryElement(const enginetype::GridCell &cell);
+
+    /*
+     * Initalize the unique sprite IDs.
+     * Temporary elements and empty space/soil do not get IDs.
+     */
+    void initSpriteIDs();
+
+    /*
+     * Get the sprite ID (if one exists) for the given cell.
+     *
+     * @param The GridCell to get the sprite.
+     * @return the unique sprite ID.
+     */
+    int getSpriteID(const enginetype::GridCell &cell);
+
+    /*
+     * Get the grid cell the given sprite resides in.
+     *
+     * @param The unique ID representing the sprite.
+     * @return the grid cell the sprite resides in.
+     */
+    enginetype::GridCell getSpriteGridCell(int spriteID);
+
+    /*
+     * Checks if the given sprite ID is active. 
+     *
+     * @param The unique ID of the sprite to check.
+     * @return True if the sprite is still active in the level.
+     */
+    bool isSpriteActive(int spriteID);
+
+    /*
+     * Get the sprite locations on the level map.
+     *
+     * @return Vector of GridCell locations for each of the sprites.
+     */
+    std::vector<enginetype::GridCell> getMapSprites();
+
+    /*
+     * Get the item element located at the given GridCell (x,y) location.
+     *
+     * @param The GridCell to locate.
+     * @return The integer code for the object at the grid location, or empty if GridCell out of bounds.
+     */
+    int getGridElement(enginetype::GridCell cell);
+
+    /*
+     * Get the item MovPos at the given GridCell (x,y) location.
+     *
+     * @param The grid cell to locate.
+     * @return The integer code for the object offset while moving.
+     */
+    int getGridMovPos(enginetype::GridCell cell);
+
+    /*
+     * Get the grid cell that the player is currently located in.
+     *
+     * @return The GridCell struct containing the player.
+     */
+    enginetype::GridCell getPlayerPosition();
+
+    /*
+     * Check if the player resides in the current cell.
+     *
+     * @param The GridCell which contains the player.
+     * @return True if the player resides in the given GridCell.
+     */
+    bool isPlayerPosition(const enginetype::GridCell &cell);
+
+    /**
+     * Check if the player is currently in the middle of executing an action.
+     * 
+     * @return True if the player is in the middle of grid cells (moving)
+     */
+    bool isPlayerDoneAction();
+
+    /*
+     * Check if the grid cell at location (x,y) is empty.
+     *
+     * This only checks if the cell is designated by the empty integer ID, not whether
+     * the grid cell is also dirt. A cell is empty if no object is currently in that
+     * cell. Since it takes multiple ticks for objects to move between cells, there is 
+     * also a temporary ID used for objects to claim GirdCells they are on route to travel
+     * next to. 
+     * 
+     * @param cell The GridCell struct to check if empty.
+     * @return True if the GirdCell is designated by the empty int code.
+     */
+    bool isGridEmpty(enginetype::GridCell cell);
+
+    /*
+     * Get the current goal location (defined by distance of 0).
+     *
+     * If no grid location has distance 0, then (-1, -1) is returned and the calling method
+     * must deal with this.
+     *
+     * @return The GridCell struct containing the goal.
+     */
+    enginetype::GridCell getCurrentGoalLocation();
+
+
+    // -------------------------------------------------------
+    // -------------Element Property Information--------------
+    // -------------------------------------------------------
+
+
+    /**
+     * Get a readable description name (as defined in the engine config) for the given item.
+     * 
+     * If the item is not known to the engine, "UNKNOWN" is returned.
+     * 
+     * @param item The item integer code to check.
+     * @return The string readable description name.
+     */
+    std::string getItemReadableDescription(int item);
+
+
+    /**
+     * Check if the item in the gridcell is moving.
+     * 
+     * Moving is defined as not being completely inside a single grid cell
+     * i.e. it is moving between gridcells. This means that if an item is free
+     * falling between multiple cells, there will be a single game step where is 
+     * check is false.
+     * 
+     * @param cell The grid cell to check
+     * @return True if the item in the cell is moving.
+     */
+    bool isMoving(const enginetype::GridCell cell);
+
+    /**
+     * Checks if the grid cell contains the exit.
+     * Exit can be either open, closed, or in the process of opening/closing.
+     * 
+     * @param cell The grid cell to check.
+     * @return True if the cell contains an exit, false otherwise.
+     */
+    bool isExit(const enginetype::GridCell cell);
+
+    /**
+     * Checks if the grid cell contains the open exit.
+     * 
+     * @param cell The grid cell to check.
+     * @return True if the cell contains an open exit, false otherwise.
+     */
+    bool isExitOpen(const enginetype::GridCell cell);
+
+    /**
+     * Checks if the grid cell contains the closed exit.
+     * 
+     * @param cell The grid cell to check.
+     * @return True if the cell contains a closed exit, false otherwise.
+     */
+    bool isExitClosed(const enginetype::GridCell cell);
+
+    /**
+     * Checks if the grid cell contains the exit which is in the 
+     * process of opening.
+     * 
+     * @param cell The grid cell to check.
+     * @return True if the cell contains an opening exit, false otherwise.
+     */
+    bool isExitOpening(const enginetype::GridCell cell);
+
+    /**
+     * Checks if the grid cell contains the exit which is in the 
+     * process of closing.
+     * 
+     * @param cell The grid cell to check.
+     * @return True if the cell contains a closing exit, false otherwise.
+     */
+    bool isExitClosing(const enginetype::GridCell cell);
+
+    /**
+     * Get the number of gems the item in the grid cell counts towards.
+     * 
+     * @param cell The cell to check
+     * @return The number of gems the item in the grid cell counts towards.
+     */
+    int getItemGemCount(const enginetype::GridCell cell);
+
+    /**
+     * Get the score the item in the grid cell will give the player.
+     * If the grid cell is invalid, the returned score is 0.
+     * 
+     * @param cell The cell to check
+     * @return The score the item in the cell will give the player, 0 if no score or
+     * invalid cell.
+     */
+    int getItemScore(const enginetype::GridCell cell);
+
+    /*
+     * Checks if the direction the player wants to move in is walkable.
+     * Walkable means that the player is able to stand in the cell which results
+     * in the action being applied.
+     *
+     * Assumes the current state to check is already set in the engine if no player cell
+     * is given as the second argument.
+     *
+     * @param action The action the player wants to attempt to make
+     * @param playerCell The cell the player is in.
+     * @return True if the action the player wants to take is walkable.
+     */
+    bool isWalkable(Action action, const enginetype::GridCell cellFrom = {-1,-1});
+
+    /*
+     * Checks if the direction the player wants to move in is diggable.
+     * Diggable means that the player is able to stand in the cell which results
+     * in the action being applied.
+     * 
+     * Assumes the current state to check is already set in the engine if no player cell
+     * is given as the second argument.
+     *
+     * @param action The action the player wants to attempt to make
+     * @param playerCell The cell the player is in.
+     * @return True if the action the player wants to take is digable.
+     */
+    bool isDigable(Action action, const enginetype::GridCell cellFrom = {-1,-1});
+
+    /*
+     * Checks if the direction the player wants to move in is a wall.
+     * This works for predefined wall objects from the default game objects. A custom
+     * non-passible object (which acts as a wall) won't be caught here.
+     *
+     * Assumes the current state to check is already set in the engine if no player cell
+     * is given as the second argument.
+     *
+     * @param action The action the player wants to attempt to make
+     * @param playerCell The cell the player is in.
+     * @return True if the action the player wants to take is blocked by a wall.
+     */
+    bool isWall(Action action, enginetype::GridCell playerCell = {-1,-1});
+
+    /*
+     * Checks if resulting GridCell the player wants to move to contains a collectible element.
+     *
+     * Assumes the current state to check is already set in the engine if no player cell
+     * is given as the second argument.
+     *
+     * @param action The action the player wants to attempt to make
+     * @param playerCell The cell the player is in.
+     * @return True if the resulting cell contains a collectible element
+     */
+    bool isCollectable(Action action, enginetype::GridCell playerCell = {-1,-1});
+
+    /*
+     * Checks if the direction the player wants to move in is passable.
+     * Passable means that the player walks through the cell which results in the
+     * action being applied, and into the next cell.
+     *
+     * Assumes the current state to check is already set in the engine if no player cell
+     * is given as the second argument.
+     *
+     * @param action The action the player wants to attempt to make
+     * @param playerCell The cell the player is in.
+     * @return True if the action the player wants to take is passable.
+     */
+    bool isPassable(Action action, const enginetype::GridCell cellFrom = {-1,-1});
+
+    /*
+     * Checks if the action will move the player.
+     * Player can move if they are not walking into a wall, and the GridCell in the direction
+     * the player wants to move is either walkable, passable, or contains a collectable item.
+     *
+     * Assumes the current state to check is already set in the engine if no player cell
+     * is given as the second argument.
+     *
+     * @param action The action the player wants to attempt to make
+     * @param playerCell The cell the player is in.
+     * @return True if the action the player wants to take is passable.
+     */
+    bool isActionMoveable(Action action, const enginetype::GridCell cellFrom);
 
 
 // -------------------------------------------------------
 // ---------------Custom Level Programming----------------
 // -------------------------------------------------------
-
 
     /*
      * Count how many of a specified element in the game.
@@ -294,7 +515,6 @@ namespace enginehelper {
 
     /*
      * Check if the current status of the engine is loss of life.
-     *
      * The internal engine checkGameFailed() function is called. 
      *
      * @return True if the current status of the engine is failed.
@@ -303,7 +523,6 @@ namespace enginehelper {
 
     /*
      * Check if the current status of the engine is level solved.
-     *
      * Structs game.LevelSolved and game.LevelSolved_GameEnd need to be checked.
      *
      * @return True if the current status of the engine is solved.
@@ -316,6 +535,18 @@ namespace enginehelper {
      * @return True if the current status of engine is failed or solved.
      */
     bool engineGameOver();
+
+    /**
+     * Set the game engine mode status to GAME_MODE_QUIT.
+     * This will trigger the program to end after cleanup. 
+     */
+    void setEngineGameStatusModeQuit();
+
+    /**
+     * Set the game engine mode status to GAME_MODE_PLAYING.
+     * This will allow the game loop to query actions from controller. 
+     */
+    void setEngineGameStatusModePlaying();
 
     /*
      * Set the action for the engine to perform on behalf of the player on the next iteration.
@@ -330,8 +561,8 @@ namespace enginehelper {
     /*
      * Set the stored player's action as a valid random action.
      *
-     * This is a pseudo-smart random, in the sense that it will not attempt to move into
-     * a wall if the player is currently blocked by said wall. This is 
+     * To allow for fast simulations, this doesn't check whether the action is
+     * useful i.e. not moving left if there is a wall to the left of the player.
      */
     void setEngineRandomPlayerAction();
 
@@ -408,6 +639,11 @@ namespace enginehelper {
      */
     void initZorbristTables();
 
+    /**
+     * Get the hash representation of a vector grid cell path.
+     */
+    uint64_t gridcellPathToHash(const std::deque<enginetype::GridCell> &path);
+
     /*
      * Get the hash representation of the current state in the engine
      */
@@ -424,52 +660,34 @@ namespace enginehelper {
     int getL1Distance(enginetype::GridCell left, enginetype::GridCell right);
 
     /*
-     * Get the minimum player distance in reference to given list of gridcells
-     */
-    int minDistanceToAllowedCells(std::vector<enginetype::GridCell> &goal_cells);
-
-    /*
-     * Get the players current shortest path distance to goal
-     * This uses distance tile maps pre-calculated using Dijkstra's algorithm,
-     * NOT Euclidean distance.
-     */
-    float getPlayerDistanceToGoal();
-
-    /*
-     * Get the distance to goal from given gridcell
+     * Get the distance to goal (defined as distances[x][y] = 0) from given GridCell
      * This is set by distance metric, usually L1
      */
-    int getGridDistanceToGoal(enginetype::GridCell gridCell);
+    int getGridDistanceToGoal(const enginetype::GridCell goalCell);
 
     /*
-     * Get the player distance to the next abstract node
-     * Internal abstract node distances are set by Dijsktra, used to help
-     * player get around corners that fails by L1 shortest distance
+     * Set the distance to goal manually for more exotic distance functions.
+     * 
+     * @param cell The GridCell to set the distance for.
+     * @param value The distance to set.
      */
-    int getPlayerDistanceToNextNode();
+    void setGridDistanceToGoal(const enginetype::GridCell cell, short value);
 
     /*
-     * Find the grid location of the exit, given by enginetype::FIELD_EXIT
+     * Find the grid location of the exit, given by EL_EXIT_OPEN.
+     * 
+     * @return The GridCell of the EL_EXIT_OPEN element, or {-1, -1} if DNE.
      */
     enginetype::GridCell findExitLocation();
 
     /*
-     * Set the grid distances to goal using Dijkstra's algorithm (shortest path)
-     */
-    void setBoardDistancesDijkstra(enginetype::GridCell goal_cell);
-
-    /*
      * Set the grid distances to goal using L1 distance
+     * If no goal cell is given, will attempt to use the open exit location
+     * given by EL_EXIT_OPEN, it it exists.
+     * 
+     * @param goalCell The goal cell 
      */
-    void setBoardDistancesL1(enginetype::GridCell goal_cell);
-
-    /*
-     * Used in PFA_MCST
-     * Set the internal grid cell distances to goal in abstract node
-     * This helps MCTS get around corners that fails with just L1
-     */
-    void setAbstractNodeDistances(std::vector<enginetype::GridCell> goal_cells,
-    std::vector<enginetype::GridCell> allowed_cells);
+    // void setBoardDistancesL1(const enginetype::GridCell goalCell = {-1, -1});
 
 
 

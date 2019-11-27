@@ -13,16 +13,19 @@
 // Engine
 #include "../engine/engine_helper.h" 
 
+#include "../util/timer.h" 
+
 // Logging
-#include "../util/logging_wrapper.h"
-#include <plog/Log.h>   
+#include "../util/statistics.h"
+#include "../util/logger.h"
+#include <plog/Logger.h>
 
 // Controllers
-// #include "bfs/bfs.h"
+#include "controller_listing.h"
+#include "default/default.h"
 #include "mcts/mcts.h"
 #include "replay/replay.h"
-// #include "user/user.h"
-// #include "pfa/pfa.h"
+#include "two_level_search/two_level_search.h"
 
 
 OptionSingleStep noopOption(Action::noop, 1);
@@ -41,85 +44,81 @@ Controller::Controller() {
  * Constructor which sets the controller based on a given controller type
  * Used for testing
  */
-Controller::Controller(enginetype::ControllerType controller) {
+Controller::Controller(ControllerType controller) {
     initController(controller);
     step_counter_ = 0;
 }
 
 
 /*
- * Get the runtime of the controller.
- */
-int Controller::getRunTime() {
-    return statistics_[enginetype::RUN_TIME];
-}
-
-
-/*
- * Get the number of nodes expanded by the type of tree search used.
- */
-int Controller::getCountExpandedNodes() {
-    return statistics_[enginetype::COUNT_EXPANDED_NODES];
-}
-
-
-/*
- * Get the number of nodes simulated by the type of tree search used.
- */
-int Controller::getCountSimulatedNodes() {
-    return statistics_[enginetype::COUNT_SIMULATED_NODES];
-}
-
-
-/*
- * Get the max depth of nodes expanded by the type of tree search used.
- */
-int Controller::getMaxDepth() {
-    return statistics_[enginetype::MAX_DEPTH];
-}
-
-
-/*
  * Reset the controller
- * Stored solution is set to NOOP, statistics_ reset, and base controller
  * HandleLevelStart is called. 
  */
 void Controller::reset() {
-    // reset statistics_
-    step_counter_ = 0;
-    statistics_[enginetype::RUN_TIME] = 0;
-    statistics_[enginetype::COUNT_EXPANDED_NODES] = 0;
-    statistics_[enginetype::COUNT_SIMULATED_NODES] = 0;
-    statistics_[enginetype::MAX_DEPTH] = 0;
+    PLOGI_(logger::FileLogger) << "Resetting controller.";
+    PLOGI_(logger::ConsoleLogger) << "Resetting controller.";
+    PLOGI_(logger::FileLogger) << baseController_.get()->controllerDetailsToString();
 
     // Set sprite IDs
     enginehelper::initSpriteIDs();
 
-    // !<-- This needs to be fixed? (multiple factories?)
-    baseController_.get()->setAvailableOptions(optionFactory_.createSingleStepOptions());
-    if (enginehelper::getControllerType() == enginetype::MCTS_CUSTOM) {
-        baseController_.get()->setAvailableOptions(optionFactory_.createCustomOptions());
-    }
+    // Reset available options
+    // Needs to be done here (after the level and sprites are loaded.)
+    enginehelper::setSimulatorFlag(true);
+    baseController_.get()->resetOptions();
 
     // Solution is cleared and stored with noops to begin
-    currentSolution_.clear();
-    currentOption_ = &noopOption;
-    nextOption_ = &noopOption;
-    optionStatusFlag_ = true;
+    currentAction_.clear();
+    nextAction_ = Action::noop;
+    step_counter_ = 0;
 
     // Controller specific handler to ensure proper setup
     baseController_.get()->handleLevelStart();
+    enginehelper::setSimulatorFlag(false);
 }
 
 
-void Controller::logNextOptionDetails() {
-    BaseController* baseController = baseController_.get();
-    PLOGI_(logwrap::FileLogger) << "Current option: " << nextOption_->optionToString();
-    PLOGD_(logwrap::ConsolLogger) << "Current option: " << nextOption_->optionToString();
-    PLOGD_(logwrap::FileLogger) << "Controller details:\n" + baseController->controllerDetailsToString();
-    PLOGD_(logwrap::ConsolLogger) << "Controller details:\n" + baseController->controllerDetailsToString();
-
+/**
+ * Check if the controller wants to request a reset.
+ */
+bool Controller::requestReset() {
+    return baseController_->requestRest();
 }
+
+
+void Controller::handleLevelSolved() {
+    // Log info to user
+    PLOGI_(logger::FileLogger) << "Game solved.";
+    PLOGI_(logger::ConsoleLogger) << "Game solved.";
+
+    // Stats
+    statistics::numLevelTries += 1;
+
+    PLOGI_(logger::FileLogger) << "Number of plays = " << statistics::numLevelTries;
+    PLOGI_(logger::ConsoleLogger) << "Number of plays = " << statistics::numLevelTries;
+
+    // Signal game over and close logs
+    enginehelper::setEngineGameStatusModeQuit();
+    logger::closeReplayFile();
+}
+
+
+void Controller::handleLevelFailed() {
+    PLOGI_(logger::FileLogger) << "Game Failed.";
+    PLOGI_(logger::ConsoleLogger) << "Game Failed.";
+
+    statistics::numLevelTries += 1;
+
+    if (baseController_.get()->retryOnLevelFail()) {
+        // Handle necessary changes before/after level reload
+        baseController_.get()->handleLevelRestartBefore();
+        enginehelper::restartLevel();
+        logger::savePlayerMove("reset");
+        reset();
+        baseController_.get()->handleLevelRestartAfter();
+    }
+}
+
 
 /*
  * Get the action from the controller.
@@ -128,51 +127,38 @@ void Controller::logNextOptionDetails() {
  * complete.
  */
 Action Controller::getAction() {
+    enginehelper::setSimulatorFlag(true);
     Action action = Action::noop;
     BaseController* baseController = baseController_.get();
-    std::string msg = "";
-
-    // If current game is over, clean up file handler and send NOOP action
-    if (enginehelper::engineGameOver()) {
-        logwrap::closeReplayFile();
-        return action;
-    }
 
     // Handle empty action solution queue.
-    if (currentSolution_.empty()) {
-        // If the current option is complete, controller should set current option to 
-        // next option and handle controller specific resets (forward the search tree).
-        if (optionStatusFlag_) {
-            logNextOptionDetails();
-            baseController->handleEmpty(&currentOption_, &nextOption_);
-            optionStatusFlag_ = false;
-        }
-        // Get next action to take from the current option
-        Action tempAction;
-        optionStatusFlag_ = currentOption_->singleStep(tempAction);
-        currentSolution_.assign(enginetype::ENGINE_RESOLUTION, tempAction);
+    if (currentAction_.empty()) {
+        // If both currentAction_ and nextAction_ are empty, and controller 
+        // wants to use forward model to plan while executing, it should seed with noop
+        currentAction_.insert(currentAction_.end(), enginetype::ENGINE_RESOLUTION, baseController_.get()->getAction());
     }
 
     // Continue to run controller to find the next option which should be taken.
-    baseController->run(&currentOption_, &nextOption_, statistics_);
-    enginehelper::setSimulatorFlag(false);
+    baseController->plan();
 
     // Get next action in action-currentSolution_ queue
-    if (!currentSolution_.empty()) {
-        action = currentSolution_.front();
-        currentSolution_.erase(currentSolution_.begin());
+    if (!currentAction_.empty()) {
+        action = currentAction_.front();
+        currentAction_.erase(currentAction_.begin());
     }
 
     // Send action information to logger
     // We only care about information at the engine resolution
     if (step_counter_++ % enginetype::ENGINE_RESOLUTION == 0) {
-        logwrap::logPlayerMove(actionToString(action));
-        logwrap::logState();
-        logwrap::logBoardSpriteIDs();
+        // Save action to replay file
+        logger::savePlayerMove(actionToString(action));
+
+        logger::logPlayerMove(actionToString(action));
+        logger::logCurrentState();
+        logger::logBoardSpriteIDs();
     }
 
-    // Save action to replay file
-    logwrap::savePlayerMove(actionToString(action));
+    enginehelper::setSimulatorFlag(false);
 
     return action;
 }
@@ -182,29 +168,40 @@ Action Controller::getAction() {
  * Inits the controller.
  * Controller type is determined by command line argument.
  */
-void Controller::initController(enginetype::ControllerType controller) {
-    // No controller type passed, check if set by user command line argumetn
-    if (controller == enginetype::ControllerType::DEFAULT) {
-        controller = enginehelper::getControllerType();
-    }
+void Controller::initController() {
+    enginehelper::initZorbristTables();
+    initController(enginehelper::getControllerType());
+}
 
-    if (controller == enginetype::REPLAY) {
+
+/*
+ * Inits the controller.
+ * Controller type is determined by command line argument.
+ */
+void Controller::initController(ControllerType controller) {
+    // reset statistics
+    statistics::resetAllStatistics();
+
+    // Set appropriate controller
+    if (controller == CONTROLLER_DEFAULT) {
+        baseController_ = std::make_unique<Default>();
+    }
+    else if (controller == CONTROLLER_REPLAY) {
         baseController_ = std::make_unique<Replay>();
     }
-    // else if (controller == enginetype::BFS) {
-    //     baseController_ = std::make_unique<BFS>();
-    // }
-    else if (controller == enginetype::MCTS || controller == enginetype::MCTS_CUSTOM) {
+    else if (controller == CONTROLLER_MCTS) {
         baseController_ = std::make_unique<MCTS>();
     }
-    // else if (controller == enginetype::USER) {
-    //     baseController_ = std::make_unique<User>();
-    // }
-    // else if (controller == enginetype::PFA) {
-    //     baseController_ = std::make_unique<PFA>();
-    // }
-    else if (controller != enginetype::DEFAULT) {
-        PLOGE_(logwrap::FileLogger) << "Unknown controller type: " + std::to_string(controller);
-        PLOGE_(logwrap::ConsolLogger) << "Unknown controller type: " + std::to_string(controller);
+    else if (controller == CONTROLLER_MCTS_CUSTOM) {
+        baseController_ = std::make_unique<MCTS>(OptionFactoryType::CUSTOM);
+    }
+    else if (controller == CONTROLLER_TWOLEVEL) {
+        baseController_ = std::make_unique<TwoLevelSearch>(OptionFactoryType::TWO_LEVEL_SEARCH);
+    }
+    // Add case for new ControllerType and initialize baseController_
+    else {
+        PLOGE_(logger::FileLogger) << "Unknown controller type: " << controller;
+        PLOGE_(logger::ConsoleLogger) << "Unknown controller type: " << controller;
+        baseController_ = std::make_unique<Default>();
     }
 }

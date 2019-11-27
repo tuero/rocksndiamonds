@@ -13,7 +13,7 @@
 
 #include <string>
 #include <plog/Log.h>
-
+#include "../engine/engine_types.h"
 
 extern "C" {
     #include "../../main.h"
@@ -21,29 +21,25 @@ extern "C" {
 }
 
 
-namespace logwrap {
+namespace logger {
 
-    enum {FileLogger, ConsolLogger};
+    enum {FileLogger, ConsoleLogger};
+    enum class LogLevel {none, fatal, error, warning, info, debug, verbose};
 
     /*
      * Initialize loggers for file and std_out
      */
-    void initLogger(plog::Severity logLevel, std::string &programArgs);
+    void initLogger(LogLevel logLevel, std::string &programArgs);
 
     /*
      * Initialize the replay file.
      */
-    void initReplayFile();
+    void initReplayFile(const std::string levelSet, int levelNumber);
 
     /*
      * Set max log level used for both loggers
      */
-    void setLogLevel(plog::Severity logLevel);
-
-    /*
-     * Log RNG seed, levelset and level number used.
-     */
-    void saveReplayLevelInfo();
+    void setLogLevel(LogLevel logLevel);
 
     /*
      * Logs the engine type being used my the simulator
@@ -55,43 +51,37 @@ namespace logwrap {
     /*
      * Logs some of the important player fields.
      */
-    void logPlayerDetails();
+    void logPlayerDetails(plog::Severity logLevel = plog::verbose);
 
     /*
      * Logs the current board state (FELD) at the tile level.
      */
-    void logBoardState();
+    void logBoardState(plog::Severity logLevel = plog::verbose);
 
     /*
      * Logs the current board state (MovPos) sprite tile distance offsets.
      */
-    void logMovPosState();
+    void logMovPosState(plog::Severity logLevel = plog::verbose);
 
     /*
      * Logs the current board state (MovDir) sprite tile direction offsets.
      */
-    void logMovDirState();
+    void logMovDirState(plog::Severity logLevel = plog::verbose);
 
     /*
      * Logs the current tile distances to goal (used in pathfinding).
      */
-    void logBoardDistances();
+    void logBoardDistances(plog::Severity logLevel = plog::verbose);
 
     /*
      * Logs the sprite IDs
      */
-    void logBoardSpriteIDs();
-
-    /*
-     * Log all information at level start
-     * Includes engine type, player position and state, board item positions, and distances.
-     */
-    void logLevelStart();
+    void logBoardSpriteIDs(plog::Severity logLevel = plog::verbose);
 
     /*
      * Logs the current tile distances to goal (used in pathfinding).
      */
-    void logState();
+    void logCurrentState(plog::Severity logLevel = plog::verbose);
 
     /*
      * Log the players current move.

@@ -20,26 +20,25 @@
 #include "../../engine/engine_helper.h"
 
 //Logging
-#include "../../util/logging_wrapper.h"
-#include <plog/Log.h>  
+#include "../../util/logger.h"
 
 
 OptionToRock::OptionToRock(int spriteID, Action direction) {
     optionType_ = OptionType::ToRock;
     spriteID_ = spriteID;
     enginetype::GridCell cell = enginehelper::getSpriteGridCell(spriteID);
-    item_ = enginehelper::getGridItem(cell);
+    item_ = enginehelper::getGridElement(cell);
     direction_ = direction;
     timesCalled_ = 0;
 
-    optionStringName_ += enginetype::TYPE_TO_STRING[item_] + " " + std::to_string(spriteID_);
+    optionStringName_ += enginehelper::getItemReadableDescription(item_) + " " + std::to_string(spriteID_);
     optionStringName_ += " " + actionToString(direction_);
 }
 
 
 void OptionToRock::findRock() {
     for (enginetype::GridCell cell : enginehelper::getMapSprites()) {
-        if (enginehelper::getGridItem(cell) == enginetype::FIELD_BOULDER) {
+        if (enginehelper::getGridElement(cell) == enginetype::FIELD_BOULDER) {
             goalCell_ = cell;
             if (direction_ == Action::left) {goalCell_.x -= 1;}
             else if (direction_ == Action::right) {goalCell_.x += 1;}
@@ -57,7 +56,7 @@ void OptionToRock::findRock() {
 
 bool OptionToRock::rockMoved() {
     for (enginetype::GridCell cell : enginehelper::getMapSprites()) {
-        if (enginehelper::getGridItem(cell) == enginetype::FIELD_BOULDER) {
+        if (enginehelper::getGridElement(cell) == enginetype::FIELD_BOULDER) {
             return goalCell_ == cell;
         }
     }
@@ -76,22 +75,22 @@ bool OptionToRock::run() {
         else if (direction_ == Action::up) {goalCell_.y -= 1;}
         else if (direction_ == Action::down) {goalCell_.y += 1;}
         
-        runAStar(false);
-        if (solutionPath.empty()) {break;}
+        runAStar();
+        if (solutionPath_.empty()) {break;}
 
-        enginetype::GridCell cell = solutionPath.front();
+        enginetype::GridCell cell = solutionPath_.front();
         enginetype::GridCell playerCell = enginehelper::getPlayerPosition();
-        solutionPath.pop_front();
-        Action action = enginehelper::getResultingAction(playerCell, cell);
+        solutionPath_.pop_front();
+        Action action = enginehelper::getActionFromNeighbours(playerCell, cell);
         
         enginehelper::setEnginePlayerAction(action);
         enginehelper::engineSimulate();
 
-        if (solutionPath.empty()) {break;}
+        if (solutionPath_.empty()) {break;}
 
         if (loopCounter == 100) {
-            PLOGE_(logwrap::ConsolLogger) << "Loop not terminating.";
-            PLOGE_(logwrap::FileLogger) << "Loop not terminating.";
+            PLOGE_(logger::FileLogger) << "Loop not terminating.";
+            PLOGE_(logger::ConsoleLogger) << "Loop not terminating.";
         }
         loopCounter += 1;
     }
@@ -101,7 +100,7 @@ bool OptionToRock::run() {
 }
 
 
-bool OptionToRock::singleStep(Action &action) {
+bool OptionToRock::getNextAction(Action &action) {
     action = Action::noop;
     goalCell_ = enginehelper::getSpriteGridCell(spriteID_);
     if (direction_ == Action::left) {goalCell_.x -= 1;}
@@ -118,17 +117,17 @@ bool OptionToRock::singleStep(Action &action) {
         return false;
     }
 
-    runAStar(false);
+    runAStar();
 
     // Get next gridcell
-    enginetype::GridCell cell = solutionPath.front();
-    solutionPath.pop_front();
+    enginetype::GridCell cell = solutionPath_.front();
+    solutionPath_.pop_front();
 
     // Find the corresponding action
-    action = enginehelper::getResultingAction(playerCell, cell);
+    action = enginehelper::getActionFromNeighbours(playerCell, cell);
 
     // Option is complete if we pulled the last action off the solution.
-    return solutionPath.empty();
+    return solutionPath_.empty();
 
 }
 
@@ -136,19 +135,19 @@ bool OptionToRock::singleStep(Action &action) {
 bool OptionToRock::isValid_() {
     if (!enginehelper::isSpriteActive(spriteID_)) {return false;}
     
-    goalCell_ = enginehelper::getSpriteGridCell(spriteID_);
+    enginetype::GridCell goalCell = enginehelper::getSpriteGridCell(spriteID_);
     enginetype::GridCell rockCell = enginehelper::getSpriteGridCell(spriteID_);
     enginetype::GridCell playerCell = enginehelper::getPlayerPosition();
 
     // Fix location for side of rock we want to be on
-    if (direction_ == Action::left) {goalCell_.x -= 1;}
-    else if (direction_ == Action::right) {goalCell_.x += 1;}
-    else if (direction_ == Action::up) {goalCell_.y -= 1;}
-    else if (direction_ == Action::down) {goalCell_.y += 1;}
+    if (direction_ == Action::left) {goalCell.x -= 1;}
+    else if (direction_ == Action::right) {goalCell.x += 1;}
+    else if (direction_ == Action::up) {goalCell.y -= 1;}
+    else if (direction_ == Action::down) {goalCell.y += 1;}
 
     // Position on side of rock is out of bounds
-    if (goalCell_.x < 0 || goalCell_.x >= enginehelper::getLevelWidth() ||
-        goalCell_.y < 0 || goalCell_.y >= enginehelper::getLevelHeight()) 
+    if (goalCell.x < 0 || goalCell.x >= enginehelper::getLevelWidth() ||
+        goalCell.y < 0 || goalCell.y >= enginehelper::getLevelHeight()) 
     {
         return false;
     }
@@ -159,24 +158,18 @@ bool OptionToRock::isValid_() {
     }
 
     // Something is currently in the spot we wish to be in (we can't get there)
-    int itemType = enginehelper::getGridItem(goalCell_);
+    int itemType = enginehelper::getGridElement(goalCell);
     if (itemType != enginetype::FIELD_EMPTY && itemType != enginetype::FIELD_DIRT) {
         return false;
     }
 
     // We are already at the location
-    return !(playerCell == goalCell_);
+    return !(playerCell == goalCell);
 }
 
 
-std::string OptionToRock::optionToString() {
+std::string OptionToRock::toString() const {
     return optionStringName_;
-}
-
-
-// https://stackoverflow.com/questions/1549930/c-equivalent-of-javas-tostring
-std::ostream& OptionToRock::toString(std::ostream& o) const {
-    return o << optionStringName_;
 }
 
 

@@ -18,6 +18,7 @@
 
 // Options
 #include "options/base_option.h"
+#include "options/option_single_step.h"
 #include "options/option_factory.h"
 
 // Engine
@@ -26,98 +27,124 @@
 // Util
 #include "../util/timer.h"
 
-//Logging
-#include "../util/logging_wrapper.h"
-#include <plog/Log.h>   
-
 
 /**
  * Skeleton definition which each derived controller is based off of.
  *
- * All controllers implemented should be derived from this class. The methods
- * handleEmpty() and run() are required to be implemented, with handleLevelStart() 
- * being optional. 
  */
 class BaseController {
 protected:
-    OptionFactory optionFactory;
-    std::vector<BaseOption*> availableOptions_;
-    Timer timer;
-
-    /*
-     * Long the current state, along with message to consol.
-     * 
-     * @param msg The message to display before logging the current state.
-     * @param sendToConsol Flag to display above message to consol as well.
-     */
-    void logCurrentState(std::string msg, bool sendToConsol) {
-        PLOGD_(logwrap::FileLogger) << msg;
-        PLOGD_IF_(logwrap::ConsolLogger, sendToConsol) << msg;
-
-        // logwrap::logPlayerDetails();
-        // logwrap::logBoardState();
-        // logwrap::logMovPosState();
-        // logwrap::logBoardSpriteIDs();
-    }
+    OptionFactory optionFactory_;                       // Factory object to create and manage option memory
+    OptionFactoryType optionFactoryType_;               // Type of options to create
+    OptionSingleStep noopOption;                        // Option to perfrom a stand still action (usually used as a safeguard)
+    std::vector<BaseOption*> availableOptions_;         // Vector of options available for the controller (set from optionFactory)
+    bool requestReset_ = false;                         // Flag to signal a reset of the level
+    Timer timer;                                        // Timer for internal testing/real-time tracking
 
 public:
 
-    /*
+    /**
      * Default constructor
      * 
      * The available options to plan over is set by default to be the single step 
      * actions (left, right, up, down, and noop).
      */
-    BaseController() : availableOptions_(optionFactory.createSingleStepOptions()) {}
+    BaseController() : 
+        optionFactoryType_(OptionFactoryType::SINGLE_ACTION),
+        noopOption(Action::noop, 1),
+        availableOptions_(optionFactory_.createOptions(OptionFactoryType::SINGLE_ACTION)) 
+    {}
 
-    /*
+    /**
+     * Constructor with given option factory type.
+     * 
+     * The available options to plan over is set by the input option factory type.
+     * 
+     * @param optionFactoryType The specified option factory type to use as the available options.
+     */
+    BaseController(OptionFactoryType optionFactoryType) : 
+        optionFactoryType_(optionFactoryType),
+        noopOption(Action::noop, 1),
+        availableOptions_(optionFactory_.createOptions(optionFactoryType)) 
+    {}
+
+    /**
+     * Reset the options which are available.
+     * This is called during level start, as we need to know the sprites available to
+     * accurately set what options are available.
+     */
+    virtual void resetOptions() {availableOptions_ = optionFactory_.createOptions(optionFactoryType_);}
+
+    /**
+     * Called on every loop to check if controller wants to reset the level.
+     * The underlying flag should be set either in handleEmpty() or run().
+     * 
+     * @return True if the controller wants to reset the level.
+     */
+    virtual bool requestRest() {return requestReset_;}
+
+    /**
      * Handle setup required at level start.
      * 
      * Called only during level start. Any preprocessing or intiailizations needed for the 
      * controller that wouldn't otherwise be done during each game tick, should be setup here.
      */
-    virtual void handleLevelStart() {}
+    virtual void handleLevelStart() {requestReset_ = false;}
 
-    /*
+    /**
+     * Flag for controller to try again if level fails.
+     * If this is set to true, on level fail (player died, time runs out, etc.),
+     * the level will be restarted. Otherwise, the program will terminate.
+     */
+    virtual bool retryOnLevelFail() const {return false;}
+
+    /**
+     * Handle necessary items before the level gets restarted.
+     * This is only applicable if the controller handles reattempts. 
+     */
+    virtual void handleLevelRestartBefore() {};
+
+    /**
+     * Handle necessary items after the level gets restarted.
+     * This is only applicable if the controller handles reattempts. 
+     */
+    virtual void handleLevelRestartAfter() {};
+
+    /**
      * Set option which agent should immediately take.
      * 
-     * Called when the currentOption is complete. Agent always executes the next option
-     * from currentSolution. If conducting search on the future state while the agent 
-     * is conducting the current option, the controller should set currentOption to
-     * the nextOption.
+     * Called every enginetype::ENGINE_RESOLUTION game steps (resolution the
+     * player moves by).
      * 
-     * @param currentOption Option which the agent gets to execute.
-     * @param nextOption Planned option for the agent to take at the future state.
+     * @return The action to perform
      */
-    virtual void handleEmpty(BaseOption **currentOption, BaseOption **nextOption) = 0;
+    virtual Action getAction() = 0;
 
 
-    /*
-     * Continue to find the next option the agent should take.
-     *
-     * Called during every game tick. In most cases, controller is planning on the next 
-     * future state while agent is conducting the current option. currentOption holds 
-     * the option the agent is currently conducting. The option to be taken once 
-     * current option is complete should be put into nextOption.
-     *
-     * @param currentOption Option which the agent gets to execute.
-     * @param nextOption Planned option for the agent to take at the future state.
-     * @param statistics Statistic information of the search performed by the controller.
+    /**
+     * Called every game step to allow the controller time to plan while
+     * executing the current action as taken from getAction().
+     * 
+     * To ensure the game remaines real-time, plain() should not take longer than ~18ms.
      */
-    virtual void run(BaseOption **currentOption, BaseOption **nextOption, 
-        std::map<enginetype::Statistics, int> &statistics) = 0;
+    virtual void plan() {};
 
-    /*
+    /**
      * Set the available options for the controller to plan with.
      *
-     * @param availableOptions A vector of options the controller will plan over.
+     * @param optionFactoryType Enum type to represent set of options to build
      */
-    void setAvailableOptions(const std::vector<BaseOption*> &availableOptions) {
-        availableOptions_ = availableOptions;
+    void setAvailableOptions(const OptionFactoryType optionFactoryType) {
+        availableOptions_ = optionFactory_.createOptions(optionFactoryType);
     }
 
-
-    virtual std::string controllerDetailsToString() {return "";}
+    /**
+     * Convey any important details about the controller in string format.
+     * Useful for logging relevant information about the current controller configuration.
+     * 
+     * @return The controller details in string format.
+     */
+    virtual std::string controllerDetailsToString() {return "Default controller";}
 
 };
 

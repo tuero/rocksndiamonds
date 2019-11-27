@@ -27,6 +27,30 @@ PFATreeNode::PFATreeNode(PFATreeNode* parent, const std::vector<Action> &actions
     is_solved = getSolvedStatusFromEngine();
 }
 
+/*
+ * Checks if action is valid given restricted GridCells player is allowed in.
+ */
+bool _canExpand(Action action, std::vector<enginetype::GridCell> &allowedCells) {
+    if (action == Action::noop) {
+        return true;
+    }
+
+    // Check if we can even make the desired action
+    enginetype::GridCell cellTo = enginehelper::getCellFromAction(action, enginehelper::getPlayerPosition());
+    if (!enginehelper::_isActionMoveable(action, cellTo)) {
+        return false;
+    }
+
+    // Check if direction is in allowed cells
+    for (auto const & cell : allowedCells) {
+        if (cell.x == cellTo.x && cell.y == cellTo.y) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 
 void PFATreeNode::setActions(std::vector<enginetype::GridCell> &allowed_cells) {
     // Simulator must be in this new state to determine the possible child actions
@@ -36,7 +60,7 @@ void PFATreeNode::setActions(std::vector<enginetype::GridCell> &allowed_cells) {
 
     for (Action action : ALL_ACTIONS) {
         // Player is blocked by wall
-        if (action == Action::noop || !enginehelper::canExpand(action, allowed_cells)) {
+        if (action == Action::noop || !_canExpand(action, allowed_cells)) {
             continue;
         }
         actions.push_back(action);

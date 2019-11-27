@@ -13,6 +13,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 // engine
 #include "engine/action.h"
@@ -22,13 +23,12 @@
 // controller
 #include "controller/controller.h"
 
-// util
-#include "util/level_programming.h"
+// Misc
+#include "level_programming/level_programming.h"
 #include "util/rng.h"
-#include "util/summary_window.h"
 
 // Logging
-#include "util/logging_wrapper.h"
+#include "util/logger.h"
 #include <plog/Log.h>
 
 // Tests
@@ -44,8 +44,6 @@ boolean is_simulating;
 // Global objects which are needed outside local scopes
 Controller controller;
 
-std::string levelsetSurvival = "custom_survival";
-
 
 // ------------------------ Init Functions --------------------------
 
@@ -53,29 +51,49 @@ std::string levelsetSurvival = "custom_survival";
  * Perform all necessary actions at level start.
  */
 extern "C" void handleLevelStart() {
-    // Log level
-    PLOGI_(logwrap::FileLogger) << "Level being played: " << level.file_info.nr;
-
     // If level is a custom programmed level, the respective level start code is called.
     levelprogramming::customLevelProgrammingStart();
 
     // Initialize zorbrist tables for state hashing
     enginehelper::initZorbristTables();
 
-    // Send starting board positions and player into to loggers
-    logwrap::logLevelStart();
-
     // clear solution
     controller.reset();
 
-    // Ensure RNG seeds reset during level start
-    RNG::setEngineSeed(RNG::getEngineSeed());
-    RNG::setSimulatingSeed(RNG::getSimulationSeed());
+    // Initial logging
+    PLOGI_(logger::FileLogger) << "Level starting: " << enginehelper::getLevelNumber();
+    PLOGI_(logger::ConsoleLogger) << "Level starting: " << enginehelper::getLevelNumber();
+    PLOGI_(logger::FileLogger) << "Gems needed: " << enginehelper::getLevelGemsNeeded();
+    PLOGI_(logger::ConsoleLogger) << "Gems needed: " << enginehelper::getLevelGemsNeeded();
+    logger::logCurrentState(plog::debug);
 
-    // if (options.summary_window) {summarywindow::init();}
+    // Ensure RNG seeds reset during level start
+    RNG::resetToEngineSeed();
+    RNG::resetToSimulationSeed();
 
     // Initialize and open replay file
-    logwrap::initReplayFile();
+    // Don't create replay file if we are currently in a replay
+    if (enginehelper::getControllerType() != CONTROLLER_REPLAY) {
+        logger::initReplayFile(enginehelper::getLevelSet(), enginehelper::getLevelNumber());
+    }
+}
+
+
+/**
+ * Call controller action handler when level is solved. 
+ * This will close logging and cleanup.
+ */
+extern "C" void handleLevelSolved() {
+    controller.handleLevelSolved();
+}
+
+
+/**
+ * Call controller action handler when level is failed. 
+ * Depending on the controller, this will either terminate or attempt the level again.
+ */
+extern "C" void handleLevelFailed() {
+    controller.handleLevelFailed();
 }
 
 
@@ -91,7 +109,7 @@ extern "C" void initController() {
 
 /*
  * Initialize the loggers.
- * Passes the command line arguments to logwrapper
+ * Passes the command line arguments to loggerper
  */
 extern "C" void initLogger(int argc, char *argv[]) {
     std::vector<std::string> allArgs(argv, argv + argc);
@@ -103,11 +121,7 @@ extern "C" void initLogger(int argc, char *argv[]) {
         programArgs += allArgs[i] + " ";
     }
 
-    // Set log level depending if debug flag set or if we are in a replay
-    plog::Severity logLevel = static_cast<plog::Severity>(options.log_level);
-    if (options.controller_type == CONTROLLER_TYPE_REPLAY) {logLevel = plog::error;}
-
-    logwrap::initLogger(logLevel, programArgs);
+    logger::initLogger(static_cast<logger::LogLevel>(options.log_level), programArgs);
 }
 
 
@@ -119,33 +133,28 @@ extern "C" void setLevelSet(void) {
 } 
 
 
-/*
- * Save the RNG seed, levelset and level used.
+/**
+ * Set the level
  */
-extern "C" void saveReplayLevelInfo(void) {
-    if (options.controller_type == CONTROLLER_TYPE_REPLAY) {return;}
-    logwrap::saveReplayLevelInfo();
-}
-
-
-// ----------------------- Summary Window -------------------------
-
-/*
- * Close the summary window.
- */
-extern "C" void closeMapWindow() {
-    summarywindow::close();
+extern "C" void setLevel(int levelNumber) {
+    enginehelper::loadLevel(levelNumber);
 }
 
 // ----------------------- Action Handler --------------------------
+
+/**
+ * Check if the controller wants to request a reset.
+ */
+extern "C" int requestReset() {
+    return controller.requestReset();
+}
+
 
 /*
  * Get an action from the controller and send back to engine.
  * Implementation of solution will depend on controller type.
  */
 extern "C" int getAction() {
-    // <!-- This will not be needed.
-    if (options.summary_window) {summarywindow::draw();}
     return controller.getAction();
 }
 
@@ -156,10 +165,7 @@ extern "C" int getAction() {
  * in the built in CE programming
  */
 extern "C" void handleCustomLevelProgramming() {
-    std::string currentLevelsetSubdir(leveldir_current->subdir);
-    if (currentLevelsetSubdir == levelsetSurvival) {
-        levelprogramming::customLevelProgrammingUpdate();
-    }
+    levelprogramming::customLevelProgrammingUpdate();
 }
 
 
@@ -184,22 +190,9 @@ extern "C" int getRandomNumber(int max) {
  * Results are logged to file
  */
 extern "C" void testEngineSpeed() {
-    logwrap::setLogLevel(plog::debug);
-    testenginespeed::testEngineSpeedNoOptimizations();
+    logger::setLogLevel(logger::LogLevel::debug);
+    // testenginespeed::testEngineSpeedNoOptimizations();
     testenginespeed::testEngineSpeedWithOptimizations();
-}
-
-
-/*
- * Tests the speed of running BFS
- * Dijkstra must be ran first to get the tile distances to goal.
- * Results are logged to file
- */
-extern "C" void testBFSSpeed() {
-    enginetype::GridCell exitCell = enginehelper::findExitLocation();
-    enginehelper::setBoardDistancesDijkstra(exitCell);
-    logwrap::setLogLevel(plog::debug);
-    testenginespeed::testBfsSpeed();
 }
 
 
@@ -210,9 +203,7 @@ extern "C" void testBFSSpeed() {
  * Results are logged to file
  */
 extern "C" void testMCTSSpeed() {
-    enginetype::GridCell exitCell = enginehelper::findExitLocation();
-    enginehelper::setBoardDistancesDijkstra(exitCell);
-    logwrap::setLogLevel(plog::debug);
+    logger::setLogLevel(logger::LogLevel::debug);
     testenginespeed::testMctsSpeed();
 }
 
@@ -221,7 +212,7 @@ extern "C" void testMCTSSpeed() {
  * Tests for RNG reproducibility after engine simulations during rollouts
  */
 extern "C" void testRNGAfterSimulations() {
-    logwrap::setLogLevel(plog::debug);
+    logger::setLogLevel(logger::LogLevel::debug);
     testrng::testStateAfterSimulations();
 }
 
@@ -229,33 +220,32 @@ extern "C" void testRNGAfterSimulations() {
  * Runs all of the above tests in sequence
  * Results are logged to file.
  */
-extern "C" void testAll() {
+extern "C" void runTests() {
     // Override logging level for tests
-    logwrap::setLogLevel(plog::debug);
+    logger::setLogLevel(logger::LogLevel::debug);
 
-    std::string msg = "Running all tests...";
+    PLOGI_(logger::FileLogger) << "Running all tests...";
+
     // Save current game state
     GameState state;
     state.setFromEngineState();
 
-    enginetype::GridCell exitCell = enginehelper::findExitLocation();
-    enginehelper::setBoardDistancesDijkstra(exitCell);
+    // enginetype::GridCell exitCell = enginehelper::findExitLocation();
+    // enginehelper::setBoardDistancesDijkstra(exitCell);
 
-    PLOGI_(logwrap::FileLogger) << msg;
-
-    state.restoreEngineState();
-    testenginespeed::testEngineSpeedNoOptimizations();
+    // state.restoreEngineState();
+    // testenginespeed::testEngineSpeedNoOptimizations();
 
     state.restoreEngineState();
     testenginespeed::testEngineSpeedWithOptimizations();
     
-    state.restoreEngineState();
-    testenginespeed::testBfsSpeed();
+    // state.restoreEngineState();
+    // testenginespeed::testBfsSpeed();
 
-    state.restoreEngineState();
-    testenginespeed::testMctsSpeed();
+    // state.restoreEngineState();
+    // testenginespeed::testMctsSpeed();
 
-    state.restoreEngineState();
-    testrng::testStateAfterSimulations();
+    // state.restoreEngineState();
+    // testrng::testStateAfterSimulations();
 }
 

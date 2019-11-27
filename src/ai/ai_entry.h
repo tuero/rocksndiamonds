@@ -34,6 +34,18 @@ extern "C"
      */
     void handleLevelStart(void);
 
+    /**
+     * Call controller action handler when level is solved. 
+     * This will close logging and cleanup.
+     */
+    void handleLevelSolved(void);
+
+    /**
+     * Call controller action handler when level is failed. 
+     * Depending on the controller, this will either terminate or attempt the level again.
+     */
+    void handleLevelFailed(void);
+
     /*
      * Initalizes the controller to be used.
      * 
@@ -58,19 +70,22 @@ extern "C"
      */
     void setLevelSet(void); 
 
-    /*
-     * Save the RNG seed, levelset and level used.
+    /**
+     * Set the level
+     * 
+     * @param levelNumber The level number for the respective levelset.
      */
-    void saveReplayLevelInfo(void);
+    void setLevel(int levelNumber);
 
-    // ----------------------- Summary Window -------------------------
-
-    /*
-     * Close the summary window.
-     */
-    void closeMapWindow(void);
 
     // --------------- Action Handler ------------------
+
+    /**
+     * Check if the controller wants to request a reset.
+     * 
+     * @return True if the controller wants to request a rest.
+     */
+    int requestReset(void);
 
     /*
      * Get an action from the controller (implementation specific) and send back to engine.
@@ -114,13 +129,6 @@ extern "C"
     void testEngineSpeed(void);
 
     /*
-     * Tests the speed of running BFS
-     * Dijkstra must be ran first to get the tile distances to goal.
-     * Results are logged to file
-     */
-    void testBFSSpeed(void);
-
-    /*
      * Tests the speed of running MCTS
      * This does one sweep of MCTS with a budget of 20ms (as per engine spec of
      * having a 20ms frame delay).
@@ -137,7 +145,7 @@ extern "C"
      * Runs all of the above tests in sequence
      * Results are logged to file
      */
-    void testAll(void);
+    void runTests(void);
 
 
 

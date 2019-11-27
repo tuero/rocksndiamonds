@@ -47,8 +47,7 @@ void AbstractGraph::init() {
     setCurrentFromNext();
 
     timer.stop();
-    PLOGI_(logwrap::FileLogger) << "Init Time: " << timer.getDuration();
-    PLOGI_(logwrap::ConsolLogger) << "Init Time: " << timer.getDuration();
+    logger::logInfoToFileAndConsole("Init Time: " + timer.getDuration());
 }
 
 
@@ -56,8 +55,9 @@ void AbstractGraph::init() {
  * Get the node which represents the top level of the abstraction
  */
 AbstractNode* AbstractGraph::getTopLevelNode() {
-    PLOGE_IF_(logwrap::FileLogger, current_level_.size() > 1) << "Top level has more than 1 node.";
-    PLOGE_IF_(logwrap::ConsolLogger, current_level_.size() > 1) << "Top level has more than 1 node.";
+    if ( current_level_.size() > 1) {
+        logger::logErrorToFileAndConsole("Top level has more than 1 node.");
+    }
     return current_level_[id_].get();
 }
 
@@ -70,8 +70,7 @@ AbstractNode* AbstractGraph::getStartNode(int level) {
     if (level == -1) {level = level_used_;}
 
     if (level < 0 || level > top_level_) {
-        PLOGE_(logwrap::FileLogger) << "Invalid level.";
-        PLOGE_(logwrap::ConsolLogger) << "Invalid level.";
+        logger::logErrorToFileAndConsole("Invalid level.");
         return nullptr;
     }
 
@@ -91,8 +90,6 @@ AbstractNode* AbstractGraph::getStartNode(int level) {
             }
         }
     }
-
-    PLOGD_(logwrap::FileLogger) << "Player " << player_grid.x << " " << player_grid.y;
 
     return start_node;
 }
@@ -556,7 +553,7 @@ void AbstractGraph::boardPrint(std::vector<std::vector<int>> &print_array){
 
     if (max_value < 10000) {min_value = 0;}
 
-    LOGD_(logwrap::FileLogger) << "Min value used: " << min_value;
+    LOGD_(logger::FileLogger) << "Min value used: " << min_value;
 
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
@@ -573,7 +570,7 @@ void AbstractGraph::boardPrint(std::vector<std::vector<int>> &print_array){
         }
         os << std::endl;
     }
-    LOGD_(logwrap::FileLogger) << os.str();
+    LOGD_(logger::FileLogger) << os.str();
 }
 
 
@@ -611,14 +608,14 @@ void AbstractGraph::logGraph() {
             // Current node
             msg = "Level: " + std::to_string(node_level) + ", Node: " + std::to_string(node_id); 
             msg += ", value: " + std::to_string(node_value) + ", goal: " + std::to_string(is_goal);
-            LOGD_(logwrap::FileLogger) << msg;
+            LOGD_(logger::FileLogger) << msg;
 
             // Neighbours
             msg = "\tNeighbours: ";
             for (auto const &neighbour : neighbours) {
                 msg += std::to_string(neighbour.first) + ", ";
             }
-            LOGD_(logwrap::FileLogger) << msg;
+            LOGD_(logger::FileLogger) << msg;
 
             // Node Reperesentation
             msg = "\tRepresenting: ";
@@ -626,19 +623,19 @@ void AbstractGraph::logGraph() {
                 msg += "(" + std::to_string(rep.x) + "," + std::to_string(rep.y) + "), ";
                 print_array[rep.y][rep.x] = node_id;
             }
-            LOGD_(logwrap::FileLogger) << msg;
+            LOGD_(logger::FileLogger) << msg;
 
             // Children
             msg = "\tChildren: ";
             for (auto const &child : children) {
                 msg += std::to_string(child->getId()) + ", ";
             }
-            LOGD_(logwrap::FileLogger) << msg;
+            LOGD_(logger::FileLogger) << msg;
         }
         boardPrint(print_array);
     }
 
-    LOGD_(logwrap::FileLogger) << header;
+    LOGD_(logger::FileLogger) << header;
 }
 
 
@@ -677,14 +674,14 @@ void AbstractGraph::logGraphLevel(int level) {
         // Current node
         msg = "Level: " + std::to_string(node_level) + ", Node: " + std::to_string(node_id); 
         msg += ", value: " + std::to_string(node_value) + ", goal: " + std::to_string(is_goal);
-        LOGD_(logwrap::FileLogger) << msg;
+        LOGD_(logger::FileLogger) << msg;
 
         // Neighbours
         msg = "\tNeighbours: ";
         for (auto const &neighbour : neighbours) {
             msg += std::to_string(neighbour.first) + ", ";
         }
-        LOGD_(logwrap::FileLogger) << msg;
+        LOGD_(logger::FileLogger) << msg;
 
         // Node Reperesentation
         msg = "\tRepresenting: ";
@@ -692,14 +689,14 @@ void AbstractGraph::logGraphLevel(int level) {
             msg += "(" + std::to_string(rep.x) + "," + std::to_string(rep.y) + "), ";
             print_array[rep.y][rep.x] = node_id;
         }
-        LOGD_(logwrap::FileLogger) << msg;
+        LOGD_(logger::FileLogger) << msg;
 
         // Children
         msg = "\tChildren: ";
         for (auto const &child : children) {
             msg += std::to_string(child->getId()) + ", ";
         }
-        LOGD_(logwrap::FileLogger) << msg;
+        LOGD_(logger::FileLogger) << msg;
     }
     boardPrint(print_array);
 }
@@ -709,7 +706,7 @@ void AbstractGraph::logGraphLevel(int level) {
  * Abstract the base level upwards until there is a single abstracted node.
  */
 void AbstractGraph::abstract() {
-    LOGI_(logwrap::FileLogger) << "Abstracting graph.";
+    LOGI_(logger::FileLogger) << "Abstracting graph.";
 
     Timer timer;
     timer.start();
@@ -727,19 +724,19 @@ void AbstractGraph::abstract() {
 
         // logGraph();
         // Sanity check
-        // PLOGE_IF_(logwrap::FileLogger, !current_level_.empty()) << "Not all nodes could be abstracted.";
+        // PLOGE_IF_(logger::FileLogger, !current_level_.empty()) << "Not all nodes could be abstracted.";
     }
 
     level_used_ = top_level_ / 2;
 
     timer.stop();
 
-    LOGI_(logwrap::FileLogger) << "Abstraction complete.";
-    LOGI_(logwrap::FileLogger) << "Abstract Time: " << timer.getDuration();
-    LOGI_(logwrap::ConsolLogger) << "Abstract Time: " << timer.getDuration();
-    LOGI_(logwrap::FileLogger) << "Number of levels: " << top_level_;
-    LOGI_(logwrap::ConsolLogger) << "Number of levels: " << top_level_;
-    LOGI_(logwrap::FileLogger) << "Total nodes: " << id_;
+    LOGI_(logger::FileLogger) << "Abstraction complete.";
+    LOGI_(logger::FileLogger) << "Abstract Time: " << timer.getDuration();
+    LOGI_(logger::ConsolLogger) << "Abstract Time: " << timer.getDuration();
+    LOGI_(logger::FileLogger) << "Number of levels: " << top_level_;
+    LOGI_(logger::ConsolLogger) << "Number of levels: " << top_level_;
+    LOGI_(logger::FileLogger) << "Total nodes: " << id_;
 
     logGraph();
 

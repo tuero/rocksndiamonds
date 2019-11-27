@@ -33,6 +33,11 @@ namespace RNG {
     void setEngineSeed();
 
     /*
+     * Reset the engine seed to the stored engine seed.
+     */
+    void resetToEngineSeed();
+
+    /*
      * Set the seed from the input for the RNG used by the simulation in planning.
      */
     void setSimulatingSeed(uint64_t seed);
@@ -41,6 +46,11 @@ namespace RNG {
      * Set the seed to current time in milliseconds for the RNG used by the simulation in planning.
      */
     void setSimulatingSeed();
+
+    /*
+     * Reset the simulation seed to the stored simulation seed.
+     */
+    void resetToSimulationSeed();
 
     /*
      * Get a random number from the engine RNG, from [0, max).

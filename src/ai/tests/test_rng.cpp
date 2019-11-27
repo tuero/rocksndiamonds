@@ -6,10 +6,10 @@
 namespace testrng{
 
     void testStateAfterSimulations() {
-        PLOGD_(logwrap::FileLogger) << "Running test: RNG state reproducibility.";
-        PLOGD_(logwrap::FileLogger) << "Level: " << level.file_info.nr;
+        PLOGD_(logger::FileLogger) << "Running test: RNG state reproducibility.";
+        PLOGD_(logger::FileLogger) << "Level: " << level.file_info.nr;
 
-        logwrap::logBoardState();
+        logger::logBoardState();
 
         StartGameActions(network.enabled, setup.autorecord, level.random_seed);
         enginehelper::setSimulatorFlag(FALSE);
@@ -33,7 +33,6 @@ namespace testrng{
 
             // Simulate a random number of states forward
             for (int j = 0; j < depth; j++) {
-                // RNG::setSeedEngineHash();
                 enginehelper::setEngineRandomPlayerAction();
                 actionsTaken.push_back(static_cast<Action>(enginehelper::getEnginePlayerAction()));
                 enginehelper::engineSimulate();
@@ -55,25 +54,25 @@ namespace testrng{
             referenceState.setFromEngineState();
             if (!(referenceState == forwardState)) {
                 failedComparisons += 1;
-                PLOGD_(logwrap::FileLogger) << "States are not equal.";
+                PLOGD_(logger::FileLogger) << "States are not equal.";
                 forwardState.restoreEngineState();
-                logwrap::logBoardState();
+                logger::logBoardState();
 
                 referenceState.restoreEngineState();
-                logwrap::logBoardState();
+                logger::logBoardState();
 
             }
             else {
-                PLOGD_(logwrap::FileLogger) << "States are equal.";
+                PLOGD_(logger::FileLogger) << "States are equal.";
             }
         }
 
         if (failedComparisons == 0) {
-            PLOGD_(logwrap::FileLogger) << "All states match after simulations";
+            PLOGD_(logger::FileLogger) << "All states match after simulations";
         }
 
-        PLOGD_(logwrap::FileLogger) << "End of test...";
-        PLOGD_(logwrap::FileLogger) << "";
+        PLOGD_(logger::FileLogger) << "End of test...";
+        PLOGD_(logger::FileLogger) << "";
     }
 
 }

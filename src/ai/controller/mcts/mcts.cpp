@@ -12,10 +12,9 @@
 #include "mcts.h"
 
 #include <iostream>
-#include <ostream>
-#include <fstream>
 #include <algorithm>
 #include <random>
+#include <cassert>
 
 // Engine
 #include "../../engine/engine_types.h"
@@ -23,59 +22,21 @@
 #include "../options/option_single_step.h"
 
 //Logging
-#include "../../util/logging_wrapper.h"
-#include <plog/Log.h>   
+#include "../../util/logger.h"
 
 
 std::random_device rd;
 std::mt19937 g(rd());
-
-MCTS::MCTS(){
-    // Load parameters from file
-    std::string line;
-    std::string parameterName;
-    float parameterValue;
-
-    try{
-        std::ifstream configFile (config_dir + mcts_config);
-        std::vector<Action> path;
-        while (std::getline(configFile,line)){
-            std::istringstream iss(line);
-            if (!(iss >> parameterName >> parameterValue) || parameterValue < 0) {
-                PLOGE_(logwrap::FileLogger) << "Bad line in config file, skipping.";
-                continue;
-            }
-
-            // Process parameter
-            if (configParameters_.find(parameterName) != configParameters_.end()) {
-                *(configParameters_[parameterName]) = parameterValue;
-            }
-        }
-
-        configFile.close();
-    }
-    catch (const std::ifstream::failure& e) {
-        PLOGE_(logwrap::FileLogger) << "Cannot open file.";
-    }
-
-    timer.setLimit(maxTime_);
-
-    // Log parameters being used
-    PLOGI_(logwrap::FileLogger) << "MCTS parametrs:";
-    for (auto const param : configParameters_) {
-        PLOGI_(logwrap::FileLogger) << param.first << ": " << *(param.second);
-    }
-}
 
 
 /*
  * Log the current MCTS stats.
  */
 void MCTS::logCurrentStats() {
-    PLOGD_(logwrap::FileLogger) << "Time remaining: " << timer.getTimeLeft();
-    PLOGD_(logwrap::FileLogger) << "Current number of expanded nodes: " << countExpandedNodes_ 
-        << ", simulated nodes: " << countSimulatedNodes_
-        << ", max depth: " << maxDepth_;
+    PLOGD_(logger::FileLogger) << "Time remaining: " << timer.getTimeLeft();
+    PLOGD_(logger::FileLogger) << "Current number of expanded nodes: " << countExpandedNodes_
+                               << ", simulated nodes: " << countSimulatedNodes_
+                               << ", max depth: " << maxDepth_;
 }
 
 
@@ -188,7 +149,7 @@ std::string MCTS::controllerDetailsToString() {
         float value = childNode->getValue() / (float)visitCount;
 
         output += "\taction: ";
-        output += childNode->getOptionTaken()->optionToString();
+        output += childNode->getOptionTaken()->toString();
         output += ", value: ";
         output += std::to_string(value);
         output += ", visit count: ";
@@ -200,6 +161,12 @@ std::string MCTS::controllerDetailsToString() {
 }
 
 
+void MCTS::handleLevelStart() {
+    optionStatusFlag_ = true;
+    nextOption_ = &noopOption;
+}
+
+
 /*
  * Reset the MCTS controller.
  *
@@ -207,7 +174,7 @@ std::string MCTS::controllerDetailsToString() {
  * search for the second option while we are currently executing the first option. By
  * default, the starting options is a single step noop.
  */
-void MCTS::reset(BaseOption *nextOption) {   
+void MCTS::reset() {   
     // Reset statistics
     callsSinceReset_ = 0;
     countSimulatedNodes_ = 0;
@@ -223,29 +190,24 @@ void MCTS::reset(BaseOption *nextOption) {
     std::string msg = "Setting root to next option in queue: ";
 
     // Safeguard against bad pointers, option will be to step forward my performing noop action
-    if (nextOption == nullptr) {
+    if (nextOption_ == nullptr) {
         OptionSingleStep tempOption = OptionSingleStep(Action::noop, 1);
-        msg += tempOption.optionToString();
+        msg += tempOption.toString();
         tempOption.run();
     }
     else {
-        msg += nextOption->optionToString();
-        nextOption->run();
+        msg += nextOption_->toString();
+        nextOption_->run();
     }
 
-    logCurrentState(msg, true);
+    currentOption_ = nextOption_;
+    PLOGD_(logger::ConsoleLogger) << "Next option: " << currentOption_->toString() << " " << currentOption_->isValid();
+    PLOGD_(logger::FileLogger) << "Next option: " << currentOption_->toString() << " " << currentOption_->isValid();
+
+    logger::logCurrentState(plog::debug);
+    logger::logBoardSpriteIDs(plog::debug);
 
     // save root state to where we will be when done executing current queued action
-    // if (root != nullptr) {
-    //     root = root.get()->getChild(nextOption);
-    //     if (root != nullptr) {root.get()->setParent(nullptr);}
-    // }
-    // if (root == nullptr) {
-    //     root = std::make_unique<TreeNode>(nullptr);
-    //     rootSavedState.setFromEngineState();
-    //     root.get()->setOptions(availableOptions_);
-    // }
-
     root = std::make_unique<TreeNode>(nullptr);
     rootSavedState.setFromEngineState();
     root.get()->setOptions(availableOptions_);
@@ -263,17 +225,22 @@ void MCTS::reset(BaseOption *nextOption) {
  * nextOption, which is the option MCTS wants to do next. The MCTS search tree
  * is then reset to the state after the current option is complete.
  */
-void MCTS::handleEmpty(BaseOption **currentOption, BaseOption **nextOption) {
-    *currentOption = *nextOption;
-
+Action MCTS::getAction() {
     // Ensure game is currently not over
     if (enginehelper::engineGameOver()) {
-        return;
+        return Action::noop;
     }
 
-    PLOGD_(logwrap::FileLogger) << "Resetting MCTS tree.";
-    PLOGD_(logwrap::ConsolLogger) << "Resetting MCTS tree.";
-    reset(*nextOption);
+    // Check if option is complete
+    if (optionStatusFlag_) {
+        PLOGD_(logger::FileLogger) << "Resetting MCTS tree.";
+        PLOGD_(logger::ConsoleLogger) << "Resetting MCTS tree.";
+        reset();
+    }
+
+    Action action;
+    optionStatusFlag_ = currentOption_->getNextAction(action);
+    return action;
 }
 
 
@@ -285,12 +252,7 @@ void MCTS::handleEmpty(BaseOption **currentOption, BaseOption **nextOption) {
  * the option the agent is currently conducting. The option to be taken once 
  * current option is complete should be put into nextOption.
  */
-void MCTS::run(BaseOption **currentOption, BaseOption **nextOption, 
-        std::map<enginetype::Statistics, int> &statistics) 
-{
-    // Silent compiler warning
-    (void)currentOption;
-
+void MCTS::plan() {
     // Break early if either current state or root state is already over.
     if (enginehelper::engineGameOver() || rootSavedState.isGameOver()) {
         return;
@@ -317,7 +279,7 @@ void MCTS::run(BaseOption **currentOption, BaseOption **nextOption,
     // Log state before MCTS to ensure we are simulating after queued actions are taken.
     // This allows for a next step partial solution to be given immediately after current
     // actions are finished.
-    logCurrentState("State before MCTS.", false);
+    // logCurrentState("State before MCTS.", false);
 
     // forwardSolution.clear();
     timer.start();
@@ -339,7 +301,6 @@ void MCTS::run(BaseOption **currentOption, BaseOption **nextOption,
         // <!-- Maybe use engine status rather than nodes?
         while (!current->isTerminal() && current->allExpanded()) {
             current = selectPolicyUCT(current);
-            PLOGE_(logwrap::FileLogger) << "Running Option: " << current->getOptionTaken()->optionToString();
             current->getOptionTaken()->run();
             currentDepth += 1;
         }
@@ -399,26 +360,27 @@ void MCTS::run(BaseOption **currentOption, BaseOption **nextOption,
     int ms = timer.getDuration();
 
     // Update statistics
-    statistics[enginetype::RUN_TIME] = ms;
-    statistics[enginetype::COUNT_EXPANDED_NODES] = countExpandedNodes_;
-    statistics[enginetype::COUNT_SIMULATED_NODES] = countSimulatedNodes_;
-    statistics[enginetype::MAX_DEPTH] = maxDepth_;
+    logCurrentStats();
 
     // Get best child and its associated action
     rootSavedState.restoreEngineState();
     bestChild = selectMostVisitedChild(root.get());
-    BaseOption* bestOption = bestChild->getOptionTaken();
+    // BaseOption* bestOption = bestChild->getOptionTaken();
+    nextOption_ = bestChild->getOptionTaken();
 
     // Logg root child nodes along with their current valuation
     // msg = "Child node values:\n" + childrenToString(root.get());
     // PLOGD_(logwrap::FileLogger) << msg;
-    // PLOGD_IF_(logwrap::ConsolLogger, callsSinceReset_ == 8) << msg;
-    // PLOGD_(logwrap::ConsolLogger) << msg;
+    // PLOGD_IF_(logwrap::ConsoleLogger, callsSinceReset_ == 8) << msg;
+    // PLOGD_(logwrap::ConsoleLogger) << msg;
 
     // Put simulator back to original state
     startingState.restoreEngineState();
     enginehelper::setSimulatorFlag(false);
 
     // return best option
-    *nextOption = bestOption;
+    // *nextOption = bestOption;
+    // Action action;
+    // optionStatusFlag_ = currentOption_->getNextAction(action);
+    // return action;
 }

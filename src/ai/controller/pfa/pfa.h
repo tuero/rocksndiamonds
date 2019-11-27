@@ -24,7 +24,7 @@
 #include "../../util/summary_window.h"
 
 //Logging
-#include "../../util/logging_wrapper.h"
+#include "../../util/logger.h"
 #include <plog/Log.h>   
 
 

@@ -367,9 +367,10 @@ void EventLoop(void)
 
   while (1)
   {
-      // New level loaded, so calculate tile distances and print starting state
+      // Game state change indicates new game is started
+      // Reset controller, initialize replay file, set RNG seeds for reproducibility
       if (prev_game_status != game_status && game_status == GAME_MODE_PLAYING &&
-          options.controller_type != CONTROLLER_TYPE_DEFAULT)
+          options.controller_type != CONTROLLER_DEFAULT)
       {
           handleLevelStart();
       }
@@ -391,25 +392,29 @@ void EventLoop(void)
 
       // don't use all CPU time when idle; the main loop while playing
     // has its own synchronization and is CPU friendly, too
-
     if (game_status == GAME_MODE_PLAYING){
+        // If the game is over, we rest
+
+
         // Get action from controller
         // We can get rid of the conditional by just returning user action
         // if no controller is selected
-        if (options.controller_type != CONTROLLER_TYPE_DEFAULT) {
-            handleCustomLevelProgramming();
-            stored_player[0].action = getAction();
+        if (options.controller_type != CONTROLLER_DEFAULT) {
+            // Game solved
+            if (game.LevelSolved && !game.LevelSolved_GameEnd) {
+                handleLevelSolved();
+            }
+            else if (checkGameFailed() || requestReset()) {
+                handleLevelFailed();
+            }
+            else {
+                handleCustomLevelProgramming();
+                stored_player[0].action = getAction();
+            }
         }
 
         HandleGameActions();
     }
-
-    // If level is complete during headless, we set end status and log output
-#ifdef HEADLESS
-    if ((game.LevelSolved && !game.LevelSolved_GameEnd) || checkGameFailed()) {
-        game_status = GAME_MODE_QUIT;
-    }
-#endif
 
     // always copy backbuffer to visible screen for every video frame
 #ifndef HEADLESS
@@ -417,6 +422,7 @@ void EventLoop(void)
 
     // reset video frame delay to default (may change again while playing)
     SetVideoFrameDelay(MenuFrameDelay);
+    SetVideoFrameDelay(options.delay != GAME_FRAME_DELAY && !is_simulating ? options.delay : MenuFrameDelay);
 #endif
 
     if (game_status == GAME_MODE_QUIT)
@@ -652,9 +658,6 @@ void HandleWindowEvent(WindowEvent *event)
       event->event == SDL_WINDOWEVENT_EXPOSED)
     SDLRedrawWindow();
 #endif
-  if (event->event == SDL_WINDOWEVENT_CLOSE) {
-      closeMapWindow();
-  }
 
   if (event->event == SDL_WINDOWEVENT_RESIZED)
   {

@@ -20,6 +20,10 @@
 #include "events.h"
 #include "config.h"
 
+// (tuero@ualberta.ca) - September 2019
+// Controller type listings
+#include "ai/controller/controller_listing.h"
+
 #ifndef HEADLESS
 Bitmap		       *bitmap_db_field;
 Bitmap		       *bitmap_db_panel;
@@ -70,6 +74,11 @@ short			ExplodePhase[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 short			ExplodeDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int			RunnerVisit[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 int			PlayerVisit[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+
+// (tuero@ualberta.ca) - October 2019
+// external access struct for fast distance calculations throughout
+// shared custom code.
+short distances[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 
 #ifndef HEADLESS
 int			GfxFrame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
@@ -7806,48 +7815,23 @@ int main(int argc, char *argv[])
     // Init custom logging
     initController();
 
-    // Load maps for above mapset, and set current level
-    if (options.controller_type == CONTROLLER_TYPE_TEST_SPEED) {
-        LoadLevel(options.level_number);
-        handleLevelStart();
-        testEngineSpeed();
-        return 0;
-    }
-    else if (options.controller_type == CONTROLLER_TYPE_TEST_BFS) {
-        LoadLevel(options.level_number);
-        handleLevelStart();
-        testBFSSpeed();
-        return 0;
-    }
-    else if (options.controller_type == CONTROLLER_TYPE_TEST_MCTS) {
-        LoadLevel(options.level_number);
-        handleLevelStart();
-        testMCTSSpeed();
-        return 0;
-    }
-    else if (options.controller_type == CONTROLLER_TYPE_TEST_RNG) {
-        LoadLevel(options.level_number);
-        handleLevelStart();
-        testRNGAfterSimulations();
-        return 0;
-    }
-    else if (options.controller_type == CONTROLLER_TYPE_TEST_ALL) {
-        LoadLevel(options.level_number);
-        handleLevelStart();
-        testAll();
-        return 0;
-    }
-    else if (options.level_number > 0) {
-        LoadLevel(options.level_number);
+    // If level number given as program argument, try to load
+    if (options.level_number > 0) {
+        setLevel(options.level_number);
     }
 
-    // start game
-    if (options.controller_type != CONTROLLER_TYPE_DEFAULT) {
+    // Running tests do not go into the main game loop
+    if (options.run_tests) {
+        handleLevelStart();
+        runTests();
+        return 0;
+    }
+
+    // If we have specified a controller, we need to manually start game actions
+    // Normally this would run when the user manually clicks on game start
+    if (options.controller_type != CONTROLLER_DEFAULT) {
         StartGameActions(network.enabled, setup.autorecord, level.random_seed);
     }
-
-//    StartGameActions(network.enabled, setup.autorecord, level.random_seed);
-
 
     // normal event loop
   EventLoop();

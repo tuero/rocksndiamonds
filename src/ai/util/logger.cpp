@@ -8,21 +8,25 @@
  * Contact: tuero@ualberta.ca
  */
 
-#include "logging_wrapper.h"
+#include "logger.h"
 
 #include <iostream>
 #include <fstream>
 #include <sys/types.h>
 #include <unistd.h>
+
+// Third party logging library
+#include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
 
-#include "../engine/engine_helper.h"
 #include "../engine/engine_types.h"
+#include "rng.h"
 
 
 // Directory locations
 const std::string LOG_DIR = "./src/ai/logs/";
 const std::string REPLAY_DIR = "./src/ai/replays/";
+const std::string STATS_DIR = "./src/ai/stats/";
 const std::string LOG_EXTENSION = ".log";
 const std::string REPLAY_EXTENSION = ".txt";
 static std::ofstream replayFile;
@@ -78,13 +82,17 @@ std::string getStructRepresentation(short (&data)[MAX_LEV_FIELDX][MAX_LEV_FIELDY
     return os.str();
 }
 
+
+/*
+ * Helper function to get pretty print of internal engine data structure
+ */
 std::string getStructRepresentation(int (&data)[MAX_LEV_FIELDX][MAX_LEV_FIELDY]) {
     std::ostringstream os;
     for (int y = 0; y < level.fieldy; y++) {
         for (int x = 0; x < level.fieldx; x++) {
             os.width(5);
             if (stored_player[0].jx == x && stored_player[0].jy == y && data[x][y] == 0) {
-                os << "X ";
+                os << " X ";
             }
             else {
                 os << data[x][y] << " ";
@@ -97,7 +105,7 @@ std::string getStructRepresentation(int (&data)[MAX_LEV_FIELDX][MAX_LEV_FIELDY])
 }
 
 
-namespace logwrap {
+namespace logger {
     
     /*
      * Initialize loggers for file and std_out.
@@ -105,19 +113,24 @@ namespace logwrap {
      * @param logLevel Max log level
      * @param programArgs String of all program args
      */
-    void initLogger(plog::Severity logLevel, std::string &programArgs) {
+    void initLogger(LogLevel logLevel, std::string &programArgs) {
+        plog::Severity logLevel_ = static_cast<plog::Severity>(logLevel);
+        
+        // Set log level depending if debug flag set or if we are in a replay
+        if (options.controller_type == CONTROLLER_REPLAY) {logLevel_ = plog::error;}
+
         // log file name with path
         std::string logFileFullPath = LOG_DIR + getFileName() + LOG_EXTENSION;
 
         // Default logger to file
-        plog::init<FileLogger>(logLevel, logFileFullPath.c_str());
+        plog::init<FileLogger>(logLevel_, logFileFullPath.c_str());
 
         // Second logger to stdout
         static plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
-        plog::init<ConsolLogger>(logLevel, &consoleAppender);
+        plog::init<ConsoleLogger>(logLevel_, &consoleAppender);
 
         // Log CLAs used
-        PLOGI_(logwrap::FileLogger) << programArgs;
+        PLOGI_(logger::FileLogger) << programArgs;
     }
 
 
@@ -128,15 +141,19 @@ namespace logwrap {
      * Includes levelset, level played, engine random number seed, and all actions
      * taken by the agent.
      */
-    void initReplayFile() {
-        // Don't create replay file if we are currently in a replay
-        if (enginehelper::getControllerType() == enginetype::REPLAY) {
+    void initReplayFile(const std::string levelSet, int levelNumber) {
+        std::string replayFileFullPath = REPLAY_DIR + getFileName() + REPLAY_EXTENSION;
+        PLOGI_(logger::FileLogger) << "Creating replay file \"" << replayFileFullPath << "\"";
+        replayFile.open(replayFileFullPath, std::ios::app);
+        
+        if (!replayFile.is_open()) {
+            PLOGE_(logger::FileLogger) << "Can't save replay level info, file already closed.";
             return;
         }
-        std::string replayFileFullPath = REPLAY_DIR + getFileName() + REPLAY_EXTENSION;
-        PLOGI_(logwrap::FileLogger) << "Creating replay file " << replayFileFullPath;
-        replayFile.open(replayFileFullPath, std::ios::app);
-        saveReplayLevelInfo();
+
+        replayFile << RNG::getEngineSeed() << std::endl;
+        replayFile << levelSet << std::endl;
+        replayFile << levelNumber << std::endl;
     }
 
 
@@ -145,24 +162,10 @@ namespace logwrap {
      *
      * @param logLevel The max level to log.
      */
-    void setLogLevel(plog::Severity logLevel) {
-        plog::get<logwrap::FileLogger>()->setMaxSeverity(logLevel);
-        plog::get<logwrap::ConsolLogger>()->setMaxSeverity(logLevel);
-    }
-
-
-    /*
-     * Log RNG seed, levelset and level number used.
-     */
-    void saveReplayLevelInfo() {
-        if (!replayFile.is_open()) {
-            PLOGE_(logwrap::FileLogger) << "Can't save replay level info, file already closed.";
-            return;
-        }
-
-        replayFile << RNG::getEngineSeed() << std::endl;
-        replayFile << enginehelper::getLevelSet() << std::endl;
-        replayFile << enginehelper::getLevelNumber() << std::endl;
+    void setLogLevel(LogLevel logLevel) {
+        plog::Severity logLevel_ = static_cast<plog::Severity>(logLevel);
+        plog::get<logger::FileLogger>()->setMaxSeverity(logLevel_);
+        plog::get<logger::ConsoleLogger>()->setMaxSeverity(logLevel_);
     }
 
 
@@ -173,9 +176,7 @@ namespace logwrap {
      * are used. In most cases (and in all custom maps), TYPE_RND is used.
      */
     void logEngineType() {
-        std::string msg;
-
-        msg = "Using engine type ";
+        std::string msg = "Using engine type ";
         if (level.game_engine_type == GAME_ENGINE_TYPE_EM) {
             msg += "EM";
         }
@@ -186,14 +187,14 @@ namespace logwrap {
             msg += "RND";
         }
 
-        PLOGI_(logwrap::FileLogger) << msg;
+        PLOGI_(logger::FileLogger) << msg;
     }
 
 
     /*
      * Logs some of the important player fields.
      */
-    void logPlayerDetails() {
+    void logPlayerDetails(plog::Severity logLevel) {
         std::string msg = "Player Info: ";
         msg += "X: " + std::to_string(stored_player[0].jx) + " ";
         msg += "Y: " + std::to_string(stored_player[0].jy) + " ";
@@ -202,71 +203,47 @@ namespace logwrap {
         msg += "is_moving: " + std::to_string(stored_player[0].is_moving) + " ";
         msg += "is_waiting: " + std::to_string(stored_player[0].is_waiting) + " ";
         msg += "move_delay: " + std::to_string(stored_player[0].move_delay) + " ";
-        PLOGD_(logwrap::FileLogger) << msg;
+        PLOG_(logger::FileLogger, logLevel) << msg;
     }
 
 
     /*
      * Logs the current board state (FELD) at the tile level.
      */
-    void logBoardState() {
-        std::string msg = "Board state at step: " + std::to_string(step_counter) + "\n";
-        msg += getStructRepresentation(Feld);
-        PLOGD_(logwrap::FileLogger) << msg;
+    void logBoardState(plog::Severity logLevel) {
+        PLOG_(logger::FileLogger, logLevel) << "Board state at step: " << step_counter << "\n" << getStructRepresentation(Feld);
     }
 
 
     /*
      * Logs the current board state (MovPos) sprite tile distance offsets.
      */
-    void logMovPosState() {
-        std::string msg = "MovPos at step: " + std::to_string(step_counter) + "\n";
-        msg += getStructRepresentation(MovPos);
-        PLOGD_(logwrap::FileLogger) << msg;
+    void logMovPosState(plog::Severity logLevel) {
+        PLOG_(logger::FileLogger, logLevel) << "MovPos at step: " << step_counter << "\n" << getStructRepresentation(MovPos);
     }
 
 
     /*
      * Logs the current board state (MovDir) sprite tile direction offsets.
      */
-    void logMovDirState() {
-        std::string msg = "MovDir at step: " + std::to_string(step_counter) + "\n";
-        msg += getStructRepresentation(MovDir);
-        PLOGD_(logwrap::FileLogger) << msg;
+    void logMovDirState(plog::Severity logLevel) {
+        PLOG_(logger::FileLogger, logLevel) << "MovDir at step: " << step_counter << "\n" << getStructRepresentation(MovDir);
     }
 
 
     /*
      * Logs the current tile distances to goal (used in pathfinding).
      */
-    void logBoardDistances() {
-        std::string msg = "Board distances:\n";
-        msg += getStructRepresentation(enginehelper::distances);
-        PLOGD_(logwrap::FileLogger) << msg;
+    void logBoardDistances(plog::Severity logLevel) {
+        PLOG_(logger::FileLogger, logLevel) << "Board distances:\n" << getStructRepresentation(distances);
     }
 
 
     /*
      * Logs the sprite IDs
      */
-    void logBoardSpriteIDs() {
-        std::string msg = "Sprite IDs\n";
-        msg += getStructRepresentation(spriteIDs);
-        PLOGD_(logwrap::FileLogger) << msg;
-    }
-
-
-    /*
-     * Log all information at level start.
-     *
-     * Includes engine type, player position and state, board item positions, and distances.
-     */
-    void logLevelStart() {
-        PLOGD_(logwrap::FileLogger) << "Level start";
-        logEngineType();
-        logPlayerDetails();
-        logBoardState();
-        logBoardDistances();
+    void logBoardSpriteIDs(plog::Severity logLevel) {
+        PLOG_(logger::FileLogger, logLevel) << "Sprite IDs:\n" << getStructRepresentation(spriteIDs);
     }
 
 
@@ -275,12 +252,13 @@ namespace logwrap {
      *
      * Includes player position and state, board item positions, and directions.
      */
-    void logState() {
-        PLOGD_(logwrap::FileLogger) << "Current state";
-        logPlayerDetails();
-        logBoardState();
-        logMovPosState();
-        logMovDirState();
+    void logCurrentState(plog::Severity logLevel) {
+        PLOG_(logger::FileLogger, logLevel) << "Current state:";
+        logPlayerDetails(logLevel);
+        logBoardState(logLevel);
+        logBoardSpriteIDs(logLevel);
+        logMovPosState(logLevel);
+        logMovDirState(logLevel);
     }
 
 
@@ -288,8 +266,8 @@ namespace logwrap {
      * Log the players current move.
      */
     void logPlayerMove(const std::string &action) {
-        PLOGI_(logwrap::FileLogger) << "Controller sending action: " + action;
-        PLOGD_(logwrap::ConsolLogger) << "Controller sending action: " + action;
+        PLOGD_(logger::FileLogger) << "Controller sending action: " + action;
+        PLOGD_(logger::ConsoleLogger) << "Controller sending action: " + action;
     }
 
 
@@ -298,7 +276,7 @@ namespace logwrap {
      */
     void savePlayerMove(const std::string &action) {
         // Don't record action if we are already in a replay
-        if (options.controller_type == CONTROLLER_TYPE_REPLAY || !replayFile.is_open()) {
+        if (options.controller_type == CONTROLLER_REPLAY || !replayFile.is_open()) {
             return;
         }
 
@@ -316,4 +294,4 @@ namespace logwrap {
         replayFile.close();
     }
 
-} //namespace logwrap
+} //namespace logger

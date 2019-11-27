@@ -1,0 +1,143 @@
+/**
+ * @file: two_level_search.h
+ *
+ * @brief: Masters thesis controller.
+ * 
+ * @author: Jake Tuero
+ * Date: November 2019
+ * Contact: tuero@ualberta.ca
+ */
+
+#ifndef TWO_LEVEL_SEARCH_H
+#define TWO_LEVEL_SEARCH_H
+
+#include <string>
+#include <deque>
+#include <unordered_map>
+#include <vector>
+#include <algorithm>
+
+#include "../base_controller.h"
+#include "../options/base_option.h"
+
+#include "../../engine/game_state_abstract.h"
+
+/**
+ * Default controller
+ *
+ * This does nothing, and acts as a backup to prevent unknown controller input from breaking
+ */
+class TwoLevelSearch : public BaseController {
+private:
+    bool optionStatusFlag_ = true;                                                  // Flag signifying current option is complete
+    int solutionIndex_;                                                             // Current index in the high level path
+    BaseOption* currentOption_;                                                     // Pointer to current option in high level path
+    std::deque<BaseOption*> highlevelPlannedPath_ = {};                             // Path of high level options
+    std::vector<std::vector<enginetype::GridCell>> restrictedCellsByOption_;        // Restricted cells for each option
+    
+    uint64_t hash = 0;                                                              // Hash of the current option being attempted
+    std::unordered_map<uint64_t, AbstractGameState> storedPathStates_;              // Cached previous paths attempted to avoid duplicate attempts
+
+    // Struct for restricted cell
+    struct SpriteRestriction {
+        int spriteID;                   // Sprite restriction corresponds to
+        enginetype::GridCell cell;      // The gridcell to avoid
+
+        bool operator==(const SpriteRestriction &other) const {
+            return spriteID == other.spriteID && cell == other.cell;
+        }
+    };
+
+    enginetype::GridCell prevPlayerCell_;                               // Player cell on the previous game step (Used to find restricted cells on current step)
+    enginetype::GridCell currPlayerCell_;                               // Player cell on the current game step
+    std::unordered_map<int, bool> prevIsMoving_;                        // Map of sprites which are moving for the previous game step
+    std::unordered_map<int, bool> currIsMoving_;                        // Map of sprites which are moving for the current game step
+    std::deque<enginetype::GridCell> lowlevelPlannedPath_;              // Path of individual grid cells for the current option
+    std::vector<std::vector<SpriteRestriction>> spritesMoved;           // Current list of sprites which moved during player actions
+    std::vector<std::vector<SpriteRestriction>> spritesMovedTemp;       // Temporary list of newer moved sprites which occur while still parsing the original list
+    std::vector<uint64_t> bitMasks_;                                    // Bit masks for each option, represents which restriction to use
+
+    struct HighLevelNode {
+        BaseOption *id;                             // Fast access node ID = gridcell index 
+        BaseOption *parentId;                       // node ID for the parent node
+        BaseOption *option;                 // Represented data member to search over
+        double g;                            // g-value used in A*
+        double h;                            // h-value used in A* (Euclidean distance)
+    };
+
+    // Custom comparator for priority queue 
+    class CompareHighLevelNode {
+        public:
+            bool operator() (HighLevelNode left, HighLevelNode right) {
+                return (left.g + left.h) > (right.g + right.h);
+            }
+    };
+
+    void highLevelSearch();
+
+    void checkForMovedObjects();
+
+    void setNewRestrictions();
+
+public:
+
+    TwoLevelSearch() {}
+
+    TwoLevelSearch(OptionFactoryType optionType) : BaseController(optionType) {}
+
+    void resetOptions() override;
+
+    /**
+     * Flag for controller to try again if level fails.
+     */
+    bool retryOnLevelFail() const override {return true;}
+
+    /**
+     * Handle necessary items before the level gets restarted.
+     *  
+     */
+    void handleLevelRestartBefore() override;
+
+    /**
+     * Handle necessary items after the level gets restarted.
+     *  
+     */
+    void handleLevelRestartAfter() override;
+
+    /*
+     * Handle setup required at level start.
+     * 
+     * Called only during level start. Any preprocessing or intiailizations needed for the 
+     * controller that wouldn't otherwise be done during each game tick, should be setup here.
+     */
+    void handleLevelStart() override;
+
+    /**
+     * Get the action from the controller.
+     * 
+     * @param currentOption Option which the agent gets to execute.
+     * @param nextOption Planned option for the agent to take at the future state.
+     */
+    Action getAction() override;
+
+    /*
+     * Continue to find the next option the agent should take.
+     * 
+     *
+     * @param currentOption Option which the agent gets to execute.
+     * @param nextOption Planned option for the agent to take at the future state.
+     */
+    // void run(BaseOption **currentOption, BaseOption **nextOption) override;
+    void plan() override;
+
+    /**
+     * Convey any important details about the controller in string format.
+     * @return The controller details in string format.
+     */
+    std::string controllerDetailsToString() override;
+
+};
+
+#endif  //TWO_LEVEL_SEARCH_H
+
+

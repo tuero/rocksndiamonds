@@ -43,14 +43,11 @@ public:
      */
     bool run() override;
 
-    bool singleStep(Action &action) override;
+    bool getNextAction(Action &action) override;
 
     bool isValid_() override;
 
-    std::string optionToString() override;
-
-    std::ostream& toString(std::ostream& o) const override;
-
+    std::string toString() const override;
 };
 
 

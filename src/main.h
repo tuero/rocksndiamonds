@@ -3641,6 +3641,11 @@ extern short			ExplodeDelay[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int			RunnerVisit[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int			PlayerVisit[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 
+// (tuero@ualberta.ca) - October 2019
+// external access struct for fast distance calculations throughout
+// shared custom code.
+extern short distances[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
+
 #ifndef HEADLESS
 extern int			GfxFrame[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int			GfxRandom[MAX_LEV_FIELDX][MAX_LEV_FIELDY];

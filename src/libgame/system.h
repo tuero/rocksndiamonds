@@ -15,6 +15,9 @@
 #include "platform.h"
 #include "types.h"
 
+// (tuero@ualberta.ca) - September 2019
+// Controller type listings
+#include "../ai/controller/controller_listing.h"
 
 #if defined(PLATFORM_MACOSX)
 #include "macosx.h"
@@ -974,11 +977,9 @@ struct RuntimeInfo
   boolean uses_touch_device;
 };
 
-typedef enum controller_type {CONTROLLER_TYPE_DEFAULT, CONTROLLER_TYPE_TEST_SPEED, CONTROLLER_TYPE_TEST_BFS,
-                              CONTROLLER_TYPE_TEST_MCTS, CONTROLLER_TYPE_BFS, CONTROLLER_TYPE_TEST_ALL,
-                              CONTROLLER_TYPE_USER, CONTROLLER_TYPE_MCTS, CONTROLLER_TYPE_MCTS_CUSTOM,
-                              CONTROLLER_TYPE_TEST_RNG,
-                              CONTROLLER_TYPE_REPLAY, CONTROLLER_TYPE_PFA} controller_type;
+// typedef enum ControllerType {CONTROLLER_TYPE_DEFAULT, CONTROLLER_TYPE_BFS, CONTROLLER_TYPE_TEST,
+//                               CONTROLLER_TYPE_USER, CONTROLLER_TYPE_MCTS, CONTROLLER_TYPE_MCTS_CUSTOM,
+//                               CONTROLLER_TYPE_REPLAY, CONTROLLER_TYPE_PFA} ControllerType;
 
 struct OptionInfo
 {
@@ -1003,14 +1004,16 @@ struct OptionInfo
   boolean network;
   boolean verbose;
   boolean debug;
-  // Custom options
-  controller_type controller_type;       // Solver to act as controller
+  // (tuero@ualberta.ca) - September 2019
+  // Additional command line options to set
+  ControllerType controller_type;       // Solver to act as controller
+  boolean run_tests;
   int level_number;                      // level number to load
   int delay;                             // SetVideoFrameDelay
   int log_level;
-  boolean summary_window;
   char* replay_file;
   char* level_set;
+  int opt;
 };
 
 struct VideoSystemInfo

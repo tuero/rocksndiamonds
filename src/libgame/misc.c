@@ -32,7 +32,10 @@
 #include "text.h"
 #include "image.h"
 
+// (tuero@ualberta.ca) - September 2019
+// RNG code, as well as controller type listings
 #include "../ai/ai_entry.h"
+#include "../ai/controller/controller_listing.h"
 
 
 // ============================================================================
@@ -958,10 +961,12 @@ void GetOptions(int argc, char *argv[],
   options.network = FALSE;
   options.verbose = FALSE;
   options.debug = FALSE;
-  options.controller_type = CONTROLLER_TYPE_DEFAULT;
+  options.controller_type = CONTROLLER_DEFAULT;
+  options.run_tests = FALSE;
   options.level_number = 0;
   options.log_level = 2;
   options.delay = GAME_FRAME_DELAY;
+  options.opt = 0;
 
 #if 1
   options.verbose = TRUE;
@@ -1125,39 +1130,19 @@ void GetOptions(int argc, char *argv[],
         if (option_arg == NULL) {
             Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
         }
-        else if (strcmp("BFS", option_arg) == 0 || strcmp("bfs", option_arg) == 0) {
-            options.controller_type = CONTROLLER_TYPE_BFS;
-        }
-        else if (strcmp("MCTS", option_arg) == 0 || strcmp("mcts", option_arg) == 0) {
-            options.controller_type = CONTROLLER_TYPE_MCTS;
-        }
-        else if (strcmp("MCTS_CUSTOM", option_arg) == 0 || strcmp("mcts_custom", option_arg) == 0) {
-            options.controller_type = CONTROLLER_TYPE_MCTS_CUSTOM;
-        }
-        else if (strcmp("USER", option_arg) == 0 || strcmp("user", option_arg) == 0) {
-            options.controller_type = CONTROLLER_TYPE_USER;
-        }
-        else if (strcmp("PFA", option_arg) == 0 || strcmp("pfa", option_arg) == 0) {
-            options.controller_type = CONTROLLER_TYPE_PFA;
-        }
-        else if (strcmp("test_engine", option_arg) == 0) {
-            options.controller_type = CONTROLLER_TYPE_TEST_SPEED;
-        }
-        else if (strcmp("test_bfs", option_arg) == 0) {
-            options.controller_type = CONTROLLER_TYPE_TEST_BFS;
-        }
-        else if (strcmp("test_mcts", option_arg) == 0) {
-            options.controller_type = CONTROLLER_TYPE_TEST_MCTS;
-        }
-        else if (strcmp("test_rng", option_arg) == 0) {
-            options.controller_type = CONTROLLER_TYPE_TEST_RNG;
-        }
-        else if (strcmp("test_all", option_arg) == 0) {
-            options.controller_type = CONTROLLER_TYPE_TEST_ALL;
-        }
         else {
-            // Additionally check for valid level file if it exists?
-            Error(ERR_EXIT_HELP, "option '%s' argument must be a valid integer", option_str);
+            boolean flag = FALSE;
+            const char* controller_cla[] = CONTROLLER_STRINGS;
+            for (int i = 0; i < NELEMS(controller_cla); i++) {
+                if (strcmp(controller_cla[i], option_arg) == 0) {
+                    options.controller_type = (ControllerType)i;
+                    flag = TRUE;
+                }
+            }
+
+            if (!flag) {
+                Error(ERR_EXIT_HELP, "option '%s' argument must be a valid integer", option_str);
+            }
         }
         if (option_arg == next_option) {
             options_left++;
@@ -1165,31 +1150,7 @@ void GetOptions(int argc, char *argv[],
     }
     else if (strncmp(option, "-test", option_len) == 0)
     {
-        if (option_arg == NULL) {
-            Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
-        }
-        else if (strcmp("engine", option_arg) == 0) {
-            options.controller_type = CONTROLLER_TYPE_TEST_SPEED;
-        }
-        else if (strcmp("bfs", option_arg) == 0) {
-            options.controller_type = CONTROLLER_TYPE_TEST_BFS;
-        }
-        else if (strcmp("mcts", option_arg) == 0) {
-            options.controller_type = CONTROLLER_TYPE_TEST_MCTS;
-        }
-        else if (strcmp("rng", option_arg) == 0) {
-            options.controller_type = CONTROLLER_TYPE_TEST_RNG;
-        }
-        else if (strcmp("all", option_arg) == 0) {
-            options.controller_type = CONTROLLER_TYPE_TEST_ALL;
-        }
-        else {
-            // Additionally check for valid level file if it exists?
-            Error(ERR_EXIT_HELP, "option '%s' argument must be a valid integer", option_str);
-        }
-        if (option_arg == next_option) {
-            options_left++;
-        }
+        options.run_tests = TRUE;
     }
     else if (strncmp(option, "-replay", option_len) == 0)
     {
@@ -1198,7 +1159,7 @@ void GetOptions(int argc, char *argv[],
         }
         else {
             options.replay_file = option_arg;
-            options.controller_type = CONTROLLER_TYPE_REPLAY;
+            options.controller_type = CONTROLLER_REPLAY;
         }
         if (option_arg == next_option) {
             options_left++;
@@ -1268,9 +1229,21 @@ void GetOptions(int argc, char *argv[],
             options_left++;
         }
     }
-    else if (strncmp(option, "-window", option_len) == 0)
+    else if (strncmp(option, "-opt", option_len) == 0)
     {
-        options.summary_window = TRUE;
+        if (option_arg == NULL) {
+            Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
+        }
+        else if (!isNumber(option_arg)) {
+            // Additionally check for valid level file if it exists?
+            Error(ERR_EXIT_HELP, "option '%s' argument must be a valid integer", option_str);
+        }
+        else {
+            options.opt = atoi(option_arg);
+        }
+        if (option_arg == next_option) {
+            options_left++;
+        }
     }
 #if defined(PLATFORM_MACOSX)
     else if (strPrefix(option, "-psn"))

@@ -27,7 +27,7 @@ OptionWaitRock::OptionWaitRock(int spriteID) {
 //     enginetype::GridCell rockCell = {-1, -1};
 
 //     for (enginetype::GridCell cell : enginehelper::getMapSprites()) {
-//         if (enginehelper::getGridItem(cell) == enginetype::FIELD_BOULDER) {
+//         if (enginehelper::getGridElement(cell) == enginetype::FIELD_BOULDER) {
 //             rockCell.x = cell.x;
 //             rockCell.y = cell.y;
 //             break;
@@ -46,7 +46,8 @@ bool OptionWaitRock::run() {
         enginehelper::engineSimulate();
 
         if (loopCounter == 100) {
-            std::cout << "This shouldn't happen" << std::endl;
+            // std::cout << "This shouldn't happen" << std::endl;
+            break;
         }
         loopCounter += 1;
     }
@@ -57,7 +58,7 @@ bool OptionWaitRock::run() {
 }
 
 
-bool OptionWaitRock::singleStep(Action &action) {
+bool OptionWaitRock::getNextAction(Action &action) {
     action = Action::noop;
     return (enginehelper::getGridMovPos(enginehelper::getSpriteGridCell(spriteID_)) == 0);
 
@@ -76,12 +77,6 @@ bool OptionWaitRock::isValid_() {
 }
 
 
-std::string OptionWaitRock::optionToString() {
+std::string OptionWaitRock::toString() const {
     return optionStringName_;
-}
-
-
-// https://stackoverflow.com/questions/1549930/c-equivalent-of-javas-tostring
-std::ostream& OptionWaitRock::toString(std::ostream& o) const {
-    return o << "Wait boulder: ";
 }

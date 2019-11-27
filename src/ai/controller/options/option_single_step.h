@@ -16,43 +16,57 @@
 #include "../../engine/action.h"
 
 /**
- * Skeleton definition which each derived Option is based off of.
- *
- * All options implemented should be derived from this class. An option is a policy
- * which executes (possible non-deterministic) actions. The controller should determine
- * the type of option to run depending on the state. The method run() are required to 
- * be implemented.
+ * Represents option of performing one specific action a number of times.
+ * 
+ * Derived class of BaseOption. Only one action (UP, DOWN, LEFT, RIGHT, NOOP)
+ * can be represented by the option, and the option can perform that action
+ * any number of times.
  */
 class OptionSingleStep : public BaseOption {
 
 private:
     Action action_;
     int numTimes_;
-    std::string optionStringName = "Single step action: ";
+    std::string optionStringName = "Single action: ";
 
 public:
     
     OptionSingleStep(Action action, int numTimes);
 
-
     /**
-     * Set action which agent should immediately take.
+     * Performs the saved action numTimes_ number of ENGINE_RESOLUTION 
+     * game ticks.
      * 
-     * Called when the currentSolution is empty. Agent always executes the next action
-     * from currentSolution. If conducting search on the future state while the agent 
-     * is conducting the current action, the controller should set currentSolution to
-     * the forwardSolution.
+     * @return True if there was no failure during performing the action.
      */
     bool run() override;
+    
+    /**
+     * Return the stored action.
+     * 
+     * Internal counter is decremented on each call. Once the counter reaches 0 
+     * (signifying the option is complete), the counter gets reset and true
+     * is returned.
+     * 
+     * @param action Reference to action to set.
+     * @return True if the action has been sent numTimes_ times, false otherwise.
+     */
+    bool getNextAction(Action &action) override;
 
-    bool singleStep(Action &action) override;
-
+    /**
+     * Single action option is valid so long as the action it wants
+     * to perform is moveable.
+     * 
+     * @return True if the action the option represents is moveable.
+     */
     bool isValid_() override;
 
-    std::string optionToString() override;
-
-    std::ostream& toString(std::ostream& o) const override;
-
+    /**
+     * String representation of the option and its characteristics.
+     * 
+     * @return String representation of option.
+     */
+    std::string toString() const override;
 };
 
 

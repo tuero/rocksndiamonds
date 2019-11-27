@@ -22,8 +22,7 @@
 #include "../../engine/engine_helper.h"
 
 //Logging
-#include "../../util/logging_wrapper.h"
-#include <plog/Log.h>   
+#include "../../util/logger.h"
 
 
 typedef std::unique_ptr<TreeNode> Pointer;
@@ -63,13 +62,9 @@ TreeNode* TreeNode::expand() {
     childNode->optionTaken_ = option;
 
     // Simulate to child
-    PLOGE_(logwrap::FileLogger) << "Expanding Option: " << option->optionToString();
-    // option->run();
-
     childNode->isTerminal_ = false;
     if (!option->run()) {
         childNode->isTerminal_ = true;
-        PLOGE_(logwrap::FileLogger) << "Is Terminal"; 
     }
 
     // Simulator is set to the child state, so determine what the available actions
@@ -148,8 +143,8 @@ void TreeNode::setOptions(std::vector<BaseOption*> &allOptions) {
     // Prioritize recent valid options.
     // Option is recently valid if currently valid while not valid in parent.
     // Create separate vectors (newely available, prevously visited?), shuffle each then concatenate.
-    std::vector<BaseOption*> singleStepOptions;
-    std::vector<BaseOption*> recentlAvailableOptions;
+    std::vector<BaseOption*> singleActionOptions;
+    std::vector<BaseOption*> recentlyAvailableOptions;
     std::vector<BaseOption*> otherOptions;
     availableOptions_.clear();
     allOptions_ = allOptions;
@@ -161,14 +156,14 @@ void TreeNode::setOptions(std::vector<BaseOption*> &allOptions) {
         if (parent_ != nullptr && std::find(parent_->availableOptions_.begin(), 
             parent_->availableOptions_.end(), option) != parent_->availableOptions_.end()) 
         {
-            recentlAvailableOptions.push_back(option);
+            recentlyAvailableOptions.push_back(option);
         }
         // Non-single step option
         // else if (option->getOptionType() != OptionType::SingleStep) {
         //     otherOptions.push_back(option);
         // }
-        else if (option->optionToString().compare("Single step action: noop") == 0) {
-            singleStepOptions.push_back(option);
+        else if (option->toString().compare("Single action: noop") == 0) {
+            singleActionOptions.push_back(option);
         }
         else {
            otherOptions.push_back(option);
@@ -176,13 +171,13 @@ void TreeNode::setOptions(std::vector<BaseOption*> &allOptions) {
         // availableOptions_.push_back(option); 
     }
     // std::random_shuffle(std::next(availableOptions_.begin()), availableOptions_.end());
-    std::random_shuffle(singleStepOptions.begin(), singleStepOptions.end(), [&](int i) {return std::rand() % i;});
-    std::random_shuffle(recentlAvailableOptions.begin(), recentlAvailableOptions.end(), [&](int i) {return std::rand() % i;});
+    std::random_shuffle(singleActionOptions.begin(), singleActionOptions.end(), [&](int i) {return std::rand() % i;});
+    std::random_shuffle(recentlyAvailableOptions.begin(), recentlyAvailableOptions.end(), [&](int i) {return std::rand() % i;});
     std::random_shuffle(otherOptions.begin(), otherOptions.end(), [&](int i) {return std::rand() % i;});
     sort(otherOptions.begin(), otherOptions.end(), compareBaseOptionPointer);
 
-    availableOptions_.insert(availableOptions_.end(), recentlAvailableOptions.begin(), recentlAvailableOptions.end());
-    availableOptions_.insert(availableOptions_.end(), singleStepOptions.begin(), singleStepOptions.end());
+    availableOptions_.insert(availableOptions_.end(), recentlyAvailableOptions.begin(), recentlyAvailableOptions.end());
+    availableOptions_.insert(availableOptions_.end(), singleActionOptions.begin(), singleActionOptions.end());
     availableOptions_.insert(availableOptions_.end(), otherOptions.begin(), otherOptions.end());
 }
 
@@ -206,8 +201,7 @@ Pointer TreeNode::getChild(BaseOption* optionTaken) {
         }
     }
 
-    PLOGE_(logwrap::FileLogger) << "Couldn't find child representing option: " << optionTaken->optionToString();
-
+    PLOGE_(logger::FileLogger) << "Couldn't find child representing option: " << optionTaken->toString();
     return nullptr;
 }
 

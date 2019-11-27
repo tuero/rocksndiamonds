@@ -18,8 +18,8 @@
 # CC = gcc
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
-	CC = gcc-7
-	CXX = g++-7
+	CC = gcc-9
+	CXX = g++-9
 else
 	CC = gcc
 	CXX = g++

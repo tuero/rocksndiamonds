@@ -20,17 +20,17 @@
 #include "../../engine/engine_helper.h"
 
 //Logging
-#include "../../util/logging_wrapper.h"
-#include <plog/Log.h>  
+#include "../../util/logger.h"
 
 
 OptionToSprite::OptionToSprite(int spriteID) {
     optionType_ = OptionType::ToSprite;
     spriteID_ = spriteID;
     enginetype::GridCell cell = enginehelper::getSpriteGridCell(spriteID);
-    item_ = enginehelper::getGridItem(cell);
+    item_ = enginehelper::getGridElement(cell);
     count_ = 0;
-    optionStringName_ += enginetype::TYPE_TO_STRING[item_] + " " + std::to_string(spriteID_);
+    optionStringName_ += enginehelper::getItemReadableDescription(item_) + " " + std::to_string(spriteID_);
+    solutionPath_.clear();
 }
 
 
@@ -38,21 +38,21 @@ bool OptionToSprite::run() {
     int loopCounter = 0;
     while (true) {
         goalCell_ = enginehelper::getSpriteGridCell(spriteID_);
-        runAStar(false);
-        if (solutionPath.empty()) {break;}
-        enginetype::GridCell cell = solutionPath.front();
-        solutionPath.pop_front();
-        Action action = enginehelper::getResultingAction(enginehelper::getPlayerPosition(), cell);
+        runAStar();
+        if (solutionPath_.empty()) {break;}
+        enginetype::GridCell cell = solutionPath_.front();
+        solutionPath_.pop_front();
+        Action action = enginehelper::getActionFromNeighbours(enginehelper::getPlayerPosition(), cell);
         
         enginehelper::setEnginePlayerAction(action);
         enginehelper::engineSimulate();
 
         if (enginehelper::engineGameOver()) {return false;}
-        if (solutionPath.empty()) {break;}
+        if (solutionPath_.empty()) {break;}
 
         if (loopCounter == 100) {
-            PLOGE_(logwrap::FileLogger) << "Loop not terminating.";
-            PLOGE_(logwrap::ConsolLogger) << "Loop not terminating.";
+            PLOGE_(logger::FileLogger) << "Loop not terminating.";
+            PLOGE_(logger::FileLogger) << "Loop not terminating.";
         }
         loopCounter += 1;
     }
@@ -63,24 +63,26 @@ bool OptionToSprite::run() {
 }
 
 
-bool OptionToSprite::singleStep(Action &action) {
+bool OptionToSprite::getNextAction(Action &action) {
+    // Run A* to get path to sprite
     goalCell_ = enginehelper::getSpriteGridCell(spriteID_);
-    runAStar(false);
+    runAStar();
 
     // Get next gridcell
-    enginetype::GridCell cell = solutionPath.front();
-    solutionPath.pop_front();
+    enginetype::GridCell cell = solutionPath_.front();
+    solutionPath_.pop_front();
 
     // Find the corresponding action
     enginetype::GridCell playerCell = enginehelper::getPlayerPosition();
-    action = enginehelper::getResultingAction(playerCell, cell);
+    action = enginehelper::getActionFromNeighbours(playerCell, cell);
 
     // Option is complete if we pulled the last action off the solution.
-    return solutionPath.empty();
+    return solutionPath_.empty();
 }
 
 
 bool OptionToSprite::isValid_() {
+    // Option to walk to sprite is invalid if sprite not active on map.
     if (!enginehelper::isSpriteActive(spriteID_)) {return false;}
 
     enginetype::GridCell playerCell = enginehelper::getPlayerPosition();
@@ -90,14 +92,8 @@ bool OptionToSprite::isValid_() {
 }
 
 
-std::string OptionToSprite::optionToString() {
+std::string OptionToSprite::toString() const {
     return optionStringName_;
-}
-
-
-// https://stackoverflow.com/questions/1549930/c-equivalent-of-javas-tostring
-std::ostream& OptionToSprite::toString(std::ostream& o) const {
-    return o << optionStringName_;
 }
 
 

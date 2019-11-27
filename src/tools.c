@@ -970,10 +970,12 @@ void BackToFront_WithFrameDelay(unsigned int frame_delay_value)
   unsigned int frame_delay_value_old = GetVideoFrameDelay();
 
   SetVideoFrameDelay(is_simulating ? 0 : frame_delay_value);
+  SetVideoFrameDelay(options.delay != GAME_FRAME_DELAY && !is_simulating ? options.delay : frame_delay_value);
 
   if (is_simulating == FALSE){BackToFront();}
 
   SetVideoFrameDelay(is_simulating ? 0 : frame_delay_value_old);
+  SetVideoFrameDelay(options.delay != GAME_FRAME_DELAY && !is_simulating ? options.delay : frame_delay_value_old);
 }
 #endif
 

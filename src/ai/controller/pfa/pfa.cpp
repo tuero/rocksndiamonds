@@ -7,10 +7,10 @@ PFA::PFA() {}
 
 void PFA::logPath() {
     std::string msg;
-    PLOGI_(logwrap::FileLogger) << "Logging path: ";
+    PLOGI_(logger::FileLogger) << "Logging path: ";
 
     for (auto const &node: abstract_path) {
-        PLOGI_(logwrap::FileLogger) << "Node id: " << node->getId();
+        PLOGI_(logger::FileLogger) << "Node id: " << node->getId();
     }
 }
 
@@ -27,10 +27,10 @@ void PFA::findPath(int abstract_level) {
         node->setValueG(std::numeric_limits<float>::max());
     }
 
-    PLOGI_(logwrap::FileLogger) << "Abstraction level: " << start_node->getLevel();
-    PLOGI_(logwrap::FileLogger) << "Start node: " << start_node->getId();
-    PLOGI_(logwrap::FileLogger) << "Starting A*";
-    PLOGI_(logwrap::ConsolLogger) << "Starting A*";
+    PLOGI_(logger::FileLogger) << "Abstraction level: " << start_node->getLevel();
+    PLOGI_(logger::FileLogger) << "Start node: " << start_node->getId();
+    PLOGI_(logger::FileLogger) << "Starting A*";
+    PLOGI_(logger::ConsolLogger) << "Starting A*";
 
     // A* datastructures
     std::priority_queue<AbstractNode*, std::vector<AbstractNode*>, CompareAbstractNode> open_queue;
@@ -59,7 +59,7 @@ void PFA::findPath(int abstract_level) {
 
         // Found goal
         if (node->representsGoal()) {
-            PLOGI_(logwrap::FileLogger) << "Path found.";
+            PLOGI_(logger::FileLogger) << "Path found.";
             abstract_path.clear();
 
             while(node) {
@@ -67,7 +67,7 @@ void PFA::findPath(int abstract_level) {
                 node = node->getPathParent();
             }
 
-            PLOGI_(logwrap::FileLogger) << "Path length: " << abstract_path.size();
+            PLOGI_(logger::FileLogger) << "Path length: " << abstract_path.size();
             break;
         }
 
@@ -134,8 +134,8 @@ void PFA::findPath(int abstract_level) {
 
     timer.stop();
 
-    PLOGI_(logwrap::FileLogger) << "Path Time: " << timer.getDuration();
-    PLOGI_(logwrap::ConsolLogger) << "Path Time: " << timer.getDuration();
+    PLOGI_(logger::FileLogger) << "Path Time: " << timer.getDuration();
+    PLOGI_(logger::ConsolLogger) << "Path Time: " << timer.getDuration();
     logPath();
 
 }
@@ -149,8 +149,8 @@ void PFA::handleLevelStart() {
 
     abstract_level = abstract_graph.getLevelUsed();
 
-    PLOGI_(logwrap::FileLogger) << "Level being used: " << abstract_level;
-    PLOGI_(logwrap::ConsolLogger) << "Level being used: " << abstract_level;
+    PLOGI_(logger::FileLogger) << "Level being used: " << abstract_level;
+    PLOGI_(logger::ConsolLogger) << "Level being used: " << abstract_level;
     abstract_graph.logGraphLevel(abstract_level);
 
     abstract_path.clear();

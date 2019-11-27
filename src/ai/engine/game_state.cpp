@@ -148,19 +148,19 @@ void GameState::setFromEngineState() {
     game_ = game;
 
     // Game status
-    allPlayersGone_ = game.all_players_gone;
+    // allPlayersGone_ = game.all_players_gone;
     gameStatus_ = game_status;
-    levelSolvedGameEnd_ = game.LevelSolved_GameEnd;
+    // levelSolvedGameEnd_ = game.LevelSolved_GameEnd;
     emGameOver_ = game_em.game_over;
     emLevelSolved_ = game_em.level_solved;
     spGameOver_ = game_sp.game_over;
     spLevelSolved_ = game_sp.level_solved;
     mmGameOver_ = game_mm.game_over;
-    game_mm.level_solved = mmLevelSolved_;
-    gameOver_ = game.GameOver;
-    levelSolved_ = game.LevelSolved;
-    levelSolvedGameWon_ = game.LevelSolved_GameWon;
-    score_ = game.score;
+    mmLevelSolved_ = game_mm.level_solved ;
+    // gameOver_ = game.GameOver;
+    // levelSolved_ = game.LevelSolved;
+    // levelSolvedGameWon_ = game.LevelSolved_GameWon;
+    // score_ = game.score;
 
     // Current position in viewfinder
     scrollX_ = scroll_x;
@@ -247,19 +247,19 @@ void GameState::restoreEngineState() {
     game = game_;
 
     // Game status
-    game.all_players_gone = allPlayersGone_;
+    // game.all_players_gone = allPlayersGone_;
     game_status =  gameStatus_;
-    game.LevelSolved_GameEnd = levelSolvedGameEnd_;
+    // game.LevelSolved_GameEnd = levelSolvedGameEnd_;
     game_em.game_over = emGameOver_; 
     game_em.level_solved = emLevelSolved_;
     game_sp.game_over = spGameOver_; 
     game_sp.level_solved = spLevelSolved_;
     game_mm.game_over = mmGameOver_; 
     game_mm.level_solved = mmLevelSolved_;
-    game.GameOver = gameOver_; 
-    game.LevelSolved = levelSolved_;
-    game.LevelSolved_GameWon = levelSolvedGameWon_;
-    game.score = score_;
+    // game.GameOver = gameOver_; 
+    // game.LevelSolved = levelSolved_;
+    // game.LevelSolved_GameWon = levelSolvedGameWon_;
+    // game.score = score_;
 
     // Current position in viewfinder
     scroll_x = scrollX_;

@@ -5168,12 +5168,15 @@ static int MovingOrBlocked2ElementIfNotLeaving(int x, int y)
 
 static void RemoveField(int x, int y)
 {
-  Feld[x][y] = EL_EMPTY;
-
   // (tuero@ualberta.ca) - September 2019
   // sprite IDs are used for custom controllers for object tracking
   // If Field is removed, then we remove sprite ID from known list
-  spriteIDs[x][y] = -1;
+  int temp_item = Feld[x][y];
+  if (!(temp_item >= EL_EXIT_OPENING && temp_item <= EL_SP_EXIT_OPEN)) {
+      spriteIDs[x][y] = -1;
+  }
+
+  Feld[x][y] = EL_EMPTY;
 
 
   MovPos[x][y] = 0;
@@ -5413,6 +5416,7 @@ static void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
   ScrollScreen(NULL, SCROLL_GO_ON);	// scroll last frame to full tile
 
   SetVideoFrameDelay(is_simulating ? 0 : wait_delay_value);
+  SetVideoFrameDelay(options.delay != GAME_FRAME_DELAY && !is_simulating ? options.delay : wait_delay_value);
 
   while (scroll_x != new_scroll_x || scroll_y != new_scroll_y)
   {
@@ -5447,6 +5451,7 @@ static void DrawRelocateScreen(int old_x, int old_y, int x, int y, int move_dir,
   BackToFront();
 
   SetVideoFrameDelay(is_simulating ? 0 : frame_delay_value_old);
+  SetVideoFrameDelay(options.delay != GAME_FRAME_DELAY && !is_simulating ? options.delay : frame_delay_value_old);
 }
 #endif
 
@@ -11981,8 +11986,11 @@ static void GameActionsExt(void)
   if (tape.playing && tape.warp_forward && !tape.pausing)
     game_frame_delay_value = 0;
 
+  if (options.delay != GAME_FRAME_DELAY) {game_frame_delay_value = options.delay;}
+
   if (checkGameFailed() || options.delay != 20 || (game.LevelSolved && !game.LevelSolved_GameEnd)) {game_frame_delay_value = options.delay;}
   SetVideoFrameDelay((game_frame_delay_value == 0 || is_simulating) ? 0 : game_frame_delay_value);
+  SetVideoFrameDelay(options.delay != GAME_FRAME_DELAY && !is_simulating ? options.delay : game_frame_delay_value);
 #endif
 
   // (de)activate virtual buttons depending on current game status

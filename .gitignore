@@ -37,8 +37,13 @@ rocksndiamonds_headless
 
 # Custom
 todo.txt
-CMakeLists.txt
 .idea/
 cmake-build-debug/
 calgrind.out*
+.vscode/
+src/.vscode/
+src/ai/logs/*
+src/ai/replays/*
+bin/*
 
+rocksndiamonds 2

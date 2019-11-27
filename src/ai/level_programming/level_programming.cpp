@@ -19,8 +19,7 @@
 #include "../engine/action.h"
 
 // Logging
-#include "../util/logging_wrapper.h"
-#include <plog/Log.h> 
+#include "../util/logger.h"
 
 
 namespace levelprogramming {
@@ -35,7 +34,7 @@ void spawnYamYam() {
     std::vector<enginetype::GridCell> emptyGridCells = enginehelper::getEmptyGridCells();
 
     if (emptyGridCells.empty()) {
-        PLOGI_(logwrap::FileLogger) << "No empty cells";
+        PLOGI_(logger::FileLogger) << "No empty cells to spawn YamYam.";
         return;
     }
 
@@ -61,7 +60,7 @@ void spawnYamYam() {
 
     // Spawn yamyam
     enginehelper::spawnElement(enginetype::FIELD_CUSTOM_2, dir, emptyGridCell);
-    PLOGI_(logwrap::FileLogger) << "Adding yamyam at x=" << emptyGridCell.x << ", y=" << emptyGridCell.y;
+    PLOGI_(logger::FileLogger) << "Adding yamyam at x=" << emptyGridCell.x << ", y="  << emptyGridCell.y;
 }
 
 
@@ -75,7 +74,7 @@ void spawnDiamond() {
     std::vector<enginetype::GridCell> emptyGridCells = enginehelper::getEmptyGridCells();
 
     if (emptyGridCells.empty()) {
-        PLOGI_(logwrap::FileLogger) << "No empty cells";
+        PLOGI_(logger::FileLogger) << "No empty cells to spawn Diamond.";
         return;
     }
 
@@ -84,8 +83,7 @@ void spawnDiamond() {
 
     // Spawn diamond
     enginehelper::spawnElement(enginetype::FIELD_CUSTOM_1, enginetype::ENGINE_NOOP, emptyGridCell);
-    enginehelper::setBoardDistancesL1(emptyGridCell);
-    PLOGI_(logwrap::FileLogger) << "Adding diamond at x=" << emptyGridCell.x << ", y=" << emptyGridCell.y;
+    PLOGI_(logger::FileLogger) << "Adding diamond at x=" << emptyGridCell.x << ", y="  << emptyGridCell.y;
 }
 
 
@@ -107,15 +105,7 @@ void handleSurvivalUpdate() {
 }
 
 void handleSurvivalLevelStart() {   
-    // Find diamond and set distances
-    for (int y = 0; y < enginehelper::getLevelHeight(); y++) {
-        for (int x = 0; x < enginehelper::getLevelWidth(); x++) {
-            if (enginehelper::getGridItem({x, y}) == enginetype::FIELD_CUSTOM_1) {
-                enginehelper::setBoardDistancesL1({x, y});
-                return;
-            }
-        }
-    }
+    
 }
 
 
@@ -126,15 +116,19 @@ void handleSurvivalLevelStart() {
  */
 void customLevelProgrammingUpdate() {
     // Add proper level checks
-    switch (enginehelper::getLevelNumber()) {
-        case 1 :
-        case 2 :
-        case 5 :
-        case 6 :
-            handleSurvivalUpdate();
-            break;
-        default :
-            return;
+    std::string levelSet = enginehelper::getLevelSet();
+
+    if (levelSet == "custom_survival") {
+        switch (enginehelper::getLevelNumber()) {
+            case 1 :
+            case 2 :
+            case 5 :
+            case 6 :
+                handleSurvivalUpdate();
+                break;
+            default :
+                return;
+        }
     }
 }
 
@@ -144,15 +138,19 @@ void customLevelProgrammingUpdate() {
  */
 void customLevelProgrammingStart() {
     // Add proper level checks
-    switch (enginehelper::getLevelNumber()) {
-        case 1 :
-        case 2 :
-        case 5 :
-        case 6 :
-            handleSurvivalLevelStart();
-            break;
-        default :
-            return;
+    std::string levelSet = enginehelper::getLevelSet();
+    
+    if (levelSet == "custom_survival") {
+        switch (enginehelper::getLevelNumber()) {
+            case 1 :
+            case 2 :
+            case 5 :
+            case 6 :
+                handleSurvivalLevelStart();
+                break;
+            default :
+                return;
+        }
     }
 }
 

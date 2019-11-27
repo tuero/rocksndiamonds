@@ -1,4 +1,12 @@
-
+/**
+ * @file: replay.h
+ *
+ * @brief: Controller for reading/replaying previous games.
+ * 
+ * @author: Jake Tuero
+ * Date: October 2019
+ * Contact: tuero@ualberta.ca
+ */
 
 #ifndef REPLAY_H
 #define REPLAY_H
@@ -7,44 +15,41 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <vector>
-#include <map>
-#include <time.h>
 
-#include "../base_controller.h"
-
-// #include "../pfa/abstract_graph.h"
-// #include "../../util/summary_window.h"
-
-#include "../../engine/game_state.h"
-#include "../../engine/engine_types.h"
-#include "../../engine/engine_helper.h"
-#include "../../engine/action.h"
-#include "../../util/timer.h"
-
-//Logging
-#include "../../util/logging_wrapper.h"
-#include <plog/Log.h>   
+#include "../base_controller.h" 
 
 
+/**
+ * Controller to handle replay files.
+ *
+ * This reads and redirects every action as listed in the replay file.
+ */
 class Replay : public BaseController {
 private:
-    const std::string REPLAY_DIR = "./src/ai/replays/";
-    std::string replayFileName;
-    std::ifstream replayFileStream;
-    // AbstractGraph abstract_graph;
-    // std::vector<std::vector<int>> grid_representation;
+    const std::string REPLAY_DIR = "./src/ai/replays/";         // Replay files location
+    std::string replayFileName;                                 // Replay file name (directed through CLA)
+    std::ifstream replayFileStream;                             // Replay file stream
 
 public:
 
     Replay();
 
+    /**
+     * Set the replay file to use as a file stream.
+     */
     void setReplayFile(std::string &file);
 
-    void handleEmpty(BaseOption **currentOption, BaseOption **nextOption) override;
+    /**
+     * Flag for controller to try again if level fails.
+     * Replay files can handle replays.
+     */
+    bool retryOnLevelFail() const override {return true;}
 
-    void run(BaseOption **currentOption, BaseOption **nextOption, 
-        std::map<enginetype::Statistics, int> &statistics) override; 
+    /**
+     * Get the action from the replay file.
+     * If there is a reset command, the level is restarted.
+     */
+    Action getAction() override;
 
 };
 

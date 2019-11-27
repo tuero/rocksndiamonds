@@ -46,6 +46,14 @@ void setEngineSeed() {
 
 
 /*
+ * Reset the engine seed to the stored engine seed.
+ */
+void resetToEngineSeed() {
+    genEngine_.seed(seedEngine_);
+}
+
+
+/*
  * Set the seed from the input for the RNG used by the simulation in planning.
  * 
  * @param seed Input seed for the game engine RNG.
@@ -62,6 +70,13 @@ void setSimulatingSeed() {
     uint64_t seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
     seedSimulation_ = seed;
     genSimulating_.seed(seed);
+}
+
+/*
+ * Reset the simulation seed to the stored simulation seed.
+ */
+void resetToSimulationSeed() {
+    genSimulating_.seed(seedSimulation_);
 }
 
 

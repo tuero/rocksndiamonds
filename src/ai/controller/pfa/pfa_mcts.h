@@ -18,7 +18,7 @@
 #include "../../util/timer.h"
 
 //Logging
-#include "../../util/logging_wrapper.h"
+#include "../../util/logger.h"
 #include <plog/Log.h>   
 
 
@@ -77,6 +77,9 @@ private:
     PFATreeNode* getBestChild(PFATreeNode* current);
 
     std::string childValues(PFATreeNode* current);
+
+    void setAbstractNodeDistances(std::vector<enginetype::GridCell> goal_cells,
+        std::vector<enginetype::GridCell> allowedCells);
 
 public:
 

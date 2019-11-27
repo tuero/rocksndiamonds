@@ -17,6 +17,7 @@
 #include <memory>
 
 // Controllers
+#include "controller_listing.h"
 #include "base_controller.h"
 #include "options/base_option.h"
 #include "options/option_single_step.h"
@@ -37,22 +38,10 @@
 class Controller {
 private:
     int step_counter_ = 0;
-
-    // !TODO --> Make this a proper struct?
-    std::map<enginetype::Statistics, int> statistics_ = {{enginetype::RUN_TIME, 0},
-                                                        {enginetype::COUNT_EXPANDED_NODES, 0}, 
-                                                        {enginetype::COUNT_SIMULATED_NODES, 0},
-                                                        {enginetype::MAX_DEPTH, 0}
-                                                       };
-    std::vector<Action> currentSolution_;
-    std::vector<Action> forwardSolution_;
-    BaseOption* currentOption_;
-    BaseOption* nextOption_;
+    std::vector<Action> currentAction_;
+    Action nextAction_;
     std::unique_ptr<BaseController> baseController_;
-    OptionFactory optionFactory_;
-    bool optionStatusFlag_;
 
-    void logNextOptionDetails();
 
 
 public:
@@ -63,9 +52,30 @@ public:
 
     /*
      * Constructor which sets the controller based on a given controller type
-     * Used for testing
+     * Used for testing.
+     * 
+     * @param controller Controller type.
      */
-    Controller(enginetype::ControllerType controller);
+    Controller(ControllerType controller);
+
+    /**
+     * Check if the controller wants to request a reset.
+     * 
+     * @return True if the controller wants to request a rest.
+     */
+    bool requestReset();
+
+    /**
+     * Called when level is solved.
+     * This will close logging and cleanup.
+     */
+    void handleLevelSolved();
+
+    /**
+     * Called when level is failed. 
+     * Depending on the controller, this will either terminate or attempt the level again.
+     */
+    void handleLevelFailed();
 
     /*
      * Reset the controller, which is called at level start.
@@ -78,32 +88,17 @@ public:
     Action getAction();
 
     /*
-     * Get the runtime of the controller.
+     * Inits the controller.
+     * Controller type is determined by command line argument.
      */
-    int getRunTime();
-
-    /*
-     * Get the number of nodes expanded by the type of tree search used.
-     */
-    int getCountExpandedNodes();
-
-    /*
-     * Get the number of nodes simulated by the type of tree search used.
-     */
-    int getCountSimulatedNodes();
-
-    /*
-     * Get the max depth of nodes expanded by the type of tree search used.
-     */
-    int getMaxDepth();
+    void initController();
 
     /*
      * Inits the controller.
-     * Controller type is determined by command line argument.
      *
      * @param controller Controller enum type 
      */
-    void initController(enginetype::ControllerType controller = enginetype::ControllerType::DEFAULT);
+    void initController(ControllerType controller);
 
 };
 

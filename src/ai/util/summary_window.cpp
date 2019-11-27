@@ -24,7 +24,7 @@
 #include "../engine/engine_helper.h"
 
 //Logging
-#include "../util/logging_wrapper.h"
+#include "../util/logger.h"
 #include <plog/Log.h>  
 
 
@@ -82,24 +82,24 @@ bool init() {
     // Create window
     window_ = SDL_CreateWindow("summary window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
     if (window_ == NULL) {
-        LOGE_(logwrap::FileLogger) << "Could not create window: " << SDL_GetError();
-        LOGE_(logwrap::ConsolLogger) << "Could not create window: " << SDL_GetError();
+        LOGE_(logger::FileLogger) << "Could not create window: " << SDL_GetError();
+        LOGE_(logger::ConsoleLogger) << "Could not create window: " << SDL_GetError();
         return false;
     }
 
     // Attach render to window
     renderer_ = SDL_CreateRenderer(window_, -1, SDL_RENDERER_ACCELERATED);
     if(renderer_ == NULL) {
-        LOGE_(logwrap::FileLogger) << "Renderer could not be created: " << SDL_GetError();
-        LOGE_(logwrap::ConsolLogger) << "Renderer could not be created: " << SDL_GetError();
+        LOGE_(logger::FileLogger) << "Renderer could not be created: " << SDL_GetError();
+        LOGE_(logger::ConsoleLogger) << "Renderer could not be created: " << SDL_GetError();
         return false;
     }
 
     // Initialize SDL image for textures
     int imgFlags = IMG_INIT_PNG;
     if(!(IMG_Init(imgFlags) & imgFlags)) {
-        LOGE_(logwrap::FileLogger) << "SDL_image could not initialize: " << IMG_GetError();
-        LOGE_(logwrap::ConsolLogger) << "SDL_image could not initialize: " << IMG_GetError();
+        LOGE_(logger::FileLogger) << "SDL_image could not initialize: " << IMG_GetError();
+        LOGE_(logger::ConsoleLogger) << "SDL_image could not initialize: " << IMG_GetError();
         return false;
     }
 
@@ -204,7 +204,7 @@ void draw() {
             }
 
             // Draw texture representing item in map
-            int item_id = enginehelper::getGridItem({col, row});
+            int item_id = enginehelper::getGridElement({col, row});
             if (graphicsMap_.find(item_id) != graphicsMap_.end()) {
                 SDL_RenderCopy(renderer_, texturesMap_[item_id], NULL, &textureRects_[counter]);
             }
