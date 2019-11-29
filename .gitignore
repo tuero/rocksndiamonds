@@ -30,6 +30,7 @@ src/conf_act.c
 # ignore compiled executable files
 rocksndiamonds
 rocksndiamonds.exe
+rocksndiamonds_gui
 rocksndiamonds_headless
 
 .DS_Store
@@ -37,6 +38,7 @@ rocksndiamonds_headless
 
 # Custom
 todo.txt
+*_Makefile
 .idea/
 cmake-build-debug/
 calgrind.out*
@@ -44,6 +46,5 @@ calgrind.out*
 src/.vscode/
 src/ai/logs/*
 src/ai/replays/*
-bin/*
-
-rocksndiamonds 2
+bin
+build
