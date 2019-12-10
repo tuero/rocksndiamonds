@@ -273,7 +273,7 @@ static void SDLSetWindowIcon(char *basename)
 
   if ((surface = IMG_Load(filename)) == NULL)
   {
-    Error(ERR_WARN, "IMG_Load() failed: %s", SDL_GetError());
+    Error(ERR_WARN, "IMG_Load('%s') failed: %s", basename, SDL_GetError());
 
     return;
   }
@@ -2239,7 +2239,8 @@ Bitmap *SDLLoadImage(char *filename)
 
   // load image to temporary surface
   if ((sdl_image_tmp = IMG_Load(filename)) == NULL)
-    Error(ERR_EXIT, "IMG_Load() failed: %s", SDL_GetError());
+    Error(ERR_EXIT, "IMG_Load('%s') failed: %s", getBaseNamePtr(filename),
+	  SDL_GetError());
 
   print_timestamp_time("IMG_Load");
 
