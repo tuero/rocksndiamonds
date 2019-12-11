@@ -22,7 +22,7 @@
 #include "../options/option_factory.h"
 
 #include "../../engine/game_state.h"
-#include "../../engine/action.h"
+#include "../../engine/engine_types.h"
 #include "../../util/timer.h"
 
 

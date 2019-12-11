@@ -70,5 +70,5 @@ bool OptionSingleStep::isValid_() {
  * String representation of the option and its characteristics.
  */
 std::string OptionSingleStep::toString() const {
-    return optionStringName + actionToString(action_);
+    return optionStringName + enginehelper::actionToString(action_);
 }

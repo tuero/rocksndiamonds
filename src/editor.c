@@ -13158,9 +13158,6 @@ static void HandleTextInputGadgets(struct GadgetInfo *gi)
 static void HandleTextAreaGadgets(struct GadgetInfo *gi)
 {
   int type_id = gi->custom_type_id;
-
-  strncpy(textarea_info[type_id].value, gi->textarea.value,
-	  MAX_ENVELOPE_TEXT_LEN);
   textarea_info[type_id].value[MAX_ENVELOPE_TEXT_LEN] = '\0';
 
   level.changed = TRUE;

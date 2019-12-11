@@ -32,7 +32,7 @@ OptionToRock::OptionToRock(int spriteID, Action direction) {
     timesCalled_ = 0;
 
     optionStringName_ += enginehelper::getItemReadableDescription(item_) + " " + std::to_string(spriteID_);
-    optionStringName_ += " " + actionToString(direction_);
+    optionStringName_ += " " + enginehelper::actionToString(direction_);
 }
 
 

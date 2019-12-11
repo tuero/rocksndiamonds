@@ -13,7 +13,7 @@
 
 
 #include "base_option.h"
-#include "../../engine/action.h"
+#include "../../engine/engine_types.h"
 
 /**
  * Represents option of performing one specific action a number of times.

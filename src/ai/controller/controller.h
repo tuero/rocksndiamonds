@@ -19,38 +19,30 @@
 // Controllers
 #include "controller_listing.h"
 #include "base_controller.h"
-#include "options/base_option.h"
-#include "options/option_single_step.h"
-#include "options/option_factory.h"
 
 // Engine and typedefs
-#include "../engine/action.h"           // Action enum
 #include "../engine/engine_types.h"
 
 
 /**
- * Controller interface which 
- *
- * All controllers implemented should be derived from this class. The methods
- * handleEmpty() and run() are required to be implemented, with handleLevelStart() 
- * being optional. 
+ * Controller interface which is responsible for which methods of implemented controllers
+ * should be called upon various events.
  */
 class Controller {
 private:
     int step_counter_ = 0;
     std::vector<Action> currentAction_;
-    Action nextAction_;
     std::unique_ptr<BaseController> baseController_;
 
 
-
 public:
-    /*
+    
+    /**
      * Default constructor which gets the controller type from the engine
      */
     Controller();
 
-    /*
+    /**
      * Constructor which sets the controller based on a given controller type
      * Used for testing.
      * 
@@ -77,26 +69,28 @@ public:
      */
     void handleLevelFailed();
 
-    /*
+    /**
      * Reset the controller, which is called at level start.
      */
     void reset();
 
-    /*
-     * Get the action from the controller.
+    /**
+     * Get the integer action code from the controller.
+     * 
+     * @return The integer action code from the controller.
      */
-    Action getAction();
+    int getAction();
 
-    /*
+    /**
      * Inits the controller.
      * Controller type is determined by command line argument.
      */
     void initController();
 
-    /*
+    /**
      * Inits the controller.
      *
-     * @param controller Controller enum type 
+     * @param controller Controller enum type.
      */
     void initController(ControllerType controller);
 

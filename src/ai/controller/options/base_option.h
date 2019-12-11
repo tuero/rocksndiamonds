@@ -20,7 +20,6 @@
 #include "option_types.h"
 
 // Engine
-#include "../../engine/action.h"
 #include "../../engine/engine_types.h"
 #include "../../engine/engine_helper.h"
 

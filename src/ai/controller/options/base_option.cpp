@@ -144,7 +144,7 @@ void BaseOption::runAStar(enginetype::GridCell startCell, enginetype::GridCell g
         }
 
         // Expand children
-        for (Action action : ALL_ACTIONS_NO_NOOP) {
+        for (Action action : enginetype::ALL_ACTIONS_NO_NOOP) {
             // Skip if in the restricted set
             enginetype::GridCell childCell = enginehelper::getCellFromAction(action, node.cell);
             if (std::find(restrictedCells_.begin(), restrictedCells_.end(), childCell) != restrictedCells_.end()) {continue;}

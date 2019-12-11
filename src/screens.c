@@ -7590,8 +7590,11 @@ static boolean ConfigureJoystickMapButtonsAndAxes(SDL_Joystick *joystick)
   // initialize mapping with GUID and name
   SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(joystick), temp, sizeof(temp));
 
-  snprintf(mapping, sizeof(mapping), "%s,%s,platform:%s,",
+  // (tuero@ualberta.ca) - November 2019
+  // Catch GCC 7+(?) format-truncation warnings
+  int ret = snprintf(mapping, sizeof(mapping), "%s,%s,platform:%s,",
 	   temp, name, SDL_GetPlatform());
+  if (ret < 0) {abort();}
 
   // loop through all steps (buttons and axes), getting joystick events
   for (i = 0; i < SDL_arraysize(steps) && !done;)

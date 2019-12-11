@@ -17,8 +17,8 @@
 /**
  * Simple timer class.
  *
- * Allows for start/stop, and checks if time has exceeded the given limit. The limit can be 
- * given as an optional consturctor argument, or  
+ * Allows for start/stop, and checks if time has exceeded the given limit. The base unit of
+ * time for the clock is in microseconds.
  */
 class Timer {
     typedef std::chrono::high_resolution_clock Clock;
@@ -32,38 +32,49 @@ private:
 public:
     Timer(int limit = 0);
 
-    /*
+    /**
      * Reset the timer.
      */
     void reset();
 
-    /*
+    /**
      * Set the timer limit.
+     * 
+     * @param limit The limit in microseconds.
      */
     void setLimit(int limit);
 
-    /*
+    /**
      * Start the timer.
      */
     void start();
 
-    /*
+    /**
      * Stop the timer.
      */
     void stop();
 
-    /*
+    /**
      * Check if there is still time left on the timer.
+     * If no limit is given, then this will always return true
+     * 
+     * @return True if the time duration doesn't exceed the given limit, or if no limit was given.
      */
     bool hasTimeLeft();
 
-    /*
-     * Check if there is still time left on the timer.
+    /**
+     * Get the time remaining in microseconds.
+     * 
+     * @return The time remaining on the clock.
      */
-    int getTimeLeft();
+    int getTimeRemaining();
 
-    /*
+    /**
      * Check the duration of the timer.
+     * If the clock is still running, it will be the time the clock has been running for.
+     * If the clock was stopped, it will be the duration from start to finish.
+     * 
+     * @return The duration of the timer in microseconds.
      */
     int getDuration();
 

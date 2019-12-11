@@ -11,8 +11,8 @@
 #include "replay.h"
 
 // Engine
+#include "../../engine/engine_types.h"
 #include "../../engine/engine_helper.h"
-#include "../../engine/action.h"
 
 //Logging
 #include "../../util/logger.h"
@@ -77,7 +77,7 @@ Action Replay::getAction() {
                     requestReset_ = true;
                     return Action::noop;
                 }
-                return stringToAction(line);
+                return enginehelper::stringToAction(line);
             }
         }
     }

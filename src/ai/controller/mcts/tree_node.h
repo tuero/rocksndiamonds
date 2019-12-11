@@ -15,7 +15,7 @@
 #include <memory>
 
 // Engine
-#include "../../engine/action.h"
+#include "../../engine/engine_types.h"
 #include "../../engine/game_state.h"
 #include "../options/base_option.h"
 

@@ -10,15 +10,11 @@
 
 #include "ai_entry.h"
 
-#include <iostream>
 #include <string>
 #include <vector>
-#include <algorithm>
 
 // engine
-#include "engine/action.h"
 #include "engine/engine_helper.h"
-#include "engine/engine_types.h"
 
 // controller
 #include "controller/controller.h"
@@ -32,8 +28,10 @@
 #include <plog/Log.h>
 
 // Tests
-#include "tests/test_engine_speed.h"
-#include "tests/test_rng.h"
+#ifdef HEADLESS
+#define CATCH_CONFIG_RUNNER
+#include <catch2/catch.hpp>
+#endif
 
 
 // External variables accessible to engine
@@ -182,53 +180,22 @@ extern "C" int getRandomNumber(int max) {
 
 // ------------------------ Tests ------------------------------
 
-/*
- * Test the engine simulator speed.
- * These tests will simulate random player actions and progress the environment
- * forward. Optimizations are blocked engine code that is not needed during simulation,
- * Such as drawing to screen buffers.
- * Results are logged to file
- */
-extern "C" void testEngineSpeed() {
-    logger::setLogLevel(logger::LogLevel::debug);
-    // testenginespeed::testEngineSpeedNoOptimizations();
-    testenginespeed::testEngineSpeedWithOptimizations();
-}
-
-
-/*
- * Tests the speed of running MCTS
- * This does one sweep of MCTS with a budget of 20ms (as per engine spec of
- * having a 20ms frame delay).
- * Results are logged to file
- */
-extern "C" void testMCTSSpeed() {
-    logger::setLogLevel(logger::LogLevel::debug);
-    testenginespeed::testMctsSpeed();
-}
-
-
-/*
- * Tests for RNG reproducibility after engine simulations during rollouts
- */
-extern "C" void testRNGAfterSimulations() {
-    logger::setLogLevel(logger::LogLevel::debug);
-    testrng::testStateAfterSimulations();
-}
-
+#ifdef HEADLESS
 /*
  * Runs all of the above tests in sequence
  * Results are logged to file.
  */
-extern "C" void runTests() {
+extern "C" int runTests(int argc, char* argv[]) {
+    int result = Catch::Session().run();
+    return result;
     // Override logging level for tests
-    logger::setLogLevel(logger::LogLevel::debug);
+    // logger::setLogLevel(logger::LogLevel::debug);
 
-    PLOGI_(logger::FileLogger) << "Running all tests...";
+    // PLOGI_(logger::FileLogger) << "Running all tests...";
 
     // Save current game state
-    GameState state;
-    state.setFromEngineState();
+    // GameState state;
+    // state.setFromEngineState();
 
     // enginetype::GridCell exitCell = enginehelper::findExitLocation();
     // enginehelper::setBoardDistancesDijkstra(exitCell);
@@ -236,8 +203,8 @@ extern "C" void runTests() {
     // state.restoreEngineState();
     // testenginespeed::testEngineSpeedNoOptimizations();
 
-    state.restoreEngineState();
-    testenginespeed::testEngineSpeedWithOptimizations();
+    // state.restoreEngineState();
+    // testenginespeed::testEngineSpeedWithOptimizations();
     
     // state.restoreEngineState();
     // testenginespeed::testBfsSpeed();
@@ -248,4 +215,5 @@ extern "C" void runTests() {
     // state.restoreEngineState();
     // testrng::testStateAfterSimulations();
 }
+#endif
 

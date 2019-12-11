@@ -9,22 +9,18 @@
  */
 
 
-#ifndef CUSTOM_H
-#define CUSTOM_H
+#ifndef AI_ENTRY_H
+#define AI_ENTRY_H
 
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-    // ---------------- C Declarations ------------------
-    #include "../main.h"
-    #include "../screens.h"
-
 
     // ---------------- Init Functions ------------------
 
-    /*
+    /**
      * Perform all necessary actions at level start.
      *
      * Called whenever level is started. Calculates tile distances to goal for 
@@ -46,7 +42,7 @@ extern "C"
      */
     void handleLevelFailed(void);
 
-    /*
+    /**
      * Initalizes the controller to be used.
      * 
      * The controller is supplied by the -controller command line argument. If none is 
@@ -54,7 +50,7 @@ extern "C"
      */
     void initController(void);
 
-    /*
+    /**
      * Initialize the loggers.
      *
      * A file and consol logger are used. Consol logger only displays partial information
@@ -65,7 +61,7 @@ extern "C"
      */
     void initLogger(int argc, char *argv[]);
 
-    /*
+    /**
      * Set the levelset given by the command line argument.
      */
     void setLevelSet(void); 
@@ -87,14 +83,14 @@ extern "C"
      */
     int requestReset(void);
 
-    /*
+    /**
      * Get an action from the controller (implementation specific) and send back to engine.
      *
      * @return Integer representation of action as defined by the engine.
      */
     int getAction(void);
 
-    /*
+    /**
      * Call level specific actions for custom programming levels.
      * 
      * Some custom levels have elements that continuously spawn in
@@ -106,7 +102,7 @@ extern "C"
 
     // -------------------- RNG ----------------------
 
-    /*
+    /**
      * Wrapper to get random number for engine use.
      * 
      * Engine already provides RNG, but this allows for reproducibility
@@ -119,33 +115,13 @@ extern "C"
 
     // ---------------- Tests ----------------------
 
-    /*
-     * Test the engine simulator speed.
-     * These tests will simulate random player actions and progress the environment
-     * forward. Optimizations are blocked engine code that is not needed during simulation,
-     * Such as drawing to screen buffers.
-     * Results are logged to file
-     */
-    void testEngineSpeed(void);
-
-    /*
-     * Tests the speed of running MCTS
-     * This does one sweep of MCTS with a budget of 20ms (as per engine spec of
-     * having a 20ms frame delay).
-     * Results are logged to file
-     */
-    void testMCTSSpeed(void);
-
-    /*
-     * Tests for RNG reproducibility after engine simulations during rollouts
-     */
-    void testRNGAfterSimulations(void);
-
-    /*
+    #ifdef HEADLESS
+    /**
      * Runs all of the above tests in sequence
      * Results are logged to file
      */
-    void runTests(void);
+    int runTests(int argc, char* argv[]);
+    #endif
 
 
 
@@ -155,9 +131,6 @@ extern "C"
 
 
 
-
-
-
-#endif  //CUSTOM_H
+#endif  //AI_ENTRY_H
 
 

@@ -6,29 +6,13 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 
-#set(CMAKE_C_FLAGS "-g -O3 -Wall -Wstrict-prototypes -Wmissing-prototypes -MMD -MP")
-#set(CMAKE_C_FLAGS_DEBUG "-g -O3 -Wall -Wstrict-prototypes -Wmissing-prototypes -MMD -MP")
-#set(CMAKE_C_FLAGS_MINSIZEREL "-g -O3 -Wall -Wstrict-prototypes -Wmissing-prototypes -MMD -MP")
-#set(CMAKE_C_FLAGS_RELWITHDEBINFO "-g -O3 -Wall -Wstrict-prototypes -Wmissing-prototypes -MMD -MP")
-#set(CMAKE_C_FLAGS_RELEASE "-g -O3 -Wall -Wstrict-prototypes -Wmissing-prototypes -MMD -MP")
-#
-#set(CMAKE_CXX_FLAGS "-Wall -Wextra -g -O3 -MMD -MP -DDEBUG -g")
-#set(CMAKE_CXX_FLAGS_DEBUG "-Wall -Wextra -g -O3 -MMD -MP -DDEBUG -g")
-#set(CMAKE_CXX_FLAGS_MINSIZEREL "-Wall -Wextra -g -O3 -MMD -MP")
-#set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-Wall -Wextra -g -O3 -MMD -MP")
-#set(CMAKE_CXX_FLAGS_RELEASE "-Wall -Wextra -g -O3 -MMD -MP")
-
-set(CMAKE_C_FLAGS "-g -O3 -Wall -Wstrict-prototypes -Wmissing-prototypes")
+set(CMAKE_C_FLAGS "-O3 -Wall -Wstrict-prototypes -Wmissing-prototypes")
 set(CMAKE_C_FLAGS_DEBUG "-g -O3 -Wall -Wstrict-prototypes -Wmissing-prototypes")
-set(CMAKE_C_FLAGS_MINSIZEREL "-g -O3 -Wall -Wstrict-prototypes -Wmissing-prototypes")
-set(CMAKE_C_FLAGS_RELWITHDEBINFO "-g -O3 -Wall -Wstrict-prototypes -Wmissing-prototypes")
-set(CMAKE_C_FLAGS_RELEASE "-g -O3 -Wall -Wstrict-prototypes -Wmissing-prototypes")
+set(CMAKE_C_FLAGS_RELEASE "-O3 -Wall -Wstrict-prototypes -Wmissing-prototypes")
 
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -g -O3 -MMD -g")
-set(CMAKE_CXX_FLAGS_DEBUG "-Wall -Wextra -g -O3 -DDEBUG -g")
-set(CMAKE_CXX_FLAGS_MINSIZEREL "-Wall -Wextra -g -O3")
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-Wall -Wextra -g -O3")
-set(CMAKE_CXX_FLAGS_RELEASE "-Wall -Wextra -g -O3")
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -g -O3")
+set(CMAKE_CXX_FLAGS_DEBUG "-Wall -Wextra -g -O3 -DDEBUG")
+set(CMAKE_CXX_FLAGS_RELEASE "-Wall -Wextra -O3")
 
 
 # Includes
@@ -108,11 +92,11 @@ add_custom_target(
 # Executable
 if (SDL2_FOUND AND SDL2_image_FOUND AND SDL2_mixer_FOUND AND SDL2_net_FOUND)
     add_executable(rocksndiamonds_gui ${sources})
-        add_dependencies(rocksndiamonds_gui auto_conf auto_conftime)
+    add_dependencies(rocksndiamonds_gui auto_conf auto_conftime)
     set_target_properties(rocksndiamonds_gui PROPERTIES COMPILE_FLAGS "-DTARGET_SDL2")
 endif()
 
-add_executable(rocksndiamonds_headless ${sources})
+add_executable(rocksndiamonds_headless ${sources} ${sources_tests})
 add_dependencies(rocksndiamonds_headless auto_conf auto_conftime)
 set_target_properties(rocksndiamonds_headless PROPERTIES COMPILE_FLAGS "-DHEADLESS")
 

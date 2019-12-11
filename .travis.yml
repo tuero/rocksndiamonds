@@ -1,0 +1,34 @@
+os: linux
+dist: bionic
+
+language: cpp
+compiler: gcc
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - gcc-8
+      - g++-8
+      - cmake
+
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq libegl1-mesa-dev libgles2-mesa-dev
+  - sudo apt-get install -qq libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev
+
+script:
+  - sudo ln -s /usr/bin/gcc-8 /usr/local/bin/gcc
+  - sudo ln -s /usr/bin/g++-8 /usr/local/bin/g++
+  - export CC=/usr/bin/gcc-8
+  - export CXX=/usr/bin/g++-8
+  - echo ${CC} --version
+  - echo ${CXX} --version
+  - echo cmake --version
+  - mkdir build
+  - cd build
+  - cmake ..
+  - make -j2
+  - cd ..
+  - ./rocksndiamonds_headless -test

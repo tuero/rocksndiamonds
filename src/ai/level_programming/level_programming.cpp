@@ -14,9 +14,8 @@
 #include <array>
 
 // Engine
-#include "../engine/engine_helper.h"
 #include "../engine/engine_types.h"
-#include "../engine/action.h"
+#include "../engine/engine_helper.h"
 
 // Logging
 #include "../util/logger.h"
@@ -25,7 +24,7 @@
 namespace levelprogramming {
 
 
-/*
+/**
  * Spawns a diamond into an empty grid cell
  * Assumes diamond is Custom Element 1 i.e. element value 360
  */
@@ -65,7 +64,7 @@ void spawnYamYam() {
 
 
 
-/*
+/**
  * Spawns a diamond into an empty grid cell
  * Assumes diamond is Custom Element 1 i.e. element value 360
  */
@@ -87,7 +86,7 @@ void spawnDiamond() {
 }
 
 
-/*
+/**
  * The survival levelset 
  * For each diamond the agent collects, another yamyam will spawn.
  */
@@ -109,7 +108,7 @@ void handleSurvivalLevelStart() {
 }
 
 
-/*
+/**
  * Handle custom level programming for each game tick.
  * 
  * For example, checking whether an item or enemy should be spawned.
@@ -133,7 +132,7 @@ void customLevelProgrammingUpdate() {
 }
 
 
-/*
+/**
  * Handle custom level programming at level start.
  */
 void customLevelProgrammingStart() {

@@ -12,7 +12,7 @@
 #define OPTION_TO_EXIT_H
 
 #include "base_option.h"
-#include "../../engine/action.h"
+#include "../../engine/engine_types.h"
 
 /**
  * Skeleton definition which each derived Option is based off of.

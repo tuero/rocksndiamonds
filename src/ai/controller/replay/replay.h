@@ -36,18 +36,24 @@ public:
 
     /**
      * Set the replay file to use as a file stream.
+     * 
+     * @param The replay file string name.
      */
     void setReplayFile(std::string &file);
 
     /**
      * Flag for controller to try again if level fails.
      * Replay files can handle replays.
+     * 
+     * @return True.
      */
     bool retryOnLevelFail() const override {return true;}
 
     /**
      * Get the action from the replay file.
      * If there is a reset command, the level is restarted.
+     * 
+     * @return The next action from the replay file.
      */
     Action getAction() override;
 

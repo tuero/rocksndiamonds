@@ -27,7 +27,6 @@ OptionToExit::OptionToExit(int spriteID) {
 
 
 std::string OptionToExit::toString() const {
-    int item = enginehelper::getGridElement(goalCell_);
     return enginehelper::getItemReadableDescription(item_) + " " + std::to_string(spriteID_);
 }
 

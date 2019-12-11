@@ -13,12 +13,16 @@
 #include <iostream>
 #include <array>
 #include <algorithm>
-#include <random>
 #include <map>
+#include <random>
+
+// RNG
+#include "../util/rng.h"
 
 //Logging
 #include "../util/logger.h"
 #include <plog/Log.h>
+
 
 extern int spriteIDs[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int spriteIDCounter;
@@ -27,20 +31,16 @@ namespace enginehelper {
 
 // Hashing data structures
 uint64_t zobristElement[MAX_LEV_FIELDX * MAX_LEV_FIELDY][MAX_NUM_ELEMENTS];
-uint64_t zobristDir[MAX_LEV_FIELDX * MAX_LEV_FIELDY][MAX_DIR];
-
-auto rng = std::default_random_engine {};
 
 
-
-/*
+/**
  * Get the controller type defined by user command line argument.
  */
 ControllerType getControllerType() {
     return options.controller_type;
 }
 
-/*
+/**
  * Get the replay file name.
  */
 std::string getReplayFileName() {
@@ -58,11 +58,61 @@ int getOptParam() {
 
 
 // -------------------------------------------------------
+// ------------------Action Information-------------------
+// -------------------------------------------------------
+
+/**
+ * Fast lookup action descriptions.
+ */
+static const std::unordered_map<Action, std::string> ACTION_TO_STRING = 
+{
+    {Action::right, "right"},
+    {Action::down,  "down"},
+    {Action::left,  "left"},
+    {Action::up,    "up"},
+    {Action::noop,  "noop"}
+};
+static const std::unordered_map<std::string, Action> STRING_TO_ACTION = 
+{
+    {"right",   Action::right},
+    {"down",    Action::down},
+    {"left",    Action::left},
+    {"up",      Action::up},
+    {"noop",    Action::noop}
+};
+
+/**
+ * Get string representation of action.
+ */
+std::string actionToString(const Action action) {
+    auto it = ACTION_TO_STRING.find(action);
+    return (it == ACTION_TO_STRING.end() ? ACTION_TO_STRING.find(Action::noop)->second : it->second);
+}
+
+
+/**
+ * Get the enum representation of the action.
+ */
+Action stringToAction(const std::string &str) {
+    auto it = STRING_TO_ACTION.find(str);
+    return (it == STRING_TO_ACTION.end() ? Action::noop : it->second);
+}
+
+
+/**
+ * Get the opposite direction.
+ */
+Action getOppositeDirection(Action action) {
+    return static_cast<Action>(MV_DIR_OPPOSITE(action));
+}
+
+
+// -------------------------------------------------------
 // -------------------Level Information-------------------
 // -------------------------------------------------------
 
 
-/*
+/**
  * Call engine functions to automatically load the levelset.
  */
 void setLevelSet() {
@@ -99,7 +149,7 @@ void setLevelSet() {
     }
 }
 
-/*
+/**
  * Get the levelset currently set in the engine.
  */
 const std::string getLevelSet() {
@@ -107,7 +157,7 @@ const std::string getLevelSet() {
 }
 
 
-/*
+/**
  * Call engine function to load the given level.
  */
 void loadLevel(int level_num) {
@@ -118,7 +168,7 @@ void loadLevel(int level_num) {
 }
 
 
-/*
+/**
  * Get the level number loaded in the level struct
  */
 int getLevelNumber() {
@@ -138,7 +188,7 @@ void restartLevel() {
 }
 
 
-/*
+/**
  * Get the level height of the level currently loaded in the engine.
  */
 int getLevelHeight() {
@@ -146,7 +196,7 @@ int getLevelHeight() {
 }
 
 
-/*
+/**
  * Get the level width of the level currently loaded in the engine.
  */
 int getLevelWidth() {
@@ -174,7 +224,7 @@ int getLevelRemainingGemsNeeded() {
 // ---------------Grid Action Information-----------------
 // -------------------------------------------------------
 
-/*
+/**
  * Check if two grid cells are neighbours, defined by being separated by Euclidean distance of 1.
  */
 bool checkIfNeighbours(enginetype::GridCell left, enginetype::GridCell right) {
@@ -201,7 +251,7 @@ const std::map<Action, std::array<int, 2>> ACTION_DELTA_MAP =
     {Action::down, {0,1}}
 };
 
-/*
+/**
  * Get the action which moves from the first given grid cell to the second. 
  *
  * Note: The gridcells must be neighbours.
@@ -214,7 +264,7 @@ Action getActionFromNeighbours(enginetype::GridCell from, enginetype::GridCell t
 }
 
 
-/*
+/**
  * Get the resulting cell from applying the action in the given cell.
  */
 enginetype::GridCell getCellFromAction(Action action, const enginetype::GridCell from) {
@@ -235,7 +285,7 @@ int cellToIndex(const enginetype::GridCell &cell) {
     return (cell.y * getLevelWidth() + cell.x);
 }
 
-/*
+/**
  * Checks if the given gridcell is in bounds of the level field.
  */
 bool inBounds(const enginetype::GridCell &cell) {
@@ -243,7 +293,7 @@ bool inBounds(const enginetype::GridCell &cell) {
 }
 
 
-/*
+/**
  * Check if the element in the gridcell is a temporary element.
  * For internal use when bound-check is implicitly done.
  */
@@ -252,7 +302,7 @@ bool _isTemporaryElement(const enginetype::GridCell &cell) {
 }
 
 
-/*
+/**
  * Check if the element in the gridcell is a temporary element.
  */
 bool isTemporaryElement(const enginetype::GridCell &cell) {
@@ -260,7 +310,7 @@ bool isTemporaryElement(const enginetype::GridCell &cell) {
 }
 
 
-/*
+/**
  * Checks if a given cell contains a valid sprite.
  * For internal use when bound-check is implicitly done.
  */
@@ -270,7 +320,7 @@ bool _isValidSprite(const enginetype::GridCell &cell) {
 }
 
 
-/*
+/**
  * Initialize the unique sprite IDs
  */
 void initSpriteIDs() {
@@ -289,7 +339,7 @@ void initSpriteIDs() {
 }
 
 
-/*
+/**
  * Get the sprite ID (if one exists) for the given cell.
  */
 int getSpriteID(const enginetype::GridCell &cell) {
@@ -297,7 +347,7 @@ int getSpriteID(const enginetype::GridCell &cell) {
 }
 
 
-/*
+/**
  * Get the grid cell the given sprite resides in.
  */
 enginetype::GridCell getSpriteGridCell(int spriteID) {
@@ -315,7 +365,7 @@ enginetype::GridCell getSpriteGridCell(int spriteID) {
 }
 
 
-/*
+/**
  * Checks if the given sprite ID is active. 
  */
 bool isSpriteActive(int spriteID) {
@@ -330,7 +380,7 @@ bool isSpriteActive(int spriteID) {
 }
 
 
-/*
+/**
  * Get the sprite locations on the level map.
  */
 std::vector<enginetype::GridCell> getMapSprites() {
@@ -348,7 +398,7 @@ std::vector<enginetype::GridCell> getMapSprites() {
 }
 
 
-/*
+/**
  * Get the item element located at the given GridCell (x,y) location.
  */
 int getGridElement(enginetype::GridCell cell) {
@@ -356,7 +406,7 @@ int getGridElement(enginetype::GridCell cell) {
 }
 
 
-/*
+/**
  * Get the item MovPos at the given GridCell (x,y) location.
  */
 int getGridMovPos(enginetype::GridCell cell) {
@@ -364,7 +414,7 @@ int getGridMovPos(enginetype::GridCell cell) {
 }
 
 
-/*
+/**
  * Get the grid cell that the player is currently located in.
  */
 enginetype::GridCell getPlayerPosition() {
@@ -373,7 +423,7 @@ enginetype::GridCell getPlayerPosition() {
 }
 
 
-/*
+/**
  * Check if the player resides in the current cell.
  */
 bool isPlayerPosition(const enginetype::GridCell &cell) {
@@ -389,7 +439,7 @@ bool isPlayerDoneAction() {
 }
 
 
-/*
+/**
  * Check if the grid cell at location (x,y) is empty.
  */
 bool isGridEmpty(enginetype::GridCell cell) {
@@ -399,7 +449,7 @@ bool isGridEmpty(enginetype::GridCell cell) {
 }
 
 
-/*
+/**
  * Get the current goal location (defined by distance of 0).
  */
 enginetype::GridCell getCurrentGoalLocation() {
@@ -593,7 +643,7 @@ int getItemScore(const enginetype::GridCell cell) {
 }
 
 
-/*
+/**
  * Internal check (doesn't valid bounds), check if player can perform action 
  * and walk into cell cellTo.
  */
@@ -603,7 +653,7 @@ bool _isWalkable(Action action, const enginetype::GridCell cellTo) {
     return IS_WALKABLE(element) && isAccessibleFromDirection;
 }
 
-/*
+/**
  * Checks if the direction the player wants to move in is walkable.
  * Walkable means that the player is able to stand in the cell which results
  * in the action being applied.
@@ -619,7 +669,7 @@ bool isWalkable(Action action, const enginetype::GridCell cellFrom) {
 }
 
 
-/*
+/**
  * Checks if the GridCell cellTo is diggable.
  * For internal use, assumes bounds are validated elsewhere.
  */
@@ -628,7 +678,7 @@ bool _isDigable(const enginetype::GridCell cellTo) {
     return IS_DIGGABLE(element);
 }
 
-/*
+/**
  * Checks if the direction the player wants to move in is diggable.
  * Diggable means that the player is able to stand in the cell which results
  * in the action being applied.
@@ -641,7 +691,7 @@ bool isDigable(Action action, const enginetype::GridCell cellFrom) {
 }
 
 
-/*
+/**
  * Checks if the GridCell cellTo is a wall.
  * IS_WALL is a predefined macro for the default game wall types.
  * For internal use, assumes bounds are validated elsewhere.
@@ -652,7 +702,7 @@ bool _isWall(const enginetype::GridCell cellTo) {
 }
 
 
-/*
+/**
  * Checks if the direction the player wants to move in is a wall.
  * This works for predefined wall objects from the default game objects. A custom
  * non-passible object (which acts as a wall) won't be caught here.
@@ -665,7 +715,7 @@ bool isWall(Action action, const enginetype::GridCell cellFrom) {
 }
 
 
-/*
+/**
  * Checks if the GridCell cellTo is contains a collectible element.
  * For internal use, assumes bounds are validated elsewhere.
  */
@@ -674,7 +724,7 @@ bool _isCollectable(const enginetype::GridCell cellTo) {
     return IS_COLLECTIBLE(element);
 }
 
-/*
+/**
  * Checks if resulting GridCell the player wants to move to contains a collectible element.
  */
 bool isCollectable(Action action, const enginetype::GridCell cellFrom) {
@@ -685,7 +735,7 @@ bool isCollectable(Action action, const enginetype::GridCell cellFrom) {
 }
 
 
-/*
+/**
  * Checks if the GridCell cellPassed can be passed through from 
  * using the given action.
  * This mirrors an internal engine function logic. 
@@ -707,7 +757,7 @@ bool _canPassField(const enginetype::GridCell cellPassed, Action action) {
 }
 
 
-/*
+/**
  * Checks if the GridCell cellPassed is passable
  * For internal use, assumes bounds are validated elsewhere.
  */
@@ -716,7 +766,7 @@ bool _isPassable(Action action, const enginetype::GridCell cellPassed) {
     return IS_PASSABLE(element) && _canPassField(cellPassed, action);
 }
 
-/*
+/**
  * Checks if the direction the player wants to move in is passable.
  * Passable means that the player walks through the cell which results in the
  * action being applied, and into the next cell.
@@ -732,7 +782,7 @@ bool isPassable(Action action, const enginetype::GridCell cellFrom) {
 }
 
 
-/*
+/**
  * Checks if the action will move the player.
  * For internal use, assumes bounds are validated elsewhere.
  */
@@ -742,7 +792,7 @@ bool _isActionMoveable(Action action, const enginetype::GridCell cellTo) {
 }
 
 
-/*
+/**
  * Checks if the action will move the player.
  * Player can move if they are not walking into a wall, and the GridCell in the direction
  * the player wants to move is either walkable, passable, or contains a collectable item.
@@ -762,7 +812,7 @@ bool isActionMoveable(Action action, const enginetype::GridCell cellFrom) {
 // ---------------Custom Level Programming----------------
 // -------------------------------------------------------
 
-/*
+/**
  * Count how many of a specified element in the game.
  */
 int countNumOfElement(int element) {
@@ -778,7 +828,7 @@ int countNumOfElement(int element) {
 }
 
 
-/*
+/**
  * Add the specified element to the level.
  */
 void spawnElement(int element, int dir, enginetype::GridCell gridCell) {
@@ -790,7 +840,7 @@ void spawnElement(int element, int dir, enginetype::GridCell gridCell) {
 }
 
 
-/*
+/**
  * Get all grid cells which are empty.
  */
 std::vector<enginetype::GridCell> getEmptyGridCells() {
@@ -811,7 +861,7 @@ std::vector<enginetype::GridCell> getEmptyGridCells() {
 // -------------------------------------------------------
 
 
-/*
+/**
  * Check if the current status of the engine is loss of life.
  */
 bool engineGameFailed() {
@@ -819,7 +869,7 @@ bool engineGameFailed() {
 }
 
 
-/*
+/**
  * Check if the current status of the engine is level solved.
  */
 bool engineGameSolved() {
@@ -827,7 +877,7 @@ bool engineGameSolved() {
 }
 
 
-/*
+/**
  * Check if the current status of the engine is failed or solved
  */
 bool engineGameOver() {
@@ -852,7 +902,7 @@ void setEngineGameStatusModePlaying() {
 }
 
 
-/*
+/**
  * Set the action for the engine to perform on behalf of the player on the next iteration.
  */
 void setEnginePlayerAction(Action action) {
@@ -860,7 +910,7 @@ void setEnginePlayerAction(Action action) {
 }
 
 
-/*
+/**
  * Set the stored player's action as a valid random action.
  */
 void setEngineRandomPlayerAction() {
@@ -873,7 +923,7 @@ void setEngineRandomPlayerAction() {
 }
 
 
-/*
+/**
  * Get the currently stored player action.
  */
 int getEnginePlayerAction() {
@@ -881,7 +931,7 @@ int getEnginePlayerAction() {
 }
 
 
-/*
+/**
  * Get the current score of the game.
  */
 int getCurrentScore() {
@@ -889,7 +939,7 @@ int getCurrentScore() {
 }
 
 
-/*
+/**
  * Get the Time left in the game.
  */
 int getTimeLeftScore() {
@@ -897,7 +947,7 @@ int getTimeLeftScore() {
 }
 
 
-/*
+/**
  * Simulate the engine ahead a single tick.
  */
 void engineSimulateSingle() {
@@ -905,7 +955,7 @@ void engineSimulateSingle() {
 }
 
 
-/*
+/**
  * Simulate the engine ahead ENGINE_RESOLUTION game ticks.
  */
 void engineSimulate() {
@@ -914,7 +964,7 @@ void engineSimulate() {
     }
 }
 
-/*
+/**
  * Set flag for simulating.
  */
 void setSimulatorFlag(bool simulatorFlag) {
@@ -922,7 +972,7 @@ void setSimulatorFlag(bool simulatorFlag) {
 }
 
 
-/*
+/**
  * Get the simulator flag status.
  */
 bool isSimulating() {
@@ -935,7 +985,7 @@ bool isSimulating() {
 // -------------------------------------------------------
 
 
-/*
+/**
  * Initialize Zorbrist tables, used to hash game board states
  */
 void initZorbristTables() {
@@ -944,13 +994,13 @@ void initZorbristTables() {
         for (int k = 0; k < MAX_NUM_ELEMENTS; k++) {
             zobristElement[i][k] = RNG::getRandomNumber();
         }
-        // for (int k = 0; k < MAX_DIR; k++) {
-        //     zobristDir[i][k] = RNG::getRandomNumber();
-        // }
     }
 }
 
 
+/**
+ * Get the hash representation of a vector grid cell path.
+ */
 uint64_t gridcellPathToHash(const std::deque<enginetype::GridCell> &path) {
     uint64_t hashValue = 0; 
     for (auto const & cell : path) {
@@ -961,25 +1011,22 @@ uint64_t gridcellPathToHash(const std::deque<enginetype::GridCell> &path) {
 }
 
 
-/*
+/**
  * Get the hash representation of the current state in the engine
  */
 uint64_t stateToHash() {
     int px = stored_player[0].jx;
     int py = stored_player[0].jy;
-    // int pMov = stored_player[0].MovDir;
     uint64_t hashValue = 0; 
 
     // Set initial hash
     for (int x = 0; x < level.fieldx; x++) {
         for (int y = 0; y < level.fieldy; y++) {
             hashValue ^= zobristElement[y*level.fieldx + x][Feld[x][y]];
-            // hashValue ^= zobristDir[y*level.fieldx + x][MovDir[x][y]];
         }
     }
 
     hashValue ^= zobristElement[py*level.fieldx + px][80];
-    // hashValue ^= zobristDir[py*level.fieldx + px][pMov];
 
     return hashValue;
 }
@@ -990,7 +1037,7 @@ uint64_t stateToHash() {
 // -------------------------------------------------------
 
 
-/*
+/**
  * Get L1 distance between two gridcells
  */
 int getL1Distance(enginetype::GridCell left, enginetype::GridCell right) {
@@ -998,7 +1045,7 @@ int getL1Distance(enginetype::GridCell left, enginetype::GridCell right) {
 }
 
 
-/*
+/**
  * Get the distance to goal from given GridCell
  * This is set by distance metric, usually L1
  */
@@ -1010,7 +1057,7 @@ int getGridDistanceToGoal(const enginetype::GridCell goalCell) {
 }
 
 
-/*
+/**
  * Set the distance to goal manually for more exotic distance functions.
  */
 void setGridDistanceToGoal(const enginetype::GridCell cell, short value) {
@@ -1021,7 +1068,7 @@ void setGridDistanceToGoal(const enginetype::GridCell cell, short value) {
 }
 
 
-/*
+/**
  * Find the grid location of the goal, given by EL_EXIT_OPEN
  */
 enginetype::GridCell findExitLocation() {
@@ -1039,7 +1086,7 @@ enginetype::GridCell findExitLocation() {
 }
 
 
-/*
+/**
  * Set the grid distances to goal using L1 distance
  */
 void setBoardDistancesL1(const enginetype::GridCell goalCell) {

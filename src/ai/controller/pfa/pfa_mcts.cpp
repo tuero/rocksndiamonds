@@ -339,7 +339,7 @@ void PFA_MCTS::handleEmpty(std::vector<Action> &currentSolution, std::vector<Act
 
 
 void PFA_MCTS::logCurrentStats() {
-    PLOGD_(logger::FileLogger) << "Time remaining: " << timer.getTimeLeft();
+    PLOGD_(logger::FileLogger) << "Time remaining: " << timer.getTimeRemaining();
     PLOGD_(logger::FileLogger) << "Current number of expanded nodes: " << count_expanded_nodes 
         << ", simulated nodes: " << count_simulated_nodes;
 }
@@ -480,7 +480,7 @@ void PFA_MCTS::run(std::vector<Action> &currentSolution, std::vector<Action> &fo
         // Reached max iterations or max time
         loop_counter += 1;
         float avgTime = timer.getDuration() / loop_counter;
-        if (timer.getTimeLeft() < avgTime) {break;}
+        if (timer.getTimeRemaining() < avgTime) {break;}
     }
 
     timer.stop();

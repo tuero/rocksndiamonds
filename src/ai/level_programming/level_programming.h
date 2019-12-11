@@ -14,12 +14,12 @@
 
 namespace levelprogramming {
 
-    /*
+    /**
      * Handle custom level programming for each game tick.
      */
     void customLevelProgrammingUpdate();
 
-    /*
+    /**
      * Handle custom level programming at level start.
      */
     void customLevelProgrammingStart();

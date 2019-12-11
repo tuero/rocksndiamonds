@@ -33,7 +33,7 @@ std::mt19937 g(rd());
  * Log the current MCTS stats.
  */
 void MCTS::logCurrentStats() {
-    PLOGD_(logger::FileLogger) << "Time remaining: " << timer.getTimeLeft();
+    PLOGD_(logger::FileLogger) << "Time remaining: " << timer.getTimeRemaining();
     PLOGD_(logger::FileLogger) << "Current number of expanded nodes: " << countExpandedNodes_
                                << ", simulated nodes: " << countSimulatedNodes_
                                << ", max depth: " << maxDepth_;
@@ -353,7 +353,7 @@ void MCTS::plan() {
         // Exit conditions: Reached max iterations or max time
         loopCounter += 1;
         float avgTime = timer.getDuration() / loopCounter;
-        if (timer.getTimeLeft() < avgTime) {break;}
+        if (timer.getTimeRemaining() < avgTime) {break;}
     }
 
     timer.stop();

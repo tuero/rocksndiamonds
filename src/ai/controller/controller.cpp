@@ -13,6 +13,7 @@
 // Engine
 #include "../engine/engine_helper.h" 
 
+// Util
 #include "../util/timer.h" 
 
 // Logging
@@ -28,10 +29,7 @@
 #include "two_level_search/two_level_search.h"
 
 
-OptionSingleStep noopOption(Action::noop, 1);
-
-
-/*
+/**
  * Default constructor which gets the controller type from the engine
  */
 Controller::Controller() {
@@ -40,7 +38,7 @@ Controller::Controller() {
 }
 
 
-/*
+/**
  * Constructor which sets the controller based on a given controller type
  * Used for testing
  */
@@ -50,7 +48,7 @@ Controller::Controller(ControllerType controller) {
 }
 
 
-/*
+/**
  * Reset the controller
  * HandleLevelStart is called. 
  */
@@ -69,7 +67,6 @@ void Controller::reset() {
 
     // Solution is cleared and stored with noops to begin
     currentAction_.clear();
-    nextAction_ = Action::noop;
     step_counter_ = 0;
 
     // Controller specific handler to ensure proper setup
@@ -86,6 +83,10 @@ bool Controller::requestReset() {
 }
 
 
+/**
+ * Called when level is solved.
+ * This will close logging and cleanup.
+ */
 void Controller::handleLevelSolved() {
     // Log info to user
     PLOGI_(logger::FileLogger) << "Game solved.";
@@ -103,6 +104,10 @@ void Controller::handleLevelSolved() {
 }
 
 
+/**
+ * Called when level is failed. 
+ * Depending on the controller, this will either terminate or attempt the level again.
+ */
 void Controller::handleLevelFailed() {
     PLOGI_(logger::FileLogger) << "Game Failed.";
     PLOGI_(logger::ConsoleLogger) << "Game Failed.";
@@ -120,13 +125,13 @@ void Controller::handleLevelFailed() {
 }
 
 
-/*
+/**
  * Get the action from the controller.
  * currentSolution_ is the action which the agent is currently performing. forwardSolution_
  * is the action which the controller is planning to take once the current action is 
  * complete.
  */
-Action Controller::getAction() {
+int Controller::getAction() {
     enginehelper::setSimulatorFlag(true);
     Action action = Action::noop;
     BaseController* baseController = baseController_.get();
@@ -151,20 +156,18 @@ Action Controller::getAction() {
     // We only care about information at the engine resolution
     if (step_counter_++ % enginetype::ENGINE_RESOLUTION == 0) {
         // Save action to replay file
-        logger::savePlayerMove(actionToString(action));
-
-        logger::logPlayerMove(actionToString(action));
+        logger::savePlayerMove(enginehelper::actionToString(action));
+        logger::logPlayerMove(enginehelper::actionToString(action));
         logger::logCurrentState();
-        logger::logBoardSpriteIDs();
     }
 
     enginehelper::setSimulatorFlag(false);
 
-    return action;
+    return static_cast<std::underlying_type_t<Action>>(action);
 }
 
 
-/*
+/**
  * Inits the controller.
  * Controller type is determined by command line argument.
  */
@@ -174,7 +177,7 @@ void Controller::initController() {
 }
 
 
-/*
+/**
  * Inits the controller.
  * Controller type is determined by command line argument.
  */

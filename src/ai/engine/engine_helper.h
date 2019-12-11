@@ -17,17 +17,18 @@
 #include <deque>
 #include <limits>
 #include <cstdint>
-#include <cstdlib>              // abs
+#include <cstdlib>
 
 #include "engine_types.h"
-#include "action.h"
 #include "../util/rng.h"
 
 extern "C" {
     #include "../../main.h"
+    #include "../../screens.h"
     #include "../../files.h"
     #include "../../init.h"
     #include "../../game.h"
+    #include "../../libgame/system.h"
 }
 
 
@@ -37,7 +38,7 @@ namespace enginehelper {
     static const int MAX_DIR = 32;
 
 
-    /*
+    /**
      * Get the controller type defined by user command line argument.
      * 
      * The type of available controllers are defined by system.h by enum controller_type,
@@ -47,7 +48,7 @@ namespace enginehelper {
      */
     ControllerType getControllerType();
 
-    /*
+    /**
      * Get the replay file name.
      *
      * The replay file name is supplied by the command line argument -replay <REPLAY_FILE>.
@@ -65,11 +66,40 @@ namespace enginehelper {
 
 
 // -------------------------------------------------------
+// ------------------Action Information-------------------
+// -------------------------------------------------------
+
+    /**
+     * Get string representation of action.
+     *
+     * @param action The action enum type.
+     * @return The string representation of the action.
+     */
+    std::string actionToString(const Action action);
+
+    /**
+     * Get the enum representation of the action.
+     *
+     * @param str The action string.
+     * @return The action enum type.
+     */
+    Action stringToAction(const std::string &str);
+
+    /**
+     * Get the opposite direction.
+     * 
+     * @param action The reference action
+     * @return The opposite action direction.
+     */
+    Action getOppositeDirection(Action action);
+
+
+// -------------------------------------------------------
 // -------------------Level Information-------------------
 // -------------------------------------------------------
 
 
-    /*
+    /**
      * Call engine functions to automatically load the levelset.
      *
      * This is used when supplying the command line argument -levelset <LEVELSET>, so that
@@ -82,14 +112,14 @@ namespace enginehelper {
      */
     void setLevelSet();
 
-    /*
+    /**
      * Get the levelset currently set in the engine.
      *
      * @return The string name of the levelset.
      */
     const std::string getLevelSet();
 
-    /*
+    /**
      * Call engine function to load the given level.
      *
      * The struct options.level_number is referenced by the engine when loading the
@@ -103,7 +133,7 @@ namespace enginehelper {
      */
     void loadLevel(int level_num);
 
-    /*
+    /**
      * Get the level number loaded in the level struct
      *
      * @return The level number
@@ -116,14 +146,14 @@ namespace enginehelper {
      */
     void restartLevel();
 
-    /*
+    /**
      * Get the level height of the level currently loaded in the engine.
      *
      * @return The level height as measured in grid tiles.
      */
     int getLevelHeight();
 
-    /*
+    /**
      * Get the level width of the level currently loaded in the engine.
      *
      * @return The level width as measured in grid tiles.
@@ -132,11 +162,15 @@ namespace enginehelper {
 
     /**
      * Get the number of gems needed to open the exit.
+     * 
+     * @return The number of gems.
      */
     int getLevelGemsNeeded();
 
     /**
      * Get the number of remaining gems needed to open the exit.
+     * 
+     * @return the count of gems remaining to open the exit.
      */
     int getLevelRemainingGemsNeeded();
 
@@ -145,7 +179,7 @@ namespace enginehelper {
 // ---------------Grid Action Information-----------------
 // -------------------------------------------------------
 
-    /*
+    /**
      * Check if two grid cells are neighbours, defined by being separated by Euclidean distance of 1.
      *
      * @param left First GridCell struct to compare.
@@ -154,7 +188,7 @@ namespace enginehelper {
      */
     bool checkIfNeighbours(enginetype::GridCell left, enginetype::GridCell right);
 
-    /*
+    /**
      * Get the action which moves from the first given grid cell to the second. 
      *
      * Note: The gridcells must be neighbours.
@@ -165,7 +199,7 @@ namespace enginehelper {
      */
     Action getActionFromNeighbours(enginetype::GridCell from, enginetype::GridCell to);
 
-    /*
+   /**
     * Get the resulting cell from applying the action in the given cell.
     * 
     * @param action The action to apply.
@@ -187,7 +221,7 @@ namespace enginehelper {
      */
     int cellToIndex(const enginetype::GridCell &cell);
 
-    /*
+    /**
      * Checks if the given GridCell is in bounds of the level field.
      *
      * @param The GridCell to check.
@@ -195,7 +229,7 @@ namespace enginehelper {
      */
     bool inBounds(const enginetype::GridCell &cell);
 
-    /*
+    /**
      * Check if the element in the GridCell is a temporary element.
      * A temporary element are usually for placeholders and do not represent
      * actual elements. As an example, EL_BLOCKED is used to signify an object
@@ -206,13 +240,13 @@ namespace enginehelper {
      */
     bool isTemporaryElement(const enginetype::GridCell &cell);
 
-    /*
+    /**
      * Initalize the unique sprite IDs.
      * Temporary elements and empty space/soil do not get IDs.
      */
     void initSpriteIDs();
 
-    /*
+    /**
      * Get the sprite ID (if one exists) for the given cell.
      *
      * @param The GridCell to get the sprite.
@@ -220,7 +254,7 @@ namespace enginehelper {
      */
     int getSpriteID(const enginetype::GridCell &cell);
 
-    /*
+    /**
      * Get the grid cell the given sprite resides in.
      *
      * @param The unique ID representing the sprite.
@@ -228,7 +262,7 @@ namespace enginehelper {
      */
     enginetype::GridCell getSpriteGridCell(int spriteID);
 
-    /*
+    /**
      * Checks if the given sprite ID is active. 
      *
      * @param The unique ID of the sprite to check.
@@ -236,14 +270,14 @@ namespace enginehelper {
      */
     bool isSpriteActive(int spriteID);
 
-    /*
+    /**
      * Get the sprite locations on the level map.
      *
      * @return Vector of GridCell locations for each of the sprites.
      */
     std::vector<enginetype::GridCell> getMapSprites();
 
-    /*
+    /**
      * Get the item element located at the given GridCell (x,y) location.
      *
      * @param The GridCell to locate.
@@ -251,7 +285,7 @@ namespace enginehelper {
      */
     int getGridElement(enginetype::GridCell cell);
 
-    /*
+    /**
      * Get the item MovPos at the given GridCell (x,y) location.
      *
      * @param The grid cell to locate.
@@ -259,14 +293,14 @@ namespace enginehelper {
      */
     int getGridMovPos(enginetype::GridCell cell);
 
-    /*
+    /**
      * Get the grid cell that the player is currently located in.
      *
      * @return The GridCell struct containing the player.
      */
     enginetype::GridCell getPlayerPosition();
 
-    /*
+    /**
      * Check if the player resides in the current cell.
      *
      * @param The GridCell which contains the player.
@@ -281,7 +315,7 @@ namespace enginehelper {
      */
     bool isPlayerDoneAction();
 
-    /*
+    /**
      * Check if the grid cell at location (x,y) is empty.
      *
      * This only checks if the cell is designated by the empty integer ID, not whether
@@ -295,7 +329,7 @@ namespace enginehelper {
      */
     bool isGridEmpty(enginetype::GridCell cell);
 
-    /*
+    /**
      * Get the current goal location (defined by distance of 0).
      *
      * If no grid location has distance 0, then (-1, -1) is returned and the calling method
@@ -396,7 +430,7 @@ namespace enginehelper {
      */
     int getItemScore(const enginetype::GridCell cell);
 
-    /*
+    /**
      * Checks if the direction the player wants to move in is walkable.
      * Walkable means that the player is able to stand in the cell which results
      * in the action being applied.
@@ -410,7 +444,7 @@ namespace enginehelper {
      */
     bool isWalkable(Action action, const enginetype::GridCell cellFrom = {-1,-1});
 
-    /*
+    /**
      * Checks if the direction the player wants to move in is diggable.
      * Diggable means that the player is able to stand in the cell which results
      * in the action being applied.
@@ -424,7 +458,7 @@ namespace enginehelper {
      */
     bool isDigable(Action action, const enginetype::GridCell cellFrom = {-1,-1});
 
-    /*
+    /**
      * Checks if the direction the player wants to move in is a wall.
      * This works for predefined wall objects from the default game objects. A custom
      * non-passible object (which acts as a wall) won't be caught here.
@@ -438,7 +472,7 @@ namespace enginehelper {
      */
     bool isWall(Action action, enginetype::GridCell playerCell = {-1,-1});
 
-    /*
+    /**
      * Checks if resulting GridCell the player wants to move to contains a collectible element.
      *
      * Assumes the current state to check is already set in the engine if no player cell
@@ -450,7 +484,7 @@ namespace enginehelper {
      */
     bool isCollectable(Action action, enginetype::GridCell playerCell = {-1,-1});
 
-    /*
+    /**
      * Checks if the direction the player wants to move in is passable.
      * Passable means that the player walks through the cell which results in the
      * action being applied, and into the next cell.
@@ -464,7 +498,7 @@ namespace enginehelper {
      */
     bool isPassable(Action action, const enginetype::GridCell cellFrom = {-1,-1});
 
-    /*
+    /**
      * Checks if the action will move the player.
      * Player can move if they are not walking into a wall, and the GridCell in the direction
      * the player wants to move is either walkable, passable, or contains a collectable item.
@@ -483,7 +517,7 @@ namespace enginehelper {
 // ---------------Custom Level Programming----------------
 // -------------------------------------------------------
 
-    /*
+    /**
      * Count how many of a specified element in the game.
      *
      * @param element The integer ID of the element to count.
@@ -491,7 +525,7 @@ namespace enginehelper {
      */
     int countNumOfElement(int element);
 
-    /*
+    /**
      * Add the specified element to the level.
      *
      * @param element The element integer ID to spawn.
@@ -500,7 +534,7 @@ namespace enginehelper {
      */
     void spawnElement(int element, int dir, enginetype::GridCell gridCell);
 
-    /*
+    /**
      * Get all grid cells which are empty.
      *
      * @return A vector of GridCells structs which do not have an object in it.
@@ -513,7 +547,7 @@ namespace enginehelper {
 // -----------------Game Engine State---------------------
 // -------------------------------------------------------
 
-    /*
+    /**
      * Check if the current status of the engine is loss of life.
      * The internal engine checkGameFailed() function is called. 
      *
@@ -521,7 +555,7 @@ namespace enginehelper {
      */
     bool engineGameFailed();
 
-    /*
+    /**
      * Check if the current status of the engine is level solved.
      * Structs game.LevelSolved and game.LevelSolved_GameEnd need to be checked.
      *
@@ -529,7 +563,7 @@ namespace enginehelper {
      */
     bool engineGameSolved();
 
-    /*
+    /**
      * Check if the current status of the engine is failed or solved
      *
      * @return True if the current status of engine is failed or solved.
@@ -548,7 +582,7 @@ namespace enginehelper {
      */
     void setEngineGameStatusModePlaying();
 
-    /*
+    /**
      * Set the action for the engine to perform on behalf of the player on the next iteration.
      *
      * The default agent (in single player mode) is in the struct stored_player[0]. The engine
@@ -558,7 +592,7 @@ namespace enginehelper {
      */
     void setEnginePlayerAction(Action action);
 
-    /*
+    /**
      * Set the stored player's action as a valid random action.
      *
      * To allow for fast simulations, this doesn't check whether the action is
@@ -566,26 +600,26 @@ namespace enginehelper {
      */
     void setEngineRandomPlayerAction();
 
-    /*
+    /**
      * Get the currently stored player action.
      *
      * @return The integer representation of the action to perform.
      */
     int getEnginePlayerAction();
 
-    /*
+    /**
      * Get the current score of the game.
      *
      * @return The score of the game.
      */
     int getCurrentScore();
 
-    /*
+    /**
      * Get the Time left in the game.
      */
     int getTimeLeftScore();
 
-    /*
+    /**
      * Simulate the engine ahead a single tick.
      *
      * This calls the HandleGameActions() engine function, which performs one game tick.
@@ -594,7 +628,7 @@ namespace enginehelper {
      */
     void engineSimulateSingle();
 
-    /*
+    /**
      * Simulate the engine ahead ENGINE_RESOLUTION=8 ticks.
      *
      * At normal speed, objects take 8 game ticks to take an action (move completely to a 
@@ -607,7 +641,7 @@ namespace enginehelper {
      */
     void engineSimulate();
 
-    /*
+    /**
      * Set flag for simulating.
      *
      * This should be set to True whenever the controller wants to simulate, and 
@@ -622,7 +656,7 @@ namespace enginehelper {
      */
     void setSimulatorFlag(bool simulatorFlag);
 
-    /*
+    /**
      * Get the simulator flag status.
      *
      * @param True if the simulator flag is currently set.
@@ -634,7 +668,7 @@ namespace enginehelper {
 // -------------------State Hashing-----------------------
 // -------------------------------------------------------
 
-    /*
+    /**
      * Initialize Zorbrist tables, used to hash game board states
      */
     void initZorbristTables();
@@ -644,7 +678,7 @@ namespace enginehelper {
      */
     uint64_t gridcellPathToHash(const std::deque<enginetype::GridCell> &path);
 
-    /*
+    /**
      * Get the hash representation of the current state in the engine
      */
     uint64_t stateToHash();
@@ -654,18 +688,18 @@ namespace enginehelper {
 // ----------------Distance Functions---------------------
 // -------------------------------------------------------
 
-    /*
+    /**
      * Get L1 distance between two gridcells
      */
     int getL1Distance(enginetype::GridCell left, enginetype::GridCell right);
 
-    /*
+    /**
      * Get the distance to goal (defined as distances[x][y] = 0) from given GridCell
      * This is set by distance metric, usually L1
      */
     int getGridDistanceToGoal(const enginetype::GridCell goalCell);
 
-    /*
+    /**
      * Set the distance to goal manually for more exotic distance functions.
      * 
      * @param cell The GridCell to set the distance for.
@@ -673,21 +707,21 @@ namespace enginehelper {
      */
     void setGridDistanceToGoal(const enginetype::GridCell cell, short value);
 
-    /*
+    /**
      * Find the grid location of the exit, given by EL_EXIT_OPEN.
      * 
      * @return The GridCell of the EL_EXIT_OPEN element, or {-1, -1} if DNE.
      */
     enginetype::GridCell findExitLocation();
 
-    /*
+    /**
      * Set the grid distances to goal using L1 distance
      * If no goal cell is given, will attempt to use the open exit location
      * given by EL_EXIT_OPEN, it it exists.
      * 
      * @param goalCell The goal cell 
      */
-    // void setBoardDistancesL1(const enginetype::GridCell goalCell = {-1, -1});
+    void setBoardDistancesL1(const enginetype::GridCell goalCell = {-1, -1});
 
 
 

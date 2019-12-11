@@ -24,7 +24,28 @@ extern "C" {
     #include "../../libgame/system.h"
 }
 
-namespace enginetype{
+
+/**
+ * Action definition, based on internal engine definitions.
+ */
+enum Action {noop=MV_NONE, left=MV_LEFT, right=MV_RIGHT, up=MV_UP, down=MV_DOWN};
+
+
+namespace enginetype {
+
+    // ------------- Action sets -------------
+
+    /**
+     * Array of all actions.
+     */
+    extern const Action ALL_ACTIONS[5];
+
+    /**
+     * Array of all actions without NOOP
+     * This is useful when running pathfinding at the grid level where we don't want to stand still.
+     */
+    extern const Action ALL_ACTIONS_NO_NOOP[4];
+
     // ------------- Short naming -------------
     typedef std::array<short, MAX_LEV_FIELDX * MAX_LEV_FIELDY> board_short;
     typedef std::array<int, MAX_LEV_FIELDX * MAX_LEV_FIELDY> board_int;
@@ -61,11 +82,11 @@ namespace enginetype{
 
 
     // ------------- Action values -------------
-    static const int ENGINE_NOOP    = 0;
-    static const int ENGINE_LEFT    = 1;
-    static const int ENGINE_RIGHT   = 2; 
-    static const int ENGINE_UP      = 4;
-    static const int ENGINE_DOWN    = 8;
+    static const int ENGINE_NOOP    = MV_NONE;
+    static const int ENGINE_LEFT    = MV_LEFT;
+    static const int ENGINE_RIGHT   = MV_RIGHT; 
+    static const int ENGINE_UP      = MV_UP;
+    static const int ENGINE_DOWN    = MV_DOWN;
     static const int NUM_ACTIONS    = 5;
     static const int ENGINE_RESOLUTION = 8;     // Engine ticks per time step the agent considers
 

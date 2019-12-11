@@ -20,7 +20,7 @@
 #include "option_wait_rock.h"
 
 // Engine
-#include "../../engine/action.h"
+#include "../../engine/engine_types.h"
 #include "../../engine/engine_helper.h"
 
 // Logger
@@ -35,7 +35,7 @@ std::vector<BaseOption*> OptionFactory::createSingleActionOptions() {
     options_.clear();
 
     // Single action for each available 
-    for (Action action : ALL_ACTIONS) {
+    for (Action action : enginetype::ALL_ACTIONS) {
         std::unique_ptr<OptionSingleStep> option = std::make_unique<OptionSingleStep>(action, 1);
         options_.push_back(std::move(option));
         optionPointers.push_back(options_.back().get());

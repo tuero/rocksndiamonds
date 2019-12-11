@@ -33,7 +33,7 @@ static std::ofstream replayFile;
 
 
 
-/*
+/**
  * Get the current datetime in string format to name the log/replay files
  */
 std::string datetimeToString() {
@@ -51,7 +51,7 @@ std::string datetimeToString() {
 }
 
 
-/*
+/**
  * Get the file name used for both logging and replay.
  * File name is the datetime and PID.
  */
@@ -61,7 +61,7 @@ std::string getFileName() {
 }
 
 
-/*
+/**
  * Helper function to get pretty print of internal engine data structure
  */
 std::string getStructRepresentation(short (&data)[MAX_LEV_FIELDX][MAX_LEV_FIELDY]) {
@@ -83,7 +83,7 @@ std::string getStructRepresentation(short (&data)[MAX_LEV_FIELDX][MAX_LEV_FIELDY
 }
 
 
-/*
+/**
  * Helper function to get pretty print of internal engine data structure
  */
 std::string getStructRepresentation(int (&data)[MAX_LEV_FIELDX][MAX_LEV_FIELDY]) {
@@ -107,11 +107,8 @@ std::string getStructRepresentation(int (&data)[MAX_LEV_FIELDX][MAX_LEV_FIELDY])
 
 namespace logger {
     
-    /*
+    /**
      * Initialize loggers for file and std_out.
-     *
-     * @param logLevel Max log level
-     * @param programArgs String of all program args
      */
     void initLogger(LogLevel logLevel, std::string &programArgs) {
         plog::Severity logLevel_ = static_cast<plog::Severity>(logLevel);
@@ -134,7 +131,7 @@ namespace logger {
     }
 
 
-    /*
+    /**
      * Initialize the replay file.
      *
      * This will hold all information needed for an exact replay
@@ -157,10 +154,8 @@ namespace logger {
     }
 
 
-    /*
+    /**
      * Set max log level used for both loggers.
-     *
-     * @param logLevel The max level to log.
      */
     void setLogLevel(LogLevel logLevel) {
         plog::Severity logLevel_ = static_cast<plog::Severity>(logLevel);
@@ -169,7 +164,7 @@ namespace logger {
     }
 
 
-    /*
+    /**
      * Logs the engine type being used my the simulator.
      *
      * Depending on the level set being used, different parts of the simulator
@@ -191,7 +186,7 @@ namespace logger {
     }
 
 
-    /*
+    /**
      * Logs some of the important player fields.
      */
     void logPlayerDetails(plog::Severity logLevel) {
@@ -207,7 +202,7 @@ namespace logger {
     }
 
 
-    /*
+    /**
      * Logs the current board state (FELD) at the tile level.
      */
     void logBoardState(plog::Severity logLevel) {
@@ -215,7 +210,7 @@ namespace logger {
     }
 
 
-    /*
+    /**
      * Logs the current board state (MovPos) sprite tile distance offsets.
      */
     void logMovPosState(plog::Severity logLevel) {
@@ -223,7 +218,7 @@ namespace logger {
     }
 
 
-    /*
+    /**
      * Logs the current board state (MovDir) sprite tile direction offsets.
      */
     void logMovDirState(plog::Severity logLevel) {
@@ -231,7 +226,7 @@ namespace logger {
     }
 
 
-    /*
+    /**
      * Logs the current tile distances to goal (used in pathfinding).
      */
     void logBoardDistances(plog::Severity logLevel) {
@@ -239,15 +234,15 @@ namespace logger {
     }
 
 
-    /*
-     * Logs the sprite IDs
+    /**
+     * Logs the sprite IDs.
      */
     void logBoardSpriteIDs(plog::Severity logLevel) {
         PLOG_(logger::FileLogger, logLevel) << "Sprite IDs:\n" << getStructRepresentation(spriteIDs);
     }
 
 
-    /*
+    /**
      * Log all information for the current state.
      *
      * Includes player position and state, board item positions, and directions.
@@ -262,7 +257,7 @@ namespace logger {
     }
 
 
-    /*
+    /**
      * Log the players current move.
      */
     void logPlayerMove(const std::string &action) {
@@ -271,7 +266,7 @@ namespace logger {
     }
 
 
-    /*
+    /**
      * Save the players current move to replay file.
      */
     void savePlayerMove(const std::string &action) {
@@ -284,7 +279,7 @@ namespace logger {
     }
 
 
-    /*
+    /**
      * Close the replay file for cleanup.
      */
     void closeReplayFile() {

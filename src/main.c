@@ -7812,19 +7812,19 @@ int main(int argc, char *argv[])
 
   OpenAll();
 
+    // Running tests do not go into the main game loop
+    #ifdef HEADLESS
+    if (options.run_tests) {
+        return runTests(argc, argv);
+    }
+    #endif
+
     // Init custom logging
     initController();
 
     // If level number given as program argument, try to load
     if (options.level_number > 0) {
         setLevel(options.level_number);
-    }
-
-    // Running tests do not go into the main game loop
-    if (options.run_tests) {
-        handleLevelStart();
-        runTests();
-        return 0;
     }
 
     // If we have specified a controller, we need to manually start game actions

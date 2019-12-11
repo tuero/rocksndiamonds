@@ -121,5 +121,5 @@ bool OptionPushRock::isValid_() {
 
 
 std::string OptionPushRock::toString() const {
-    return optionStringName + actionToString(action_);
+    return optionStringName + enginehelper::actionToString(action_);
 }

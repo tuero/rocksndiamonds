@@ -73,7 +73,6 @@ set(sources
     ${PROJECT_SOURCE_DIR}/src/game_sp/Sound.c 
     ${PROJECT_SOURCE_DIR}/src/game_sp/Zonk.c
     ${PROJECT_SOURCE_DIR}/src/ai/ai_entry.cpp
-    ${PROJECT_SOURCE_DIR}/src/ai/hash_table.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/controller.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/default/default.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/mcts/mcts.cpp
@@ -89,7 +88,7 @@ set(sources
     ${PROJECT_SOURCE_DIR}/src/ai/controller/options/option_push_rock.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/replay/replay.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/two_level_search.cpp
-    ${PROJECT_SOURCE_DIR}/src/ai/engine/action.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/engine/engine_types.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/engine/engine_helper.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/engine/game_state.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/engine/game_state_abstract.cpp
@@ -98,9 +97,10 @@ set(sources
     ${PROJECT_SOURCE_DIR}/src/ai/util/rng.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/util/logger.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/util/statistics.cpp
-    ${PROJECT_SOURCE_DIR}/src/ai/util/summary_window.cpp
-    ${PROJECT_SOURCE_DIR}/src/ai/tests/test_engine_speed.cpp
-    ${PROJECT_SOURCE_DIR}/src/ai/tests/test_rng.cpp 
+)
+
+set(sources_tests
+    ${PROJECT_SOURCE_DIR}/src/ai/tests/engine_grid_action_test.cpp
 )
 
 set(AUTOCONF
