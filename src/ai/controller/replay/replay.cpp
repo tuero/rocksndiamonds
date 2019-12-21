@@ -10,13 +10,11 @@
 
 #include "replay.h"
 
-// Engine
-#include "../../engine/engine_types.h"
-#include "../../engine/engine_helper.h"
-
-//Logging
-#include "../../util/logger.h"
-#include <plog/Log.h>  
+// Includes
+#include "rng.h"
+#include "engine_types.h"
+#include "engine_helper.h"
+#include "logger.h"
 
 
 /**

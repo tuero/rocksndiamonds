@@ -7,6 +7,12 @@ An Ataxx game implementation that allows users to enter moves, or uses tree-sear
 
 Both search methods are implemented with transposition tables and iterative deepening. The value function for AlphaBeta is the piece differential between the players and serves as a baseline. The advanced search with NegaScout uses a value function which incorporate the piece differential along with favouring pieces which are surrounded by non-opponent pieces (harder to capture) and penalizes non-opponent pieces which have a single square gap between them (opponent can jump into the gap and capture both pieces).
 
+## Libraries
+- Catch2 v2.11.0
+- FakeIt v2.0.5
+- Plog v1.1.5
+
+
 ## Installing
 These instructions will help you install the program. This has been created/tested on Ubuntu 18.04, g++ 7.3.0.
 ```

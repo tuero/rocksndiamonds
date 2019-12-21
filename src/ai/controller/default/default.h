@@ -12,10 +12,9 @@
 #define DEFAULT_H
 
 
-#include "../base_controller.h"
-
-// Engine
-#include "../../engine/engine_types.h"
+// Includes
+#include "base_controller.h"
+#include "engine_types.h"
 
 
 /**

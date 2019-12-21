@@ -10,15 +10,15 @@
 
 #include "level_programming.h"
 
+// Standard Libary/STL
 #include <vector>
 #include <array>
 
-// Engine
-#include "../engine/engine_types.h"
-#include "../engine/engine_helper.h"
-
-// Logging
-#include "../util/logger.h"
+// Includes
+#include "engine_types.h"           // Gridcell, action
+#include "engine_helper.h"          // Engine access functions
+#include "rng.h"                    // RNG
+#include "logger.h"                 // Logger
 
 
 namespace levelprogramming {

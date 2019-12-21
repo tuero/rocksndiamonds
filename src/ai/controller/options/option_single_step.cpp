@@ -9,13 +9,11 @@
  */
 
 #include "option_single_step.h"
+
+// Includes
 #include "option_types.h"
-
-// Engine
-#include "../../engine/engine_helper.h"
-
-// Logger
-#include "../../util/logger.h"
+#include "engine_helper.h"
+#include "logger.h"
 
 
 OptionSingleStep::OptionSingleStep(Action action, int numTimes) {
@@ -62,7 +60,7 @@ bool OptionSingleStep::getNextAction(Action &action) {
  * to perform is moveable.
  */
 bool OptionSingleStep::isValid_() {
-    return enginehelper::isActionMoveable(action_, enginehelper::getPlayerPosition());
+    return enginehelper::isActionMoveable(enginehelper::getPlayerPosition(), action_);
 }
 
 

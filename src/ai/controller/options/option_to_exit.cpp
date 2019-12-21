@@ -11,9 +11,8 @@
 
 #include "option_to_exit.h"
 
-// Logger
-#include "../../util/logger.h"
-#include <plog/Logger.h>
+// Includes
+#include "logger.h"
 
 
 OptionToExit::OptionToExit(int spriteID) {

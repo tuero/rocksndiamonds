@@ -31,4 +31,4 @@ script:
   - cmake ..
   - make -j2
   - cd ..
-  - ./rocksndiamonds_headless -test
+  - ./run_tests

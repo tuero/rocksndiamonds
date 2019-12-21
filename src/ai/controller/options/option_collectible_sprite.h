@@ -11,10 +11,12 @@
 #ifndef OPTION_COLLECTIBLE_SPRITE_H
 #define OPTION_COLLECTIBLE_SPRITE_H
 
+// Standard Libary/STL
 #include <deque>
 
+// Includes
 #include "base_option.h"
-#include "../../engine/engine_types.h"
+#include "engine_types.h"
 
 /**
  * Skeleton definition which each derived Option is based off of.

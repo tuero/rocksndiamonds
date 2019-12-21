@@ -12,9 +12,10 @@
 #define GAMESTATE_H
 
 
+// Standard Libary/STL
 #include <array>
 
-
+// Game headers
 extern "C" {
     #include "../../main.h"
     #include "../../events.h"

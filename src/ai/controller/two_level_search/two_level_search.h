@@ -11,14 +11,16 @@
 #ifndef TWO_LEVEL_SEARCH_H
 #define TWO_LEVEL_SEARCH_H
 
+// Standard Libary/STL
 #include <string>
 #include <deque>
 #include <unordered_map>
 #include <vector>
 #include <algorithm>
 
-#include "../base_controller.h"
-#include "../options/base_option.h"
+// Includes
+#include "base_controller.h"
+#include "base_option.h"
 
 #include "../../engine/game_state_abstract.h"
 

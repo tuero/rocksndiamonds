@@ -11,9 +11,8 @@
 
 #include "option_collectible_sprite.h"
 
-// Logger
-#include "../../util/logger.h"
-#include <plog/Logger.h>
+// Includes
+#include "logger.h"
 
 
 OptionCollectibleSprite::OptionCollectibleSprite(int spriteID) {

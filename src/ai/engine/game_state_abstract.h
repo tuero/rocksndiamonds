@@ -12,11 +12,13 @@
 #define GAMESTATE_ABSTRACT_H
 
 
+// Standard Libary/STL
 #include <array>
 
-// Engine
+// Includes
 #include "engine_types.h"
 
+// Game headers
 extern "C" {
     #include "../../main.h"
     #include "../../events.h"

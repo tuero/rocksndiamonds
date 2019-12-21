@@ -10,18 +10,15 @@
 
 #include "base_option.h"
 
-// STL containers
+// Standard Libary/STL
 #include <algorithm>
 #include <queue>
 #include <unordered_map>
 #include <limits>
 
-// Engine
-#include "../../engine/engine_helper.h"
-
-// Logger
-#include "../util/logger.h"
-#include <plog/Logger.h>
+// Includes
+#include "engine_helper.h"
+#include "logger.h"
 
 
 /**
@@ -146,11 +143,11 @@ void BaseOption::runAStar(enginetype::GridCell startCell, enginetype::GridCell g
         // Expand children
         for (Action action : enginetype::ALL_ACTIONS_NO_NOOP) {
             // Skip if in the restricted set
-            enginetype::GridCell childCell = enginehelper::getCellFromAction(action, node.cell);
+            enginetype::GridCell childCell = enginehelper::getCellFromAction(node.cell, action);
             if (std::find(restrictedCells_.begin(), restrictedCells_.end(), childCell) != restrictedCells_.end()) {continue;}
 
             // Child not valid if out of bounds or action doesn't result in being in a moveable cell
-            if (!enginehelper::isActionMoveable(action, node.cell) && !(childCell == goalCell)) {continue;}
+            if (!enginehelper::isActionMoveable(node.cell, action) && !(childCell == goalCell)) {continue;}
 
             int childIndex = enginehelper::cellToIndex(childCell);
             float newG = node.g + 1;

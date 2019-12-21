@@ -11,13 +11,14 @@
 #ifndef TREENODEMCTS_H
 #define TREENODEMCTS_H
 
+// Standard Libary/STL
 #include <vector>
 #include <memory>
 
-// Engine
-#include "../../engine/engine_types.h"
+// Includes
+#include "engine_types.h"
 #include "../../engine/game_state.h"
-#include "../options/base_option.h"
+#include "base_option.h"
 
 
 /**

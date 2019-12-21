@@ -11,18 +11,16 @@
 
 #include "tree_node.h"
 
+// Standard Libary/STL
 #include <algorithm>
 #include <iostream>
 #include <cassert>
 #include <typeinfo>
 
-#include "../options/option_types.h"
-
-// Engine
-#include "../../engine/engine_helper.h"
-
-//Logging
-#include "../../util/logger.h"
+// Includes
+#include "option_types.h"
+#include "engine_helper.h"
+#include "logger.h"
 
 
 typedef std::unique_ptr<TreeNode> Pointer;

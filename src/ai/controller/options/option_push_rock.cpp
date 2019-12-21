@@ -8,9 +8,10 @@
  * Contact: tuero@ualberta.ca
  */
 
+// Includes
 #include "option_push_rock.h"
 #include "option_types.h"
-#include "../../engine/engine_helper.h"
+#include "engine_helper.h"
 
 
 OptionPushRock::OptionPushRock(int spriteID, Action action) {

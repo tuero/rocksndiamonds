@@ -11,15 +11,15 @@
 
 #include "two_level_search.h"
 
+// Standard Libary/STL
 #include <queue>
 #include <unordered_map>
 #include <limits>
 #include <algorithm>
 #include <bitset>
 
-// Logger
-#include "../../util/logger.h"
-#include <plog/Logger.h>
+// Includes
+#include "logger.h"
 
 /**
  * Convey any important details about the controller in string format.

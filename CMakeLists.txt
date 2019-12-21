@@ -6,18 +6,20 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 
-set(CMAKE_C_FLAGS "-O3 -Wall -Wstrict-prototypes -Wmissing-prototypes")
-set(CMAKE_C_FLAGS_DEBUG "-g -O3 -Wall -Wstrict-prototypes -Wmissing-prototypes")
-set(CMAKE_C_FLAGS_RELEASE "-O3 -Wall -Wstrict-prototypes -Wmissing-prototypes")
+set(CMAKE_C_FLAGS "-O3 -Wall -Wstrict-prototypes -Wmissing-prototypes -Wno-extern-c-compat")
+set(CMAKE_C_FLAGS_DEBUG "-g -O3 -Wall -Wstrict-prototypes -Wmissing-prototypes -Wno-extern-c-compat")
+set(CMAKE_C_FLAGS_RELEASE "-O3 -Wall -Wstrict-prototypes -Wmissing-prototypes -Wno-extern-c-compat")
 
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -g -O3")
-set(CMAKE_CXX_FLAGS_DEBUG "-Wall -Wextra -g -O3 -DDEBUG")
-set(CMAKE_CXX_FLAGS_RELEASE "-Wall -Wextra -O3")
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-extern-c-compat -g -O3")
+set(CMAKE_CXX_FLAGS_DEBUG "-Wall -Wextra -Wno-extern-c-compat -g -O3 -DDEBUG ")
+set(CMAKE_CXX_FLAGS_RELEASE "-Wall -Wextra -Wno-extern-c-compat -O3")
 
 
 # Includes
 include(sourcelist.cmake)
-include_directories (${PROJECT_SOURCE_DIR}/src/ai/includes)
+include_directories (${PROJECT_SOURCE_DIR}/src/ai/include)
+include_directories (${PROJECT_SOURCE_DIR}/src/ai/extern/plog/include)
+include_directories (${PROJECT_SOURCE_DIR}/src/ai/extern/Catch2/single_include)
 
 # Find SDL2 libraries
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/")
@@ -54,7 +56,7 @@ set(CNFS_CMD ${PROJECT_SOURCE_DIR}/build-scripts/create_element_defs.pl)
 set(conftime ${PROJECT_SOURCE_DIR}/src/conftime.h)
 add_custom_command(
         OUTPUT ${conftime}
-        DEPENDS ${sources}
+        DEPENDS ${sources_rnd}
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/src/
         COMMAND ${PROJECT_SOURCE_DIR}/build-scripts/string_date.sh
 )
@@ -91,14 +93,18 @@ add_custom_target(
 
 # Executable
 if (SDL2_FOUND AND SDL2_image_FOUND AND SDL2_mixer_FOUND AND SDL2_net_FOUND)
-    add_executable(rocksndiamonds_gui ${sources})
+    add_executable(rocksndiamonds_gui ${sources_rnd} ${sources_ai})
     add_dependencies(rocksndiamonds_gui auto_conf auto_conftime)
     set_target_properties(rocksndiamonds_gui PROPERTIES COMPILE_FLAGS "-DTARGET_SDL2")
 endif()
 
-add_executable(rocksndiamonds_headless ${sources} ${sources_tests})
+add_executable(rocksndiamonds_headless ${sources_rnd} ${sources_ai})
 add_dependencies(rocksndiamonds_headless auto_conf auto_conftime)
 set_target_properties(rocksndiamonds_headless PROPERTIES COMPILE_FLAGS "-DHEADLESS")
+
+add_executable(run_tests ${sources_rnd} ${sources_ai} ${sources_tests})
+add_dependencies(run_tests auto_conf auto_conftime)
+set_target_properties(run_tests PROPERTIES COMPILE_FLAGS "-DHEADLESS -DRUN_TESTS")
 
 
 # Dependendies
@@ -108,3 +114,4 @@ if (SDL2_FOUND AND SDL2_image_FOUND AND SDL2_mixer_FOUND AND SDL2_net_FOUND)
 endif()
 
 target_link_libraries(rocksndiamonds_headless m z)
+target_link_libraries(run_tests m z)

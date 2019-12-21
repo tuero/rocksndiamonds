@@ -17,11 +17,11 @@ namespace enginetype {
     /**
      * Array of all actions.
      */
-    const Action ALL_ACTIONS[5] = {Action::right, Action::down, Action::left, Action::up, Action::noop};
+    const Action ALL_ACTIONS[NUM_MV] = {Action::right, Action::down, Action::left, Action::up, Action::noop};
 
     /**
      * Array of all actions without NOOP
      * This is useful when running pathfinding at the grid level where we don't want to stand still.
      */
-    const Action ALL_ACTIONS_NO_NOOP[4] = {Action::right, Action::down, Action::left, Action::up};
+    const Action ALL_ACTIONS_NO_NOOP[NUM_MV-1] = {Action::right, Action::down, Action::left, Action::up};
 }

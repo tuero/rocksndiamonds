@@ -17,7 +17,7 @@
 
 // (tuero@ualberta.ca) - September 2019
 // Controller type listings
-#include "../ai/controller/controller_listing.h"
+#include "controller_listing.h"
 
 #if defined(PLATFORM_MACOSX)
 #include "macosx.h"

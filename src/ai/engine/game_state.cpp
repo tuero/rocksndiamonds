@@ -10,7 +10,7 @@
 
 #include "game_state.h"
 
-// Engine
+// Includes
 #include "engine_types.h"
 #include "engine_helper.h"
 

@@ -35,7 +35,7 @@
 // (tuero@ualberta.ca) - September 2019
 // RNG code, as well as controller type listings
 #include "../ai/ai_entry.h"
-#include "../ai/controller/controller_listing.h"
+#include "controller_listing.h"
 
 
 // ============================================================================

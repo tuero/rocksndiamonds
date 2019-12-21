@@ -19,12 +19,10 @@
 #include "option_push_rock.h"
 #include "option_wait_rock.h"
 
-// Engine
-#include "../../engine/engine_types.h"
-#include "../../engine/engine_helper.h"
-
-// Logger
-#include "../../util/logger.h"
+// Includes
+#include "engine_types.h"
+#include "engine_helper.h"
+#include "logger.h"
 
 
 /*
@@ -70,7 +68,7 @@ std::vector<BaseOption*> OptionFactory::createTwoLevelSearchOptions() {
     for (enginetype::GridCell cell : enginehelper::getMapSprites()) {
         int spriteID = enginehelper::getSpriteID(cell);
         // Collectible sprite (diamond in this case)
-        if (enginehelper::isCollectable(Action::noop, cell)) {
+        if (enginehelper::isCollectable(cell)) {
             std::unique_ptr<OptionCollectibleSprite> option = std::make_unique<OptionCollectibleSprite>(spriteID);
             options_.push_back(std::move(option));
             optionPointers.push_back(options_.back().get());

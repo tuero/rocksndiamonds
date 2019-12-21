@@ -11,22 +11,22 @@
 
 #include "mcts.h"
 
+// Standard Libary/STL
 #include <iostream>
 #include <algorithm>
 #include <random>
 #include <cassert>
 
-// Engine
-#include "../../engine/engine_types.h"
-#include "../../engine/engine_helper.h"
+// Includes
+#include "engine_types.h"
+#include "engine_helper.h"
 #include "../options/option_single_step.h"
-
-//Logging
-#include "../../util/logger.h"
+#include "logger.h"
 
 
 std::random_device rd;
 std::mt19937 g(rd());
+OptionSingleStep noopOption(Action::noop, 1);
 
 
 /*

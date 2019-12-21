@@ -1,0 +1,196 @@
+/**
+ * @file: base_option.h
+ *
+ * @brief: Base option which all implemented options should be derived from.
+ * 
+ * @author: Jake Tuero
+ * Date: September 2019
+ * Contact: tuero@ualberta.ca
+ */
+
+#ifndef BASE_OPTION_H
+#define BASE_OPTION_H
+
+
+// Standard Libary/STL
+#include <string>
+#include <ostream>
+#include <deque>
+#include <vector>
+
+// Option type enum
+#include "option_types.h"
+
+// Includes
+#include "engine_types.h"
+#include "engine_helper.h"
+
+
+/**
+ * Skeleton definition which each derived Option is based off of.
+ *
+ * All options implemented should be derived from this class. An option is a policy
+ * which executes (possible non-deterministic) actions. The controller should determine
+ * the type of option to run depending on the state. The method run() are required to 
+ * be implemented.
+ */
+class BaseOption {
+protected:
+    OptionType optionType_ = OptionType::Misc;          // Option enum type, used to group related options
+    enginetype::GridCell goalCell_;                     // 
+    std::deque<enginetype::GridCell> solutionPath_  = {};
+    std::vector<enginetype::GridCell> restrictedCells_ = {};
+    int spriteID_ = -1;                                 // Associated sprint for option
+    int timesCalled_ = 0;                               // Number of times called
+    int counter_ = 0;
+
+    struct Node {
+        int id;                             // Fast access node ID = gridcell index 
+        int parentId;                       // node ID for the parent node
+        enginetype::GridCell cell;          // Gridcell represented by search node
+        float g;                            // g-value used in A*
+        float h;                            // h-value used in A* (Euclidean distance)
+    };
+
+    // Custom comparator for priority queue 
+    class CompareNode {
+        public:
+            bool operator() (Node left, Node right) {
+                return (left.g + left.h) > (right.g + right.h);
+            }
+    };
+
+    /**
+     * Determine if the option is valid to perform as per the current game engine state.
+     * 
+     * This is called by the base option wrapper which also checks if the associated spriteID
+     * is active on the map.
+     * 
+     * @return True if the option is valid, false otherwise.
+     */
+    virtual bool isValid_() = 0;
+
+public:
+
+    virtual ~BaseOption() {};
+
+    /**
+     * Set the Options solutionPath as the path found during A* 
+     * at the grid level (time-independent).
+     * 
+     * No goalCell is provided, so the currently saved cell is used 
+     * (this might be a static grid on the map no related to sprites,
+     * and we may not want this changed).
+     */
+    void runAStar();
+
+    /**
+     * Set the Options solutionPath as the path found during A* 
+     * at the grid level (time-independent).
+     * 
+     * @param startCell The gridcell designated as the start for A*.
+     * @param goalCell The gridcell designated as the goal for A*.
+     * @param restrictedCells Vector of restricted cells that A* will treat as blocked.
+     */
+    void runAStar(enginetype::GridCell startCell, enginetype::GridCell goalCell);
+
+    /**
+     * Run the action(s) defined by the option, usually done during simulation (to
+     * forward the search tree).
+     * 
+     * The definition of the options can be their own programs in the sense that they can
+     * either step forward a single step, or perform many actions such as moving to a 
+     * sprite of particular interest. It is up to the Option implementation to handle
+     * events such as forwarding the engine.
+     * 
+     * @return True if the option was able to perform is actions without error, false otherwise.
+     */
+    virtual bool run() = 0;
+
+    /**
+     * Queries the next action to perform from the option, and signals if the option is complete.
+     * 
+     * This doesn't forward the engine game state. It should however forward the internal
+     * representation of the option. For example, if the option is to apply the action
+     * LEFT 4 times, calling once should decrease an internal counter of the option
+     * from 4 to 3. Once the option has peformed its last move, it should signal its complete
+     * by returning true.
+     * 
+     * @param action Reference to action which will be set by the option to perform
+     * @return True if the option has determined it is complete, false otherwise.
+     */
+    virtual bool getNextAction(Action &action) = 0;
+
+    /**
+     * String representation of the option and its characteristics
+     * 
+     * Used for logging. The string should decribe the option behaviour as well as any sprite it
+     * is associated with. For example, "Walk to sprite: Diamond". 
+     * 
+     * @return String representation of option.
+     */
+    virtual std::string toString() const = 0;
+
+    /**
+     * Get the option type.
+     * 
+     * @return The option category type.
+     */
+    OptionType getOptionType() const;
+
+    std::deque<enginetype::GridCell> getSolutionPath() {return solutionPath_;}
+
+    virtual bool isComplete();
+
+    /**
+     * Determine if the option is valid to perform as per the current game engine state.
+     * 
+     * Checks if the associated spriteID is active, as well as the option-specific valid check.
+     * 
+     * @return True if the option is valid, false otherwise.
+     */
+    bool isValid();
+
+    /**
+     * Increment the number of times the option has been expanded during search.
+     */
+    void incrementTimesCalled();
+
+    /**
+     * Reset the number of times the option has been expanded during search.
+     */
+    void resetTimesCalled();
+
+    /**
+     * Get the number of times the option has been expanded during search.
+     *  
+     * @return The number of times option has been expanded.
+     */
+    int getTimesCalled() const;
+
+    /**
+     * Set the sprite ID that the option represents/interacts with.
+     * 
+     * @param spriteID The unique sprite ID to set.
+     */
+    void setSpriteID(int spriteID);
+
+    /**
+     * Get the sprite ID that the option represents/interacts with.
+     * 
+     * @return The unique sprite ID represented by the option.
+     */
+    int getSpriteID() const;
+
+    /**
+     * Set the restricted cells.
+     */
+    void setRestrictedCells(std::vector<enginetype::GridCell> &restrictedCells) {restrictedCells_ = restrictedCells;}
+
+};
+
+
+
+#endif  //BASE_OPTION_Hd
+
+

@@ -10,25 +10,23 @@
 
 #include "ai_entry.h"
 
+// Standard Libary/STL
 #include <string>
 #include <vector>
 
-// engine
-#include "engine/engine_helper.h"
+// Includes
+#include "engine_helper.h"      // Engine helper functions
+#include "rng.h"                // RNG
+#include "logger.h"             // Logger
 
-// controller
+// Controller
 #include "controller/controller.h"
 
 // Misc
 #include "level_programming/level_programming.h"
-#include "util/rng.h"
-
-// Logging
-#include "util/logger.h"
-#include <plog/Log.h>
 
 // Tests
-#ifdef HEADLESS
+#ifdef RUN_TESTS
 #define CATCH_CONFIG_RUNNER
 #include <catch2/catch.hpp>
 #endif
@@ -123,7 +121,7 @@ extern "C" void initLogger(int argc, char *argv[]) {
 }
 
 
-/*
+/**
  * Set the levelset given by the command line argument.
  */
 extern "C" void setLevelSet(void) {
@@ -132,9 +130,9 @@ extern "C" void setLevelSet(void) {
 
 
 /**
- * Set the level
+ * Load the level.
  */
-extern "C" void setLevel(int levelNumber) {
+extern "C" void loadLevel(int levelNumber) {
     enginehelper::loadLevel(levelNumber);
 }
 
@@ -180,12 +178,12 @@ extern "C" int getRandomNumber(int max) {
 
 // ------------------------ Tests ------------------------------
 
-#ifdef HEADLESS
+#ifdef RUN_TESTS
 /*
  * Runs all of the above tests in sequence
  * Results are logged to file.
  */
-extern "C" int runTests(int argc, char* argv[]) {
+extern "C" int runTests() {
     int result = Catch::Session().run();
     return result;
     // Override logging level for tests

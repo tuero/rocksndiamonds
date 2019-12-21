@@ -120,7 +120,7 @@ extern "C"
      * Runs all of the above tests in sequence
      * Results are logged to file
      */
-    int runTests(int argc, char* argv[]);
+    int runTests(void);
     #endif
 
 

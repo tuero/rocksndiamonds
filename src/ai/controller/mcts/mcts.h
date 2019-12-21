@@ -11,19 +11,22 @@
 #ifndef MCTS_H
 #define MCTS_H
 
+// Standard Libary/STL
 #include <vector>
 #include <string>
 #include <map>
 
-#include "../base_controller.h"
-
+// MCTS
 #include "tree_node.h"
-#include "../options/base_option.h"
-#include "../options/option_factory.h"
+
+// Includes
+#include "base_controller.h"
+#include "base_option.h"
+#include "option_factory.h"
+#include "engine_types.h"
+#include "timer.h"
 
 #include "../../engine/game_state.h"
-#include "../../engine/engine_types.h"
-#include "../../util/timer.h"
 
 
 /**

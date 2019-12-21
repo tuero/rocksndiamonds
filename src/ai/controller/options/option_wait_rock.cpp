@@ -9,10 +9,10 @@
  */
 
 #include "option_wait_rock.h"
-#include "option_types.h"
 
-#include "../../engine/engine_types.h"
-#include "../../engine/engine_helper.h"
+// Includes
+#include "engine_types.h"
+#include "engine_helper.h"
 #include "../../engine/game_state.h"
 
 

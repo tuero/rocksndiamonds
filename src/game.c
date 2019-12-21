@@ -11964,12 +11964,13 @@ static void GameActionsExt(void)
 #ifndef HEADLESS
   if (game.restart_level)
     StartGameActions(network.enabled, setup.autorecord, level.random_seed);
+#endif
 
   CheckLevelSolved();
 
   if (game.LevelSolved && !game.LevelSolved_GameEnd)
     GameWon();
-#endif
+// #endif
 
 #ifndef HEADLESS
   if (game.all_players_gone && !TAPE_IS_STOPPED(tape))

@@ -22,7 +22,7 @@
 
 // (tuero@ualberta.ca) - September 2019
 // Controller type listings
-#include "ai/controller/controller_listing.h"
+#include "controller_listing.h"
 
 #ifndef HEADLESS
 Bitmap		       *bitmap_db_field;
@@ -7813,10 +7813,8 @@ int main(int argc, char *argv[])
   OpenAll();
 
     // Running tests do not go into the main game loop
-    #ifdef HEADLESS
-    if (options.run_tests) {
-        return runTests(argc, argv);
-    }
+    #ifdef RUN_TESTS
+    return runTests();
     #endif
 
     // Init custom logging
@@ -7824,7 +7822,7 @@ int main(int argc, char *argv[])
 
     // If level number given as program argument, try to load
     if (options.level_number > 0) {
-        setLevel(options.level_number);
+        LoadLevel(options.level_number);
     }
 
     // If we have specified a controller, we need to manually start game actions

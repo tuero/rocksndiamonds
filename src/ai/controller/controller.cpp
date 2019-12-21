@@ -10,16 +10,13 @@
 
 #include "controller.h"
 
-// Engine
-#include "../engine/engine_helper.h" 
+// Includes
+#include "engine_helper.h" 
+#include "timer.h" 
+#include "logger.h"
 
-// Util
-#include "../util/timer.h" 
 
-// Logging
 #include "../util/statistics.h"
-#include "../util/logger.h"
-#include <plog/Logger.h>
 
 // Controllers
 #include "controller_listing.h"

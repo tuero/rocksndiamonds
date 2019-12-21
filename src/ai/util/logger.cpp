@@ -10,6 +10,7 @@
 
 #include "logger.h"
 
+// Standard Libary/STL
 #include <iostream>
 #include <fstream>
 #include <sys/types.h>
@@ -19,7 +20,8 @@
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
 
-#include "../engine/engine_types.h"
+// Includes
+#include "engine_types.h"
 #include "rng.h"
 
 

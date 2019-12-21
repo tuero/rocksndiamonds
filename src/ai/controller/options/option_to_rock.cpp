@@ -10,17 +10,15 @@
 
 #include "option_to_rock.h"
 
+// Standard Libary/STL
 #include <queue>
 #include <map>
 #include <iostream>
 
+// Includes
 #include "option_types.h"
-
-// Engine
-#include "../../engine/engine_helper.h"
-
-//Logging
-#include "../../util/logger.h"
+#include "engine_helper.h"
+#include "logger.h"
 
 
 OptionToRock::OptionToRock(int spriteID, Action direction) {

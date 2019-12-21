@@ -12,8 +12,9 @@
 #define OPTION_SINGLE_STEP_H
 
 
+// Includes
 #include "base_option.h"
-#include "../../engine/engine_types.h"
+#include "engine_types.h"
 
 /**
  * Represents option of performing one specific action a number of times.

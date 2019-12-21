@@ -12,6 +12,7 @@
 #define CONTROLLER_H
 
 
+// Standard Libary/STL
 #include <vector>
 #include <map>
 #include <memory>
@@ -20,8 +21,8 @@
 #include "controller_listing.h"
 #include "base_controller.h"
 
-// Engine and typedefs
-#include "../engine/engine_types.h"
+// Includes
+#include "engine_types.h"
 
 
 /**

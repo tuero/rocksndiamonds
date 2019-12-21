@@ -1,4 +1,4 @@
-set(sources
+set(sources_rnd
     ${PROJECT_SOURCE_DIR}/src/main.c
     ${PROJECT_SOURCE_DIR}/src/conf_gfx.c 
     ${PROJECT_SOURCE_DIR}/src/conf_snd.c 
@@ -72,6 +72,9 @@ set(sources
     ${PROJECT_SOURCE_DIR}/src/game_sp/SnikSnaks.c  
     ${PROJECT_SOURCE_DIR}/src/game_sp/Sound.c 
     ${PROJECT_SOURCE_DIR}/src/game_sp/Zonk.c
+)
+
+set(sources_ai
     ${PROJECT_SOURCE_DIR}/src/ai/ai_entry.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/controller.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/default/default.cpp
@@ -89,7 +92,14 @@ set(sources
     ${PROJECT_SOURCE_DIR}/src/ai/controller/replay/replay.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/two_level_search.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/engine/engine_types.cpp
-    ${PROJECT_SOURCE_DIR}/src/ai/engine/engine_helper.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/engine/engine_action_info.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/engine/engine_distance.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/engine/engine_element_info.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/engine/engine_grid_action.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/engine/engine_grid_info.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/engine/engine_hash.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/engine/engine_level_info.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/engine/engine_status_info.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/engine/game_state.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/engine/game_state_abstract.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/level_programming/level_programming.cpp
@@ -100,7 +110,13 @@ set(sources
 )
 
 set(sources_tests
+    ${PROJECT_SOURCE_DIR}/src/ai/tests/engine_action_info_test.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/tests/engine_distance_test.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/tests/engine_element_info_test.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/tests/engine_grid_action_test.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/tests/engine_grid_info_test.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/tests/engine_level_info_test.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/tests/test_util.cpp
 )
 
 set(AUTOCONF

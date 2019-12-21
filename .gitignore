@@ -32,6 +32,7 @@ rocksndiamonds
 rocksndiamonds.exe
 rocksndiamonds_gui
 rocksndiamonds_headless
+run_tests
 
 .DS_Store
 

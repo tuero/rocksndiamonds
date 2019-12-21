@@ -12,11 +12,13 @@
 #define REPLAY_H
 
 
+// Standard Libary/STL
 #include <iostream>
 #include <fstream>
 #include <string>
 
-#include "../base_controller.h" 
+// Includes
+#include "base_controller.h" 
 
 
 /**
@@ -37,7 +39,7 @@ public:
     /**
      * Set the replay file to use as a file stream.
      * 
-     * @param The replay file string name.
+     * @param file The replay file string name.
      */
     void setReplayFile(std::string &file);
 
