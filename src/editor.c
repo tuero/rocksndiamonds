@@ -8325,6 +8325,9 @@ static void CopyCustomElementPropertiesToGame(int element)
   // copy change events also to special level editor variable
   custom_element = element_info[element];
   custom_element_change = *element_info[element].change;
+
+  // needed here to restore runtime value "element_info[element].gfx_element"
+  InitElementPropertiesGfxElement();
 }
 
 static void CopyGroupElementPropertiesToGame(int element)
