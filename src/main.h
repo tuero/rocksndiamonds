@@ -2548,8 +2548,8 @@ enum
 // program information and versioning definitions
 #define PROGRAM_VERSION_SUPER		4
 #define PROGRAM_VERSION_MAJOR		1
-#define PROGRAM_VERSION_MINOR		3
-#define PROGRAM_VERSION_PATCH		1
+#define PROGRAM_VERSION_MINOR		4
+#define PROGRAM_VERSION_PATCH		0
 #define PROGRAM_VERSION_EXTRA		""
 
 #define PROGRAM_TITLE_STRING		"Rocks'n'Diamonds"
