@@ -22,6 +22,7 @@ extern "C" {
     #include "../../main.h"                 // level
     #include "../../files.h"                // LoadLevel
     #include "../../game.h"                 // game
+    #include "../../init.h"                 // OpenAll
     #include "../../libgame/setup.h"        // LoadLevelInfo, SaveLevelSetup_LastSeries
     #include "../../libgame/system.h"       // options.levelset, leveldir_current
 }
@@ -32,7 +33,7 @@ namespace enginehelper {
 /**
  * Call engine functions to automatically load the levelset.
  */
-void setLevelSet() {
+void setLevelSet(bool reopen) {
     // Need to load levelset before openall
     // Maybe get setLevelset to check if replay, then get the levelset from there?
     // Kind of messy, need a better
@@ -57,6 +58,7 @@ void setLevelSet() {
         // Save the levelset
         // We save because on startup, the previously saved levelset is loaded
         SaveLevelSetup_LastSeries();
+        if (reopen) {OpenAll();}
     }
     catch (...){
         PLOGE_(logger::FileLogger) << "Something went wrong trying to load levelset " << level_set;

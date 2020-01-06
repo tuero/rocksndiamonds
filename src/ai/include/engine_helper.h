@@ -101,7 +101,7 @@ namespace enginehelper {
      * valid. If the levelset doesn't exist, OpenAll() falls back to using a default
      * empty level.
      */
-    void setLevelSet();
+    void setLevelSet(bool openall=false);
 
     /**
      * Get the levelset currently set in the engine.

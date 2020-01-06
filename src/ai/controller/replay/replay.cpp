@@ -42,7 +42,7 @@ Replay::Replay(){
         // Call respective methods to set above data
         RNG::setEngineSeed(seed);
         options.level_set = (char*)level_set.c_str();
-        enginehelper::setLevelSet();
+        enginehelper::setLevelSet(true);
         enginehelper::loadLevel(level_num);
     }
     catch (...) {
