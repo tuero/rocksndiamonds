@@ -22,15 +22,14 @@
 
 
 /**
- * Determine if the option is valid to perform as per the current game engine state.
+ * Reset the option.
  */
-bool BaseOption::isValid() {
-    return isValid_() && enginehelper::isSpriteActive(spriteID_);
-    // return isValid_();
-}
-
-bool BaseOption::isComplete() {
-    return false;
+void BaseOption::reset() {
+    // Find sprite ID again
+    goalCell_ = enginehelper::getSpriteGridCell(spriteID_);
+    counter_ = 0;
+    solutionPath_.clear();
+    restrictedCells_.clear();
 }
 
 
@@ -77,6 +76,28 @@ void BaseOption::setSpriteID(int spriteID) {
  */
 int BaseOption::getSpriteID() const {
     return spriteID_;
+}
+
+
+/**
+ * Get the solution path as found by A*.
+ */
+std::deque<enginetype::GridCell> BaseOption::getSolutionPath() {
+    return solutionPath_;
+}
+
+/**
+ * Set the restricted cells.
+ */
+void BaseOption::setRestrictedCells(std::vector<enginetype::GridCell> &restrictedCells) {
+    restrictedCells_ = restrictedCells;
+}
+
+/**
+ * Get the list of restricted cells.
+ */
+const std::vector<enginetype::GridCell> & BaseOption::getRestrictedCells() {
+    return restrictedCells_;
 }
 
 
@@ -148,6 +169,7 @@ void BaseOption::runAStar(enginetype::GridCell startCell, enginetype::GridCell g
 
             // Child not valid if out of bounds or action doesn't result in being in a moveable cell
             if (!enginehelper::isActionMoveable(node.cell, action) && !(childCell == goalCell)) {continue;}
+            if (!(enginehelper::isDigable(node.cell, action) || enginehelper::isEmpty(node.cell, action)) && !(childCell == goalCell)) {continue;}
 
             int childIndex = enginehelper::cellToIndex(childCell);
             float newG = node.g + 1;
@@ -172,4 +194,5 @@ void BaseOption::runAStar(enginetype::GridCell startCell, enginetype::GridCell g
             open[childIndex] = {childIndex, node.id, childCell, newG, h};
         }
     }
+    PLOGV_(logger::FileLogger) << "A* couldn't find a path";
 }

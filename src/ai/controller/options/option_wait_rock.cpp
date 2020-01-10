@@ -71,7 +71,7 @@ bool OptionWaitRock::getNextAction(Action &action) {
 }
 
 
-bool OptionWaitRock::isValid_() {
+bool OptionWaitRock::isValid() {
     if (!enginehelper::isSpriteActive(spriteID_)) {return false;}
     return (enginehelper::getGridMovPos(enginehelper::getSpriteGridCell(spriteID_)) != 0);
 }

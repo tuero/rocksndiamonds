@@ -60,7 +60,7 @@ public:
      * 
      * @return True if the action the option represents is moveable.
      */
-    bool isValid_() override;
+    bool isValid() override;
 
     /**
      * String representation of the option and its characteristics.

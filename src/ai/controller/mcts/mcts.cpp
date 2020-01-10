@@ -129,6 +129,7 @@ float MCTS::getNodeValue() {
         return -10;
     }
     return enginehelper::getCurrentScore() - rootSavedState.getScore() + enginehelper::countNumOfElement(enginetype::FIELD_DIAMOND);
+    return enginehelper::getCurrentScore() - rootSavedState.getScore();
 }
 
 
@@ -320,8 +321,8 @@ void MCTS::plan() {
 
         // Step 3: Simulation
         // The expansion step sets the simulator to the expanded node's state
-        numSimulations_ = 5;
-        maxIterationsDepth_ = 5;
+        numSimulations_ = 0;
+        maxIterationsDepth_ = 0;
         for (int i = 0; i < numSimulations_; i++) {
             reference_state.restoreEngineState();
             if (!current->isTerminal()) {
@@ -332,10 +333,10 @@ void MCTS::plan() {
                     }
 
                     // Apply random action
-                    // enginehelper::setEngineRandomPlayerAction();
+                    enginehelper::setEngineRandomPlayerAction();
                     // enginehelper::setEnginePlayerAction(current->getActionTaken());
-                    // enginehelper::engineSimulate();
-                    current->getOptionTaken()->run();
+                    enginehelper::engineSimulate();
+                    // current->getOptionTaken()->run();
                     countSimulatedNodes_ += 1;
                 }
             }
@@ -357,7 +358,6 @@ void MCTS::plan() {
     }
 
     timer.stop();
-    int ms = timer.getDuration();
 
     // Update statistics
     logCurrentStats();

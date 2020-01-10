@@ -46,15 +46,18 @@ Controller controller;
 /*
  * Perform all necessary actions at level start.
  */
-extern "C" void handleLevelStart() {
+extern "C" void handleFirstLevelStart() {
     // If level is a custom programmed level, the respective level start code is called.
     levelprogramming::customLevelProgrammingStart();
 
     // Initialize zorbrist tables for state hashing
     enginehelper::initZorbristTables();
 
+    // // Initialize sprite IDs
+    // enginehelper::initSpriteIDs();
+
     // clear solution
-    controller.reset();
+    controller.handleFirstLevelStart();
 
     // Initial logging
     PLOGI_(logger::FileLogger) << "Level starting: " << enginehelper::getLevelNumber();

@@ -40,7 +40,8 @@ bool OptionCollectibleSprite::run() {
 bool OptionCollectibleSprite::getNextAction(Action &action) {
     action = Action::noop;
 
-    if (isComplete()) {
+    bool isComplete = enginehelper::getPlayerPosition() == goalCell_ || !enginehelper::isSpriteActive(spriteID_);
+    if (isComplete) {
         return true;
     }
 
@@ -60,18 +61,11 @@ bool OptionCollectibleSprite::getNextAction(Action &action) {
     }
 
     // Option is complete if we pulled the last action off the solution.
-    // return solutionPath_.empty();
-    // return playerCell == goalCell_ && enginehelper::isPlayerDoneAction();
     return (solutionPath_.empty() && enginehelper::isPlayerDoneAction());
 }
 
 
-bool OptionCollectibleSprite::isValid_() {
+bool OptionCollectibleSprite::isValid() {
     runAStar();
     return !(solutionPath_.empty() && enginehelper::isPlayerDoneAction());
-}
-
-
-bool OptionCollectibleSprite::isComplete() {
-    return enginehelper::getPlayerPosition() == goalCell_ || !enginehelper::isSpriteActive(spriteID_);
 }

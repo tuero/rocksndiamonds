@@ -60,39 +60,9 @@ protected:
             }
     };
 
-    /**
-     * Determine if the option is valid to perform as per the current game engine state.
-     * 
-     * This is called by the base option wrapper which also checks if the associated spriteID
-     * is active on the map.
-     * 
-     * @return True if the option is valid, false otherwise.
-     */
-    virtual bool isValid_() = 0;
-
 public:
 
     virtual ~BaseOption() {};
-
-    /**
-     * Set the Options solutionPath as the path found during A* 
-     * at the grid level (time-independent).
-     * 
-     * No goalCell is provided, so the currently saved cell is used 
-     * (this might be a static grid on the map no related to sprites,
-     * and we may not want this changed).
-     */
-    void runAStar();
-
-    /**
-     * Set the Options solutionPath as the path found during A* 
-     * at the grid level (time-independent).
-     * 
-     * @param startCell The gridcell designated as the start for A*.
-     * @param goalCell The gridcell designated as the goal for A*.
-     * @param restrictedCells Vector of restricted cells that A* will treat as blocked.
-     */
-    void runAStar(enginetype::GridCell startCell, enginetype::GridCell goalCell);
 
     /**
      * Run the action(s) defined by the option, usually done during simulation (to
@@ -122,6 +92,13 @@ public:
     virtual bool getNextAction(Action &action) = 0;
 
     /**
+     * Determine if the option is valid to perform as per the current game engine state.
+     * 
+     * @return True if the option is valid, false otherwise.
+     */
+    virtual bool isValid() = 0;
+
+    /**
      * String representation of the option and its characteristics
      * 
      * Used for logging. The string should decribe the option behaviour as well as any sprite it
@@ -132,24 +109,59 @@ public:
     virtual std::string toString() const = 0;
 
     /**
+     * Reset the option.
+     * Resetting includes finding the cell that corresponds to the sprite, and 
+     * clearing the solution path and restricted cells.
+     */
+    void reset();
+
+    /**
+     * Set the Options solutionPath as the path found during A* 
+     * at the grid level (time-independent).
+     * 
+     * No goalCell is provided, so the currently saved cell is used 
+     * (this might be a static grid on the map no related to sprites,
+     * and we may not want this changed).
+     */
+    void runAStar();
+
+    /**
+     * Set the Options solutionPath as the path found during A* 
+     * at the grid level (time-independent).
+     * 
+     * @param startCell The gridcell designated as the start for A*.
+     * @param goalCell The gridcell designated as the goal for A*.
+     * @param restrictedCells Vector of restricted cells that A* will treat as blocked.
+     */
+    void runAStar(enginetype::GridCell startCell, enginetype::GridCell goalCell);
+
+    /**
+     * Get the solution path as found by A*.
+     * 
+     * @return A deque of gridcells representing the found path.
+     */
+    std::deque<enginetype::GridCell> getSolutionPath();
+
+    /**
+     * Set the restricted cells.
+     * 
+     * @param restrictedCells A vector of restricted cells.
+     */
+    void setRestrictedCells(std::vector<enginetype::GridCell> &restrictedCells);
+
+    /**
+     * Get the list of restricted cells.
+     * 
+     * @return The vector of restricted cells.
+     */
+    const std::vector<enginetype::GridCell> & getRestrictedCells();
+
+    /**
      * Get the option type.
      * 
      * @return The option category type.
      */
     OptionType getOptionType() const;
-
-    std::deque<enginetype::GridCell> getSolutionPath() {return solutionPath_;}
-
-    virtual bool isComplete();
-
-    /**
-     * Determine if the option is valid to perform as per the current game engine state.
-     * 
-     * Checks if the associated spriteID is active, as well as the option-specific valid check.
-     * 
-     * @return True if the option is valid, false otherwise.
-     */
-    bool isValid();
 
     /**
      * Increment the number of times the option has been expanded during search.
@@ -181,12 +193,6 @@ public:
      * @return The unique sprite ID represented by the option.
      */
     int getSpriteID() const;
-
-    /**
-     * Set the restricted cells.
-     */
-    void setRestrictedCells(std::vector<enginetype::GridCell> &restrictedCells) {restrictedCells_ = restrictedCells;}
-
 };
 
 

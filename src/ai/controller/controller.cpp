@@ -45,6 +45,18 @@ Controller::Controller(ControllerType controller) {
 }
 
 
+void Controller::handleFirstLevelStart() {
+    enginehelper::initSpriteIDs();
+    // Initialize controller options
+    baseController_.get()->initializeOptions();
+
+    // Controller specific handler to ensure proper setup
+    baseController_.get()->handleLevelStart();
+
+    reset();
+}
+
+
 /**
  * Reset the controller
  * HandleLevelStart is called. 
@@ -54,21 +66,12 @@ void Controller::reset() {
     PLOGI_(logger::ConsoleLogger) << "Resetting controller.";
     PLOGI_(logger::FileLogger) << baseController_.get()->controllerDetailsToString();
 
-    // Set sprite IDs
-    enginehelper::initSpriteIDs();
-
     // Reset available options
-    // Needs to be done here (after the level and sprites are loaded.)
-    enginehelper::setSimulatorFlag(true);
     baseController_.get()->resetOptions();
 
     // Solution is cleared and stored with noops to begin
     currentAction_.clear();
     step_counter_ = 0;
-
-    // Controller specific handler to ensure proper setup
-    baseController_.get()->handleLevelStart();
-    enginehelper::setSimulatorFlag(false);
 }
 
 

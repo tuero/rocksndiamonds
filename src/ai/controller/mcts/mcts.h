@@ -45,7 +45,7 @@ private:
 
     // MCTS runtime configurations
     // These are fallback values in the event configuration file isn't loaded
-    int maxTime_ = 18000;              // Time limit
+    int maxTime_ = 20000;              // Time limit
     int maxIterationsDepth_ = 10;           // Node limit
     int numSimulations_ = 20;           // Node limit
     std::map<std::string, int*> configParameters_ = {
@@ -116,7 +116,7 @@ private:
 
 public:
 
-    MCTS() {}
+    MCTS() {timer.setLimit(maxTime_);}
 
     MCTS(OptionFactoryType optionType) : BaseController(optionType) {}
 

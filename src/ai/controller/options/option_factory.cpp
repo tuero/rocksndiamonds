@@ -14,7 +14,6 @@
 #include "option_single_step.h"
 #include "option_collectible_sprite.h"
 #include "option_to_exit.h"
-#include "option_to_sprite.h"
 #include "option_to_rock.h"
 #include "option_push_rock.h"
 #include "option_wait_rock.h"
@@ -53,7 +52,7 @@ std::vector<BaseOption*> OptionFactory::createPathToSpriteOptions() {
     // Single step option for each available 
     for (enginetype::GridCell cell : enginehelper::getMapSprites()) {
         int spriteID = enginehelper::getSpriteID(cell);
-        std::unique_ptr<OptionToSprite> option = std::make_unique<OptionToSprite>(spriteID);
+        std::unique_ptr<OptionCollectibleSprite> option = std::make_unique<OptionCollectibleSprite>(spriteID);
         options_.push_back(std::move(option));
         optionPointers.push_back(options_.back().get());
     }
@@ -86,6 +85,29 @@ std::vector<BaseOption*> OptionFactory::createTwoLevelSearchOptions() {
 
 
 std::vector<BaseOption*> OptionFactory::createCustomOptions() {
+    std::vector<BaseOption*> optionPointers;
+    options_.clear();
+
+    for (enginetype::GridCell cell : enginehelper::getMapSprites()) {
+        int spriteID = enginehelper::getSpriteID(cell);
+        // Collectible sprite (diamond in this case)
+        if (enginehelper::isCollectable(cell)) {
+            std::unique_ptr<OptionCollectibleSprite> option = std::make_unique<OptionCollectibleSprite>(spriteID);
+            options_.push_back(std::move(option));
+            optionPointers.push_back(options_.back().get());
+        }
+        // Exit
+        else if (enginehelper::isExit(cell)) {
+            std::unique_ptr<OptionToExit> option = std::make_unique<OptionToExit>(spriteID);
+            options_.push_back(std::move(option));
+            optionPointers.push_back(options_.back().get());
+        }
+    }
+    return optionPointers;
+
+
+
+    /*
     std::vector<BaseOption*> optionPointers;
     options_.clear();
 
@@ -137,12 +159,13 @@ std::vector<BaseOption*> OptionFactory::createCustomOptions() {
         //     optionPointers.push_back(options_.back().get());
         // }
         int spriteID = enginehelper::getSpriteID(cell);
-        std::unique_ptr<OptionToSprite> option = std::make_unique<OptionToSprite>(spriteID);
+        std::unique_ptr<OptionCollectibleSprite> option = std::make_unique<OptionCollectibleSprite>(spriteID);
         options_.push_back(std::move(option));
         optionPointers.push_back(options_.back().get());
     }
 
     return optionPointers;
+    */
 }
 
 

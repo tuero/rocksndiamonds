@@ -53,7 +53,7 @@ public:
 
     bool getNextAction(Action &action) override;
 
-    bool isValid_() override;
+    bool isValid() override;
 
     std::string toString() const override;
 

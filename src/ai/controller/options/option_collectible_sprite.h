@@ -48,9 +48,7 @@ public:
 
     bool getNextAction(Action &action) override;
 
-    bool isValid_() override;
-
-    bool isComplete() override;
+    bool isValid() override;
 
     std::string toString() const override;
 };

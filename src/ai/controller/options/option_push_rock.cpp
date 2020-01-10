@@ -87,7 +87,7 @@ bool OptionPushRock::getNextAction(Action &action) {
 }
 
 
-bool OptionPushRock::isValid_() {
+bool OptionPushRock::isValid() {
     if (!enginehelper::isSpriteActive(spriteID_)) {return false;}
     
     bool valid = false;

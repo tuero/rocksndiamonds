@@ -259,6 +259,24 @@ bool isDigable(const enginetype::GridCell cellFrom, Action directionToMove) {
     return inBounds(cellTo) && _isDigable(cellTo);
 }
 
+/**
+ * Checks if the GridCell cellTo is empty.
+ * For internal use, assumes bounds are validated elsewhere.
+ */
+bool _isEmpty(const enginetype::GridCell cellTo) {
+    int element = Feld[cellTo.x][cellTo.y];
+    return Feld[cellTo.x][cellTo.y] == EL_EMPTY;
+}
+
+/**
+ * Checks if the direction the player wants to move in is empty.
+ * in the action being applied, after digging away the current element.
+ */
+bool isEmpty(const enginetype::GridCell cellFrom, Action directionToMove) {
+    enginetype::GridCell cellTo = getCellFromAction(cellFrom, directionToMove);
+    return inBounds(cellTo) && _isEmpty(cellTo);
+}
+
 
 /**
  * Checks if the GridCell cellTo is a wall.
@@ -279,6 +297,26 @@ bool _isWall(const enginetype::GridCell cellTo) {
 bool isWall(const enginetype::GridCell cellFrom, Action directionToMove) {
     enginetype::GridCell cellTo = getCellFromAction(cellFrom, directionToMove);
     return inBounds(cellTo) && _isWall(cellTo);
+}
+
+
+/**
+ * Checks if the GridCell cellTo is a rock.
+ * For internal use, assumes bounds are validated elsewhere.
+ */
+bool _isRock(const enginetype::GridCell cellTo) {
+    int element = Feld[cellTo.x][cellTo.y];
+    return element == EL_ROCK || element == EL_BD_ROCK;
+}
+
+
+/**
+ * Checks if the direction the player wants to move in is a rock.
+ * Rocks are either EL_ROCK or EL_BD_ROCK.
+ */
+bool isRock(const enginetype::GridCell cellFrom, Action directionToMove) {
+    enginetype::GridCell cellTo = getCellFromAction(cellFrom, directionToMove);
+    return inBounds(cellTo) && _isRock(cellTo);
 }
 
 

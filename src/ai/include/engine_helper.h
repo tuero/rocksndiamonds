@@ -459,6 +459,15 @@ namespace enginehelper {
     bool isDigable(const enginetype::GridCell cellFrom, Action directionToMove = Action::noop);
 
     /**
+     * Checks if the direction the player wants to move in is diggable.
+     *
+     * @param cellFrom The cell the player is in.
+     * @param directionToMove The action the player wants to attempt to make.
+     * @return True if the action the player wants to take is empty.
+     */
+    bool isEmpty(const enginetype::GridCell cellFrom, Action directionToMove = Action::noop);
+
+    /**
      * Checks if the direction the player wants to move in is a wall.
      * This works for predefined wall objects from the default game objects. A custom
      * non-passible object (which acts as a wall) won't be caught here.
@@ -468,6 +477,16 @@ namespace enginehelper {
      * @return True if the action the player wants to take is blocked by a wall.
      */
     bool isWall(const enginetype::GridCell cellFrom, Action directionToMove = Action::noop);
+
+    /**
+     * Checks if the direction the player wants to move in is a rock.
+     * Only rocks defined in the game are EL_ROCK or EL_BD_ROCK
+     *
+     * @param cellFrom The cell the player is in.
+     * @param directionToMove The action the player wants to attempt to make.
+     * @return True if the action the player wants to take is blocked by a rock.
+     */
+    bool isRock(const enginetype::GridCell cellFrom, Action directionToMove = Action::noop);
 
     /**
      * Checks if resulting GridCell the player wants to move to contains a collectible element.

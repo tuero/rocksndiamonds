@@ -51,9 +51,7 @@ public:
      * Player can only walk to the exit if the exit is open 
      * and the exit is pathable.
      */
-    bool isValid_() override;
-
-    bool isComplete() override;
+    bool isValid() override;
     
     std::string toString() const override;
 };

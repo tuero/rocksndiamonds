@@ -49,8 +49,8 @@ public:
      * actions (left, right, up, down, and noop).
      */
     BaseController() : 
-        optionFactoryType_(OptionFactoryType::SINGLE_ACTION),
-        availableOptions_(optionFactory_.createOptions(OptionFactoryType::SINGLE_ACTION)) 
+        optionFactoryType_(OptionFactoryType::SINGLE_ACTION)
+        // availableOptions_(optionFactory_.createOptions(OptionFactoryType::SINGLE_ACTION)) 
     {}
 
     /**
@@ -61,16 +61,24 @@ public:
      * @param optionFactoryType The specified option factory type to use as the available options.
      */
     BaseController(OptionFactoryType optionFactoryType) : 
-        optionFactoryType_(optionFactoryType),
-        availableOptions_(optionFactory_.createOptions(optionFactoryType)) 
+        optionFactoryType_(optionFactoryType)
+        // availableOptions_(optionFactory_.createOptions(optionFactoryType)) 
     {}
+
+    void initializeOptions() {
+        availableOptions_ = optionFactory_.createOptions(optionFactoryType_);
+    }
 
     /**
      * Reset the options which are available.
      * This is called during level start, as we need to know the sprites available to
      * accurately set what options are available.
      */
-    virtual void resetOptions() {availableOptions_ = optionFactory_.createOptions(optionFactoryType_);}
+    virtual void resetOptions() {
+        for (auto const & option : availableOptions_) {
+            option->reset();
+        }
+    }
 
     /**
      * Called on every loop to check if controller wants to reset the level.

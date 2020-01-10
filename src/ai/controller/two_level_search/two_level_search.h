@@ -16,6 +16,7 @@
 #include <deque>
 #include <unordered_map>
 #include <vector>
+#include <queue>
 #include <algorithm>
 
 // Includes
@@ -35,7 +36,10 @@ private:
     int solutionIndex_;                                                             // Current index in the high level path
     BaseOption* currentOption_;                                                     // Pointer to current option in high level path
     std::deque<BaseOption*> highlevelPlannedPath_ = {};                             // Path of high level options
-    std::vector<std::vector<enginetype::GridCell>> restrictedCellsByOption_;        // Restricted cells for each option
+    uint64_t currentHighLevelPathHash;
+    // std::vector<std::vector<enginetype::GridCell>> restrictedCellsByOption_;        // Restricted cells for each option
+    std::unordered_map<BaseOption*, std::vector<enginetype::GridCell>> restrictedCellsByOption_;        // Restricted cells for each option
+    std::unordered_map<BaseOption*, std::vector<enginetype::GridCell>> knownConstraints_;
     
     uint64_t hash = 0;                                                              // Hash of the current option being attempted
     std::unordered_map<uint64_t, AbstractGameState> storedPathStates_;              // Cached previous paths attempted to avoid duplicate attempts
@@ -50,14 +54,15 @@ private:
         }
     };
 
+    // Constraint idenficiation
     enginetype::GridCell prevPlayerCell_;                               // Player cell on the previous game step (Used to find restricted cells on current step)
     enginetype::GridCell currPlayerCell_;                               // Player cell on the current game step
     std::unordered_map<int, bool> prevIsMoving_;                        // Map of sprites which are moving for the previous game step
     std::unordered_map<int, bool> currIsMoving_;                        // Map of sprites which are moving for the current game step
     std::deque<enginetype::GridCell> lowlevelPlannedPath_;              // Path of individual grid cells for the current option
-    std::vector<std::vector<SpriteRestriction>> spritesMoved;           // Current list of sprites which moved during player actions
-    std::vector<std::vector<SpriteRestriction>> spritesMovedTemp;       // Temporary list of newer moved sprites which occur while still parsing the original list
-    std::vector<uint64_t> bitMasks_;                                    // Bit masks for each option, represents which restriction to use
+    // std::vector<std::vector<SpriteRestriction>> spritesMoved;           // Current list of sprites which moved during player actions
+    std::unordered_map<BaseOption*, std::vector<SpriteRestriction>> spritesMoved; // Current list of sprites which moved during player actions
+    std::unordered_map<uint64_t, std::unordered_map<BaseOption*, uint64_t>> bitMasks_;
 
     struct HighLevelNode {
         BaseOption *id;                             // Fast access node ID = gridcell index 
@@ -75,11 +80,37 @@ private:
             }
     };
 
+    void initializationForEveryLevelStart();
+
+    // HLS
+    void addNewConstraints();
+
+    void CBS();
+
+    void highLevelSearchGemsInOrder();
+
+    void smartAStar();
+
     void highLevelSearch();
 
+    // Constraints
     void checkForMovedObjects();
 
-    void setNewRestrictions();
+    // Logging
+    void logPath(const std::deque<enginetype::GridCell> &path);
+
+    void logAvailableOptions();
+
+    void logHighLevelPath();
+
+    void logRestrictedSprites();
+
+    // Path hashing
+    uint64_t optionPathToHash(std::deque<BaseOption*> path);
+
+    void findUnseenPath();
+
+    void saveCurrentPathHash();
 
 public:
 

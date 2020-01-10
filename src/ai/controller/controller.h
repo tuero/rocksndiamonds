@@ -70,6 +70,8 @@ public:
      */
     void handleLevelFailed();
 
+    void handleFirstLevelStart();
+
     /**
      * Reset the controller, which is called at level start.
      */

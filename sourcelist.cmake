@@ -83,7 +83,6 @@ set(sources_ai
     ${PROJECT_SOURCE_DIR}/src/ai/controller/options/option_factory.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/options/base_option.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/options/option_single_step.cpp
-    ${PROJECT_SOURCE_DIR}/src/ai/controller/options/option_to_sprite.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/options/option_collectible_sprite.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/options/option_to_exit.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/options/option_to_rock.cpp
@@ -91,6 +90,10 @@ set(sources_ai
     ${PROJECT_SOURCE_DIR}/src/ai/controller/options/option_push_rock.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/replay/replay.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/two_level_search.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/tls_highlevel.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/tls_constraint_detection.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/tls_log.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/tls_hash.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/engine/engine_types.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/engine/engine_action_info.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/engine/engine_distance.cpp

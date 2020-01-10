@@ -21,14 +21,14 @@ extern "C"
     // ---------------- Init Functions ------------------
 
     /**
-     * Perform all necessary actions at level start.
+     * Perform all necessary actions at first time the level is started.
      *
      * Called whenever level is started. Calculates tile distances to goal for 
      * MCTS with goal, initializes Zorbrist Tables for state hashing, and sends 
      * starting state information to logger. Levels with custom programming call 
      * the respective level start actions.
      */
-    void handleLevelStart(void);
+    void handleFirstLevelStart(void);
 
     /**
      * Call controller action handler when level is solved. 

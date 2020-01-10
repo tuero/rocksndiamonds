@@ -70,11 +70,9 @@ bool OptionToExit::getNextAction(Action &action) {
  * Player can only walk to the exit if the exit is open 
  * and the exit is pathable.
  */
-bool OptionToExit::isValid_() {
+bool OptionToExit::isValid() {
     runAStar();
-    return (enginehelper::isExitOpen(goalCell_) || enginehelper::isExitOpening(goalCell_)) && !(solutionPath_.empty() && enginehelper::isPlayerDoneAction());
-}
-
-bool OptionToExit::isComplete() {
-    return enginehelper::getPlayerPosition() == goalCell_;
+    bool doorValid = enginehelper::isExitOpen(goalCell_) || enginehelper::isExitOpening(goalCell_) || enginehelper::isExitClosing(goalCell_);
+    bool playerInGoal = enginehelper::getPlayerPosition() == goalCell_;
+    return doorValid && (!solutionPath_.empty() || playerInGoal);
 }

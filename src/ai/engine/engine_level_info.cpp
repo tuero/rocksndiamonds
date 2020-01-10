@@ -102,6 +102,7 @@ void restartLevel() {
     PLOGI_(logger::ConsoleLogger) << "Restarting level: " << getLevelNumber();
     
     InitGame();
+    initSpriteIDs();
 }
 
 

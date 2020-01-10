@@ -372,7 +372,7 @@ void EventLoop(void)
       if (prev_game_status != game_status && game_status == GAME_MODE_PLAYING &&
           options.controller_type != CONTROLLER_DEFAULT)
       {
-          handleLevelStart();
+          handleFirstLevelStart();
       }
       prev_game_status = game_status;
 

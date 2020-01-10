@@ -59,7 +59,7 @@ bool OptionSingleStep::getNextAction(Action &action) {
  * Single action option is valid so long as the action it wants
  * to perform is moveable.
  */
-bool OptionSingleStep::isValid_() {
+bool OptionSingleStep::isValid() {
     return enginehelper::isActionMoveable(enginehelper::getPlayerPosition(), action_);
 }
 

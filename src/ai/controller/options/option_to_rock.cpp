@@ -130,7 +130,7 @@ bool OptionToRock::getNextAction(Action &action) {
 }
 
 
-bool OptionToRock::isValid_() {
+bool OptionToRock::isValid() {
     if (!enginehelper::isSpriteActive(spriteID_)) {return false;}
     
     enginetype::GridCell goalCell = enginehelper::getSpriteGridCell(spriteID_);
