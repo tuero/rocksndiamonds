@@ -15,20 +15,49 @@
 #include <algorithm>
 #include <iterator>
 
-
 // Include
 #include "logger.h"
 
 
+int TwoLevelSearch::optionIndexPairToHash(int indexCurr, int indexPrev) {
+    // indexCurr should always be a valid index in availableOptions_.
+    if (indexCurr < 0 || indexCurr >= (int)availableOptions_.size()) {
+        PLOGE_(logger::FileLogger) << "Invalid current index.";
+    }
+
+    // indexCurr is the first option being executed.
+    if (indexPrev == -1) {return indexCurr;}
+
+    int multiplier = 10;
+    while (multiplier < (int)availableOptions_.size()) {
+        multiplier *= 10;
+    }
+
+    return (indexCurr * multiplier) + indexPrev;
+}
+
+
+TwoLevelSearch::OptionIndexPair TwoLevelSearch::hashToOptionIndexPair(int hash) {
+    OptionIndexPair optionPair;
+
+    return optionPair;
+}
+
+
 uint64_t TwoLevelSearch::optionPathToHash(std::deque<BaseOption*> path) {
     uint64_t hash = 0;
-    uint64_t pow = 10;
+    // uint64_t pow = 10;
+    uint64_t multiplier = 10;
+    while (multiplier < (uint64_t)availableOptions_.size()) {
+        multiplier *= 10;
+    }
     for (auto const & option : path) {
         // Get option index
         auto iter = std::find(availableOptions_.begin(), availableOptions_.end(), option);
         uint64_t index = std::distance(availableOptions_.begin(), iter);
-        while (index >= pow) {pow *= 10;}
-        hash = (hash * pow) + index;
+        // while (index >= pow) {pow *= 10;}
+        // hash = (hash * pow) + index;
+        hash = (hash * multiplier) + index;
     }
 
     return hash;

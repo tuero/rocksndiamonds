@@ -16,6 +16,7 @@
 #include <deque>
 #include <unordered_map>
 #include <vector>
+#include <array>
 #include <queue>
 #include <algorithm>
 
@@ -37,7 +38,6 @@ private:
     BaseOption* currentOption_;                                                     // Pointer to current option in high level path
     std::deque<BaseOption*> highlevelPlannedPath_ = {};                             // Path of high level options
     uint64_t currentHighLevelPathHash;
-    // std::vector<std::vector<enginetype::GridCell>> restrictedCellsByOption_;        // Restricted cells for each option
     std::unordered_map<BaseOption*, std::vector<enginetype::GridCell>> restrictedCellsByOption_;        // Restricted cells for each option
     std::unordered_map<BaseOption*, std::vector<enginetype::GridCell>> knownConstraints_;
     
@@ -54,15 +54,20 @@ private:
         }
     };
 
-    // Constraint idenficiation
+    // High level costs
+
+
+    // Constraint identification
+    typedef std::array<int, 2> OptionIndexPair;
     enginetype::GridCell prevPlayerCell_;                               // Player cell on the previous game step (Used to find restricted cells on current step)
     enginetype::GridCell currPlayerCell_;                               // Player cell on the current game step
     std::unordered_map<int, bool> prevIsMoving_;                        // Map of sprites which are moving for the previous game step
     std::unordered_map<int, bool> currIsMoving_;                        // Map of sprites which are moving for the current game step
+    std::unordered_map<int, enginetype::GridCell> prevSprites_;
+    std::unordered_map<int, enginetype::GridCell> currSprites_;
     std::deque<enginetype::GridCell> lowlevelPlannedPath_;              // Path of individual grid cells for the current option
-    // std::vector<std::vector<SpriteRestriction>> spritesMoved;           // Current list of sprites which moved during player actions
     std::unordered_map<BaseOption*, std::vector<SpriteRestriction>> spritesMoved; // Current list of sprites which moved during player actions
-    std::unordered_map<uint64_t, std::unordered_map<BaseOption*, uint64_t>> bitMasks_;
+    // std::unordered_map<uint64_t, std::vector<SpriteRestriction>> spritesMoved; // Current list of sprites which moved during player actions
 
     struct HighLevelNode {
         BaseOption *id;                             // Fast access node ID = gridcell index 
@@ -83,9 +88,9 @@ private:
     void initializationForEveryLevelStart();
 
     // HLS
-    void addNewConstraints();
-
     void CBS();
+
+    void LevinTS();
 
     void highLevelSearchGemsInOrder();
 
@@ -94,6 +99,8 @@ private:
     void highLevelSearch();
 
     // Constraints
+    void addNewConstraints();
+
     void checkForMovedObjects();
 
     // Logging
@@ -106,6 +113,10 @@ private:
     void logRestrictedSprites();
 
     // Path hashing
+    int optionIndexPairToHash(int indexCurr, int indexPrev);
+
+    OptionIndexPair hashToOptionIndexPair(int hash);
+
     uint64_t optionPathToHash(std::deque<BaseOption*> path);
 
     void findUnseenPath();

@@ -45,6 +45,10 @@ Controller::Controller(ControllerType controller) {
 }
 
 
+/**
+ * Called when the level is started for the first time.
+ * Special initializations in which we only want to occur once.
+ */
 void Controller::handleFirstLevelStart() {
     enginehelper::initSpriteIDs();
     // Initialize controller options
@@ -59,12 +63,14 @@ void Controller::handleFirstLevelStart() {
 
 /**
  * Reset the controller
- * HandleLevelStart is called. 
+ * This is called during first level start and every level reattempt.
  */
 void Controller::reset() {
     PLOGI_(logger::FileLogger) << "Resetting controller.";
     PLOGI_(logger::ConsoleLogger) << "Resetting controller.";
     PLOGI_(logger::FileLogger) << baseController_.get()->controllerDetailsToString();
+
+    actionsTaken.clear();
 
     // Reset available options
     baseController_.get()->resetOptions();
@@ -99,6 +105,7 @@ void Controller::handleLevelSolved() {
     PLOGI_(logger::ConsoleLogger) << "Number of plays = " << statistics::numLevelTries;
 
     // Signal game over and close logs
+    logger::createReplayForIndividualRun(enginehelper::getLevelSet(), enginehelper::getLevelNumber(), actionsTaken);
     enginehelper::setEngineGameStatusModeQuit();
     logger::closeReplayFile();
 }
@@ -159,6 +166,7 @@ int Controller::getAction() {
         logger::savePlayerMove(enginehelper::actionToString(action));
         logger::logPlayerMove(enginehelper::actionToString(action));
         logger::logCurrentState();
+        actionsTaken.push_back(enginehelper::actionToString(action));
     }
 
     enginehelper::setSimulatorFlag(false);

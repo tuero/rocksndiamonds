@@ -29,6 +29,7 @@
 const std::string LOG_DIR = "./src/ai/logs/";
 const std::string REPLAY_DIR = "./src/ai/replays/";
 const std::string STATS_DIR = "./src/ai/stats/";
+const std::string INDIVIDUAL_RUN = "_INDIVIDUAL";
 const std::string LOG_EXTENSION = ".log";
 const std::string REPLAY_EXTENSION = ".txt";
 static std::ofstream replayFile;
@@ -153,6 +154,41 @@ namespace logger {
         replayFile << RNG::getEngineSeed() << std::endl;
         replayFile << levelSet << std::endl;
         replayFile << levelNumber << std::endl;
+    }
+
+
+    /**
+     * Create a replay file for an individual run.
+     * This is usually for saving the run which solves the level, whereas the complete 
+     * replay file saves all attempts.
+     */
+    void createReplayForIndividualRun(const std::string levelSet, int levelNumber, const std::vector<std::string> &actionsTaken) {
+        // Skip if we are already a replay 
+        if (options.controller_type == CONTROLLER_REPLAY) {return;}
+
+        // File setup
+        std::string replayFileFullPath = REPLAY_DIR + getFileName() + INDIVIDUAL_RUN + REPLAY_EXTENSION;
+        PLOGI_(logger::FileLogger) << "Creating replay file \"" << replayFileFullPath << "\"";
+        PLOGI_(logger::ConsoleLogger) << "Creating replay file \"" << replayFileFullPath << "\"";
+        std::ofstream replayFileIndividual;
+        replayFileIndividual.open(replayFileFullPath, std::ios::app);
+        
+        if (!replayFileIndividual.is_open()) {
+            PLOGE_(logger::FileLogger) << "Can't save replay level info, file already closed.";
+            return;
+        }
+
+        // Parameters needed for reproducibility
+        replayFileIndividual << RNG::getEngineSeed() << std::endl;
+        replayFileIndividual << levelSet << std::endl;
+        replayFileIndividual << levelNumber << std::endl;
+
+        // Save each action in sequence
+        for (auto const & action : actionsTaken) {
+            replayFileIndividual << action << std::endl;
+        }
+
+        replayFileIndividual.close();
     }
 
 

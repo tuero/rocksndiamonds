@@ -16,6 +16,7 @@
 #include <vector>
 #include <map>
 #include <memory>
+#include <string>
 
 // Controllers
 #include "controller_listing.h"
@@ -34,7 +35,7 @@ private:
     int step_counter_ = 0;
     std::vector<Action> currentAction_;
     std::unique_ptr<BaseController> baseController_;
-
+    std::vector<std::string> actionsTaken;
 
 public:
     
@@ -70,10 +71,14 @@ public:
      */
     void handleLevelFailed();
 
+    /**
+     * Called when the level is started for the first time.
+     * Special initializations in which we only want to occur once.
+     */
     void handleFirstLevelStart();
 
     /**
-     * Reset the controller, which is called at level start.
+     * Reset the controller, which is called at every level start.
      */
     void reset();
 

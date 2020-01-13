@@ -24,28 +24,6 @@
 #include "logger.h"
 
 
-void TwoLevelSearch::addNewConstraints() {
-    bool flag = false;
-    for (auto const & option : availableOptions_) {
-        std::vector<enginetype::GridCell> &optionRestrictions = restrictedCellsByOption_[option];
-        for (auto const & restriction : spritesMoved[option]) {
-            // Add restriction if cell isn't already restricted
-            bool cellRestricted = std::find(optionRestrictions.begin(), optionRestrictions.end(), restriction.cell) != optionRestrictions.end();
-            if (!cellRestricted) {
-                flag = true;
-                optionRestrictions.push_back(restriction.cell);
-            }
-        }
-    }
-    if (flag) {
-        int count = 0;
-        for (auto const & option : availableOptions_) {
-            count += restrictedCellsByOption_[option].size();
-        }
-        PLOGE_(logger::ConsoleLogger) << "New constraints added, total = " << count;
-    }
-}
-
 
 // CBS
 struct NodeCBS {
@@ -118,43 +96,6 @@ void TwoLevelSearch::CBS() {
 
     // Constraints updated, now we do one iteration of search
     // Get best node in OPEN and add to CLOSED
-
-    // 1. Everytime we put a node into open, we hash and save
-    // 1. Before putting into open, we check if hash exists
-    // 2. Put a flag on new constraints and track
-    // bool flag = false;
-    // NodeCBS P;
-    // PriorityQueue tempopen = open;
-    // std::vector<NodeCBS> allNodes = closed;
-    // int index = 0;
-    // while(!tempopen.empty()) {
-    //     allNodes.push_back(tempopen.top());
-    //     tempopen.pop();
-    // }
-    // while (true) {
-    //     index = 0;
-    //     if (open.empty()) {
-    //         PLOGE_(logger::ConsoleLogger) << "Shouldn't get here, ALL OPTIONS EMPTY";
-    //     }
-    //     P = open.top();
-    //     open.pop();
-    //     for (auto const & node : allNodes) {
-    //         if (index - closed.size() == 0) {continue;}
-    //         flag = true;
-    //         for (auto const & option : highlevelPlannedPath_) {
-    //             std::set<enginetype::GridCell> s1;
-    //             std::set<enginetype::GridCell> s2;
-    //             s1.insert(P.constraints[option].begin(), P.constraints[option].end());
-    //             s2.insert(node.constraints.at(option).begin(), node.constraints.at(option).end());
-    //             if (s1 != s2) {flag = false;}
-    //         }
-    //         index += 1;
-    //         // Nodes have same constraints, skip
-    //         if (flag) {break;}
-    //     }
-    //     if (!flag){break;}
-
-    // }
     NodeCBS P = open.top();
     open.pop();
     closed.push_back(P);
@@ -197,6 +138,14 @@ void TwoLevelSearch::highLevelSearch() {
     // Run middle level search on given path
     // Middle level means to find the next set of constraints
     CBS();
+}
+
+
+void TwoLevelSearch::LevinTS() {
+    // Find each path and calculate path costs
+    // Flip coin at each step
+
+    highlevelPlannedPath_.clear();
 }
 
 

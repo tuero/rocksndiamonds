@@ -46,6 +46,17 @@ namespace logger {
     void initReplayFile(const std::string levelSet, int levelNumber);
 
     /**
+     * Create a replay file for an individual run.
+     * This is usually for saving the run which solves the level, whereas the complete 
+     * replay file saves all attempts.
+     * 
+     * @param levelSet The string name of the levelSet (for loading during replay).
+     * @param levelNumber The level number being played.
+     * @param actionsTaken The vector of string represented actions taken.
+     */
+    void createReplayForIndividualRun(const std::string levelSet, int levelNumber, const std::vector<std::string> &actionsTaken);
+
+    /**
      * Set max log level used for both loggers.
      * 
      * @param logLevel The max level to log.

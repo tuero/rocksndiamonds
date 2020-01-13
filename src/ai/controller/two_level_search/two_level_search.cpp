@@ -85,6 +85,7 @@ void TwoLevelSearch::handleLevelStart() {
     logAvailableOptions();
 
     // Empty sprites 
+    currSprites_.clear();
     spritesMoved.clear();
     for (auto const & option : availableOptions_) {
         spritesMoved[option] = {};
@@ -101,9 +102,6 @@ void TwoLevelSearch::handleLevelStart() {
     for (auto const & option : availableOptions_) {
         knownConstraints_[option] = {};
     }
-
-    // Set bitmaps to zero'd
-    bitMasks_.clear();
 
     initializationForEveryLevelStart();
 
