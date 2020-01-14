@@ -8341,6 +8341,9 @@ static void CopyGroupElementPropertiesToGame(int element)
 
   element_info[element] = custom_element;
   *element_info[element].group = group_element_info;
+
+  // needed here to restore runtime value "element_info[element].gfx_element"
+  InitElementPropertiesGfxElement();
 }
 
 static void CopyClassicElementPropertiesToGame(int element)
