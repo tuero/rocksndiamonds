@@ -686,7 +686,7 @@ char *getLevelSetInfoFilename(void)
 #ifndef HEADLESS
 static char *getLevelSetTitleMessageBasename(int nr, boolean initial)
 {
-  static char basename[32];
+  static char basename[32+5];
 
   sprintf(basename, "%s_%d.txt",
 	  (initial ? "titlemessage_initial" : "titlemessage"), nr + 1);
@@ -1725,7 +1725,7 @@ boolean checkCookieString(const char *cookie, const char *template)
 char *getFormattedSetupEntry(char *token, char *value)
 {
   int i;
-  static char entry[MAX_LINE_LEN];
+  static char entry[MAX_LINE_LEN+1];
 
   // if value is an empty string, just return token without value
   if (*value == '\0')

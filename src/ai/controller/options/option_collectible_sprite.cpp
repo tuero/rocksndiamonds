@@ -33,7 +33,7 @@ std::string OptionCollectibleSprite::toString() const {
 
 
 bool OptionCollectibleSprite::run() {
-
+    return true;
 }
 
 

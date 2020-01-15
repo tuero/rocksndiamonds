@@ -264,7 +264,6 @@ bool isDigable(const enginetype::GridCell cellFrom, Action directionToMove) {
  * For internal use, assumes bounds are validated elsewhere.
  */
 bool _isEmpty(const enginetype::GridCell cellTo) {
-    int element = Feld[cellTo.x][cellTo.y];
     return Feld[cellTo.x][cellTo.y] == EL_EMPTY;
 }
 

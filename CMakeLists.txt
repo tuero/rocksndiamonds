@@ -5,14 +5,27 @@ set(CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
+# C compiler flags
+set(CMAKE_C_FLAGS "-O3 -Wall -Wstrict-prototypes -Wmissing-prototypes")
+set(CMAKE_C_FLAGS_DEBUG "-g -O3 -Wall -Wstrict-prototypes -Wmissing-prototypes")
+set(CMAKE_C_FLAGS_RELEASE "-O3 -Wall -Wstrict-prototypes -Wmissing-prototypes")
 
-set(CMAKE_C_FLAGS "-O3 -Wall -Wstrict-prototypes -Wmissing-prototypes -Wno-extern-c-compat")
-set(CMAKE_C_FLAGS_DEBUG "-g -O3 -Wall -Wstrict-prototypes -Wmissing-prototypes -Wno-extern-c-compat")
-set(CMAKE_C_FLAGS_RELEASE "-O3 -Wall -Wstrict-prototypes -Wmissing-prototypes -Wno-extern-c-compat")
+# C++ compiler flags
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -g -O3")
+set(CMAKE_CXX_FLAGS_DEBUG "-Wall -Wextra -g -O3 -DDEBUG ")
+set(CMAKE_CXX_FLAGS_RELEASE "-Wall -Wextra -O3")
 
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-extern-c-compat -g -O3")
-set(CMAKE_CXX_FLAGS_DEBUG "-Wall -Wextra -Wno-extern-c-compat -g -O3 -DDEBUG ")
-set(CMAKE_CXX_FLAGS_RELEASE "-Wall -Wextra -Wno-extern-c-compat -O3")
+# Special flags for clang
+if (CMAKE_C_COMPILER_ID STREQUAL "Clang")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-extern-c-compat")
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wno-extern-c-compat")
+    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -Wno-extern-c-compat")
+endif()
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-extern-c-compat")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -Wno-extern-c-compat")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -Wno-extern-c-compat")
+endif()
 
 
 # Includes

@@ -27,7 +27,6 @@ class OptionToExit : public BaseOption {
 private:
     int item_;
     int count_;
-    enginetype::GridCell cell_;
     std::string optionStringName_ = "Path to exit: ";
 
 public:

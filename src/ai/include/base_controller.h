@@ -50,7 +50,6 @@ public:
      */
     BaseController() : 
         optionFactoryType_(OptionFactoryType::SINGLE_ACTION)
-        // availableOptions_(optionFactory_.createOptions(OptionFactoryType::SINGLE_ACTION)) 
     {}
 
     /**
@@ -62,9 +61,11 @@ public:
      */
     BaseController(OptionFactoryType optionFactoryType) : 
         optionFactoryType_(optionFactoryType)
-        // availableOptions_(optionFactory_.createOptions(optionFactoryType)) 
     {}
 
+    /**
+     * Initialize the options by asking the factory.
+     */
     void initializeOptions() {
         availableOptions_ = optionFactory_.createOptions(optionFactoryType_);
     }

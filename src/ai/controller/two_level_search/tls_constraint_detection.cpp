@@ -20,11 +20,16 @@
 #include "logger.h"
 
 
+/**
+ * Add new constraints for a given pair of options
+ * This is called during each step, and adds restrictions based on those found 
+ * from checkForMovedObjects()
+ */
 void TwoLevelSearch::addNewConstraints() {
     bool newConstraints = false;
-    for (auto const & option : availableOptions_) {
-        std::vector<enginetype::GridCell> &optionRestrictions = restrictedCellsByOption_[option];
-        for (auto const & restriction : spritesMoved[option]) {
+    for (auto const & hash : allOptionPairHashes()) {
+        std::vector<enginetype::GridCell> &optionRestrictions = restrictedCellsByOption_[hash];
+        for (auto const & restriction : spritesMoved[hash]) {
             // Add restriction if cell isn't already restricted
             bool cellRestricted = std::find(optionRestrictions.begin(), optionRestrictions.end(), restriction.cell) != optionRestrictions.end();
             if (!cellRestricted) {
@@ -39,9 +44,10 @@ void TwoLevelSearch::addNewConstraints() {
 
     // Log total changes
     int count = 0;
-    for (auto const & option : availableOptions_) {
-        count += restrictedCellsByOption_[option].size();
+    for (auto const & hash : allOptionPairHashes()) {
+        count += restrictedCellsByOption_[hash].size();
     }
+    
     PLOGE_(logger::FileLogger) << "New constraints added, total = " << count;
     PLOGE_(logger::ConsoleLogger) << "New constraints added, total = " << count;
 }
@@ -56,7 +62,9 @@ bool playerCausedSpriteMove(const enginetype::GridCell playerCell, const enginet
 
 
 /**
- * Check for newely moved objects as a result of player actions
+ * Check for newely moved objects as a result of player actions.
+ * Objects are stored as sprite and gridcell pairs for a given pair of options (option from -> option to)
+ * In addNewConstraints(), we store only the intersection of gridcells in restrictedCellsByOption_
  */
 void TwoLevelSearch::checkForMovedObjects() {
     prevPlayerCell_ = currPlayerCell_;
@@ -93,9 +101,10 @@ void TwoLevelSearch::checkForMovedObjects() {
         // Sprite is now moving on this step
         // Add if we haven't added before
         SpriteRestriction spriteRestriction = {spriteID, prevPlayerCell_};
-        bool alreadyRestricted = std::find(spritesMoved[currentOption_].begin(), spritesMoved[currentOption_].end(), spriteRestriction) != spritesMoved[currentOption_].end();
+        int hash = optionPairHash(currentOption_, previousOption_);
+        bool alreadyRestricted = std::find(spritesMoved[hash].begin(), spritesMoved[hash].end(), spriteRestriction) != spritesMoved[hash].end();
         if (!prevIsMoving_[spriteID] && currIsMoving_[spriteID] && !alreadyRestricted) {
-            spritesMoved[currentOption_].push_back(spriteRestriction);
+            spritesMoved.at(hash).push_back(spriteRestriction);
         }
     }
     

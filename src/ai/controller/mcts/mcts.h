@@ -67,7 +67,6 @@ private:
     GameState rootSavedState;
     BaseOption *currentOption_;
     BaseOption *nextOption_;
-    Action actionToSend;
     bool optionStatusFlag_ = true;
 
 

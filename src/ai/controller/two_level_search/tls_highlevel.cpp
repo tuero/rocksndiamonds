@@ -27,10 +27,9 @@
 
 // CBS
 struct NodeCBS {
-    std::unordered_map<BaseOption*, std::vector<enginetype::GridCell>> constraints;
+    std::unordered_map<int, std::vector<enginetype::GridCell>> constraints;
     int size = 0;
 };
-// auto compareNodeCBS = [] (const NodeCBS &lhs, const NodeCBS &rhs) {return lhs.constraints.size() < rhs.constraints.size();};
 
 class CompareNodeCBS {
 public:
@@ -45,7 +44,14 @@ std::unordered_map<uint64_t, PriorityQueue> openByPath;
 std::unordered_map<uint64_t, std::vector<NodeCBS>> closedByPath;
 
 
+/**
+ * Runs one iteration of CBS on the currentHighLevelPathHash.
+ * An iteration is counted as a single replay, which will use the restricted cells
+ * set in the best node in OPEN, and will insert the children nodes into OPEN for
+ * later iterations.
+ */
 void TwoLevelSearch::CBS() {
+    // Safeguard against OPEN/CLOSED not seeing the current high level path before
     if (openByPath.find(currentHighLevelPathHash) == openByPath.end()) {
         openByPath[currentHighLevelPathHash] = {};
     }
@@ -53,18 +59,18 @@ void TwoLevelSearch::CBS() {
         closedByPath[currentHighLevelPathHash] = {};
     }
 
+    // Get the OPEN/CLOSED for the given high level path
     PriorityQueue &open = openByPath[currentHighLevelPathHash];
     std::vector<NodeCBS> &closed = closedByPath[currentHighLevelPathHash];
 
 
     // Check every option in the planned path
-    for (auto const & option : highlevelPlannedPath_) {
-        // Check if it exists in known constraints
-        for (auto const & constraint : restrictedCellsByOption_[option]) {
-            bool isKnown = std::find(knownConstraints_[option].begin(), knownConstraints_[option].end(), constraint) != knownConstraints_[option].end();
+    for (auto const & hash : givenPathOptionPairHashes(highlevelPlannedPath_)) {
+        for (auto const & constraint : restrictedCellsByOption_[hash]) {
+            bool isKnown = std::find(knownConstraints_[hash].begin(), knownConstraints_[hash].end(), constraint) != knownConstraints_[hash].end();
             if (isKnown) {continue;}
 
-            knownConstraints_[option].push_back(constraint);
+            knownConstraints_[hash].push_back(constraint);
 
             // If constraint is new, we need to consider adding to any node in closed
             // This would involve knowing where the agent is before attempting this option. Doable but involved.
@@ -72,19 +78,20 @@ void TwoLevelSearch::CBS() {
             for (auto const & node : closed) {
                 // Create child with parent constraints, and add the new constraint
                 NodeCBS child = node;
-                child.constraints[option].push_back(constraint);
+                child.constraints[hash].push_back(constraint);
                 child.size += 1;
                 open.push(child);
             }
         }
     }
 
+
     // If first time running, we need to set initial node
     if (open.empty() && closed.empty()) {
-        PLOGE_(logger::ConsoleLogger) << "Setting first node";
-        std::unordered_map<BaseOption*, std::vector<enginetype::GridCell>> constraints;
-        for (auto const & option : highlevelPlannedPath_) {
-            constraints[option] = {};
+        PLOGD_(logger::ConsoleLogger) << "Setting first node";
+        std::unordered_map<int, std::vector<enginetype::GridCell>> constraints;
+        for (auto const & hash : givenPathOptionPairHashes(highlevelPlannedPath_)) {
+            constraints[hash] = {};
         }
         open.push((NodeCBS){constraints, 0});
     }
@@ -101,21 +108,22 @@ void TwoLevelSearch::CBS() {
     closed.push_back(P);
 
     // Set constraints from P for each node in high level
-    for (auto const & option : highlevelPlannedPath_) {
-        option->setRestrictedCells(P.constraints[option]);
+    int index = 0;
+    for (auto const & hash : givenPathOptionPairHashes(highlevelPlannedPath_)) {
+        highlevelPlannedPath_[index++]->setRestrictedCells(P.constraints[hash]);
     }
+
 
     // The actual path validation will happen real time by controller. 
     // Here we just go ahead and add children to OPEN. If path is solved then we won't reenter.
     // Children inherit all constraints from parent, and add one single constraint.
-    for (auto const & option : highlevelPlannedPath_) {
-        std::vector<enginetype::GridCell> &knownConstraitsForOption = knownConstraints_[option];
-        // Look over all known constraints for the option
+    for (auto const & hash : givenPathOptionPairHashes(highlevelPlannedPath_)) {
+        std::vector<enginetype::GridCell> &knownConstraitsForOption = knownConstraints_[hash];
         for (auto const & constraint : knownConstraitsForOption) {
             // If node currently doesn't have this constraint, create child for it
-            if (std::find(P.constraints[option].begin(), P.constraints[option].end(), constraint) == P.constraints[option].end()) {
+            if (std::find(P.constraints[hash].begin(), P.constraints[hash].end(), constraint) == P.constraints[hash].end()) {
                 NodeCBS child = P;
-                child.constraints[option].push_back(constraint);
+                child.constraints[hash].push_back(constraint);
                 child.size += 1;
                 open.push(child);
             }
@@ -124,7 +132,18 @@ void TwoLevelSearch::CBS() {
 }
 
 
-// Put in highlevel
+void TwoLevelSearch::LevinTS() {
+    // Find each path and calculate path costs
+    // Flip coin at each step
+    highlevelPlannedPath_.clear();
+}
+
+
+/**
+ * Check and add new constraints found in previous searches, then
+ * find the next high level path to try. Once the path is found, the
+ * low level path algorithm is called.
+ */
 void TwoLevelSearch::highLevelSearch() {
     // Add new constraints found from previous attempt
     addNewConstraints();
@@ -141,14 +160,11 @@ void TwoLevelSearch::highLevelSearch() {
 }
 
 
-void TwoLevelSearch::LevinTS() {
-    // Find each path and calculate path costs
-    // Flip coin at each step
-
-    highlevelPlannedPath_.clear();
-}
-
-
+/**
+ * Find the path of high level options which corresponds to the collectible sprites
+ * in order of (row, col), with the exit at the end. This is a deterministic path
+ * that never changes, good for testing sanity.
+ */
 void TwoLevelSearch::highLevelSearchGemsInOrder() {
     // Clear current solution
     highlevelPlannedPath_.clear();
@@ -167,109 +183,5 @@ void TwoLevelSearch::highLevelSearchGemsInOrder() {
     // Path is to visit each gem in order, then exit
     for (auto const & option : availableOptions_) {
         highlevelPlannedPath_.push_back(option);
-    }
-}
-
-
-void TwoLevelSearch::smartAStar() {
-    HighLevelNode startNode = {nullptr, nullptr, nullptr, 0, (double)enginehelper::getLevelRemainingGemsNeeded()};
-
-    // Search data structures
-    std::unordered_map<BaseOption*, HighLevelNode> open;
-    std::unordered_map<BaseOption*, HighLevelNode> closed;
-
-    // Initialize with start node
-    open[startNode.id] = startNode;
-
-    while (!open.empty()) {
-        // Pull next node and update data structures
-        HighLevelNode node = {nullptr, nullptr, nullptr, std::numeric_limits<float>::lowest(), 0};
-        for (auto it = open.begin(); it != open.end(); ++it) {
-            if (it->second.g + it->second.h > node.g + node.h) {
-                node = it->second;
-            }
-        }
-
-        if (node.g == std::numeric_limits<float>::lowest()) {
-            PLOGE_(logger::ConsoleLogger) << "Cannot find a node to pull";
-            break;
-        }
-
-        open.erase(node.id);
-        closed[node.id] = node;
-
-        PLOGD_(logger::ConsoleLogger) << "Pulling option: " << (node.option == nullptr ? "Root" : node.option->toString());
-
-        // Goal condition check
-        // Goal is if we reach the exit
-        if (node.option && node.option->getOptionType() == OptionType::ToExit) {
-            PLOGD_(logger::ConsoleLogger) << "Found solution.";
-            highlevelPlannedPath_.clear();
-            while(node.id) {
-                highlevelPlannedPath_.push_front(node.option);
-                node = closed[node.parentId];
-            }
-            return;
-        }
-
-        // Expand children (each option)
-        for (auto const & option : availableOptions_) {
-            double dg = enginehelper::getLevelRemainingGemsNeeded();
-            
-            // if an option is not valid, then we skip
-            // OptionToExit -> Must have enough gems collected in history
-            if (option->getOptionType() == OptionType::ToExit) {
-                HighLevelNode current = node;
-                int gemsNeeded = enginehelper::getLevelRemainingGemsNeeded();
-                while (current.id) {
-                    if (current.option->getOptionType() == OptionType::ToCollectibleSprite) {
-                        enginetype::GridCell cell = enginehelper::getSpriteGridCell(current.option->getSpriteID());
-                        gemsNeeded -= enginehelper::getItemGemCount(cell);
-                    }
-                    current = closed[current.parentId];
-                }
-                // If not enough diamonds were collected in our path, then we cannot go to exit
-                if (gemsNeeded > 0) {continue;}
-            }
-            // OptionCollectibleSprite -> Must have not previously collected the item
-            else if (option->getOptionType() == OptionType::ToCollectibleSprite) {
-                HighLevelNode current = node;
-                int spriteId = option->getSpriteID();
-                dg = enginehelper::getItemGemCount(enginehelper::getSpriteGridCell(spriteId));
-                bool hasSeen = false;
-                while (current.id) {
-                    // We have collected this collectible previously
-                    if (current.option->getOptionType() == OptionType::ToCollectibleSprite && current.option->getSpriteID() == spriteId) {
-                        hasSeen = true;
-                        break;
-                    }
-                    current = closed[current.parentId];
-                }
-                if (hasSeen) {continue;}
-            }
-            // Otherwise we don't know how to handle
-            else {
-                continue;
-            }
-
-            PLOGD_(logger::ConsoleLogger) << "Expanding option: " << option->toString();
-
-            double newG = node.g + dg;
-            double h = std::max(enginehelper::getLevelRemainingGemsNeeded() - newG, 0.0);
-
-            // Node generated but not expanded
-            if (open.find(option) != open.end()) {
-                // Check if new path cheaper
-                if (open[option].g > newG) {continue;}
-                open.erase(option);
-            }
-            // Node already expanded
-            else if (closed.find(option) != closed.end()) {
-                // Check if new path cheaper
-                if (closed[option].g > newG) {continue;}
-                closed.erase(option);
-            }
-            open[option] = {option, node.id, option, newG, h};
-        }
     }
 }

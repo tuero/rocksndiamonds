@@ -16,7 +16,10 @@
 #include "logger.h"
 
 
-void TwoLevelSearch::logPath(const std::deque<enginetype::GridCell> &path) {
+/**
+ * Log the given path of gridcells.
+ */
+void TwoLevelSearch::logPath(const std::vector<enginetype::GridCell> &path) {
     std::string msg;
     for (auto const & cell : path) {
         msg += "{" + std::to_string(cell.x) + ", " + std::to_string(cell.y) + "}, ";
@@ -26,6 +29,9 @@ void TwoLevelSearch::logPath(const std::deque<enginetype::GridCell> &path) {
 }
 
 
+/**
+ * Log all the available options the controller has access to.
+ */
 void TwoLevelSearch::logAvailableOptions() {
     PLOGD_(logger::ConsoleLogger) << "Number of options: " << availableOptions_.size();
     PLOGD_(logger::FileLogger) << "Number of options: " << availableOptions_.size();
@@ -36,6 +42,9 @@ void TwoLevelSearch::logAvailableOptions() {
 }
 
 
+/**
+ * Log the set high level path of options.
+ */
 void TwoLevelSearch::logHighLevelPath() {
     PLOGI_(logger::ConsoleLogger) << "Solution length: " << highlevelPlannedPath_.size();
     PLOGI_(logger::FileLogger) << "Solution length: " << highlevelPlannedPath_.size();
@@ -45,15 +54,22 @@ void TwoLevelSearch::logHighLevelPath() {
     }
 }
 
+
+/**
+ * Log all the restricted cells found thus far for each pair of options.
+ */
 void TwoLevelSearch::logRestrictedSprites() {
     PLOGD_(logger::ConsoleLogger) << "Cells with restrictions: " << highlevelPlannedPath_.size();
     PLOGD_(logger::FileLogger) << "Cells with restrictions: " << highlevelPlannedPath_.size();
-    for (auto const & option : availableOptions_) {
-        PLOGD_(logger::ConsoleLogger) << "Restrictions for option: " << option->toString();
-        PLOGD_(logger::FileLogger) << "Restrictions for option: " << option->toString();
-        for (auto const & constraint : spritesMoved[option]) {
-            PLOGD_(logger::ConsoleLogger) << "sprite " << constraint.spriteID 
-            << ", x = " << constraint.cell.x << ", y = " << constraint.cell.y ;
+    for (auto const & hash : allOptionPairHashes()) {
+        OptionIndexPair optionIndexPair = hashToOptionIndexPair(hash);
+        if (optionIndexPair[0] == optionIndexPair[1]) {
+            PLOGD_(logger::FileLogger) << "Restrictions for root to option " << availableOptions_[optionIndexPair[0]]->toString();
+        } else {
+            PLOGD_(logger::FileLogger) << "Restrictions for option " << availableOptions_[optionIndexPair[0]]->toString() 
+            << " to option " << availableOptions_[optionIndexPair[1]]->toString();
+        }
+        for (auto const & constraint : spritesMoved[hash]) {
             PLOGD_(logger::FileLogger) << "sprite " << constraint.spriteID 
             << ", x = " << constraint.cell.x << ", y = " << constraint.cell.y ;
         }

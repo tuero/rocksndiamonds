@@ -130,7 +130,7 @@ void GameState::setFromEngineState() {
     memcpy(WasJustFalling_, WasJustFalling, sizeof (short) * MAX_LEV_FIELDX * MAX_LEV_FIELDY);
     memcpy(CheckCollision_, CheckCollision, sizeof (short) * MAX_LEV_FIELDX * MAX_LEV_FIELDY);
     memcpy(CheckImpact_, CheckImpact, sizeof (short) * MAX_LEV_FIELDX * MAX_LEV_FIELDY);
-    memcpy(AmoebaNr_, AmoebaNr_, sizeof (short) * MAX_LEV_FIELDX * MAX_LEV_FIELDY);
+    memcpy(AmoebaNr_, AmoebaNr, sizeof (short) * MAX_LEV_FIELDX * MAX_LEV_FIELDY);
     memcpy(ExplodeField_, ExplodeField, sizeof (short) * MAX_LEV_FIELDX * MAX_LEV_FIELDY);
     memcpy(ExplodePhase_, ExplodePhase, sizeof (short) * MAX_LEV_FIELDX * MAX_LEV_FIELDY);
     memcpy(ExplodeDelay_, ExplodeDelay, sizeof (short) * MAX_LEV_FIELDX * MAX_LEV_FIELDY);

@@ -21,6 +21,7 @@
 // Includes
 #include "logger.h"
 
+
 /**
  * Convey any important details about the controller in string format.
  */
@@ -29,6 +30,9 @@ std::string TwoLevelSearch::controllerDetailsToString() {
 }
 
 
+/**
+ * 
+ */
 void TwoLevelSearch::resetOptions() {
     if (highlevelPlannedPath_.empty()) {
         availableOptions_ = optionFactory_.createOptions(optionFactoryType_);
@@ -40,19 +44,18 @@ void TwoLevelSearch::resetOptions() {
  * Handle necessary items before the level gets restarted.
  */
 void TwoLevelSearch::handleLevelRestartBefore() {
-    // If we fail, we need to remember to save the state 
-    // for the path we were just attempting
-    AbstractGameState state;
-    state.setFromEngineState();
-    storedPathStates_[hash] = state;
+    
 }
 
 
+/**
+ * Initializations which need to occur BOTH on first level start
+ * and on every level restart after a failure.
+ */
 void TwoLevelSearch::initializationForEveryLevelStart() {
     requestReset_ = false;
     solutionIndex_ = -1;
     optionStatusFlag_ = true;
-    lowlevelPlannedPath_.clear();
 
     // Player tracking for constraint detection
     prevPlayerCell_ = {-1, -1};
@@ -60,15 +63,12 @@ void TwoLevelSearch::initializationForEveryLevelStart() {
     prevIsMoving_.clear();
     currIsMoving_.clear();
 
-    hash = 0;
-
     highLevelSearch();
 }
 
 
 /**
  * Handle necessary items after the level gets restarted.
- *  
  */
 void TwoLevelSearch::handleLevelRestartAfter() {
     initializationForEveryLevelStart();
@@ -84,23 +84,15 @@ void TwoLevelSearch::handleLevelRestartAfter() {
 void TwoLevelSearch::handleLevelStart() {
     logAvailableOptions();
 
-    // Empty sprites 
+    // Clear and intialize data structures
     currSprites_.clear();
     spritesMoved.clear();
-    for (auto const & option : availableOptions_) {
-        spritesMoved[option] = {};
-    }
-
-    // Empty restrictions
-    // !<TODO> rename to all constraints
     restrictedCellsByOption_.clear();
-    for (auto const & option : availableOptions_) {
-        restrictedCellsByOption_[option] = {};
-    }
-
     knownConstraints_.clear();
-    for (auto const & option : availableOptions_) {
-        knownConstraints_[option] = {};
+    for (auto const & hash : allOptionPairHashes()) {
+        spritesMoved[hash] = {};
+        restrictedCellsByOption_[hash] = {};
+        knownConstraints_[hash] = {};
     }
 
     initializationForEveryLevelStart();
@@ -132,6 +124,7 @@ Action TwoLevelSearch::getAction() {
     if (optionStatusFlag_) {
         // Get next option and set restricted cells
         solutionIndex_ += 1;
+        previousOption_ = (solutionIndex_ == 0) ? highlevelPlannedPath_[solutionIndex_] : currentOption_;
         currentOption_ = highlevelPlannedPath_[solutionIndex_];
         optionStatusFlag_ = false;
 

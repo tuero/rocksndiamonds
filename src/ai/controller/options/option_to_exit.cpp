@@ -31,7 +31,7 @@ std::string OptionToExit::toString() const {
 
 
 bool OptionToExit::run() {
-
+    return true;
 }
 
 

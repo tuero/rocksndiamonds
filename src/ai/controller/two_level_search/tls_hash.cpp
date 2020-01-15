@@ -12,6 +12,7 @@
 #include "two_level_search.h"
 
 // Standard Libary/STL
+#include <vector>
 #include <algorithm>
 #include <iterator>
 
@@ -19,6 +20,47 @@
 #include "logger.h"
 
 
+/**
+ * Create hash for all pairs of options.
+ */
+std::vector<int> TwoLevelSearch::allOptionPairHashes() {
+    std::vector<int> optionPairHashes;
+    for (int i = 0; i < (int)availableOptions_.size(); i++) {
+        for (int j = 0; j < (int)availableOptions_.size(); j++) {
+            optionPairHashes.push_back(optionIndexPairToHash(i, j));
+        }
+    }
+    return optionPairHashes;
+}
+
+
+/**
+ * Create a hash for the given pair of options. 
+ */
+int TwoLevelSearch::optionPairHash(BaseOption *currOption, BaseOption *prevOption) {
+    int indexCurr = std::distance(availableOptions_.begin(), std::find(availableOptions_.begin(), availableOptions_.end(), currOption));
+    int indexPrev = std::distance(availableOptions_.begin(), std::find(availableOptions_.begin(), availableOptions_.end(), prevOption));
+    return optionIndexPairToHash(indexCurr, indexPrev);
+}
+
+
+/**
+ * Create a hash for each pair of a given path of options. 
+ */
+std::vector<int> TwoLevelSearch::givenPathOptionPairHashes(std::vector<BaseOption*> path) {
+    std::vector<int> optionPairHashes;
+    for (int i = 0; i < (int) path.size(); i++) {
+        int j = (i == 0) ? i : i - 1;
+        optionPairHashes.push_back(optionPairHash(path[i], path[j]));
+    }
+    return optionPairHashes;
+}
+
+
+/**
+ * Create a hash for a given pair of indices for the master list of options availableOptions_.
+ * Hash value is the string concatenation of the 2 indices.
+ */
 int TwoLevelSearch::optionIndexPairToHash(int indexCurr, int indexPrev) {
     // indexCurr should always be a valid index in availableOptions_.
     if (indexCurr < 0 || indexCurr >= (int)availableOptions_.size()) {
@@ -26,27 +68,40 @@ int TwoLevelSearch::optionIndexPairToHash(int indexCurr, int indexPrev) {
     }
 
     // indexCurr is the first option being executed.
-    if (indexPrev == -1) {return indexCurr;}
+    if (indexCurr == indexPrev) {return (uint64_t)indexCurr;}
 
     int multiplier = 10;
     while (multiplier < (int)availableOptions_.size()) {
         multiplier *= 10;
     }
 
-    return (indexCurr * multiplier) + indexPrev;
+    return ((indexCurr + 1) * multiplier) + indexPrev;
 }
 
 
+/**
+ * Get a pair of options represented by the given hash.
+ */
 TwoLevelSearch::OptionIndexPair TwoLevelSearch::hashToOptionIndexPair(int hash) {
-    OptionIndexPair optionPair;
+    if (hash < (int)availableOptions_.size()) {
+        return {hash, hash};
+    }
 
-    return optionPair;
+    int multiplier = 10;
+    while (multiplier < (int)availableOptions_.size()) {
+        multiplier *= 10;
+    }
+
+    return {(hash / multiplier) - 1, hash % multiplier};
 }
 
 
-uint64_t TwoLevelSearch::optionPathToHash(std::deque<BaseOption*> path) {
+/**
+ * Create a hash for a given path.
+ * This hash represents all options in order in the path (can be more than 2)
+ */
+uint64_t TwoLevelSearch::optionPathToHash(std::vector<BaseOption*> path) {
     uint64_t hash = 0;
-    // uint64_t pow = 10;
     uint64_t multiplier = 10;
     while (multiplier < (uint64_t)availableOptions_.size()) {
         multiplier *= 10;
@@ -55,89 +110,8 @@ uint64_t TwoLevelSearch::optionPathToHash(std::deque<BaseOption*> path) {
         // Get option index
         auto iter = std::find(availableOptions_.begin(), availableOptions_.end(), option);
         uint64_t index = std::distance(availableOptions_.begin(), iter);
-        // while (index >= pow) {pow *= 10;}
-        // hash = (hash * pow) + index;
         hash = (hash * multiplier) + index;
     }
 
     return hash;
-}
-
-
-void TwoLevelSearch::findUnseenPath() {
-    AbstractGameState current;
-    current.setFromEngineState();
-
-    //Continue until we have a set of restrictions which results in paths not seen before
-    while (true) {
-        current.restoreEngineState();
-        // setNewRestrictions();
-
-        // Set restrictions, generate paths by A* and check if attempted before
-        bool flag = true;
-        for (std::size_t i = 0; i < highlevelPlannedPath_.size(); i++) {
-            BaseOption *option = highlevelPlannedPath_[i];
-            
-            // Set restricted cells and run A*
-            // option->setRestrictedCells(restrictedCellsByOption_[i]);
-            option->runAStar(enginehelper::getPlayerPosition(), enginehelper::getSpriteGridCell(option->getSpriteID()));
-            std::deque<enginetype::GridCell> optionhighlevelPlannedPath_ = option->getSolutionPath();
-
-            // An empty path implies there was a failure when attempting, so we can auto skip
-            if (optionhighlevelPlannedPath_.empty()) {break;}
-
-            // Always add player starting position, (this may no longer be needed as empty case handled above)
-            optionhighlevelPlannedPath_.push_front(enginehelper::getPlayerPosition());
-            
-            // Hash the path and check if we have seen before
-            uint64_t innerHash = enginehelper::gridcellPathToHash(optionhighlevelPlannedPath_);
-            if (storedPathStates_.find(innerHash) == storedPathStates_.end()) {
-                flag = false;
-                PLOGE_(logger::ConsoleLogger) << "Path not in map " << innerHash << " " << option->toString();
-                PLOGE_(logger::FileLogger) << "Path not in map " << innerHash << " " << option->toString();
-                logPath(optionhighlevelPlannedPath_);
-                break;
-            }
-
-            PLOGD_(logger::ConsoleLogger) << "Path in map " << innerHash << " " << option->toString();
-            PLOGD_(logger::FileLogger) << "Path in map " << innerHash << " " << option->toString();
-            logPath(optionhighlevelPlannedPath_);
-            
-            // Set engine state so we can correctly test next option path
-            storedPathStates_[innerHash].restoreEngineState();
-        }
-
-        // If flag is true, then complete path has been tested before
-        current.restoreEngineState();
-        if (!flag) {break;}
-
-        PLOGD_(logger::ConsoleLogger) << "Skipping restriction permutation";
-        PLOGD_(logger::FileLogger) << "Skipping restriction permutation";
-    }
-}
-
-
-void TwoLevelSearch::saveCurrentPathHash() {
-    // hash is initial path taken from option which just finished
-    // We save the state after path complete for the initial path
-    if (hash != 0 && storedPathStates_.find(hash) == storedPathStates_.end()) {
-        AbstractGameState state;
-        state.setFromEngineState();
-        PLOGD_(logger::FileLogger) << "Adding new hash " << hash;
-        logPath(lowlevelPlannedPath_);
-        storedPathStates_[hash] = state;
-    }
-
-    // Get initial path that the new option wants to run
-    currentOption_->runAStar(enginehelper::getPlayerPosition(), enginehelper::getSpriteGridCell(currentOption_->getSpriteID()));
-    lowlevelPlannedPath_ = currentOption_->getSolutionPath();
-    lowlevelPlannedPath_.push_front(enginehelper::getPlayerPosition());
-
-    // Set hash for the proposed path, set resulting state once this option is complete
-    hash = enginehelper::gridcellPathToHash(lowlevelPlannedPath_);
-    if (storedPathStates_.find(hash) == storedPathStates_.end()) {
-        PLOGD_(logger::ConsoleLogger) << "Adding new hash " << hash;
-        PLOGD_(logger::FileLogger) << "Adding new hash " << hash;
-        logPath(lowlevelPlannedPath_);
-    }
 }
