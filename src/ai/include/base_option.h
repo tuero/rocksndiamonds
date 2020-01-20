@@ -16,6 +16,7 @@
 #include <string>
 #include <ostream>
 #include <deque>
+#include <unordered_set>
 #include <vector>
 
 // Option type enum
@@ -148,6 +149,13 @@ public:
      * @param restrictedCells A vector of restricted cells.
      */
     void setRestrictedCells(std::vector<enginetype::GridCell> &restrictedCells);
+
+    /**
+     * Set the restricted cells.
+     * 
+     * @param restrictedCells A set of restricted cells indices.
+     */
+    void setRestrictedCells(std::unordered_set<int> &restrictedCells);
 
     /**
      * Get the list of restricted cells.

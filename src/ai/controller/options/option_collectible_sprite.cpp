@@ -66,6 +66,7 @@ bool OptionCollectibleSprite::getNextAction(Action &action) {
 
 
 bool OptionCollectibleSprite::isValid() {
+    goalCell_ = enginehelper::getSpriteGridCell(spriteID_);
     runAStar();
     return !(solutionPath_.empty() && enginehelper::isPlayerDoneAction());
 }

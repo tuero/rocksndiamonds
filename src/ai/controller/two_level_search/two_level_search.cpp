@@ -30,12 +30,31 @@ std::string TwoLevelSearch::controllerDetailsToString() {
 }
 
 
+void TwoLevelSearch::initializeOptions() {
+    availableOptions_ = optionFactory_.createOptions(optionFactoryType_);
+
+    multiplier_ = 10;
+    while (multiplier_ < (uint64_t)availableOptions_.size()) {
+        multiplier_ *= 10;
+    }
+    PLOGI_(logger::FileLogger) << "Multiplier used for hashing: " << multiplier_;
+    PLOGI_(logger::ConsoleLogger) << "Multiplier used for hashing: " << multiplier_;
+}
+
+
 /**
  * 
  */
 void TwoLevelSearch::resetOptions() {
     if (highlevelPlannedPath_.empty()) {
         availableOptions_ = optionFactory_.createOptions(optionFactoryType_);
+
+        multiplier_ = 10;
+        while (multiplier_ < (uint64_t)availableOptions_.size()) {
+            multiplier_ *= 10;
+        }
+        PLOGI_(logger::FileLogger) << "Multiplier used for hashing: " << multiplier_;
+        PLOGI_(logger::ConsoleLogger) << "Multiplier used for hashing: " << multiplier_;
     }
 }
 
@@ -63,7 +82,10 @@ void TwoLevelSearch::initializationForEveryLevelStart() {
     prevIsMoving_.clear();
     currIsMoving_.clear();
 
+    PLOGD_(logger::FileLogger) << "------------------------";
     highLevelSearch();
+    logHighLevelPath();
+    logRestrictedSprites();
 }
 
 
@@ -85,6 +107,9 @@ void TwoLevelSearch::handleLevelStart() {
     logAvailableOptions();
 
     // Clear and intialize data structures
+    newSpriteFoundFlag_ = true;
+    newConstraintFoundFlag_ = true;
+    hashPathTimesVisited.clear();
     currSprites_.clear();
     spritesMoved.clear();
     restrictedCellsByOption_.clear();
@@ -98,10 +123,10 @@ void TwoLevelSearch::handleLevelStart() {
     initializationForEveryLevelStart();
 
     // Log high level macro option path
-    logHighLevelPath();
+    // logHighLevelPath();
 
     // Log restricted sprites
-    logRestrictedSprites();
+    // logRestrictedSprites();
 }
 
 
@@ -110,8 +135,8 @@ void TwoLevelSearch::handleLevelStart() {
  */
 Action TwoLevelSearch::getAction() {
     // Set currentOption to the option we want to use
-    PLOGD_(logger::ConsoleLogger) << "Solution index: " << solutionIndex_  << ", solution size: "  << highlevelPlannedPath_.size();
-    PLOGD_(logger::FileLogger) << "Solution index: " << solutionIndex_  << ", solution size: "  << highlevelPlannedPath_.size();
+    // PLOGD_(logger::ConsoleLogger) << "Solution index: " << solutionIndex_  << ", solution size: "  << highlevelPlannedPath_.size();
+    // PLOGD_(logger::FileLogger) << "Solution index: " << solutionIndex_  << ", solution size: "  << highlevelPlannedPath_.size();
 
     // We don't have any more options...
     if (solutionIndex_ >= (int)highlevelPlannedPath_.size()) {
@@ -128,14 +153,14 @@ Action TwoLevelSearch::getAction() {
         currentOption_ = highlevelPlannedPath_[solutionIndex_];
         optionStatusFlag_ = false;
 
-        PLOGI_(logger::FileLogger) << "Next option to execute: " << currentOption_->toString();
-        PLOGI_(logger::ConsoleLogger) << "Next option to execute: " << currentOption_->toString();
+        PLOGD_(logger::FileLogger) << "Next option to execute: " << currentOption_->toString();
+        PLOGD_(logger::ConsoleLogger) << "Next option to execute: " << currentOption_->toString();
 
-        PLOGI_(logger::FileLogger) << "Option restrictions: ";
-        PLOGI_(logger::ConsoleLogger) << "Option restrictions: ";
+        PLOGD_(logger::FileLogger) << "Option restrictions: ";
+        PLOGD_(logger::ConsoleLogger) << "Option restrictions: ";
         for (auto const & restriction : currentOption_->getRestrictedCells()) {
-            PLOGI_(logger::FileLogger) << "x=" << restriction.x << ", y=" << restriction.y;
-            PLOGI_(logger::ConsoleLogger) << "x=" << restriction.x << ", y=" << restriction.y;
+            PLOGD_(logger::FileLogger) << "x=" << restriction.x << ", y=" << restriction.y;
+            PLOGD_(logger::ConsoleLogger) << "x=" << restriction.x << ", y=" << restriction.y;
         }
 
         // Hash the planned path and save for future duplicate detection
@@ -143,8 +168,8 @@ Action TwoLevelSearch::getAction() {
 
         // If option is not valid, we cannot progress further, and so set request reset flag
         if (!currentOption_->isValid()) {
-            PLOGI_(logger::FileLogger) << "Option invalid, requesting reset";
-            PLOGI_(logger::ConsoleLogger) << "Option invalid, requesting reset";
+            PLOGD_(logger::FileLogger) << "Option invalid, requesting reset";
+            PLOGD_(logger::ConsoleLogger) << "Option invalid, requesting reset";
             requestReset_ = true;
         }
     }

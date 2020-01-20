@@ -97,10 +97,7 @@ int getLevelNumber() {
  * Restart the level.
  * Game is reinitialized using the current loaded level.
  */
-void restartLevel() {
-    PLOGI_(logger::FileLogger) << "Restarting level: " << getLevelNumber();
-    PLOGI_(logger::ConsoleLogger) << "Restarting level: " << getLevelNumber();
-    
+void restartLevel() {    
     InitGame();
     initSpriteIDs();
 }

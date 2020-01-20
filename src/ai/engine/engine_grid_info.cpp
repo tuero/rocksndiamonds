@@ -45,6 +45,18 @@ int cellToIndex(const enginetype::GridCell &cell) {
 
 
 /**
+ * Convert a flat index into a gridcell.
+ */
+enginetype::GridCell indexToCell(int index) {
+    const enginetype::GridCell invalidCell = {-1, -1};
+    if (index == -1) {return invalidCell;}
+    int x = index % getLevelWidth();
+    int y = index / getLevelWidth();
+    return (x >= getLevelWidth() || y >= getLevelHeight()) ? invalidCell : (enginetype::GridCell ){x, y};
+}
+
+
+/**
  * Checks if a given cell contains a valid sprite.
  * For internal use when bound-check is implicitly done.
  */

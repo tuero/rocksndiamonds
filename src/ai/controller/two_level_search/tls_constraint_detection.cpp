@@ -20,27 +20,68 @@
 #include "logger.h"
 
 
+bool TwoLevelSearch::newConstraintSeen(std::vector<BaseOption*> &optionPath) {
+    // Check every option in the planned path
+    bool flag = false;
+    for (auto const & hash : givenPathOptionPairHashes<std::vector<BaseOption*>>(optionPath)) {
+        // if (newConstraintsAdded_[hash] = true) {return true;}
+        for (auto const & constraint : restrictedCellsByOption_[hash]) {
+            if (knownConstraints_[hash].find(constraint) == knownConstraints_[hash].end()) {
+                flag = true;
+            }
+        }
+    }
+
+    return flag;
+}
+
+
+template<typename T>
+int TwoLevelSearch::restrictionCountForPath(const T &pathContainer) {
+    int count = 0;
+    for (auto const & pairHash : givenPathOptionPairHashes(pathContainer)) {
+        count += (int)restrictedCellsByOption_[pairHash].size();
+    }
+    return count;
+}
+template int TwoLevelSearch::restrictionCountForPath<std::vector<BaseOption*>> (const std::vector<BaseOption*>&);
+template int TwoLevelSearch::restrictionCountForPath<std::deque<BaseOption*>> (const std::deque<BaseOption*>&);
+
+
 /**
  * Add new constraints for a given pair of options
  * This is called during each step, and adds restrictions based on those found 
  * from checkForMovedObjects()
  */
 void TwoLevelSearch::addNewConstraints() {
+    PLOGD_(logger::FileLogger) << "Adding new constraints.";
     bool newConstraints = false;
     for (auto const & hash : allOptionPairHashes()) {
-        std::vector<enginetype::GridCell> &optionRestrictions = restrictedCellsByOption_[hash];
+        newConstraintsAdded_[hash] = false;
+        // std::vector<enginetype::GridCell> &optionRestrictions = restrictedCellsByOption_[hash];
         for (auto const & restriction : spritesMoved[hash]) {
             // Add restriction if cell isn't already restricted
-            bool cellRestricted = std::find(optionRestrictions.begin(), optionRestrictions.end(), restriction.cell) != optionRestrictions.end();
-            if (!cellRestricted) {
+            int index = enginehelper::cellToIndex(restriction.cell);
+            if (restrictedCellsByOption_[hash].find(index) == restrictedCellsByOption_[hash].end()) {
                 newConstraints = true;
-                optionRestrictions.push_back(restriction.cell);
+                newConstraintFoundFlag_ = true;
+                restrictedCellsByOption_[hash].insert(index);
+                newConstraintsAdded_[hash] = true;
             }
+            // bool cellRestricted = std::find(optionRestrictions.begin(), optionRestrictions.end(), restriction.cell) != optionRestrictions.end();
+            // if (!cellRestricted) {
+            //     newConstraints = true;
+            //     newConstraintFoundFlag_ = true;
+            //     optionRestrictions.push_back(restriction.cell);
+            // }
         }
     }
 
     // No new constraints added
-    if (!newConstraints) {return;}
+    if (!newConstraints) {
+        PLOGD_(logger::FileLogger) << "No new constraints found.";
+        return;
+    }
 
     // Log total changes
     int count = 0;
@@ -48,11 +89,14 @@ void TwoLevelSearch::addNewConstraints() {
         count += restrictedCellsByOption_[hash].size();
     }
     
-    PLOGE_(logger::FileLogger) << "New constraints added, total = " << count;
-    PLOGE_(logger::ConsoleLogger) << "New constraints added, total = " << count;
+    PLOGD_(logger::FileLogger) << "New constraints added, total = " << count;
+    PLOGD_(logger::ConsoleLogger) << "New constraints added, total = " << count;
 }
 
 
+/**
+ * Checks if the player is beside or below right/left of the given sprite cell.
+ */
 bool playerCausedSpriteMove(const enginetype::GridCell playerCell, const enginetype::GridCell spriteCell) {
     bool isBelow = (playerCell.y - spriteCell.y == 1 && playerCell.x - spriteCell.x == 0);
     bool isBelowLeft = (playerCell.y - spriteCell.y == 1 && playerCell.x - spriteCell.x == -1);
@@ -101,10 +145,11 @@ void TwoLevelSearch::checkForMovedObjects() {
         // Sprite is now moving on this step
         // Add if we haven't added before
         SpriteRestriction spriteRestriction = {spriteID, prevPlayerCell_};
-        int hash = optionPairHash(currentOption_, previousOption_);
+        uint64_t hash = optionPairHash(currentOption_, previousOption_);
         bool alreadyRestricted = std::find(spritesMoved[hash].begin(), spritesMoved[hash].end(), spriteRestriction) != spritesMoved[hash].end();
         if (!prevIsMoving_[spriteID] && currIsMoving_[spriteID] && !alreadyRestricted) {
             spritesMoved.at(hash).push_back(spriteRestriction);
+            newSpriteFoundFlag_ = true;
         }
     }
     

@@ -66,7 +66,7 @@ public:
     /**
      * Initialize the options by asking the factory.
      */
-    void initializeOptions() {
+    virtual void initializeOptions() {
         availableOptions_ = optionFactory_.createOptions(optionFactoryType_);
     }
 

@@ -209,6 +209,34 @@ bool isExitClosing(const enginetype::GridCell cell) {
     return item == EL_EXIT_CLOSING;
 }
 
+bool isKey(const enginetype::GridCell cell) {
+    int item = getGridElement(cell);
+    return IS_KEY(item);
+}
+
+
+bool isGate(const enginetype::GridCell cell) {
+    int item = getGridElement(cell);
+    return IS_GATE(item);
+}
+
+bool isGateOpen(const enginetype::GridCell cell) {
+    int item = getGridElement(cell);
+    return  (IS_RND_GATE(item) && stored_player[0].key[RND_GATE_NR(item)]) ||
+            (IS_RND_GATE_GRAY(item) && stored_player[0].key[RND_GATE_GRAY_NR(item)]) ||
+            (IS_RND_GATE_GRAY_ACTIVE(item) && stored_player[0].key[RND_GATE_GRAY_ACTIVE_NR(item)]) ||
+            (IS_EM_GATE(item) && stored_player[0].key[EM_GATE_NR(item)]) ||
+            (IS_EM_GATE_GRAY(item) && stored_player[0].key[EM_GATE_GRAY_NR(item)]) ||
+            (IS_EM_GATE_GRAY_ACTIVE(item) && stored_player[0].key[EM_GATE_GRAY_ACTIVE_NR(item)]) ||
+            (IS_EMC_GATE(item) && stored_player[0].key[EMC_GATE_NR(item)]) ||
+            (IS_EMC_GATE_GRAY(item) && stored_player[0].key[EMC_GATE_GRAY_NR(item)]) ||
+            (IS_EMC_GATE_GRAY_ACTIVE(item) && stored_player[0].key[EMC_GATE_GRAY_ACTIVE_NR(item)]);
+}
+
+bool isGateClosed(const enginetype::GridCell cell) {
+    return !isGateOpen(cell);
+}
+
 
 /**
  * Check if given gridcell is accessible by moving in the given direction.

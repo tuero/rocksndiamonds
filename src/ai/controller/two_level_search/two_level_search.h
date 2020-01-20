@@ -15,9 +15,11 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <unordered_set>
 #include <array>
 #include <queue>
 #include <algorithm>
+#include <cmath>                // pow
 
 // Includes
 #include "base_controller.h"
@@ -32,13 +34,17 @@
 class TwoLevelSearch : public BaseController {
 private:
     bool optionStatusFlag_ = true;                                                  // Flag signifying current option is complete
+    bool newSpriteFoundFlag_;
+    bool newConstraintFoundFlag_ = true;
     int solutionIndex_;                                                             // Current index in the high level path
+    uint64_t multiplier_;                                                                // Multiplier used for hashing
     BaseOption* previousOption_;                                                    // Pointer to previous option in high level path
     BaseOption* currentOption_;                                                     // Pointer to current option in high level path
     std::vector<BaseOption*> highlevelPlannedPath_ = {};                            // Current path of high level options
     uint64_t currentHighLevelPathHash;                                              // Hash representing the current high level option path
-    std::unordered_map<int, std::vector<enginetype::GridCell>> restrictedCellsByOption_;        // Restricted cells for each option pair
-    std::unordered_map<int, std::vector<enginetype::GridCell>> knownConstraints_;               // Restricted cells already accounted for during planning (subset of restrictedCellsByOption_)
+    std::unordered_map<uint64_t, std::unordered_set<int>> restrictedCellsByOption_;        // Restricted cells for each option pair
+    std::unordered_map<uint64_t, bool> newConstraintsAdded_;        // Restricted cells for each option pair
+    std::unordered_map<uint64_t, std::unordered_set<int>> knownConstraints_;               // Restricted cells already accounted for during planning (subset of restrictedCellsByOption_)
     
     // Struct for restricted cell
     struct SpriteRestriction {
@@ -50,8 +56,22 @@ private:
         }
     };
 
+    struct NodeLevin {
+        uint64_t hash;
+        int timesVisited;
+        int numConstraints;
+
+        double cost() const {
+            return (double)timesVisited * pow(2.0, (double)numConstraints);
+        }
+    };
+    std::vector<NodeLevin> levinNodes_;
+
+    // HLS costs
+    std::unordered_map<uint64_t, int> hashPathTimesVisited;                 // Map tracking number of visits for each (partial) path
+
     // Constraint identification
-    typedef std::array<int, 2> OptionIndexPair;                             // Typedef for pairs of options (for return types)
+    typedef std::array<uint64_t, 2> OptionIndexPair;                             // Typedef for pairs of options (for return types)
     enginetype::GridCell prevPlayerCell_;                                   // Player cell on the previous game step (Used to find restricted cells on current step)
     enginetype::GridCell currPlayerCell_;                                   // Player cell on the current game step
     std::unordered_map<int, bool> prevIsMoving_;                            // Map of sprites which are moving for the previous game step
@@ -60,13 +80,40 @@ private:
     std::unordered_map<int, enginetype::GridCell> currSprites_;             // Map of sprites for each option pair which are active currently
     std::unordered_map<int, std::vector<SpriteRestriction>> spritesMoved;   // Current list of sprites which moved during player actions for the option pair
 
+
+    // --------------------- CBS --------------------------------
+    struct NodeCBS {
+        std::unordered_map<uint64_t, std::unordered_set<int>> constraints;
+        int size = 0;
+    };
+
+    class CompareNodeCBS {
+    public:
+        bool operator() (const NodeCBS &lhs, const NodeCBS &rhs) {
+            return lhs.size > rhs.size;
+            // return lhs.constraints.size() < rhs.constraints.size();
+        }
+    };
+
+    typedef std::priority_queue<NodeCBS, std::vector<NodeCBS>, CompareNodeCBS> PriorityQueue;
+    std::unordered_map<uint64_t, PriorityQueue> openByPath;
+    std::unordered_map<uint64_t, std::vector<NodeCBS>> closedByPath;
+    std::unordered_map<uint64_t, std::vector<NodeCBS>> consideredNodesByPath;
+
     /**
      * Initializations which need to occur BOTH on first level start
      * and on every level restart after a failure.
      */
     void initializationForEveryLevelStart();
 
-    // --------------- HLS --------------- 
+
+    // --------------- LLS --------------- 
+
+    /**
+     * Run the implemented low level search. 
+     */
+    void lowLevelSearch();
+
     /**
      * Runs one iteration of CBS on the currentHighLevelPathHash.
      * An iteration is counted as a single replay, which will use the restricted cells
@@ -74,6 +121,10 @@ private:
      * later iterations.
      */
     void CBS();
+
+    // --------------- HLS --------------- 
+
+    void recursiveFindNextLevinHLP(std::vector<BaseOption*> &optionPath, int maxDepth);
 
     void LevinTS();
 
@@ -91,7 +142,15 @@ private:
      */
     void highLevelSearchGemsInOrder();
 
+    void highLevelSearchDeterministic();
+
     // --------------- Constraints --------------- 
+
+    bool newConstraintSeen(std::vector<BaseOption*> &optionPath);
+
+    template<typename T>
+    int restrictionCountForPath(const T &pathContainer);
+
     /**
      * Add new constraints for a given pair of options
      * This is called during each step, and adds restrictions based on those found 
@@ -129,13 +188,15 @@ private:
      */
     void logRestrictedSprites();
 
+    void logLevinNodes();
+
     // --------------- Path hashing ---------------
     /**
      * Create hash for all pairs of options.
      * 
      * @return A vector of hash ints representing each pair of options
      */
-    std::vector<int> allOptionPairHashes();
+    std::vector<uint64_t> allOptionPairHashes();
 
     /**
      * Create a hash for the given pair of options of moving from option prevOption to option currOption. 
@@ -143,7 +204,7 @@ private:
      * @param prevOption The previous option (option From)
      * @return The hash for the pair of given options (in order)
      */
-    int optionPairHash(BaseOption *currOption, BaseOption *prevOption);
+    uint64_t optionPairHash(BaseOption *currOption, BaseOption *prevOption);
 
     /**
      * Create a hash for each pair of a given path of options.  
@@ -151,7 +212,8 @@ private:
      * @param path The path of options (in order)
      * @return A vector of hashes for each pair (in order) of the given path
      */
-    std::vector<int> givenPathOptionPairHashes(std::vector<BaseOption*> path);
+    template<typename T>
+    std::vector<uint64_t> givenPathOptionPairHashes(const T &pathContainer);
 
     /**
      * Create a hash for a given pair of indices for the master list of options availableOptions_.
@@ -160,7 +222,7 @@ private:
      * @param indexCurr The index of the option in availableOptions_ for the option To.
      * @param indexPrev The index of the option in availableOptions_ for the option From.
      */
-    int optionIndexPairToHash(int indexCurr, int indexPrev);
+    uint64_t optionIndexPairToHash(int indexCurr, int indexPrev);
 
     /**
      * Get a pair of options represented by the given hash.
@@ -168,7 +230,7 @@ private:
      * @param hash The input hash
      * @return A typedef of array[2], with OptionIndexPair[0] = currOption, OptionIndexPair[1] = prevOption
      */
-    OptionIndexPair hashToOptionIndexPair(int hash);
+    OptionIndexPair hashToOptionIndexPair(uint64_t hash);
 
     /**
      * Create a hash for a given path.
@@ -177,13 +239,24 @@ private:
      * @param path The given path of options.
      * @return A hash representing the given path of options.
      */
-    uint64_t optionPathToHash(std::vector<BaseOption*> path);
+    template<typename T>
+    uint64_t optionPathToHash(const T &pathContainer);
+
+    std::vector<BaseOption*> hashToOptionPath(uint64_t hash);
+
+    template<typename T>
+    void incrementPathTimesVisited(const T &pathContainer);
+
+    template<typename T>
+    int getPathTimesVisited(const T &pathContainer);
 
 public:
 
     TwoLevelSearch() {}
 
     TwoLevelSearch(OptionFactoryType optionType) : BaseController(optionType) {}
+
+    void initializeOptions() override;
 
     /**
      * Reset the options which are available.

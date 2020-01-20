@@ -72,6 +72,28 @@ TEST_CASE("Check Cell To Index", "[gridcell_information]") {
 
 
 /**
+ * Test for cells to index
+ */
+TEST_CASE("Check Index To Cell", "[gridcell_information]") {
+    int levelNum = testutil::EMPTY_LEVEL.levelNum;
+    testutil::loadTestLevelAndStart(levelNum);
+
+    int levelWidth = enginehelper::getLevelWidth();
+    int levelHeight = enginehelper::getLevelHeight();
+
+    // Cell not in bounds
+    REQUIRE(enginehelper::indexToCell(-1) == (enginetype::GridCell){-1, -1});
+    REQUIRE(enginehelper::indexToCell(levelWidth*levelHeight) == (enginetype::GridCell){-1, -1});
+
+    // Cell in bounds
+    REQUIRE(enginehelper::indexToCell(0) == (enginetype::GridCell){0, 0});
+    REQUIRE(enginehelper::indexToCell(levelWidth-1) == (enginetype::GridCell){levelWidth-1, 0});
+    REQUIRE(enginehelper::indexToCell((levelHeight-1)*levelWidth) == (enginetype::GridCell){0, levelHeight-1});
+    REQUIRE(enginehelper::indexToCell((levelWidth*levelHeight) - 1) == (enginetype::GridCell){levelWidth-1, levelHeight-1});
+}
+
+
+/**
  * Test for sprite ID initialization and retrieving them.
  */
 TEST_CASE("Check the init sprite IDs", "[gridcell_information]") {

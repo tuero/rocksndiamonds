@@ -191,3 +191,87 @@ TEST_CASE("Check Door Statuses", "[element_information]") {
     enginehelper::engineSimulateSingle();
     _checkDoorStatuses(door, 0 | CLOSING_FLAG);
 }
+
+
+/**
+ * Check elements collectible status 
+ */
+TEST_CASE("Check Collectible Statuses", "[element_information]") {
+    int levelNum = testutil::FULL_LEVEL.levelNum;
+    testutil::loadTestLevelAndStart(levelNum);
+
+    // Gems should be collectible
+    for (auto const & cell : testutil::FULL_LEVEL.allGems()) {
+        REQUIRE(enginehelper::isCollectable(cell));
+    }
+
+    // Keys should be collectible
+    for (auto const & cell : testutil::FULL_LEVEL.keys) {
+        REQUIRE(enginehelper::isCollectable(cell));
+    }
+
+    // Rocks are not collectible
+    for (auto const & cell : testutil::FULL_LEVEL.allRocks()) {
+        REQUIRE(!enginehelper::isCollectable(cell));
+    }
+    
+}
+
+
+/**
+ * Check gate status with and without keys
+ */
+TEST_CASE("Check Gate Statuses", "[element_information]") {
+    int levelNum = testutil::FULL_LEVEL.levelNum;
+    testutil::loadTestLevelAndStart(levelNum);
+
+    // Check gates
+    for (auto const & cell : testutil::FULL_LEVEL.gates) {
+        REQUIRE(enginehelper::isGate(cell));
+    }
+
+    // Gate shouldn't be open
+    for (auto const & cell : testutil::FULL_LEVEL.gates) {
+        REQUIRE(enginehelper::isGateClosed(cell));
+        REQUIRE(!enginehelper::isGateOpen(cell));
+    }
+
+    // Walk to key
+    for (int i = 0; i < 11; i++) {
+        enginehelper::setEnginePlayerAction(Action::right);
+        enginehelper::engineSimulate();
+    }
+    for (int i = 0; i < 12; i++) {
+        enginehelper::setEnginePlayerAction(Action::down);
+        enginehelper::engineSimulate();
+    }
+    for (int i = 0; i < 8; i++) {
+        enginehelper::setEnginePlayerAction(Action::left);
+        enginehelper::engineSimulate();
+    }
+
+    // Gate shouldn't be open
+    for (auto const & cell : testutil::FULL_LEVEL.gates) {
+        REQUIRE(enginehelper::isGateClosed(cell));
+        REQUIRE(!enginehelper::isGateOpen(cell));
+    }
+
+    // Walk over key
+    enginehelper::setEnginePlayerAction(Action::down);
+    enginehelper::engineSimulate();
+    
+
+    // Gate should now be open
+    for (int i = 0; i < testutil::FULL_LEVEL.numGates(); i++) {
+        enginetype::GridCell cell = testutil::FULL_LEVEL.gates[i];
+        if (i == 1) {
+            REQUIRE(!enginehelper::isGateClosed(cell));
+            REQUIRE(enginehelper::isGateOpen(cell));
+        }
+        else {
+            REQUIRE(enginehelper::isGateClosed(cell));
+            REQUIRE(!enginehelper::isGateOpen(cell));
+        }
+    }
+   
+}

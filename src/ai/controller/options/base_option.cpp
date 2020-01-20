@@ -13,6 +13,7 @@
 // Standard Libary/STL
 #include <algorithm>
 #include <queue>
+#include <unordered_set>
 #include <unordered_map>
 #include <limits>
 
@@ -93,6 +94,15 @@ void BaseOption::setRestrictedCells(std::vector<enginetype::GridCell> &restricte
     restrictedCells_ = restrictedCells;
 }
 
+void BaseOption::setRestrictedCells(std::unordered_set<int> &restrictedCells) {
+    restrictedCells_.clear();
+    for (auto const & cell : restrictedCells) {
+        enginetype::GridCell rcell = enginehelper::indexToCell(cell);
+        // PLOGE_(logger::FileLogger) << toString() << "rest. node: x= " << rcell.x << ", y= " << rcell.y;
+        restrictedCells_.push_back(rcell);
+    }
+}
+
 /**
  * Get the list of restricted cells.
  */
@@ -120,6 +130,10 @@ void BaseOption::runAStar(enginetype::GridCell startCell, enginetype::GridCell g
     PLOGV_(logger::FileLogger) << "Running A* at grid cell level";
     PLOGV_(logger::FileLogger) << "Start node: x= " << startCell.x << ", y= " << startCell.y;
     PLOGV_(logger::FileLogger) << "Goal node: x= " << goalCell.x << ", y= " << goalCell.y;
+    PLOGV_(logger::FileLogger) << "Restricted cells: ";
+    for (auto const & restriction : restrictedCells_) {
+        PLOGV_(logger::FileLogger) << "    cell: x= " << restriction.x << ", y= " << restriction.y;
+    }
 
     // A* data structures
     std::unordered_map<int, Node> open;
@@ -168,8 +182,9 @@ void BaseOption::runAStar(enginetype::GridCell startCell, enginetype::GridCell g
             if (std::find(restrictedCells_.begin(), restrictedCells_.end(), childCell) != restrictedCells_.end()) {continue;}
 
             // Child not valid if out of bounds or action doesn't result in being in a moveable cell
-            if (!enginehelper::isActionMoveable(node.cell, action) && !(childCell == goalCell)) {continue;}
-            if (!(enginehelper::isDigable(node.cell, action) || enginehelper::isEmpty(node.cell, action)) && !(childCell == goalCell)) {continue;}
+            // if (!enginehelper::isActionMoveable(node.cell, action) && !(childCell == goalCell)) {continue;}
+            if ((!enginehelper::isDigable(node.cell, action) && !enginehelper::isEmpty(node.cell, action)
+                && !enginehelper::isGateOpen(childCell)) && !(childCell == goalCell)) {continue;}
 
             int childIndex = enginehelper::cellToIndex(childCell);
             float newG = node.g + 1;

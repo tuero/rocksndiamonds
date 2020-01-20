@@ -220,6 +220,14 @@ namespace enginehelper {
     int cellToIndex(const enginetype::GridCell &cell);
 
     /**
+     * Convert a flat index into a gridcell.
+     * 
+     * @param index The index representing the gridcell
+     * @return The gridcell represented by the index.
+     */
+    enginetype::GridCell indexToCell(int index);
+
+    /**
      * Initalize the unique sprite IDs.
      * Temporary elements and empty space/soil do not get IDs.
      */
@@ -435,6 +443,38 @@ namespace enginehelper {
      * @return True if the cell contains a closing exit, false otherwise.
      */
     bool isExitClosing(const enginetype::GridCell cell);
+
+    /**
+     * Check if the grid cell contains a key element.
+     * 
+     * @param cell The grid cell to check.
+     * @return True if the cell contains a key, flase otherwise.
+     */
+    bool isKey(const enginetype::GridCell cell);
+
+    /**
+     * Check if the grid cell contains a gate element.
+     * 
+     * @param cell The grid cell to check.
+     * @return True if the cell contains a gate (open or closed), flase otherwise.
+     */
+    bool isGate(const enginetype::GridCell cell);
+
+    /**
+     * Check if the grid cell contains an unlocked gate element.
+     * 
+     * @param cell The grid cell to check.
+     * @return True if the cell contains an unlocked gate, flase otherwise.
+     */
+    bool isGateOpen(const enginetype::GridCell cell);
+
+    /**
+     * Check if the grid cell contains a closed gate element.
+     * 
+     * @param cell The grid cell to check.
+     * @return True if the cell contains a closed gate, flase otherwise.
+     */
+    bool isGateClosed(const enginetype::GridCell cell);
 
     /**
      * Checks if the direction the player wants to move in is walkable.

@@ -50,7 +50,8 @@ Controller::Controller(ControllerType controller) {
  * Special initializations in which we only want to occur once.
  */
 void Controller::handleFirstLevelStart() {
-    enginehelper::initSpriteIDs();
+    statistics::numLevelTries += 1;
+    // enginehelper::initSpriteIDs();
     // Initialize controller options
     baseController_.get()->initializeOptions();
 
@@ -66,9 +67,8 @@ void Controller::handleFirstLevelStart() {
  * This is called during first level start and every level reattempt.
  */
 void Controller::reset() {
-    PLOGI_(logger::FileLogger) << "Resetting controller.";
-    PLOGI_(logger::ConsoleLogger) << "Resetting controller.";
-    PLOGI_(logger::FileLogger) << baseController_.get()->controllerDetailsToString();
+    PLOGD_(logger::FileLogger) << "Resetting controller.";
+    PLOGD_(logger::ConsoleLogger) << "Resetting controller.";
 
     actionsTaken.clear();
 
@@ -116,14 +116,24 @@ void Controller::handleLevelSolved() {
  * Depending on the controller, this will either terminate or attempt the level again.
  */
 void Controller::handleLevelFailed() {
-    PLOGI_(logger::FileLogger) << "Game Failed.";
-    PLOGI_(logger::ConsoleLogger) << "Game Failed.";
+    if (statistics::numLevelTries % 1000 == 0) {
+        PLOGI_(logger::FileLogger) << "Game Failed.";
+        PLOGI_(logger::ConsoleLogger) << "Game Failed.";
+    }
+    // PLOGI_(logger::FileLogger) << "Game Failed.";
+    // PLOGI_(logger::ConsoleLogger) << "Game Failed.";
 
     statistics::numLevelTries += 1;
 
     if (baseController_.get()->retryOnLevelFail()) {
         // Handle necessary changes before/after level reload
         baseController_.get()->handleLevelRestartBefore();
+        if (statistics::numLevelTries % 1000 == 0) {
+            PLOGI_(logger::FileLogger) << "Restarting level: " << enginehelper::getLevelNumber() << ", attempt " << statistics::numLevelTries;
+            PLOGI_(logger::ConsoleLogger) << "Restarting level: " << enginehelper::getLevelNumber() << ", attempt " << statistics::numLevelTries;
+        }
+        // PLOGI_(logger::FileLogger) << "Restarting level: " << enginehelper::getLevelNumber() << ", attempt " << statistics::numLevelTries;
+        // PLOGI_(logger::ConsoleLogger) << "Restarting level: " << enginehelper::getLevelNumber() << ", attempt " << statistics::numLevelTries;
         enginehelper::restartLevel();
         logger::savePlayerMove("reset");
         reset();
@@ -164,7 +174,7 @@ int Controller::getAction() {
     if (step_counter_++ % enginetype::ENGINE_RESOLUTION == 0) {
         // Save action to replay file
         logger::savePlayerMove(enginehelper::actionToString(action));
-        logger::logPlayerMove(enginehelper::actionToString(action));
+        // logger::logPlayerMove(enginehelper::actionToString(action));
         logger::logCurrentState();
         actionsTaken.push_back(enginehelper::actionToString(action));
     }
@@ -215,4 +225,6 @@ void Controller::initController(ControllerType controller) {
         PLOGE_(logger::ConsoleLogger) << "Unknown controller type: " << controller;
         baseController_ = std::make_unique<Default>();
     }
+    PLOGI_(logger::FileLogger) << "Using controller: " << baseController_.get()->controllerDetailsToString();
+    PLOGI_(logger::ConsoleLogger) << "Using controller: " << baseController_.get()->controllerDetailsToString();
 }

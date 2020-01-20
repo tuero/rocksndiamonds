@@ -54,10 +54,10 @@ extern "C" void handleFirstLevelStart() {
     enginehelper::initZorbristTables();
 
     // // Initialize sprite IDs
-    // enginehelper::initSpriteIDs();
+    enginehelper::initSpriteIDs();
 
     // clear solution
-    controller.handleFirstLevelStart();
+    // controller.handleFirstLevelStart();
 
     // Initial logging
     PLOGI_(logger::FileLogger) << "Level starting: " << enginehelper::getLevelNumber();
@@ -75,6 +75,8 @@ extern "C" void handleFirstLevelStart() {
     if (enginehelper::getControllerType() != CONTROLLER_REPLAY) {
         logger::initReplayFile(enginehelper::getLevelSet(), enginehelper::getLevelNumber());
     }
+
+    controller.handleFirstLevelStart();
 }
 
 

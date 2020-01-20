@@ -1,5 +1,5 @@
 /**
- * @file: high_level_search.cpp
+ * @file: tel_highlevel.cpp
  *
  * @brief: High level search functionality for Masters thesis controller.
  * 
@@ -14,8 +14,12 @@
 // Standard Libary/STL
 #include <vector>
 #include <queue>
+#include <deque>
 #include <set>
+#include <unordered_set>
 #include <algorithm>            // sort, find
+#include <random>               // random_device, mt19937, discrete_distribution
+#include <limits>               // numeric_limits
 
 // Includes
 #include "base_option.h"
@@ -26,116 +30,78 @@
 
 
 // CBS
-struct NodeCBS {
-    std::unordered_map<int, std::vector<enginetype::GridCell>> constraints;
-    int size = 0;
-};
+void TwoLevelSearch::recursiveFindNextLevinHLP(std::vector<BaseOption*> &optionPath, int maxDepth) {
+    // Full length path, calculate cost and store as hash
+    if ((int)optionPath.size() == maxDepth) {
+        uint64_t hash = optionPathToHash<std::vector<BaseOption*>>(optionPath);
 
-class CompareNodeCBS {
-public:
-    bool operator() (const NodeCBS &lhs, const NodeCBS &rhs) {
-        return lhs.size > rhs.size;
-        // return lhs.constraints.size() < rhs.constraints.size();
-    }
-};
-
-typedef std::priority_queue<NodeCBS, std::vector<NodeCBS>, CompareNodeCBS> PriorityQueue;
-std::unordered_map<uint64_t, PriorityQueue> openByPath;
-std::unordered_map<uint64_t, std::vector<NodeCBS>> closedByPath;
-
-
-/**
- * Runs one iteration of CBS on the currentHighLevelPathHash.
- * An iteration is counted as a single replay, which will use the restricted cells
- * set in the best node in OPEN, and will insert the children nodes into OPEN for
- * later iterations.
- */
-void TwoLevelSearch::CBS() {
-    // Safeguard against OPEN/CLOSED not seeing the current high level path before
-    if (openByPath.find(currentHighLevelPathHash) == openByPath.end()) {
-        openByPath[currentHighLevelPathHash] = {};
-    }
-    if (closedByPath.find(currentHighLevelPathHash) == closedByPath.end()) {
-        closedByPath[currentHighLevelPathHash] = {};
-    }
-
-    // Get the OPEN/CLOSED for the given high level path
-    PriorityQueue &open = openByPath[currentHighLevelPathHash];
-    std::vector<NodeCBS> &closed = closedByPath[currentHighLevelPathHash];
-
-
-    // Check every option in the planned path
-    for (auto const & hash : givenPathOptionPairHashes(highlevelPlannedPath_)) {
-        for (auto const & constraint : restrictedCellsByOption_[hash]) {
-            bool isKnown = std::find(knownConstraints_[hash].begin(), knownConstraints_[hash].end(), constraint) != knownConstraints_[hash].end();
-            if (isKnown) {continue;}
-
-            knownConstraints_[hash].push_back(constraint);
-
-            // If constraint is new, we need to consider adding to any node in closed
-            // This would involve knowing where the agent is before attempting this option. Doable but involved.
-            // Just assume we need to add for now.
-            for (auto const & node : closed) {
-                // Create child with parent constraints, and add the new constraint
-                NodeCBS child = node;
-                child.constraints[hash].push_back(constraint);
-                child.size += 1;
-                open.push(child);
-            }
+        // We have exhausted all low level paths and we have not seen new constraints
+        if (!newConstraintSeen(optionPath) && openByPath[hash].empty() && !closedByPath[hash].empty()) {
+            return;
         }
+
+        NodeLevin node = {hash, getPathTimesVisited(optionPath), restrictionCountForPath(optionPath)};
+        levinNodes_.push_back(node);
+        return;
     }
-
-
-    // If first time running, we need to set initial node
-    if (open.empty() && closed.empty()) {
-        PLOGD_(logger::ConsoleLogger) << "Setting first node";
-        std::unordered_map<int, std::vector<enginetype::GridCell>> constraints;
-        for (auto const & hash : givenPathOptionPairHashes(highlevelPlannedPath_)) {
-            constraints[hash] = {};
-        }
-        open.push((NodeCBS){constraints, 0});
-    }
-
-    // If all nodes exhausted, signal to HLS 
-    if (open.empty()) {
-        PLOGE_(logger::ConsoleLogger) << "ALL OPTIONS EMPTY";
-    }
-
-    // Constraints updated, now we do one iteration of search
-    // Get best node in OPEN and add to CLOSED
-    NodeCBS P = open.top();
-    open.pop();
-    closed.push_back(P);
-
-    // Set constraints from P for each node in high level
-    int index = 0;
-    for (auto const & hash : givenPathOptionPairHashes(highlevelPlannedPath_)) {
-        highlevelPlannedPath_[index++]->setRestrictedCells(P.constraints[hash]);
-    }
-
-
-    // The actual path validation will happen real time by controller. 
-    // Here we just go ahead and add children to OPEN. If path is solved then we won't reenter.
-    // Children inherit all constraints from parent, and add one single constraint.
-    for (auto const & hash : givenPathOptionPairHashes(highlevelPlannedPath_)) {
-        std::vector<enginetype::GridCell> &knownConstraitsForOption = knownConstraints_[hash];
-        for (auto const & constraint : knownConstraitsForOption) {
-            // If node currently doesn't have this constraint, create child for it
-            if (std::find(P.constraints[hash].begin(), P.constraints[hash].end(), constraint) == P.constraints[hash].end()) {
-                NodeCBS child = P;
-                child.constraints[hash].push_back(constraint);
-                child.size += 1;
-                open.push(child);
-            }
-        }
+    
+    // Add each possible child and go into recursion
+    for (auto const & option : availableOptions_) {
+        auto iter = std::find(optionPath.begin(), optionPath.end(), option);
+        if (iter != optionPath.end()) {continue;}
+        // if (iter != availableOptions_.end()) {continue;}
+        optionPath.push_back(option);
+        recursiveFindNextLevinHLP(optionPath, maxDepth);
+        optionPath.pop_back();
     }
 }
 
+uint64_t seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+std::mt19937 gen(seed);
 
 void TwoLevelSearch::LevinTS() {
-    // Find each path and calculate path costs
-    // Flip coin at each step
+    levinNodes_.clear();
+    std::vector<BaseOption*> optionPath;
+
+    // Recursively construct paths and store costs
+    PLOGD_(logger::FileLogger) << "Finding all path costs.";
+    recursiveFindNextLevinHLP(optionPath, (int)availableOptions_.size());
+
+    // Log paths
+    logLevinNodes();
+
+    // For each full path in map, add to distribution
+    // std::vector<double> pathCosts;
+    int minIndex = -1;
+    double minCost = std::numeric_limits<double>::max();
+    for (int i = 0; i < (int) levinNodes_.size(); i++) {
+    // for (auto const & node : levinNodes_) {
+        NodeLevin &node = levinNodes_[i];
+        if (node.cost() < minCost) {
+            minCost = node.cost();
+            minIndex = i;
+        }
+        // pathCosts.push_back(node.cost());
+    }
+
+    if (minIndex == -1) {
+        PLOGE_(logger::FileLogger) << "No least Levin node found";
+        PLOGE_(logger::ConsoleLogger) << "No least Levin node found";
+    }
+
+    // std::discrete_distribution<> d(pathCosts.begin(), pathCosts.end());
+
+    // Flip coin to determine the path
+    // NodeLevin chosenPathNode = levinNodes_[d(gen)];
+    NodeLevin chosenPathNode = levinNodes_[minIndex];
+    PLOGD_(logger::FileLogger) << "Chosen high level path: " << chosenPathNode.hash;
+    for (auto const & option : hashToOptionPath(chosenPathNode.hash)) {
+        PLOGD_(logger::FileLogger) << option->toString();
+    }
+
+    // Set high level path
     highlevelPlannedPath_.clear();
+    highlevelPlannedPath_ = hashToOptionPath(chosenPathNode.hash);
 }
 
 
@@ -145,24 +111,34 @@ void TwoLevelSearch::LevinTS() {
  * low level path algorithm is called.
  */
 void TwoLevelSearch::highLevelSearch() {
+    PLOGD_(logger::FileLogger) << "Starting high level search.";
+
     // Add new constraints found from previous attempt
+    // if (enginehelper::getOptParam() == 1) {
+    //     addNewConstraints();
+    // }
     addNewConstraints();
 
     // Create deterministic path
-    highLevelSearchGemsInOrder();
-    // smartAStar();
+    if (enginehelper::getOptParam() == 1) {
+        highLevelSearchDeterministic();
+    } else {
+       LevinTS(); 
+    }
 
-    currentHighLevelPathHash = optionPathToHash(highlevelPlannedPath_);
+    currentHighLevelPathHash = optionPathToHash<std::vector<BaseOption*>>(highlevelPlannedPath_);
+
+    // Increment visited path node visits
+    incrementPathTimesVisited<std::vector<BaseOption*>>(highlevelPlannedPath_);
 
     // Run middle level search on given path
     // Middle level means to find the next set of constraints
-    CBS();
+    lowLevelSearch();
 }
 
 
 /**
- * Find the path of high level options which corresponds to the collectible sprites
- * in order of (row, col), with the exit at the end. This is a deterministic path
+ * Find the path of high level options which corresponds to the collectible sprites in order of (row, col), with the exit at the end. This is a deterministic path
  * that never changes, good for testing sanity.
  */
 void TwoLevelSearch::highLevelSearchGemsInOrder() {
@@ -183,5 +159,20 @@ void TwoLevelSearch::highLevelSearchGemsInOrder() {
     // Path is to visit each gem in order, then exit
     for (auto const & option : availableOptions_) {
         highlevelPlannedPath_.push_back(option);
+    }
+}
+
+
+void TwoLevelSearch::highLevelSearchDeterministic() {
+    highlevelPlannedPath_.clear();
+    std::vector<int> optionSpriteOrder = {24, 22, 7, 15, 26};
+
+    for (auto const & spriteID : optionSpriteOrder) {
+        for (auto const & option : availableOptions_) {
+            if (option->getSpriteID() == spriteID) {
+                highlevelPlannedPath_.push_back(option);
+                break;
+            }
+        }
     }
 }
