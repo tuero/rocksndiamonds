@@ -12,14 +12,14 @@
 #include "mcts.h"
 
 // Standard Libary/STL
-#include <iostream>
+#include <unordered_map>
 #include <algorithm>
 #include <random>
-#include <cassert>
 
 // Includes
-#include "engine_types.h"
 #include "engine_helper.h"
+#include "engine_types.h"
+#include "config_reader.h"
 #include "../options/option_single_step.h"
 #include "logger.h"
 
@@ -40,12 +40,38 @@ void MCTS::logCurrentStats() {
 }
 
 
+/**
+ * Set the MCTS parameters from the config file.
+ */
+void MCTS::setParamsFromConfig() {
+    PLOGD_(logger::FileLogger) << "Reading values from MCTS configuration";
+    std::unordered_map<std::string, double> configValues = config::getConfigValues(MCTS_CONFIG_FILE);
+
+    for (auto const & configItem : configValues) {
+        // Parameter in file matches known parameter
+        if (configParameters_.find(configItem.first) != configParameters_.end()) {
+            // Downcasting to int, which is fine here.
+            *(configParameters_[configItem.first]) = (int)configItem.second;
+        }
+    }
+
+    // Log configuration values being used
+    PLOGD_(logger::FileLogger) << "MCTS config parameters being used:";
+    PLOGD_(logger::ConsoleLogger) << "MCTS config parameters being used:";
+    for (auto const & configItem : configParameters_) {
+        PLOGD_(logger::FileLogger) << "\t" << configItem.first << ": " << *(configItem.second);
+        PLOGD_(logger::ConsoleLogger) << "\t" << configItem.first << ": " << *(configItem.second);
+    }
+}
+
+
 /*
  * Select the child node based on UCT.
  *
  * @param node The ndoe to select the child from.
  */
 TreeNode* MCTS::selectPolicyUCT(TreeNode* node) {
+    // UCT parameters
     float UCT_K = sqrt(2);
     float epsilon = 0.00001;
 
@@ -53,26 +79,36 @@ TreeNode* MCTS::selectPolicyUCT(TreeNode* node) {
     std::vector<TreeNode*> bestNodes;
 
     // iterate all immediate children and find best UTC score
-    assert(node->getChildCount() > 0);
     for(std::size_t i = 0; i < node->getChildCount(); i++) {
         TreeNode* child = node->getChild(i);
         float childValue = child->getValue();
         float childVisitCount = (float)child->getVisitCount();
 
+        // UCT values
         float uct_exploitation = childValue / (childVisitCount + epsilon);
         float uct_exploration = sqrt(log(childVisitCount + 1) / (child->getVisitCount() + epsilon));
         float uct_score = uct_exploitation + UCT_K * uct_exploration;
 
+        // Better value found
         if(uct_score > bestScoreUCT) {
             bestScoreUCT = uct_score;
             bestNodes.clear();
-            bestNodes.push_back(child);
         }
-        else if (uct_score == bestScoreUCT) {
+
+        // Add as candidate
+        if (uct_score == bestScoreUCT) {
             bestNodes.push_back(child);
         }
     }
 
+    // Shouldn't happen but safeguard against no children
+    if (bestNodes.empty()) {
+        PLOGE_(logger::FileLogger) << "No children available to select from.";
+        PLOGE_(logger::ConsoleLogger) << "No children available to select from.";
+        throw std::exception();
+    }
+
+    // Select randomly best node
     std::shuffle(bestNodes.begin(), bestNodes.end(), g);
 
     return bestNodes[0];
@@ -89,19 +125,23 @@ TreeNode* MCTS::selectMostVisitedChild(TreeNode* node) {
     int mostVisitedCount = -1;
     std::vector<TreeNode*> mostVisitedChildren;
 
+    // Iterate children
     for (std::size_t i = 0; i < node->getChildCount(); i++) {
         TreeNode* child = node->getChild(i);
+
         // Better count found
         if (child->getVisitCount() > mostVisitedCount) {
             mostVisitedCount = child->getVisitCount();
             mostVisitedChildren.clear();
         }
 
+        // Add as candidate
         if (child->getVisitCount() == mostVisitedCount) {
             mostVisitedChildren.push_back(child);
         }
     }
 
+    // Select a best child, tiebreaking by better value
     std::sort(mostVisitedChildren.begin(), mostVisitedChildren.end(),
     [](const TreeNode* lhs, const TreeNode* rhs)
             { 
@@ -109,7 +149,13 @@ TreeNode* MCTS::selectMostVisitedChild(TreeNode* node) {
             }
     );  
 
-    // std::shuffle(mostVisitedChildren.begin(), mostVisitedChildren.end(), g);
+    // Shouldn't happen but safeguard against no children
+    if (mostVisitedChildren.empty()) {
+        PLOGE_(logger::FileLogger) << "No children available to select from.";
+        PLOGE_(logger::ConsoleLogger) << "No children available to select from.";
+        throw std::exception();
+    }
+
     return mostVisitedChildren[0];
 }
 
@@ -121,14 +167,13 @@ TreeNode* MCTS::selectMostVisitedChild(TreeNode* node) {
  * engine functions will be called. The state will then save its value, so the value
  * can be queried later, even if the engine is not set to the state.
  */
-float MCTS::getNodeValue() {
+double MCTS::getNodeValue() {
     if (enginehelper::engineGameSolved()) {
-        return enginehelper::getTimeLeftScore();
+        return enginehelper::getTimeLeftScore() > 999 ? enginehelper::getTimeLeftScore() : 999;
     }
     if (enginehelper::engineGameFailed()) {
         return -10;
     }
-    return enginehelper::getCurrentScore() - rootSavedState.getScore() + enginehelper::countNumOfElement(enginetype::FIELD_DIAMOND);
     return enginehelper::getCurrentScore() - rootSavedState.getScore();
 }
 
@@ -144,25 +189,25 @@ std::string MCTS::controllerDetailsToString() {
 
     output += "Max depth: " + std::to_string(maxDepth_) + "\n";
 
+    // Log children details
     for (std::size_t i = 0; i < node->getChildCount(); i++) {
         TreeNode* childNode = node->getChild(i);
         int visitCount = childNode->getVisitCount();
-        float value = childNode->getValue() / (float)visitCount;
-
-        output += "\taction: ";
-        output += childNode->getOptionTaken()->toString();
-        output += ", value: ";
-        output += std::to_string(value);
-        output += ", visit count: ";
-        output += std::to_string(visitCount);
-        output += "\n";
+        double value = childNode->getValue() / (double)visitCount;
+        output  += "\taction: " + childNode->getOptionTaken()->toString() + ", value: "
+                + std::to_string(value) + ", visit count: " + std::to_string(visitCount) + "\n";
     }
 
     return output;
 }
 
 
+/**
+ * Start of level handeling
+ */
 void MCTS::handleLevelStart() {
+    timer.setLimit(maxTime_);
+    setParamsFromConfig();
     optionStatusFlag_ = true;
     nextOption_ = &noopOption;
 }
@@ -201,12 +246,11 @@ void MCTS::reset() {
         nextOption_->run();
     }
 
+    // Logging
     currentOption_ = nextOption_;
     PLOGD_(logger::ConsoleLogger) << "Next option: " << currentOption_->toString() << " " << currentOption_->isValid();
     PLOGD_(logger::FileLogger) << "Next option: " << currentOption_->toString() << " " << currentOption_->isValid();
-
-    logger::logCurrentState(plog::debug);
-    logger::logBoardSpriteIDs(plog::debug);
+    PLOGD_(logger::FileLogger) << controllerDetailsToString();
 
     // save root state to where we will be when done executing current queued action
     root = std::make_unique<TreeNode>(nullptr);
@@ -227,9 +271,11 @@ void MCTS::reset() {
  * is then reset to the state after the current option is complete.
  */
 Action MCTS::getAction() {
+    Action action = Action::noop;
+
     // Ensure game is currently not over
     if (enginehelper::engineGameOver()) {
-        return Action::noop;
+        return action;
     }
 
     // Check if option is complete
@@ -239,7 +285,7 @@ Action MCTS::getAction() {
         reset();
     }
 
-    Action action;
+    // Get next action from the current option 
     optionStatusFlag_ = currentOption_->getNextAction(action);
     return action;
 }
@@ -276,16 +322,9 @@ void MCTS::plan() {
 
     // MCTS starting configurations
     TreeNode* bestChild = nullptr;
-
-    // Log state before MCTS to ensure we are simulating after queued actions are taken.
-    // This allows for a next step partial solution to be given immediately after current
-    // actions are finished.
-    // logCurrentState("State before MCTS.", false);
-
-    // forwardSolution.clear();
     timer.start();
 
-    // Always loop until breaking conditions
+    // Main MCTS loop
     while (true) {
         // Step 1: Selection
         // Starting at root, continuously select best child using policy until leaf node
@@ -294,12 +333,10 @@ void MCTS::plan() {
         int currentDepth = 0;
 
         // Put simulator back to root state
-        // !TODO -> Maybe encorporate set seed into restore simulator?
         rootSavedState.restoreEngineState();
         logCurrentStats();
 
         // Select child based on policy and forward engine simulator
-        // <!-- Maybe use engine status rather than nodes?
         while (!current->isTerminal() && current->allExpanded()) {
             current = selectPolicyUCT(current);
             current->getOptionTaken()->run();
@@ -321,29 +358,30 @@ void MCTS::plan() {
 
         // Step 3: Simulation
         // The expansion step sets the simulator to the expanded node's state
-        numSimulations_ = 0;
-        maxIterationsDepth_ = 0;
+        double value = 0.0;
         for (int i = 0; i < numSimulations_; i++) {
             reference_state.restoreEngineState();
             if (!current->isTerminal()) {
+                enginehelper::setEngineRandomPlayerAction();
+                Action action = enginehelper::getEnginePlayerAction();
                 for (int t = 0; t < maxIterationsDepth_; t++) {
-                    // Terminal condition in simulator
                     if (enginehelper::engineGameFailed() || enginehelper::engineGameSolved()) {
                         break;
                     }
 
                     // Apply random action
-                    enginehelper::setEngineRandomPlayerAction();
-                    // enginehelper::setEnginePlayerAction(current->getActionTaken());
+                    enginehelper::setEnginePlayerAction(action);
                     enginehelper::engineSimulate();
-                    // current->getOptionTaken()->run();
                     countSimulatedNodes_ += 1;
                 }
+
+                // Get simulated value
+                value += getNodeValue();
             }
         }
 
-        // reference_state.restoreEngineState();
-        float value = getNodeValue();
+        // Average values seen
+        value /= numSimulations_;
 
         // Step 4: Backpropagation   
         while (current != nullptr) {
@@ -365,22 +403,9 @@ void MCTS::plan() {
     // Get best child and its associated action
     rootSavedState.restoreEngineState();
     bestChild = selectMostVisitedChild(root.get());
-    // BaseOption* bestOption = bestChild->getOptionTaken();
     nextOption_ = bestChild->getOptionTaken();
-
-    // Logg root child nodes along with their current valuation
-    // msg = "Child node values:\n" + childrenToString(root.get());
-    // PLOGD_(logwrap::FileLogger) << msg;
-    // PLOGD_IF_(logwrap::ConsoleLogger, callsSinceReset_ == 8) << msg;
-    // PLOGD_(logwrap::ConsoleLogger) << msg;
 
     // Put simulator back to original state
     startingState.restoreEngineState();
     enginehelper::setSimulatorFlag(false);
-
-    // return best option
-    // *nextOption = bestOption;
-    // Action action;
-    // optionStatusFlag_ = currentOption_->getNextAction(action);
-    // return action;
 }

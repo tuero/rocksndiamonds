@@ -26,7 +26,13 @@ extern "C" {
 
 namespace logger {
 
-    enum {FileLogger, ConsoleLogger};
+    // Logger types
+    enum {
+        FileLogger,             // Logs to the predefined log file in "./src/ai/logs/*.log"
+        ConsoleLogger           // Logs to the console
+    };
+
+    // These are the default log leves used by PLOG
     enum class LogLevel {none, fatal, error, warning, info, debug, verbose};
 
     /**

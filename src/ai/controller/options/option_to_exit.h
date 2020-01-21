@@ -12,6 +12,9 @@
 #define OPTION_TO_EXIT_H
 
 
+// Standard library and STL
+#include <string>
+
 // Includes
 #include "base_option.h"
 #include "engine_types.h"
@@ -25,8 +28,7 @@
 class OptionToExit : public BaseOption {
 
 private:
-    int item_;
-    int count_;
+    int item_;                          // Internal engine code defining exit
     std::string optionStringName_ = "Path to exit: ";
 
 public:
@@ -34,24 +36,30 @@ public:
     OptionToExit(int spriteID);
 
     /**
-     * Set action which agent should immediately take.
+     * Run the action(s) defined by the option to get to the exit.
      * 
-     * Called when the currentSolution is empty. Agent always executes the next action
-     * from currentSolution. If conducting search on the future state while the agent 
-     * is conducting the current action, the controller should set currentSolution to
-     * the forwardSolution.
+     * @return True if the option was able to perform without error, false otherwise.
      */
     bool run() override;
 
+    /**
+     * Get the next action to get to the exit.
+     */
     bool getNextAction(Action &action) override;
 
     /**
      * Checks if the player can walk to the exit.
-     * Player can only walk to the exit if the exit is open 
-     * and the exit is pathable.
+     * Player can only walk to the exit if the exit is open and the exit is pathable.
+     * 
+     * @return True if the option is valid, false otherwise.
      */
     bool isValid() override;
     
+    /**
+     * Convert to human readable format (spriteID, location, etc.)
+     * 
+     * @return String representation of option.
+     */
     std::string toString() const override;
 };
 

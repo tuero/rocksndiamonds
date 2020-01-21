@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.com/tuero/rocksndiamonds.svg?token=zarvik1a4n45zBNhaz4z&branch=master)](https://travis-ci.com/tuero/rocksndiamonds)
 
-# Ataxx
+# Rocksndiamonds
 An Ataxx game implementation that allows users to enter moves, or uses tree-search techniques to come up with moves. The two types of tree-search methods implemented are:
 - AlphaBeta pruning
 - NegaScout
@@ -17,16 +17,19 @@ Both search methods are implemented with transposition tables and iterative deep
 These instructions will help you install the program. This has been created/tested on Ubuntu 18.04, g++ 7.3.0.
 ```
 # Clone this repository
-$ git clone https://github.com/tuero/ataxx.git
+$ git clone --recurse-submodules https://github.com/tuero/rocksndiamonds.git
 
 # Enter the repository
-$ cd ataxx
+$ cd rocksndiamonds
 
 # Compile
-$ make
+$ mkdir build && cd build
+$ cmake ..
+$ make -j8
+$ cd ..
 
-# Run the program
-$ ./ataxx
+# Run the GUI program with user input
+$ ./rocksndiamonds_gui
 ```
 
 ## How It Works

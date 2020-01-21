@@ -126,8 +126,8 @@ void setEngineRandomPlayerAction() {
 /**
  * Get the currently stored player action.
  */
-int getEnginePlayerAction() {
-    return stored_player[0].action;
+Action getEnginePlayerAction() {
+    return static_cast<Action>(stored_player[0].action);
 }
 
 

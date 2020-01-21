@@ -12,8 +12,25 @@
 #define OPTION_TYPES_H
 
 
-
+/**
+ * Option type definitions.
+ * 
+ * @note Add new option types here.
+ */
 enum OptionType {SingleAction, ToSprite, ToRock, PushRock, ToCollectibleSprite, ToExit, Misc};
+
+
+/**
+ * Option grouping definitions for factory.
+ * 
+ * @note Add new option groupings here.
+ */
+enum class OptionFactoryType {
+    SINGLE_ACTION = 0,
+    PATH_TO_SPRITE,
+    TWO_LEVEL_SEARCH,
+    CUSTOM
+};
 
 
 #endif  //OPTION_TYPES_H

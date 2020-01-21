@@ -11,7 +11,12 @@
 
 #include "option_to_exit.h"
 
+// Standard library and STL
+#include <string>
+
 // Includes
+#include "engine_types.h"
+#include "engine_helper.h"
 #include "logger.h"
 
 
@@ -20,21 +25,44 @@ OptionToExit::OptionToExit(int spriteID) {
     spriteID_ = spriteID;
     goalCell_ = enginehelper::getSpriteGridCell(spriteID);
     item_ = enginehelper::getGridElement(goalCell_);
-    count_ = 0;
     solutionPath_.clear();
 }
 
 
+/**
+ * Convert to human readable format (spriteID, location, etc.)
+ */
 std::string OptionToExit::toString() const {
     return enginehelper::getItemReadableDescription(item_) + " " + std::to_string(spriteID_);
 }
 
 
+/**
+ * Run the action(s) defined by the option to get to the exit.
+ */
 bool OptionToExit::run() {
-    return true;
+    int MAX_ATTEMPT = 1000;
+    int counter = 0;
+    Action action = Action::noop;
+
+    while(true) {
+        ++counter;
+
+        // Game over while running option
+        if (enginehelper::engineGameOver() || MAX_ATTEMPT) {return false;}
+
+        bool flag = getNextAction(action);
+        enginehelper::setEnginePlayerAction(action);
+        enginehelper::engineSimulate();
+        
+        if (flag) {return true;}
+    }
 }
 
 
+/**
+ * Get the next action to get to the exit.
+ */
 bool OptionToExit::getNextAction(Action &action) {
     if (enginehelper::isExitOpening(goalCell_)) {
         action = Action::noop;
@@ -61,14 +89,12 @@ bool OptionToExit::getNextAction(Action &action) {
 
     // Option is complete if we pulled the last action off the solution.
     return playerCell == goalCell_ && enginehelper::isPlayerDoneAction();
-    // return !(enginehelper::isExitOpen(goalCell_) || enginehelper::isExitOpening(goalCell_)) && !(solutionPath_.empty() && enginehelper::isPlayerDoneAction());
 }
 
 
 /**
  * Checks if the player can walk to the exit.
- * Player can only walk to the exit if the exit is open 
- * and the exit is pathable.
+ * Player can only walk to the exit if the exit is open and the exit is pathable.
  */
 bool OptionToExit::isValid() {
     runAStar();

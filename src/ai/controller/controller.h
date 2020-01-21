@@ -14,8 +14,6 @@
 
 // Standard Libary/STL
 #include <vector>
-#include <map>
-#include <memory>
 #include <string>
 
 // Controllers
@@ -32,10 +30,10 @@
  */
 class Controller {
 private:
-    int step_counter_ = 0;
-    std::vector<Action> currentAction_;
-    std::unique_ptr<BaseController> baseController_;
-    std::vector<std::string> actionsTaken;
+    int step_counter_ = 0;                                  // Current engine game step
+    std::vector<Action> currentAction_;                     // Current action which is being sent to engine
+    std::unique_ptr<BaseController> baseController_;        // Pointer to controller being used
+    std::vector<std::string> actionsTaken_;                 // Vector of string actions for playthrough which solves level
 
 public:
     

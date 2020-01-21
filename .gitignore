@@ -5,6 +5,10 @@
 .depend
 
 # ignore automatically generated files
+# (tuero@ualberta.ca) 
+#   - This has been modified, the original source would compile/generate some 
+#     of the assets manually from sprite sheets which would break compiling. 
+#     Changes now allow it to compile (not the best but it works).
 src/conftime.h
 src/conf_gfx.h
 src/conf_snd.h
@@ -37,9 +41,7 @@ run_tests
 .DS_Store
 
 
-# Custom
-todo.txt
-*_Makefile
+# (tuero@ualberta.ca)
 .idea/
 cmake-build-debug/
 calgrind.out*
@@ -47,5 +49,4 @@ calgrind.out*
 src/.vscode/
 src/ai/logs/*
 src/ai/replays/*
-bin
 build

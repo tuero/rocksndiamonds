@@ -13,8 +13,6 @@
 
 // Standard Libary/STL
 #include <algorithm>
-#include <iostream>
-#include <cassert>
 #include <typeinfo>
 
 // Includes
@@ -35,9 +33,10 @@ TreeNode::TreeNode(TreeNode* parent, const std::vector<Action> &actionsFromStart
     depth_ = (parent_ == nullptr ? 0 : parent_->depth_ + 1);
     value_ = 0;
 
-    isTerminal_ = (enginehelper::engineGameFailed() || enginehelper::engineGameSolved());
+    // Set internal engine status flags
     isFailed_ = enginehelper::engineGameFailed();
     isSolved_ = enginehelper::engineGameSolved();
+    isTerminal_ = isFailed_ && isSolved_;
 }
 
 
@@ -49,13 +48,17 @@ TreeNode::TreeNode(TreeNode* parent, const std::vector<Action> &actionsFromStart
  */
 TreeNode* TreeNode::expand() {
     // Should be non-terminal and not fully expanded. MCTS checks this outside
-    assert(!allExpanded());
-    // assert(!allExpanded() && !(enginehelper::engineGameFailed() || enginehelper::engineGameSolved()));
+    if (allExpanded()) {
+        PLOGE_(logger::FileLogger) << "Trying to expand a fully expanded node.";
+        PLOGE_(logger::ConsoleLogger) << "Trying to expand a fully expanded node.";
+        throw std::exception();
+    }
 
     // Create new node
     Pointer child = std::make_unique<TreeNode>(this, actionsFromStart_);
     TreeNode* childNode = child.get();
 
+    // Set child node option taken
     BaseOption* option = availableOptions_[children_.size()];
     childNode->optionTaken_ = option;
 
@@ -65,10 +68,8 @@ TreeNode* TreeNode::expand() {
         childNode->isTerminal_ = true;
     }
 
-    // Simulator is set to the child state, so determine what the available actions
-    // the child has
+    // Simulator is set to the child state, so determine what the available actions the child has
     childNode->setOptions(allOptions_);
-
 
     // Set termination flags
     childNode->isTerminal_ |= (enginehelper::engineGameFailed() || enginehelper::engineGameSolved());
@@ -78,6 +79,7 @@ TreeNode* TreeNode::expand() {
     // Store child
     children_.push_back(std::move(child));
 
+    // Get pointer to child
     return children_.back().get();
 }
 
@@ -131,57 +133,19 @@ BaseOption* TreeNode::getOptionTaken() {
     return optionTaken_;
 }
 
-bool compareBaseOptionPointer(BaseOption* a, BaseOption* b) { return (a->getTimesCalled() < b->getTimesCalled());}
-
 
 /*
  * Set the options the tree node can represent.
  */
 void TreeNode::setOptions(std::vector<BaseOption*> &allOptions) {
-    // Prioritize recent valid options.
-    // Option is recently valid if currently valid while not valid in parent.
-    // Create separate vectors (newely available, prevously visited?), shuffle each then concatenate.
-    // std::vector<BaseOption*> singleActionOptions;
-    // std::vector<BaseOption*> recentlyAvailableOptions;
-    // std::vector<BaseOption*> otherOptions;
     availableOptions_.clear();
     allOptions_ = allOptions;
 
+    // Only store valid options
     for (auto const & option : allOptions) {
         if (!option->isValid()) {continue;}
         availableOptions_.push_back(option);
     }
-
-    // for (BaseOption* option : allOptions) {
-    //     if (!option->isValid()) {continue;}
-
-    //     // Check if was not valid in parent
-    //     if (parent_ != nullptr && std::find(parent_->availableOptions_.begin(), 
-    //         parent_->availableOptions_.end(), option) != parent_->availableOptions_.end()) 
-    //     {
-    //         recentlyAvailableOptions.push_back(option);
-    //     }
-    //     // Non-single step option
-    //     // else if (option->getOptionType() != OptionType::SingleStep) {
-    //     //     otherOptions.push_back(option);
-    //     // }
-    //     else if (option->toString().compare("Single action: noop") == 0) {
-    //         singleActionOptions.push_back(option);
-    //     }
-    //     else {
-    //        otherOptions.push_back(option);
-    //     }
-    //     // availableOptions_.push_back(option); 
-    // }
-    // // std::random_shuffle(std::next(availableOptions_.begin()), availableOptions_.end());
-    // std::random_shuffle(singleActionOptions.begin(), singleActionOptions.end(), [&](int i) {return std::rand() % i;});
-    // std::random_shuffle(recentlyAvailableOptions.begin(), recentlyAvailableOptions.end(), [&](int i) {return std::rand() % i;});
-    // std::random_shuffle(otherOptions.begin(), otherOptions.end(), [&](int i) {return std::rand() % i;});
-    // sort(otherOptions.begin(), otherOptions.end(), compareBaseOptionPointer);
-
-    // availableOptions_.insert(availableOptions_.end(), recentlyAvailableOptions.begin(), recentlyAvailableOptions.end());
-    // availableOptions_.insert(availableOptions_.end(), singleActionOptions.begin(), singleActionOptions.end());
-    // availableOptions_.insert(availableOptions_.end(), otherOptions.begin(), otherOptions.end());
 }
 
 
@@ -189,7 +153,11 @@ void TreeNode::setOptions(std::vector<BaseOption*> &allOptions) {
  * Get the child for a specified index.
  */
 TreeNode* TreeNode::getChild(unsigned int index) {
-    assert(index < children_.size());
+    if (index >= children_.size()) {
+        PLOGE_(logger::FileLogger) << "Child index out of bounds.";
+        PLOGE_(logger::ConsoleLogger) << "Child index out of bounds.";
+        throw std::exception();
+    }
     return children_[index].get();
 }
 
@@ -204,8 +172,9 @@ Pointer TreeNode::getChild(BaseOption* optionTaken) {
         }
     }
 
-    PLOGE_(logger::FileLogger) << "Couldn't find child representing option: " << optionTaken->toString();
-    return nullptr;
+    PLOGE_(logger::FileLogger) << "Can't find child representing given option.";
+    PLOGE_(logger::ConsoleLogger) << "Can't find child representing given option.";
+    throw std::exception();
 }
 
 

@@ -11,6 +11,9 @@
 
 #include "option_collectible_sprite.h"
 
+// Standard Libary/STL
+#include <string>
+
 // Includes
 #include "logger.h"
 
@@ -20,23 +23,46 @@ OptionCollectibleSprite::OptionCollectibleSprite(int spriteID) {
     spriteID_ = spriteID;
     goalCell_ = enginehelper::getSpriteGridCell(spriteID);
     item_ = enginehelper::getGridElement(goalCell_);
-    count_ = 0;
     optionStringName_ = enginehelper::getItemReadableDescription(item_) + " " + std::to_string(spriteID_) + ", score = " 
         + std::to_string(enginehelper::getItemScore(goalCell_)) + ", gem count = " + std::to_string(enginehelper::getItemGemCount(goalCell_));
     solutionPath_.clear();
 }
 
 
+/**
+ * Convert to human readable format (spriteID, location, etc.)
+ */
 std::string OptionCollectibleSprite::toString() const {
     return optionStringName_;
 }
 
 
+/**
+ * Run the action(s) defined by the option to get to the collectible sprite.
+ */
 bool OptionCollectibleSprite::run() {
-    return true;
+    int MAX_ATTEMPT = 1000;
+    int counter = 0;
+    Action action = Action::noop;
+
+    while(true) {
+        ++counter;
+
+        // Game over while running option
+        if (enginehelper::engineGameOver() || MAX_ATTEMPT) {return false;}
+
+        bool flag = getNextAction(action);
+        enginehelper::setEnginePlayerAction(action);
+        enginehelper::engineSimulate();
+        
+        if (flag) {return true;}
+    }
 }
 
 
+/**
+ * Get the next action to get to the collectible sprite.
+ */
 bool OptionCollectibleSprite::getNextAction(Action &action) {
     action = Action::noop;
 
@@ -65,6 +91,10 @@ bool OptionCollectibleSprite::getNextAction(Action &action) {
 }
 
 
+/**
+ * Checks if the player can walk to the collectible sprite.
+ * Player can only walk to the sprite if it is pathable.
+ */
 bool OptionCollectibleSprite::isValid() {
     goalCell_ = enginehelper::getSpriteGridCell(spriteID_);
     runAStar();

@@ -631,9 +631,9 @@ namespace enginehelper {
     /**
      * Get the currently stored player action.
      *
-     * @return The integer representation of the action to perform.
+     * @return The Action set for the stored player.
      */
-    int getEnginePlayerAction();
+    Action getEnginePlayerAction();
 
     /**
      * Get the current score of the game.

@@ -14,7 +14,6 @@
 
 // Standard Libary/STL
 #include <vector>
-#include <map>
 #include <string>
 
 // Options

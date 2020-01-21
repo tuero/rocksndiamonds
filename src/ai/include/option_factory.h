@@ -17,14 +17,7 @@
 
 // Includes
 #include "base_option.h"
-
-
-enum class OptionFactoryType {
-    SINGLE_ACTION = 0,
-    PATH_TO_SPRITE,
-    TWO_LEVEL_SEARCH,
-    CUSTOM
-};
+#include "option_types.h"
 
 
 /**
@@ -36,8 +29,8 @@ enum class OptionFactoryType {
  */
 class OptionFactory {
 private:
-    OptionFactoryType optionFactoryType_ = OptionFactoryType::SINGLE_ACTION;
-    std::vector<std::unique_ptr<BaseOption>> options_;
+    OptionFactoryType optionFactoryType_ = OptionFactoryType::SINGLE_ACTION;        
+    std::vector<std::unique_ptr<BaseOption>> options_;                              // Option is responsible for memory managing the option objects
     
     /**
      * Create options for each of the single step actions.
@@ -53,9 +46,22 @@ private:
      */
     std::vector<BaseOption*> createPathToSpriteOptions();
 
-
+    /**
+     * Create options for the two level search.
+     * This uses pathing to collectible sprites (diamonds, keys, etc.) and to exit.
+     * Used for Masters thesis.
+     *
+     * @return Vector containing pointers to each sprite option.
+     */
     std::vector<BaseOption*> createTwoLevelSearchOptions();
 
+    /**
+     * Used for a custom list of options.
+     * 
+     * @note Here is where you can define similar functions to the above for new controllers.
+     *
+     * @return Vector containing pointers to each sprite option.
+     */
     std::vector<BaseOption*> createCustomOptions();
 
 public:
@@ -64,7 +70,6 @@ public:
 
     /**
      * Create options for use in search. 
-     * 
      * Calls specific option factory method depending on input.
      * 
      * @param optionFactoryType The factory type specifying the group of options to create.

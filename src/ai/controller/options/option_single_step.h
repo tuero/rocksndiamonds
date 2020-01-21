@@ -26,8 +26,8 @@
 class OptionSingleStep : public BaseOption {
 
 private:
-    Action action_;
-    int numTimes_;
+    Action action_;             // The action to perform
+    int numTimes_;              // Number of times to perform the action
     std::string optionStringName = "Single action: ";
 
 public:

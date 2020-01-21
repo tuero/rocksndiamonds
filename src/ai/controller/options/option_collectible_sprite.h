@@ -12,7 +12,7 @@
 #define OPTION_COLLECTIBLE_SPRITE_H
 
 // Standard Libary/STL
-#include <deque>
+#include <string>
 
 // Includes
 #include "base_option.h"
@@ -28,8 +28,7 @@
 class OptionCollectibleSprite : public BaseOption {
 
 private:
-    int item_;
-    int count_;
+    int item_;                              // Internal engine code defining collectible sprite.
     std::string optionStringName_ = "Path to sprite: ";
 
 public:
@@ -37,19 +36,30 @@ public:
     OptionCollectibleSprite(int spriteID);
 
     /**
-     * Set action which agent should immediately take.
+     * Run the action(s) defined by the option to get to the collectible sprite.
      * 
-     * Called when the currentSolution is empty. Agent always executes the next action
-     * from currentSolution. If conducting search on the future state while the agent 
-     * is conducting the current action, the controller should set currentSolution to
-     * the forwardSolution.
+     * @return True if the option was able to perform without error, false otherwise.
      */
     bool run() override;
 
+    /**
+     * Get the next action to get to the collectible sprite.
+     */
     bool getNextAction(Action &action) override;
 
+    /**
+     * Checks if the player can walk to the collectible sprite.
+     * Player can only walk to the sprite if it is pathable.
+     * 
+     * @return True if the option is valid, false otherwise.
+     */
     bool isValid() override;
 
+    /**
+     * Convert to human readable format (spriteID, location, etc.)
+     * 
+     * @return String representation of option.
+     */
     std::string toString() const override;
 };
 

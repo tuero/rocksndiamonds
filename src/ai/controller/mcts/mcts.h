@@ -18,6 +18,7 @@
 
 // MCTS
 #include "tree_node.h"
+#include "game_state.h"
 
 // Includes
 #include "base_controller.h"
@@ -26,7 +27,6 @@
 #include "engine_types.h"
 #include "timer.h"
 
-#include "../../engine/game_state.h"
 
 
 /**
@@ -39,15 +39,20 @@ class MCTS : public BaseController {
     typedef std::unique_ptr<TreeNode> Pointer;
 private:
     // Configuration file location
-    // !TODO Maybe put dirs into another header
-    const std::string mcts_config = "mcts.config";
-    const std::string config_dir = "./src/ai/config/";
+    const std::string MCTS_CONFIG_FILE = "mcts.config";
+
+    // MCTS state values
+    Pointer root = nullptr;                 // Pointer to root node (future state)
+    GameState rootSavedState;               // Game state representing the root
+    BaseOption *currentOption_;             // Current option which actions are being sent to engine
+    BaseOption *nextOption_;                // The next option to execute (best as chosen by MCTS)
+    bool optionStatusFlag_ = true;          // Flag to indicate the current option is finished and the next option should start
 
     // MCTS runtime configurations
     // These are fallback values in the event configuration file isn't loaded
-    int maxTime_ = 20000;              // Time limit
-    int maxIterationsDepth_ = 10;           // Node limit
-    int numSimulations_ = 20;           // Node limit
+    int maxTime_ = 40000;                   // Time limit
+    int maxIterationsDepth_ = 5;            // Max depth during simulation
+    int numSimulations_ = 5;                // Number of simulations to average the value from
     std::map<std::string, int*> configParameters_ = {
         {"max_time", &maxTime_},
         {"max_iterations_depth", &maxIterationsDepth_},
@@ -63,26 +68,25 @@ private:
     int callsSinceReset_ = 0;
     std::string msg;
 
-    Pointer root = nullptr;
-    GameState rootSavedState;
-    BaseOption *currentOption_;
-    BaseOption *nextOption_;
-    bool optionStatusFlag_ = true;
 
-
-    /*
+    /**
      * Log the current MCTS stats.
      */
     void logCurrentStats();
 
-    /*
+    /**
+     * Set the MCTS parameters from the config file.
+     */
+    void setParamsFromConfig();
+
+    /**
      * Select the child node based on UCT.
      *
      * @param node The ndoe to select the child from.
      */
     TreeNode* selectPolicyUCT(TreeNode* node);
 
-    /*
+    /**
      * Select node which was visited the most during MCTS
      *
      * If multiple nodes have share the most frequent visit count, one will be chosen
@@ -92,16 +96,16 @@ private:
      */
     TreeNode* selectMostVisitedChild(TreeNode* node);
 
-    /*
+    /**
      * Get the value for the current node.
      *
      * Assumes the engine is currently set to the state which the nodes represents, as 
      * engine functions will be called. The state will then save its value, so the value
      * can be queried later, even if the engine is not set to the state.
      */
-    float getNodeValue();
+    double getNodeValue();
 
-    /*
+    /**
      * Reset the MCTS controller.
      *
      * MCTS search tree is reset to one state forward following nextOption. This lets us
@@ -119,37 +123,31 @@ public:
 
     MCTS(OptionFactoryType optionType) : BaseController(optionType) {}
 
-
+    /**
+     * Start of level handeling.
+     */
     void handleLevelStart() override;
     
-    /*
-     * Set option the agent will now take, and reset the MCTS search tree.
+    /**
+     * Get the next action to execture from the controller. Since the MCTS root
+     * is at the state after execution, the sent action is from a saved option.
      * 
-     * Called when the currentOption is complete. currentOption is now set to 
-     * nextOption, which is the option MCTS wants to do next. The MCTS search tree
-     * is then reset to the state after the current option is complete.
-     * 
-     * @param currentOption Option which the agent gets to execute.
-     * @param nextOption Planned option for the agent to take at the future state.
+     * @return The action to execture.
      */
-    // void handleEmpty() override;
     Action getAction() override;
 
 
-    /*
+    /**
      * Continue to find the next option the agent should take.
      *
-     * Called during every game tick. Controller is planning on the next 
-     * future state while agent is conducting the current option. currentOption holds 
-     * the option the agent is currently conducting. The option to be taken once 
-     * current option is complete should be put into nextOption.
-     *
-     * @param currentOption Option which the agent gets to execute.
-     * @param nextOption Planned option for the agent to take at the future state.
+     * MCTS is run over the tree starting at the state AFTER the current option
+     * is finished executing. To achieve real time, this step should take ~18ms.
      */
-    // Action run() override;
     void plan() override;
 
+    /**
+     * Controller details in readable format.
+     */
     std::string controllerDetailsToString() override;
 
 };

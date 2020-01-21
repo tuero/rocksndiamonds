@@ -56,9 +56,6 @@ extern "C" void handleFirstLevelStart() {
     // // Initialize sprite IDs
     enginehelper::initSpriteIDs();
 
-    // clear solution
-    // controller.handleFirstLevelStart();
-
     // Initial logging
     PLOGI_(logger::FileLogger) << "Level starting: " << enginehelper::getLevelNumber();
     PLOGI_(logger::ConsoleLogger) << "Level starting: " << enginehelper::getLevelNumber();
@@ -191,32 +188,6 @@ extern "C" int getRandomNumber(int max) {
 extern "C" int runTests() {
     int result = Catch::Session().run();
     return result;
-    // Override logging level for tests
-    // logger::setLogLevel(logger::LogLevel::debug);
-
-    // PLOGI_(logger::FileLogger) << "Running all tests...";
-
-    // Save current game state
-    // GameState state;
-    // state.setFromEngineState();
-
-    // enginetype::GridCell exitCell = enginehelper::findExitLocation();
-    // enginehelper::setBoardDistancesDijkstra(exitCell);
-
-    // state.restoreEngineState();
-    // testenginespeed::testEngineSpeedNoOptimizations();
-
-    // state.restoreEngineState();
-    // testenginespeed::testEngineSpeedWithOptimizations();
-    
-    // state.restoreEngineState();
-    // testenginespeed::testBfsSpeed();
-
-    // state.restoreEngineState();
-    // testenginespeed::testMctsSpeed();
-
-    // state.restoreEngineState();
-    // testrng::testStateAfterSimulations();
 }
 #endif
 

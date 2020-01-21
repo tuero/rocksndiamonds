@@ -33,37 +33,6 @@ extern "C" {
  */
 class GameState {
 private:
-    // Number of structs of each type
-//     static const int NUM_SHORTS = 22;
-// #ifndef HEADLESS
-//     static const int NUM_INTS = 9;
-// #else
-//     static const int NUM_INTS = 3;
-// #endif
-//     static const int NUM_BOOLS = 2;
-//     static const int NUM_AMOEBAS = 2;
-
-//     // Pointers to engine state structs
-//     short (*pointersToShorts_[NUM_SHORTS])[MAX_LEV_FIELDX][MAX_LEV_FIELDY] = {
-//         &Feld, &Last, &MovPos, &MovDir, &MovDelay, &ChangeDelay, &ChangePage, 
-//         &CustomValue, &Store, &Store2, &StorePlayer, &Back, &ChangeCount, &ChangeEvent, 
-//         &WasJustMoving, &WasJustFalling, &CheckCollision, &CheckImpact, &AmoebaNr, 
-//         &ExplodeField, &ExplodePhase, &ExplodeDelay
-//     };
-//     int (*pointersToInts_[NUM_INTS])[MAX_LEV_FIELDX][MAX_LEV_FIELDY] = {
-//         &RunnerVisit, &PlayerVisit, 
-//         #ifndef HEADLESS
-//         &GfxFrame, &GfxRandom, &GfxElement, &GfxAction, &GfxDir, &GfxRedraw,
-//         #endif
-//         &spriteIDs
-//     };
-//     boolean (*pointersToBools_[NUM_BOOLS])[MAX_LEV_FIELDX][MAX_LEV_FIELDY] = {
-//         &Stop, &Pushed
-//     };
-//     short (*pointersToAmoebas_[NUM_AMOEBAS])[MAX_NUM_AMOEBA] = {
-//         &AmoebaCnt, &AmoebaCnt2
-//     };
-
     short Feld_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
     short Last_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
     short MovPos_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
@@ -98,17 +67,11 @@ private:
     bool gameSolved_;
 
 public:
-    // Containers of saved game state
-    // std::array<enginetype::board_short, NUM_SHORTS> arrayShorts_;
-    // std::array<enginetype::board_int, NUM_INTS> arrayInts_;
-    // std::array<enginetype::board_bool, NUM_BOOLS> arrayBools_;
-    // std::array<enginetype::amoeba_short, NUM_AMOEBAS> arrayAmoebas_;
-
     // Player info
     struct PlayerInfo player_;
-    struct GameInfo game_;
 
     // Game status
+    struct GameInfo game_;
     boolean allPlayersGone_;
     boolean gameStatus_;
     boolean levelSolvedGameEnd_;
@@ -139,48 +102,40 @@ public:
 
     GameState();
 
-    /*
+    /**
      * Get the stored score for the state.
      *
      * @return The saved score.
      */
     int getScore();
 
-    /*
+    /**
      * Check if the saved state is failed.
      *
      * @return True if the saved state is failed.
      */
     bool isGameFailed();
 
-    /*
+    /**
      * Check if the saved state is failed or solved.
      *
      * @return True if the saved state is failed or solved.
      */
     bool isGameOver();
 
-    /*
+    /**
      * Check if the saved state is solved.
      *
      * @return True if the saved state is solved.
      */
     bool isGameSolved();
 
-    /*
-     * Custom comparison operator, primarily used in testing.
-     *
-     * Not all stored data is checked, just a safe minimal amount to ensure that 
-     * states before/after simulations are the same.
-     */
-    bool operator==(const GameState &other); 
-
-    /*
+    /**
      * Set the stored state to the current game engine state.
      */
     void setFromEngineState();
 
-    /*
+    /**
      * Restore the game engine state to the stored state.
      */
     void restoreEngineState();

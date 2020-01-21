@@ -28,8 +28,6 @@ void Timer::reset() {
 
 /**
  * Set the timer limit.
- *
- * @param limit The limit for the timer in microseconds.
  */
 void Timer::setLimit(int limit) {
     limit_ = limit;
@@ -66,8 +64,6 @@ bool Timer::hasTimeLeft() {
 
 /**
  * Check if there is still time left on the timer.
- *
- * @return True if the timer still has time left.
  */
 int Timer::getTimeRemaining() {
     auto currentTime = std::chrono::high_resolution_clock::now();
@@ -79,8 +75,6 @@ int Timer::getTimeRemaining() {
 
 /**
  * Check the duration of the timer.
- *
- * @return number of microseconds since timer start.
  */
 int Timer::getDuration() {
     // if clock still running (starttime==endtime), return time since clock started

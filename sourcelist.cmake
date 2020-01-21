@@ -107,6 +107,7 @@ set(sources_ai
     ${PROJECT_SOURCE_DIR}/src/ai/engine/game_state.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/engine/game_state_abstract.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/level_programming/level_programming.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/util/config_reader.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/util/timer.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/util/rng.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/util/logger.cpp

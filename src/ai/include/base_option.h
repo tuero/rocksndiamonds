@@ -14,7 +14,6 @@
 
 // Standard Libary/STL
 #include <string>
-#include <ostream>
 #include <deque>
 #include <unordered_set>
 #include <vector>
@@ -37,14 +36,15 @@
  */
 class BaseOption {
 protected:
-    OptionType optionType_ = OptionType::Misc;          // Option enum type, used to group related options
-    enginetype::GridCell goalCell_;                     // 
-    std::deque<enginetype::GridCell> solutionPath_  = {};
-    std::vector<enginetype::GridCell> restrictedCells_ = {};
-    int spriteID_ = -1;                                 // Associated sprint for option
-    int timesCalled_ = 0;                               // Number of times called
-    int counter_ = 0;
+    OptionType optionType_ = OptionType::Misc;                  // Option enum type, used to group related options
+    enginetype::GridCell goalCell_;                             // The gridcell associated with A* as a solution.
+    std::deque<enginetype::GridCell> solutionPath_  = {};       // Path found by A*
+    std::vector<enginetype::GridCell> restrictedCells_ = {};    // Container of restricted cells A* must avoid
+    int spriteID_ = -1;                                         // Associated sprite for option
+    int timesCalled_ = 0;                                       // Number of times called
+    int counter_ = 0;                                           // Internal counter for tracking actions taking multiple game ticks
 
+    // Node for A* search
     struct Node {
         int id;                             // Fast access node ID = gridcell index 
         int parentId;                       // node ID for the parent node

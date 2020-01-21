@@ -13,7 +13,7 @@
 // Includes
 #include "engine_types.h"
 #include "engine_helper.h"
-#include "../../engine/game_state.h"
+#include "game_state.h"
 
 
 OptionWaitRock::OptionWaitRock(int spriteID) {

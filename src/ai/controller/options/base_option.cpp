@@ -94,12 +94,14 @@ void BaseOption::setRestrictedCells(std::vector<enginetype::GridCell> &restricte
     restrictedCells_ = restrictedCells;
 }
 
+
+/**
+ * Set the restricted cells.
+ */
 void BaseOption::setRestrictedCells(std::unordered_set<int> &restrictedCells) {
     restrictedCells_.clear();
     for (auto const & cell : restrictedCells) {
-        enginetype::GridCell rcell = enginehelper::indexToCell(cell);
-        // PLOGE_(logger::FileLogger) << toString() << "rest. node: x= " << rcell.x << ", y= " << rcell.y;
-        restrictedCells_.push_back(rcell);
+        restrictedCells_.push_back(enginehelper::indexToCell(cell));
     }
 }
 
@@ -209,5 +211,8 @@ void BaseOption::runAStar(enginetype::GridCell startCell, enginetype::GridCell g
             open[childIndex] = {childIndex, node.id, childCell, newG, h};
         }
     }
+
+    // A* is usually called to check if an option is valid (can we path to it), so its not needed
+    // to throw errors if we fail.
     PLOGV_(logger::FileLogger) << "A* couldn't find a path";
 }

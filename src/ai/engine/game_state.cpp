@@ -18,24 +18,22 @@
 GameState::GameState() : gameFailed_(false), gameSolved_(false) {}
 
 
-/*
+/**
  * Get the stored score for the state.
- *
- * @return The saved score.
  */
 int GameState::getScore() {
     return score_;
 }
 
 
-/*
+/**
  * Check if the saved state is failed.
  */
 bool GameState::isGameFailed() {
     return gameFailed_;
 }
 
-/*
+/**
  * Check if the saved state is solved.
  */
 bool GameState::isGameSolved() {
@@ -43,75 +41,18 @@ bool GameState::isGameSolved() {
 }
 
 
-/*
+/**
  * Check if the saved state is failed or solved.
- *
- * @return True if the saved state is failed or solved.
  */
 bool GameState::isGameOver() {
     return gameSolved_ || gameFailed_;
 }
 
 
-/*
- * Custom comparison operator, primarily used in testing.
- */
-bool GameState::operator==(const GameState &other){ 
-    (void)other;
-    return false;
-    // return  (arrayShorts_ == other.arrayShorts_) && 
-    //         (arrayShorts_ == other.arrayShorts_) && 
-    //         (arrayInts_ == other.arrayInts_) && 
-    //         (arrayBools_ == other.arrayBools_); 
-    //         (arrayAmoebas_ == other.arrayAmoebas_) && 
-    //         (player_.jx == other.player_.jx) && 
-    //         (player_.jy == other.player_.jy) && 
-    //         (player_.MovDir == other.player_.MovDir) && 
-    //         (player_.MovPos == other.player_.MovPos) && 
-    //         (allPlayersGone_ == other.allPlayersGone_) && 
-    //         (gameStatus_ == other.gameStatus_) && 
-    //         (levelSolvedGameEnd_ == other.levelSolvedGameEnd_) && 
-    //         (emGameOver_ == other.emGameOver_) && 
-    //         (emLevelSolved_ == other.emLevelSolved_) && 
-    //         (spGameOver_ == other.spGameOver_) && 
-    //         (spLevelSolved_ == other.spLevelSolved_) && 
-    //         (mmGameOver_ == other.mmGameOver_) && 
-    //         (mmLevelSolved_ == other.mmLevelSolved_) && 
-    //         (gameOver_ == other.gameOver_) && 
-    //         (levelSolved_ == other.levelSolved_) && 
-    //         (levelSolvedGameWon_ == other.levelSolvedGameWon_);     
-} 
-
-
-/*
+/**
  * Set the stored state to the current game engine state.
  */
 void GameState::setFromEngineState() {
-    // for (int i = 0; i < NUM_SHORTS; i++) {
-    //     std::copy(enginehelper::decayed_begin(*(pointersToShorts_[i])), 
-    //               enginehelper::decayed_end(*(pointersToShorts_[i])), 
-    //               enginehelper::decayed_begin(arrayShorts_[i])
-    //             );
-    // }
-    // for (int i = 0; i < NUM_INTS; i++) {
-    //     std::copy(enginehelper::decayed_begin(*(pointersToInts_[i])), 
-    //               enginehelper::decayed_end(*(pointersToInts_[i])), 
-    //               enginehelper::decayed_begin(arrayInts_[i])
-    //             );
-    // }
-    // for (int i = 0; i < NUM_BOOLS; i++) {
-    //     std::copy(enginehelper::decayed_begin(*(pointersToBools_[i])), 
-    //               enginehelper::decayed_end(*(pointersToBools_[i])), 
-    //               enginehelper::decayed_begin(arrayBools_[i])
-    //             );
-    // }
-    // for (int i = 0; i < NUM_AMOEBAS; i++) {
-    //     std::copy(enginehelper::decayed_begin(*(pointersToAmoebas_[i])), 
-    //               enginehelper::decayed_end(*(pointersToAmoebas_[i])), 
-    //               enginehelper::decayed_begin(arrayAmoebas_[i])
-    //             );
-    // }
-
     memcpy(Feld_, Feld, sizeof (short) * MAX_LEV_FIELDX * MAX_LEV_FIELDY);
     memcpy(Last_, Last, sizeof (short) * MAX_LEV_FIELDX * MAX_LEV_FIELDY);
     memcpy(MovPos_, MovPos, sizeof (short) * MAX_LEV_FIELDX * MAX_LEV_FIELDY);
@@ -145,22 +86,16 @@ void GameState::setFromEngineState() {
 
     // Player info
     player_ = stored_player[0];
-    game_ = game;
 
     // Game status
-    // allPlayersGone_ = game.all_players_gone;
+    game_ = game;
     gameStatus_ = game_status;
-    // levelSolvedGameEnd_ = game.LevelSolved_GameEnd;
     emGameOver_ = game_em.game_over;
     emLevelSolved_ = game_em.level_solved;
     spGameOver_ = game_sp.game_over;
     spLevelSolved_ = game_sp.level_solved;
     mmGameOver_ = game_mm.game_over;
     mmLevelSolved_ = game_mm.level_solved ;
-    // gameOver_ = game.GameOver;
-    // levelSolved_ = game.LevelSolved;
-    // levelSolvedGameWon_ = game.LevelSolved_GameWon;
-    // score_ = game.score;
 
     // Current position in viewfinder
     scrollX_ = scroll_x;
@@ -182,35 +117,10 @@ void GameState::setFromEngineState() {
 }
 
 
-/*
+/**
  * Restore the game engine state to the stored state.
  */
 void GameState::restoreEngineState() {
-    // for (int i = 0; i < NUM_SHORTS; i++) {
-    //     std::copy(enginehelper::decayed_begin(arrayShorts_[i]), 
-    //               enginehelper::decayed_end(arrayShorts_[i]), 
-    //               enginehelper::decayed_begin(*(pointersToShorts_[i]))
-    //             );
-    // }
-    // for (int i = 0; i < NUM_INTS; i++) {
-    //     std::copy(enginehelper::decayed_begin(arrayInts_[i]), 
-    //               enginehelper::decayed_end(arrayInts_[i]), 
-    //               enginehelper::decayed_begin(*(pointersToInts_[i]))
-    //             );
-    // }
-    // for (int i = 0; i < NUM_BOOLS; i++) {
-    //     std::copy(enginehelper::decayed_begin(arrayBools_[i]), 
-    //               enginehelper::decayed_end(arrayBools_[i]), 
-    //               enginehelper::decayed_begin(*(pointersToBools_[i]))
-    //             );
-    // }
-    // for (int i = 0; i < NUM_AMOEBAS; i++) {
-    //     std::copy(enginehelper::decayed_begin(arrayAmoebas_[i]), 
-    //               enginehelper::decayed_end(arrayAmoebas_[i]), 
-    //               enginehelper::decayed_begin(*(pointersToAmoebas_[i]))
-    //             );
-    // }
-
     memcpy(Feld, Feld_, sizeof (short) * MAX_LEV_FIELDX * MAX_LEV_FIELDY);
     memcpy(Last, Last_, sizeof (short) * MAX_LEV_FIELDX * MAX_LEV_FIELDY);
     memcpy(MovPos, MovPos_, sizeof (short) * MAX_LEV_FIELDX * MAX_LEV_FIELDY);
@@ -244,22 +154,17 @@ void GameState::restoreEngineState() {
 
     // Player info
     stored_player[0] = player_;
-    game = game_;
 
     // Game status
-    // game.all_players_gone = allPlayersGone_;
+    game = game_;
     game_status =  gameStatus_;
-    // game.LevelSolved_GameEnd = levelSolvedGameEnd_;
     game_em.game_over = emGameOver_; 
     game_em.level_solved = emLevelSolved_;
     game_sp.game_over = spGameOver_; 
     game_sp.level_solved = spLevelSolved_;
     game_mm.game_over = mmGameOver_; 
     game_mm.level_solved = mmLevelSolved_;
-    // game.GameOver = gameOver_; 
-    // game.LevelSolved = levelSolved_;
-    // game.LevelSolved_GameWon = levelSolvedGameWon_;
-    // game.score = score_;
+
 
     // Current position in viewfinder
     scroll_x = scrollX_;

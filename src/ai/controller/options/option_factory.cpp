@@ -32,7 +32,7 @@ std::vector<BaseOption*> OptionFactory::createSingleActionOptions() {
     options_.clear();
 
     // Single action for each available 
-    for (Action action : enginetype::ALL_ACTIONS) {
+    for (Action action : enginetype::ALL_ACTIONS_NO_NOOP) {
         std::unique_ptr<OptionSingleStep> option = std::make_unique<OptionSingleStep>(action, 1);
         options_.push_back(std::move(option));
         optionPointers.push_back(options_.back().get());
@@ -49,17 +49,30 @@ std::vector<BaseOption*> OptionFactory::createPathToSpriteOptions() {
     std::vector<BaseOption*> optionPointers;
     options_.clear();
 
-    // Single step option for each available 
     for (enginetype::GridCell cell : enginehelper::getMapSprites()) {
         int spriteID = enginehelper::getSpriteID(cell);
-        std::unique_ptr<OptionCollectibleSprite> option = std::make_unique<OptionCollectibleSprite>(spriteID);
-        options_.push_back(std::move(option));
-        optionPointers.push_back(options_.back().get());
+        // Collectible sprite (diamond in this case)
+        if (enginehelper::isCollectable(cell)) {
+            std::unique_ptr<OptionCollectibleSprite> option = std::make_unique<OptionCollectibleSprite>(spriteID);
+            options_.push_back(std::move(option));
+            optionPointers.push_back(options_.back().get());
+        }
+        // Exit
+        else if (enginehelper::isExit(cell)) {
+            std::unique_ptr<OptionToExit> option = std::make_unique<OptionToExit>(spriteID);
+            options_.push_back(std::move(option));
+            optionPointers.push_back(options_.back().get());
+        }
     }
-
     return optionPointers;
 }
 
+
+/**
+ * Create options for the two level search.
+ * This uses pathing to collectible sprites (diamonds, keys, etc.) and to exit.
+ * Used for Masters thesis.
+ */
 std::vector<BaseOption*> OptionFactory::createTwoLevelSearchOptions() {
     std::vector<BaseOption*> optionPointers;
     options_.clear();
@@ -84,6 +97,9 @@ std::vector<BaseOption*> OptionFactory::createTwoLevelSearchOptions() {
 }
 
 
+/**
+ * Used for a custom list of options.
+ */
 std::vector<BaseOption*> OptionFactory::createCustomOptions() {
     std::vector<BaseOption*> optionPointers;
     options_.clear();
@@ -104,73 +120,13 @@ std::vector<BaseOption*> OptionFactory::createCustomOptions() {
         }
     }
     return optionPointers;
-
-
-
-    /*
-    std::vector<BaseOption*> optionPointers;
-    options_.clear();
-
-    // Single step option for each available 
-    // for (Action action : ALL_ACTIONS) {
-    //     if (action != Action::noop) {
-    //         std::unique_ptr<OptionSingleStep> option = std::make_unique<OptionSingleStep>(action, 1);
-    //         options_.push_back(std::move(option));
-    //         optionPointers.push_back(options_.back().get());
-    //     }
-    //     else {
-    //         std::unique_ptr<OptionSingleStep> option = std::make_unique<OptionSingleStep>(action, 4);
-    //         options_.push_back(std::move(option));
-    //         optionPointers.push_back(options_.back().get());
-    //     }
-    // }
-
-    for (enginetype::GridCell cell : enginehelper::getMapSprites()) {
-        // if (enginehelper::getGridElement(cell) == enginetype::FIELD_BOULDER) {
-        //     int spriteID = enginehelper::getSpriteID(cell);
-
-        //     // To rock
-        //     for (Action direction : ALL_ACTIONS) {
-        //         if (direction == Action::noop || direction == Action::up) {continue;}
-        //         std::unique_ptr<OptionToRock> option = std::make_unique<OptionToRock>(spriteID, direction);
-        //         options_.push_back(std::move(option));
-        //         optionPointers.push_back(options_.back().get());
-        //     }
-
-        //     // Rock wait
-        //     // !~~ Maybe not needed
-        //     std::unique_ptr<OptionWaitRock> optionWaitRock = std::make_unique<OptionWaitRock>(spriteID);
-        //     options_.push_back(std::move(optionWaitRock));
-        //     optionPointers.push_back(options_.back().get());
-
-        //     // Rock push
-        //     std::unique_ptr<OptionPushRock> optionLeft = std::make_unique<OptionPushRock>(spriteID, Action::left);
-        //     options_.push_back(std::move(optionLeft));
-        //     optionPointers.push_back(options_.back().get());
-
-        //     std::unique_ptr<OptionPushRock> optionRight = std::make_unique<OptionPushRock>(spriteID, Action::right);
-        //     options_.push_back(std::move(optionRight));
-        //     optionPointers.push_back(options_.back().get());
-        // }
-        // else {
-        //     int spriteID = enginehelper::getSpriteID(cell);
-        //     std::unique_ptr<OptionToSprite> option = std::make_unique<OptionToSprite>(spriteID);
-        //     options_.push_back(std::move(option));
-        //     optionPointers.push_back(options_.back().get());
-        // }
-        int spriteID = enginehelper::getSpriteID(cell);
-        std::unique_ptr<OptionCollectibleSprite> option = std::make_unique<OptionCollectibleSprite>(spriteID);
-        options_.push_back(std::move(option));
-        optionPointers.push_back(options_.back().get());
-    }
-
-    return optionPointers;
-    */
 }
 
 
 /**
  * Create options for use in search. 
+ * 
+ * @note Here is where you can define similar functions to the above for new controllers.
  */
 std::vector<BaseOption*> OptionFactory::createOptions(OptionFactoryType optionFactoryType) {
     optionFactoryType_ = optionFactoryType;
@@ -179,10 +135,10 @@ std::vector<BaseOption*> OptionFactory::createOptions(OptionFactoryType optionFa
             return createSingleActionOptions();
         case OptionFactoryType::PATH_TO_SPRITE :
             return createPathToSpriteOptions();
-        case OptionFactoryType::CUSTOM :
-            return createCustomOptions();
         case OptionFactoryType::TWO_LEVEL_SEARCH :
             return createTwoLevelSearchOptions();
+        case OptionFactoryType::CUSTOM :
+            return createCustomOptions();
         default :
             optionFactoryType_ = OptionFactoryType::SINGLE_ACTION;
             PLOGE_(logger::FileLogger) << "Unknown option factory type.";

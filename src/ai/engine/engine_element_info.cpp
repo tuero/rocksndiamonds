@@ -209,17 +209,27 @@ bool isExitClosing(const enginetype::GridCell cell) {
     return item == EL_EXIT_CLOSING;
 }
 
+/**
+ * Check if the grid cell contains a key element.
+ */
 bool isKey(const enginetype::GridCell cell) {
     int item = getGridElement(cell);
     return IS_KEY(item);
 }
 
 
+/**
+ * Check if the grid cell contains a gate element.
+ */
 bool isGate(const enginetype::GridCell cell) {
     int item = getGridElement(cell);
     return IS_GATE(item);
 }
 
+
+/**
+ * Check if the grid cell contains an unlocked gate element.
+ */
 bool isGateOpen(const enginetype::GridCell cell) {
     int item = getGridElement(cell);
     return  (IS_RND_GATE(item) && stored_player[0].key[RND_GATE_NR(item)]) ||
@@ -233,6 +243,10 @@ bool isGateOpen(const enginetype::GridCell cell) {
             (IS_EMC_GATE_GRAY_ACTIVE(item) && stored_player[0].key[EMC_GATE_GRAY_ACTIVE_NR(item)]);
 }
 
+
+/**
+ * Check if the grid cell contains a closed gate element.
+ */
 bool isGateClosed(const enginetype::GridCell cell) {
     return !isGateOpen(cell);
 }

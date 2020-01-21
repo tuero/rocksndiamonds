@@ -10,16 +10,19 @@
 
 #include "controller.h"
 
+// Standard Libary/STL
+#include <iostream>
+
 // Includes
 #include "engine_helper.h" 
 #include "timer.h" 
 #include "logger.h"
 
-
 #include "../util/statistics.h"
 
 // Controllers
 #include "controller_listing.h"
+#include "option_types.h"
 #include "default/default.h"
 #include "mcts/mcts.h"
 #include "replay/replay.h"
@@ -51,7 +54,7 @@ Controller::Controller(ControllerType controller) {
  */
 void Controller::handleFirstLevelStart() {
     statistics::numLevelTries += 1;
-    // enginehelper::initSpriteIDs();
+
     // Initialize controller options
     baseController_.get()->initializeOptions();
 
@@ -70,7 +73,7 @@ void Controller::reset() {
     PLOGD_(logger::FileLogger) << "Resetting controller.";
     PLOGD_(logger::ConsoleLogger) << "Resetting controller.";
 
-    actionsTaken.clear();
+    actionsTaken_.clear();
 
     // Reset available options
     baseController_.get()->resetOptions();
@@ -105,7 +108,7 @@ void Controller::handleLevelSolved() {
     PLOGI_(logger::ConsoleLogger) << "Number of plays = " << statistics::numLevelTries;
 
     // Signal game over and close logs
-    logger::createReplayForIndividualRun(enginehelper::getLevelSet(), enginehelper::getLevelNumber(), actionsTaken);
+    logger::createReplayForIndividualRun(enginehelper::getLevelSet(), enginehelper::getLevelNumber(), actionsTaken_);
     enginehelper::setEngineGameStatusModeQuit();
     logger::closeReplayFile();
 }
@@ -116,24 +119,21 @@ void Controller::handleLevelSolved() {
  * Depending on the controller, this will either terminate or attempt the level again.
  */
 void Controller::handleLevelFailed() {
-    if (statistics::numLevelTries % 1000 == 0) {
+    static const int MSG_FREQ = 100;
+    if (statistics::numLevelTries % MSG_FREQ == 0) {
         PLOGI_(logger::FileLogger) << "Game Failed.";
         PLOGI_(logger::ConsoleLogger) << "Game Failed.";
     }
-    // PLOGI_(logger::FileLogger) << "Game Failed.";
-    // PLOGI_(logger::ConsoleLogger) << "Game Failed.";
 
     statistics::numLevelTries += 1;
 
     if (baseController_.get()->retryOnLevelFail()) {
         // Handle necessary changes before/after level reload
         baseController_.get()->handleLevelRestartBefore();
-        if (statistics::numLevelTries % 1000 == 0) {
+        if (statistics::numLevelTries % MSG_FREQ == 0) {
             PLOGI_(logger::FileLogger) << "Restarting level: " << enginehelper::getLevelNumber() << ", attempt " << statistics::numLevelTries;
             PLOGI_(logger::ConsoleLogger) << "Restarting level: " << enginehelper::getLevelNumber() << ", attempt " << statistics::numLevelTries;
         }
-        // PLOGI_(logger::FileLogger) << "Restarting level: " << enginehelper::getLevelNumber() << ", attempt " << statistics::numLevelTries;
-        // PLOGI_(logger::ConsoleLogger) << "Restarting level: " << enginehelper::getLevelNumber() << ", attempt " << statistics::numLevelTries;
         enginehelper::restartLevel();
         logger::savePlayerMove("reset");
         reset();
@@ -151,36 +151,46 @@ void Controller::handleLevelFailed() {
 int Controller::getAction() {
     enginehelper::setSimulatorFlag(true);
     Action action = Action::noop;
-    BaseController* baseController = baseController_.get();
 
-    // Handle empty action solution queue.
-    if (currentAction_.empty()) {
-        // If both currentAction_ and nextAction_ are empty, and controller 
-        // wants to use forward model to plan while executing, it should seed with noop
-        currentAction_.insert(currentAction_.end(), enginetype::ENGINE_RESOLUTION, baseController_.get()->getAction());
+    try{
+        BaseController* baseController = baseController_.get();
+
+        // Handle empty action solution queue (ask controller for next action)
+        if (currentAction_.empty()) {
+            currentAction_.insert(currentAction_.end(), enginetype::ENGINE_RESOLUTION, baseController_.get()->getAction());
+        }
+
+        // Continue to run controller to find the next option which should be taken.
+        // Controller implementation may be to do nothing (if we are not using forward model planning).
+        baseController->plan();
+
+        // Get next action in queue
+        if (!currentAction_.empty()) {
+            action = currentAction_.front();
+            currentAction_.erase(currentAction_.begin());
+        }
+
+        // Send action information to logger
+        // We only care about information at the engine resolution
+        if (step_counter_++ % enginetype::ENGINE_RESOLUTION == 0) {
+            // Save action to replay file
+            logger::savePlayerMove(enginehelper::actionToString(action));
+            logger::logPlayerMove(enginehelper::actionToString(action));
+            logger::logCurrentState();
+            actionsTaken_.push_back(enginehelper::actionToString(action));
+        }
+    } 
+    catch (const std::exception &ex) {
+        std::cerr << "A failure occured: " << ex.what() << ". Please check logs." << std::endl;
     }
-
-    // Continue to run controller to find the next option which should be taken.
-    baseController->plan();
-
-    // Get next action in action-currentSolution_ queue
-    if (!currentAction_.empty()) {
-        action = currentAction_.front();
-        currentAction_.erase(currentAction_.begin());
-    }
-
-    // Send action information to logger
-    // We only care about information at the engine resolution
-    if (step_counter_++ % enginetype::ENGINE_RESOLUTION == 0) {
-        // Save action to replay file
-        logger::savePlayerMove(enginehelper::actionToString(action));
-        // logger::logPlayerMove(enginehelper::actionToString(action));
-        logger::logCurrentState();
-        actionsTaken.push_back(enginehelper::actionToString(action));
+    catch (...) {
+        // catch any errors
+        std::cerr << "Unknown failure occurred. Please check logs." << std::endl;
     }
 
     enginehelper::setSimulatorFlag(false);
 
+    // Send action to engine, which expects as the underlying int code.
     return static_cast<std::underlying_type_t<Action>>(action);
 }
 
@@ -213,8 +223,8 @@ void Controller::initController(ControllerType controller) {
     else if (controller == CONTROLLER_MCTS) {
         baseController_ = std::make_unique<MCTS>();
     }
-    else if (controller == CONTROLLER_MCTS_CUSTOM) {
-        baseController_ = std::make_unique<MCTS>(OptionFactoryType::CUSTOM);
+    else if (controller == CONTROLLER_MCTS_OPTIONS) {
+        baseController_ = std::make_unique<MCTS>(OptionFactoryType::PATH_TO_SPRITE);
     }
     else if (controller == CONTROLLER_TWOLEVEL) {
         baseController_ = std::make_unique<TwoLevelSearch>(OptionFactoryType::TWO_LEVEL_SEARCH);
