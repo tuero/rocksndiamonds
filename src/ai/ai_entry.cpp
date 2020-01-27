@@ -40,10 +40,13 @@ boolean is_simulating;
 // Global objects which are needed outside local scopes
 Controller controller;
 
+// Flag to check whether trying to load the level failed
+boolean load_level_failed;
+
 
 // ------------------------ Init Functions --------------------------
 
-/*
+/**
  * Perform all necessary actions at level start.
  */
 extern "C" void handleFirstLevelStart() {
@@ -69,7 +72,8 @@ extern "C" void handleFirstLevelStart() {
 
     // Initialize and open replay file
     // Don't create replay file if we are currently in a replay
-    if (enginehelper::getControllerType() != CONTROLLER_REPLAY) {
+    // if (enginehelper::getControllerType() != CONTROLLER_REPLAY) {
+    if (options.save_run) {
         logger::initReplayFile(enginehelper::getLevelSet(), enginehelper::getLevelNumber());
     }
 
@@ -95,7 +99,7 @@ extern "C" void handleLevelFailed() {
 }
 
 
-/*
+/**
  * Initalizes the controller to be used.
  * The controller type is provided by a command line argument, which the 
  * engine helper grabs.
@@ -105,7 +109,7 @@ extern "C" void initController() {
 }
 
 
-/*
+/**
  * Initialize the loggers.
  * Passes the command line arguments to loggerper
  */
@@ -120,6 +124,14 @@ extern "C" void initLogger(int argc, char *argv[]) {
     }
 
     logger::initLogger(static_cast<logger::LogLevel>(options.log_level), programArgs);
+}
+
+
+/**
+ * Close the replay file.
+ */
+extern "C" void closeReplayFile(void) {
+    logger::closeReplayFile();
 }
 
 
@@ -148,7 +160,7 @@ extern "C" int requestReset() {
 }
 
 
-/*
+/**
  * Get an action from the controller and send back to engine.
  * Implementation of solution will depend on controller type.
  */
@@ -157,7 +169,7 @@ extern "C" int getAction() {
 }
 
 
-/*
+/**
  * Some custom levels have elements that continuously spawn in
  * Hook needs to be made in event loop, as these features are not supported
  * in the built in CE programming
@@ -169,7 +181,7 @@ extern "C" void handleCustomLevelProgramming() {
 
 // ----------------------------- RNG ------------------------------
 
-/*
+/**
  * Wrapper to get random number for engine use.
  */
 extern "C" int getRandomNumber(int max) {

@@ -1006,14 +1006,15 @@ struct OptionInfo
   boolean debug;
   // (tuero@ualberta.ca) - September 2019
   // Additional command line options to set
-  ControllerType controller_type;       // Solver to act as controller
-  boolean run_tests;
+  ControllerType controller_type;        // Solver to act as controller
   int level_number;                      // level number to load
+  boolean all_levels;                    // Try all levels in the levelset
   int delay;                             // SetVideoFrameDelay
-  int log_level;
-  char* replay_file;
-  char* level_set;
-  int opt;
+  int log_level;                         // PLOG loglevel int code
+  char* replay_file;                     // Name of replay file to load
+  char* level_set;                       // Name of levelset to load
+  boolean save_run;                      // Flag to save replay file of actions taken
+  int opt;                               // Option int argument for controllers
 };
 
 struct VideoSystemInfo

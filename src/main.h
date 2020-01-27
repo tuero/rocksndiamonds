@@ -3776,5 +3776,6 @@ extern struct ConfigInfo	helptext_config[];
 
 extern boolean is_simulating;
 extern int step_counter;
+extern boolean load_level_failed;
 
 #endif	// MAIN_H

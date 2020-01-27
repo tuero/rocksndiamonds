@@ -962,10 +962,11 @@ void GetOptions(int argc, char *argv[],
   options.verbose = FALSE;
   options.debug = FALSE;
   options.controller_type = CONTROLLER_DEFAULT;
-  options.run_tests = FALSE;
   options.level_number = 0;
+  options.all_levels = FALSE;
   options.log_level = 2;
   options.delay = GAME_FRAME_DELAY;
+  options.save_run = FALSE;
   options.opt = 0;
 
 #if 1
@@ -1125,6 +1126,10 @@ void GetOptions(int argc, char *argv[],
       // when doing batch processing, always enable verbose mode (warnings)
       options.verbose = TRUE;
     }
+    else if (strncmp(option, "-save_run", option_len) == 0)
+    {
+      options.save_run = TRUE;
+    }
     else if (strncmp(option, "-controller", option_len) == 0)
     {
         if (option_arg == NULL) {
@@ -1147,10 +1152,6 @@ void GetOptions(int argc, char *argv[],
         if (option_arg == next_option) {
             options_left++;
         }
-    }
-    else if (strncmp(option, "-test", option_len) == 0)
-    {
-        options.run_tests = TRUE;
     }
     else if (strncmp(option, "-replay", option_len) == 0)
     {
@@ -1176,6 +1177,10 @@ void GetOptions(int argc, char *argv[],
         if (option_arg == next_option) {
             options_left++;
         }
+    }
+    else if (strncmp(option, "-all_levels", option_len) == 0)
+    {
+      options.all_levels = TRUE;
     }
     else if (strncmp(option, "-loadlevel", option_len) == 0)
     {

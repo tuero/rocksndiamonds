@@ -7817,23 +7817,41 @@ int main(int argc, char *argv[])
     return runTests();
     #endif
 
-    // Init custom logging
-    initController();
+    int level_num = options.all_levels ? 1 : options.level_number;
 
-    // If level number given as program argument, try to load
-    if (options.level_number > 0) {
-        LoadLevel(options.level_number);
+    while (1) {
+      // Init custom logging
+      initController();
+
+      // If level number given as program argument, try to load
+      if (level_num > 0) {
+          load_level_failed = FALSE;
+          LoadLevel(level_num);
+
+          // Failed to load, exit
+          if (load_level_failed) {
+            Error(ERR_WARN, "Can't load level %d, exiting.", level_num);
+            return 1;
+          }
+      }
+
+      // If we have specified a controller, we need to manually start game actions
+      // Normally this would run when the user manually clicks on game start
+      if (options.controller_type != CONTROLLER_DEFAULT) {
+          StartGameActions(network.enabled, setup.autorecord, level.random_seed);
+      }
+
+      // normal event loop
+      EventLoop();
+
+      // Level is done (either solved or failed)
+      // If all_levels is set, we increment to next level and continue again
+      if (!options.all_levels) {return 0;}
+      ++level_num;
     }
 
-    // If we have specified a controller, we need to manually start game actions
-    // Normally this would run when the user manually clicks on game start
-    if (options.controller_type != CONTROLLER_DEFAULT) {
-        StartGameActions(network.enabled, setup.autorecord, level.random_seed);
-    }
-
-    // normal event loop
-  EventLoop();
-  CloseAllAndExit(0);
+    // Game over, cleanup
+    CloseAllAndExit(0);
 
   return 0;	// to keep compilers happy
 }

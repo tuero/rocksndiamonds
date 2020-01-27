@@ -425,8 +425,11 @@ void EventLoop(void)
     SetVideoFrameDelay(options.delay != GAME_FRAME_DELAY && !is_simulating ? options.delay : MenuFrameDelay);
 #endif
 
-    if (game_status == GAME_MODE_QUIT)
+    // Game over
+    if (game_status == GAME_MODE_QUIT) {
+      closeReplayFile();
       return;
+    }
 
   }
 }

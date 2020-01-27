@@ -51,6 +51,11 @@ extern "C"
     void initController(void);
 
     /**
+     * Close the replay file.
+     */
+    void closeReplayFile(void);
+
+    /**
      * Initialize the loggers.
      *
      * A file and consol logger are used. Consol logger only displays partial information

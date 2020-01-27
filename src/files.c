@@ -3349,6 +3349,7 @@ static void LoadLevelFromFileInfo_RND(struct LevelInfo *level,
       return;
 
     Error(ERR_WARN, "cannot read level '%s' -- using empty level", filename);
+    load_level_failed = TRUE;
 
     if (!setup.editor.use_template_for_new_levels)
       return;
@@ -6197,7 +6198,6 @@ static void LoadLevelFromFileInfo(struct LevelInfo *level,
 {
   // always start with reliable default values
   setLevelInfoToDefaults(level, level_info_only, TRUE);
-
   switch (level_file_info->type)
   {
     case LEVEL_FILE_TYPE_RND:
@@ -6233,8 +6233,11 @@ static void LoadLevelFromFileInfo(struct LevelInfo *level,
   }
 
   // if level file is invalid, restore level structure to default values
-  if (level->no_valid_file)
+  if (level->no_valid_file) {
     setLevelInfoToDefaults(level, level_info_only, FALSE);
+    load_level_failed = TRUE;
+  }
+    
 
   if (level->game_engine_type == GAME_ENGINE_TYPE_UNKNOWN)
     level->game_engine_type = GAME_ENGINE_TYPE_RND;
