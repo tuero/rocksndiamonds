@@ -71,7 +71,7 @@ private:
     std::unordered_map<uint64_t, int> hashPathTimesVisited;                 // Map tracking number of visits for each (partial) path
 
     // Constraint identification
-    typedef std::array<uint64_t, 2> OptionIndexPair;                             // Typedef for pairs of options (for return types)
+    typedef std::array<uint64_t, 2> OptionIndexPair;                        // Typedef for pairs of options (for return types)
     enginetype::GridCell prevPlayerCell_;                                   // Player cell on the previous game step (Used to find restricted cells on current step)
     enginetype::GridCell currPlayerCell_;                                   // Player cell on the current game step
     std::unordered_map<int, bool> prevIsMoving_;                            // Map of sprites which are moving for the previous game step
@@ -298,14 +298,9 @@ public:
      */
     Action getAction() override;
 
-    /*
-     * Continue to find the next option the agent should take.
-     * 
-     *
-     * @param currentOption Option which the agent gets to execute.
-     * @param nextOption Planned option for the agent to take at the future state.
+    /**
+     * Use this time to check for moved objects.
      */
-    // void run(BaseOption **currentOption, BaseOption **nextOption) override;
     void plan() override;
 
     /**

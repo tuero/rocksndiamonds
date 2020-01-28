@@ -88,7 +88,7 @@ void Controller::reset() {
  * Check if the controller wants to request a reset.
  */
 bool Controller::requestReset() {
-    return baseController_->requestRest();
+    return baseController_->requestReset();
 }
 
 

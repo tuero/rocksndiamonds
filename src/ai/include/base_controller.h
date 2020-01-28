@@ -86,7 +86,7 @@ public:
      * 
      * @return True if the controller wants to reset the level.
      */
-    virtual bool requestRest() {return requestReset_;}
+    virtual bool requestReset() {return requestReset_;}
 
     /**
      * Handle setup required at level start.

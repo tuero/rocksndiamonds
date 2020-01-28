@@ -14,7 +14,7 @@ The following header only libraries are used in this project. They are included 
 - Plog v1.1.5
 
 Additionally, SDL2 is needed, and highly recommended, to run any the GUI version. In addition to the standard package, image, mixer, net, and ttf will also need to be installed.
-```
+```shell
 sudo apt-get install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-net-dev libsdl2-ttf-dev
 ```
 
@@ -27,7 +27,7 @@ These instructions will help you install the program. It should compile fine on 
 - macOS Catalina 10.15.2, Apple Clang 11.0.0
 
 To install this project, follow the below steps:
-```
+```shell
 # Clone this repository
 $ git clone --recurse-submodules https://github.com/tuero/rocksndiamonds.git
 
@@ -43,40 +43,17 @@ $ cd ..
 # Run the GUI program with user input
 $ ./rocksndiamonds_gui
 ```
+For a detailed listing of the usage, see the [usage](docs/usage.md) section of the documents.
 
-## How It Works
-### Setting up a position:
-- `i n` : Initialize the game to use an (n,n) board, where 'n' is in [4,8] inclusive. This command has to be executed at least once before any of b,w,s,g,m,u commands.
-- `b` : set black to move
-- `w` : set white to move
-- `s` : Setup a new position by specifying the contents of the board from left-to-right and top-to-bottom. The setup uses 'e' for empty, 'x' for blocked, 'b' for a black players disc, and 'w' for a white players disc. For example, using the 5x5 board above, the setup commands would look like this one:
-```
-s 
-eeeee
-eeeee
-exwbe
-exeee
-eeeex
-```
-
-### Playing Moves
-- `ms1s2` : Move from square s1 to s2, which uses [Algebraic Notation](https://en.wikipedia.org/wiki/Algebraic_notation_(chess))
-- `u` : Undo the last move played. Note, that this command can be issued repeatedly to undo any number of moves.
-
-
-### Search Control
-- `1` : Enable subsequent searches using the AlphaBeta search, described [above](#ataxx).
-- `2` : Enable subsequent searches using the NegaScout search, described [above](#ataxx).
-- `d <depth>` : Set the maximum search depth used in iterative deepening to `<depth>`.
-- `ft <time>` : Set the fixed search time per move to `<time>` seconds.
-- `rt <time>` : Set the remaning time for the entire game to `<time>` seconds.
-- `g` : Begin searching, whose settings are defined by the by the above settings.
-
-
-### Execution Control
-- `q` : Quit the program.
+## Documentation
+- [GUI vs Headless](docs/binaries.md)
+- [Creating a basic controller](docs/controller.md)
+- [Detailed controller features](docs/controller_detailed.md)
+- [Accessing engine state and information](docs/engine.md)
+- [Usage](docs/usage.md)
+- [Logging](docs/logging.md)
+- [Replay files](docs/replay.md)
 
 
 ## License
-
-This project is licensed under the GNU GPL version 2 License - see the [COPYING](COPYING) file for details
+This project is licensed under the GNU GPL version 2 License - see the [COPYING](COPYING) file for details.

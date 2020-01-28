@@ -13,8 +13,6 @@
 // Standard Libary/STL
 #include <iostream>
 #include <fstream>
-#include <sys/types.h>
-#include <unistd.h>
 
 // Third party logging library
 #include <plog/Log.h>
@@ -23,6 +21,7 @@
 // Includes
 #include "engine_types.h"
 #include "rng.h"
+#include "file_naming.h"
 
 
 // Directory locations
@@ -33,35 +32,6 @@ const std::string INDIVIDUAL_RUN = "_INDIVIDUAL";
 const std::string LOG_EXTENSION = ".log";
 const std::string REPLAY_EXTENSION = ".txt";
 static std::ofstream replayFile;
-
-
-
-/**
- * Get the current datetime in string format to name the log/replay files
- */
-std::string datetimeToString() {
-    time_t rawtime;
-    struct tm * timeinfo;
-    char buffer[80];
-
-    time (&rawtime);
-    timeinfo = localtime(&rawtime);
-
-    // TODO: Prone to overflow?
-    strftime(buffer,sizeof(buffer),"%Y-%m-%d %H:%M:%S",timeinfo);
-
-    return std::string(buffer);
-}
-
-
-/**
- * Get the file name used for both logging and replay.
- * File name is the datetime and PID.
- */
-std::string getFileName() {
-    pid_t pid = getpid();
-    return datetimeToString() + " " + std::to_string(pid);
-}
 
 
 /**

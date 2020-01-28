@@ -188,11 +188,7 @@ Action TwoLevelSearch::getAction() {
 
 
 /**
- * Continue to find the next option the agent should take.
- * 
- *
- * @param currentOption Option which the agent gets to execute.
- * @param nextOption Planned option for the agent to take at the future state.
+ * Use this time to check for moved objects.
  */
 void TwoLevelSearch::plan() {
     checkForMovedObjects();
