@@ -18,7 +18,7 @@
 #include "timer.h" 
 #include "logger.h"
 
-#include "../util/statistics.h"
+#include "statistics.h"
 
 // Controllers
 #include "controller_listing.h"
@@ -120,11 +120,6 @@ void Controller::handleLevelSolved() {
  */
 void Controller::handleLevelFailed() {
     static const int MSG_FREQ = 100;
-    if (statistics::numLevelTries % MSG_FREQ == 0) {
-        PLOGI_(logger::FileLogger) << "Game Failed.";
-        PLOGI_(logger::ConsoleLogger) << "Game Failed.";
-    }
-
     statistics::numLevelTries += 1;
 
     if (baseController_.get()->retryOnLevelFail()) {

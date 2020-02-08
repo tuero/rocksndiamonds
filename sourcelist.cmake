@@ -93,6 +93,7 @@ set(sources_ai
     ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/tls_highlevel.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/tls_lowlevel.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/tls_constraint_detection.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/tls_combinatorial_node.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/tls_log.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/tls_hash.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/engine/engine_types.cpp
@@ -108,6 +109,7 @@ set(sources_ai
     ${PROJECT_SOURCE_DIR}/src/ai/engine/game_state_abstract.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/level_programming/level_programming.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/util/config_reader.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/util/file_naming.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/util/timer.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/util/rng.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/util/logger.cpp

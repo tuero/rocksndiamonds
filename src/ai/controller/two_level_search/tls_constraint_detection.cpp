@@ -22,14 +22,31 @@
 
 bool TwoLevelSearch::newConstraintSeen(std::vector<BaseOption*> &optionPath) {
     // Check every option in the planned path
+    if (lowLevelSearchType == LowLevelSearchType::combinatorial) {
+        std::vector<int> numConstraintsOptionPair;
+        std::vector<uint64_t> pathHashes = givenPathOptionPairHashes<std::vector<BaseOption*>>(optionPath);
+        for (auto const & hash : pathHashes) {
+            numConstraintsOptionPair.push_back(restrictedCellsByOption_[hash].size());
+        }
+
+        // Haven't seen this one before
+        int optionPathHash = optionPathToHash<std::vector<BaseOption*>>(optionPath);
+        if (combinatorialByPath.find(optionPathHash) == combinatorialByPath.end()) {
+            return true;
+        }
+
+        CombinatorialPartition &combinatorialPartition = combinatorialByPath[optionPathHash];
+        return combinatorialPartition.requiresReset(numConstraintsOptionPair);
+    }
+
     bool flag = false;
     for (auto const & hash : givenPathOptionPairHashes<std::vector<BaseOption*>>(optionPath)) {
-        // if (newConstraintsAdded_[hash] = true) {return true;}
-        for (auto const & constraint : restrictedCellsByOption_[hash]) {
-            if (knownConstraints_[hash].find(constraint) == knownConstraints_[hash].end()) {
-                flag = true;
-            }
-        }
+        if (newConstraintsAdded_[hash]) {return true;}
+        // for (auto const & constraint : restrictedCellsByOption_[hash]) {
+        //     if (knownConstraints_[hash].find(constraint) == knownConstraints_[hash].end()) {
+        //         flag = true;
+        //     }
+        // }
     }
 
     return flag;
@@ -55,42 +72,18 @@ template int TwoLevelSearch::restrictionCountForPath<std::deque<BaseOption*>> (c
  */
 void TwoLevelSearch::addNewConstraints() {
     PLOGD_(logger::FileLogger) << "Adding new constraints.";
-    bool newConstraints = false;
     for (auto const & hash : allOptionPairHashes()) {
         newConstraintsAdded_[hash] = false;
-        // std::vector<enginetype::GridCell> &optionRestrictions = restrictedCellsByOption_[hash];
         for (auto const & restriction : spritesMoved[hash]) {
             // Add restriction if cell isn't already restricted
             int index = enginehelper::cellToIndex(restriction.cell);
             if (restrictedCellsByOption_[hash].find(index) == restrictedCellsByOption_[hash].end()) {
-                newConstraints = true;
-                newConstraintFoundFlag_ = true;
+                PLOGE_(logger::FileLogger) << "hash: " << hash << ", x=" << restriction.cell.x << ", y=" << restriction.cell.y;
                 restrictedCellsByOption_[hash].insert(index);
                 newConstraintsAdded_[hash] = true;
             }
-            // bool cellRestricted = std::find(optionRestrictions.begin(), optionRestrictions.end(), restriction.cell) != optionRestrictions.end();
-            // if (!cellRestricted) {
-            //     newConstraints = true;
-            //     newConstraintFoundFlag_ = true;
-            //     optionRestrictions.push_back(restriction.cell);
-            // }
         }
     }
-
-    // No new constraints added
-    if (!newConstraints) {
-        PLOGD_(logger::FileLogger) << "No new constraints found.";
-        return;
-    }
-
-    // Log total changes
-    int count = 0;
-    for (auto const & hash : allOptionPairHashes()) {
-        count += restrictedCellsByOption_[hash].size();
-    }
-    
-    PLOGD_(logger::FileLogger) << "New constraints added, total = " << count;
-    PLOGD_(logger::ConsoleLogger) << "New constraints added, total = " << count;
 }
 
 

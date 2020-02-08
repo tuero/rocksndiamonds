@@ -46,10 +46,8 @@ void TwoLevelSearch::logAvailableOptions() {
  * Log the set high level path of options.
  */
 void TwoLevelSearch::logHighLevelPath() {
-    PLOGD_(logger::ConsoleLogger) << "Solution length: " << highlevelPlannedPath_.size();
-    PLOGD_(logger::FileLogger) << "Solution length: " << highlevelPlannedPath_.size();
+    PLOGD_(logger::FileLogger) << "Solution: " << currentHighLevelPathHash << ", length: " << highlevelPlannedPath_.size();
     for (auto const & option : highlevelPlannedPath_) {
-        PLOGD_(logger::ConsoleLogger) << option->toString();
         PLOGD_(logger::FileLogger) << option->toString();
     }
 }
@@ -59,7 +57,6 @@ void TwoLevelSearch::logHighLevelPath() {
  * Log all the restricted cells found thus far for each pair of options.
  */
 void TwoLevelSearch::logRestrictedSprites() {
-    PLOGD_(logger::ConsoleLogger) << "Cells with restrictions: " << highlevelPlannedPath_.size();
     PLOGD_(logger::FileLogger) << "Cells with restrictions: " << highlevelPlannedPath_.size();
     for (auto const & hash : allOptionPairHashes()) {
         OptionIndexPair optionIndexPair = hashToOptionIndexPair(hash);

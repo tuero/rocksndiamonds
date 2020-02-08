@@ -47,6 +47,7 @@ void TwoLevelSearch::initializeOptions() {
  */
 void TwoLevelSearch::resetOptions() {
     if (highlevelPlannedPath_.empty()) {
+        combinatorialByPath.clear();
         availableOptions_ = optionFactory_.createOptions(optionFactoryType_);
 
         multiplier_ = 10;
@@ -82,6 +83,12 @@ void TwoLevelSearch::initializationForEveryLevelStart() {
     prevIsMoving_.clear();
     currIsMoving_.clear();
 
+    // Set lowlevel search type
+    lowLevelSearchType = LowLevelSearchType::combinatorial;
+    if (enginehelper::getOptParam() == 1) {
+        lowLevelSearchType = LowLevelSearchType::cbs;
+    }
+
     PLOGD_(logger::FileLogger) << "------------------------";
     highLevelSearch();
     logHighLevelPath();
@@ -108,7 +115,6 @@ void TwoLevelSearch::handleLevelStart() {
 
     // Clear and intialize data structures
     newSpriteFoundFlag_ = true;
-    newConstraintFoundFlag_ = true;
     hashPathTimesVisited.clear();
     currSprites_.clear();
     spritesMoved.clear();
@@ -120,13 +126,9 @@ void TwoLevelSearch::handleLevelStart() {
         knownConstraints_[hash] = {};
     }
 
+    combinatorialByPath.clear();
+
     initializationForEveryLevelStart();
-
-    // Log high level macro option path
-    // logHighLevelPath();
-
-    // Log restricted sprites
-    // logRestrictedSprites();
 }
 
 
@@ -134,10 +136,6 @@ void TwoLevelSearch::handleLevelStart() {
  * Get the action from the controller.
  */
 Action TwoLevelSearch::getAction() {
-    // Set currentOption to the option we want to use
-    // PLOGD_(logger::ConsoleLogger) << "Solution index: " << solutionIndex_  << ", solution size: "  << highlevelPlannedPath_.size();
-    // PLOGD_(logger::FileLogger) << "Solution index: " << solutionIndex_  << ", solution size: "  << highlevelPlannedPath_.size();
-
     // We don't have any more options...
     if (solutionIndex_ >= (int)highlevelPlannedPath_.size()) {
         PLOGE_(logger::FileLogger) << "No more options in solution list.";

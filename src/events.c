@@ -427,7 +427,7 @@ void EventLoop(void)
 
     // Game over
     if (game_status == GAME_MODE_QUIT) {
-      closeReplayFile();
+      // closeReplayFile();
       return;
     }
 

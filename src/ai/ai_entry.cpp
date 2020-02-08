@@ -18,6 +18,7 @@
 #include "engine_helper.h"      // Engine helper functions
 #include "rng.h"                // RNG
 #include "logger.h"             // Logger
+#include "statistics.h"
 
 // Controller
 #include "controller/controller.h"
@@ -128,10 +129,42 @@ extern "C" void initLogger(int argc, char *argv[]) {
 
 
 /**
+ * Initialize the replay directory.
+ */
+extern "C" void initReplayDirectory(void) {
+    logger::initReplayDirectory();
+}
+
+
+/**
+ * Initialize the stats file.
+ */
+extern "C" void initStatsFile(void) {
+    statistics::openStatsFile();
+}
+
+
+/**
  * Close the replay file.
  */
 extern "C" void closeReplayFile(void) {
     logger::closeReplayFile();
+}
+
+
+/**
+ * Close the stats file.
+ */
+extern "C" void closeStatsFile(void) {
+    statistics::closeStatsFile();
+}
+
+
+/**
+ * Output necessary statistics to file.
+ */
+extern "C" void outputStatsToFile(void) {
+    statistics::outputStatsToFile();
 }
 
 

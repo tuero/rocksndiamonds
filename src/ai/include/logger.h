@@ -44,6 +44,17 @@ namespace logger {
     void initLogger(LogLevel logLevel, std::string &programArgs);
 
     /**
+     * Initialize the replay directory.
+     */
+    void initReplayDirectory();
+
+    /**
+     * Initialize the stats file.
+     * This remains persistant for all retries/levels in the levelset.
+     */
+    void initStatsFile();
+
+    /**
      * Initialize the replay file.
      * 
      * @param levelSet The string name of the levelSet (for loading during replay).

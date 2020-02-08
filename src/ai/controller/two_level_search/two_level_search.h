@@ -22,6 +22,7 @@
 #include <cmath>                // pow
 
 // Includes
+#include "tls_combinatorial_node.h"
 #include "base_controller.h"
 #include "base_option.h"
 
@@ -35,7 +36,6 @@ class TwoLevelSearch : public BaseController {
 private:
     bool optionStatusFlag_ = true;                                                  // Flag signifying current option is complete
     bool newSpriteFoundFlag_;
-    bool newConstraintFoundFlag_ = true;
     int solutionIndex_;                                                             // Current index in the high level path
     uint64_t multiplier_;                                                                // Multiplier used for hashing
     BaseOption* previousOption_;                                                    // Pointer to previous option in high level path
@@ -81,6 +81,13 @@ private:
     std::unordered_map<int, std::vector<SpriteRestriction>> spritesMoved;   // Current list of sprites which moved during player actions for the option pair
 
 
+    /**
+     * Initializations which need to occur BOTH on first level start
+     * and on every level restart after a failure.
+     */
+    void initializationForEveryLevelStart();
+
+
     // --------------------- CBS --------------------------------
     struct NodeCBS {
         std::unordered_map<uint64_t, std::unordered_set<int>> constraints;
@@ -98,21 +105,23 @@ private:
     typedef std::priority_queue<NodeCBS, std::vector<NodeCBS>, CompareNodeCBS> PriorityQueue;
     std::unordered_map<uint64_t, PriorityQueue> openByPath;
     std::unordered_map<uint64_t, std::vector<NodeCBS>> closedByPath;
-    std::unordered_map<uint64_t, std::vector<NodeCBS>> consideredNodesByPath;
-
-    /**
-     * Initializations which need to occur BOTH on first level start
-     * and on every level restart after a failure.
-     */
-    void initializationForEveryLevelStart();
 
 
     // --------------- LLS --------------- 
+
+    enum LowLevelSearchType{cbs, combinatorial};
+    LowLevelSearchType lowLevelSearchType;
+
+    std::unordered_map<uint64_t, CombinatorialPartition> combinatorialByPath;
 
     /**
      * Run the implemented low level search. 
      */
     void lowLevelSearch();
+    
+    bool currentHighLevelPathComplete(uint64_t hash);
+
+    void iterativeCombinatorial();
 
     /**
      * Runs one iteration of CBS on the currentHighLevelPathHash.

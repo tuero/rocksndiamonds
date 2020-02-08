@@ -20,6 +20,7 @@
 #include <algorithm>            // sort, find
 #include <random>               // random_device, mt19937, discrete_distribution
 #include <limits>               // numeric_limits
+#include <numeric>              // accumulate
 
 // Includes
 #include "base_option.h"
@@ -28,8 +29,70 @@
 #include "logger.h"
 
 
+
 void TwoLevelSearch::lowLevelSearch() {
-    CBS();
+    if (lowLevelSearchType == LowLevelSearchType::cbs) {
+        CBS();
+    }
+    else if (lowLevelSearchType == LowLevelSearchType::combinatorial) {
+        iterativeCombinatorial();
+    }
+}
+
+
+bool TwoLevelSearch::currentHighLevelPathComplete(uint64_t hash) {
+    if (lowLevelSearchType == LowLevelSearchType::cbs) {
+        if (openByPath.find(hash) == openByPath.end()) {return false;}
+        return openByPath[hash].empty() && !closedByPath[hash].empty();
+    }
+    else if (lowLevelSearchType == LowLevelSearchType::combinatorial) {
+        if (combinatorialByPath.find(hash) == combinatorialByPath.end()) {return false;}
+        return combinatorialByPath[hash].isComplete();
+    }
+    return false;
+}
+
+
+void TwoLevelSearch::iterativeCombinatorial() {
+    // Safeguard against first time access
+    if (combinatorialByPath.find(currentHighLevelPathHash) == combinatorialByPath.end()) {
+        combinatorialByPath[currentHighLevelPathHash] = CombinatorialPartition();
+    }
+
+    CombinatorialPartition &combinatorialPartition = combinatorialByPath[currentHighLevelPathHash];
+
+    // Get current path number of constraints known
+    std::vector<int> numConstraintsOptionPair;
+    std::vector<uint64_t> pathHashes = givenPathOptionPairHashes<std::vector<BaseOption*>>(highlevelPlannedPath_);
+    for (auto const & hash : pathHashes) {
+        numConstraintsOptionPair.push_back(restrictedCellsByOption_[hash].size());
+    }
+
+    // If new constraints detected, reset
+    if (combinatorialPartition.requiresReset(numConstraintsOptionPair)) {
+        combinatorialPartition.reset(numConstraintsOptionPair);
+    }
+
+    if (combinatorialPartition.isComplete()) {
+        PLOGE_(logger::FileLogger) << "All constraints have been exhausted for the given high level path:" << currentHighLevelPathHash;
+        PLOGE_(logger::ConsoleLogger) << "All constraints have been exhausted:" << currentHighLevelPathHash;
+        return;
+    }
+
+    // Get next bit set
+    std::vector<uint64_t> constraintBits = combinatorialPartition.getNextConstraintBits();
+
+    // Set constraints from bits for each option in the high level path
+    for (int i = 0; i < (int)pathHashes.size(); i++) {
+        std::unordered_set<int> constraints;
+        uint64_t mask = 0;
+        for (auto const & constraint : restrictedCellsByOption_[pathHashes[i]]) {
+            if (constraintBits[i] & (1 << mask++)) {
+                constraints.insert(constraint);
+            }
+        }
+        highlevelPlannedPath_[i]->setRestrictedCells(constraints);
+    }
 }
 
 
@@ -47,49 +110,38 @@ void TwoLevelSearch::CBS() {
     if (closedByPath.find(currentHighLevelPathHash) == closedByPath.end()) {
         closedByPath[currentHighLevelPathHash] = {};
     }
-    if (consideredNodesByPath.find(currentHighLevelPathHash) == consideredNodesByPath.end()) {
-        consideredNodesByPath[currentHighLevelPathHash] = {};
-    }
 
     // Get the OPEN/CLOSED for the given high level path
     PriorityQueue &open = openByPath[currentHighLevelPathHash];
     std::vector<NodeCBS> &closed = closedByPath[currentHighLevelPathHash];
-    std::vector<NodeCBS> &consideredNodes = consideredNodesByPath[currentHighLevelPathHash];
 
 
     // Check every option in the planned path
-    // if (newConstraintFoundFlag_) {
-        for (auto const & hash : givenPathOptionPairHashes<std::vector<BaseOption*>>(highlevelPlannedPath_)) {
-            for (auto const & constraint : restrictedCellsByOption_[hash]) {
-                // bool isKnown = std::find(knownConstraints_[hash].begin(), knownConstraints_[hash].end(), constraint) != knownConstraints_[hash].end();
-                // if (isKnown) {continue;}
+    for (auto const & hash : givenPathOptionPairHashes<std::vector<BaseOption*>>(highlevelPlannedPath_)) {
+        for (auto const & constraint : restrictedCellsByOption_[hash]) {
+            if (knownConstraints_[hash].find(constraint) != knownConstraints_[hash].end()) {continue;}
+            knownConstraints_[hash].insert(constraint);
 
-                // knownConstraints_[hash].push_back(constraint);
-                if (knownConstraints_[hash].find(constraint) != knownConstraints_[hash].end()) {continue;}
-                knownConstraints_[hash].insert(constraint);
-
-                // If constraint is new, we need to consider adding to any node in closed
-                // This would involve knowing where the agent is before attempting this option. Doable but involved.
-                // Just assume we need to add for now.
-                for (auto const & node : closed) {
-                    // Create child with parent constraints, and add the new constraint
-                    NodeCBS child = node;
-                    child.constraints[hash].insert(constraint);
-                    child.size += 1;
-                    open.push(child);
-                    PLOGD_(logger::FileLogger) << "Updating to Open hash = " << hash << ", constraint = " << constraint;
-                    PLOGD_(logger::ConsoleLogger) << "Updating to Open hash = " << hash << ", constraint = " << constraint;
-                    for (auto const & tempHash : givenPathOptionPairHashes<std::vector<BaseOption*>>(highlevelPlannedPath_)) {
-                        for (auto const & constraint : child.constraints[tempHash]) {
-                            PLOGD_(logger::FileLogger) << "  hash: " << tempHash << ", constraint: " << constraint;
-                            PLOGD_(logger::ConsoleLogger) << "  hash: " << tempHash << ", constraint: " << constraint;
-                        }
+            // If constraint is new, we need to consider adding to any node in closed
+            // This would involve knowing where the agent is before attempting this option. Doable but involved.
+            // Just assume we need to add for now.
+            for (auto const & node : closed) {
+                // Create child with parent constraints, and add the new constraint
+                NodeCBS child = node;
+                child.constraints[hash].insert(constraint);
+                child.size += 1;
+                open.push(child);
+                PLOGD_(logger::FileLogger) << "Updating to Open hash = " << hash << ", constraint = " << constraint;
+                PLOGD_(logger::ConsoleLogger) << "Updating to Open hash = " << hash << ", constraint = " << constraint;
+                for (auto const & tempHash : givenPathOptionPairHashes<std::vector<BaseOption*>>(highlevelPlannedPath_)) {
+                    for (auto const & constraint : child.constraints[tempHash]) {
+                        PLOGD_(logger::FileLogger) << "  hash: " << tempHash << ", constraint: " << constraint;
+                        PLOGD_(logger::ConsoleLogger) << "  hash: " << tempHash << ", constraint: " << constraint;
                     }
                 }
             }
         }
-        newConstraintFoundFlag_ = false;
-    // }
+    }
 
 
     // If first time running, we need to set initial node
@@ -143,7 +195,6 @@ void TwoLevelSearch::CBS() {
     // Here we just go ahead and add children to OPEN. If path is solved then we won't reenter.
     // Children inherit all constraints from parent, and add one single constraint.
     for (auto const & hash : givenPathOptionPairHashes<std::vector<BaseOption*>>(highlevelPlannedPath_)) {
-        // std::vector<enginetype::GridCell> &knownConstraitsForOption = knownConstraints_[hash];
         std::unordered_set<int> &knownConstraitsForOption = knownConstraints_[hash];
         for (auto const & constraint : knownConstraitsForOption) {
             // If node currently doesn't have this constraint, create child for it
@@ -162,27 +213,6 @@ void TwoLevelSearch::CBS() {
                 }
             }
 
-            // if (std::find(P.constraints[hash].begin(), P.constraints[hash].end(), constraint) == P.constraints[hash].end()) {
-            //     NodeCBS child = P;
-            //     child.constraints[hash].push_back(constraint);
-            //     child.size += 1;
-
-            //     // Make sure we have not already touched a node with the same constraints
-            //     // bool flag = false;
-            //     // for (auto const & consideredNode : consideredNodes) {
-            //     //     if (consideredNode.constraints == child.constraints) {
-            //     //         PLOGE_(logger::FileLogger) << "Skipping duplicate node";
-            //     //         PLOGE_(logger::ConsoleLogger) << "Skipping duplicate node";
-            //     //         flag = true;
-            //     //         break;
-            //     //     }
-            //     // }
-            //     // if (!flag) {
-            //     //     open.push(child);
-            //     //     consideredNodes.push_back(child);
-            //     // }
-            //     open.push(child);
-            // }
         }
     }
 }

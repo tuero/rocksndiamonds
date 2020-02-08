@@ -18,6 +18,7 @@ class Sprite(enum.IntEnum):
     gate_blue       = 0x00CE
     door_exit       = 0x0007
     wall_steel      = 0x000D
+    wall_round      = 0x0003
     gem_diamond     = 0x0038
     agent           = 0x0050
 
@@ -70,6 +71,7 @@ SPRITE_IMG = {
     Sprite.gate_green   :    Image.open(SPRITES_DIR + 'gate_green.png'),
     Sprite.door_exit    :    Image.open(SPRITES_DIR + 'door_exit.png'),
     Sprite.wall_steel   :    Image.open(SPRITES_DIR + 'wall_steel.png'),
+    Sprite.wall_round   :    Image.open(SPRITES_DIR + 'wall_round.png'),
     Sprite.agent        :    Image.open(SPRITES_DIR + 'agent.png')
 }
 

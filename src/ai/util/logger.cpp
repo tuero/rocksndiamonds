@@ -14,6 +14,10 @@
 #include <iostream>
 #include <fstream>
 
+// System libraries
+#include <sys/stat.h>           // mkdir
+#include <sys/types.h>
+
 // Third party logging library
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
@@ -26,12 +30,17 @@
 
 // Directory locations
 const std::string LOG_DIR = "./src/ai/logs/";
-const std::string REPLAY_DIR = "./src/ai/replays/";
+const std::string REPLAY_DIR_BASE = "./src/ai/replays/";
+std::string REPLAY_DIR_FULL = "";
 const std::string STATS_DIR = "./src/ai/stats/";
 const std::string INDIVIDUAL_RUN = "_INDIVIDUAL";
 const std::string LOG_EXTENSION = ".log";
 const std::string REPLAY_EXTENSION = ".txt";
+const std::string STATS_EXTENSION = ".txt";
+
+// ofstreams
 static std::ofstream replayFile;
+static std::ofstream statsFile;
 
 
 /**
@@ -103,6 +112,15 @@ namespace logger {
         PLOGI_(logger::FileLogger) << programArgs;
     }
 
+    void initReplayDirectory() {
+        // Initialize the replay directory (needs to be done here in the event initReplayFile is not set but )
+        REPLAY_DIR_FULL = REPLAY_DIR_BASE + getFileName() + "/";
+        int rc = mkdir(REPLAY_DIR_FULL.c_str(), 0777);
+        if (rc != 0) {
+            PLOGE_(logger::FileLogger) << "Replay directory " << REPLAY_DIR_FULL << " already exists";
+        }
+    }
+
 
     /**
      * Initialize the replay file.
@@ -112,7 +130,7 @@ namespace logger {
      * taken by the agent.
      */
     void initReplayFile(const std::string levelSet, int levelNumber) {
-        std::string replayFileFullPath = REPLAY_DIR + getFileName() + REPLAY_EXTENSION;
+        std::string replayFileFullPath = REPLAY_DIR_FULL + "complete" + REPLAY_EXTENSION;
         PLOGI_(logger::FileLogger) << "Creating replay file \"" << replayFileFullPath << "\"";
         replayFile.open(replayFileFullPath, std::ios::app);
         
@@ -137,7 +155,7 @@ namespace logger {
         if (options.controller_type == CONTROLLER_REPLAY) {return;}
 
         // File setup
-        std::string replayFileFullPath = REPLAY_DIR + getFileName() + INDIVIDUAL_RUN + REPLAY_EXTENSION;
+        std::string replayFileFullPath = REPLAY_DIR_FULL + std::to_string(levelNumber) + REPLAY_EXTENSION;
         PLOGI_(logger::FileLogger) << "Creating replay file \"" << replayFileFullPath << "\"";
         PLOGI_(logger::ConsoleLogger) << "Creating replay file \"" << replayFileFullPath << "\"";
         std::ofstream replayFileIndividual;
@@ -269,8 +287,8 @@ namespace logger {
      * Log the players current move.
      */
     void logPlayerMove(const std::string &action) {
-        PLOGD_(logger::FileLogger) << "Controller sending action: " + action;
-        PLOGD_(logger::ConsoleLogger) << "Controller sending action: " + action;
+        PLOGV_(logger::FileLogger) << "Controller sending action: " + action;
+        PLOGV_(logger::ConsoleLogger) << "Controller sending action: " + action;
     }
 
 

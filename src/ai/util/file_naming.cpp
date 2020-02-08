@@ -28,7 +28,7 @@ std::string datetimeToString() {
     timeinfo = localtime(&rawtime);
 
     // TODO: Prone to overflow?
-    strftime(buffer,sizeof(buffer),"%Y-%m-%d %H:%M:%S",timeinfo);
+    strftime(buffer,sizeof(buffer),"%Y-%m-%d_%H:%M:%S",timeinfo);
 
     return std::string(buffer);
 }
@@ -40,5 +40,5 @@ std::string datetimeToString() {
  */
 std::string getFileName() {
     pid_t pid = getpid();
-    return datetimeToString() + " " + std::to_string(pid);
+    return datetimeToString() + "_" + std::to_string(pid);
 }

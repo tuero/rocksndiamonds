@@ -1,11 +1,13 @@
 
 import numpy as np
 import random
+import copy
 from PIL import Image
 
 from tilesets.sprite import Sprite, SpriteInfo
-from tilesets.tile import Tile, TileProperty
+from tilesets.tile import Tile, TileProperty, MetaTile
 from tilesets.tileset_3by3 import tileSetInfo
+from tilesets.leveltemplates import LevelTemplate
 
 
 IMG_EXT = '.png'
@@ -13,7 +15,7 @@ IMG_EXT = '.png'
 
 class LevelDifficulty():
 
-    def __init__(self, numGemTiles, numRockTiles, numGemsRequired):
+    def __init__(self, numGemTiles, numRockTiles, numGemsRequired, bitComplexity=0):
         """
         Requirements which a randomized level must meet to ensure the wanted difficulty
 
@@ -24,11 +26,15 @@ class LevelDifficulty():
         self.numGemTiles = numGemTiles
         self.numRockTiles = numRockTiles
         self.numGemsRequired = numGemsRequired
+        self.bitComplexity = bitComplexity
+
+        self.isKeyDoorPresent = False
+
 
 
 class Level():
 
-    def __init__(self, numTilesWidth, numTilesHeight, tileSetInfo, levelDifficulty):
+    def __init__(self, numTilesWidth, numTilesHeight, tileSetInfo, levelDifficulty, levelTemplate):
         """
         Level definition
 
@@ -38,23 +44,46 @@ class Level():
             tileSetInfo (TileSetInfo) : Information regarding tiles available to the level to use
             levelDifficulty (LevelDifficulty) : Difficulty requirements for level randomization
         """
-        self.numTilesWidth = numTilesWidth
-        self.numTilesHeight = numTilesHeight
+        self.numTilesWidth = levelTemplate.numTilesWidth
+        self.numTilesHeight = levelTemplate.numTilesHeight
         self.tileSetInfo = tileSetInfo
         self.levelDifficulty = levelDifficulty
-        self.tiles = np.array([[tileSetInfo.defaultTile]*numTilesWidth]*numTilesHeight, dtype=Tile)
+        self.levelTemplate = levelTemplate
+        # self.tiles = np.array([[tileSetInfo.defaultTile]*numTilesWidth]*numTilesHeight, dtype=Tile)
+        self.tiles = self.levelTemplate.getTiles()
+
+        # -- reference ranges
+        referenceRange_l = [(self.tileSetInfo.width + 1, y) for y in range(self.tileSetInfo.height+2)] + [(self.tileSetInfo.width, y) for y in range(self.tileSetInfo.height+2)]
+        referenceRange_r = [(0, y) for y in range(self.tileSetInfo.height+2)] + [(1, y) for y in range(self.tileSetInfo.height+2)]
+        referenceRange_u = [(x, self.tileSetInfo.height + 1) for x in range(self.tileSetInfo.width+2)] + [(x, self.tileSetInfo.height) for x in range(self.tileSetInfo.width+2)]
+        referenceRange_d = [(x, 0) for x in range(self.tileSetInfo.width+2)] + [(x, 1) for x in range(self.tileSetInfo.width+2)]
+
+        tileRange_l = [(1, y) for y in range(self.tileSetInfo.height+2)] + [(0, y) for y in range(self.tileSetInfo.height+2)]
+        tileRange_r = [(self.tileSetInfo.width, y) for y in range(self.tileSetInfo.height+2)] + [(self.tileSetInfo.width + 1, y) for y in range(self.tileSetInfo.height+2)]
+        tileRange_u = [(x, 1) for x in range(self.tileSetInfo.width+2)] + [(x, 0) for x in range(self.tileSetInfo.width+2)]
+        tileRange_d = [(x, self.tileSetInfo.height) for x in range(self.tileSetInfo.width+2)] + [(x, self.tileSetInfo.height+1) for x in range(self.tileSetInfo.width+2)]
+
+        self.refence_ranges = {'left'    : [referenceRange_l, tileRange_l],
+                               'right'   : [referenceRange_r, tileRange_r],
+                               'up'      : [referenceRange_u, tileRange_u],
+                               'down'    : [referenceRange_d, tileRange_d]
+                        }
 
         # Get all tile transpositions and remove duplicates
-        self.availableTiles = [tile for tile in tileSetInfo.allTiles] + [tileSetInfo.defaultTile]
-        for tile in tileSetInfo.allTiles:
-            self.availableTiles += tile.getAllTranspositions()
+        # self.availableTiles = [tile for tile in tileSetInfo.allTiles] + [tileSetInfo.defaultTile]
+        # for tile in tileSetInfo.allTiles:
+        #     self.availableTiles += tile.getAllTranspositions()
 
-        self.availableTiles = list(set(self.availableTiles))
+        # self.availableTiles = list(set(self.availableTiles))
+
+    def canOverwriteTile(self, tile):
+        return tile == self.tileSetInfo.defaultTile or tile == self.tileSetInfo.blockingTile
 
 
     def resetLevel(self):
         # Set the level back to the default tile
-        self.tiles = np.array([[self.tileSetInfo.defaultTile]*self.numTilesWidth]*self.numTilesHeight, dtype=Tile)
+        # self.tiles = np.array([[self.tileSetInfo.defaultTile]*self.numTilesWidth]*self.numTilesHeight, dtype=Tile)
+        self.tiles = self.levelTemplate.getTiles()
 
 
     def getWidth(self):
@@ -68,6 +97,7 @@ class Level():
 
 
     def _validateTileToReference(self, tile1, tile2, tile1Range, tile2Range):
+        if self.canOverwriteTile(tile1): return True
         # For given tile pair, check tile padding is null or both are matching
         for tile1Coord, tile2Coord in zip(tile1Range, tile2Range):
             col1, row1 = tile1Coord
@@ -77,37 +107,25 @@ class Level():
         return True
 
 
-    def _validateTileToAllNeighbours(self, tile, row, col):
+    def _validateTileToAllNeighbours(self, tile, row, col):        
         # Check each neighbour for the given tile, and check padding rules
         validLeft, validRight, validAbove, validBelow = True, True, True, True
 
         # Check if tile is valid with reference tile to the left
-        if col > 0:
-            tileReference = self.tiles[row, col-1]
-            referenceRange = [(self.tileSetInfo.width + 1, y) for y in range(self.tileSetInfo.height+2)] + [(self.tileSetInfo.width, y) for y in range(self.tileSetInfo.height+2)]
-            tileRange = [(1, y) for y in range(self.tileSetInfo.height+2)] + [(0, y) for y in range(self.tileSetInfo.height+2)]
-            validLeft = self._validateTileToReference(tileReference, tile, referenceRange, tileRange)
+        tileReference = self.tiles[row, col-1] if col > 0 else self.tileSetInfo.padTile
+        validLeft = self._validateTileToReference(tileReference, tile, *self.refence_ranges['left'])
 
         # Check if tile is valid with reference tile to the right
-        if col < self.numTilesWidth - 1:
-            tileReference = self.tiles[row, col+1]
-            referenceRange = [(0, y) for y in range(self.tileSetInfo.height+2)] + [(1, y) for y in range(self.tileSetInfo.height+2)]
-            tileRange = [(self.tileSetInfo.width, y) for y in range(self.tileSetInfo.height+2)] + [(self.tileSetInfo.width + 1, y) for y in range(self.tileSetInfo.height+2)]
-            validRight = self._validateTileToReference(tileReference, tile, referenceRange, tileRange)
+        tileReference = self.tiles[row, col+1] if (col < self.numTilesWidth - 1) else self.tileSetInfo.padTile
+        validRight = self._validateTileToReference(tileReference, tile, *self.refence_ranges['right'])
 
         # Check if tile is valid with reference tile above
-        if row > 0:
-            tileReference = self.tiles[row-1, col]
-            referenceRange = [(x, self.tileSetInfo.height + 1) for x in range(self.tileSetInfo.width+2)] + [(x, self.tileSetInfo.height) for x in range(self.tileSetInfo.width+2)]
-            tileRange = [(x, 1) for x in range(self.tileSetInfo.width+2)] + [(x, 0) for x in range(self.tileSetInfo.width+2)]
-            validAbove = self._validateTileToReference(tileReference, tile, referenceRange, tileRange)
+        tileReference = self.tiles[row-1, col] if row > 0 else self.tileSetInfo.padTile
+        validAbove = self._validateTileToReference(tileReference, tile, *self.refence_ranges['up'])
 
         # Check if tile is valid with reference tile below
-        if row < self.numTilesHeight - 1:
-            tileReference = self.tiles[row+1, col]
-            referenceRange = [(x, 0) for x in range(self.tileSetInfo.width+2)] + [(x, 1) for x in range(self.tileSetInfo.width+2)]
-            tileRange = [(x, self.tileSetInfo.height) for x in range(self.tileSetInfo.width+2)] + [(x, self.tileSetInfo.height+1) for x in range(self.tileSetInfo.width+2)]
-            validBelow = self._validateTileToReference(tileReference, tile, referenceRange, tileRange)
+        tileReference = self.tiles[row+1, col] if (row < self.numTilesHeight - 1) else self.tileSetInfo.padTile
+        validBelow = self._validateTileToReference(tileReference, tile, *self.refence_ranges['down'])
 
         return validLeft and validRight and validAbove and validBelow
 
@@ -119,10 +137,10 @@ class Level():
 
         Note: We assume that the exit is placed on the bottom row.
         """
-        empty_indices = [(self.numTilesHeight-1, col) for col in range(self.numTilesWidth) if self.tiles[self.numTilesHeight-1, col] == self.tileSetInfo.defaultTile]
+        empty_indices = [(self.numTilesHeight-1, col) for col in range(1, self.numTilesWidth-1) if self.canOverwriteTile(self.tiles[self.numTilesHeight-1, col])]
         exit_tiles = [tile for tile in self.availableTiles if tile.propertyFlags & TileProperty.has_exit]
-        empty_index = random.choice(empty_indices)
-        self.tiles[empty_index[0], empty_index[1]] = random.choice(exit_tiles)
+        exit_index = random.choice(empty_indices)
+        self.tiles[exit_index] = random.choice(exit_tiles)
 
 
     def placeAgent(self):
@@ -130,10 +148,100 @@ class Level():
         Place an agent tile on the map. 
         The agent tile is always assumed to be the second tile placed, and only one tile can contain the agent.
         """
-        empty_indices = [(row, col) for row in range(self.numTilesHeight) for col in range(self.numTilesWidth) if self.tiles[row, col] == self.tileSetInfo.defaultTile]
+        empty_indices = [(row, col) for row in range(self.numTilesHeight) for col in range(self.numTilesWidth) if self.canOverwriteTile(self.tiles[row, col])]
         agent_tiles = [tile for tile in self.availableTiles if tile.propertyFlags & TileProperty.has_agent]
-        empty_index = random.choice(empty_indices)
-        self.tiles[empty_index[0], empty_index[1]] = random.choice(agent_tiles)
+        agent_index = random.choice(empty_indices)
+        self.tiles[agent_index] = random.choice(agent_tiles)
+
+
+    def _validateMetaTile(self, empty_tile, meta_tile):
+        start_row, start_col = empty_tile
+
+        # Walk along left
+        for r in range(start_row, start_row + meta_tile.height):
+            tile = self.tiles[r, start_col]
+            tileReference = self.tiles[r, start_col-1] if start_col > 0 else self.tileSetInfo.padTile
+            if not self._validateTileToReference(tileReference, tile, *self.refence_ranges['left']): 
+                return False
+
+        # Walk along right
+        for r in range(start_row, start_row + meta_tile.height):
+            tile = self.tiles[r, start_col + meta_tile.width - 1]
+            tileReference = self.tiles[r, start_col + meta_tile.width] if (start_col + meta_tile.width < self.numTilesWidth - 1) else self.tileSetInfo.padTile
+            if not self._validateTileToReference(tileReference, tile, *self.refence_ranges['right']): 
+                return False
+
+        # Walk along top
+        for c in range(start_col, start_col + meta_tile.width):
+            tile = self.tiles[start_row, c]
+            tileReference = self.tiles[start_row-1, c] if start_row > 0 else self.tileSetInfo.padTile
+            if not self._validateTileToReference(tileReference, tile, *self.refence_ranges['up']): 
+                return False
+
+        # Walk along bottom
+        for c in range(start_col, start_col + meta_tile.width):
+            tile = self.tiles[start_row + meta_tile.height - 1, c]
+            print('{} {} {}'.format(start_row, meta_tile.height, self.numTilesHeight))
+            tileReference = self.tiles[start_row + meta_tile.height, c] if (start_row + meta_tile.height < self.numTilesHeight - 1) else self.tileSetInfo.padTile
+            if not self._validateTileToReference(tileReference, tile, *self.refence_ranges['down']): 
+                return False
+
+        return True
+
+
+    def findPlacementMetaTile(self, empty_tiles, meta_tile):
+        for empty_tile in empty_tiles:
+            if self._validateMetaTile(empty_tile, meta_tile):
+                # Place cells represented by the tile
+                start_row, start_col = empty_tile
+                tiles_indices = [(row, col) for row in range(start_row, start_row + meta_tile.height) for col in range(start_col, start_col + meta_tile.width)]
+                tiles = meta_tile.tiles.reshape(1, -1)[0]
+                for index, tile in zip(tiles_indices, tiles):
+                    row, col = index
+                    self.tiles[row][col] = tile
+                return True
+        return False
+
+    def _getEmptyMetaTiles(self, width, height):
+        empty_indices = []
+        for row_t in range(self.numTilesHeight - height+1):
+            for col_t in range(self.numTilesWidth - width+1):
+                # (row_t, col) is start of meta tile coverage top left, need to verify all interior tiles are empty
+                interior_cells = [self.canOverwriteTile(self.tiles[r, c]) for r in range(row_t, row_t+height) for c in range(col_t, col_t+width)]
+                if False not in interior_cells:
+                    empty_indices.append([row_t, col_t])
+        return empty_indices
+
+    def placeMetaTile(self):
+        for _ in range(1000):
+            flag = True
+            for meta_tile in self.tileSetInfo.metaTiles:
+                # Find empty locations of same size of meta tile
+                empty_indices = self._getEmptyMetaTiles(meta_tile.width, meta_tile.height)
+                random.shuffle(empty_indices)
+
+                # Successfully found and placed meta tile
+                if not self.findPlacementMetaTile(empty_indices, meta_tile): 
+                    flag = False
+                    break
+
+            if flag: return True
+
+        return False
+
+
+    def placeExitMetaTile(self):
+        random.shuffle(self.tileSetInfo.metaExitTiles)
+        exit_meta_tile = self.tileSetInfo.metaExitTiles[0]
+        empty_indices = self._getEmptyMetaTiles(exit_meta_tile.width, exit_meta_tile.height)
+        # exit starts on lowest row, cant be on boarder column
+        empty_indices = [e for e in empty_indices if e[0] == max(empty_indices, key=lambda x : x[0])[0] and e[1] > 0 and e[1] < self.numTilesWidth-1]
+
+        # randomly choose viable option and place exit meta tile
+        random.shuffle(empty_indices)
+        self.findPlacementMetaTile(empty_indices, exit_meta_tile)
+
+
 
 
     def findValidPlacement(self, empty_indices, sprite_tiles):
@@ -154,7 +262,7 @@ class Level():
             empty_index = empty_indices[i]
             for j in range(len(sprite_tiles)):
                 if self._validateTileToAllNeighbours(sprite_tiles[j], empty_index[0], empty_index[1]):
-                    self.tiles[empty_index[0], empty_index[1]] = sprite_tiles[j]
+                    self.tiles[empty_index] = sprite_tiles[j]
                     empty_indices.pop(i)
                     return True
         return False
@@ -162,8 +270,8 @@ class Level():
 
     def _placeTileCategoryType(self, numOfType, tiles_of_type):
         # Given a type of tile, randomly select tile of that type and find valid placement
-        empty_indices = [(row, col) for row in range(self.numTilesHeight) for col in range(self.numTilesWidth) if self.tiles[row, col] == self.tileSetInfo.defaultTile]
-
+        empty_indices = [(row, col) for row in range(self.numTilesHeight) for col in range(self.numTilesWidth) if self.canOverwriteTile(self.tiles[row, col])]
+        
         # For each gem, find random gem tile and random location
         for _ in range(numOfType):
             random.shuffle(tiles_of_type)
@@ -186,6 +294,10 @@ class Level():
         """
         gem_tiles = [tile for tile in self.availableTiles if tile.propertyFlags & TileProperty.has_gem]
         return self._placeTileCategoryType(self.levelDifficulty.numGemTiles, gem_tiles)
+
+    def placeRoundWalls(self):
+        slip_tiles = [tile for tile in self.availableTiles if tile.propertyFlags & TileProperty.is_slippery]
+        return self._placeTileCategoryType(3, slip_tiles)
 
 
     def placeRocks(self):
@@ -223,6 +335,11 @@ class Level():
         return data
 
 
+    def _removeIndex(self, index, *lists):
+        for l in lists:
+            if index in l: l.remove(index)
+        
+
     def randomizeLevel(self):
         """
         Randomize the given level.
@@ -230,38 +347,54 @@ class Level():
         Note: Throws exception if ordering of tiles placed created rules from padding which doesn't
                 allow the level to be created.
         """
-        timeout_counter = 0
+        self.resetLevel()
+        
+        empty_indices = self.levelTemplate.getEmptyIndices()
+        agent_indices = self.levelTemplate.getAgentIndices()
+        key_indices = self.levelTemplate.getKeyIndices()
+        gem_indices = self.levelTemplate.getGemIndices()
+        rock_indices = self.levelTemplate.getRockIndices()
 
-        while (True):
-            timeout_counter += 1
+        # Place agent
+        agent_tiles = self.tileSetInfo.getAgentTiles()
+        agent_index = random.choice(agent_indices)
+        self._removeIndex(agent_index, empty_indices, gem_indices, rock_indices, key_indices)
+        self.tiles[agent_index] = random.choice(agent_tiles)
 
-            if timeout_counter > 1: 
-                raise Exception('Can\'t find a legal level')
+        # Place key
+        if len(key_indices) > 0:
+            key_tiles = self.tileSetInfo.getKeyTiles()
+            key_index = random.choice(key_indices)
+            self._removeIndex(key_index, empty_indices, gem_indices, rock_indices, key_indices)
+            self.tiles[key_index] = random.choice(key_tiles)
 
-            # Try and 
-            self.resetLevel()
-            self.placeExit()
-            self.placeAgent()
+        # Place rocks
+        rock_tiles = self.tileSetInfo.getRockTiles()
+        num_rocks = self.levelDifficulty.numRockTiles
+        rock_placements = []
+        assert num_rocks <= len(rock_indices), "Not enough empty tiles for number of rocks."
+        for _ in range(num_rocks):
+            rock_index = random.choice(rock_indices)
+            self._removeIndex(rock_index, empty_indices, gem_indices, rock_indices, key_indices)
+            self.tiles[rock_index] = copy.deepcopy(random.choice(rock_tiles))
+            rock_placements.append(rock_index)
 
-            # These placements may fail, continue until valid
-            if not self.placeGems(): 
-                continue
-            if not self.placeRocks(): 
-                continue
+        # Place gems
+        gem_tiles = self.tileSetInfo.getGemTiles()
+        num_gems = self.levelDifficulty.numGemTiles
+        assert num_gems <= len(gem_indices), "Not enough empty tiles for number of gems."
+        for _ in range(num_gems):
+            gem_index = random.choice(gem_indices)
+            self._removeIndex(gem_index, empty_indices, gem_indices, rock_indices, key_indices)
+            self.tiles[gem_index] = copy.deepcopy(random.choice(gem_tiles))
 
-            # For each empty tile, try and insert 
-            empty_indices = [(row, col) for row in range(self.numTilesHeight) for col in range(self.numTilesWidth) if self.tiles[row, col] == self.tileSetInfo.defaultTile]
-            for empty_index in empty_indices:
-                row, col = empty_index
-                valid_tiles = [tile for tile in self.availableTiles if tile.propertyFlags & TileProperty.is_filler and self._validateTileToAllNeighbours(tile, row, col)]
-                
-                # No valid tile
-                if len(valid_tiles) == 0: continue
+        #Place rock bit complexity
+        for _ in range(self.levelDifficulty.bitComplexity):
+            # Get tiles with rock and has bit room
+            index = random.choice([i for i in rock_placements if self.tiles[i].canAddRockBit()])
+            self.tiles[index].addBit()
 
-                # Place tile 
-                self.tiles[row, col] = random.choice(valid_tiles)
-
-            return
+        return
         
 
     def _setTileImage(self, image, tile_row, tile_col):

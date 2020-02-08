@@ -129,13 +129,13 @@ void BaseOption::runAStar() {
 void BaseOption::runAStar(enginetype::GridCell startCell, enginetype::GridCell goalCell) {
     Node startNode = {enginehelper::cellToIndex(startCell), -1, startCell, 0, (float)enginehelper::getL1Distance(startCell, goalCell)};
 
-    PLOGV_(logger::FileLogger) << "Running A* at grid cell level";
-    PLOGV_(logger::FileLogger) << "Start node: x= " << startCell.x << ", y= " << startCell.y;
-    PLOGV_(logger::FileLogger) << "Goal node: x= " << goalCell.x << ", y= " << goalCell.y;
-    PLOGV_(logger::FileLogger) << "Restricted cells: ";
-    for (auto const & restriction : restrictedCells_) {
-        PLOGV_(logger::FileLogger) << "    cell: x= " << restriction.x << ", y= " << restriction.y;
-    }
+    // PLOGV_(logger::FileLogger) << "Running A* at grid cell level";
+    // PLOGV_(logger::FileLogger) << "Start node: x= " << startCell.x << ", y= " << startCell.y;
+    // PLOGV_(logger::FileLogger) << "Goal node: x= " << goalCell.x << ", y= " << goalCell.y;
+    // PLOGV_(logger::FileLogger) << "Restricted cells: ";
+    // for (auto const & restriction : restrictedCells_) {
+    //     PLOGV_(logger::FileLogger) << "    cell: x= " << restriction.x << ", y= " << restriction.y;
+    // }
 
     // A* data structures
     std::unordered_map<int, Node> open;
@@ -154,7 +154,7 @@ void BaseOption::runAStar(enginetype::GridCell startCell, enginetype::GridCell g
             }
         }
 
-        PLOGV_(logger::FileLogger) << "Pulling node: x= " << node.cell.x << ", y= " << node.cell.y << ", id " << node.id << ", pid " << node.parentId;
+        // PLOGV_(logger::FileLogger) << "Pulling node: x= " << node.cell.x << ", y= " << node.cell.y << ", id " << node.id << ", pid " << node.parentId;
 
         if (node.g == std::numeric_limits<float>::max()) {
             PLOGE_(logger::ConsoleLogger) << "Cannot find a node to pull";
@@ -167,10 +167,10 @@ void BaseOption::runAStar(enginetype::GridCell startCell, enginetype::GridCell g
 
         // Goal condition check
         if (node.cell == goalCell) {
-            PLOGV_(logger::FileLogger) << "Found solution";
+            // PLOGV_(logger::FileLogger) << "Found solution";
             solutionPath_.clear();
             while(!(node.cell == startCell)) {
-                PLOGV_(logger::FileLogger) << "node: x= " << node.cell.x << ", y= " << node.cell.y << ", id " << node.id << ", pid " << node.parentId;
+                // PLOGV_(logger::FileLogger) << "node: x= " << node.cell.x << ", y= " << node.cell.y << ", id " << node.id << ", pid " << node.parentId;
                 solutionPath_.push_front(node.cell);
                 node = (closed.find(node.parentId) != closed.end() ? closed[node.parentId] : open[node.parentId]);
             }
@@ -196,18 +196,18 @@ void BaseOption::runAStar(enginetype::GridCell startCell, enginetype::GridCell g
             if (open.find(childIndex) != open.end()) {
                 // Check if new path cheaper
                 if (open[childIndex].g < newG) {continue;}
-                PLOGV_(logger::FileLogger) << "Removing from open: x= " << open[childIndex].cell.x << ", y= " << open[childIndex].cell.y << ", id " << open[childIndex].id << ", pid " << open[childIndex].parentId;
+                // PLOGV_(logger::FileLogger) << "Removing from open: x= " << open[childIndex].cell.x << ", y= " << open[childIndex].cell.y << ", id " << open[childIndex].id << ", pid " << open[childIndex].parentId;
                 open.erase(childIndex);
             }
             // Node already expanded
             else if (closed.find(childIndex) != closed.end()) {
                 // Check if new path cheaper
                 if (closed[childIndex].g < newG) {continue;}
-                PLOGV_(logger::FileLogger) << "Removing from closed: x= " << closed[childIndex].cell.x << ", y= " << closed[childIndex].cell.y << ", id " << closed[childIndex].id << ", pid " << closed[childIndex].parentId;
+                // PLOGV_(logger::FileLogger) << "Removing from closed: x= " << closed[childIndex].cell.x << ", y= " << closed[childIndex].cell.y << ", id " << closed[childIndex].id << ", pid " << closed[childIndex].parentId;
                 closed.erase(childIndex);
             }
 
-            PLOGV_(logger::FileLogger) << "Adding to open: x= " << childCell.x << ", y= " << childCell.y << ", id " << childIndex << ", pid " << node.id;
+            // PLOGV_(logger::FileLogger) << "Adding to open: x= " << childCell.x << ", y= " << childCell.y << ", id " << childIndex << ", pid " << node.id;
             open[childIndex] = {childIndex, node.id, childCell, newG, h};
         }
     }

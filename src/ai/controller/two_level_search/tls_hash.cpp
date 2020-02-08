@@ -19,6 +19,7 @@
 
 // Include
 #include "logger.h"
+#include "statistics.h"
 
 
 /**
@@ -132,6 +133,11 @@ void TwoLevelSearch::incrementPathTimesVisited(const T &pathContainer) {
         ++hashPathTimesVisited[hash];
         pathVisited.pop_front();
     }
+
+    // Statistics logging
+    ++(statistics::pathCounts[enginehelper::getLevelNumber()][currentHighLevelPathHash]);
+    statistics::solutionPathCounts[enginehelper::getLevelNumber()][0] = currentHighLevelPathHash;
+    statistics::solutionPathCounts[enginehelper::getLevelNumber()][1] = hashPathTimesVisited[currentHighLevelPathHash];
 }
 template void TwoLevelSearch::incrementPathTimesVisited<std::vector<BaseOption*>> (const std::vector<BaseOption*>&);
 template void TwoLevelSearch::incrementPathTimesVisited<std::deque<BaseOption*>> (const std::deque<BaseOption*>&);

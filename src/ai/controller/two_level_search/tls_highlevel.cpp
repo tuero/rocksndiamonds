@@ -33,10 +33,11 @@
 void TwoLevelSearch::recursiveFindNextLevinHLP(std::vector<BaseOption*> &optionPath, int maxDepth) {
     // Full length path, calculate cost and store as hash
     if ((int)optionPath.size() == maxDepth) {
+        if (optionPath[optionPath.size() - 1]->getOptionType() != OptionType::ToExit) {return;}
         uint64_t hash = optionPathToHash<std::vector<BaseOption*>>(optionPath);
 
         // We have exhausted all low level paths and we have not seen new constraints
-        if (!newConstraintSeen(optionPath) && openByPath[hash].empty() && !closedByPath[hash].empty()) {
+        if (!newConstraintSeen(optionPath) && currentHighLevelPathComplete(hash)) {
             return;
         }
 
@@ -49,7 +50,6 @@ void TwoLevelSearch::recursiveFindNextLevinHLP(std::vector<BaseOption*> &optionP
     for (auto const & option : availableOptions_) {
         auto iter = std::find(optionPath.begin(), optionPath.end(), option);
         if (iter != optionPath.end()) {continue;}
-        // if (iter != availableOptions_.end()) {continue;}
         optionPath.push_back(option);
         recursiveFindNextLevinHLP(optionPath, maxDepth);
         optionPath.pop_back();
@@ -71,17 +71,13 @@ void TwoLevelSearch::LevinTS() {
     logLevinNodes();
 
     // For each full path in map, add to distribution
-    // std::vector<double> pathCosts;
     int minIndex = -1;
     double minCost = std::numeric_limits<double>::max();
     for (int i = 0; i < (int) levinNodes_.size(); i++) {
-    // for (auto const & node : levinNodes_) {
-        NodeLevin &node = levinNodes_[i];
-        if (node.cost() < minCost) {
-            minCost = node.cost();
+        if (levinNodes_[i].cost() < minCost) {
+            minCost = levinNodes_[i].cost();
             minIndex = i;
         }
-        // pathCosts.push_back(node.cost());
     }
 
     if (minIndex == -1) {
@@ -89,10 +85,7 @@ void TwoLevelSearch::LevinTS() {
         PLOGE_(logger::ConsoleLogger) << "No least Levin node found";
     }
 
-    // std::discrete_distribution<> d(pathCosts.begin(), pathCosts.end());
-
-    // Flip coin to determine the path
-    // NodeLevin chosenPathNode = levinNodes_[d(gen)];
+    // Choose min cost node
     NodeLevin chosenPathNode = levinNodes_[minIndex];
     PLOGD_(logger::FileLogger) << "Chosen high level path: " << chosenPathNode.hash;
     for (auto const & option : hashToOptionPath(chosenPathNode.hash)) {
@@ -114,17 +107,10 @@ void TwoLevelSearch::highLevelSearch() {
     PLOGD_(logger::FileLogger) << "Starting high level search.";
 
     // Add new constraints found from previous attempt
-    // if (enginehelper::getOptParam() == 1) {
-    //     addNewConstraints();
-    // }
     addNewConstraints();
 
-    // Create deterministic path
-    if (enginehelper::getOptParam() == 1) {
-        highLevelSearchDeterministic();
-    } else {
-       LevinTS(); 
-    }
+    // High level search
+    LevinTS(); 
 
     currentHighLevelPathHash = optionPathToHash<std::vector<BaseOption*>>(highlevelPlannedPath_);
 

@@ -7808,6 +7808,10 @@ int main(int argc, char *argv[])
     // save the levelsetup as last series played, then let OpenAll() load. By default, OpenAll() will
     // load the levelset last played, which we mask to the one we want now.
     initLogger(argc, argv);
+    if (options.controller_type != CONTROLLER_DEFAULT) {
+        initStatsFile();
+        initReplayDirectory();
+    }
     setLevelSet();
 
   OpenAll();
@@ -7831,7 +7835,7 @@ int main(int argc, char *argv[])
           // Failed to load, exit
           if (load_level_failed) {
             Error(ERR_WARN, "Can't load level %d, exiting.", level_num);
-            return 1;
+            break;
           }
       }
 
@@ -7846,11 +7850,16 @@ int main(int argc, char *argv[])
 
       // Level is done (either solved or failed)
       // If all_levels is set, we increment to next level and continue again
-      if (!options.all_levels) {return 0;}
+      if (!options.all_levels) {break;}
       ++level_num;
     }
 
+    // Output stats
+    outputStatsToFile();
+
     // Game over, cleanup
+    closeStatsFile();
+    closeReplayFile();
     CloseAllAndExit(0);
 
   return 0;	// to keep compilers happy

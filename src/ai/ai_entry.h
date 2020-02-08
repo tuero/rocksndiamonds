@@ -67,6 +67,26 @@ extern "C"
     void initLogger(int argc, char *argv[]);
 
     /**
+     * Initialize the replay directory.
+     */
+    void initReplayDirectory(void);
+
+    /**
+     * Initialize the stats file.
+     */
+    void initStatsFile(void);
+
+    /**
+     * Close the stats file.
+     */
+    void closeStatsFile(void);
+
+    /**
+     * Output necessary statistics to file.
+     */
+    void outputStatsToFile(void);
+
+    /**
      * Set the levelset given by the command line argument.
      */
     void setLevelSet(void); 
