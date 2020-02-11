@@ -150,14 +150,14 @@ struct CompareNode {
 bool canExpandAvoidCollectingNonGoalGems(const enginetype::GridCell &cellFrom, const enginetype::GridCell &cellTo, 
     const enginetype::GridCell &goalCell, Action action) 
 {
-    return elementproperty::isDigable(cellFrom, action) || elementproperty::isWalkable(cellFrom, action) || 
-        elementproperty::isGateOpen(cellTo) || cellTo == goalCell;
+    return elementproperty::isDigable(cellFrom, action) || elementproperty::isWalkable(cellFrom, action) || elementproperty::isEmpty(cellFrom, action) ||
+        elementproperty::isGateOpen(cellTo) || elementproperty::isGateOpen(cellTo) || cellTo == goalCell;
 }
 
 bool canExpandCollectingNonGoalGems(const enginetype::GridCell &cellFrom, const enginetype::GridCell &cellTo, 
     const enginetype::GridCell &goalCell, Action action) 
 {
-    return elementproperty::isActionMoveable(cellFrom, action) || cellTo == goalCell;
+    return elementproperty::isActionMoveable(cellFrom, action) || elementproperty::isGateOpen(cellTo) || cellTo == goalCell;
 }
 
 /**

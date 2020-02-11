@@ -75,8 +75,8 @@ bool OptionToExit::getNextAction(Action &action) {
     runAStar();
 
     if (solutionPath_.empty()) {
-        PLOGE_(logger::FileLogger) << "Not able to find path to collectible sprite.";
-        PLOGE_(logger::ConsoleLogger) << "Not able to find path to collectible sprite.";
+        PLOGE_(logger::FileLogger) << "Not able to find path to " << toString();
+        PLOGE_(logger::ConsoleLogger) << "Not able to find path to " << toString();
         action = Action::noop;
         return false;
     }

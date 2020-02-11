@@ -10810,7 +10810,9 @@ static void CreateFieldExt(int x, int y, int element, boolean is_change)
     // (tuero@ualberta.ca) Feb 2020
     // When a new element appears, we want to make sure that we are tracking
     // it by giving it the next spriteID.
-    spriteIDs[x][y] = spriteIDCounter++;
+    if (!(old_element >= EL_EXIT_OPENING && old_element <= EL_SP_EXIT_OPEN)) { 
+      spriteIDs[x][y] = spriteIDCounter++; 
+    } 
 
     if (element_info[new_element].move_direction_initial == MV_START_PREVIOUS)
       MovDir[x][y] = previous_move_direction;
