@@ -7,13 +7,13 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 # C compiler flags
 set(CMAKE_C_FLAGS "-O3 -Wall -Wstrict-prototypes -Wmissing-prototypes")
-set(CMAKE_C_FLAGS_DEBUG "-g -O3 -Wall -Wstrict-prototypes -Wmissing-prototypes")
-set(CMAKE_C_FLAGS_RELEASE "-O3 -Wall -Wstrict-prototypes -Wmissing-prototypes")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS} -g")
+set(CMAKE_C_FLAGS_RELEASE "{CMAKE_C_FLAGS}")
 
 # C++ compiler flags
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -g -O3")
-set(CMAKE_CXX_FLAGS_DEBUG "-Wall -Wextra -g -O3 -DDEBUG ")
-set(CMAKE_CXX_FLAGS_RELEASE "-Wall -Wextra -O3")
+set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -DDEBUG ")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS}")
 
 # Special flags for clang
 if (CMAKE_C_COMPILER_ID STREQUAL "Clang")
@@ -27,6 +27,11 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -Wno-extern-c-compat")
 endif()
 
+# Log/replay/stat directories 
+message(STATUS "Creating log/replay/stat directories.")
+file(MAKE_DIRECTORY ${PROJECT_SOURCE_DIR}/src/ai/logs)
+file(MAKE_DIRECTORY ${PROJECT_SOURCE_DIR}/src/ai/replays)
+file(MAKE_DIRECTORY ${PROJECT_SOURCE_DIR}/src/ai/stats)
 
 # Includes
 include(sourcelist.cmake)
@@ -106,11 +111,12 @@ add_custom_target(
 
 # Executable
 if (SDL2_FOUND AND SDL2_image_FOUND AND SDL2_mixer_FOUND AND SDL2_net_FOUND)
-    add_executable(rocksndiamonds_gui ${sources_rnd} ${sources_ai})
-    add_dependencies(rocksndiamonds_gui auto_conf auto_conftime)
-    set_target_properties(rocksndiamonds_gui PROPERTIES COMPILE_FLAGS "-DTARGET_SDL2")
+    add_executable(rocksndiamonds ${sources_rnd} ${sources_ai})
+    add_dependencies(rocksndiamonds auto_conf auto_conftime)
+    set_target_properties(rocksndiamonds PROPERTIES COMPILE_FLAGS "-DTARGET_SDL2")
 endif()
 
+# These are always added as they don't depend on SDL2
 add_executable(rocksndiamonds_headless ${sources_rnd} ${sources_ai})
 add_dependencies(rocksndiamonds_headless auto_conf auto_conftime)
 set_target_properties(rocksndiamonds_headless PROPERTIES COMPILE_FLAGS "-DHEADLESS")
@@ -118,12 +124,13 @@ set_target_properties(rocksndiamonds_headless PROPERTIES COMPILE_FLAGS "-DHEADLE
 add_executable(run_tests ${sources_rnd} ${sources_ai} ${sources_tests})
 add_dependencies(run_tests auto_conf auto_conftime)
 set_target_properties(run_tests PROPERTIES COMPILE_FLAGS "-DHEADLESS -DRUN_TESTS")
+set_target_properties(run_tests PROPERTIES EXCLUDE_FROM_ALL TRUE)
 
 
 # Dependendies
 if (SDL2_FOUND AND SDL2_image_FOUND AND SDL2_mixer_FOUND AND SDL2_net_FOUND)
-    target_link_libraries(rocksndiamonds_gui m z)
-    target_link_libraries(rocksndiamonds_gui ${SDL2_IMAGE_LIBRARIES} ${SDL2_MIXER_LIBRARIES} ${SDL2_NET_LIBRARIES} ${SDL2_LIBRARIES})
+    target_link_libraries(rocksndiamonds m z)
+    target_link_libraries(rocksndiamonds ${SDL2_IMAGE_LIBRARIES} ${SDL2_MIXER_LIBRARIES} ${SDL2_NET_LIBRARIES} ${SDL2_LIBRARIES})
 endif()
 
 target_link_libraries(rocksndiamonds_headless m z)

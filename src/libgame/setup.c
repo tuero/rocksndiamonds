@@ -247,7 +247,9 @@ char *getNewUserLevelSubdir(void)
     checked_free(new_level_subdir);
     new_level_subdir = getStringCat2(subdir_prefix, subdir_suffix);
 
-    if (!directoryExists(getUserLevelDir(new_level_subdir)))
+    // (tuero@ualberta.ca) - Feb 2020
+    // Save new directories in project levels folder.
+    if (!directoryExists(getPath2("./levels", new_level_subdir)))
       break;
   }
 
@@ -3931,8 +3933,9 @@ static boolean AddTreeSetToTreeInfoExt(TreeInfo *tree_node_old, char *tree_dir,
     }
   }
 
-  if (tree_dir == NULL)
+  if (tree_dir == NULL) {
     tree_dir = TREE_USERDIR(type);
+  }
 
   if (tree_node_old   == NULL ||
       tree_dir        == NULL ||
@@ -4126,9 +4129,11 @@ boolean CreateUserLevelSet(char *level_subdir, char *level_name,
   int i;
 
   // create user level sub-directory, if needed
-  createDirectory(getUserLevelDir(level_subdir), "user level", PERMS_PRIVATE);
+  // createDirectory(getUserLevelDir(level_subdir), "user level", PERMS_PRIVATE);
+  createDirectory(getPath2("./levels", level_subdir), "user level", PERMS_PRIVATE);
 
-  filename = getPath2(getUserLevelDir(level_subdir), LEVELINFO_FILENAME);
+  // filename = getPath2(getUserLevelDir(level_subdir), LEVELINFO_FILENAME);
+  filename = getPath3("./levels", level_subdir, LEVELINFO_FILENAME);
 
   if (!(file = fopen(filename, MODE_WRITE)))
   {
@@ -4488,7 +4493,6 @@ void LoadLevelSetup_SeriesInfo(void)
   level_subdir = leveldir_current->subdir;
 
   filename = getPath2(getLevelSetupDir(level_subdir), LEVELSETUP_FILENAME);
-//    printf("%s\n", filename);
 
   if ((level_setup_hash = loadSetupFileHash(filename)))
   {

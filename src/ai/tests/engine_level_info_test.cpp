@@ -20,6 +20,8 @@
 // Test util
 #include "test_util.h"
 
+using namespace enginehelper;
+
 
 /**
  * Test the level information functions
@@ -37,21 +39,21 @@ TEST_CASE("Loading the default test level/levelset and check attribtues", "[leve
     StartGameActions(network.enabled, setup.autorecord, level.random_seed);
 
     // Check level number
-    REQUIRE(enginehelper::getLevelNumber() == levelNum);
+    REQUIRE(levelinfo::getLevelNumber() == levelNum);
 
     // Check level dimensions
-    REQUIRE(enginehelper::getLevelWidth() == levelWidth);
-    REQUIRE(enginehelper::getLevelHeight() == levelHeight);
+    REQUIRE(levelinfo::getLevelWidth() == levelWidth);
+    REQUIRE(levelinfo::getLevelHeight() == levelHeight);
 
     // Check gems to collect
-    REQUIRE(enginehelper::getLevelGemsNeeded() == gemsNeeded);
-    REQUIRE(enginehelper::getLevelRemainingGemsNeeded() == gemsNeeded);
+    REQUIRE(levelinfo::getLevelGemsNeeded() == gemsNeeded);
+    REQUIRE(levelinfo::getLevelRemainingGemsNeeded() == gemsNeeded);
 
     // Collect a diamond and then check the updated gem count
-    enginehelper::setEnginePlayerAction(Action::right);
-    enginehelper::engineSimulate();
-    enginehelper::setEnginePlayerAction(Action::right);
-    enginehelper::engineSimulate();
-    REQUIRE(enginehelper::getLevelGemsNeeded() == gemsNeeded);
-    REQUIRE(enginehelper::getLevelRemainingGemsNeeded() == gemsNeeded - 1);
+    enginestate::setEnginePlayerAction(Action::right);
+    enginestate::engineSimulate();
+    enginestate::setEnginePlayerAction(Action::right);
+    enginestate::engineSimulate();
+    REQUIRE(levelinfo::getLevelGemsNeeded() == gemsNeeded);
+    REQUIRE(levelinfo::getLevelRemainingGemsNeeded() == gemsNeeded - 1);
 }

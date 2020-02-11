@@ -85,31 +85,19 @@ set(sources_ai
     ${PROJECT_SOURCE_DIR}/src/ai/controller/options/option_single_step.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/options/option_collectible_sprite.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/options/option_to_exit.cpp
-    ${PROJECT_SOURCE_DIR}/src/ai/controller/options/option_to_rock.cpp
-    ${PROJECT_SOURCE_DIR}/src/ai/controller/options/option_wait_rock.cpp
-    ${PROJECT_SOURCE_DIR}/src/ai/controller/options/option_push_rock.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/replay/replay.cpp
-    ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/two_level_search.cpp
-    ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/tls_highlevel.cpp
-    ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/tls_lowlevel.cpp
-    ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/tls_constraint_detection.cpp
-    ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/tls_combinatorial_node.cpp
-    ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/tls_log.cpp
-    ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/tls_hash.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/engine/engine_types.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/engine/engine_action_info.cpp
-    ${PROJECT_SOURCE_DIR}/src/ai/engine/engine_distance.cpp
-    ${PROJECT_SOURCE_DIR}/src/ai/engine/engine_element_info.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/engine/engine_element_property.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/engine/engine_grid_action.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/engine/engine_grid_info.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/engine/engine_hash.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/engine/engine_level_info.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/engine/engine_status_info.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/engine/game_state.cpp
-    ${PROJECT_SOURCE_DIR}/src/ai/engine/game_state_abstract.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/level_programming/level_programming.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/util/config_reader.cpp
-    ${PROJECT_SOURCE_DIR}/src/ai/util/file_naming.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/util/file_dir_naming.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/util/timer.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/util/rng.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/util/logger.cpp
@@ -118,8 +106,7 @@ set(sources_ai
 
 set(sources_tests
     ${PROJECT_SOURCE_DIR}/src/ai/tests/engine_action_info_test.cpp
-    ${PROJECT_SOURCE_DIR}/src/ai/tests/engine_distance_test.cpp
-    ${PROJECT_SOURCE_DIR}/src/ai/tests/engine_element_info_test.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/tests/engine_element_property_test.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/tests/engine_grid_action_test.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/tests/engine_grid_info_test.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/tests/engine_level_info_test.cpp

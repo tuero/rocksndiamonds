@@ -393,9 +393,6 @@ void EventLoop(void)
       // don't use all CPU time when idle; the main loop while playing
     // has its own synchronization and is CPU friendly, too
     if (game_status == GAME_MODE_PLAYING){
-        // If the game is over, we rest
-
-
         // Get action from controller
         // We can get rid of the conditional by just returning user action
         // if no controller is selected
@@ -427,7 +424,6 @@ void EventLoop(void)
 
     // Game over
     if (game_status == GAME_MODE_QUIT) {
-      // closeReplayFile();
       return;
     }
 

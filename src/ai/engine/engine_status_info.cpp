@@ -16,6 +16,7 @@
 
 // Includes
 #include "engine_types.h"       // GridCell, Action
+#include "controller_listing.h"
 #include "logger.h"
 
 // Game headers
@@ -28,6 +29,7 @@ extern "C" {
 
 
 namespace enginehelper {
+namespace enginestate {
 
 /**
  * Get the controller type defined by user command line argument.
@@ -151,7 +153,9 @@ int getTimeLeftScore() {
  * Simulate the engine ahead a single tick.
  */
 void engineSimulateSingle() {
+    is_simulating = true;
     HandleGameActions();
+    is_simulating = false;
 }
 
 
@@ -159,9 +163,11 @@ void engineSimulateSingle() {
  * Simulate the engine ahead ENGINE_RESOLUTION game ticks.
  */
 void engineSimulate() {
+    is_simulating = true;
     for (int i = 0; i < enginetype::ENGINE_RESOLUTION; i++) {
         HandleGameActions();
     }
+    is_simulating = false;
 }
 
 /**
@@ -179,4 +185,5 @@ bool isSimulating() {
     return is_simulating;
 }
 
+} //namespace enginestate
 } //namespace enginehelper

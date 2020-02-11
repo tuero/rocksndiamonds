@@ -23,6 +23,8 @@
 #include "../options/option_single_step.h"
 #include "logger.h"
 
+using namespace enginehelper;
+
 
 std::random_device rd;
 std::mt19937 g(rd());
@@ -109,7 +111,9 @@ TreeNode* MCTS::selectPolicyUCT(TreeNode* node) {
     }
 
     // Select randomly best node
-    std::shuffle(bestNodes.begin(), bestNodes.end(), g);
+    if (bestNodes.size() > 1) {
+        std::shuffle(bestNodes.begin(), bestNodes.end(), g);
+    }
 
     return bestNodes[0];
 }
@@ -168,13 +172,13 @@ TreeNode* MCTS::selectMostVisitedChild(TreeNode* node) {
  * can be queried later, even if the engine is not set to the state.
  */
 double MCTS::getNodeValue() {
-    if (enginehelper::engineGameSolved()) {
-        return enginehelper::getTimeLeftScore() > 999 ? enginehelper::getTimeLeftScore() : 999;
+    if (enginestate::engineGameSolved()) {
+        return enginestate::getTimeLeftScore() > 999 ? enginestate::getTimeLeftScore() : 999;
     }
-    if (enginehelper::engineGameFailed()) {
+    if (enginestate::engineGameFailed()) {
         return -10;
     }
-    return enginehelper::getCurrentScore() - rootSavedState.getScore();
+    return enginestate::getCurrentScore() - rootSavedState.getScore();
 }
 
 
@@ -227,12 +231,12 @@ void MCTS::reset() {
     countExpandedNodes_ = 0;
     maxDepth_ = 0;
 
-    // Save current state
+    // Save current engine state
     GameState reference_state;
     reference_state.setFromEngineState();
 
     // step forward to state after current option
-    enginehelper::setSimulatorFlag(true);
+    enginestate::setSimulatorFlag(true);
     std::string msg = "Setting root to next option in queue: ";
 
     // Safeguard against bad pointers, option will be to step forward my performing noop action
@@ -259,7 +263,7 @@ void MCTS::reset() {
 
     // reset engine back to reference state
     reference_state.restoreEngineState();
-    enginehelper::setSimulatorFlag(false);
+    enginestate::setSimulatorFlag(false);
 }
 
 
@@ -274,7 +278,7 @@ Action MCTS::getAction() {
     Action action = Action::noop;
 
     // Ensure game is currently not over
-    if (enginehelper::engineGameOver()) {
+    if (enginestate::engineGameOver()) {
         return action;
     }
 
@@ -301,12 +305,12 @@ Action MCTS::getAction() {
  */
 void MCTS::plan() {
     // Break early if either current state or root state is already over.
-    if (enginehelper::engineGameOver() || rootSavedState.isGameOver()) {
+    if (enginestate::engineGameOver() || rootSavedState.isGameOver()) {
         return;
     }
 
     // Set simulator flag, allows for optimized simulations
-    enginehelper::setSimulatorFlag(true);
+    enginestate::setSimulatorFlag(true);
 
     // Timer gets initialized
     timer.reset();
@@ -362,16 +366,16 @@ void MCTS::plan() {
         for (int i = 0; i < numSimulations_; i++) {
             reference_state.restoreEngineState();
             if (!current->isTerminal()) {
-                enginehelper::setEngineRandomPlayerAction();
-                Action action = enginehelper::getEnginePlayerAction();
+                enginestate::setEngineRandomPlayerAction();
+                Action action = enginestate::getEnginePlayerAction();
                 for (int t = 0; t < maxIterationsDepth_; t++) {
-                    if (enginehelper::engineGameFailed() || enginehelper::engineGameSolved()) {
+                    if (enginestate::engineGameFailed() || enginestate::engineGameSolved()) {
                         break;
                     }
 
                     // Apply random action
-                    enginehelper::setEnginePlayerAction(action);
-                    enginehelper::engineSimulate();
+                    enginestate::setEnginePlayerAction(action);
+                    enginestate::engineSimulate();
                     countSimulatedNodes_ += 1;
                 }
 
@@ -407,5 +411,5 @@ void MCTS::plan() {
 
     // Put simulator back to original state
     startingState.restoreEngineState();
-    enginehelper::setSimulatorFlag(false);
+    enginestate::setSimulatorFlag(false);
 }

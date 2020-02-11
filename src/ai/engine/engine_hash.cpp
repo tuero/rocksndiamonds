@@ -1,7 +1,7 @@
 /**
- * @file: engine_distance.cpp
+ * @file: engine_hash.cpp
  *
- * @brief: Implementation of distance functions from the engine.
+ * @brief: Implementation of hashing function for the engine state.
  * 
  * @author: Jake Tuero
  * Date: August 2019
@@ -12,6 +12,8 @@
 #include "engine_helper.h"
 
 // Standard Libary/STL
+#include <vector>
+#include <deque>
 #include <cmath>                // abs
 
 // Includes
@@ -25,6 +27,10 @@ extern "C" {
 
 
 namespace enginehelper {
+namespace enginehash {
+
+const uint64_t MAX_HASH = UINT64_MAX;
+const int MAX_DIR = 32;
 
 // Hashing data structures
 uint64_t zobristElement[MAX_LEV_FIELDX * MAX_LEV_FIELDY][MAX_NUM_ELEMENTS];
@@ -46,14 +52,17 @@ void initZorbristTables() {
 /**
  * Get the hash representation of a vector grid cell path.
  */
-uint64_t gridcellPathToHash(const std::deque<enginetype::GridCell> &path) {
+template<typename Iter>
+uint64_t gridcellPathToHash(Iter iter, Iter end) {
     uint64_t hashValue = 0; 
-    for (auto const & cell : path) {
-        hashValue ^= zobristElement[cellToIndex(cell)][EL_EMPTY];
+    for (; iter != end; ++iter) {
+        hashValue ^= zobristElement[gridinfo::cellToIndex(*iter)][EL_EMPTY];
     }
 
     return hashValue;
 }
+template uint64_t gridcellPathToHash(std::vector<enginetype::GridCell>::iterator, std::vector<enginetype::GridCell>::iterator);
+template uint64_t gridcellPathToHash(std::deque<enginetype::GridCell>::iterator, std::deque<enginetype::GridCell>::iterator);
 
 
 /**
@@ -76,4 +85,5 @@ uint64_t stateToHash() {
     return hashValue;
 }
 
+} //namespace enginehash
 } //namespace enginehelper

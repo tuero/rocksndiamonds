@@ -1,5 +1,5 @@
 /**
- * @file: logging_wrapper.h
+ * @file: logger.h
  *
  * @brief: Interface for logging and replay file.
  * 

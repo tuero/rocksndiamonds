@@ -21,12 +21,7 @@ extern "C"
     // ---------------- Init Functions ------------------
 
     /**
-     * Perform all necessary actions at first time the level is started.
-     *
-     * Called whenever level is started. Calculates tile distances to goal for 
-     * MCTS with goal, initializes Zorbrist Tables for state hashing, and sends 
-     * starting state information to logger. Levels with custom programming call 
-     * the respective level start actions.
+     * Perform all necessary actions at level start.
      */
     void handleFirstLevelStart(void);
 
@@ -142,8 +137,7 @@ extern "C"
 
     #ifdef HEADLESS
     /**
-     * Runs all of the above tests in sequence
-     * Results are logged to file
+     * Run Catch2 tests
      */
     int runTests(void);
     #endif

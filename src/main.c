@@ -7828,7 +7828,7 @@ int main(int argc, char *argv[])
       initController();
 
       // If level number given as program argument, try to load
-      if (level_num > 0) {
+      if (level_num >= 0) {
           load_level_failed = FALSE;
           LoadLevel(level_num);
 

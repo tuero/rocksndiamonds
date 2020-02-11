@@ -1,5 +1,5 @@
 /**
- * @file: logging_wrapper.cpp
+ * @file: logger.cpp
  *
  * @brief: Interface for logging and replay file.
  * 
@@ -25,18 +25,15 @@
 // Includes
 #include "engine_types.h"
 #include "rng.h"
-#include "file_naming.h"
+#include "file_dir_naming.h"
 
 
 // Directory locations
 const std::string LOG_DIR = "./src/ai/logs/";
 const std::string REPLAY_DIR_BASE = "./src/ai/replays/";
-std::string REPLAY_DIR_FULL = "";
-const std::string STATS_DIR = "./src/ai/stats/";
-const std::string INDIVIDUAL_RUN = "_INDIVIDUAL";
 const std::string LOG_EXTENSION = ".log";
 const std::string REPLAY_EXTENSION = ".txt";
-const std::string STATS_EXTENSION = ".txt";
+std::string REPLAY_DIR_FULL = "";
 
 // ofstreams
 static std::ofstream replayFile;
@@ -99,7 +96,7 @@ namespace logger {
         if (options.controller_type == CONTROLLER_REPLAY) {logLevel_ = plog::error;}
 
         // log file name with path
-        std::string logFileFullPath = LOG_DIR + getFileName() + LOG_EXTENSION;
+        std::string logFileFullPath = LOG_DIR + getFileDirName() + LOG_EXTENSION;
 
         // Default logger to file
         plog::init<FileLogger>(logLevel_, logFileFullPath.c_str());
@@ -114,7 +111,7 @@ namespace logger {
 
     void initReplayDirectory() {
         // Initialize the replay directory (needs to be done here in the event initReplayFile is not set but )
-        REPLAY_DIR_FULL = REPLAY_DIR_BASE + getFileName() + "/";
+        REPLAY_DIR_FULL = REPLAY_DIR_BASE + getFileDirName() + "/";
         int rc = mkdir(REPLAY_DIR_FULL.c_str(), 0777);
         if (rc != 0) {
             PLOGE_(logger::FileLogger) << "Replay directory " << REPLAY_DIR_FULL << " already exists";
@@ -287,8 +284,8 @@ namespace logger {
      * Log the players current move.
      */
     void logPlayerMove(const std::string &action) {
-        PLOGV_(logger::FileLogger) << "Controller sending action: " + action;
-        PLOGV_(logger::ConsoleLogger) << "Controller sending action: " + action;
+        PLOGD_(logger::FileLogger) << "Controller sending action: " + action;
+        PLOGD_(logger::ConsoleLogger) << "Controller sending action: " + action;
     }
 
 

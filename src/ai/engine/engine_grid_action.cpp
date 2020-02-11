@@ -22,12 +22,13 @@
 
 
 namespace enginehelper {
+namespace gridaction {
 
 /**
  * Check if two grid cells are neighbours, defined by being separated by Euclidean distance of 1.
  */
 bool checkIfNeighbours(enginetype::GridCell left, enginetype::GridCell right) {
-    return inBounds(left) && inBounds(right) && std::abs(left.x - right.x) + std::abs(left.y - right.y) == 1;
+    return gridinfo::inBounds(left) && gridinfo::inBounds(right) && std::abs(left.x - right.x) + std::abs(left.y - right.y) == 1;
 }
 
 
@@ -68,4 +69,5 @@ enginetype::GridCell getCellFromAction(const enginetype::GridCell cellFrom, Acti
     return {cellFrom.x + delta[0], cellFrom.y + delta[1]};
 }
 
+} //namespace gridaction
 } //namespace enginehelper

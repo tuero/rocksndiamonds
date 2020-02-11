@@ -34,12 +34,10 @@ src/conf_act.c
 # ignore compiled executable files
 rocksndiamonds
 rocksndiamonds.exe
-rocksndiamonds_gui
 rocksndiamonds_headless
 run_tests
 
 .DS_Store
-
 
 # (tuero@ualberta.ca)
 .idea/
@@ -47,8 +45,7 @@ cmake-build-debug/
 calgrind.out*
 .vscode/
 src/.vscode/
+src/ai/stats/*
 src/ai/logs/*
 src/ai/replays/*
 build
-__pychache__/
-*.pyc

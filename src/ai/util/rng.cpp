@@ -14,6 +14,8 @@
 #include <random>
 #include <chrono>
 
+using namespace enginehelper;
+
 namespace RNG {
 
 uint64_t seedEngine_ = std::chrono::high_resolution_clock::now().time_since_epoch().count();
@@ -84,7 +86,7 @@ void resetToSimulationSeed() {
  * Get a random number from the engine RNG, from [0, max).
  */
 uint64_t getRandomNumber(uint64_t max) {
-    uint64_t randnum = (enginehelper::isSimulating() ? distSimulation_(genSimulating_) : distEngine_(genEngine_));
+    uint64_t randnum = (enginestate::isSimulating() ? distSimulation_(genSimulating_) : distEngine_(genEngine_));
     return randnum % max;
 }
 

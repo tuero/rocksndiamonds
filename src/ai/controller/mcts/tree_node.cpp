@@ -20,8 +20,10 @@
 #include "engine_helper.h"
 #include "logger.h"
 
+using namespace enginehelper;
 
 typedef std::unique_ptr<TreeNode> Pointer;
+
 
 TreeNode::TreeNode(TreeNode* parent, const std::vector<Action> &actionsFromStart) :  
     parent_(parent), actionsFromStart_(actionsFromStart)
@@ -34,8 +36,8 @@ TreeNode::TreeNode(TreeNode* parent, const std::vector<Action> &actionsFromStart
     value_ = 0;
 
     // Set internal engine status flags
-    isFailed_ = enginehelper::engineGameFailed();
-    isSolved_ = enginehelper::engineGameSolved();
+    isFailed_ = enginestate::engineGameFailed();
+    isSolved_ = enginestate::engineGameSolved();
     isTerminal_ = isFailed_ && isSolved_;
 }
 
@@ -72,9 +74,9 @@ TreeNode* TreeNode::expand() {
     childNode->setOptions(allOptions_);
 
     // Set termination flags
-    childNode->isTerminal_ |= (enginehelper::engineGameFailed() || enginehelper::engineGameSolved());
-    childNode->isFailed_ = enginehelper::engineGameFailed();
-    childNode->isSolved_ = enginehelper::engineGameSolved();
+    childNode->isTerminal_ |= (enginestate::engineGameFailed() || enginestate::engineGameSolved());
+    childNode->isFailed_ = enginestate::engineGameFailed();
+    childNode->isSolved_ = enginestate::engineGameSolved();
 
     // Store child
     children_.push_back(std::move(child));

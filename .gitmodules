@@ -1,6 +1,3 @@
-[submodule "src/ai/extern/FakeIt"]
-	path = src/ai/extern/FakeIt
-	url = https://github.com/eranpeer/FakeIt.git
 [submodule "src/ai/extern/Catch2"]
 	path = src/ai/extern/Catch2
 	url = https://github.com/catchorg/Catch2.git

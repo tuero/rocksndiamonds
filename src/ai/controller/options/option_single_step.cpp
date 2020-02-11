@@ -13,7 +13,10 @@
 // Includes
 #include "option_types.h"
 #include "engine_helper.h"
+#include "engine_types.h"
 #include "logger.h"
+
+using namespace enginehelper;
 
 
 OptionSingleStep::OptionSingleStep(Action action, int numTimes) {
@@ -37,8 +40,8 @@ OptionSingleStep::OptionSingleStep(Action action, int numTimes) {
  */
 bool OptionSingleStep::run() {
     for (int i = 0; i < enginetype::ENGINE_RESOLUTION * numTimes_; i++) {
-        enginehelper::setEnginePlayerAction(action_);
-        enginehelper::engineSimulateSingle();
+        enginestate::setEnginePlayerAction(action_);
+        enginestate::engineSimulateSingle();
     }
     return true;
 }
@@ -60,7 +63,7 @@ bool OptionSingleStep::getNextAction(Action &action) {
  * to perform is moveable.
  */
 bool OptionSingleStep::isValid() {
-    return enginehelper::isActionMoveable(enginehelper::getPlayerPosition(), action_);
+    return elementproperty::isActionMoveable(gridinfo::getPlayerPosition(), action_);
 }
 
 
@@ -68,5 +71,5 @@ bool OptionSingleStep::isValid() {
  * String representation of the option and its characteristics.
  */
 std::string OptionSingleStep::toString() const {
-    return optionStringName + enginehelper::actionToString(action_);
+    return optionStringName + actioninfo::actionToString(action_);
 }

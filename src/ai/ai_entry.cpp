@@ -19,18 +19,19 @@
 #include "rng.h"                // RNG
 #include "logger.h"             // Logger
 #include "statistics.h"
+#include "level_programming.h"
 
 // Controller
 #include "controller/controller.h"
-
-// Misc
-#include "level_programming/level_programming.h"
 
 // Tests
 #ifdef RUN_TESTS
 #define CATCH_CONFIG_RUNNER
 #include <catch2/catch.hpp>
 #endif
+
+
+using namespace enginehelper;
 
 
 // External variables accessible to engine
@@ -55,16 +56,16 @@ extern "C" void handleFirstLevelStart() {
     levelprogramming::customLevelProgrammingStart();
 
     // Initialize zorbrist tables for state hashing
-    enginehelper::initZorbristTables();
+    enginehash::initZorbristTables();
 
     // // Initialize sprite IDs
-    enginehelper::initSpriteIDs();
+    gridinfo::initSpriteIDs();
 
     // Initial logging
-    PLOGI_(logger::FileLogger) << "Level starting: " << enginehelper::getLevelNumber();
-    PLOGI_(logger::ConsoleLogger) << "Level starting: " << enginehelper::getLevelNumber();
-    PLOGI_(logger::FileLogger) << "Gems needed: " << enginehelper::getLevelGemsNeeded();
-    PLOGI_(logger::ConsoleLogger) << "Gems needed: " << enginehelper::getLevelGemsNeeded();
+    PLOGI_(logger::FileLogger) << "Level starting: " << levelinfo::getLevelNumber();
+    PLOGI_(logger::ConsoleLogger) << "Level starting: " << levelinfo::getLevelNumber();
+    PLOGI_(logger::FileLogger) << "Gems needed: " << levelinfo::getLevelGemsNeeded();
+    PLOGI_(logger::ConsoleLogger) << "Gems needed: " << levelinfo::getLevelGemsNeeded();
     logger::logCurrentState(plog::debug);
 
     // Ensure RNG seeds reset during level start
@@ -73,11 +74,11 @@ extern "C" void handleFirstLevelStart() {
 
     // Initialize and open replay file
     // Don't create replay file if we are currently in a replay
-    // if (enginehelper::getControllerType() != CONTROLLER_REPLAY) {
-    if (options.save_run) {
-        logger::initReplayFile(enginehelper::getLevelSet(), enginehelper::getLevelNumber());
+    if (options.save_run && enginestate::getControllerType() != CONTROLLER_REPLAY) {
+        logger::initReplayFile(levelinfo::getLevelSet(), levelinfo::getLevelNumber());
     }
 
+    // Let controller handle necessary actions for first time level start.
     controller.handleFirstLevelStart();
 }
 
@@ -172,7 +173,7 @@ extern "C" void outputStatsToFile(void) {
  * Set the levelset given by the command line argument.
  */
 extern "C" void setLevelSet(void) {
-    enginehelper::setLevelSet();
+    levelinfo::setLevelSet();
 } 
 
 
@@ -180,7 +181,7 @@ extern "C" void setLevelSet(void) {
  * Load the level.
  */
 extern "C" void loadLevel(int levelNumber) {
-    enginehelper::loadLevel(levelNumber);
+    levelinfo::loadLevel(levelNumber);
 }
 
 // ----------------------- Action Handler --------------------------

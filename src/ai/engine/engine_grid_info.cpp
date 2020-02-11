@@ -12,7 +12,8 @@
 #include "engine_helper.h"
 
 // Standard Libary/STL
-#include <array>
+#include <vector>
+#include <unordered_map>
 
 // Includes
 #include "engine_types.h"       // GridCell, Action
@@ -27,6 +28,15 @@ extern int spriteIDs[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
 extern int spriteIDCounter;
 
 namespace enginehelper {
+namespace gridinfo {
+
+
+/**
+ * Get L1 distance between two gridcells
+ */
+int getL1Distance(const enginetype::GridCell &left, const enginetype::GridCell &right) {
+    return (std::abs(left.x - right.x) + std::abs(left.y - right.y));
+}
 
 /**
  * Checks if the given gridcell is in bounds of the level field.
@@ -40,7 +50,7 @@ bool inBounds(const enginetype::GridCell &cell) {
  * Convert a gridcell to a flat index
  */
 int cellToIndex(const enginetype::GridCell &cell) {
-    return inBounds(cell) ? (cell.y * getLevelWidth() + cell.x) : -1;
+    return inBounds(cell) ? (cell.y * levelinfo::getLevelWidth() + cell.x) : -1;
 }
 
 
@@ -50,9 +60,9 @@ int cellToIndex(const enginetype::GridCell &cell) {
 enginetype::GridCell indexToCell(int index) {
     const enginetype::GridCell invalidCell = {-1, -1};
     if (index == -1) {return invalidCell;}
-    int x = index % getLevelWidth();
-    int y = index / getLevelWidth();
-    return (x >= getLevelWidth() || y >= getLevelHeight()) ? invalidCell : (enginetype::GridCell ){x, y};
+    int x = index % levelinfo::getLevelWidth();
+    int y = index / levelinfo::getLevelWidth();
+    return (x >= levelinfo::getLevelWidth() || y >= levelinfo::getLevelHeight()) ? invalidCell : (enginetype::GridCell ){x, y};
 }
 
 
@@ -61,9 +71,7 @@ enginetype::GridCell indexToCell(int index) {
  * For internal use when bound-check is implicitly done.
  */
 bool _isValidSprite(const enginetype::GridCell &cell) {
-    int element = Feld[cell.x][cell.y];
-    bool isRestricted = enginetype::RESTRICTED_SPRITES.find(element) != enginetype::RESTRICTED_SPRITES.end();
-    return !isRestricted && !isTemporaryElement(cell);
+    return !elementproperty::isTemporaryElement(cell) && !elementproperty::isEmpty(cell);
 }
 
 
@@ -147,18 +155,65 @@ std::vector<enginetype::GridCell> getMapSprites() {
 
 
 /**
+ * Get a list of every element along with some identifiable properties for the whole map.
+ */
+std::vector<enginetype::ElementFullObservation> getFullObservation() {
+    std::vector<enginetype::ElementFullObservation> obs;
+    for (int x = 0; x < level.fieldx; x++) {
+        for (int y = 0; y < level.fieldy; y++) {
+            enginetype::GridCell cell = {x, y};
+            obs.push_back({cell, getElementReservedCell(cell), getSpriteID(cell), 
+                (isPlayerPosition(cell)) ? enginetype::ELEMENT_PLAYER_1 : getGridElement(cell), getGridMovDir(cell)
+            });
+        }
+    }
+    return obs;
+}
+
+
+/**
  * Get the item element located at the given GridCell (x,y) location.
  */
-int getGridElement(enginetype::GridCell cell) {
+int getGridElement(const enginetype::GridCell &cell) {
     return inBounds(cell) ? Feld[cell.x][cell.y] : EL_EMPTY;
 }
 
 
 /**
  * Get the item MovPos at the given GridCell (x,y) location.
+ * This is the offset (between 0 and 32) which repsents the offset the current
+ * element is on during transition from one cell to another.
  */
-int getGridMovPos(enginetype::GridCell cell) {
+int getGridMovPos(const enginetype::GridCell &cell) {
     return inBounds(cell) ? MovPos[cell.x][cell.y] : 0;
+}
+
+
+static const std::unordered_map<int, Action> DIR_TO_ACTION = 
+{
+    {enginetype::ENGINE_MV_RIGHT,   Action::right},
+    {enginetype::ENGINE_MV_DOWN,    Action::down},
+    {enginetype::ENGINE_MV_LEFT,    Action::left},
+    {enginetype::ENGINE_MV_UP,      Action::up},
+    {enginetype::ENGINE_MV_NONE,    Action::noop}
+};
+
+/**
+ * Get the item MovDir at the given GridCell (x,y) location.
+ * This is the direction the object is currently moving in.
+ */
+Action getGridMovDir(const enginetype::GridCell &cell) {
+    return inBounds(cell) ? DIR_TO_ACTION.at(MovDir[cell.x][cell.y]) : Action::noop;
+}
+
+
+/**
+ * Get the reserved cell that the element owns.
+ * If elements are moving from one cell to another, they place a temporary element into the 
+ * new cell to claim ownership. If the cell is not moving, the same cell is returned.
+ */
+enginetype::GridCell getElementReservedCell(const enginetype::GridCell &cell) {
+    return (getGridMovPos(cell) == 0) ? cell : gridaction::getCellFromAction(cell, getGridMovDir(cell));
 }
 
 
@@ -182,10 +237,10 @@ bool isPlayerPosition(const enginetype::GridCell &cell) {
 /**
  * Check if the grid cell at location (x,y) is empty.
  */
-bool isGridEmpty(enginetype::GridCell cell) {
+bool isGridEmpty(const enginetype::GridCell &cell) {
     // If not in bounds, occupied by player or temporary element then false
     // Then check if Feld structure at cell corresponds to empty sprite
-    return (!inBounds(cell) || isPlayerPosition(cell) || isTemporaryElement(cell)) ? false : Feld[cell.x][cell.y] == EL_EMPTY;
+    return (!inBounds(cell) || isPlayerPosition(cell) || elementproperty::isTemporaryElement(cell)) ? false : Feld[cell.x][cell.y] == EL_EMPTY;
 }
 
 
@@ -223,26 +278,14 @@ int countNumOfElement(int element) {
 /**
  * Add the specified element to the level.
  */
-void spawnElement(int element, int dir, enginetype::GridCell gridCell) {
-    if (!inBounds(gridCell)) {
+void spawnElement(int element, int dir, const enginetype::GridCell &cell) {
+    if (!inBounds(cell)) {
         return;
     }
-    Feld[gridCell.x][gridCell.y] = element;
-    MovDir[gridCell.x][gridCell.y] = dir;
+    Feld[cell.x][cell.y] = element;
+    MovDir[cell.x][cell.y] = dir;
 }
 
 
-/**
- * Get the current goal location (defined by distance of 0).
- */
-enginetype::GridCell getCurrentGoalLocation() {
-    enginetype::GridCell gridCell{-1, -1};
-    for (int x = 0; x < level.fieldx; x++) {
-        for (int y = 0; y < level.fieldy; y++) {
-            if (distances[x][y] == 0) {gridCell.x = x; gridCell.y = y;}
-        }
-    }
-    return gridCell;
-}
-
+} //namespace gridinfo
 } //namespace enginehelper

@@ -16,6 +16,8 @@
 #include "engine_helper.h"
 #include "logger.h"
 
+using namespace enginehelper;
+
 
 /**
  * Default constructor.
@@ -26,7 +28,7 @@
 Replay::Replay(){
     try{
         requestReset_ = false;
-        replayFileName = enginehelper::getReplayFileName();
+        replayFileName = enginestate::getReplayFileName();
         replayFileStream.open(REPLAY_DIR + replayFileName, std::ifstream::in);
 
         uint64_t seed;
@@ -42,13 +44,13 @@ Replay::Replay(){
         // Call respective methods to set above data
         RNG::setEngineSeed(seed);
         options.level_set = (char*)level_set.c_str();
-        enginehelper::setLevelSet(true);
-        enginehelper::loadLevel(level_num);
+        levelinfo::setLevelSet();
+        levelinfo::loadLevel(level_num);
     }
     catch (...) {
         PLOGE_(logger::ConsoleLogger) << "An error occured trying to initialize levelset/level from replay file. Exiting.";
         PLOGE_(logger::FileLogger) << "An error occured trying to initialize levelset/level from replay file. Exiting.";
-        enginehelper::setEngineGameStatusModeQuit();
+        enginestate::setEngineGameStatusModeQuit();
     }
 }
 
@@ -75,7 +77,7 @@ Action Replay::getAction() {
                     requestReset_ = true;
                     return Action::noop;
                 }
-                return enginehelper::stringToAction(line);
+                return actioninfo::stringToAction(line);
             }
         }
     }

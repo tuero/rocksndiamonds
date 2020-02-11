@@ -53,7 +53,6 @@ public:
 
     /**
      * Constructor with given option factory type.
-     * 
      * The available options to plan over is set by the input option factory type.
      * 
      * @param optionFactoryType The specified option factory type to use as the available options.
@@ -61,6 +60,33 @@ public:
     BaseController(OptionFactoryType optionFactoryType) : 
         optionFactoryType_(optionFactoryType)
     {}
+
+    /**
+     * Set action which agent should immediately take.
+     * 
+     * Called every enginetype::ENGINE_RESOLUTION game steps (resolution the
+     * player moves by).
+     * 
+     * @return The action to perform
+     */
+    virtual Action getAction() = 0;
+
+
+    /**
+     * Called every game step to allow the controller time to plan while
+     * executing the current action as taken from getAction().
+     * 
+     * To ensure the game remaines real-time, plain() should not take longer than ~18ms.
+     */
+    virtual void plan() {};
+
+    /**
+     * Convey any important details about the controller in string format.
+     * Useful for logging relevant information about the current controller configuration.
+     * 
+     * @return The controller details in string format.
+     */
+    virtual std::string controllerDetailsToString() {return "Default controller";}
 
     /**
      * Initialize the options by asking the factory.
@@ -84,6 +110,8 @@ public:
      * Called on every loop to check if controller wants to reset the level.
      * The underlying flag should be set either in handleEmpty() or run().
      * 
+     * @note If you want your controller to ask for a levle reset, return true.
+     * 
      * @return True if the controller wants to reset the level.
      */
     virtual bool requestReset() {return requestReset_;}
@@ -100,6 +128,8 @@ public:
      * Flag for controller to try again if level fails.
      * If this is set to true, on level fail (player died, time runs out, etc.),
      * the level will be restarted. Otherwise, the program will terminate.
+     * 
+     * @note Return true if you want your controller to retry on level fails
      */
     virtual bool retryOnLevelFail() const {return false;}
 
@@ -116,25 +146,6 @@ public:
     virtual void handleLevelRestartAfter() {};
 
     /**
-     * Set option which agent should immediately take.
-     * 
-     * Called every enginetype::ENGINE_RESOLUTION game steps (resolution the
-     * player moves by).
-     * 
-     * @return The action to perform
-     */
-    virtual Action getAction() = 0;
-
-
-    /**
-     * Called every game step to allow the controller time to plan while
-     * executing the current action as taken from getAction().
-     * 
-     * To ensure the game remaines real-time, plain() should not take longer than ~18ms.
-     */
-    virtual void plan() {};
-
-    /**
      * Set the available options for the controller to plan with.
      *
      * @param optionFactoryType Enum type to represent set of options to build
@@ -142,14 +153,6 @@ public:
     void setAvailableOptions(const OptionFactoryType optionFactoryType) {
         availableOptions_ = optionFactory_.createOptions(optionFactoryType);
     }
-
-    /**
-     * Convey any important details about the controller in string format.
-     * Useful for logging relevant information about the current controller configuration.
-     * 
-     * @return The controller details in string format.
-     */
-    virtual std::string controllerDetailsToString() {return "Default controller";}
 
 };
 

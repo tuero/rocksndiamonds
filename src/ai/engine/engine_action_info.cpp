@@ -19,6 +19,7 @@
 #include "engine_types.h"
 
 namespace enginehelper {
+namespace actioninfo {
 
 /**
  * Fast lookup action descriptions.
@@ -66,4 +67,5 @@ Action getOppositeDirection(Action action) {
     return (it == ACTION_TO_STRING.end() ? Action::noop : static_cast<Action>(MV_DIR_OPPOSITE(action)));
 }
 
+} //namespace actioninfo
 } //namespace enginehelper

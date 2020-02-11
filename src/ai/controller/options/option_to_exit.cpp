@@ -19,12 +19,14 @@
 #include "engine_helper.h"
 #include "logger.h"
 
+using namespace enginehelper;
+
 
 OptionToExit::OptionToExit(int spriteID) {
     optionType_ = OptionType::ToExit;
     spriteID_ = spriteID;
-    goalCell_ = enginehelper::getSpriteGridCell(spriteID);
-    item_ = enginehelper::getGridElement(goalCell_);
+    goalCell_ = gridinfo::getSpriteGridCell(spriteID);
+    item_ = gridinfo::getGridElement(goalCell_);
     solutionPath_.clear();
 }
 
@@ -33,7 +35,7 @@ OptionToExit::OptionToExit(int spriteID) {
  * Convert to human readable format (spriteID, location, etc.)
  */
 std::string OptionToExit::toString() const {
-    return enginehelper::getItemReadableDescription(item_) + " " + std::to_string(spriteID_);
+    return elementproperty::getItemReadableDescription(item_) + " " + std::to_string(spriteID_);
 }
 
 
@@ -49,11 +51,11 @@ bool OptionToExit::run() {
         ++counter;
 
         // Game over while running option
-        if (enginehelper::engineGameOver() || MAX_ATTEMPT) {return false;}
+        if (enginestate::engineGameOver() || MAX_ATTEMPT) {return false;}
 
         bool flag = getNextAction(action);
-        enginehelper::setEnginePlayerAction(action);
-        enginehelper::engineSimulate();
+        enginestate::setEnginePlayerAction(action);
+        enginestate::engineSimulate();
         
         if (flag) {return true;}
     }
@@ -64,12 +66,12 @@ bool OptionToExit::run() {
  * Get the next action to get to the exit.
  */
 bool OptionToExit::getNextAction(Action &action) {
-    if (enginehelper::isExitOpening(goalCell_)) {
+    if (elementproperty::isExitOpening(goalCell_)) {
         action = Action::noop;
         return false;
     }
 
-    goalCell_ = enginehelper::getSpriteGridCell(spriteID_);
+    goalCell_ = gridinfo::getSpriteGridCell(spriteID_);
     runAStar();
 
     if (solutionPath_.empty()) {
@@ -84,11 +86,11 @@ bool OptionToExit::getNextAction(Action &action) {
     solutionPath_.pop_front();
 
     // Find the corresponding action
-    enginetype::GridCell playerCell = enginehelper::getPlayerPosition();
-    action = enginehelper::getActionFromNeighbours(playerCell, cell);
+    enginetype::GridCell playerCell = gridinfo::getPlayerPosition();
+    action = gridaction::getActionFromNeighbours(playerCell, cell);
 
     // Option is complete if we pulled the last action off the solution.
-    return playerCell == goalCell_ && enginehelper::isPlayerDoneAction();
+    return playerCell == goalCell_ && enginestate::isPlayerDoneAction();
 }
 
 
@@ -98,7 +100,7 @@ bool OptionToExit::getNextAction(Action &action) {
  */
 bool OptionToExit::isValid() {
     runAStar();
-    bool doorValid = enginehelper::isExitOpen(goalCell_) || enginehelper::isExitOpening(goalCell_) || enginehelper::isExitClosing(goalCell_);
-    bool playerInGoal = enginehelper::getPlayerPosition() == goalCell_;
+    bool doorValid = elementproperty::isExitOpen(goalCell_) || elementproperty::isExitOpening(goalCell_) || elementproperty::isExitClosing(goalCell_);
+    bool playerInGoal = gridinfo::getPlayerPosition() == goalCell_;
     return doorValid && (!solutionPath_.empty() || playerInGoal);
 }

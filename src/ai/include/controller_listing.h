@@ -17,15 +17,19 @@
 /**
  * Controller types
  * For additional controllers, add a new option to the end.
+ * 
+ * @note ADD YOUR CONTROLLER TYPE HERE
  */
 typedef enum ControllerType {CONTROLLER_DEFAULT, CONTROLLER_REPLAY, CONTROLLER_MCTS, 
-                             CONTROLLER_MCTS_OPTIONS, CONTROLLER_TWOLEVEL} ControllerType;
+                             CONTROLLER_MCTS_OPTIONS} ControllerType;
 
 /**
  * Command line strings to set the controller.
  * The ith string corresponds to the ith ControllerType. Add new options to the end.
+ * 
+ * @note ADD YOUR CONTROLLER COMMAND LINE ARGUMENT HERE
  */
-#define CONTROLLER_STRINGS {"default", "replay", "mcts", "mcts_options", "two_level"};
+#define CONTROLLER_STRINGS {"default", "replay", "mcts", "mcts_options"};
 
 
 #endif  //CONTROLLER_LISTING_H

@@ -17,19 +17,21 @@
 #include "engine_helper.h"
 
 
+using namespace enginehelper;
+
 /**
  * Test the actionToString function 
  */
 TEST_CASE("Action to string", "[action_information]") {
     SECTION("Unknown action type") {
-        REQUIRE(enginehelper::actionToString(static_cast<Action>(-1)) == "noop");
+        REQUIRE(actioninfo::actionToString(static_cast<Action>(-1)) == "noop");
     }
     SECTION("Known action types") {
-        REQUIRE(enginehelper::actionToString(Action::up) == "up");
-        REQUIRE(enginehelper::actionToString(Action::down) == "down");
-        REQUIRE(enginehelper::actionToString(Action::left) == "left");
-        REQUIRE(enginehelper::actionToString(Action::right) == "right");
-        REQUIRE(enginehelper::actionToString(Action::noop) == "noop");
+        REQUIRE(actioninfo::actionToString(Action::up) == "up");
+        REQUIRE(actioninfo::actionToString(Action::down) == "down");
+        REQUIRE(actioninfo::actionToString(Action::left) == "left");
+        REQUIRE(actioninfo::actionToString(Action::right) == "right");
+        REQUIRE(actioninfo::actionToString(Action::noop) == "noop");
     }
 }
 
@@ -39,14 +41,14 @@ TEST_CASE("Action to string", "[action_information]") {
  */
 TEST_CASE("String to action", "[action_information]") {
     SECTION("Unknown action type") {
-        REQUIRE(enginehelper::stringToAction("unkown") == Action::noop);
+        REQUIRE(actioninfo::stringToAction("unkown") == Action::noop);
     }
     SECTION("Known action types") {
-        REQUIRE(enginehelper::stringToAction("up") ==Action::up);
-        REQUIRE(enginehelper::stringToAction("down") == Action::down);
-        REQUIRE(enginehelper::stringToAction("left") == Action::left);
-        REQUIRE(enginehelper::stringToAction("right") == Action::right);
-        REQUIRE(enginehelper::stringToAction("noop") == Action::noop);
+        REQUIRE(actioninfo::stringToAction("up") ==Action::up);
+        REQUIRE(actioninfo::stringToAction("down") == Action::down);
+        REQUIRE(actioninfo::stringToAction("left") == Action::left);
+        REQUIRE(actioninfo::stringToAction("right") == Action::right);
+        REQUIRE(actioninfo::stringToAction("noop") == Action::noop);
     }
 }
 
@@ -56,13 +58,13 @@ TEST_CASE("String to action", "[action_information]") {
  */
 TEST_CASE("Get action opposite direction", "[action_information]") {
     SECTION("Unknown action type") {
-        REQUIRE(enginehelper::getOppositeDirection(static_cast<Action>(-1)) == Action::noop);
+        REQUIRE(actioninfo::getOppositeDirection(static_cast<Action>(-1)) == Action::noop);
     }
     SECTION("Known action types") {
-        REQUIRE(enginehelper::getOppositeDirection(Action::up) == Action::down);
-        REQUIRE(enginehelper::getOppositeDirection(Action::down) == Action::up);
-        REQUIRE(enginehelper::getOppositeDirection(Action::left) == Action::right);
-        REQUIRE(enginehelper::getOppositeDirection(Action::right) == Action::left);
-        REQUIRE(enginehelper::getOppositeDirection(Action::noop) == Action::noop);
+        REQUIRE(actioninfo::getOppositeDirection(Action::up) == Action::down);
+        REQUIRE(actioninfo::getOppositeDirection(Action::down) == Action::up);
+        REQUIRE(actioninfo::getOppositeDirection(Action::left) == Action::right);
+        REQUIRE(actioninfo::getOppositeDirection(Action::right) == Action::left);
+        REQUIRE(actioninfo::getOppositeDirection(Action::noop) == Action::noop);
     }
 }

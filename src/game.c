@@ -5830,8 +5830,8 @@ static void Explode(int ex, int ey, int phase, int mode)
     // (tuero@ualberta.ca) - September 2019
     // sprite IDs are used for custom controllers for object tracking
     // If Field is removed, then we remove sprite ID from known list
-    // Ensure element being replaced is not empty or dirt
-    if (element > 1) {spriteIDs[x][y] = spriteIDCounter++;}
+    // Ensure element being replaced is not empty
+    if (element > EL_EMPTY) {spriteIDs[x][y] = spriteIDCounter++;}
 
     // player can escape from explosions and might therefore be still alive
     if (element >= EL_PLAYER_IS_EXPLODING_1 &&
@@ -10806,6 +10806,11 @@ static void CreateFieldExt(int x, int y, int element, boolean is_change)
       RemoveField(x, y);
 
     Feld[x][y] = new_element;
+
+    // (tuero@ualberta.ca) Feb 2020
+    // When a new element appears, we want to make sure that we are tracking
+    // it by giving it the next spriteID.
+    spriteIDs[x][y] = spriteIDCounter++;
 
     if (element_info[new_element].move_direction_initial == MV_START_PREVIOUS)
       MovDir[x][y] = previous_move_direction;

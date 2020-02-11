@@ -771,7 +771,7 @@
 				 INFOTEXT_UNDEFINED)
 
 #define TREE_USERDIR(t)		((t) == TREE_TYPE_LEVEL_DIR ?		\
-				 getUserLevelDir(NULL) :		\
+				 "./levels" :		\
 				 (t) == TREE_TYPE_GRAPHICS_DIR ?	\
 				 getUserGraphicsDir() :			\
 				 (t) == TREE_TYPE_SOUNDS_DIR ?		\

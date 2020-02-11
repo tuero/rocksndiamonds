@@ -1,5 +1,5 @@
 /**
- * @file: config.cpp
+ * @file: config_reader.cpp
  *
  * @brief: Read configuration files
  * 

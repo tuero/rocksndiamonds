@@ -14,6 +14,8 @@
 #include "engine_types.h"
 #include "engine_helper.h"
 
+using namespace enginehelper;
+
 
 GameState::GameState() : gameFailed_(false), gameSolved_(false) {}
 
@@ -112,8 +114,8 @@ void GameState::setFromEngineState() {
 
     spriteIDCounter_ = spriteIDCounter;
 
-    gameFailed_ = enginehelper::engineGameFailed();
-    gameSolved_ = enginehelper::engineGameSolved();
+    gameFailed_ = enginestate::engineGameFailed();
+    gameSolved_ = enginestate::engineGameSolved();
 }
 
 

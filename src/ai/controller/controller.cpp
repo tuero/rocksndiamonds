@@ -17,7 +17,6 @@
 #include "engine_helper.h" 
 #include "timer.h" 
 #include "logger.h"
-
 #include "statistics.h"
 
 // Controllers
@@ -26,7 +25,8 @@
 #include "default/default.h"
 #include "mcts/mcts.h"
 #include "replay/replay.h"
-#include "two_level_search/two_level_search.h"
+
+using namespace enginehelper;
 
 
 /**
@@ -104,12 +104,12 @@ void Controller::handleLevelSolved() {
     // Stats
     statistics::numLevelTries += 1;
 
-    PLOGI_(logger::FileLogger) << "Number of plays = " << statistics::numLevelTries;
-    PLOGI_(logger::ConsoleLogger) << "Number of plays = " << statistics::numLevelTries;
+    PLOGI_(logger::FileLogger) << "Number of attempts = " << statistics::numLevelTries;
+    PLOGI_(logger::ConsoleLogger) << "Number of attempts = " << statistics::numLevelTries;
 
     // Signal game over and close logs
-    logger::createReplayForIndividualRun(enginehelper::getLevelSet(), enginehelper::getLevelNumber(), actionsTaken_);
-    enginehelper::setEngineGameStatusModeQuit();
+    logger::createReplayForIndividualRun(levelinfo::getLevelSet(), levelinfo::getLevelNumber(), actionsTaken_);
+    enginestate::setEngineGameStatusModeQuit();
     logger::closeReplayFile();
 }
 
@@ -126,11 +126,15 @@ void Controller::handleLevelFailed() {
         // Handle necessary changes before/after level reload
         baseController_.get()->handleLevelRestartBefore();
         if (statistics::numLevelTries % MSG_FREQ == 0) {
-            PLOGI_(logger::FileLogger) << "Restarting level: " << enginehelper::getLevelNumber() << ", attempt " << statistics::numLevelTries;
-            PLOGI_(logger::ConsoleLogger) << "Restarting level: " << enginehelper::getLevelNumber() << ", attempt " << statistics::numLevelTries;
+            PLOGI_(logger::FileLogger) << "Restarting level: " << levelinfo::getLevelNumber() << ", attempt " << statistics::numLevelTries;
+            PLOGI_(logger::ConsoleLogger) << "Restarting level: " << levelinfo::getLevelNumber() << ", attempt " << statistics::numLevelTries;
         }
-        enginehelper::restartLevel();
+        // Restart level
+        levelinfo::restartLevel();
+        // Logger saves a restart request
         logger::savePlayerMove("reset");
+
+        // Restart controller and handle necessary actions
         reset();
         baseController_.get()->handleLevelRestartAfter();
     }
@@ -144,7 +148,7 @@ void Controller::handleLevelFailed() {
  * complete.
  */
 int Controller::getAction() {
-    enginehelper::setSimulatorFlag(true);
+    enginestate::setSimulatorFlag(true);
     Action action = Action::noop;
 
     try{
@@ -169,10 +173,10 @@ int Controller::getAction() {
         // We only care about information at the engine resolution
         if (step_counter_++ % enginetype::ENGINE_RESOLUTION == 0) {
             // Save action to replay file
-            logger::savePlayerMove(enginehelper::actionToString(action));
-            logger::logPlayerMove(enginehelper::actionToString(action));
+            logger::savePlayerMove(actioninfo::actionToString(action));
+            logger::logPlayerMove(actioninfo::actionToString(action));
             logger::logCurrentState();
-            actionsTaken_.push_back(enginehelper::actionToString(action));
+            actionsTaken_.push_back(actioninfo::actionToString(action));
         }
     } 
     catch (const std::exception &ex) {
@@ -183,7 +187,7 @@ int Controller::getAction() {
         std::cerr << "Unknown failure occurred. Please check logs." << std::endl;
     }
 
-    enginehelper::setSimulatorFlag(false);
+    enginestate::setSimulatorFlag(false);
 
     // Send action to engine, which expects as the underlying int code.
     return static_cast<std::underlying_type_t<Action>>(action);
@@ -195,8 +199,8 @@ int Controller::getAction() {
  * Controller type is determined by command line argument.
  */
 void Controller::initController() {
-    enginehelper::initZorbristTables();
-    initController(enginehelper::getControllerType());
+    enginehash::initZorbristTables();
+    initController(enginestate::getControllerType());
 }
 
 
@@ -221,10 +225,12 @@ void Controller::initController(ControllerType controller) {
     else if (controller == CONTROLLER_MCTS_OPTIONS) {
         baseController_ = std::make_unique<MCTS>(OptionFactoryType::PATH_TO_SPRITE);
     }
-    else if (controller == CONTROLLER_TWOLEVEL) {
-        baseController_ = std::make_unique<TwoLevelSearch>(OptionFactoryType::TWO_LEVEL_SEARCH);
-    }
-    // Add case for new ControllerType and initialize baseController_
+    /**
+     * @note Add your controller here
+     * else if (controller == YOUR_CONTROLLER_ENUM_TYPE_HERE) {
+     *     baseController_ = std::make_unique<YourControllerClass>();
+     * }
+    */
     else {
         PLOGE_(logger::FileLogger) << "Unknown controller type: " << controller;
         PLOGE_(logger::ConsoleLogger) << "Unknown controller type: " << controller;

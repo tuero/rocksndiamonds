@@ -19,19 +19,20 @@ extern "C" {
     #include "../../game.h"                 // StartGameActions()
 }
 
+using namespace enginehelper;
 
 namespace testutil {
 
 void loadTestLevelAndStart(int levelNum) {
     // Set levelset
     options.level_set = (char*)"test_levels";
-    enginehelper::setLevelSet();
+    levelinfo::setLevelSet();
 
     // Reload the level dir tree
     OpenAll();
 
     // Load level and start game actions
-    enginehelper::loadLevel(levelNum);
+    levelinfo::loadLevel(levelNum);
     StartGameActions(network.enabled, setup.autorecord, level.random_seed);
 }
 

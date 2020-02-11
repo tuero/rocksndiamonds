@@ -50,7 +50,7 @@ private:
 
     // MCTS runtime configurations
     // These are fallback values in the event configuration file isn't loaded
-    int maxTime_ = 40000;                   // Time limit
+    int maxTime_ = 18000;                   // Time limit
     int maxIterationsDepth_ = 5;            // Max depth during simulation
     int numSimulations_ = 5;                // Number of simulations to average the value from
     std::map<std::string, int*> configParameters_ = {

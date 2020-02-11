@@ -12,10 +12,9 @@
 #ifndef STATISTICS_H
 #define STATISTICS_H
 
+
+// Standard library and STL
 #include <string>
-#include <map>
-#include <unordered_map>
-#include <array>
 
 
 namespace statistics {
@@ -24,12 +23,11 @@ extern int numGameTicks;
 extern int runTimeMili;
 extern int numLevelTries;
 
-extern std::map<int, std::unordered_map<uint64_t, int>> pathCounts;
-extern std::map<int, std::array<uint64_t, 2>> solutionPathCounts;
-
+/**
+ * Reset the statistic values
+ */
 void resetAllStatistics();
 
-std::string getAllStatistics();
 
 /**
  * Open the stats file.
@@ -45,8 +43,6 @@ void closeStatsFile();
  * Output the necessary statistics to file.
  */
 void outputStatsToFile();
-
-void outputPathCounts();
 
 }
 

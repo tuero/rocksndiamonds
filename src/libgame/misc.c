@@ -962,7 +962,7 @@ void GetOptions(int argc, char *argv[],
   options.verbose = FALSE;
   options.debug = FALSE;
   options.controller_type = CONTROLLER_DEFAULT;
-  options.level_number = 0;
+  options.level_number = -1;
   options.all_levels = FALSE;
   options.log_level = 2;
   options.delay = GAME_FRAME_DELAY;

@@ -14,17 +14,15 @@
 #include "option_single_step.h"
 #include "option_collectible_sprite.h"
 #include "option_to_exit.h"
-#include "option_to_rock.h"
-#include "option_push_rock.h"
-#include "option_wait_rock.h"
 
 // Includes
 #include "engine_types.h"
 #include "engine_helper.h"
 #include "logger.h"
 
+using namespace enginehelper;
 
-/*
+/**
  * Create options for each of the single step actions.
  */
 std::vector<BaseOption*> OptionFactory::createSingleActionOptions() {
@@ -42,23 +40,23 @@ std::vector<BaseOption*> OptionFactory::createSingleActionOptions() {
 }
 
 
-/*
+/**
  * Create options for path finding for each sprite on screen
  */
 std::vector<BaseOption*> OptionFactory::createPathToSpriteOptions() {
     std::vector<BaseOption*> optionPointers;
     options_.clear();
 
-    for (enginetype::GridCell cell : enginehelper::getMapSprites()) {
-        int spriteID = enginehelper::getSpriteID(cell);
+    for (enginetype::GridCell cell : gridinfo::getMapSprites()) {
+        int spriteID = gridinfo::getSpriteID(cell);
         // Collectible sprite (diamond in this case)
-        if (enginehelper::isCollectable(cell)) {
+        if (elementproperty::isCollectable(cell)) {
             std::unique_ptr<OptionCollectibleSprite> option = std::make_unique<OptionCollectibleSprite>(spriteID);
             options_.push_back(std::move(option));
             optionPointers.push_back(options_.back().get());
         }
         // Exit
-        else if (enginehelper::isExit(cell)) {
+        else if (elementproperty::isExit(cell)) {
             std::unique_ptr<OptionToExit> option = std::make_unique<OptionToExit>(spriteID);
             options_.push_back(std::move(option));
             optionPointers.push_back(options_.back().get());
@@ -69,56 +67,11 @@ std::vector<BaseOption*> OptionFactory::createPathToSpriteOptions() {
 
 
 /**
- * Create options for the two level search.
- * This uses pathing to collectible sprites (diamonds, keys, etc.) and to exit.
- * Used for Masters thesis.
- */
-std::vector<BaseOption*> OptionFactory::createTwoLevelSearchOptions() {
-    std::vector<BaseOption*> optionPointers;
-    options_.clear();
-
-    for (enginetype::GridCell cell : enginehelper::getMapSprites()) {
-        int spriteID = enginehelper::getSpriteID(cell);
-        // Collectible sprite (diamond in this case)
-        if (enginehelper::isCollectable(cell)) {
-            std::unique_ptr<OptionCollectibleSprite> option = std::make_unique<OptionCollectibleSprite>(spriteID);
-            options_.push_back(std::move(option));
-            optionPointers.push_back(options_.back().get());
-        }
-        // Exit
-        else if (enginehelper::isExit(cell)) {
-            std::unique_ptr<OptionToExit> option = std::make_unique<OptionToExit>(spriteID);
-            options_.push_back(std::move(option));
-            optionPointers.push_back(options_.back().get());
-        }
-    }
-
-    return optionPointers;
-}
-
-
-/**
- * Used for a custom list of options.
+ * @note Your custom option grouping here.
  */
 std::vector<BaseOption*> OptionFactory::createCustomOptions() {
     std::vector<BaseOption*> optionPointers;
     options_.clear();
-
-    for (enginetype::GridCell cell : enginehelper::getMapSprites()) {
-        int spriteID = enginehelper::getSpriteID(cell);
-        // Collectible sprite (diamond in this case)
-        if (enginehelper::isCollectable(cell)) {
-            std::unique_ptr<OptionCollectibleSprite> option = std::make_unique<OptionCollectibleSprite>(spriteID);
-            options_.push_back(std::move(option));
-            optionPointers.push_back(options_.back().get());
-        }
-        // Exit
-        else if (enginehelper::isExit(cell)) {
-            std::unique_ptr<OptionToExit> option = std::make_unique<OptionToExit>(spriteID);
-            options_.push_back(std::move(option));
-            optionPointers.push_back(options_.back().get());
-        }
-    }
     return optionPointers;
 }
 
@@ -135,8 +88,6 @@ std::vector<BaseOption*> OptionFactory::createOptions(OptionFactoryType optionFa
             return createSingleActionOptions();
         case OptionFactoryType::PATH_TO_SPRITE :
             return createPathToSpriteOptions();
-        case OptionFactoryType::TWO_LEVEL_SEARCH :
-            return createTwoLevelSearchOptions();
         case OptionFactoryType::CUSTOM :
             return createCustomOptions();
         default :

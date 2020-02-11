@@ -47,15 +47,6 @@ private:
     std::vector<BaseOption*> createPathToSpriteOptions();
 
     /**
-     * Create options for the two level search.
-     * This uses pathing to collectible sprites (diamonds, keys, etc.) and to exit.
-     * Used for Masters thesis.
-     *
-     * @return Vector containing pointers to each sprite option.
-     */
-    std::vector<BaseOption*> createTwoLevelSearchOptions();
-
-    /**
      * Used for a custom list of options.
      * 
      * @note Here is where you can define similar functions to the above for new controllers.

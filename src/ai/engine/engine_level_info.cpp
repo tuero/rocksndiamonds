@@ -29,11 +29,12 @@ extern "C" {
 
 
 namespace enginehelper {
+namespace levelinfo{
 
 /**
  * Call engine functions to automatically load the levelset.
  */
-void setLevelSet(bool reopen) {
+void setLevelSet() {
     // Need to load levelset before openall
     // Maybe get setLevelset to check if replay, then get the levelset from there?
     // Kind of messy, need a better
@@ -58,7 +59,10 @@ void setLevelSet(bool reopen) {
         // Save the levelset
         // We save because on startup, the previously saved levelset is loaded
         SaveLevelSetup_LastSeries();
-        if (reopen) {OpenAll();}
+        LoadLevelSetup_SeriesInfo();
+
+        SaveLevelSetup_LastSeries();
+        SaveLevelSetup_SeriesInfo();
     }
     catch (...){
         PLOGE_(logger::FileLogger) << "Something went wrong trying to load levelset " << level_set;
@@ -99,7 +103,7 @@ int getLevelNumber() {
  */
 void restartLevel() {    
     InitGame();
-    initSpriteIDs();
+    gridinfo::initSpriteIDs();
 }
 
 
@@ -134,4 +138,5 @@ int getLevelRemainingGemsNeeded() {
     return game.gems_still_needed;
 }
 
+} // namespace levelinfo
 } //namespace enginehelper

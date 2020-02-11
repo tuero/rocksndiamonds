@@ -8474,6 +8474,7 @@ static void InitLevelSetInfo(void)
 static void ChangeEditorToLevelSet(char *levelset_subdir)
 {
   leveldir_current = getTreeInfoFromIdentifier(leveldir_first, levelset_subdir);
+  leveldir_current->in_user_dir = 0;
 
   // the previous level set might have used custom artwork
   ReloadCustomArtwork(0);
@@ -12655,8 +12656,12 @@ static void WrapLevel(int dx, int dy)
 static void CopyLevelTemplateToUserLevelSet(char *levelset_subdir)
 {
   char *template_filename_old = getLocalLevelTemplateFilename();
+  // (tuero@ualberta.ca) - Feb 2020
+  // Want all levels to load out of the local levelset dir in this project, not user folder.
+  // char *template_filename_new =
+  //   getPath2(getUserLevelDir(levelset_subdir), LEVELTEMPLATE_FILENAME);
   char *template_filename_new =
-    getPath2(getUserLevelDir(levelset_subdir), LEVELTEMPLATE_FILENAME);
+    getPath3("./levels", levelset_subdir, LEVELTEMPLATE_FILENAME);
 
   if (copyFile(template_filename_old, template_filename_new) != 0)
     Request("Cannot copy level template!", REQ_CONFIRM);

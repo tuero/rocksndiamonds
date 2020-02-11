@@ -17,14 +17,16 @@
 // Includes
 #include "logger.h"
 
+using namespace enginehelper;
+
 
 OptionCollectibleSprite::OptionCollectibleSprite(int spriteID) {
     optionType_ = OptionType::ToCollectibleSprite;
     spriteID_ = spriteID;
-    goalCell_ = enginehelper::getSpriteGridCell(spriteID);
-    item_ = enginehelper::getGridElement(goalCell_);
-    optionStringName_ = enginehelper::getItemReadableDescription(item_) + " " + std::to_string(spriteID_) + ", score = " 
-        + std::to_string(enginehelper::getItemScore(goalCell_)) + ", gem count = " + std::to_string(enginehelper::getItemGemCount(goalCell_));
+    goalCell_ = gridinfo::getSpriteGridCell(spriteID);
+    item_ = gridinfo::getGridElement(goalCell_);
+    optionStringName_ = elementproperty::getItemReadableDescription(item_) + " " + std::to_string(spriteID_) + ", score = " 
+        + std::to_string(elementproperty::getItemScore(goalCell_)) + ", gem count = " + std::to_string(elementproperty::getItemGemCount(goalCell_));
     solutionPath_.clear();
 }
 
@@ -49,11 +51,11 @@ bool OptionCollectibleSprite::run() {
         ++counter;
 
         // Game over while running option
-        if (enginehelper::engineGameOver() || MAX_ATTEMPT) {return false;}
+        if (enginestate::engineGameOver() || MAX_ATTEMPT) {return false;}
 
         bool flag = getNextAction(action);
-        enginehelper::setEnginePlayerAction(action);
-        enginehelper::engineSimulate();
+        enginestate::setEnginePlayerAction(action);
+        enginestate::engineSimulate();
         
         if (flag) {return true;}
     }
@@ -66,14 +68,14 @@ bool OptionCollectibleSprite::run() {
 bool OptionCollectibleSprite::getNextAction(Action &action) {
     action = Action::noop;
 
-    bool isComplete = enginehelper::getPlayerPosition() == goalCell_ || !enginehelper::isSpriteActive(spriteID_);
-    if (isComplete) {
+    // If we are already at goal cell or sprite has disappeared.
+    if (gridinfo::getPlayerPosition() == goalCell_ || !gridinfo::isSpriteActive(spriteID_)) {
         return true;
     }
 
     // Update goal/player positions
-    goalCell_ = enginehelper::getSpriteGridCell(spriteID_);
-    enginetype::GridCell playerCell = enginehelper::getPlayerPosition();
+    goalCell_ = gridinfo::getSpriteGridCell(spriteID_);
+    enginetype::GridCell playerCell = gridinfo::getPlayerPosition();
     
     runAStar();
 
@@ -83,11 +85,11 @@ bool OptionCollectibleSprite::getNextAction(Action &action) {
         solutionPath_.pop_front();
 
         // Find the corresponding action
-        action = enginehelper::getActionFromNeighbours(playerCell, cell);
+        action = gridaction::getActionFromNeighbours(playerCell, cell);
     }
 
     // Option is complete if we pulled the last action off the solution.
-    return (solutionPath_.empty() && enginehelper::isPlayerDoneAction());
+    return (solutionPath_.empty() && enginestate::isPlayerDoneAction());
 }
 
 
@@ -96,7 +98,7 @@ bool OptionCollectibleSprite::getNextAction(Action &action) {
  * Player can only walk to the sprite if it is pathable.
  */
 bool OptionCollectibleSprite::isValid() {
-    goalCell_ = enginehelper::getSpriteGridCell(spriteID_);
+    goalCell_ = gridinfo::getSpriteGridCell(spriteID_);
     runAStar();
-    return !(solutionPath_.empty() && enginehelper::isPlayerDoneAction());
+    return !(solutionPath_.empty() && enginestate::isPlayerDoneAction());
 }

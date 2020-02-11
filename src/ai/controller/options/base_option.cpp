@@ -13,13 +13,13 @@
 // Standard Libary/STL
 #include <algorithm>
 #include <queue>
-#include <unordered_set>
 #include <unordered_map>
-#include <limits>
 
 // Includes
 #include "engine_helper.h"
 #include "logger.h"
+
+using namespace enginehelper;
 
 
 /**
@@ -27,7 +27,7 @@
  */
 void BaseOption::reset() {
     // Find sprite ID again
-    goalCell_ = enginehelper::getSpriteGridCell(spriteID_);
+    goalCell_ = gridinfo::getSpriteGridCell(spriteID_);
     counter_ = 0;
     solutionPath_.clear();
     restrictedCells_.clear();
@@ -94,6 +94,14 @@ void BaseOption::setRestrictedCells(std::vector<enginetype::GridCell> &restricte
     restrictedCells_ = restrictedCells;
 }
 
+/**
+ * Set the flag which indicates whether A* will avoid collectible elements which are
+ * not the current goal location.
+ */
+void BaseOption::setAvoidNonGoalCollectibleCells(bool flag) {
+    avoidNonGoalCollectibleCells = flag;
+}
+
 
 /**
  * Set the restricted cells.
@@ -101,7 +109,7 @@ void BaseOption::setRestrictedCells(std::vector<enginetype::GridCell> &restricte
 void BaseOption::setRestrictedCells(std::unordered_set<int> &restrictedCells) {
     restrictedCells_.clear();
     for (auto const & cell : restrictedCells) {
-        restrictedCells_.push_back(enginehelper::indexToCell(cell));
+        restrictedCells_.push_back(gridinfo::indexToCell(cell));
     }
 }
 
@@ -118,59 +126,75 @@ const std::vector<enginetype::GridCell> & BaseOption::getRestrictedCells() {
  * at the grid level (time-independent).
  */
 void BaseOption::runAStar() {
-    runAStar(enginehelper::getPlayerPosition(), goalCell_);
+    runAStar(gridinfo::getPlayerPosition(), goalCell_);
 }
 
+
+// Node for A* search
+struct Node {
+    int id;                             // Fast access node ID = gridcell index 
+    int parentId;                       // node ID for the parent node
+    enginetype::GridCell cell;          // Gridcell represented by search node
+    float g;                            // g-value used in A*
+    float h;                            // h-value used in A* (Euclidean distance)
+};
+
+// Custom comparator for priority queue 
+struct CompareNode {
+    bool operator() (Node* left, Node* right) const {
+        return (left->g + left->h) > (right->g + right->h);
+    }
+};
+
+
+bool canExpandAvoidCollectingNonGoalGems(const enginetype::GridCell &cellFrom, const enginetype::GridCell &cellTo, 
+    const enginetype::GridCell &goalCell, Action action) 
+{
+    return elementproperty::isDigable(cellFrom, action) || elementproperty::isWalkable(cellFrom, action) || 
+        elementproperty::isGateOpen(cellTo) || cellTo == goalCell;
+}
+
+bool canExpandCollectingNonGoalGems(const enginetype::GridCell &cellFrom, const enginetype::GridCell &cellTo, 
+    const enginetype::GridCell &goalCell, Action action) 
+{
+    return elementproperty::isActionMoveable(cellFrom, action) || cellTo == goalCell;
+}
 
 /**
  * Set the Options solutionPath_ as the path found during A* 
  * at the grid level (time-independent).
  */
 void BaseOption::runAStar(enginetype::GridCell startCell, enginetype::GridCell goalCell) {
-    Node startNode = {enginehelper::cellToIndex(startCell), -1, startCell, 0, (float)enginehelper::getL1Distance(startCell, goalCell)};
+    Node startNode = {gridinfo::cellToIndex(startCell), -1, startCell, 0, (float)gridinfo::getL1Distance(startCell, goalCell)};
 
-    // PLOGV_(logger::FileLogger) << "Running A* at grid cell level";
-    // PLOGV_(logger::FileLogger) << "Start node: x= " << startCell.x << ", y= " << startCell.y;
-    // PLOGV_(logger::FileLogger) << "Goal node: x= " << goalCell.x << ", y= " << goalCell.y;
-    // PLOGV_(logger::FileLogger) << "Restricted cells: ";
-    // for (auto const & restriction : restrictedCells_) {
-    //     PLOGV_(logger::FileLogger) << "    cell: x= " << restriction.x << ", y= " << restriction.y;
-    // }
+    auto expandFunc = (avoidNonGoalCollectibleCells) ? canExpandAvoidCollectingNonGoalGems : canExpandCollectingNonGoalGems;
 
     // A* data structures
     std::unordered_map<int, Node> open;
+    std::priority_queue<Node*, std::vector<Node*>, CompareNode> openSet;
     std::unordered_map<int, Node> closed;
 
     // Initialize with start node
     open[startNode.id] = startNode;
+    openSet.push(&open[startNode.id]);
     solutionPath_.clear();
 
-    while (!open.empty()) {
+    while (!openSet.empty()) {
         // Pull next node and update data structures
-        Node node = {-1, -1, {-1, -1}, std::numeric_limits<float>::max(), 0};
-        for (auto it = open.begin(); it != open.end(); ++it) {
-            if (it->second.g + it->second.h < node.g + node.h) {
-                node = it->second;
-            }
+        // Priority queue may have items which we removed from open when we found a better path
+        Node node;
+        while (open.find(openSet.top()->id) == open.end()) {
+            openSet.pop();
         }
-
-        // PLOGV_(logger::FileLogger) << "Pulling node: x= " << node.cell.x << ", y= " << node.cell.y << ", id " << node.id << ", pid " << node.parentId;
-
-        if (node.g == std::numeric_limits<float>::max()) {
-            PLOGE_(logger::ConsoleLogger) << "Cannot find a node to pull";
-            PLOGE_(logger::FileLogger) << "Cannot find a node to pull";
-            break;
-        }
-
+        node = *openSet.top();
+        openSet.pop();
         open.erase(node.id);
         closed[node.id] = node;
 
         // Goal condition check
         if (node.cell == goalCell) {
-            // PLOGV_(logger::FileLogger) << "Found solution";
             solutionPath_.clear();
             while(!(node.cell == startCell)) {
-                // PLOGV_(logger::FileLogger) << "node: x= " << node.cell.x << ", y= " << node.cell.y << ", id " << node.id << ", pid " << node.parentId;
                 solutionPath_.push_front(node.cell);
                 node = (closed.find(node.parentId) != closed.end() ? closed[node.parentId] : open[node.parentId]);
             }
@@ -180,39 +204,36 @@ void BaseOption::runAStar(enginetype::GridCell startCell, enginetype::GridCell g
         // Expand children
         for (Action action : enginetype::ALL_ACTIONS_NO_NOOP) {
             // Skip if in the restricted set
-            enginetype::GridCell childCell = enginehelper::getCellFromAction(node.cell, action);
+            enginetype::GridCell childCell = gridaction::getCellFromAction(node.cell, action);
             if (std::find(restrictedCells_.begin(), restrictedCells_.end(), childCell) != restrictedCells_.end()) {continue;}
 
             // Child not valid if out of bounds or action doesn't result in being in a moveable cell
-            // if (!enginehelper::isActionMoveable(node.cell, action) && !(childCell == goalCell)) {continue;}
-            if ((!enginehelper::isDigable(node.cell, action) && !enginehelper::isEmpty(node.cell, action)
-                && !enginehelper::isGateOpen(childCell)) && !(childCell == goalCell)) {continue;}
+            if (!expandFunc(node.cell, childCell, goalCell, action)) {continue;}
 
-            int childIndex = enginehelper::cellToIndex(childCell);
+            int childIndex = gridinfo::cellToIndex(childCell);
             float newG = node.g + 1;
-            float h = (float)enginehelper::getL1Distance(childCell, goalCell);
+            float h = (float)gridinfo::getL1Distance(childCell, goalCell);
 
             // Node generated but not expanded
             if (open.find(childIndex) != open.end()) {
                 // Check if new path cheaper
-                if (open[childIndex].g < newG) {continue;}
-                // PLOGV_(logger::FileLogger) << "Removing from open: x= " << open[childIndex].cell.x << ", y= " << open[childIndex].cell.y << ", id " << open[childIndex].id << ", pid " << open[childIndex].parentId;
+                if (open[childIndex].g <= newG) {continue;}
                 open.erase(childIndex);
             }
             // Node already expanded
             else if (closed.find(childIndex) != closed.end()) {
                 // Check if new path cheaper
-                if (closed[childIndex].g < newG) {continue;}
-                // PLOGV_(logger::FileLogger) << "Removing from closed: x= " << closed[childIndex].cell.x << ", y= " << closed[childIndex].cell.y << ", id " << closed[childIndex].id << ", pid " << closed[childIndex].parentId;
+                if (closed[childIndex].g <= newG) {continue;}
                 closed.erase(childIndex);
             }
 
-            // PLOGV_(logger::FileLogger) << "Adding to open: x= " << childCell.x << ", y= " << childCell.y << ", id " << childIndex << ", pid " << node.id;
-            open[childIndex] = {childIndex, node.id, childCell, newG, h};
+            Node childNode{childIndex, node.id, childCell, newG, h};
+            open[childIndex] = childNode;
+            openSet.push(&open[childIndex]);
         }
     }
 
     // A* is usually called to check if an option is valid (can we path to it), so its not needed
     // to throw errors if we fail.
-    PLOGV_(logger::FileLogger) << "A* couldn't find a path";
+    PLOGE_(logger::FileLogger) << "A* couldn't find a path";
 }

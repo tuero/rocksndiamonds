@@ -40,26 +40,29 @@ protected:
     enginetype::GridCell goalCell_;                             // The gridcell associated with A* as a solution.
     std::deque<enginetype::GridCell> solutionPath_  = {};       // Path found by A*
     std::vector<enginetype::GridCell> restrictedCells_ = {};    // Container of restricted cells A* must avoid
+    bool avoidNonGoalCollectibleCells = false;                  // Flag to avoid collectible cells which are not the current goal.
     int spriteID_ = -1;                                         // Associated sprite for option
     int timesCalled_ = 0;                                       // Number of times called
     int counter_ = 0;                                           // Internal counter for tracking actions taking multiple game ticks
 
-    // Node for A* search
-    struct Node {
-        int id;                             // Fast access node ID = gridcell index 
-        int parentId;                       // node ID for the parent node
-        enginetype::GridCell cell;          // Gridcell represented by search node
-        float g;                            // g-value used in A*
-        float h;                            // h-value used in A* (Euclidean distance)
-    };
+    /**
+     * Set the Options solutionPath as the path found during A* 
+     * at the grid level (time-independent).
+     * 
+     * No goalCell is provided, so the currently saved cell is used 
+     * (this might be a static grid on the map no related to sprites,
+     * and we may not want this changed).
+     */
+    void runAStar();
 
-    // Custom comparator for priority queue 
-    class CompareNode {
-        public:
-            bool operator() (Node left, Node right) {
-                return (left.g + left.h) > (right.g + right.h);
-            }
-    };
+    /**
+     * Set the Options solutionPath as the path found during A* 
+     * at the grid level (time-independent).
+     * 
+     * @param startCell The gridcell designated as the start for A*.
+     * @param goalCell The gridcell designated as the goal for A*.
+     */
+    void runAStar(enginetype::GridCell startCell, enginetype::GridCell goalCell);
 
 public:
 
@@ -117,24 +120,10 @@ public:
     void reset();
 
     /**
-     * Set the Options solutionPath as the path found during A* 
-     * at the grid level (time-independent).
-     * 
-     * No goalCell is provided, so the currently saved cell is used 
-     * (this might be a static grid on the map no related to sprites,
-     * and we may not want this changed).
+     * Set the flag which indicates whether A* will avoid collectible elements which are
+     * not the current goal location.
      */
-    void runAStar();
-
-    /**
-     * Set the Options solutionPath as the path found during A* 
-     * at the grid level (time-independent).
-     * 
-     * @param startCell The gridcell designated as the start for A*.
-     * @param goalCell The gridcell designated as the goal for A*.
-     * @param restrictedCells Vector of restricted cells that A* will treat as blocked.
-     */
-    void runAStar(enginetype::GridCell startCell, enginetype::GridCell goalCell);
+    void setAvoidNonGoalCollectibleCells(bool flag);
 
     /**
      * Get the solution path as found by A*.
