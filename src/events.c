@@ -535,6 +535,7 @@ static void SetPlayerMouseAction(int mx, int my, int button)
 }
 #endif
 
+#ifndef HEADLESS
 static Key GetKeyFromGridButton(int grid_button)
 {
   return (grid_button == CHAR_GRID_BUTTON_LEFT  ? setup.input[0].key.left :
@@ -559,6 +560,7 @@ static boolean CheckVirtualButtonPressed(int mx, int my, int button)
 
   return (key_status == KEY_PRESSED && key != KSYM_UNDEFINED);
 }
+#endif
 #endif
 
 #ifndef HEADLESS

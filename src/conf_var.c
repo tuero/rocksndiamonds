@@ -3915,6 +3915,54 @@ struct TokenIntPtrInfo image_config_vars[] =
     &menu.main.preview_players.yoffset
   },
   {
+    "setup.button.prev_player.x",
+    &menu.setup.button.prev_player.x
+  },
+  {
+    "setup.button.prev_player.y",
+    &menu.setup.button.prev_player.y
+  },
+  {
+    "setup.button.next_player.x",
+    &menu.setup.button.next_player.x
+  },
+  {
+    "setup.button.next_player.y",
+    &menu.setup.button.next_player.y
+  },
+  {
+    "setup.button.touch_back.x",
+    &menu.setup.button.touch_back.x
+  },
+  {
+    "setup.button.touch_back.y",
+    &menu.setup.button.touch_back.y
+  },
+  {
+    "setup.button.touch_next.x",
+    &menu.setup.button.touch_next.x
+  },
+  {
+    "setup.button.touch_next.y",
+    &menu.setup.button.touch_next.y
+  },
+  {
+    "setup.button.touch_back2.x",
+    &menu.setup.button.touch_back2.x
+  },
+  {
+    "setup.button.touch_back2.y",
+    &menu.setup.button.touch_back2.y
+  },
+  {
+    "setup.button.touch_next2.x",
+    &menu.setup.button.touch_next2.x
+  },
+  {
+    "setup.button.touch_next2.y",
+    &menu.setup.button.touch_next2.y
+  },
+  {
     "preview.x",
     &preview.x
   },
@@ -7843,6 +7891,22 @@ struct TokenIntPtrInfo image_config_vars[] =
     &game.button.panel_sound_simple.y
   },
   {
+    "game.button.touch_stop.x",
+    &game.button.touch_stop.x
+  },
+  {
+    "game.button.touch_stop.y",
+    &game.button.touch_stop.y
+  },
+  {
+    "game.button.touch_pause.x",
+    &game.button.touch_pause.x
+  },
+  {
+    "game.button.touch_pause.y",
+    &game.button.touch_pause.y
+  },
+  {
     "tape.button.eject.x",
     &tape.button.eject.x
   },
@@ -8925,6 +8989,30 @@ struct TokenIntPtrInfo image_config_vars[] =
   {
     "request.button.player_4.tile_size",
     &request.button.player_4.size
+  },
+  {
+    "request.button.touch_yes.x",
+    &request.button.touch_yes.x
+  },
+  {
+    "request.button.touch_yes.y",
+    &request.button.touch_yes.y
+  },
+  {
+    "request.button.touch_no.x",
+    &request.button.touch_no.x
+  },
+  {
+    "request.button.touch_no.y",
+    &request.button.touch_no.y
+  },
+  {
+    "request.button.touch_confirm.x",
+    &request.button.touch_confirm.x
+  },
+  {
+    "request.button.touch_confirm.y",
+    &request.button.touch_confirm.y
   },
   {
     "request.x",
