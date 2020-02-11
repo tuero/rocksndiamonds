@@ -18,6 +18,7 @@
 #define USEREVENT_NONE			0
 #define USEREVENT_ANIM_DELAY_ACTION	1
 #define USEREVENT_ANIM_EVENT_ACTION	2
+#define USEREVENT_GADGET_PRESSED	3
 
 #ifndef HEADLESS
 int FilterMouseMotionEvents(void *, Event *);

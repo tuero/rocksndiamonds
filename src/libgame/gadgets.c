@@ -230,6 +230,9 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
   if (gi == NULL || gi->deactivated)
     return;
 
+  if (gi->overlay_touch_button)		// will be drawn later (as texture)
+    return;
+
   gd = (!gi->active ? &gi->alt_design[state] :
  	gi->checked ? &gi->alt_design[state] : &gi->design[state]);
 
@@ -764,6 +767,100 @@ static void DrawGadget(struct GadgetInfo *gi, boolean pressed, boolean direct)
   }
 }
 
+static void SetGadgetPosition_OverlayTouchButton(struct GadgetInfo *gi)
+{
+  gi->x = gi->orig_x;
+  gi->y = gi->orig_y;
+
+  if (gi->x < 0)
+    gi->x += video.screen_width;
+  if (gi->y < 0)
+    gi->y += video.screen_height;
+
+  gi->x -= video.screen_xoffset;
+  gi->y -= video.screen_yoffset;
+}
+
+void SetGadgetsPosition_OverlayTouchButtons(void)
+{
+  struct GadgetInfo *gi;
+
+  if (gadget_list_first_entry == NULL)
+    return;
+
+  for (gi = gadget_list_first_entry; gi != NULL; gi = gi->next)
+    if (gi->overlay_touch_button)
+      SetGadgetPosition_OverlayTouchButton(gi);
+}
+
+static void DrawGadget_OverlayTouchButton(struct GadgetInfo *gi)
+{
+  struct GadgetDesign *gd;
+  int state = (gi->state ? GD_BUTTON_PRESSED : GD_BUTTON_UNPRESSED);
+
+  if (gi == NULL || gi->deactivated)
+    return;
+
+  gd = (!gi->active ? &gi->alt_design[state] :
+	gi->checked ? &gi->alt_design[state] : &gi->design[state]);
+
+  int x = gi->x + video.screen_xoffset;
+  int y = gi->y + video.screen_yoffset;
+  int alpha = gi->overlay_touch_button_alpha;
+  int alpha_max = SDL_ALPHA_OPAQUE;
+  int alpha_step = ALPHA_FADING_STEPSIZE(alpha_max);
+
+  // only show mapped overlay touch buttons if touch screen is really used
+  if (gi->mapped && runtime.uses_touch_device)
+  {
+    if (alpha < alpha_max)
+      alpha = MIN(alpha + alpha_step, alpha_max);
+  }
+  else
+  {
+    alpha = MAX(0, alpha - alpha_step);
+  }
+
+  gi->overlay_touch_button_alpha = alpha;
+
+  if (alpha == 0)
+    return;
+
+  switch (gi->type)
+  {
+    case GD_TYPE_NORMAL_BUTTON:
+    case GD_TYPE_CHECK_BUTTON:
+    case GD_TYPE_RADIO_BUTTON:
+      SDL_SetTextureAlphaMod(gd->bitmap->texture_masked, alpha);
+      SDL_SetTextureBlendMode(gd->bitmap->texture_masked, SDL_BLENDMODE_BLEND);
+
+      BlitToScreenMasked(gd->bitmap, gd->x, gd->y, gi->width, gi->height, x, y);
+      break;
+
+    default:
+      return;
+  }
+}
+
+void DrawGadgets_OverlayTouchButtons(void)
+{
+  struct GadgetInfo *gi;
+
+  if (gadget_list_first_entry == NULL)
+    return;
+
+  for (gi = gadget_list_first_entry; gi != NULL; gi = gi->next)
+    if (gi->overlay_touch_button)
+      DrawGadget_OverlayTouchButton(gi);
+}
+
+boolean CheckPosition_OverlayTouchButtons(int mx, int my, int button)
+{
+  struct GadgetInfo *gi = getGadgetInfoFromMousePosition(mx, my, button);
+
+  return (gi != NULL && gi->overlay_touch_button);
+}
+
 static int get_minimal_size_for_numeric_input(int minmax_value)
 {
   int min_size = 1;	// value needs at least one digit
@@ -818,11 +915,11 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 	break;
 
       case GDI_X:
-	gi->x = va_arg(ap, int);
+	gi->x = gi->orig_x = va_arg(ap, int);
 	break;
 
       case GDI_Y:
-	gi->y = va_arg(ap, int);
+	gi->y = gi->orig_y = va_arg(ap, int);
 	break;
 
       case GDI_WIDTH:
@@ -847,6 +944,12 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
 
       case GDI_DIRECT_DRAW:
 	gi->direct_draw = (boolean)va_arg(ap, int);
+	break;
+
+      case GDI_OVERLAY_TOUCH_BUTTON:
+	gi->overlay_touch_button = (boolean)va_arg(ap, int);
+	if (gi->overlay_touch_button)
+	  SetGadgetPosition_OverlayTouchButton(gi);
 	break;
 
       case GDI_CALLBACK_ACTION_ALWAYS:
@@ -1120,8 +1223,8 @@ static void HandleGadgetTags(struct GadgetInfo *gi, int first_tag, va_list ap)
        gi->design[GD_BUTTON_PRESSED].bitmap == NULL))
     gi->deactivated = TRUE;
 
-  // check if gadget is placed off-screen
-  if (gi->x < 0 || gi->y < 0)
+  // check if gadget is placed off-screen (and is no overlay touch button)
+  if ((gi->x < 0 || gi->y < 0) && !gi->overlay_touch_button)
     gi->deactivated = TRUE;
 
   // adjust gadget values in relation to other gadget values
@@ -1303,6 +1406,8 @@ struct GadgetInfo *CreateGadget(int first_tag, ...)
   new_gadget->callback_action = default_callback_action;
   new_gadget->active = TRUE;
   new_gadget->direct_draw = TRUE;
+  new_gadget->overlay_touch_button = FALSE;
+  new_gadget->overlay_touch_button_alpha = 0;
 
   new_gadget->next = NULL;
 

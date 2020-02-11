@@ -2550,7 +2550,7 @@ enum
 // program information and versioning definitions
 #define PROGRAM_VERSION_SUPER		4
 #define PROGRAM_VERSION_MAJOR		1
-#define PROGRAM_VERSION_MINOR		3
+#define PROGRAM_VERSION_MINOR		4
 #define PROGRAM_VERSION_PATCH		1
 #define PROGRAM_VERSION_EXTRA		""
 
@@ -2652,10 +2652,15 @@ struct RequestButtonInfo
   struct TextPosInfo yes;
   struct TextPosInfo no;
   struct TextPosInfo confirm;
+
   struct TextPosInfo player_1;
   struct TextPosInfo player_2;
   struct TextPosInfo player_3;
   struct TextPosInfo player_4;
+
+  struct TextPosInfo touch_yes;
+  struct TextPosInfo touch_no;
+  struct TextPosInfo touch_confirm;
 };
 
 struct MenuMainButtonInfo
@@ -2720,6 +2725,22 @@ struct MenuMainInfo
 
   struct TextPosInfo preview_players;
   struct TextPosInfo network_players;
+};
+
+struct MenuSetupButtonInfo
+{
+  struct MenuPosInfo prev_player;
+  struct MenuPosInfo next_player;
+
+  struct MenuPosInfo touch_back;
+  struct MenuPosInfo touch_next;
+  struct MenuPosInfo touch_back2;
+  struct MenuPosInfo touch_next2;
+};
+
+struct MenuSetupInfo
+{
+  struct MenuSetupButtonInfo button;
 };
 
 struct TitleFadingInfo
@@ -2810,6 +2831,7 @@ struct MenuInfo
   int music[NUM_SPECIAL_GFX_ARGS];
 
   struct MenuMainInfo main;
+  struct MenuSetupInfo setup;
 };
 
 struct DoorInfo

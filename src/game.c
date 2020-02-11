@@ -1029,14 +1029,16 @@ static struct GamePanelControlInfo game_panel_controls[] =
 #define GAME_CTRL_ID_PANEL_STOP		8
 #define GAME_CTRL_ID_PANEL_PAUSE	9
 #define GAME_CTRL_ID_PANEL_PLAY		10
-#define SOUND_CTRL_ID_MUSIC		11
-#define SOUND_CTRL_ID_LOOPS		12
-#define SOUND_CTRL_ID_SIMPLE		13
-#define SOUND_CTRL_ID_PANEL_MUSIC	14
-#define SOUND_CTRL_ID_PANEL_LOOPS	15
-#define SOUND_CTRL_ID_PANEL_SIMPLE	16
+#define GAME_CTRL_ID_TOUCH_STOP		11
+#define GAME_CTRL_ID_TOUCH_PAUSE	12
+#define SOUND_CTRL_ID_MUSIC		13
+#define SOUND_CTRL_ID_LOOPS		14
+#define SOUND_CTRL_ID_SIMPLE		15
+#define SOUND_CTRL_ID_PANEL_MUSIC	16
+#define SOUND_CTRL_ID_PANEL_LOOPS	17
+#define SOUND_CTRL_ID_PANEL_SIMPLE	18
 
-#define NUM_GAME_BUTTONS		17
+#define NUM_GAME_BUTTONS		19
 
 
 // forward declaration for internal use
@@ -16305,93 +16307,104 @@ static struct
   int gadget_id;
   boolean *setup_value;
   boolean allowed_on_tape;
+  boolean is_touch_button;
   char *infotext;
 } gamebutton_info[NUM_GAME_BUTTONS] =
 {
   {
     IMG_GFX_GAME_BUTTON_STOP,			&game.button.stop,
     GAME_CTRL_ID_STOP,				NULL,
-    TRUE,					"stop game"
+    TRUE, FALSE,				"stop game"
   },
   {
     IMG_GFX_GAME_BUTTON_PAUSE,			&game.button.pause,
     GAME_CTRL_ID_PAUSE,				NULL,
-    TRUE,					"pause game"
+    TRUE, FALSE,				"pause game"
   },
   {
     IMG_GFX_GAME_BUTTON_PLAY,			&game.button.play,
     GAME_CTRL_ID_PLAY,				NULL,
-    TRUE,					"play game"
+    TRUE, FALSE,				"play game"
   },
   {
     IMG_GFX_GAME_BUTTON_UNDO,			&game.button.undo,
     GAME_CTRL_ID_UNDO,				NULL,
-    TRUE,					"undo step"
+    TRUE, FALSE,				"undo step"
   },
   {
     IMG_GFX_GAME_BUTTON_REDO,			&game.button.redo,
     GAME_CTRL_ID_REDO,				NULL,
-    TRUE,					"redo step"
+    TRUE, FALSE,				"redo step"
   },
   {
     IMG_GFX_GAME_BUTTON_SAVE,			&game.button.save,
     GAME_CTRL_ID_SAVE,				NULL,
-    TRUE,					"save game"
+    TRUE, FALSE,				"save game"
   },
   {
     IMG_GFX_GAME_BUTTON_PAUSE2,			&game.button.pause2,
     GAME_CTRL_ID_PAUSE2,			NULL,
-    TRUE,					"pause game"
+    TRUE, FALSE,				"pause game"
   },
   {
     IMG_GFX_GAME_BUTTON_LOAD,			&game.button.load,
     GAME_CTRL_ID_LOAD,				NULL,
-    TRUE,					"load game"
+    TRUE, FALSE,				"load game"
   },
   {
     IMG_GFX_GAME_BUTTON_PANEL_STOP,		&game.button.panel_stop,
     GAME_CTRL_ID_PANEL_STOP,			NULL,
-    FALSE,					"stop game"
+    FALSE, FALSE,				"stop game"
   },
   {
     IMG_GFX_GAME_BUTTON_PANEL_PAUSE,		&game.button.panel_pause,
     GAME_CTRL_ID_PANEL_PAUSE,			NULL,
-    FALSE,					"pause game"
+    FALSE, FALSE,				"pause game"
   },
   {
     IMG_GFX_GAME_BUTTON_PANEL_PLAY,		&game.button.panel_play,
     GAME_CTRL_ID_PANEL_PLAY,			NULL,
-    FALSE,					"play game"
+    FALSE, FALSE,				"play game"
+  },
+  {
+    IMG_GFX_GAME_BUTTON_TOUCH_STOP,		&game.button.touch_stop,
+    GAME_CTRL_ID_TOUCH_STOP,			NULL,
+    FALSE, TRUE,				"stop game"
+  },
+  {
+    IMG_GFX_GAME_BUTTON_TOUCH_PAUSE,		&game.button.touch_pause,
+    GAME_CTRL_ID_TOUCH_PAUSE,			NULL,
+    FALSE, TRUE,				"pause game"
   },
   {
     IMG_GFX_GAME_BUTTON_SOUND_MUSIC,		&game.button.sound_music,
     SOUND_CTRL_ID_MUSIC,			&setup.sound_music,
-    TRUE,					"background music on/off"
+    TRUE, FALSE,				"background music on/off"
   },
   {
     IMG_GFX_GAME_BUTTON_SOUND_LOOPS,		&game.button.sound_loops,
     SOUND_CTRL_ID_LOOPS,			&setup.sound_loops,
-    TRUE,					"sound loops on/off"
+    TRUE, FALSE,				"sound loops on/off"
   },
   {
     IMG_GFX_GAME_BUTTON_SOUND_SIMPLE,		&game.button.sound_simple,
     SOUND_CTRL_ID_SIMPLE,			&setup.sound_simple,
-    TRUE,					"normal sounds on/off"
+    TRUE, FALSE,				"normal sounds on/off"
   },
   {
     IMG_GFX_GAME_BUTTON_PANEL_SOUND_MUSIC,	&game.button.panel_sound_music,
     SOUND_CTRL_ID_PANEL_MUSIC,			&setup.sound_music,
-    FALSE,					"background music on/off"
+    FALSE, FALSE,				"background music on/off"
   },
   {
     IMG_GFX_GAME_BUTTON_PANEL_SOUND_LOOPS,	&game.button.panel_sound_loops,
     SOUND_CTRL_ID_PANEL_LOOPS,			&setup.sound_loops,
-    FALSE,					"sound loops on/off"
+    FALSE, FALSE,				"sound loops on/off"
   },
   {
     IMG_GFX_GAME_BUTTON_PANEL_SOUND_SIMPLE,	&game.button.panel_sound_simple,
     SOUND_CTRL_ID_PANEL_SIMPLE,			&setup.sound_simple,
-    FALSE,					"normal sounds on/off"
+    FALSE, FALSE,				"normal sounds on/off"
   }
 };
 
@@ -16408,10 +16421,11 @@ void CreateGameButtons(void)
     int button_type;
     boolean checked;
     unsigned int event_mask;
+    boolean is_touch_button = gamebutton_info[i].is_touch_button;
     boolean allowed_on_tape = gamebutton_info[i].allowed_on_tape;
     boolean on_tape = (tape.show_game_buttons && allowed_on_tape);
-    int base_x = (on_tape ? VX : DX);
-    int base_y = (on_tape ? VY : DY);
+    int base_x = (is_touch_button ? 0 : on_tape ? VX : DX);
+    int base_y = (is_touch_button ? 0 : on_tape ? VY : DY);
     int gd_x   = gfx->src_x;
     int gd_y   = gfx->src_y;
     int gd_xp  = gfx->src_x + gfx->pressed_xoffset;
@@ -16420,6 +16434,8 @@ void CreateGameButtons(void)
     int gd_ya  = gfx->src_y + gfx->active_yoffset;
     int gd_xap = gfx->src_x + gfx->active_xoffset + gfx->pressed_xoffset;
     int gd_yap = gfx->src_y + gfx->active_yoffset + gfx->pressed_yoffset;
+    int x = (is_touch_button ? pos->x : GDI_ACTIVE_POS(pos->x));
+    int y = (is_touch_button ? pos->y : GDI_ACTIVE_POS(pos->y));
     int id = i;
 
     if (gfx->bitmap == NULL)
@@ -16431,6 +16447,7 @@ void CreateGameButtons(void)
 
     if (id == GAME_CTRL_ID_STOP ||
 	id == GAME_CTRL_ID_PANEL_STOP ||
+	id == GAME_CTRL_ID_TOUCH_STOP ||
 	id == GAME_CTRL_ID_PLAY ||
 	id == GAME_CTRL_ID_PANEL_PLAY ||
 	id == GAME_CTRL_ID_SAVE ||
@@ -16458,8 +16475,8 @@ void CreateGameButtons(void)
     gi = CreateGadget(GDI_CUSTOM_ID, id,
 		      GDI_IMAGE_ID, graphic,
 		      GDI_INFO_TEXT, gamebutton_info[i].infotext,
-		      GDI_X, base_x + GDI_ACTIVE_POS(pos->x),
-		      GDI_Y, base_y + GDI_ACTIVE_POS(pos->y),
+		      GDI_X, base_x + x,
+		      GDI_Y, base_y + y,
 		      GDI_WIDTH, gfx->width,
 		      GDI_HEIGHT, gfx->height,
 		      GDI_TYPE, button_type,
@@ -16470,6 +16487,7 @@ void CreateGameButtons(void)
 		      GDI_ALT_DESIGN_UNPRESSED, gfx->bitmap, gd_xa, gd_ya,
 		      GDI_ALT_DESIGN_PRESSED, gfx->bitmap, gd_xap, gd_yap,
 		      GDI_DIRECT_DRAW, FALSE,
+		      GDI_OVERLAY_TOUCH_BUTTON, is_touch_button,
 		      GDI_EVENT_MASK, event_mask,
 		      GDI_CALLBACK_ACTION, HandleGameButtons,
 		      GDI_END);
@@ -16540,8 +16558,6 @@ void MapUndoRedoButtons(void)
 
   MapGadget(game_gadget[GAME_CTRL_ID_UNDO]);
   MapGadget(game_gadget[GAME_CTRL_ID_REDO]);
-
-  ModifyGadget(game_gadget[GAME_CTRL_ID_PAUSE2], GDI_CHECKED, TRUE, GDI_END);
 }
 
 void UnmapUndoRedoButtons(void)
@@ -16551,8 +16567,22 @@ void UnmapUndoRedoButtons(void)
 
   MapGameButtonsAtSamePosition(GAME_CTRL_ID_UNDO);
   MapGameButtonsAtSamePosition(GAME_CTRL_ID_REDO);
+}
 
-  ModifyGadget(game_gadget[GAME_CTRL_ID_PAUSE2], GDI_CHECKED, FALSE, GDI_END);
+void ModifyPauseButtons(void)
+{
+  static int ids[] =
+  {
+    GAME_CTRL_ID_PAUSE,
+    GAME_CTRL_ID_PAUSE2,
+    GAME_CTRL_ID_PANEL_PAUSE,
+    GAME_CTRL_ID_TOUCH_PAUSE,
+    -1
+  };
+  int i;
+
+  for (i = 0; ids[i] > -1; i++)
+    ModifyGadget(game_gadget[ids[i]], GDI_CHECKED, tape.pausing, GDI_END);
 }
 
 static void MapGameButtonsExt(boolean on_tape)
@@ -16586,9 +16616,6 @@ static void RedrawGameButtonsExt(boolean on_tape)
   for (i = 0; i < NUM_GAME_BUTTONS; i++)
     if (!on_tape || gamebutton_info[i].allowed_on_tape)
       RedrawGadget(game_gadget[i]);
-
-  // RedrawGadget() may have set REDRAW_ALL if buttons are defined off-area
-  redraw_mask &= ~REDRAW_ALL;
 }
 
 static void SetGadgetState(struct GadgetInfo *gi, boolean state)
@@ -16695,6 +16722,7 @@ static void HandleGameButtonsExt(int id, int button)
   {
     case GAME_CTRL_ID_STOP:
     case GAME_CTRL_ID_PANEL_STOP:
+    case GAME_CTRL_ID_TOUCH_STOP:
       if (game_status == GAME_MODE_MAIN)
 	break;
 
@@ -16708,6 +16736,7 @@ static void HandleGameButtonsExt(int id, int button)
     case GAME_CTRL_ID_PAUSE:
     case GAME_CTRL_ID_PAUSE2:
     case GAME_CTRL_ID_PANEL_PAUSE:
+    case GAME_CTRL_ID_TOUCH_PAUSE:
       if (network.enabled && game_status == GAME_MODE_PLAYING)
       {
 	if (tape.pausing)

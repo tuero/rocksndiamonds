@@ -16,6 +16,7 @@
 #include "joystick.h"
 #include "misc.h"
 #include "setup.h"
+#include "gadgets.h"
 
 #define ENABLE_UNUSED_CODE	0	// currently unused functions
 
@@ -41,6 +42,7 @@ void sge_Line(SDL_Surface *, Sint16, Sint16, Sint16, Sint16, Uint32);
 #if defined(USE_TOUCH_INPUT_OVERLAY)
 // functions to draw overlay graphics for touch device input
 static void DrawTouchInputOverlay(void);
+static void DrawTouchGadgetsOverlay(void);
 #endif
 
 void SDLLimitScreenUpdates(boolean enable)
@@ -214,6 +216,9 @@ static void UpdateScreenExt(SDL_Rect *rect, boolean with_frame_delay)
 #if defined(USE_TOUCH_INPUT_OVERLAY)
   // draw overlay graphics for touch device input, if needed
   DrawTouchInputOverlay();
+
+  // draw overlay gadgets for touch device input, if needed
+  DrawTouchGadgetsOverlay();
 #endif
 
   // global synchronization point of the game to align video frame delay
@@ -270,7 +275,7 @@ static void SDLSetWindowIcon(char *basename)
 
   if ((surface = IMG_Load(filename)) == NULL)
   {
-    Error(ERR_WARN, "IMG_Load() failed: %s", SDL_GetError());
+    Error(ERR_WARN, "IMG_Load('%s') failed: %s", basename, SDL_GetError());
 
     return;
   }
@@ -2236,7 +2241,8 @@ Bitmap *SDLLoadImage(char *filename)
 
   // load image to temporary surface
   if ((sdl_image_tmp = IMG_Load(filename)) == NULL)
-    Error(ERR_EXIT, "IMG_Load() failed: %s", SDL_GetError());
+    Error(ERR_EXIT, "IMG_Load('%s') failed: %s", getBaseNamePtr(filename),
+	  SDL_GetError());
 
   print_timestamp_time("IMG_Load");
 
@@ -2835,7 +2841,10 @@ static void DrawTouchInputOverlay_ShowGridButtons(int alpha)
 	continue;
 
       if (grid_button == overlay.grid_button_highlight)
-	alpha_draw = alpha_highlight;
+      {
+	draw_outlined = FALSE;
+	alpha_draw = MIN((float)alpha_highlight * 1.5, SDL_ALPHA_OPAQUE);
+      }
 
       if (draw_pressed && overlay.grid_button_action & grid_button_action)
       {
@@ -2950,6 +2959,11 @@ static void DrawTouchInputOverlay(void)
     DrawTouchInputOverlay_ShowGrid(alpha);
 
   DrawTouchInputOverlay_ShowGridButtons(alpha);
+}
+
+static void DrawTouchGadgetsOverlay(void)
+{
+  DrawGadgets_OverlayTouchButtons();
 }
 #endif
 

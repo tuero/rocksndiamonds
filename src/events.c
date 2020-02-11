@@ -42,7 +42,6 @@ static int cursor_mode_last = CURSOR_DEFAULT;
 static unsigned int special_cursor_delay = 0;
 static unsigned int special_cursor_delay_value = 1000;
 
-static boolean virtual_button_pressed = FALSE;
 static boolean stop_processing_events = FALSE;
 #endif
 
@@ -536,6 +535,32 @@ static void SetPlayerMouseAction(int mx, int my, int button)
 }
 #endif
 
+static Key GetKeyFromGridButton(int grid_button)
+{
+  return (grid_button == CHAR_GRID_BUTTON_LEFT  ? setup.input[0].key.left :
+	  grid_button == CHAR_GRID_BUTTON_RIGHT ? setup.input[0].key.right :
+	  grid_button == CHAR_GRID_BUTTON_UP    ? setup.input[0].key.up :
+	  grid_button == CHAR_GRID_BUTTON_DOWN  ? setup.input[0].key.down :
+	  grid_button == CHAR_GRID_BUTTON_SNAP  ? setup.input[0].key.snap :
+	  grid_button == CHAR_GRID_BUTTON_DROP  ? setup.input[0].key.drop :
+	  KSYM_UNDEFINED);
+}
+
+#if defined(PLATFORM_ANDROID)
+static boolean CheckVirtualButtonPressed(int mx, int my, int button)
+{
+  float touch_x = (float)(mx + video.screen_xoffset) / video.screen_width;
+  float touch_y = (float)(my + video.screen_yoffset) / video.screen_height;
+  int x = touch_x * overlay.grid_xsize;
+  int y = touch_y * overlay.grid_ysize;
+  int grid_button = overlay.grid_button[x][y];
+  Key key = GetKeyFromGridButton(grid_button);
+  int key_status = (button == MB_RELEASED ? KEY_RELEASED : KEY_PRESSED);
+
+  return (key_status == KEY_PRESSED && key != KSYM_UNDEFINED);
+}
+#endif
+
 #ifndef HEADLESS
 void HandleButtonEvent(ButtonEvent *event)
 {
@@ -705,6 +730,7 @@ void HandleWindowEvent(WindowEvent *event)
 	video.display_height = new_display_height;
 
 	SDLSetScreenProperties();
+	SetGadgetsPosition_OverlayTouchButtons();
 
 	// check if screen orientation has changed (should always be true here)
 	if (nr != GRID_ACTIVE_NR())
@@ -746,49 +772,16 @@ static struct
 #ifndef HEADLESS
 static void HandleFingerEvent_VirtualButtons(FingerEvent *event)
 {
-#if 1
   int x = event->x * overlay.grid_xsize;
   int y = event->y * overlay.grid_ysize;
   int grid_button = overlay.grid_button[x][y];
   int grid_button_action = GET_ACTION_FROM_GRID_BUTTON(grid_button);
-  Key key = (grid_button == CHAR_GRID_BUTTON_LEFT  ? setup.input[0].key.left :
-	     grid_button == CHAR_GRID_BUTTON_RIGHT ? setup.input[0].key.right :
-	     grid_button == CHAR_GRID_BUTTON_UP    ? setup.input[0].key.up :
-	     grid_button == CHAR_GRID_BUTTON_DOWN  ? setup.input[0].key.down :
-	     grid_button == CHAR_GRID_BUTTON_SNAP  ? setup.input[0].key.snap :
-	     grid_button == CHAR_GRID_BUTTON_DROP  ? setup.input[0].key.drop :
-	     KSYM_UNDEFINED);
-#else
-  float ypos = 1.0 - 1.0 / 3.0 * video.display_width / video.display_height;
-  float event_x = (event->x);
-  float event_y = (event->y - ypos) / (1 - ypos);
-  Key key = (event_x > 0         && event_x < 1.0 / 6.0 &&
-	     event_y > 2.0 / 3.0 && event_y < 1 ?
-	     setup.input[0].key.snap :
-	     event_x > 1.0 / 6.0 && event_x < 1.0 / 3.0 &&
-	     event_y > 2.0 / 3.0 && event_y < 1 ?
-	     setup.input[0].key.drop :
-	     event_x > 7.0 / 9.0 && event_x < 8.0 / 9.0 &&
-	     event_y > 0         && event_y < 1.0 / 3.0 ?
-	     setup.input[0].key.up :
-	     event_x > 6.0 / 9.0 && event_x < 7.0 / 9.0 &&
-	     event_y > 1.0 / 3.0 && event_y < 2.0 / 3.0 ?
-	     setup.input[0].key.left :
-	     event_x > 8.0 / 9.0 && event_x < 1 &&
-	     event_y > 1.0 / 3.0 && event_y < 2.0 / 3.0 ?
-	     setup.input[0].key.right :
-	     event_x > 7.0 / 9.0 && event_x < 8.0 / 9.0 &&
-	     event_y > 2.0 / 3.0 && event_y < 1 ?
-	     setup.input[0].key.down :
-	     KSYM_UNDEFINED);
-#endif
+  Key key = GetKeyFromGridButton(grid_button);
   int key_status = (event->type == EVENT_FINGERRELEASE ? KEY_RELEASED :
 		    KEY_PRESSED);
   char *key_status_name = (key_status == KEY_RELEASED ? "KEY_RELEASED" :
 			   "KEY_PRESSED");
   int i;
-
-  virtual_button_pressed = (key_status == KEY_PRESSED && key != KSYM_UNDEFINED);
 
   // for any touch input event, enable overlay buttons (if activated)
   SetOverlayEnabled(TRUE);
@@ -1557,6 +1550,9 @@ void HandleKeyEvent(KeyEvent *event)
   {
     // for any other "real" key event, disable virtual buttons
     SetOverlayEnabled(FALSE);
+
+    // for any other "real" key event, disable overlay touch buttons
+    runtime.uses_touch_device = FALSE;
   }
 #endif
 
@@ -1800,7 +1796,15 @@ void HandleButton(int mx, int my, int button, int button_nr)
      level.game_engine_type == GAME_ENGINE_TYPE_MM ||
      strEqual(setup.touch.control_type, TOUCH_CONTROL_FOLLOW_FINGER) ||
      (strEqual(setup.touch.control_type, TOUCH_CONTROL_VIRTUAL_BUTTONS) &&
-      !virtual_button_pressed));
+      !CheckVirtualButtonPressed(mx, my, button)));
+
+  // always recognize potentially releasing already pressed gadgets
+  if (button == MB_RELEASED)
+    handle_gadgets = TRUE;
+
+  // always recognize pressing or releasing overlay touch buttons
+  if (CheckPosition_OverlayTouchButtons(mx, my, button) && !motion_status)
+    handle_gadgets = TRUE;
 #endif
 
   if (HandleGlobalAnimClicks(mx, my, button, FALSE))
@@ -2026,6 +2030,13 @@ static void HandleKeysSpecial(Key key)
       else if (letter == 'v')	// paste brush from Clipboard
       {
 	CopyClipboardToBrush();
+      }
+      else if (letter == 'z')	// undo or redo last operation
+      {
+	if (GetKeyModState() & KMOD_Shift)
+	  RedoLevelEditorOperation();
+	else
+	  UndoLevelEditorOperation();
       }
     }
   }

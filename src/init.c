@@ -302,6 +302,19 @@ static void InitBitmapPointers(void)
 #ifndef HEADLESS
 void InitImageTextures(void)
 {
+  static int texture_graphics[] =
+  {
+    IMG_GFX_REQUEST_BUTTON_TOUCH_YES,
+    IMG_GFX_REQUEST_BUTTON_TOUCH_NO,
+    IMG_GFX_REQUEST_BUTTON_TOUCH_CONFIRM,
+    IMG_GFX_GAME_BUTTON_TOUCH_STOP,
+    IMG_GFX_GAME_BUTTON_TOUCH_PAUSE,
+    IMG_MENU_BUTTON_TOUCH_BACK,
+    IMG_MENU_BUTTON_TOUCH_NEXT,
+    IMG_MENU_BUTTON_TOUCH_BACK2,
+    IMG_MENU_BUTTON_TOUCH_NEXT2,
+    -1
+  };
   int i, j, k;
 
   FreeAllImageTextures();
@@ -327,6 +340,9 @@ void InitImageTextures(void)
       }
     }
   }
+
+  for (i = 0; texture_graphics[i] > -1; i++)
+    CreateImageTextures(texture_graphics[i]);
 }
 #endif
 

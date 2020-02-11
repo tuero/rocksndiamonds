@@ -765,14 +765,17 @@ void TapeTogglePause(boolean toggle_mode)
     return;
   }
 
-  if (setup.show_snapshot_buttons &&
-      game_status == GAME_MODE_PLAYING &&
-      CheckEngineSnapshotList())
+  if (game_status == GAME_MODE_PLAYING)
   {
-    if (tape.pausing)
-      MapUndoRedoButtons();
-    else if (!tape.single_step)
-      UnmapUndoRedoButtons();
+    if (setup.show_snapshot_buttons && CheckEngineSnapshotList())
+    {
+      if (tape.pausing)
+	MapUndoRedoButtons();
+      else if (!tape.single_step)
+	UnmapUndoRedoButtons();
+    }
+
+    ModifyPauseButtons();
   }
 }
 
@@ -1410,9 +1413,6 @@ void RedrawTapeButtons(void)
 
   if (tape.show_game_buttons)
     RedrawGameButtonsOnTape();
-
-  // RedrawGadget() may have set REDRAW_ALL if buttons are defined off-area
-  redraw_mask &= ~REDRAW_ALL;
 }
 
 void RedrawOrRemapTapeButtons(void)

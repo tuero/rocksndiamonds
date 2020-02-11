@@ -33,6 +33,9 @@ void CopyClipboardToBrush(void);
 void CopyBrushToClipboard(void);
 void CopyBrushToClipboard_Small(void);
 
+void UndoLevelEditorOperation(void);
+void RedoLevelEditorOperation(void);
+
 #endif
 
 #endif

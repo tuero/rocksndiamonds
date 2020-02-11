@@ -134,6 +134,9 @@ struct GameButtonInfo
   struct XY panel_sound_music;
   struct XY panel_sound_loops;
   struct XY panel_sound_simple;
+
+  struct XY touch_stop;
+  struct XY touch_pause;
 };
 
 struct GameSnapshotInfo
@@ -468,6 +471,7 @@ void CreateGameButtons(void);
 void FreeGameButtons(void);
 void MapUndoRedoButtons(void);
 void UnmapUndoRedoButtons(void);
+void ModifyPauseButtons(void);
 void MapGameButtons(void);
 void UnmapGameButtons(void);
 void RedrawGameButtons(void);
