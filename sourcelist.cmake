@@ -87,6 +87,13 @@ set(sources_ai
     ${PROJECT_SOURCE_DIR}/src/ai/controller/options/option_to_exit.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/replay/replay.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/simple_pathing/simple_pathing.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/two_level_search.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/tls_highlevel.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/tls_lowlevel.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/tls_constraint_detection.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/tls_combinatorial_node.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/tls_log.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/tls_hash.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/engine/engine_types.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/engine/engine_action_info.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/engine/engine_element_property.cpp

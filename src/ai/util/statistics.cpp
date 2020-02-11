@@ -13,6 +13,10 @@
 
 // Standard library and STL
 #include <fstream>
+#include <vector>
+#include <array>
+#include <map>
+#include <unordered_map>
 #include <iomanip>              // precision
 #include <numeric>              // accumulate
 #include <cmath>                // std
@@ -27,6 +31,9 @@ namespace statistics {
 int numGameTicks = 0;
 int runTimeMili = 0;
 int numLevelTries = 0;
+
+std::map<int, std::unordered_map<uint64_t, int>> pathCounts;
+std::map<int, std::array<uint64_t, 2>> solutionPathCounts;
 
 // File output
 const std::string STATS_DIR = "./src/ai/stats/";
@@ -67,8 +74,83 @@ void closeStatsFile() {
  * Output the necessary statistics to file.
  */
 void outputStatsToFile() {
-    // Your stats output here...
-    statsFile << "Number of attempts = " << numLevelTries << std::endl;
+    outputPathCounts();
 }
+
+void outputPathCounts() {
+    int solution_path_visits_count = 0;
+    int total_path_visit_counts = 0;
+    std::vector<int> solutionPaths;
+    std::vector<int> totalPaths;
+    for (auto const & level_run : pathCounts) {
+        statsFile << "Level: " << level_run.first << std::endl;
+
+        std::vector<int> counts;
+        std::vector<int> countsNotOne;
+        int numSingleVisitPaths = 0;
+        for (auto const & run : level_run.second) {
+            counts.push_back(run.second);
+            if (run.second == 1) {++numSingleVisitPaths;}
+            else {countsNotOne.push_back(run.second);}
+            statsFile << "\tPath: " << run.first << ", count: " << run.second << std::endl;
+
+        }
+
+        float singleCountPercentage = (float)numSingleVisitPaths / level_run.second.size() * 100.0; 
+
+        // Total unique paths
+        statsFile << "Total number of unique paths: " <<  level_run.second.size() << std::endl;
+        // Num Paths of 1 visit
+        statsFile << "Total number of unique paths with 1 attempt: " <<  numSingleVisitPaths 
+        << ", ("<< std::fixed << std::setprecision(1) << singleCountPercentage << "%)" << std::endl;
+        // Total tries
+        int total_count = std::accumulate(counts.begin(), counts.end(), 0);
+        statsFile << "Total number of attempts: " << total_count << std::endl;
+        // Solution high level path visit count
+        solution_path_visits_count += (solutionPathCounts[level_run.first])[1];
+        solutionPaths.push_back((solutionPathCounts[level_run.first])[1]);
+        totalPaths.push_back(total_count);
+        total_path_visit_counts += total_count;
+        statsFile << "Solution path (" << (solutionPathCounts[level_run.first])[0] << ") attempts: " << (solutionPathCounts[level_run.first])[1] << std::endl;
+        // Average path visit
+        float avg = (float)(std::accumulate(countsNotOne.begin(), countsNotOne.end(), 0)) / (countsNotOne.empty() ? 1 : countsNotOne.size());
+        statsFile << "Average length above 1: " << avg << std::endl << std::endl;
+    }
+
+    // total attempts
+    int sizeTotal = (int)totalPaths.size();
+    std::sort(totalPaths.begin(), totalPaths.end());
+    double sumTotal = (double)std::accumulate(totalPaths.begin(), totalPaths.end(), 0);
+    double meanTotal = sumTotal / sizeTotal;
+    std::vector<double> diffTotal(sizeTotal);
+    std::transform(totalPaths.begin(), totalPaths.end(), diffTotal.begin(), [meanTotal](double x) { return x - meanTotal; });
+    double sq_sumTotal = std::inner_product(diffTotal.begin(), diffTotal.end(), diffTotal.begin(), 0.0);
+    double stdevTotal = std::sqrt(sq_sumTotal / sizeTotal);
+    double medianTotal = (sizeTotal % 2) ? ((totalPaths[sizeTotal / 2 - 1] + totalPaths[sizeTotal / 2]) / 2) : (totalPaths[sizeTotal / 2]);
+
+    statsFile << "----------------------------------------------------------------" << std::endl;
+    statsFile << "Levelset mean total attempts: " << meanTotal << std::endl;
+    statsFile << "Levelset median total attempts: " << medianTotal << std::endl;
+    statsFile << "Levelset std total attempts: " << stdevTotal << std::endl << std::endl;
+
+    // solution attempts
+    int sizeSolution = (int)solutionPaths.size();
+    std::sort(solutionPaths.begin(), solutionPaths.end());
+    double sumSolution = (double)std::accumulate(solutionPaths.begin(), solutionPaths.end(), 0);
+    double meanSolution = sumSolution / sizeSolution;
+    std::vector<double> diffSolution(sizeSolution);
+    std::transform(solutionPaths.begin(), solutionPaths.end(), diffSolution.begin(), [meanSolution](double x) { return x - meanSolution; });
+    double sq_sumSolution = std::inner_product(diffSolution.begin(), diffSolution.end(), diffSolution.begin(), 0.0);
+    double stdevSolution = std::sqrt(sq_sumSolution / sizeSolution);
+    double medianSolution = (sizeSolution % 2) ? ((solutionPaths[sizeSolution / 2 - 1] + solutionPaths[sizeSolution / 2]) / 2) : (solutionPaths[sizeSolution / 2]);
+    auto maxSolutionLength = std::max_element(solutionPaths.begin(), solutionPaths.end());
+
+
+    statsFile << "Levelset mean solution path attempts: " << meanSolution << std::endl;
+    statsFile << "Levelset median solution path attempts: " << medianSolution << std::endl;
+    statsFile << "Levelset std solution path attempts: " << stdevSolution << std::endl;
+    statsFile << "Levelset solution max attempts: " << *maxSolutionLength << std::endl;
+}
+
 
 }

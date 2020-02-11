@@ -286,8 +286,8 @@ namespace logger {
      * Log the players current move.
      */
     void logPlayerMove(const std::string &action) {
-        PLOGD_(logger::FileLogger) << "Controller sending action: " + action;
-        PLOGD_(logger::ConsoleLogger) << "Controller sending action: " + action;
+        PLOGV_(logger::FileLogger) << "Controller sending action: " + action;
+        PLOGV_(logger::ConsoleLogger) << "Controller sending action: " + action;
     }
 
 

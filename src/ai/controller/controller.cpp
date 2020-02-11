@@ -26,6 +26,7 @@
 #include "mcts/mcts.h"
 #include "replay/replay.h"
 #include "simple_pathing/simple_pathing.h"
+#include "two_level_search/two_level_search.h"
 
 using namespace enginehelper;
 
@@ -247,6 +248,9 @@ void Controller::initController(ControllerType controller) {
      *     baseController_ = std::make_unique<YourControllerClass>();
      * }
     */
+    else if (controller == CONTROLLER_TWOLEVEL) {
+        baseController_ = std::make_unique<TwoLevelSearch>(OptionFactoryType::TWO_LEVEL_SEARCH);
+    }
     else {
         PLOGE_(logger::FileLogger) << "Unknown controller type: " << controller;
         PLOGE_(logger::ConsoleLogger) << "Unknown controller type: " << controller;

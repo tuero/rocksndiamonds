@@ -85,6 +85,35 @@ std::vector<BaseOption*> OptionFactory::createPathToSpriteOptions() {
 
 
 /**
+ * Create options for the two level search.
+ * This uses pathing to collectible sprites (diamonds, keys, etc.) and to exit.
+ * Used for Masters thesis.
+ */
+std::vector<BaseOption*> OptionFactory::createTwoLevelSearchOptions() {
+    std::vector<BaseOption*> optionPointers;
+    options_.clear();
+
+    for (enginetype::GridCell cell : gridinfo::getMapSprites()) {
+        int spriteID = gridinfo::getSpriteID(cell);
+        // Collectible sprite (diamond in this case)
+        if (elementproperty::isCollectable(cell)) {
+            std::unique_ptr<OptionCollectibleSprite> option = std::make_unique<OptionCollectibleSprite>(spriteID);
+            options_.push_back(std::move(option));
+            optionPointers.push_back(options_.back().get());
+        }
+        // Exit
+        else if (elementproperty::isExit(cell)) {
+            std::unique_ptr<OptionToExit> option = std::make_unique<OptionToExit>(spriteID);
+            options_.push_back(std::move(option));
+            optionPointers.push_back(options_.back().get());
+        }
+    }
+
+    return optionPointers;
+}
+
+
+/**
  * @note Your custom option grouping here.
  */
 std::vector<BaseOption*> OptionFactory::createCustomOptions() {
@@ -108,6 +137,8 @@ std::vector<BaseOption*> OptionFactory::createOptions(OptionFactoryType optionFa
             return createSingleActionNoNoopOptions();
         case OptionFactoryType::PATH_TO_SPRITE:
             return createPathToSpriteOptions();
+        case OptionFactoryType::TWO_LEVEL_SEARCH :
+            return createTwoLevelSearchOptions();
         case OptionFactoryType::CUSTOM :
             return createCustomOptions();
         default :
