@@ -279,5 +279,5 @@ void BaseOption::runAStar(enginetype::GridCell startCell, enginetype::GridCell g
 
     // A* is usually called to check if an option is valid (can we path to it), so its not needed
     // to throw errors if we fail.
-    PLOGE_(logger::FileLogger) << "A* couldn't find a path";
+    // PLOGE_(logger::FileLogger) << "A* couldn't find a path";
 }

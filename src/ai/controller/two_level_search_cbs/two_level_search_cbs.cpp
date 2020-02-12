@@ -9,7 +9,7 @@
  */
 
 
-#include "two_level_search.h"
+#include "two_level_search_cbs.h"
 
 // Standard Libary/STL
 #include <queue>
@@ -27,12 +27,12 @@ using namespace enginehelper;
 /**
  * Convey any important details about the controller in string format.
  */
-std::string TwoLevelSearch::controllerDetailsToString() {
+std::string TwoLevelSearchCBS::controllerDetailsToString() {
     return "Two level search controller.";
 }
 
 
-void TwoLevelSearch::initializeOptions() {
+void TwoLevelSearchCBS::initializeOptions() {
     availableOptions_ = optionFactory_.createOptions(optionFactoryType_);
 
     multiplier_ = 10;
@@ -47,7 +47,7 @@ void TwoLevelSearch::initializeOptions() {
 /**
  * 
  */
-void TwoLevelSearch::resetOptions() {
+void TwoLevelSearchCBS::resetOptions() {
     if (highlevelPlannedPath_.empty()) {
         combinatorialByPath.clear();
         availableOptions_ = optionFactory_.createOptions(optionFactoryType_);
@@ -65,7 +65,7 @@ void TwoLevelSearch::resetOptions() {
 /**
  * Handle necessary items before the level gets restarted.
  */
-void TwoLevelSearch::handleLevelRestartBefore() {
+void TwoLevelSearchCBS::handleLevelRestartBefore() {
     
 }
 
@@ -74,7 +74,7 @@ void TwoLevelSearch::handleLevelRestartBefore() {
  * Initializations which need to occur BOTH on first level start
  * and on every level restart after a failure.
  */
-void TwoLevelSearch::initializationForEveryLevelStart() {
+void TwoLevelSearchCBS::initializationForEveryLevelStart() {
     requestReset_ = false;
     solutionIndex_ = -1;
     optionStatusFlag_ = true;
@@ -86,10 +86,7 @@ void TwoLevelSearch::initializationForEveryLevelStart() {
     currIsMoving_.clear();
 
     // Set lowlevel search type
-    lowLevelSearchType = LowLevelSearchType::combinatorial;
-    // if (enginestate::getOptParam() == 1) {
-    //     lowLevelSearchType = LowLevelSearchType::cbs;
-    // }
+    lowLevelSearchType = LowLevelSearchType::cbs;
 
     PLOGD_(logger::FileLogger) << "------------------------";
     highLevelSearch();
@@ -101,7 +98,7 @@ void TwoLevelSearch::initializationForEveryLevelStart() {
 /**
  * Handle necessary items after the level gets restarted.
  */
-void TwoLevelSearch::handleLevelRestartAfter() {
+void TwoLevelSearchCBS::handleLevelRestartAfter() {
     initializationForEveryLevelStart();
 }
 
@@ -112,7 +109,7 @@ void TwoLevelSearch::handleLevelRestartAfter() {
  * Called only during level start. Any preprocessing or intiailizations needed for the 
  * controller that wouldn't otherwise be done during each game tick, should be setup here.
  */
-void TwoLevelSearch::handleLevelStart() {
+void TwoLevelSearchCBS::handleLevelStart() {
     logAvailableOptions();
 
     // Clear and intialize data structures
@@ -139,7 +136,7 @@ void TwoLevelSearch::handleLevelStart() {
 /**
  * Get the action from the controller.
  */
-Action TwoLevelSearch::getAction() {
+Action TwoLevelSearchCBS::getAction() {
     // We don't have any more options...
     if (solutionIndex_ >= (int)highlevelPlannedPath_.size()) {
         PLOGE_(logger::FileLogger) << "No more options in solution list.";
@@ -192,6 +189,6 @@ Action TwoLevelSearch::getAction() {
 /**
  * Use this time to check for moved objects.
  */
-void TwoLevelSearch::plan() {
+void TwoLevelSearchCBS::plan() {
     checkForMovedObjects();
 }

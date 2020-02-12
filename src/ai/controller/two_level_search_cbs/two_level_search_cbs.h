@@ -22,7 +22,6 @@
 #include <cmath>                // pow
 
 // Includes
-#include "tls_combinatorial_node.h"
 #include "base_controller.h"
 #include "base_option.h"
 
@@ -32,7 +31,7 @@
  *
  * This does nothing, and acts as a backup to prevent unknown controller input from breaking
  */
-class TwoLevelSearch : public BaseController {
+class TwoLevelSearchCBS : public BaseController {
 private:
     bool optionStatusFlag_ = true;                                                  // Flag signifying current option is complete
     bool newSpriteFoundFlag_;
@@ -113,7 +112,7 @@ private:
     enum LowLevelSearchType{cbs, combinatorial};
     LowLevelSearchType lowLevelSearchType;
 
-    std::unordered_map<uint64_t, CombinatorialPartition> combinatorialByPath;
+    // std::unordered_map<uint64_t, CombinatorialPartition> combinatorialByPath;
 
     /**
      * Run the implemented low level search. 
@@ -262,9 +261,9 @@ private:
 
 public:
 
-    TwoLevelSearch() {}
+    TwoLevelSearchCBS() {}
 
-    TwoLevelSearch(OptionFactoryType optionType) : BaseController(optionType) {}
+    TwoLevelSearchCBS(OptionFactoryType optionType) : BaseController(optionType) {}
 
     void initializeOptions() override;
 

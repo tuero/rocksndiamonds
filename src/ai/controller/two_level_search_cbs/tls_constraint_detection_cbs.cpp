@@ -23,7 +23,7 @@
 using namespace enginehelper;
 
 
-bool TwoLevelSearch::newConstraintSeen(std::vector<BaseOption*> &optionPath) {
+bool TwoLevelSearchCBS::newConstraintSeen(std::vector<BaseOption*> &optionPath) {
     // Check every option in the planned path
     // if (lowLevelSearchType == LowLevelSearchType::combinatorial) {
     //     std::vector<int> numConstraintsOptionPair;
@@ -68,13 +68,13 @@ bool TwoLevelSearch::newConstraintSeen(std::vector<BaseOption*> &optionPath) {
 
 
 template<typename T>
-int TwoLevelSearch::restrictionCountForPath(const T &pathContainer) {
+int TwoLevelSearchCBS::restrictionCountForPath(const T &pathContainer) {
     std::vector<uint64_t> pathHashes = givenPathOptionPairHashes(pathContainer);
     auto lambda = [&](int sum, uint64_t hash) {return sum + restrictedCellsByOptionCount_[hash];};
     return std::accumulate(pathHashes.begin(), pathHashes.end(), 0, lambda);
 }
-template int TwoLevelSearch::restrictionCountForPath<std::vector<BaseOption*>> (const std::vector<BaseOption*>&);
-template int TwoLevelSearch::restrictionCountForPath<std::deque<BaseOption*>> (const std::deque<BaseOption*>&);
+template int TwoLevelSearchCBS::restrictionCountForPath<std::vector<BaseOption*>> (const std::vector<BaseOption*>&);
+template int TwoLevelSearchCBS::restrictionCountForPath<std::deque<BaseOption*>> (const std::deque<BaseOption*>&);
 
 
 /**
@@ -82,7 +82,7 @@ template int TwoLevelSearch::restrictionCountForPath<std::deque<BaseOption*>> (c
  * This is called during each step, and adds restrictions based on those found 
  * from checkForMovedObjects()
  */
-void TwoLevelSearch::addNewConstraints() {
+void TwoLevelSearchCBS::addNewConstraints() {
     PLOGD_(logger::FileLogger) << "Adding new constraints.";
     for (auto const & hash : allOptionPairHashes()) {
         // newConstraintsAdded_[hash] = false;
@@ -116,7 +116,7 @@ bool playerCausedSpriteMove(const enginetype::GridCell playerCell, const enginet
  * Objects are stored as sprite and gridcell pairs for a given pair of options (option from -> option to)
  * In addNewConstraints(), we store only the intersection of gridcells in restrictedCellsByOption_
  */
-void TwoLevelSearch::checkForMovedObjects() {
+void TwoLevelSearchCBS::checkForMovedObjects() {
     prevPlayerCell_ = currPlayerCell_;
     currPlayerCell_ = gridinfo::getPlayerPosition();
     prevIsMoving_ = currIsMoving_;

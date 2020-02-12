@@ -9,7 +9,7 @@
  */
 
 
-#include "two_level_search.h"
+#include "two_level_search_cbs.h"
 
 // Standard Libary/STL
 #include <vector>
@@ -31,7 +31,7 @@
 using namespace enginehelper;
 
 
-void TwoLevelSearch::lowLevelSearch() {
+void TwoLevelSearchCBS::lowLevelSearch() {
     // if (lowLevelSearchType == LowLevelSearchType::cbs) {
     //     CBS();
     // }
@@ -42,7 +42,7 @@ void TwoLevelSearch::lowLevelSearch() {
 }
 
 
-bool TwoLevelSearch::currentHighLevelPathComplete(uint64_t hash) {
+bool TwoLevelSearchCBS::currentHighLevelPathComplete(uint64_t hash) {
     // if (lowLevelSearchType == LowLevelSearchType::cbs) {
     //     if (openByPath.find(hash) == openByPath.end()) {return false;}
     //     return openByPath[hash].empty() && !closedByPath[hash].empty();
@@ -58,7 +58,7 @@ bool TwoLevelSearch::currentHighLevelPathComplete(uint64_t hash) {
 }
 
 
-void TwoLevelSearch::iterativeCombinatorial() {
+void TwoLevelSearchCBS::iterativeCombinatorial() {
     // Safeguard against first time access
     if (combinatorialByPath.find(currentHighLevelPathHash) == combinatorialByPath.end()) {
         combinatorialByPath[currentHighLevelPathHash] = CombinatorialPartition();
@@ -132,7 +132,7 @@ void TwoLevelSearch::iterativeCombinatorial() {
  * set in the best node in OPEN, and will insert the children nodes into OPEN for
  * later iterations.
  */
-void TwoLevelSearch::CBS() {
+void TwoLevelSearchCBS::CBS() {
     // Safeguard against OPEN/CLOSED not seeing the current high level path before
     if (openByPath.find(currentHighLevelPathHash) == openByPath.end()) {
         openByPath[currentHighLevelPathHash] = {};
