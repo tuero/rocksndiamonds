@@ -208,6 +208,14 @@ Action getGridMovDir(const enginetype::GridCell &cell) {
 
 
 /**
+ * Check whether the item which was previously at location cell was just falling.
+ */
+bool getWasJustFalling(const enginetype::GridCell &cell) {
+    return inBounds(cell) ? WasJustFalling[cell.x][cell.y] != 0 : false;
+}
+
+
+/**
  * Get the reserved cell that the element owns.
  * If elements are moving from one cell to another, they place a temporary element into the 
  * new cell to claim ownership. If the cell is not moving, the same cell is returned.

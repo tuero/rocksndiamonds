@@ -121,6 +121,16 @@ namespace gridinfo {
     Action getGridMovDir(const enginetype::GridCell &cell);
 
     /**
+     * Check whether the item at location cell was just falling.
+     * @note If an item is at position {x1,y1} on tick 0, starts to falls and ends up at {x1,y1+1} on tick 8, 
+     *       on tick 9 getWasJustFalling({x1,y1+1}) will return true.
+     * 
+     * @param The gridcell of the element
+     * @return True if the item in that cell was just falling on the previous tick.
+     */
+    bool getWasJustFalling(const enginetype::GridCell &cell);
+
+    /**
      * Get the reserved cell that the element owns.
      * If elements are moving from one cell to another, they place a temporary element into the 
      * new cell to claim ownership. If the cell is not moving, the same cell is returned.
