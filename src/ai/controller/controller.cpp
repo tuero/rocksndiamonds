@@ -25,6 +25,7 @@
 #include "default/default.h"
 #include "mcts/mcts.h"
 #include "replay/replay.h"
+#include "simple_pathing/simple_pathing.h"
 
 using namespace enginehelper;
 
@@ -180,11 +181,17 @@ int Controller::getAction() {
         }
     } 
     catch (const std::exception &ex) {
+        PLOGE_(logger::FileLogger) << "A failure occured: " << ex.what() << ". Please check logs.";
+        PLOGE_(logger::ConsoleLogger) << "A failure occured: " << ex.what() << ". Please check logs.";
         std::cerr << "A failure occured: " << ex.what() << ". Please check logs." << std::endl;
+        enginestate::setEngineGameStatusModeQuit();
     }
     catch (...) {
         // catch any errors
+        PLOGE_(logger::FileLogger) << "Unknown failure occurred. Please check logs.";
+        PLOGE_(logger::ConsoleLogger) << "Unknown failure occurred. Please check logs.";
         std::cerr << "Unknown failure occurred. Please check logs." << std::endl;
+        enginestate::setEngineGameStatusModeQuit();
     }
 
     enginestate::setSimulatorFlag(false);
@@ -224,6 +231,9 @@ void Controller::initController(ControllerType controller) {
     }
     else if (controller == CONTROLLER_MCTS_OPTIONS) {
         baseController_ = std::make_unique<MCTS>(OptionFactoryType::PATH_TO_SPRITE);
+    }
+    else if (controller == CONTROLLER_SIMPLE_PATHING) {
+        baseController_ = std::make_unique<SimplePathing>(OptionFactoryType::PATH_TO_SPRITE);
     }
     /**
      * @note Add your controller here

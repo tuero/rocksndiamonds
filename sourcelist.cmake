@@ -86,6 +86,7 @@ set(sources_ai
     ${PROJECT_SOURCE_DIR}/src/ai/controller/options/option_collectible_sprite.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/options/option_to_exit.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/replay/replay.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/controller/simple_pathing/simple_pathing.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/engine/engine_types.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/engine/engine_action_info.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/engine/engine_element_property.cpp
