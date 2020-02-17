@@ -102,6 +102,14 @@ void BaseOption::setAvoidNonGoalCollectibleCells(bool flag) {
     avoidNonGoalCollectibleCells = flag;
 }
 
+/**
+ * Set the flag which indicates whether A* will avoid cells which can cause the
+ * player to explode.
+ */
+void BaseOption::setPrioritizeSafeCells(bool flag) {
+    prioritizeSafeCells = flag;
+}
+
 
 /**
  * Set the restricted cells.
@@ -148,16 +156,19 @@ struct CompareNode {
 
 
 bool canExpandAvoidCollectingNonGoalGems(const enginetype::GridCell &cellFrom, const enginetype::GridCell &cellTo, 
-    const enginetype::GridCell &goalCell, Action action) 
+    const enginetype::GridCell &goalCell, Action action, bool prioritizeSafeCells) 
 {
-    return elementproperty::isDigable(cellFrom, action) || elementproperty::isWalkable(cellFrom, action) || elementproperty::isEmpty(cellFrom, action) ||
+    bool is_empty = (prioritizeSafeCells) ? elementproperty::isEmptySafe(cellFrom, action) : elementproperty::isEmpty(cellFrom, action);
+    bool is_walkable = (prioritizeSafeCells) ? elementproperty::isWalkableSafe(cellFrom, action) : elementproperty::isWalkable(cellFrom, action);
+    return elementproperty::isDigable(cellFrom, action) || is_walkable || is_empty ||
         elementproperty::isGateOpen(cellTo) || elementproperty::isGateOpen(cellTo) || cellTo == goalCell;
 }
 
 bool canExpandCollectingNonGoalGems(const enginetype::GridCell &cellFrom, const enginetype::GridCell &cellTo, 
-    const enginetype::GridCell &goalCell, Action action) 
+    const enginetype::GridCell &goalCell, Action action, bool prioritizeSafeCells) 
 {
-    return elementproperty::isActionMoveable(cellFrom, action) || elementproperty::isGateOpen(cellTo) || cellTo == goalCell;
+    bool is_moveable = (prioritizeSafeCells) ? elementproperty::isActionMoveableSafe(cellFrom, action) : elementproperty::isActionMoveable(cellFrom, action);
+    return is_moveable || elementproperty::isGateOpen(cellTo) || cellTo == goalCell;
 }
 
 /**
@@ -208,7 +219,7 @@ void BaseOption::runAStar(enginetype::GridCell startCell, enginetype::GridCell g
             if (std::find(restrictedCells_.begin(), restrictedCells_.end(), childCell) != restrictedCells_.end()) {continue;}
 
             // Child not valid if out of bounds or action doesn't result in being in a moveable cell
-            if (!expandFunc(node.cell, childCell, goalCell, action)) {continue;}
+            if (!expandFunc(node.cell, childCell, goalCell, action, prioritizeSafeCells)) {continue;}
 
             int childIndex = gridinfo::cellToIndex(childCell);
             float newG = node.g + 1;

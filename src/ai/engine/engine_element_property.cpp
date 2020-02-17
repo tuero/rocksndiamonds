@@ -264,21 +264,31 @@ bool _isAccessibleFromDirection(enginetype::GridCell cellTo, Action directionToM
 /**
  * Check if given gridcell contains element with IS_WALKABLE property.
  */
-bool _isWalkable(const enginetype::GridCell cellTo, Action directionToMove) {
+bool _isWalkable(const enginetype::GridCell cellTo, Action directionToMove, bool isSafe=false) {
     int element = Feld[cellTo.x][cellTo.y];
     bool isAccessibleFromDirection = (directionToMove == Action::noop ? true : _isAccessibleFromDirection(cellTo, directionToMove));
-    return IS_WALKABLE(element) && isAccessibleFromDirection;
+    bool danger_cell = (cellTo.y - 1 < 0) ? false : CAN_SMASH_PLAYER(Feld[cellTo.x][cellTo.y-1]);
+    return isSafe ? IS_WALKABLE(element) && isAccessibleFromDirection & !danger_cell : IS_WALKABLE(element) && isAccessibleFromDirection;
 }
 
 
 /**
  * Checks if the direction the player wants to move in is walkable.
- * Walkable means that the player can walk into the neighbouring cell without destroying the enviornment
- * i.e. removing dirt or collecting objects.
+ * Walkable means that the player can overtop an existing element i.e. door, tube, or sokoban tiles.
  */
 bool isWalkable(const enginetype::GridCell cellFrom, Action directionToMove) {
     enginetype::GridCell cellTo = gridaction::getCellFromAction(cellFrom, directionToMove);
     return gridinfo::inBounds(cellTo) && _isWalkable(cellTo, directionToMove);
+}
+
+
+/**
+ * Checks if the direction the player wants to move in is walkable.
+ * Walkable means that the player can overtop an existing element i.e. door, tube, or sokoban tiles.
+ */
+bool isWalkableSafe(const enginetype::GridCell cellFrom, Action directionToMove) {
+    enginetype::GridCell cellTo = gridaction::getCellFromAction(cellFrom, directionToMove);
+    return gridinfo::inBounds(cellTo) && _isWalkable(cellTo, directionToMove, true);
 }
 
 
@@ -305,8 +315,10 @@ bool isDigable(const enginetype::GridCell cellFrom, Action directionToMove) {
  * Checks if the GridCell cellTo is empty.
  * For internal use, assumes bounds are validated elsewhere.
  */
-bool _isEmpty(const enginetype::GridCell cellTo) {
-    return Feld[cellTo.x][cellTo.y] == EL_EMPTY;
+bool _isEmpty(const enginetype::GridCell cellTo, bool isSafe=false) {
+    bool cell_empty =  Feld[cellTo.x][cellTo.y] == EL_EMPTY;
+    bool danger_cell = (cellTo.y - 1 < 0) ? false : CAN_SMASH_PLAYER(Feld[cellTo.x][cellTo.y-1]);
+    return isSafe ? cell_empty & !danger_cell : cell_empty;
 }
 
 /**
@@ -316,6 +328,19 @@ bool _isEmpty(const enginetype::GridCell cellTo) {
 bool isEmpty(const enginetype::GridCell cellFrom, Action directionToMove) {
     enginetype::GridCell cellTo = gridaction::getCellFromAction(cellFrom, directionToMove);
     return gridinfo::inBounds(cellTo) && _isEmpty(cellTo);
+}
+
+
+/**
+ * Checks if the direction the player wants to move in is empty.
+ * in the action being applied, after digging away the current element.
+ * 
+ * @note This has an extra check to ensure that the player will not be moving into a cell which 
+ * will immediately end of killing the player due to a falling object above.
+ */
+bool isEmptySafe(const enginetype::GridCell cellFrom, Action directionToMove) {
+    enginetype::GridCell cellTo = gridaction::getCellFromAction(cellFrom, directionToMove);
+    return gridinfo::inBounds(cellTo) && _isEmpty(cellTo, true);
 }
 
 
@@ -446,9 +471,9 @@ bool isPassable(const enginetype::GridCell cellFrom, Action directionToMove) {
  * Checks if the action will move the player.
  * For internal use, assumes bounds are validated elsewhere.
  */
-bool _isActionMoveable(const enginetype::GridCell cellTo, Action directionToMove) {
-    return !_isWall(cellTo) && (_isWalkable(cellTo, directionToMove) || _isCollectable(cellTo) || _isPassable(cellTo, directionToMove) ||
-         _isDigable(cellTo) || gridinfo::isGridEmpty(cellTo));
+bool _isActionMoveable(const enginetype::GridCell cellTo, Action directionToMove, bool isSafe=false) {
+    return !_isWall(cellTo) && (_isWalkable(cellTo, directionToMove, isSafe) || _isCollectable(cellTo) || _isPassable(cellTo, directionToMove) ||
+        _isDigable(cellTo) || _isEmpty(cellTo, isSafe));
 }
 
 
@@ -462,6 +487,22 @@ bool isActionMoveable(const enginetype::GridCell cellFrom, Action directionToMov
     if (directionToMove == Action::noop) {return true;}
     enginetype::GridCell cellTo = gridaction::getCellFromAction(cellFrom, directionToMove);
     return gridinfo::inBounds(cellTo) && _isActionMoveable(cellTo, directionToMove);
+}
+
+
+/**
+ * Checks if the action will move the player.
+ * Player can move if they are not walking into a wall, and the GridCell in the direction
+ * the player wants to move is either walkable, passable, or contains a collectable item.
+ * 
+ * @note This has an extra check to ensure that the player will not be moving into a cell which 
+ * will immediately end of killing the player due to a falling object above.
+ */
+bool isActionMoveableSafe(const enginetype::GridCell cellFrom, Action directionToMove) {
+    // Skip no action.
+    if (directionToMove == Action::noop) {return true;}
+    enginetype::GridCell cellTo = gridaction::getCellFromAction(cellFrom, directionToMove);
+    return gridinfo::inBounds(cellTo) && _isActionMoveable(cellTo, directionToMove, true);
 }
 
 } //namespace elementproperty

@@ -26,6 +26,10 @@ std::string SimplePathing::controllerDetailsToString() {
 
 void SimplePathing::handleLevelStart() {
     optionStatusFlag_ = true;
+    // For our controller, we will prefer not walking into cells which kill the agent.
+    for (auto const & option : availableOptions_) {
+        option->setPrioritizeSafeCells(true);
+    }
 }
 
 

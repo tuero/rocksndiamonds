@@ -66,6 +66,9 @@ For a detailed listing of the usage, see the [usage](docs/usage.md) section of t
 # Changelog
 
 ## [v1.1](https://github.com/tuero/rocksndiamonds/tree/v1.1) (2020-02-11)
+- Added simple pathing example controller
+- Added safe options for isEmpty (isEmptySafe), isWalkable (isWalkableSafe), and isActionMoveable (isActionMoveableSafe). These have an added check to determine if moving into a cell would cause the player to immediately die from falling objects above.
+- Base options have an added flag to determine if A* pathing should avoid immediate death cells (off by default)
 - Added gridinfo function to get whether item was just falling
 - Added graphics element RocksTouch.png so compiling doesn't depend on creating these elements from scratch
 

@@ -139,6 +139,11 @@ void Controller::handleLevelFailed() {
         reset();
         baseController_.get()->handleLevelRestartAfter();
     }
+    else {
+        PLOGI_(logger::FileLogger) << "Level failed, quitting.";
+        PLOGI_(logger::ConsoleLogger) << "Level failed, quitting.";
+        enginestate::setEngineGameStatusModeQuit();
+    }
 }
 
 

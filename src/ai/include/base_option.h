@@ -40,7 +40,9 @@ protected:
     enginetype::GridCell goalCell_;                             // The gridcell associated with A* as a solution.
     std::deque<enginetype::GridCell> solutionPath_  = {};       // Path found by A*
     std::vector<enginetype::GridCell> restrictedCells_ = {};    // Container of restricted cells A* must avoid
+    // A* priority settings
     bool avoidNonGoalCollectibleCells = false;                  // Flag to avoid collectible cells which are not the current goal.
+    bool prioritizeSafeCells = false;                           // Flag to avoid cells which may cause the player to immediately die.
     int spriteID_ = -1;                                         // Associated sprite for option
     int timesCalled_ = 0;                                       // Number of times called
     int counter_ = 0;                                           // Internal counter for tracking actions taking multiple game ticks
@@ -124,6 +126,12 @@ public:
      * not the current goal location.
      */
     void setAvoidNonGoalCollectibleCells(bool flag);
+
+    /**
+     * Set the flag which indicates whether A* will avoid cells which can cause the
+     * player to explode.
+     */
+    void setPrioritizeSafeCells(bool flag);
 
     /**
      * Get the solution path as found by A*.

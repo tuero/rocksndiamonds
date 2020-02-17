@@ -148,14 +148,26 @@ namespace elementproperty {
 
     /**
      * Checks if the direction the player wants to move in is walkable.
-     * Walkable means that the player can walk into the neighbouring cell without destroying the enviornment
-     * i.e. removing dirt or collecting objects.
+     * Walkable means that the player can overtop an existing element i.e. door, tube, or sokoban tiles.
      *
      * @param cellFrom The cell the player is in.
      * @param directionToMove The action the player wants to attempt to make.
      * @return True if the action the player wants to take is walkable.
      */
     bool isWalkable(const enginetype::GridCell cellFrom, Action directionToMove = Action::noop);
+
+    /**
+     * Checks if the direction the player wants to move in is walkable.
+     * Walkable means that the player can overtop an existing element i.e. door, tube, or sokoban tiles (empty is also included here).
+     * 
+     * @note This has an extra check to ensure that the player will not be moving into a cell which 
+     * will immediately end of killing the player due to a falling object above.
+     *
+     * @param cellFrom The cell the player is in.
+     * @param directionToMove The action the player wants to attempt to make.
+     * @return True if the action the player wants to take is walkable.
+     */
+    bool isWalkableSafe(const enginetype::GridCell cellFrom, Action directionToMove = Action::noop);
 
     /**
      * Checks if the direction the player wants to move in is diggable.
@@ -176,6 +188,18 @@ namespace elementproperty {
      * @return True if the action the player wants to take is empty.
      */
     bool isEmpty(const enginetype::GridCell cellFrom, Action directionToMove = Action::noop);
+
+    /**
+     * Checks if the direction the player wants to move in is diggable.
+     * 
+     * @note This has an extra check to ensure that the player will not be moving into a cell which 
+     * will immediately end of killing the player due to a falling object above.
+     *
+     * @param cellFrom The cell the player is in.
+     * @param directionToMove The action the player wants to attempt to make.
+     * @return True if the action the player wants to take is empty.
+     */
+    bool isEmptySafe(const enginetype::GridCell cellFrom, Action directionToMove = Action::noop);
 
     /**
      * Checks if the direction the player wants to move in is a wall.
@@ -246,6 +270,23 @@ namespace elementproperty {
      * @return True if the action the player wants to take is passable.
      */
     bool isActionMoveable(const enginetype::GridCell cellFrom, Action directionToMove = Action::noop);
+
+    /**
+     * Checks if the action will move the player.
+     * Player can move if they are not walking into a wall, and the GridCell in the direction
+     * the player wants to move is either walkable, passable, diggable, or contains a collectable item.
+     *
+     * @note This has an extra check to ensure that the player will not be moving into a cell which 
+     * will immediately end of killing the player due to a falling object above.
+     * 
+     * Assumes the current state to check is already set in the engine if no player cell
+     * is given as the second argument.
+     *
+     * @param cellFrom The cell the player is in.
+     * @param directionToMove The action the player wants to attempt to make.
+     * @return True if the action the player wants to take is passable.
+     */
+    bool isActionMoveableSafe(const enginetype::GridCell cellFrom, Action directionToMove = Action::noop);
 
 }
 }
