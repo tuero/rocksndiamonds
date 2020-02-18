@@ -79,18 +79,32 @@ void TwoLevelSearch::checkForMovedObjects() {
         ++restrictedCellsByOptionCount_[hash];
 
         // Check if nodes in open need to be reset to account for new restrictions
-        for (auto & levinNode : openLevinNodes_) {
-            std::vector<uint64_t> nodePathHashes = givenPathOptionPairHashes(hashToOptionPath(levinNode.hash));
+        std::set<NodeLevin, CompareLevinNode> updatedNodes;
+        for (auto it = openLevinNodes_.begin(); it != openLevinNodes_.end(); ) {
+            std::vector<uint64_t> nodePathHashes = pathHashToOptionPairHash(it->hash);
 
             // Levin node in open wasn't affected by new constraint
-            if (std::find(nodePathHashes.begin(), nodePathHashes.end(), hash) == nodePathHashes.end()) {continue;}
-
-            std::vector<int> numConstraintsOptionPair;
-            for (auto const & hash : nodePathHashes) {
-                numConstraintsOptionPair.push_back(restrictedCellsByOptionCount_[hash]);
+            if (std::find(nodePathHashes.begin(), nodePathHashes.end(), hash) == nodePathHashes.end()) {
+                ++it;
+                continue;
             }
-            levinNode.combinatorialPartition.reset(numConstraintsOptionPair);
+
+            int totalConstraintCount = 0;
+            for (auto const & hash : nodePathHashes) {
+                totalConstraintCount += restrictedCellsByOptionCount_[hash];
+            }
+
+            // New node will be added back once we complete iteration
+            NodeLevin node = *it;
+            node.timesVisited = 0;
+            node.numConstraints = totalConstraintCount;
+            node.combinatorialPartition.reset(totalConstraintCount);
+            updatedNodes.insert(node);
+            openLevinNodes_.erase(it++);
         }
+
+        // Add back updated nodes
+        openLevinNodes_.insert(updatedNodes.begin(), updatedNodes.end());
     }
     
 }

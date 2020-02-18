@@ -31,94 +31,16 @@ using namespace enginehelper;
 
 
 
-// CBS
-void TwoLevelSearch::recursiveFindNextLevinHLP(std::vector<BaseOption*> &optionPath, int maxDepth) {
-    // Full length path, calculate cost and store as hash
-    if ((int)optionPath.size() == maxDepth) {
-        if (optionPath[optionPath.size() - 1]->getOptionType() != OptionType::ToExit) {return;}
-        uint64_t hash = optionPathToHash<std::vector<BaseOption*>>(optionPath);
+#define SKIP_NOT_ENOUGH_GEMS
 
-        // We have exhausted all low level paths and we have not seen new constraints
-        if (!newConstraintSeen(optionPath) && currentHighLevelPathComplete(hash)) {
-            return;
-        }
 
-        NodeLevin node = {hash, getPathTimesVisited(optionPath), restrictionCountForPath(optionPath)};
-        levinNodes_.push_back(node);
-        return;
-    }
-    
-    // Add each possible child and go into recursion
-    for (auto const & option : availableOptions_) {
-        auto iter = std::find(optionPath.begin(), optionPath.end(), option);
-        if (iter != optionPath.end()) {continue;}
-        optionPath.push_back(option);
-        recursiveFindNextLevinHLP(optionPath, maxDepth);
-        optionPath.pop_back();
-    }
-}
-
-uint64_t seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-std::mt19937 gen(seed);
-
-void TwoLevelSearch::LevinTS() {
-    levinNodes_.clear();
-    std::vector<BaseOption*> optionPath;
-
-    // Recursively construct paths and store costs
-    PLOGD_(logger::FileLogger) << "Finding all path costs.";
-    recursiveFindNextLevinHLP(optionPath, (int)availableOptions_.size());
-
-    // Log paths
-    logLevinNodes();
-
-    // For each full path in map, add to distribution
-    int minIndex = -1;
-    double minCost = std::numeric_limits<double>::max();
-    for (int i = 0; i < (int) levinNodes_.size(); i++) {
-        if (levinNodes_[i].cost() < minCost) {
-            minCost = levinNodes_[i].cost();
-            minIndex = i;
-        }
-    }
-
-    if (minIndex == -1) {
-        PLOGE_(logger::FileLogger) << "No least Levin node found";
-        PLOGE_(logger::ConsoleLogger) << "No least Levin node found";
-    }
-
-    // Choose min cost node
-    NodeLevin chosenPathNode = levinNodes_[minIndex];
-    PLOGD_(logger::FileLogger) << "Chosen high level path: " << chosenPathNode.hash;
-    for (auto const & option : hashToOptionPath(chosenPathNode.hash)) {
-        PLOGD_(logger::FileLogger) << option->toString();
-    }
-
-    // Set high level path
+void TwoLevelSearch::setLowLevelConstraints(const NodeLevin &node) {
     highlevelPlannedPath_.clear();
-    highlevelPlannedPath_ = hashToOptionPath(chosenPathNode.hash);
-}
 
-
-void TwoLevelSearch::modifiedLevinTS() {
-    // No available levin nodes.
-    if (openLevinNodes_.empty()) {
-        PLOGE_(logger::FileLogger) << "All levin nodes exhausted.";
-        PLOGE_(logger::ConsoleLogger) << "All levin nodes exhausted.";
-        throw std::exception();
-    }
-
-    NodeLevin node = *(openLevinNodes_.begin());
-    openLevinNodes_.erase(openLevinNodes_.begin());
-
-    // Set high level path
-    highlevelPlannedPath_.clear();
+#ifdef SKIP_NOT_ENOUGH_GEMS
     if (node.numGems >= levelinfo::getLevelGemsNeeded()) {
+#endif
         highlevelPlannedPath_ = hashToOptionPath(node.hash);
-        if (node.combinatorialPartition.isComplete()) {
-            PLOGE_(logger::ConsoleLogger) << "comb is complete.";
-            PLOGE_(logger::FileLogger) << "comb is complete.";
-        }
         uint64_t constraintBits = node.combinatorialPartition.getNextConstraintBits();
 
         // Set constraints from bits for each option in the high level path
@@ -134,27 +56,24 @@ void TwoLevelSearch::modifiedLevinTS() {
             }
             highlevelPlannedPath_[i]->setRestrictedCells(constraints);
         }
+#ifdef SKIP_NOT_ENOUGH_GEMS
     }
-    // highlevelPlannedPath_ = hashToOptionPath(node.hash);
-    // if (node.combinatorialPartition.isComplete()) {
-    //     PLOGE_(logger::ConsoleLogger) << "comb is complete.";
-    //     PLOGE_(logger::FileLogger) << "comb is complete.";
-    // }
-    // uint64_t constraintBits = node.combinatorialPartition.getNextConstraintBits();
+#endif
+}
 
-    // // Set constraints from bits for each option in the high level path
-    // uint64_t mask = 1;
-    // std::vector<uint64_t> pathHashes = givenPathOptionPairHashes(highlevelPlannedPath_);
-    // for (int i = 0; i < (int)pathHashes.size(); i++) {
-    //     std::unordered_set<int> constraints;
-    //     for (auto const & constraint : restrictedCellsByOption_[pathHashes[i]]) {
-    //         if (constraintBits & (mask)) {
-    //             constraints.insert(constraint);
-    //         }
-    //         mask = mask << 1;
-    //     }
-    //     highlevelPlannedPath_[i]->setRestrictedCells(constraints);
-    // }
+void TwoLevelSearch::modifiedLevinTS() {
+    // No available levin nodes.
+    if (openLevinNodes_.empty()) {
+        PLOGE_(logger::FileLogger) << "All levin nodes exhausted.";
+        PLOGE_(logger::ConsoleLogger) << "All levin nodes exhausted.";
+        throw std::exception();
+    }
+
+    NodeLevin node = *(openLevinNodes_.begin());
+    openLevinNodes_.erase(openLevinNodes_.begin());
+
+    // Set high level path
+    setLowLevelConstraints(node);
 
     // Add children
     if (node.timesVisited == 0) {
@@ -173,7 +92,6 @@ void TwoLevelSearch::modifiedLevinTS() {
     }
 
     // If not exhausted, add child
-    // if (!currentHighLevelPathComplete(node.hash)) {
     if (!node.combinatorialPartition.isComplete()) {
         ++node.timesVisited;
         openLevinNodes_.insert(node);

@@ -142,28 +142,13 @@ void TwoLevelSearch::handleLevelStart() {
  * Get the action from the controller.
  */
 Action TwoLevelSearch::getAction() {
-    // We don't have any more options...
-    // if (solutionIndex_ >= (int)highlevelPlannedPath_.size()) {
-    //     PLOGE_(logger::FileLogger) << "No more options in solution list.";
-    //     PLOGE_(logger::ConsoleLogger) << "No more options in solution list.";
-    //     requestReset_ = true;
-    //     return Action::noop;
-    // }
-
     // Check if we need to poll the next option. 
     if (optionStatusFlag_) {
-        // if (solutionIndex_ >= (int)highlevelPlannedPath_.size()) {
-        //     PLOGE_(logger::FileLogger) << "No more options in solution list.";
-        //     PLOGE_(logger::ConsoleLogger) << "No more options in solution list.";
-        //     requestReset_ = true;
-        //     return Action::noop;
-        // }
-
         // Get next option and set restricted cells
         solutionIndex_ += 1;
+
+        // We don't have any more options...
         if (solutionIndex_ >= (int)highlevelPlannedPath_.size()) {
-            // PLOGE_(logger::FileLogger) << "No more options in solution list.";
-            // PLOGE_(logger::ConsoleLogger) << "No more options in solution list.";
             requestReset_ = true;
             return Action::noop;
         }
@@ -173,14 +158,10 @@ Action TwoLevelSearch::getAction() {
         optionStatusFlag_ = false;
 
         PLOGD_(logger::FileLogger) << "Next option to execute: " << currentOption_->toString();
-
         PLOGD_(logger::FileLogger) << "Option restrictions: ";
         for (auto const & restriction : currentOption_->getRestrictedCells()) {
             PLOGD_(logger::FileLogger) << "x=" << restriction.x << ", y=" << restriction.y;
         }
-
-        // Hash the planned path and save for future duplicate detection
-        // saveCurrentPathHash();
 
         // If option is not valid, we cannot progress further, and so set request reset flag
         if (!currentOption_->isValid()) {

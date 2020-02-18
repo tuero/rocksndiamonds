@@ -63,30 +63,40 @@ template std::vector<uint64_t> TwoLevelSearch::givenPathOptionPairHashes<std::ve
 template std::vector<uint64_t> TwoLevelSearch::givenPathOptionPairHashes<std::deque<BaseOption*>> (const std::deque<BaseOption*>&);
 
 
+/**
+ * Convert the inidividual full path hash into the vector of hashes for each 
+ * option pair in the path.
+ */
+std::vector<uint64_t> TwoLevelSearch::pathHashToOptionPairHash(uint64_t hash) {
+    std::vector<uint64_t> optionPairHashes;
+    // hashToOptionPath(levinNode.hash)
+    int currIndex = (hash % multiplier_) - 1;
+    hash /= multiplier_;
+
+    while (hash > 0) {
+        int prevIndex = currIndex;
+        currIndex = (hash % multiplier_) - 1;
+        optionPairHashes.insert(optionPairHashes.begin(), optionPairHash(availableOptions_[prevIndex], availableOptions_[currIndex]));
+        hash /= multiplier_;
+    }
+    optionPairHashes.insert(optionPairHashes.begin(), optionPairHash(availableOptions_[currIndex], availableOptions_[currIndex]));
+    return optionPairHashes;
+}
+
+
 
 /**
  * Create a hash for a given pair of indices for the master list of options availableOptions_.
  * Hash value is the string concatenation of the 2 indices.
  */
 uint64_t TwoLevelSearch::optionIndexPairToHash(int indexCurr, int indexPrev) {
-    // // indexCurr should always be a valid index in availableOptions_.
-    // if (indexCurr < 0 || indexCurr >= (int)availableOptions_.size()) {
-    //     PLOGE_(logger::FileLogger) << "Invalid current index.";
-    // }
-
-    // // indexCurr is the first option being executed.
-    // if (indexCurr == indexPrev) {return (uint64_t)indexCurr;}
-
-    // return ((indexCurr + 1) * multiplier_) + indexPrev;
-
     // indexCurr should always be a valid index in availableOptions_.
     if (indexCurr < 0 || indexCurr >= (int)availableOptions_.size()) {
         PLOGE_(logger::FileLogger) << "Invalid current index.";
     }
 
     // indexCurr is the first option being executed.
-    ++indexCurr;
-    ++indexPrev;
+    ++indexCurr; ++indexPrev;
     if (indexCurr == indexPrev) {return (uint64_t)indexCurr;}
 
     return (indexCurr * multiplier_) + indexPrev;
@@ -97,12 +107,6 @@ uint64_t TwoLevelSearch::optionIndexPairToHash(int indexCurr, int indexPrev) {
  * Get a pair of options represented by the given hash.
  */
 TwoLevelSearch::OptionIndexPair TwoLevelSearch::hashToOptionIndexPair(uint64_t hash) {
-    // if (hash < (uint64_t)availableOptions_.size()) {
-    //     return {hash, hash};
-    // }
-
-    // return {(hash / multiplier_) - 1, hash % multiplier_};
-
     if (hash < multiplier_) {
         return {hash-1, hash-1};
     }

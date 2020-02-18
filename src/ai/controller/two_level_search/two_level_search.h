@@ -138,9 +138,7 @@ private:
 
     // --------------- HLS --------------- 
 
-    void recursiveFindNextLevinHLP(std::vector<BaseOption*> &optionPath, int maxDepth);
-
-    void LevinTS();
+    void setLowLevelConstraints(const NodeLevin &node);
 
     void modifiedLevinTS();
 
@@ -223,6 +221,12 @@ private:
      */
     template<typename T>
     std::vector<uint64_t> givenPathOptionPairHashes(const T &pathContainer);
+
+    /**
+     * Convert the inidividual full path hash into the vector of hashes for each 
+     * option pair in the path.
+     */
+    std::vector<uint64_t> pathHashToOptionPairHash(uint64_t hash);
 
     /**
      * Create a hash for a given pair of indices for the master list of options availableOptions_.

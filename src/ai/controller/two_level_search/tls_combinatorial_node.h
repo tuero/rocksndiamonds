@@ -44,93 +44,6 @@
  * Each binary number represents which constraints are to be set. The Cartesian product of these binary numbers (set for each high level
  * node for the given current partition) needs to be individually tried.
  */
-// class CombinatorialPartition {
-// private:
-//     std::vector<int> numConstraintsOptionPair_;     // Input from the user which determines binary bits to be generated
-//     bool resetFlag;
-
-//     int currentSumToDistribute_;    // Current sum to partition between option pairs
-//     int maxSumToDistribute_;        // Max sum to partition between option pairs
-//     int totalConstraintCount_;      // Total constraints for path, used for new constraint detection
-//     std::vector<int> maxSumPerOptionPair_;       // Max sum to partition for each option pair
-//     int currentPartitionIdx_;       // Current index of currentPartitionIndices_
-//     std::vector<std::vector<int>> currentPartitionIndices_;  // List of partitions for the current partition sum
-    
-//     int currentBitIndex_;       // Current Cartesian product index of items in constraintByBits_
-//     int maxBitIndex_;           // Max Cartesian product index of items in constraintByBits_
-//     std::vector<std::vector<uint64_t>> constraintByBits_;     // Bits representing constraint for current partition sum
-
-
-//     /**
-//      * Check if the current Cartesian Product of binary bits per constraint is complete for the given partition.
-//      * 
-//      * @return True if the current partition is complete. 
-//      */
-//     bool currentBitComplete() const;
-
-//     /**
-//      * Check all partitions of the current sum have been exhausted.
-//      * 
-//      * @return True if all partitions of the current sum have been exhausted.
-//      */
-//     bool currentPartitionSumComplete() const;
-
-//     /**
-//      * Check if the all sums of the partitions have been exhausted.
-//      * 
-//      * @return True if the all partitions have been exhausted.
-//      */
-//     bool isSumComplete() const;
-
-//     /**
-//      *  Set the internal sets of binary combinations (for each constraint set) for the given partition.
-//      * 
-//      * @param partitionIndices The index of binomial coefficents for the given partition (which uses the current partition sum)
-//      */
-//     void setConstraintByBits(std::vector<int> &partitionIndices);
-
-//     /**
-//      * Set the internal sets of binary combinations (for each constraint set) for the given partition.
-//      * 
-//      * @param partitionIndices The index of binomial coefficents for the given partition (which uses the current partition sum)
-//      */
-//     void updateConstraintByBits();
-
-// public:
-
-//     CombinatorialPartition();
-
-//     /**
-//      * Check if the given constraint counts exceeds the currently saved counts.
-//      * 
-//      * @param numConstraintsOptionPair The vector of constraint pair counts.
-//      * @return True if a reset is required, false otherwise.
-//      */
-//     bool requiresReset(std::vector<int> &numConstraintsOptionPair);
-
-//     /**
-//      * Check if all binary combinations for the input constraint list have been exhausted.
-//      * This is true when currentBitComplete, currentPartitionSumComplete, and isSumComplete are true.
-//      * 
-//      * @return True if all binary combinations have been returned.
-//      */
-//     bool isComplete() const;
-
-//     /**
-//      * Reset the combinatorics back to to the beginning as a new list of constraint counts is given.
-//      * 
-//      * @param numConstraintsOptionPair The vector of constraint pair counts.
-//      */
-//     void reset(std::vector<int> &numConstraintsOptionPair);
-
-//     /**
-//      * Get the next list of binary integers (1 for each set of constraints in the high level path)
-//      * 
-//      * @return A list of bits which represents the constraints to be set for each node in the high level path.
-//      */
-//     std::vector<uint64_t> getNextConstraintBits();
-// };
-
 
 class CombinatorialPartition {
 public:
@@ -155,6 +68,8 @@ public:
 
 
     void reset(std::vector<int> numConstraintsOptionPair);
+
+    void reset(int totalConstraintCount);
     
 
 
