@@ -24,24 +24,6 @@ using namespace enginehelper;
 
 
 bool TwoLevelSearch::newConstraintSeen(std::vector<BaseOption*> &optionPath) {
-    // Check every option in the planned path
-    // if (lowLevelSearchType == LowLevelSearchType::combinatorial) {
-    //     std::vector<int> numConstraintsOptionPair;
-    //     std::vector<uint64_t> pathHashes = givenPathOptionPairHashes<std::vector<BaseOption*>>(optionPath);
-    //     for (auto const & hash : pathHashes) {
-    //         numConstraintsOptionPair.push_back(restrictedCellsByOption_[hash].size());
-    //     }
-
-    //     // Haven't seen this one before
-    //     int optionPathHash = optionPathToHash<std::vector<BaseOption*>>(optionPath);
-    //     if (combinatorialByPath.find(optionPathHash) == combinatorialByPath.end()) {
-    //         return true;
-    //     }
-
-    //     CombinatorialPartition &combinatorialPartition = combinatorialByPath[optionPathHash];
-    //     return combinatorialPartition.requiresReset(numConstraintsOptionPair);
-    // }
-
     // Haven't seen this one before
     if (combinatorialByPath.find(optionPathToHash<std::vector<BaseOption*>>(optionPath)) == combinatorialByPath.end()) {
         return true;
@@ -52,18 +34,6 @@ bool TwoLevelSearch::newConstraintSeen(std::vector<BaseOption*> &optionPath) {
     int totalConstraintCount = std::accumulate(pathHashes.begin(), pathHashes.end(), 0, lambda);
     CombinatorialPartition &combinatorialPartition = combinatorialByPath[optionPathToHash<std::vector<BaseOption*>>(optionPath)];
     return combinatorialPartition.requiresReset(totalConstraintCount);
-
-    bool flag = false;
-    for (auto const & hash : givenPathOptionPairHashes<std::vector<BaseOption*>>(optionPath)) {
-        // if (newConstraintsAdded_[hash]) {return true;}
-        // for (auto const & constraint : restrictedCellsByOption_[hash]) {
-        //     if (knownConstraints_[hash].find(constraint) == knownConstraints_[hash].end()) {
-        //         flag = true;
-        //     }
-        // }
-    }
-
-    return flag;
 }
 
 
@@ -78,84 +48,48 @@ template int TwoLevelSearch::restrictionCountForPath<std::deque<BaseOption*>> (c
 
 
 /**
- * Add new constraints for a given pair of options
- * This is called during each step, and adds restrictions based on those found 
- * from checkForMovedObjects()
- */
-void TwoLevelSearch::addNewConstraints() {
-    PLOGD_(logger::FileLogger) << "Adding new constraints.";
-    for (auto const & hash : allOptionPairHashes()) {
-        // newConstraintsAdded_[hash] = false;
-        for (auto const & restriction : spritesMoved[hash]) {
-            // Add restriction if cell isn't already restricted
-            int index = gridinfo::cellToIndex(restriction.cell);
-            if (restrictedCellsByOption_[hash].find(index) == restrictedCellsByOption_[hash].end()) {
-                // PLOGE_(logger::FileLogger) << "hash: " << hash << ", x=" << restriction.cell.x << ", y=" << restriction.cell.y;
-                restrictedCellsByOption_[hash].insert(index);
-                ++restrictedCellsByOptionCount_[hash];
-                // newConstraintsAdded_[hash] = true;
-            }
-        }
-    }
-}
-
-
-/**
- * Checks if the player is beside or below right/left of the given sprite cell.
- */
-bool playerCausedSpriteMove(const enginetype::GridCell playerCell, const enginetype::GridCell spriteCell) {
-    bool isBelow = (playerCell.y - spriteCell.y == 1 && playerCell.x - spriteCell.x == 0);
-    bool isBelowLeft = (playerCell.y - spriteCell.y == 1 && playerCell.x - spriteCell.x == -1);
-    bool isBelowRight = (playerCell.y - spriteCell.y == 1 && playerCell.x - spriteCell.x == 1);
-    return isBelow || isBelowLeft || isBelowRight;
-}
-
-
-/**
  * Check for newely moved objects as a result of player actions.
  * Objects are stored as sprite and gridcell pairs for a given pair of options (option from -> option to)
  * In addNewConstraints(), we store only the intersection of gridcells in restrictedCellsByOption_
  */
 void TwoLevelSearch::checkForMovedObjects() {
-    prevPlayerCell_ = currPlayerCell_;
-    currPlayerCell_ = gridinfo::getPlayerPosition();
-    prevIsMoving_ = currIsMoving_;
-    currIsMoving_.clear();
+    if (gridinfo::getPlayerPosition() != playerCells_[1]) {
+        playerCells_[0] = playerCells_[1];
+        playerCells_[1] = gridinfo::getPlayerPosition();
+    }
 
-    // First move, skip.
-    if (prevPlayerCell_ == (enginetype::GridCell){-1, -1}) {return;}
+    if (playerCells_[0] == (enginetype::GridCell){-1, -1}) {return;}
+    
+    for (auto const & cell : gridinfo::getMapSprites()) {
+        // Wasn't just falling, so skip.
+        if (!gridinfo::getWasJustFalling(cell)) {continue;}
 
-    // Get all sprite grid locations
-    std::vector<enginetype::GridCell> spriteLocations = gridinfo::getMapSprites();
-    prevSprites_ = currSprites_;
-    currSprites_.clear();
-    for (auto const & cell : spriteLocations) {
-        int spriteID = gridinfo::getSpriteID(cell);
-        currIsMoving_[spriteID] = elementproperty::isMoving(cell);
-        currSprites_[spriteID] = cell;
+        // Player caused falling sprite
+        int dx = cell.x - playerCells_[0].x;
+        int dy = playerCells_[0].y - cell.y;
+        if (!(dx == 0 && dy == 0) && !(dx == 0 && dy == 1)) {continue;}
 
-        // Not moving, so skip
-        if (!elementproperty::isMoving(cell)) {continue;}
-
-        // Sprite is new on this step
-        if (prevIsMoving_.find(spriteID) == prevIsMoving_.end()) {continue;}
-        if (prevSprites_.find(spriteID) == prevSprites_.end()) {
-            PLOGE_(logger::FileLogger) << "Sprite not found, this shouldn't happen.";
-            PLOGE_(logger::ConsoleLogger) << "Sprite not found, this shouldn't happen.";
-            continue;
-        }
-
-        // Player not near moving sprite
-        if (!playerCausedSpriteMove(prevPlayerCell_, prevSprites_[spriteID])) {continue;}
-
-        // Sprite is now moving on this step
-        // Add if we haven't added before
-        SpriteRestriction spriteRestriction = {spriteID, prevPlayerCell_};
         uint64_t hash = optionPairHash(currentOption_, previousOption_);
-        bool alreadyRestricted = std::find(spritesMoved[hash].begin(), spritesMoved[hash].end(), spriteRestriction) != spritesMoved[hash].end();
-        if (!prevIsMoving_[spriteID] && currIsMoving_[spriteID] && !alreadyRestricted) {
-            spritesMoved.at(hash).push_back(spriteRestriction);
-            newSpriteFoundFlag_ = true;
+        int index = gridinfo::cellToIndex(playerCells_[0]);
+
+        // Restricted cell already seen
+        if (restrictedCellsByOption_[hash].find(index) != restrictedCellsByOption_[hash].end()) {continue;}
+            
+        restrictedCellsByOption_[hash].insert(index);
+        ++restrictedCellsByOptionCount_[hash];
+
+        // Check if nodes in open need to be reset to account for new restrictions
+        for (auto & levinNode : openLevinNodes_) {
+            std::vector<uint64_t> nodePathHashes = givenPathOptionPairHashes(hashToOptionPath(levinNode.hash));
+
+            // Levin node in open wasn't affected by new constraint
+            if (std::find(nodePathHashes.begin(), nodePathHashes.end(), hash) == nodePathHashes.end()) {continue;}
+
+            std::vector<int> numConstraintsOptionPair;
+            for (auto const & hash : nodePathHashes) {
+                numConstraintsOptionPair.push_back(restrictedCellsByOptionCount_[hash]);
+            }
+            levinNode.combinatorialPartition.reset(numConstraintsOptionPair);
         }
     }
     

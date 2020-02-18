@@ -21,7 +21,7 @@
  * @note ADD YOUR CONTROLLER TYPE HERE
  */
 typedef enum ControllerType {CONTROLLER_DEFAULT, CONTROLLER_REPLAY, CONTROLLER_MCTS, 
-                             CONTROLLER_MCTS_OPTIONS, CONTROLLER_SIMPLE_PATHING} ControllerType;
+                             CONTROLLER_MCTS_OPTIONS, CONTROLLER_SIMPLE_PATHING, CONTROLLER_TWOLEVEL} ControllerType;
 
 /**
  * Command line strings to set the controller.
@@ -29,7 +29,7 @@ typedef enum ControllerType {CONTROLLER_DEFAULT, CONTROLLER_REPLAY, CONTROLLER_M
  * 
  * @note ADD YOUR CONTROLLER COMMAND LINE ARGUMENT HERE
  */
-#define CONTROLLER_STRINGS {"default", "replay", "mcts", "mcts_options", "simple_pathing"};
+#define CONTROLLER_STRINGS {"default", "replay", "mcts", "mcts_options", "simple_pathing", "two_level"};
 
 
 #endif  //CONTROLLER_LISTING_H

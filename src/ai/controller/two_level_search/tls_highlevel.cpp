@@ -100,6 +100,87 @@ void TwoLevelSearch::LevinTS() {
 }
 
 
+void TwoLevelSearch::modifiedLevinTS() {
+    // No available levin nodes.
+    if (openLevinNodes_.empty()) {
+        PLOGE_(logger::FileLogger) << "All levin nodes exhausted.";
+        PLOGE_(logger::ConsoleLogger) << "All levin nodes exhausted.";
+        throw std::exception();
+    }
+
+    NodeLevin node = *(openLevinNodes_.begin());
+    openLevinNodes_.erase(openLevinNodes_.begin());
+
+    // Set high level path
+    highlevelPlannedPath_.clear();
+    if (node.numGems >= levelinfo::getLevelGemsNeeded()) {
+        highlevelPlannedPath_ = hashToOptionPath(node.hash);
+        if (node.combinatorialPartition.isComplete()) {
+            PLOGE_(logger::ConsoleLogger) << "comb is complete.";
+            PLOGE_(logger::FileLogger) << "comb is complete.";
+        }
+        uint64_t constraintBits = node.combinatorialPartition.getNextConstraintBits();
+
+        // Set constraints from bits for each option in the high level path
+        uint64_t mask = 1;
+        std::vector<uint64_t> pathHashes = givenPathOptionPairHashes(highlevelPlannedPath_);
+        for (int i = 0; i < (int)pathHashes.size(); i++) {
+            std::unordered_set<int> constraints;
+            for (auto const & constraint : restrictedCellsByOption_[pathHashes[i]]) {
+                if (constraintBits & (mask)) {
+                    constraints.insert(constraint);
+                }
+                mask = mask << 1;
+            }
+            highlevelPlannedPath_[i]->setRestrictedCells(constraints);
+        }
+    }
+    // highlevelPlannedPath_ = hashToOptionPath(node.hash);
+    // if (node.combinatorialPartition.isComplete()) {
+    //     PLOGE_(logger::ConsoleLogger) << "comb is complete.";
+    //     PLOGE_(logger::FileLogger) << "comb is complete.";
+    // }
+    // uint64_t constraintBits = node.combinatorialPartition.getNextConstraintBits();
+
+    // // Set constraints from bits for each option in the high level path
+    // uint64_t mask = 1;
+    // std::vector<uint64_t> pathHashes = givenPathOptionPairHashes(highlevelPlannedPath_);
+    // for (int i = 0; i < (int)pathHashes.size(); i++) {
+    //     std::unordered_set<int> constraints;
+    //     for (auto const & constraint : restrictedCellsByOption_[pathHashes[i]]) {
+    //         if (constraintBits & (mask)) {
+    //             constraints.insert(constraint);
+    //         }
+    //         mask = mask << 1;
+    //     }
+    //     highlevelPlannedPath_[i]->setRestrictedCells(constraints);
+    // }
+
+    // Add children
+    if (node.timesVisited == 0) {
+        std::vector<BaseOption*> nodeOptions = hashToOptionPath(node.hash);
+        std::vector<BaseOption*> childOptions = nodeOptions;
+        childOptions.push_back(nullptr);
+
+        for (auto const & option : availableOptions_) {
+            if (std::find(nodeOptions.begin(), nodeOptions.end(), option) == nodeOptions.end()) {
+                int numGems = node.numGems + elementproperty::getItemGemCount(gridinfo::getSpriteGridCell(option->getSpriteID()));
+                childOptions.back() = option;
+                uint64_t hash = optionPathToHash(childOptions);
+                openLevinNodes_.insert({hash, 0, restrictionCountForPath(childOptions), CombinatorialPartition(), numGems});
+            }
+        }
+    }
+
+    // If not exhausted, add child
+    // if (!currentHighLevelPathComplete(node.hash)) {
+    if (!node.combinatorialPartition.isComplete()) {
+        ++node.timesVisited;
+        openLevinNodes_.insert(node);
+    }
+}
+
+
 /**
  * Check and add new constraints found in previous searches, then
  * find the next high level path to try. Once the path is found, the
@@ -108,20 +189,25 @@ void TwoLevelSearch::LevinTS() {
 void TwoLevelSearch::highLevelSearch() {
     PLOGD_(logger::FileLogger) << "Starting high level search.";
 
-    // Add new constraints found from previous attempt
-    addNewConstraints();
-
     // High level search
-    LevinTS(); 
+    // LevinTS(); 
+    highlevelPlannedPath_.clear();
+    while (highlevelPlannedPath_.empty()) {
+        modifiedLevinTS();
+    }
+    // modifiedLevinTS();
 
     currentHighLevelPathHash = optionPathToHash<std::vector<BaseOption*>>(highlevelPlannedPath_);
+    incrementPathTimesVisited<std::vector<BaseOption*>>(highlevelPlannedPath_);
 
+    #if 0
     // Increment visited path node visits
     incrementPathTimesVisited<std::vector<BaseOption*>>(highlevelPlannedPath_);
 
     // Run middle level search on given path
     // Middle level means to find the next set of constraints
     lowLevelSearch();
+    #endif
 }
 
 

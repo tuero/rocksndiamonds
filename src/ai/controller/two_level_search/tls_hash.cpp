@@ -69,15 +69,27 @@ template std::vector<uint64_t> TwoLevelSearch::givenPathOptionPairHashes<std::de
  * Hash value is the string concatenation of the 2 indices.
  */
 uint64_t TwoLevelSearch::optionIndexPairToHash(int indexCurr, int indexPrev) {
+    // // indexCurr should always be a valid index in availableOptions_.
+    // if (indexCurr < 0 || indexCurr >= (int)availableOptions_.size()) {
+    //     PLOGE_(logger::FileLogger) << "Invalid current index.";
+    // }
+
+    // // indexCurr is the first option being executed.
+    // if (indexCurr == indexPrev) {return (uint64_t)indexCurr;}
+
+    // return ((indexCurr + 1) * multiplier_) + indexPrev;
+
     // indexCurr should always be a valid index in availableOptions_.
     if (indexCurr < 0 || indexCurr >= (int)availableOptions_.size()) {
         PLOGE_(logger::FileLogger) << "Invalid current index.";
     }
 
     // indexCurr is the first option being executed.
+    ++indexCurr;
+    ++indexPrev;
     if (indexCurr == indexPrev) {return (uint64_t)indexCurr;}
 
-    return ((indexCurr + 1) * multiplier_) + indexPrev;
+    return (indexCurr * multiplier_) + indexPrev;
 }
 
 
@@ -85,11 +97,17 @@ uint64_t TwoLevelSearch::optionIndexPairToHash(int indexCurr, int indexPrev) {
  * Get a pair of options represented by the given hash.
  */
 TwoLevelSearch::OptionIndexPair TwoLevelSearch::hashToOptionIndexPair(uint64_t hash) {
-    if (hash < (uint64_t)availableOptions_.size()) {
-        return {hash, hash};
+    // if (hash < (uint64_t)availableOptions_.size()) {
+    //     return {hash, hash};
+    // }
+
+    // return {(hash / multiplier_) - 1, hash % multiplier_};
+
+    if (hash < multiplier_) {
+        return {hash-1, hash-1};
     }
 
-    return {(hash / multiplier_) - 1, hash % multiplier_};
+    return {(hash / multiplier_) - 1, (hash % multiplier_) - 1};
 }
 
 
@@ -127,18 +145,18 @@ std::vector<BaseOption*> TwoLevelSearch::hashToOptionPath(uint64_t hash) {
 
 template<typename T>
 void TwoLevelSearch::incrementPathTimesVisited(const T &pathContainer) {
-    std::deque<BaseOption*> pathVisited(pathContainer.begin(), pathContainer.end());
-    // Hash each partial path after the next step is taken
-    while (!pathVisited.empty()) {
-        uint64_t hash = optionPathToHash(pathVisited);
-        ++hashPathTimesVisited[hash];
-        pathVisited.pop_front();
-    }
+    // std::deque<BaseOption*> pathVisited(pathContainer.begin(), pathContainer.end());
+    // // Hash each partial path after the next step is taken
+    // while (!pathVisited.empty()) {
+    //     uint64_t hash = optionPathToHash(pathVisited);
+    //     ++hashPathTimesVisited[hash];
+    //     pathVisited.pop_front();
+    // }
 
     // Statistics logging
     ++(statistics::pathCounts[levelinfo::getLevelNumber()][currentHighLevelPathHash]);
     statistics::solutionPathCounts[levelinfo::getLevelNumber()][0] = currentHighLevelPathHash;
-    statistics::solutionPathCounts[levelinfo::getLevelNumber()][1] = hashPathTimesVisited[currentHighLevelPathHash];
+    statistics::solutionPathCounts[levelinfo::getLevelNumber()][1] = ++hashPathTimesVisited[currentHighLevelPathHash];
 }
 template void TwoLevelSearch::incrementPathTimesVisited<std::vector<BaseOption*>> (const std::vector<BaseOption*>&);
 template void TwoLevelSearch::incrementPathTimesVisited<std::deque<BaseOption*>> (const std::deque<BaseOption*>&);

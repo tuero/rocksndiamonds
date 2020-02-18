@@ -211,7 +211,7 @@ Action getGridMovDir(const enginetype::GridCell &cell) {
  * Check whether the item which was previously at location cell was just falling.
  */
 bool getWasJustFalling(const enginetype::GridCell &cell) {
-    return inBounds(cell) ? WasJustFalling[cell.x][cell.y] != 0 : false;
+    return inBounds(cell) ? WasJustFalling[cell.x][cell.y] == 3 : false;
 }
 
 

@@ -16,6 +16,8 @@
 #include <unordered_map>
 #include <vector>
 #include <unordered_set>
+#include <set>
+#include <queue>
 #include <array>
 #include <queue>
 #include <algorithm>
@@ -44,7 +46,6 @@ private:
     uint64_t currentHighLevelPathHash;                                              // Hash representing the current high level option path
     std::unordered_map<uint64_t, std::unordered_set<int>> restrictedCellsByOption_;        // Restricted cells for each option pair
     std::unordered_map<uint64_t, int> restrictedCellsByOptionCount_;
-    // std::unordered_map<uint64_t, bool> newConstraintsAdded_;        // Restricted cells for each option pair
     std::unordered_map<uint64_t, std::unordered_set<int>> knownConstraints_;               // Restricted cells already accounted for during planning (subset of restrictedCellsByOption_)
     
     // Struct for restricted cell
@@ -61,6 +62,8 @@ private:
         uint64_t hash;
         int timesVisited;
         int numConstraints;
+        mutable CombinatorialPartition combinatorialPartition;
+        int numGems;
 
         double cost() const {
             return (double)timesVisited * pow(2.0, (double)numConstraints);
@@ -68,18 +71,19 @@ private:
     };
     std::vector<NodeLevin> levinNodes_;
 
+    struct CompareLevinNode {
+        bool operator() (const NodeLevin &left, const NodeLevin &right) const {
+            return left.cost() < right.cost() || (left.cost() == right.cost() && left.hash < right.hash);
+        }
+    };
+    std::set<NodeLevin, CompareLevinNode> openLevinNodes_;
+
     // HLS costs
     std::unordered_map<uint64_t, int> hashPathTimesVisited;                 // Map tracking number of visits for each (partial) path
 
     // Constraint identification
     typedef std::array<uint64_t, 2> OptionIndexPair;                        // Typedef for pairs of options (for return types)
-    enginetype::GridCell prevPlayerCell_;                                   // Player cell on the previous game step (Used to find restricted cells on current step)
-    enginetype::GridCell currPlayerCell_;                                   // Player cell on the current game step
-    std::unordered_map<int, bool> prevIsMoving_;                            // Map of sprites which are moving for the previous game step
-    std::unordered_map<int, bool> currIsMoving_;                            // Map of sprites which are moving for the current game step
-    std::unordered_map<int, enginetype::GridCell> prevSprites_;             // Map of sprites for each option pair which were active previously
-    std::unordered_map<int, enginetype::GridCell> currSprites_;             // Map of sprites for each option pair which are active currently
-    std::unordered_map<int, std::vector<SpriteRestriction>> spritesMoved;   // Current list of sprites which moved during player actions for the option pair
+    std::array<enginetype::GridCell, 2> playerCells_;                       // Player cell on the current/prev game step
 
 
     /**
@@ -138,6 +142,8 @@ private:
 
     void LevinTS();
 
+    void modifiedLevinTS();
+
     /**
      * Check and add new constraints found in previous searches, then
      * find the next high level path to try. Once the path is found, the
@@ -160,13 +166,6 @@ private:
 
     template<typename T>
     int restrictionCountForPath(const T &pathContainer);
-
-    /**
-     * Add new constraints for a given pair of options
-     * This is called during each step, and adds restrictions based on those found 
-     * from checkForMovedObjects()
-     */
-    void addNewConstraints();
 
     /**
      * Check for newely moved objects as a result of player actions.

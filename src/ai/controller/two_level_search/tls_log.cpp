@@ -68,9 +68,8 @@ void TwoLevelSearch::logRestrictedSprites() {
             PLOGD_(logger::FileLogger) << "Restrictions for option " << availableOptions_[optionIndexPair[0]]->toString() 
             << " to option " << availableOptions_[optionIndexPair[1]]->toString();
         }
-        for (auto const & constraint : spritesMoved[hash]) {
-            PLOGD_(logger::FileLogger) << "sprite " << constraint.spriteID 
-            << ", x = " << constraint.cell.x << ", y = " << constraint.cell.y ;
+        for (auto const & restriction : restrictedCellsByOption_[hash]) {
+            PLOGD_(logger::FileLogger) << "x = " << gridinfo::indexToCell(restriction).x << ", y = " << gridinfo::indexToCell(restriction).y ;
         }
     }
 }

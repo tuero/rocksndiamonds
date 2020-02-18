@@ -17,6 +17,7 @@
 #include <array>
 #include <map>
 #include <unordered_map>
+#include <algorithm>            // max_element
 #include <iomanip>              // precision
 #include <numeric>              // accumulate
 #include <cmath>                // std
@@ -32,6 +33,7 @@ int numGameTicks = 0;
 int runTimeMili = 0;
 int numLevelTries = 0;
 
+std::map<int, uint64_t> nodesExpanded;
 std::map<int, std::unordered_map<uint64_t, int>> pathCounts;
 std::map<int, std::array<uint64_t, 2>> solutionPathCounts;
 
@@ -82,39 +84,38 @@ void outputPathCounts() {
     int total_path_visit_counts = 0;
     std::vector<int> solutionPaths;
     std::vector<int> totalPaths;
+
     for (auto const & level_run : pathCounts) {
         statsFile << "Level: " << level_run.first << std::endl;
 
         std::vector<int> counts;
-        std::vector<int> countsNotOne;
-        int numSingleVisitPaths = 0;
+        int maxCount = 0;
+        uint64_t maxHash = 0;
         for (auto const & run : level_run.second) {
             counts.push_back(run.second);
-            if (run.second == 1) {++numSingleVisitPaths;}
-            else {countsNotOne.push_back(run.second);}
-            statsFile << "\tPath: " << run.first << ", count: " << run.second << std::endl;
-
+            if (run.second > maxCount) {
+                maxCount = run.second;
+                maxHash = run.first;
+            }
         }
 
-        float singleCountPercentage = (float)numSingleVisitPaths / level_run.second.size() * 100.0; 
-
         // Total unique paths
-        statsFile << "Total number of unique paths: " <<  level_run.second.size() << std::endl;
-        // Num Paths of 1 visit
-        statsFile << "Total number of unique paths with 1 attempt: " <<  numSingleVisitPaths 
-        << ", ("<< std::fixed << std::setprecision(1) << singleCountPercentage << "%)" << std::endl;
+        statsFile << "Total number of unique paths: " << level_run.second.size() << std::endl;
         // Total tries
         int total_count = std::accumulate(counts.begin(), counts.end(), 0);
         statsFile << "Total number of attempts: " << total_count << std::endl;
+        statsFile << "Maximum number of attempts: (" << maxHash << "), " << maxCount << std::endl;
+        // Average path visit
+        float avg = (float)(std::accumulate(counts.begin(), counts.end(), 0)) / (counts.empty() ? 1 : counts.size());
+        statsFile << "Average number of attempts: " << avg << std::endl;
+
         // Solution high level path visit count
         solution_path_visits_count += (solutionPathCounts[level_run.first])[1];
         solutionPaths.push_back((solutionPathCounts[level_run.first])[1]);
         totalPaths.push_back(total_count);
         total_path_visit_counts += total_count;
         statsFile << "Solution path (" << (solutionPathCounts[level_run.first])[0] << ") attempts: " << (solutionPathCounts[level_run.first])[1] << std::endl;
-        // Average path visit
-        float avg = (float)(std::accumulate(countsNotOne.begin(), countsNotOne.end(), 0)) / (countsNotOne.empty() ? 1 : countsNotOne.size());
-        statsFile << "Average length above 1: " << avg << std::endl << std::endl;
+        statsFile << std::endl;
     }
 
     // total attempts

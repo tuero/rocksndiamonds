@@ -242,12 +242,6 @@ void Controller::initController(ControllerType controller) {
     else if (controller == CONTROLLER_SIMPLE_PATHING) {
         baseController_ = std::make_unique<SimplePathing>(OptionFactoryType::PATH_TO_SPRITE);
     }
-    /**
-     * @note Add your controller here
-     * else if (controller == YOUR_CONTROLLER_ENUM_TYPE_HERE) {
-     *     baseController_ = std::make_unique<YourControllerClass>();
-     * }
-    */
     else if (controller == CONTROLLER_TWOLEVEL) {
         baseController_ = std::make_unique<TwoLevelSearch>(OptionFactoryType::TWO_LEVEL_SEARCH);
     }

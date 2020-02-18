@@ -53,7 +53,7 @@ void TwoLevelSearch::resetOptions() {
         availableOptions_ = optionFactory_.createOptions(optionFactoryType_);
 
         multiplier_ = 10;
-        while (multiplier_ < (uint64_t)availableOptions_.size()) {
+        while (multiplier_ <= (uint64_t)availableOptions_.size()) {
             multiplier_ *= 10;
         }
         PLOGI_(logger::FileLogger) << "Multiplier used for hashing: " << multiplier_;
@@ -80,10 +80,8 @@ void TwoLevelSearch::initializationForEveryLevelStart() {
     optionStatusFlag_ = true;
 
     // Player tracking for constraint detection
-    prevPlayerCell_ = {-1, -1};
-    currPlayerCell_ = {-1, -1};
-    prevIsMoving_.clear();
-    currIsMoving_.clear();
+    playerCells_[0] = {-1, -1};
+    playerCells_[1] = {-1, -1};
 
     // Set lowlevel search type
     lowLevelSearchType = LowLevelSearchType::combinatorial;
@@ -94,7 +92,7 @@ void TwoLevelSearch::initializationForEveryLevelStart() {
     PLOGD_(logger::FileLogger) << "------------------------";
     highLevelSearch();
     logHighLevelPath();
-    logRestrictedSprites();
+    // logRestrictedSprites();
 }
 
 
@@ -118,19 +116,23 @@ void TwoLevelSearch::handleLevelStart() {
     // Clear and intialize data structures
     newSpriteFoundFlag_ = true;
     hashPathTimesVisited.clear();
-    currSprites_.clear();
-    spritesMoved.clear();
     restrictedCellsByOption_.clear();
     restrictedCellsByOptionCount_.clear();
     knownConstraints_.clear();
     for (auto const & hash : allOptionPairHashes()) {
-        spritesMoved[hash] = {};
         restrictedCellsByOption_[hash] = {};
         restrictedCellsByOptionCount_[hash] = 0;
         knownConstraints_[hash] = {};
     }
 
     combinatorialByPath.clear();
+
+    // Set initial levin node
+    openLevinNodes_ = std::set<NodeLevin, CompareLevinNode>();
+    for (auto const & option : availableOptions_) {
+        int numGem = elementproperty::getItemGemCount(gridinfo::getSpriteGridCell(option->getSpriteID()));
+        openLevinNodes_.insert({optionPairHash(option, option), 0, 0, CombinatorialPartition(), numGem});
+    }
 
     initializationForEveryLevelStart();
 }
@@ -141,28 +143,40 @@ void TwoLevelSearch::handleLevelStart() {
  */
 Action TwoLevelSearch::getAction() {
     // We don't have any more options...
-    if (solutionIndex_ >= (int)highlevelPlannedPath_.size()) {
-        PLOGE_(logger::FileLogger) << "No more options in solution list.";
-        PLOGE_(logger::ConsoleLogger) << "No more options in solution list.";
-        return Action::noop;
-    }
+    // if (solutionIndex_ >= (int)highlevelPlannedPath_.size()) {
+    //     PLOGE_(logger::FileLogger) << "No more options in solution list.";
+    //     PLOGE_(logger::ConsoleLogger) << "No more options in solution list.";
+    //     requestReset_ = true;
+    //     return Action::noop;
+    // }
 
     // Check if we need to poll the next option. 
     if (optionStatusFlag_) {
+        // if (solutionIndex_ >= (int)highlevelPlannedPath_.size()) {
+        //     PLOGE_(logger::FileLogger) << "No more options in solution list.";
+        //     PLOGE_(logger::ConsoleLogger) << "No more options in solution list.";
+        //     requestReset_ = true;
+        //     return Action::noop;
+        // }
+
         // Get next option and set restricted cells
         solutionIndex_ += 1;
+        if (solutionIndex_ >= (int)highlevelPlannedPath_.size()) {
+            // PLOGE_(logger::FileLogger) << "No more options in solution list.";
+            // PLOGE_(logger::ConsoleLogger) << "No more options in solution list.";
+            requestReset_ = true;
+            return Action::noop;
+        }
+
         previousOption_ = (solutionIndex_ == 0) ? highlevelPlannedPath_[solutionIndex_] : currentOption_;
         currentOption_ = highlevelPlannedPath_[solutionIndex_];
         optionStatusFlag_ = false;
 
         PLOGD_(logger::FileLogger) << "Next option to execute: " << currentOption_->toString();
-        PLOGD_(logger::ConsoleLogger) << "Next option to execute: " << currentOption_->toString();
 
         PLOGD_(logger::FileLogger) << "Option restrictions: ";
-        PLOGD_(logger::ConsoleLogger) << "Option restrictions: ";
         for (auto const & restriction : currentOption_->getRestrictedCells()) {
             PLOGD_(logger::FileLogger) << "x=" << restriction.x << ", y=" << restriction.y;
-            PLOGD_(logger::ConsoleLogger) << "x=" << restriction.x << ", y=" << restriction.y;
         }
 
         // Hash the planned path and save for future duplicate detection
