@@ -162,6 +162,25 @@ public:
     const std::vector<enginetype::GridCell> & getRestrictedCells();
 
     /**
+     * Clear the saved restricted cells.
+     */
+    void clearRestrictedCells();
+
+    /**
+     * Add a restricted cell.
+     * 
+     * @param The gridcell to add as a restriction.
+     */
+    void addRestrictedCell(enginetype::GridCell &cell);
+
+    /**
+     * Add a restricted cell.
+     * 
+     * @param The index representing the cell to add as a restriction.
+     */
+    void addRestrictedCell(int index);
+
+    /**
      * Get the option type.
      * 
      * @return The option category type.

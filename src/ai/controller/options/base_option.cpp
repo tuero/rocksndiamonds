@@ -130,6 +130,30 @@ const std::vector<enginetype::GridCell> & BaseOption::getRestrictedCells() {
 
 
 /**
+ * Clear the saved restricted cells.
+ */
+void BaseOption::clearRestrictedCells() {
+    restrictedCells_.clear();
+}
+
+
+/**
+ * Add a restricted cell.
+ */
+void BaseOption::addRestrictedCell(enginetype::GridCell &cell) {
+    restrictedCells_.push_back(cell);
+}
+
+
+/**
+ * Add a restricted cell.
+ */
+void BaseOption::addRestrictedCell(int index) {
+    restrictedCells_.push_back(gridinfo::indexToCell(index));
+}
+
+
+/**
  * Set the Options solutionPath_ as the path found during A* 
  * at the grid level (time-independent).
  */
