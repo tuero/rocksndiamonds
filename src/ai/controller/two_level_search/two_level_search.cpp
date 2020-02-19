@@ -49,7 +49,6 @@ void TwoLevelSearch::initializeOptions() {
  */
 void TwoLevelSearch::resetOptions() {
     if (highlevelPlannedPath_.empty()) {
-        combinatorialByPath.clear();
         availableOptions_ = optionFactory_.createOptions(optionFactoryType_);
 
         multiplier_ = 10;
@@ -83,12 +82,6 @@ void TwoLevelSearch::initializationForEveryLevelStart() {
     playerCells_[0] = {-1, -1};
     playerCells_[1] = {-1, -1};
 
-    // Set lowlevel search type
-    lowLevelSearchType = LowLevelSearchType::combinatorial;
-    // if (enginestate::getOptParam() == 1) {
-    //     lowLevelSearchType = LowLevelSearchType::cbs;
-    // }
-
     PLOGD_(logger::FileLogger) << "------------------------";
     highLevelSearch();
     logHighLevelPath();
@@ -114,24 +107,20 @@ void TwoLevelSearch::handleLevelStart() {
     logAvailableOptions();
 
     // Clear and intialize data structures
-    newSpriteFoundFlag_ = true;
     hashPathTimesVisited.clear();
     restrictedCellsByOption_.clear();
     restrictedCellsByOptionCount_.clear();
-    knownConstraints_.clear();
     for (auto const & hash : allOptionPairHashes()) {
         restrictedCellsByOption_[hash] = {};
         restrictedCellsByOptionCount_[hash] = 0;
-        knownConstraints_[hash] = {};
     }
 
-    combinatorialByPath.clear();
-
     // Set initial levin node
-    openLevinNodes_ = std::set<NodeLevin, CompareLevinNode>();
+    openLevinNodes_.clear(); 
     for (auto const & option : availableOptions_) {
         int numGem = elementproperty::getItemGemCount(gridinfo::getSpriteGridCell(option->getSpriteID()));
-        openLevinNodes_.insert({optionPairHash(option, option), 0, 0, CombinatorialPartition(), numGem});
+        bool hasDoor = elementproperty::isExit(gridinfo::getSpriteGridCell(option->getSpriteID()));
+        openLevinNodes_.insert({optionPairHash(option, option), 0, 0, CombinatorialPartition(), numGem, hasDoor});
     }
 
     initializationForEveryLevelStart();

@@ -74,4 +74,7 @@ public:
 
 
     uint64_t getNextConstraintBits();
+
+    static uint64_t getNextConstraintBits(uint64_t &counter, uint64_t &maxCounter, uint64_t &currentBit, 
+        int &totalConstraintCount, int &currentSumToDistribute, int &maxSumToDistribute);
 };

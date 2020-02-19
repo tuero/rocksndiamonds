@@ -50,17 +50,14 @@ uint64_t TwoLevelSearch::optionPairHash(BaseOption *currOption, BaseOption *prev
 /**
  * Create a hash for each pair of a given path of options. 
  */
-template<typename T>
-std::vector<uint64_t> TwoLevelSearch::givenPathOptionPairHashes(const T &pathContainer) {
+std::vector<uint64_t> TwoLevelSearch::givenPathOptionPairHashes(const std::vector<BaseOption*> &path) {
     std::vector<uint64_t> optionPairHashes;
-    for (int i = 0; i < (int)pathContainer.size(); i++) {
+    for (int i = 0; i < (int)path.size(); i++) {
         int j = (i == 0) ? i : i - 1;
-        optionPairHashes.push_back(optionPairHash(pathContainer[i], pathContainer[j]));
+        optionPairHashes.push_back(optionPairHash(path[i], path[j]));
     }
     return optionPairHashes;
 }
-template std::vector<uint64_t> TwoLevelSearch::givenPathOptionPairHashes<std::vector<BaseOption*>> (const std::vector<BaseOption*>&);
-template std::vector<uint64_t> TwoLevelSearch::givenPathOptionPairHashes<std::deque<BaseOption*>> (const std::deque<BaseOption*>&);
 
 
 /**
@@ -119,10 +116,9 @@ TwoLevelSearch::OptionIndexPair TwoLevelSearch::hashToOptionIndexPair(uint64_t h
  * Create a hash for a given path.
  * This hash represents all options in order in the path (can be more than 2)
  */
-template<typename T>
-uint64_t TwoLevelSearch::optionPathToHash(const T &pathContainer) {
+uint64_t TwoLevelSearch::optionPathToHash(const std::vector<BaseOption*> &path) {
     uint64_t hash = 0;
-    for (auto const & option : pathContainer) {
+    for (auto const & option : path) {
         // Get option index
         auto iter = std::find(availableOptions_.begin(), availableOptions_.end(), option);
         uint64_t index = std::distance(availableOptions_.begin(), iter) + 1;
@@ -131,8 +127,6 @@ uint64_t TwoLevelSearch::optionPathToHash(const T &pathContainer) {
 
     return hash;
 }
-template uint64_t TwoLevelSearch::optionPathToHash<std::vector<BaseOption*>> (const std::vector<BaseOption*>&);
-template uint64_t TwoLevelSearch::optionPathToHash<std::deque<BaseOption*>> (const std::deque<BaseOption*>&);
 
 
 std::vector<BaseOption*> TwoLevelSearch::hashToOptionPath(uint64_t hash) {
@@ -147,8 +141,7 @@ std::vector<BaseOption*> TwoLevelSearch::hashToOptionPath(uint64_t hash) {
 }
 
 
-template<typename T>
-void TwoLevelSearch::incrementPathTimesVisited(const T &pathContainer) {
+void TwoLevelSearch::incrementPathTimesVisited(const std::vector<BaseOption*> &path) {
     // std::deque<BaseOption*> pathVisited(pathContainer.begin(), pathContainer.end());
     // // Hash each partial path after the next step is taken
     // while (!pathVisited.empty()) {
@@ -158,19 +151,8 @@ void TwoLevelSearch::incrementPathTimesVisited(const T &pathContainer) {
     // }
 
     // Statistics logging
-    ++(statistics::pathCounts[levelinfo::getLevelNumber()][currentHighLevelPathHash]);
-    statistics::solutionPathCounts[levelinfo::getLevelNumber()][0] = currentHighLevelPathHash;
-    statistics::solutionPathCounts[levelinfo::getLevelNumber()][1] = ++hashPathTimesVisited[currentHighLevelPathHash];
+    ++(statistics::pathCounts[levelinfo::getLevelNumber()][currentHighLevelPathHash_]);
+    statistics::solutionPathCounts[levelinfo::getLevelNumber()][0] = currentHighLevelPathHash_;
+    statistics::solutionPathCounts[levelinfo::getLevelNumber()][1] = ++hashPathTimesVisited[currentHighLevelPathHash_];
 }
-template void TwoLevelSearch::incrementPathTimesVisited<std::vector<BaseOption*>> (const std::vector<BaseOption*>&);
-template void TwoLevelSearch::incrementPathTimesVisited<std::deque<BaseOption*>> (const std::deque<BaseOption*>&);
 
-
-template<typename T>
-int TwoLevelSearch::getPathTimesVisited(const T &pathContainer) {
-    uint64_t hash = optionPathToHash(pathContainer);
-    auto iterator = hashPathTimesVisited.find(hash);
-    return (iterator == hashPathTimesVisited.end()) ? 1 : iterator->second + 1;
-}
-template int TwoLevelSearch::getPathTimesVisited<std::vector<BaseOption*>> (const std::vector<BaseOption*>&);
-template int TwoLevelSearch::getPathTimesVisited<std::deque<BaseOption*>> (const std::deque<BaseOption*>&);

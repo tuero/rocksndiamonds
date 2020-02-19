@@ -17,16 +17,16 @@
 #include <vector>
 #include <unordered_set>
 #include <set>
-#include <queue>
 #include <array>
-#include <queue>
 #include <algorithm>
 #include <cmath>                // pow
+#include <cstdint>              // fixed-width datatypes
 
 // Includes
-#include "tls_combinatorial_node.h"
+#include "tls_node_policy.h"
 #include "base_controller.h"
 #include "base_option.h"
+
 
 
 /**
@@ -37,51 +37,20 @@
 class TwoLevelSearch : public BaseController {
 private:
     bool optionStatusFlag_ = true;                                                  // Flag signifying current option is complete
-    bool newSpriteFoundFlag_;
     int solutionIndex_;                                                             // Current index in the high level path
-    uint64_t multiplier_;                                                                // Multiplier used for hashing
+    uint64_t multiplier_;                                                           // Multiplier used for hashing
     BaseOption* previousOption_;                                                    // Pointer to previous option in high level path
     BaseOption* currentOption_;                                                     // Pointer to current option in high level path
+
+    // HLS 
     std::vector<BaseOption*> highlevelPlannedPath_ = {};                            // Current path of high level options
-    uint64_t currentHighLevelPathHash;                                              // Hash representing the current high level option path
-    std::unordered_map<uint64_t, std::unordered_set<int>> restrictedCellsByOption_;        // Restricted cells for each option pair
-    std::unordered_map<uint64_t, int> restrictedCellsByOptionCount_;
-    std::unordered_map<uint64_t, std::unordered_set<int>> knownConstraints_;               // Restricted cells already accounted for during planning (subset of restrictedCellsByOption_)
-    
-    // Struct for restricted cell
-    struct SpriteRestriction {
-        int spriteID;                   // Sprite restriction corresponds to
-        enginetype::GridCell cell;      // The gridcell to avoid
-
-        bool operator==(const SpriteRestriction &other) const {
-            return spriteID == other.spriteID && cell == other.cell;
-        }
-    };
-
-    struct NodeLevin {
-        uint64_t hash;
-        int timesVisited;
-        int numConstraints;
-        mutable CombinatorialPartition combinatorialPartition;
-        int numGems;
-
-        double cost() const {
-            return (double)timesVisited * pow(2.0, (double)numConstraints);
-        }
-    };
-    std::vector<NodeLevin> levinNodes_;
-
-    struct CompareLevinNode {
-        bool operator() (const NodeLevin &left, const NodeLevin &right) const {
-            return left.cost() < right.cost() || (left.cost() == right.cost() && left.hash < right.hash);
-        }
-    };
-    std::set<NodeLevin, CompareLevinNode> openLevinNodes_;
-
-    // HLS costs
+    uint64_t currentHighLevelPathHash_;                                             // Hash representing the current high level option path
+    std::set<NodeLevin, CompareLevinNode> openLevinNodes_;                  // Open list for LevinTS
     std::unordered_map<uint64_t, int> hashPathTimesVisited;                 // Map tracking number of visits for each (partial) path
 
     // Constraint identification
+    std::unordered_map<uint64_t, std::unordered_set<int>> restrictedCellsByOption_;        // Restricted cells for each option pair
+    std::unordered_map<uint64_t, int> restrictedCellsByOptionCount_;                // Count of restricted cells for each option, faster access
     typedef std::array<uint64_t, 2> OptionIndexPair;                        // Typedef for pairs of options (for return types)
     std::array<enginetype::GridCell, 2> playerCells_;                       // Player cell on the current/prev game step
 
@@ -93,53 +62,19 @@ private:
     void initializationForEveryLevelStart();
 
 
-    // --------------------- CBS --------------------------------
-    struct NodeCBS {
-        std::unordered_map<uint64_t, std::unordered_set<int>> constraints;
-        int size = 0;
-    };
-
-    class CompareNodeCBS {
-    public:
-        bool operator() (const NodeCBS &lhs, const NodeCBS &rhs) {
-            return lhs.size > rhs.size;
-            // return lhs.constraints.size() < rhs.constraints.size();
-        }
-    };
-
-    typedef std::priority_queue<NodeCBS, std::vector<NodeCBS>, CompareNodeCBS> PriorityQueue;
-    std::unordered_map<uint64_t, PriorityQueue> openByPath;
-    std::unordered_map<uint64_t, std::vector<NodeCBS>> closedByPath;
-
-
-    // --------------- LLS --------------- 
-
-    enum LowLevelSearchType{cbs, combinatorial};
-    LowLevelSearchType lowLevelSearchType;
-
-    std::unordered_map<uint64_t, CombinatorialPartition> combinatorialByPath;
-
-    /**
-     * Run the implemented low level search. 
-     */
-    void lowLevelSearch();
-    
-    bool currentHighLevelPathComplete(uint64_t hash);
-
-    void iterativeCombinatorial();
-
-    /**
-     * Runs one iteration of CBS on the currentHighLevelPathHash.
-     * An iteration is counted as a single replay, which will use the restricted cells
-     * set in the best node in OPEN, and will insert the children nodes into OPEN for
-     * later iterations.
-     */
-    void CBS();
-
     // --------------- HLS --------------- 
 
+    /**
+     * Set the constraints for each node on the high-level path, before we 
+     * initiaze the low-level search
+     * 
+     * @param node The Levin node which represents the high-level path.
+     */
     void setLowLevelConstraints(const NodeLevin &node);
 
+    /**
+     * Modified leveinTS.
+     */
     void modifiedLevinTS();
 
     /**
@@ -149,21 +84,16 @@ private:
      */
     void highLevelSearch();
 
-    /**
-     * Find the path of high level options which corresponds to the collectible sprites
-     * in order of (row, col), with the exit at the end. This is a deterministic path
-     * that never changes, good for testing sanity.
-     */
-    void highLevelSearchGemsInOrder();
-
-    void highLevelSearchDeterministic();
-
     // --------------- Constraints --------------- 
 
-    bool newConstraintSeen(std::vector<BaseOption*> &optionPath);
+    int restrictionCountForPath(const std::vector<BaseOption*> &path);
 
-    template<typename T>
-    int restrictionCountForPath(const T &pathContainer);
+    /**
+     * Update any nodes in LevinTS open that had a new constraint added on its path.
+     * 
+     * @param hash The hash of the option pair to check if paths contain
+     */
+    void updateAffectedLevinNodes(uint64_t hash);
 
     /**
      * Check for newely moved objects as a result of player actions.
@@ -219,8 +149,7 @@ private:
      * @param path The path of options (in order)
      * @return A vector of hashes for each pair (in order) of the given path
      */
-    template<typename T>
-    std::vector<uint64_t> givenPathOptionPairHashes(const T &pathContainer);
+    std::vector<uint64_t> givenPathOptionPairHashes(const std::vector<BaseOption*> &path);
 
     /**
      * Convert the inidividual full path hash into the vector of hashes for each 
@@ -252,16 +181,11 @@ private:
      * @param path The given path of options.
      * @return A hash representing the given path of options.
      */
-    template<typename T>
-    uint64_t optionPathToHash(const T &pathContainer);
+    uint64_t optionPathToHash(const std::vector<BaseOption*> &path);
 
     std::vector<BaseOption*> hashToOptionPath(uint64_t hash);
 
-    template<typename T>
-    void incrementPathTimesVisited(const T &pathContainer);
-
-    template<typename T>
-    int getPathTimesVisited(const T &pathContainer);
+    void incrementPathTimesVisited(const std::vector<BaseOption*> &path);
 
 public:
 

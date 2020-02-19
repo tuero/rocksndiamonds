@@ -27,6 +27,13 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -Wno-extern-c-compat -O3")
 endif()
 
+# Options for comparing different LevinTS policies
+option(TRIVIAL_POLICY "Trivial LevinTS policy" OFF)
+
+if(TRIVIAL_POLICY)
+    add_definitions(-DTRIVIAL_POLICY)
+endif()
+
 # Log/replay/stat directories 
 message(STATUS "Creating log/replay/stat directories.")
 file(MAKE_DIRECTORY ${PROJECT_SOURCE_DIR}/src/ai/logs)
@@ -45,6 +52,13 @@ find_package(SDL2)
 find_package(SDL2_image)
 find_package(SDL2_mixer)
 find_package(SDL2_net)
+
+# Find Pytorch libary
+find_package(Torch REQUIRED)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${TORCH_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${TORCH_CXX_FLAGS}")
+
 
 # Handle SDL2 libraries
 if(SDL2_FOUND AND SDL2_image_FOUND AND SDL2_mixer_FOUND AND SDL2_net_FOUND)
@@ -65,7 +79,6 @@ endif()
 if(NOT SDL2_net_FOUND)
     message(STATUS "SDL2_net not found.")
 endif()
-
 
 
 set(CNFS_CMD ${PROJECT_SOURCE_DIR}/build-scripts/create_element_defs.pl)
@@ -129,9 +142,8 @@ set_target_properties(run_tests PROPERTIES EXCLUDE_FROM_ALL TRUE)
 
 # Dependendies
 if (SDL2_FOUND AND SDL2_image_FOUND AND SDL2_mixer_FOUND AND SDL2_net_FOUND)
-    target_link_libraries(rocksndiamonds m z)
-    target_link_libraries(rocksndiamonds ${SDL2_IMAGE_LIBRARIES} ${SDL2_MIXER_LIBRARIES} ${SDL2_NET_LIBRARIES} ${SDL2_LIBRARIES})
+    target_link_libraries(rocksndiamonds m z ${SDL2_IMAGE_LIBRARIES} ${SDL2_MIXER_LIBRARIES} ${SDL2_NET_LIBRARIES} ${SDL2_LIBRARIES} ${TORCH_LIBRARIES})
 endif()
 
-target_link_libraries(rocksndiamonds_headless m z)
-target_link_libraries(run_tests m z)
+target_link_libraries(rocksndiamonds_headless m z ${TORCH_LIBRARIES})
+target_link_libraries(run_tests m z ${TORCH_LIBRARIES})

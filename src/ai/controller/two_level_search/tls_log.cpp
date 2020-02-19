@@ -48,7 +48,7 @@ void TwoLevelSearch::logAvailableOptions() {
  * Log the set high level path of options.
  */
 void TwoLevelSearch::logHighLevelPath() {
-    PLOGD_(logger::FileLogger) << "Solution: " << currentHighLevelPathHash << ", length: " << highlevelPlannedPath_.size();
+    PLOGD_(logger::FileLogger) << "Solution: " << currentHighLevelPathHash_ << ", length: " << highlevelPlannedPath_.size();
     for (auto const & option : highlevelPlannedPath_) {
         PLOGD_(logger::FileLogger) << option->toString();
     }
@@ -77,13 +77,12 @@ void TwoLevelSearch::logRestrictedSprites() {
 
 void TwoLevelSearch::logLevinNodes() {
     PLOGD_(logger::FileLogger) << "Logging Levin nodes.";
-    PLOGD_(logger::FileLogger) << levinNodes_.size();
-    for (auto const & node : levinNodes_) {
-        int isOpenEmpty = openByPath[node.hash].empty() ? 1 : 0;
-        int isClosedEmpty = closedByPath[node.hash].empty() ? 1 : 0;
+    PLOGD_(logger::FileLogger) << openLevinNodes_.size();
+    for (auto const & node : openLevinNodes_) {
+        // PLOGD_(logger::FileLogger) << "Node: " << node.hash << ", constraints: " << node.numConstraints 
+        //     << " , visited: " << node.timesVisited << ", cost: " << node.cost();
         PLOGD_(logger::FileLogger) << "Node: " << node.hash << ", constraints: " << node.numConstraints 
-            << " , visited: " << node.timesVisited << ", cost: " << node.cost() 
-            << ", isOpenEmpty = " << isOpenEmpty << ", isclosedempty = " << isClosedEmpty;
+            << " , visited: " << node.timesVisited;
         for (auto const & option : hashToOptionPath(node.hash)) {
             PLOGD_(logger::FileLogger) << option->toString();
         }

@@ -89,7 +89,7 @@ set(sources_ai
     ${PROJECT_SOURCE_DIR}/src/ai/controller/simple_pathing/simple_pathing.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/two_level_search.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/tls_highlevel.cpp
-    ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/tls_lowlevel.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/tls_node_policy.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/tls_constraint_detection.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/tls_combinatorial_node.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/tls_log.cpp

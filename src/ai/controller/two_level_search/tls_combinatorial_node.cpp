@@ -27,10 +27,11 @@ uint64_t nextBinaryString(int numBitsSet, int numBitsLength, uint64_t current) {
 
     // number of bits set is zero
     if (numBitsSet == 0) {return {0};}
-    uint64_t t = (current | (current - 1)) + 1;
 #ifdef __GNUC__
+    uint64_t t = (current | (current - 1));
     return (t + 1) | (((~t & -~t) - 1) >> (__builtin_ctz(current) + 1));
 #else
+    uint64_t t = (current | (current - 1)) + 1;
     return t | ((((t & -t) / (current & -current)) >> 1) - 1);
 #endif
 }
@@ -41,7 +42,7 @@ uint64_t nChoosek(uint64_t n, uint64_t k) {
     if (k == 0) {return 1;}
 
     uint64_t result = n;
-    for( int i = 2; i <= k; ++i ) {
+    for(uint64_t i = 2; i <= k; ++i) {
         result *= (n-i+1);
         result /= i;
     }
@@ -67,7 +68,6 @@ bool CombinatorialPartition::isComplete() {
 
 
 void CombinatorialPartition::reset(std::vector<int> numConstraintsOptionPair) {
-    resetFlag = false;
     totalConstraintCount_ = std::accumulate(numConstraintsOptionPair.begin(), numConstraintsOptionPair.end(), 0);
     maxSumToDistribute_ = (totalConstraintCount_ / 2);
     currentSumToDistribute_ = -1;
@@ -78,7 +78,6 @@ void CombinatorialPartition::reset(std::vector<int> numConstraintsOptionPair) {
 
 
 void CombinatorialPartition::reset(int totalConstraintCount) {
-    resetFlag = false;
     totalConstraintCount_ = totalConstraintCount;
     maxSumToDistribute_ = (totalConstraintCount_ / 2);
     currentSumToDistribute_ = -1;
@@ -89,7 +88,6 @@ void CombinatorialPartition::reset(int totalConstraintCount) {
 
 
 uint64_t CombinatorialPartition::getNextConstraintBits() {
-    resetFlag = true;
 
     // Done current sum to distribute
     if (counter_ == maxCounter_) {
@@ -108,6 +106,31 @@ uint64_t CombinatorialPartition::getNextConstraintBits() {
     if (currentSumToDistribute_ == maxSumToDistribute_ && totalConstraintCount_ % 2 == 0) {
         currentBit_ = ~currentBit_;
         ++counter_;
+    }
+    return bitsToSend;
+}
+
+
+uint64_t CombinatorialPartition::getNextConstraintBits(uint64_t &counter, uint64_t &maxCounter, uint64_t &currentBit, 
+        int &totalConstraintCount, int &currentSumToDistribute, int &maxSumToDistribute)
+{
+    // Done current sum to distribute
+    if (counter == maxCounter) {
+        counter = 0;
+        maxCounter = 2 * nChoosek(totalConstraintCount, ++currentSumToDistribute);
+        currentBit = ((uint64_t)1 << currentSumToDistribute) - 1;
+    }
+
+    // Both current bit and compliment sent, increment to next lexicographical ordering
+    if (counter % 2 == 0 && counter > 0) {
+        currentBit = nextBinaryString(currentSumToDistribute, totalConstraintCount, currentBit);
+    }
+    uint64_t bitsToSend = currentBit;
+    currentBit = ~currentBit;
+    ++counter;
+    if (currentSumToDistribute == maxSumToDistribute && totalConstraintCount % 2 == 0) {
+        currentBit = ~currentBit;
+        ++counter;
     }
     return bitsToSend;
 }

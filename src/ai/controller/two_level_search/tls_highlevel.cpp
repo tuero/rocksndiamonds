@@ -13,13 +13,7 @@
 
 // Standard Libary/STL
 #include <vector>
-#include <queue>
-#include <deque>
-#include <set>
-#include <unordered_set>
 #include <algorithm>            // sort, find
-#include <random>               // random_device, mt19937, discrete_distribution
-#include <limits>               // numeric_limits
 
 // Includes
 #include "base_option.h"
@@ -30,15 +24,16 @@
 using namespace enginehelper;
 
 
-
-#define SKIP_NOT_ENOUGH_GEMS
+// Flag to skip level tries if path doesn't have minimum number
+// of diamonds, or doesn't have the exit.
+#define SKIP_REQUIRED_GEMS_DOOR
 
 
 void TwoLevelSearch::setLowLevelConstraints(const NodeLevin &node) {
     highlevelPlannedPath_.clear();
 
-#ifdef SKIP_NOT_ENOUGH_GEMS
-    if (node.numGems >= levelinfo::getLevelGemsNeeded()) {
+#ifdef SKIP_REQUIRED_GEMS_DOOR
+    if (node.numGems >= levelinfo::getLevelGemsNeeded() && node.hasDoor) {
 #endif
         highlevelPlannedPath_ = hashToOptionPath(node.hash);
         uint64_t constraintBits = node.combinatorialPartition.getNextConstraintBits();
@@ -47,16 +42,16 @@ void TwoLevelSearch::setLowLevelConstraints(const NodeLevin &node) {
         uint64_t mask = 1;
         std::vector<uint64_t> pathHashes = givenPathOptionPairHashes(highlevelPlannedPath_);
         for (int i = 0; i < (int)pathHashes.size(); i++) {
-            std::unordered_set<int> constraints;
+            highlevelPlannedPath_[i]->clearRestrictedCells();
             for (auto const & constraint : restrictedCellsByOption_[pathHashes[i]]) {
+                // Bit indicates that this constraint should be set.
                 if (constraintBits & (mask)) {
-                    constraints.insert(constraint);
+                    highlevelPlannedPath_[i]->addRestrictedCell(constraint);
                 }
                 mask = mask << 1;
             }
-            highlevelPlannedPath_[i]->setRestrictedCells(constraints);
         }
-#ifdef SKIP_NOT_ENOUGH_GEMS
+#ifdef SKIP_REQUIRED_GEMS_DOOR
     }
 #endif
 }
@@ -73,25 +68,28 @@ void TwoLevelSearch::modifiedLevinTS() {
     openLevinNodes_.erase(openLevinNodes_.begin());
 
     // Set high level path
+    // This is the node which will be simulated (after we add children to open)
     setLowLevelConstraints(node);
 
-    // Add children
+    // Add children (additional high-level action)
     if (node.timesVisited == 0) {
         std::vector<BaseOption*> nodeOptions = hashToOptionPath(node.hash);
         std::vector<BaseOption*> childOptions = nodeOptions;
         childOptions.push_back(nullptr);
 
+        // If option not already on path, add as a child
         for (auto const & option : availableOptions_) {
             if (std::find(nodeOptions.begin(), nodeOptions.end(), option) == nodeOptions.end()) {
-                int numGems = node.numGems + elementproperty::getItemGemCount(gridinfo::getSpriteGridCell(option->getSpriteID()));
                 childOptions.back() = option;
                 uint64_t hash = optionPathToHash(childOptions);
-                openLevinNodes_.insert({hash, 0, restrictionCountForPath(childOptions), CombinatorialPartition(), numGems});
+                int numGems = node.numGems + elementproperty::getItemGemCount(gridinfo::getSpriteGridCell(option->getSpriteID()));
+                bool hasDoor = elementproperty::isExit(gridinfo::getSpriteGridCell(option->getSpriteID()));
+                openLevinNodes_.insert({hash, 0, restrictionCountForPath(childOptions), CombinatorialPartition(), numGems, hasDoor});
             }
         }
     }
 
-    // If not exhausted, add child
+    // If not exhausted, add child (same high-level path but increment bitwise index)
     if (!node.combinatorialPartition.isComplete()) {
         ++node.timesVisited;
         openLevinNodes_.insert(node);
@@ -108,63 +106,12 @@ void TwoLevelSearch::highLevelSearch() {
     PLOGD_(logger::FileLogger) << "Starting high level search.";
 
     // High level search
-    // LevinTS(); 
     highlevelPlannedPath_.clear();
     while (highlevelPlannedPath_.empty()) {
         modifiedLevinTS();
     }
-    // modifiedLevinTS();
 
-    currentHighLevelPathHash = optionPathToHash<std::vector<BaseOption*>>(highlevelPlannedPath_);
-    incrementPathTimesVisited<std::vector<BaseOption*>>(highlevelPlannedPath_);
-
-    #if 0
-    // Increment visited path node visits
-    incrementPathTimesVisited<std::vector<BaseOption*>>(highlevelPlannedPath_);
-
-    // Run middle level search on given path
-    // Middle level means to find the next set of constraints
-    lowLevelSearch();
-    #endif
+    currentHighLevelPathHash_ = optionPathToHash(highlevelPlannedPath_);
+    incrementPathTimesVisited(highlevelPlannedPath_);
 }
 
-
-/**
- * Find the path of high level options which corresponds to the collectible sprites in order of (row, col), with the exit at the end. This is a deterministic path
- * that never changes, good for testing sanity.
- */
-void TwoLevelSearch::highLevelSearchGemsInOrder() {
-    // Clear current solution
-    highlevelPlannedPath_.clear();
-
-    // Sort options by gem index first, then exit.
-    std::sort(availableOptions_.begin(), availableOptions_.end(), 
-        [](BaseOption* a, BaseOption* b) -> bool 
-        {
-            bool isexit_a = a->getOptionType() == OptionType::ToExit;
-            bool isexit_b = b->getOptionType() == OptionType::ToExit;
-            int index_a = gridinfo::cellToIndex(gridinfo::getSpriteGridCell(a->getSpriteID()));
-            int index_b = gridinfo::cellToIndex(gridinfo::getSpriteGridCell(b->getSpriteID()));
-            return index_a < index_b && !(isexit_a && !isexit_b);
-        });
-    
-    // Path is to visit each gem in order, then exit
-    for (auto const & option : availableOptions_) {
-        highlevelPlannedPath_.push_back(option);
-    }
-}
-
-
-void TwoLevelSearch::highLevelSearchDeterministic() {
-    highlevelPlannedPath_.clear();
-    std::vector<int> optionSpriteOrder = {24, 22, 7, 15, 26};
-
-    for (auto const & spriteID : optionSpriteOrder) {
-        for (auto const & option : availableOptions_) {
-            if (option->getSpriteID() == spriteID) {
-                highlevelPlannedPath_.push_back(option);
-                break;
-            }
-        }
-    }
-}
