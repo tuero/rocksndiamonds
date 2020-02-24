@@ -16,6 +16,7 @@
 #include <numeric>
 
 // Includes
+#include "util/tls_hash.h"
 #include "engine_types.h"
 #include "engine_helper.h"
 #include "logger.h"
@@ -25,7 +26,7 @@ using namespace enginehelper;
 
 
 int TwoLevelSearch::restrictionCountForPath(const std::vector<BaseOption*> &path) {
-    std::vector<uint64_t> pathHashes = givenPathOptionPairHashes(path);
+    std::vector<uint64_t> pathHashes = tlshash::givenPathItemPairHashes(availableOptions_, multiplier_, path);
     auto lambda = [&](int sum, uint64_t hash) {return sum + restrictedCellsByOptionCount_[hash];};
     return std::accumulate(pathHashes.begin(), pathHashes.end(), 0, lambda);
 }
@@ -47,7 +48,7 @@ bool playerCausedObjectFall(const enginetype::GridCell &playerCell, const engine
 void TwoLevelSearch::updateAffectedLevinNodes(uint64_t hash) {
     std::set<NodeLevin, CompareLevinNode> updatedNodes;
     for (auto it = openLevinNodes_.begin(); it != openLevinNodes_.end(); ) {
-        std::vector<uint64_t> nodePathHashes = pathHashToOptionPairHash(it->hash);
+        std::vector<uint64_t> nodePathHashes = tlshash::pathHashToItemPairHash(it->hash, availableOptions_, multiplier_);
 
         // Levin node in open wasn't affected by new constraint
         if (std::find(nodePathHashes.begin(), nodePathHashes.end(), hash) == nodePathHashes.end()) {
@@ -90,7 +91,7 @@ void TwoLevelSearch::checkForMovedObjects() {
         // Wasn't just falling or falling but not by player, so skip.
         if (!gridinfo::getWasJustFalling(cell) || !playerCausedObjectFall(playerCells_[0], cell)) {continue;}
 
-        uint64_t hash = optionPairHash(currentOption_, previousOption_);
+        uint64_t hash = tlshash::itemPairHash(availableOptions_, multiplier_, currentOption_, previousOption_);
         int index = gridinfo::cellToIndex(playerCells_[0]);
 
         // Restricted cell already seen

@@ -13,7 +13,7 @@
 #include <cstdint>              // fixed-width datatypes
 
 // Includes
-#include "tls_combinatorial_node.h"
+#include "util/tls_combinatorial_node.h"
 
 
 /**

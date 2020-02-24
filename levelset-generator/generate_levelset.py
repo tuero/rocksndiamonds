@@ -66,6 +66,7 @@ def _setLevelSize(file, level_width, level_height):
 
 
 def _setLevelSprites(file, level):
+    # Set the map data sprites for the given level
     data = level.getUnderlyingData()
     for sprite in data:
         sprite_high = (sprite & 0xFF00) >> 8

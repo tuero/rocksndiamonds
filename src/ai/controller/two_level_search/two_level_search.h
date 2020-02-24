@@ -61,6 +61,8 @@ private:
      */
     void initializationForEveryLevelStart();
 
+    void incrementPathTimesVisited();
+
 
     // --------------- HLS --------------- 
 
@@ -126,66 +128,6 @@ private:
     void logRestrictedSprites();
 
     void logLevinNodes();
-
-    // --------------- Path hashing ---------------
-    /**
-     * Create hash for all pairs of options.
-     * 
-     * @return A vector of hash ints representing each pair of options
-     */
-    std::vector<uint64_t> allOptionPairHashes();
-
-    /**
-     * Create a hash for the given pair of options of moving from option prevOption to option currOption. 
-     * @param currOption The current option (option To)
-     * @param prevOption The previous option (option From)
-     * @return The hash for the pair of given options (in order)
-     */
-    uint64_t optionPairHash(BaseOption *currOption, BaseOption *prevOption);
-
-    /**
-     * Create a hash for each pair of a given path of options.  
-     * 
-     * @param path The path of options (in order)
-     * @return A vector of hashes for each pair (in order) of the given path
-     */
-    std::vector<uint64_t> givenPathOptionPairHashes(const std::vector<BaseOption*> &path);
-
-    /**
-     * Convert the inidividual full path hash into the vector of hashes for each 
-     * option pair in the path.
-     */
-    std::vector<uint64_t> pathHashToOptionPairHash(uint64_t hash);
-
-    /**
-     * Create a hash for a given pair of indices for the master list of options availableOptions_.
-     * Hash value is the string concatenation of the 2 indices.
-     * 
-     * @param indexCurr The index of the option in availableOptions_ for the option To.
-     * @param indexPrev The index of the option in availableOptions_ for the option From.
-     */
-    uint64_t optionIndexPairToHash(int indexCurr, int indexPrev);
-
-    /**
-     * Get a pair of options represented by the given hash.
-     * 
-     * @param hash The input hash
-     * @return A typedef of array[2], with OptionIndexPair[0] = currOption, OptionIndexPair[1] = prevOption
-     */
-    OptionIndexPair hashToOptionIndexPair(uint64_t hash);
-
-    /**
-     * Create a hash for a given path.
-     * This hash represents all options in order in the path (can be more than 2).
-     * 
-     * @param path The given path of options.
-     * @return A hash representing the given path of options.
-     */
-    uint64_t optionPathToHash(const std::vector<BaseOption*> &path);
-
-    std::vector<BaseOption*> hashToOptionPath(uint64_t hash);
-
-    void incrementPathTimesVisited(const std::vector<BaseOption*> &path);
 
 public:
 

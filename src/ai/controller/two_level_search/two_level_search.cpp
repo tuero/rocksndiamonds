@@ -19,6 +19,8 @@
 #include <bitset>
 
 // Includes
+#include "util/tls_hash.h"
+#include "statistics.h"
 #include "logger.h"
 
 using namespace enginehelper;
@@ -39,8 +41,7 @@ void TwoLevelSearch::initializeOptions() {
     while (multiplier_ < (uint64_t)availableOptions_.size()) {
         multiplier_ *= 10;
     }
-    PLOGI_(logger::FileLogger) << "Multiplier used for hashing: " << multiplier_;
-    PLOGI_(logger::ConsoleLogger) << "Multiplier used for hashing: " << multiplier_;
+    PLOGD_(logger::FileLogger) << "Multiplier used for hashing: " << multiplier_;
 }
 
 
@@ -55,8 +56,7 @@ void TwoLevelSearch::resetOptions() {
         while (multiplier_ <= (uint64_t)availableOptions_.size()) {
             multiplier_ *= 10;
         }
-        PLOGI_(logger::FileLogger) << "Multiplier used for hashing: " << multiplier_;
-        PLOGI_(logger::ConsoleLogger) << "Multiplier used for hashing: " << multiplier_;
+        PLOGD_(logger::FileLogger) << "Multiplier used for hashing: " << multiplier_;
     }
 }
 
@@ -66,6 +66,14 @@ void TwoLevelSearch::resetOptions() {
  */
 void TwoLevelSearch::handleLevelRestartBefore() {
     
+}
+
+
+void TwoLevelSearch::incrementPathTimesVisited() {
+    // Statistics logging
+    ++(statistics::pathCounts[levelinfo::getLevelNumber()][currentHighLevelPathHash_]);
+    statistics::solutionPathCounts[levelinfo::getLevelNumber()][0] = currentHighLevelPathHash_;
+    statistics::solutionPathCounts[levelinfo::getLevelNumber()][1] = ++hashPathTimesVisited[currentHighLevelPathHash_];
 }
 
 
@@ -84,6 +92,7 @@ void TwoLevelSearch::initializationForEveryLevelStart() {
 
     PLOGD_(logger::FileLogger) << "------------------------";
     highLevelSearch();
+    incrementPathTimesVisited();
     logHighLevelPath();
     // logRestrictedSprites();
 }
@@ -110,7 +119,7 @@ void TwoLevelSearch::handleLevelStart() {
     hashPathTimesVisited.clear();
     restrictedCellsByOption_.clear();
     restrictedCellsByOptionCount_.clear();
-    for (auto const & hash : allOptionPairHashes()) {
+    for (auto const & hash : tlshash::allItemsPairHashes(availableOptions_, multiplier_)) {
         restrictedCellsByOption_[hash] = {};
         restrictedCellsByOptionCount_[hash] = 0;
     }
@@ -120,7 +129,7 @@ void TwoLevelSearch::handleLevelStart() {
     for (auto const & option : availableOptions_) {
         int numGem = elementproperty::getItemGemCount(gridinfo::getSpriteGridCell(option->getSpriteID()));
         bool hasDoor = elementproperty::isExit(gridinfo::getSpriteGridCell(option->getSpriteID()));
-        openLevinNodes_.insert({optionPairHash(option, option), 0, 0, CombinatorialPartition(), numGem, hasDoor});
+        openLevinNodes_.insert({tlshash::itemPairHash(availableOptions_, multiplier_, option, option), 0, 0, CombinatorialPartition(0), numGem, hasDoor});
     }
 
     initializationForEveryLevelStart();

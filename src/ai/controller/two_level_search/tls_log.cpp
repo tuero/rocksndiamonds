@@ -13,6 +13,7 @@
 
 
 // Includes
+#include "util/tls_hash.h"
 #include "logger.h"
 
 using namespace enginehelper;
@@ -60,8 +61,8 @@ void TwoLevelSearch::logHighLevelPath() {
  */
 void TwoLevelSearch::logRestrictedSprites() {
     PLOGD_(logger::FileLogger) << "Cells with restrictions: " << highlevelPlannedPath_.size();
-    for (auto const & hash : allOptionPairHashes()) {
-        OptionIndexPair optionIndexPair = hashToOptionIndexPair(hash);
+    for (auto const & hash : tlshash::allItemsPairHashes(availableOptions_, multiplier_)) {
+        std::array<std::size_t, 2> optionIndexPair = tlshash::hashToItemIndexPair(hash, multiplier_);
         if (optionIndexPair[0] == optionIndexPair[1]) {
             PLOGD_(logger::FileLogger) << "Restrictions for root to option " << availableOptions_[optionIndexPair[0]]->toString();
         } else {
@@ -83,7 +84,7 @@ void TwoLevelSearch::logLevinNodes() {
         //     << " , visited: " << node.timesVisited << ", cost: " << node.cost();
         PLOGD_(logger::FileLogger) << "Node: " << node.hash << ", constraints: " << node.numConstraints 
             << " , visited: " << node.timesVisited;
-        for (auto const & option : hashToOptionPath(node.hash)) {
+        for (auto const & option : tlshash::hashToItemPath(node.hash, multiplier_, availableOptions_)) {
             PLOGD_(logger::FileLogger) << option->toString();
         }
     }

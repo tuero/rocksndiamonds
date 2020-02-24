@@ -19,16 +19,16 @@
  * with penality for number of times tried.
  */
 bool trivialPolicy(const NodeLevin &left, const NodeLevin &right) {
-    double costLeft = (double)left.timesVisited * pow(2.0, (double)left.numConstraints);
-    double costRight = (double)right.timesVisited * pow(2.0, (double)right.numConstraints);
+    double costLeft = (double)(left.timesVisited + 1) * pow(2.0, (double)left.numConstraints);
+    double costRight = (double)(right.timesVisited + 1) * pow(2.0, (double)right.numConstraints);
 
     return costLeft < costRight || (costLeft == costRight && left.hash < right.hash);
 }
 
 
 bool distNetPolicy(const NodeLevin &left, const NodeLevin &right) {
-    double costLeft = (double)left.timesVisited * pow(2.0, (double)left.numConstraints);
-    double costRight = (double)right.timesVisited * pow(2.0, (double)right.numConstraints);
+    double costLeft = (double)(left.timesVisited + 1) * pow(2.0, (double)left.numConstraints);
+    double costRight = (double)(right.timesVisited + 1) * pow(2.0, (double)right.numConstraints);
 
     return costLeft < costRight || (costLeft == costRight && left.hash < right.hash);
 }

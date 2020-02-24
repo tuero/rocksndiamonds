@@ -45,36 +45,31 @@
  * node for the given current partition) needs to be individually tried.
  */
 
-class CombinatorialPartition {
-public:
-    bool resetFlag;
 
-    
-        
-    uint64_t counter_;
-    uint64_t maxCounter_;
-    uint64_t currentBit_;
-    int totalConstraintCount_;       // Total constraints for path, used for new constraint detection
-    int currentSumToDistribute_;     // Current sum to partition between option pairs
-    int maxSumToDistribute_;
+struct CombinatorialPartition {
+    uint64_t counter;
+    uint64_t maxCounter;
+    uint64_t currentBit; 
+    int totalConstraintCount;
+    int currentSumToDistribute; 
+    int maxSumToDistribute;
 
-    CombinatorialPartition();
+    CombinatorialPartition(int currentTotalConstraintCount) : counter(-1), maxCounter(-1), currentBit(0), 
+        totalConstraintCount(currentTotalConstraintCount), currentSumToDistribute(-1), maxSumToDistribute(currentTotalConstraintCount / 2) {}
 
-    bool requiresReset(std::vector<int> &numConstraintsOptionPair);
+    void reset(int newTotalConstraintCount) {
+        counter = -1;
+        maxCounter = -1;
+        currentBit = 0; 
+        totalConstraintCount = newTotalConstraintCount;
+        currentSumToDistribute = -1; 
+        maxSumToDistribute = newTotalConstraintCount / 2;
+    }
 
-    bool requiresReset(int totalConstraintCount);
-
-    bool isComplete();
-
-
-    void reset(std::vector<int> numConstraintsOptionPair);
-
-    void reset(int totalConstraintCount);
-    
-
-
-    uint64_t getNextConstraintBits();
-
-    static uint64_t getNextConstraintBits(uint64_t &counter, uint64_t &maxCounter, uint64_t &currentBit, 
-        int &totalConstraintCount, int &currentSumToDistribute, int &maxSumToDistribute);
+    bool isComplete() {return currentSumToDistribute == maxSumToDistribute  && counter == maxCounter;}
 };
+
+namespace tlsbits {
+
+    uint64_t getNextConstraintBits(CombinatorialPartition &cPartition);
+}
