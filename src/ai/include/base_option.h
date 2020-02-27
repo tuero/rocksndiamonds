@@ -47,6 +47,9 @@ protected:
     int timesCalled_ = 0;                                       // Number of times called
     int counter_ = 0;                                           // Internal counter for tracking actions taking multiple game ticks
 
+
+public:
+
     /**
      * Set the Options solutionPath as the path found during A* 
      * at the grid level (time-independent).
@@ -65,8 +68,6 @@ protected:
      * @param goalCell The gridcell designated as the goal for A*.
      */
     void runAStar(enginetype::GridCell startCell, enginetype::GridCell goalCell);
-
-public:
 
     virtual ~BaseOption() {};
 
@@ -217,6 +218,14 @@ public:
      * @return The unique sprite ID represented by the option.
      */
     int getSpriteID() const;
+
+
+    /**
+     * Get the current goal cell.
+     * 
+     * @return The current goal cell.
+     */
+    enginetype::GridCell getGoalCell() const;
 };
 
 

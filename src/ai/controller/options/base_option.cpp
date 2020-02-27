@@ -152,6 +152,13 @@ void BaseOption::addRestrictedCell(int index) {
     restrictedCells_.push_back(gridinfo::indexToCell(index));
 }
 
+/**
+ * Get the current goal cell.
+ */
+enginetype::GridCell BaseOption::getGoalCell() const {
+    return goalCell_;
+}
+
 
 /**
  * Set the Options solutionPath_ as the path found during A* 

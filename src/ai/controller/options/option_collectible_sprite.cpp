@@ -35,7 +35,8 @@ OptionCollectibleSprite::OptionCollectibleSprite(int spriteID) {
  * Convert to human readable format (spriteID, location, etc.)
  */
 std::string OptionCollectibleSprite::toString() const {
-    return optionStringName_;
+    return optionStringName_ + " " + std::to_string(spriteID_) + 
+        " (x=" + std::to_string(goalCell_.x) + ", y=" + std::to_string(goalCell_.y) + ")";
 }
 
 

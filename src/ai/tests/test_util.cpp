@@ -34,6 +34,7 @@ void loadTestLevelAndStart(int levelNum) {
     // Load level and start game actions
     levelinfo::loadLevel(levelNum);
     StartGameActions(network.enabled, setup.autorecord, level.random_seed);
+    gridinfo::initSpriteIDs();
 }
 
 }

@@ -35,7 +35,8 @@ OptionToExit::OptionToExit(int spriteID) {
  * Convert to human readable format (spriteID, location, etc.)
  */
 std::string OptionToExit::toString() const {
-    return elementproperty::getItemReadableDescription(item_) + " " + std::to_string(spriteID_);
+    return elementproperty::getItemReadableDescription(item_) + " " + std::to_string(spriteID_) + 
+    " (x=" + std::to_string(goalCell_.x) + ", y=" + std::to_string(goalCell_.y) + ")";
 }
 
 
