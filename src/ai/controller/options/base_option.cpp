@@ -195,14 +195,15 @@ bool canExpandAvoidCollectingNonGoalGems(const enginetype::GridCell &cellFrom, c
     bool is_empty = (prioritizeSafeCells) ? elementproperty::isEmptySafe(cellFrom, action) : elementproperty::isEmpty(cellFrom, action);
     bool is_walkable = (prioritizeSafeCells) ? elementproperty::isWalkableSafe(cellFrom, action) : elementproperty::isWalkable(cellFrom, action);
     return elementproperty::isDigable(cellFrom, action) || is_walkable || is_empty ||
-        elementproperty::isGateOpen(cellTo) || elementproperty::isGateOpen(cellTo) || cellTo == goalCell;
+        elementproperty::isGateOpen(cellTo) || cellTo == goalCell;
 }
 
 bool canExpandCollectingNonGoalGems(const enginetype::GridCell &cellFrom, const enginetype::GridCell &cellTo, 
     const enginetype::GridCell &goalCell, Action action, bool prioritizeSafeCells) 
 {
     bool is_moveable = (prioritizeSafeCells) ? elementproperty::isActionMoveableSafe(cellFrom, action) : elementproperty::isActionMoveable(cellFrom, action);
-    return is_moveable || elementproperty::isGateOpen(cellTo) || cellTo == goalCell;
+    // return is_moveable || elementproperty::isGateOpen(cellTo) || cellTo == goalCell;
+    return (is_moveable && !elementproperty::isGate(cellTo)) || cellTo == goalCell;
 }
 
 

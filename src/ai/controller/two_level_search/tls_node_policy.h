@@ -21,11 +21,13 @@
  */
 struct NodeLevin {
     uint64_t hash;
+    int pathLength;
     int timesVisited;
     int numConstraints;
     mutable CombinatorialPartition combinatorialPartition;
     int numGems;
     bool hasDoor;
+    // NN dist params
 };
 
 

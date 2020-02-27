@@ -85,6 +85,7 @@ set(sources_ai
     ${PROJECT_SOURCE_DIR}/src/ai/controller/options/option_single_step.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/options/option_collectible_sprite.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/options/option_to_exit.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/controller/options/option_door.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/replay/replay.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/simple_pathing/simple_pathing.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/two_level_search.cpp

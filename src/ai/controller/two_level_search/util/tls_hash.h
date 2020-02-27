@@ -125,7 +125,7 @@ std::vector<uint64_t> pathHashToItemPairHash(uint64_t hash, const std::vector<T>
 /**
  * Get a pair of item indices represented by the given hash.
  * 
- * @param hash Hash of the path to decode
+ * @param hash Hash of the HLA pair to decode
  * @param multiplier The multiplier being used during hashing
  * @return Array of indices represented by the given hash
  */

@@ -129,7 +129,7 @@ void TwoLevelSearch::handleLevelStart() {
     for (auto const & option : availableOptions_) {
         int numGem = elementproperty::getItemGemCount(gridinfo::getSpriteGridCell(option->getSpriteID()));
         bool hasDoor = elementproperty::isExit(gridinfo::getSpriteGridCell(option->getSpriteID()));
-        openLevinNodes_.insert({tlshash::itemPairHash(availableOptions_, multiplier_, option, option), 0, 0, CombinatorialPartition(0), numGem, hasDoor});
+        openLevinNodes_.insert({tlshash::itemPairHash(availableOptions_, multiplier_, option, option), 0, 0, 0, CombinatorialPartition(0), numGem, hasDoor});
     }
 
     initializationForEveryLevelStart();

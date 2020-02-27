@@ -82,12 +82,15 @@ void TwoLevelSearch::modifiedLevinTS() {
 
         // If option not already on path, add as a child
         for (auto const & option : availableOptions_) {
-            if (std::find(nodeOptions.begin(), nodeOptions.end(), option) == nodeOptions.end()) {
+            bool in_path = std::find(nodeOptions.begin(), nodeOptions.end(), option) != nodeOptions.end();
+            bool valid_door = option->getOptionType() == OptionType::ToDoor && nodeOptions[nodeOptions.size()-1]->getOptionType() != OptionType::ToDoor;
+            if (valid_door || !in_path) {
                 childOptions.back() = option;
                 uint64_t hash = tlshash::itemPathToHash(availableOptions_, childOptions, multiplier_);
                 int numGems = node.numGems + elementproperty::getItemGemCount(gridinfo::getSpriteGridCell(option->getSpriteID()));
                 bool hasDoor = elementproperty::isExit(gridinfo::getSpriteGridCell(option->getSpriteID()));
-                openLevinNodes_.insert({hash, 0, restrictionCountForPath(childOptions), CombinatorialPartition(restrictionCountForPath(childOptions)), numGems, hasDoor});
+                int restriction_count = restrictionCountForPath(childOptions);
+                openLevinNodes_.insert({hash, childOptions.size(), 0, restriction_count, CombinatorialPartition(restriction_count), numGems, hasDoor});
             }
         }
     }

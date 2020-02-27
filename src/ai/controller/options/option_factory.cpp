@@ -14,6 +14,7 @@
 #include "option_single_step.h"
 #include "option_collectible_sprite.h"
 #include "option_to_exit.h"
+#include "option_door.h"
 
 // Includes
 #include "engine_types.h"
@@ -104,6 +105,12 @@ std::vector<BaseOption*> OptionFactory::createTwoLevelSearchOptions() {
         // Exit
         else if (elementproperty::isExit(cell)) {
             std::unique_ptr<OptionToExit> option = std::make_unique<OptionToExit>(spriteID);
+            options_.push_back(std::move(option));
+            optionPointers.push_back(options_.back().get());
+        }
+        // Door
+        else if (elementproperty::isGate(cell)) {
+            std::unique_ptr<OptionDoor> option = std::make_unique<OptionDoor>(spriteID);
             options_.push_back(std::move(option));
             optionPointers.push_back(options_.back().get());
         }
