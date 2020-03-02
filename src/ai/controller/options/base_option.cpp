@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <queue>
 #include <unordered_map>
+#include <set>
 
 // Includes
 #include "engine_helper.h"
@@ -181,7 +182,9 @@ struct Node {
 // Custom comparator for priority queue 
 struct CompareNode {
     bool operator() (Node* left, Node* right) const {
-        return (left->g + left->h) > (right->g + right->h);
+        float vleft = left->g + left->h;
+        float vright = right->g + right->h;
+        return vleft < vright || (vleft == vright && left < right);
     }
 };
 
@@ -202,6 +205,7 @@ bool canExpandCollectingNonGoalGems(const enginetype::GridCell &cellFrom, const 
     return is_moveable || elementproperty::isGateOpen(cellTo) || cellTo == goalCell;
 }
 
+
 /**
  * Set the Options solutionPath_ as the path found during A* 
  * at the grid level (time-independent).
@@ -210,26 +214,23 @@ void BaseOption::runAStar(enginetype::GridCell startCell, enginetype::GridCell g
     Node startNode = {gridinfo::cellToIndex(startCell), -1, startCell, 0, (float)gridinfo::getL1Distance(startCell, goalCell)};
 
     auto expandFunc = (avoidNonGoalCollectibleCells) ? canExpandAvoidCollectingNonGoalGems : canExpandCollectingNonGoalGems;
+    // PLOGE_(logger::FileLogger) << "start: x=" << startNode.cell.x <<  ", y=" << startNode.cell.y;
+    // PLOGE_(logger::FileLogger) << "goal: x=" << goalCell.x <<  ", y=" << goalCell.y;
 
     // A* data structures
     std::unordered_map<int, Node> open;
-    std::priority_queue<Node*, std::vector<Node*>, CompareNode> openSet;
+    std::set<Node*, CompareNode> openSet;
     std::unordered_map<int, Node> closed;
 
     // Initialize with start node
     open[startNode.id] = startNode;
-    openSet.push(&open[startNode.id]);
+    openSet.insert(&open[startNode.id]);
     solutionPath_.clear();
 
     while (!openSet.empty()) {
         // Pull next node and update data structures
-        // Priority queue may have items which we removed from open when we found a better path
-        Node node;
-        while (open.find(openSet.top()->id) == open.end()) {
-            openSet.pop();
-        }
-        node = *openSet.top();
-        openSet.pop();
+        Node node = open[(*openSet.begin())->id];
+        openSet.erase(openSet.begin());
         open.erase(node.id);
         closed[node.id] = node;
 
@@ -260,6 +261,7 @@ void BaseOption::runAStar(enginetype::GridCell startCell, enginetype::GridCell g
             if (open.find(childIndex) != open.end()) {
                 // Check if new path cheaper
                 if (open[childIndex].g <= newG) {continue;}
+                openSet.erase(&open[childIndex]);
                 open.erase(childIndex);
             }
             // Node already expanded
@@ -271,7 +273,7 @@ void BaseOption::runAStar(enginetype::GridCell startCell, enginetype::GridCell g
 
             Node childNode{childIndex, node.id, childCell, newG, h};
             open[childIndex] = childNode;
-            openSet.push(&open[childIndex]);
+            openSet.insert(&open[childIndex]);
         }
     }
 
