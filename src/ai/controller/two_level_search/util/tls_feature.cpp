@@ -12,23 +12,25 @@
 // Standard Libary/STL
 #include <cstdint>              // fixed-width datatypes
 #include <vector>
+#include <deque>
 #include <algorithm>            // std::find, distance
 
 // Includes
 #include "base_option.h"
+#include "engine_types.h"
+#include "engine_helper.h"
 #include "tls_hash.h"
+
+using namespace enginehelper;
 
 #ifdef RUN_TESTS
 #include <catch2/catch.hpp>
 #include <iostream>
 #include "option_types.h"
 #include "option_factory.h"
-#include "engine_helper.h"
-#include "engine_types.h"
 #include "../../../tests/test_util.h"
-
-using namespace enginehelper;
 #endif
+
 
 /**
  * Get the vector of HLA ordering flags.
@@ -51,24 +53,48 @@ std::vector<double> _orderings(uint64_t path_hash, std::size_t multiplier, std::
     return feature_orderings;
 }
 
-double _avg_constraints(int numConstraints, int pathLength) {
-    return (double)numConstraints / pathLength;
-}
 
 double _total_constraints(int numConstraints) {
     return (double)numConstraints;
 }
 
-double _avg_bitwalls(uint64_t path_hash, std::size_t multiplier, std::vector<BaseOption*> &allItems) {
-    std::vector<BaseOption*> path = tlshash::hashToItemPath(path_hash, multiplier, allItems);
+double _avg_constraints(int numConstraints, int pathLength) {
+    return (double)numConstraints / pathLength;
+}
+
+
+double _count_bitwalls(std::vector<BaseOption*> &path) {
+    double bit_counter = 0.0;
 
     // Walk along the path and count the number of bitwalls
+    enginetype::GridCell prev_cell;
+    enginetype::GridCell next_cell = gridinfo::getPlayerPosition();
+    for (std::size_t i = 0; i < path.size(); ++i) {
+        prev_cell = next_cell;
+        next_cell = path[i]->getGoalCell();
+        path[i]->runAStar(prev_cell, next_cell);
+        std::deque<enginetype::GridCell> solution_path = path[i]->getSolutionPath();
+        
+        // For path, check cell below for bit wall
+        for (auto & cell : solution_path) {
+            ++cell.y;
+            if (gridinfo::getGridElement(cell) == enginetype::ELEMENT_WALL) {
+                ++bit_counter;
+            }
+        }
+    }
+    return bit_counter;
 }
+
 
 double _total_bitwalls(uint64_t path_hash, std::size_t multiplier, std::vector<BaseOption*> &allItems) {
     std::vector<BaseOption*> path = tlshash::hashToItemPath(path_hash, multiplier, allItems);
+    return _count_bitwalls(path);
+}
 
-    // Walk along the path and count the number of bitwalls
+double _avg_bitwalls(uint64_t path_hash, std::size_t multiplier, std::vector<BaseOption*> &allItems) {
+    std::vector<BaseOption*> path = tlshash::hashToItemPath(path_hash, multiplier, allItems);
+    return _count_bitwalls(path) / path.size();
 }
 
 
@@ -144,13 +170,21 @@ TEST_CASE("TLS feature bits", "[tls_features]") {
         std::vector<BaseOption*> allOptions = factory.createOptions(OptionFactoryType::TWO_LEVEL_SEARCH);
         uint64_t multiplier = _getMultiplier(allOptions);
 
-        for (auto const & option : allOptions) {
-            std::cout << option->toString() << std::endl;
-        }
-
         std::vector<BaseOption*> partial_path{allOptions[6], allOptions[3]};
         uint64_t path_hash = tlshash::itemPathToHash(allOptions, partial_path, multiplier);
         double totalBits = _total_bitwalls(path_hash, multiplier, allOptions);
+        REQUIRE(totalBits == 3);
+    }
+    SECTION("Path 2") {
+        OptionFactory factory;
+        testutil::loadTestLevelAndStart(3);
+        std::vector<BaseOption*> allOptions = factory.createOptions(OptionFactoryType::TWO_LEVEL_SEARCH);
+        uint64_t multiplier = _getMultiplier(allOptions);
+
+        std::vector<BaseOption*> partial_path{allOptions[6], allOptions[0], allOptions[5], allOptions[4], allOptions[5], allOptions[3]};
+        uint64_t path_hash = tlshash::itemPathToHash(allOptions, partial_path, multiplier);
+        double totalBits = _total_bitwalls(path_hash, multiplier, allOptions);
+        REQUIRE(totalBits == 11);
     }
     
     

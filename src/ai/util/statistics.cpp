@@ -36,6 +36,7 @@ int numLevelTries = 0;
 std::map<int, uint64_t> nodesExpanded;
 std::map<int, std::unordered_map<uint64_t, int>> pathCounts;
 std::map<int, std::array<uint64_t, 2>> solutionPathCounts;
+std::map<int, int> solutionConstraintCount;
 
 // File output
 const std::string STATS_DIR = "./src/ai/stats/";
@@ -72,6 +73,17 @@ void closeStatsFile() {
 }
 
 
+void outputRunLengthToFile(int run, int level) {
+    std::vector<int> counts;
+    for (auto const & run : pathCounts[level]) {
+        counts.push_back(run.second);
+    }
+    int total_count = std::accumulate(counts.begin(), counts.end(), 0);
+    statsFile <<  run << ",constraints=" << solutionConstraintCount[level] << ",paths=" << 
+    pathCounts[level].size() << ",total=" << total_count << std::endl;
+}
+
+
 /**
  * Output the necessary statistics to file.
  */
@@ -79,6 +91,8 @@ void outputStatsToFile() {
     outputPathCounts();
 }
 
+#define SINGLE_PATH
+#ifndef SINGLE_PATH
 void outputPathCounts() {
     int solution_path_visits_count = 0;
     int total_path_visit_counts = 0;
@@ -152,6 +166,12 @@ void outputPathCounts() {
     statsFile << "Levelset std solution path attempts: " << stdevSolution << std::endl;
     statsFile << "Levelset solution max attempts: " << *maxSolutionLength << std::endl;
 }
-
+#else
+void outputPathCounts() {
+    // for (auto const & level_run : pathCounts) {
+    //     statsFile <<  (solutionPathCounts[level_run.first])[1] << std::endl;
+    // }
+}
+#endif
 
 }

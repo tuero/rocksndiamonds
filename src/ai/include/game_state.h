@@ -32,7 +32,7 @@ extern "C" {
  * and restoreSimulator() sets the engine state from the data saved in the class instance.
  */
 class GameState {
-private:
+public:
     short Feld_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
     short Last_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
     short MovPos_[MAX_LEV_FIELDX][MAX_LEV_FIELDY];
@@ -66,7 +66,6 @@ private:
     bool gameFailed_;
     bool gameSolved_;
 
-public:
     // Player info
     struct PlayerInfo player_;
 

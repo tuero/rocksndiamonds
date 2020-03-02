@@ -26,8 +26,11 @@
 #include "tls_node_policy.h"
 #include "base_controller.h"
 #include "base_option.h"
+#include "game_state.h"
 
-
+#define SINGLE_PATH
+#define SET_RESTRICTIONS
+// #define MANUAL_CONSTRAINTS
 
 /**
  * Default controller
@@ -50,9 +53,12 @@ private:
 
     // Constraint identification
     std::unordered_map<uint64_t, std::unordered_set<int>> restrictedCellsByOption_;        // Restricted cells for each option pair
+    std::unordered_map<uint64_t, std::set<int>> restrictedCellsByPath_;        // Restricted cells for each option pair
     std::unordered_map<uint64_t, int> restrictedCellsByOptionCount_;                // Count of restricted cells for each option, faster access
     typedef std::array<uint64_t, 2> OptionIndexPair;                        // Typedef for pairs of options (for return types)
     std::array<enginetype::GridCell, 2> playerCells_;                       // Player cell on the current/prev game step
+
+    GameState initialState;
 
 
     /**
@@ -86,7 +92,11 @@ private:
      */
     void highLevelSearch();
 
+    void singlePath();
+
     // --------------- Constraints --------------- 
+
+    void setPathRestrictionSet(uint64_t hash, const std::vector<BaseOption*> &path);
 
     int restrictionCountForPath(const std::vector<BaseOption*> &path);
 

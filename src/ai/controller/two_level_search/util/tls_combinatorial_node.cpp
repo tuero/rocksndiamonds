@@ -54,6 +54,7 @@ namespace tlsbits {
 
 uint64_t getNextConstraintBits(CombinatorialPartition &cPartition)
 {
+    // return cPartition.currentBit++;
     // Done current sum to distribute
     if (cPartition.counter == cPartition.maxCounter) {
         cPartition.counter = 0;

@@ -110,6 +110,8 @@ void Controller::handleLevelSolved() {
     PLOGI_(logger::FileLogger) << "Number of attempts = " << statistics::numLevelTries;
     PLOGI_(logger::ConsoleLogger) << "Number of attempts = " << statistics::numLevelTries;
 
+    statistics::outputRunLengthToFile(statistics::solutionPathCounts[levelinfo::getLevelNumber()][1], levelinfo::getLevelNumber());
+
     // Signal game over and close logs
     logger::createReplayForIndividualRun(levelinfo::getLevelSet(), levelinfo::getLevelNumber(), actionsTaken_);
     enginestate::setEngineGameStatusModeQuit();
@@ -122,7 +124,7 @@ void Controller::handleLevelSolved() {
  * Depending on the controller, this will either terminate or attempt the level again.
  */
 void Controller::handleLevelFailed() {
-    static const int MSG_FREQ = 100;
+    static const int MSG_FREQ = 10000;
     statistics::numLevelTries += 1;
 
     if (baseController_.get()->retryOnLevelFail()) {

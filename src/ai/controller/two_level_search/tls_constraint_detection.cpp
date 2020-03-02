@@ -23,7 +23,21 @@
 
 using namespace enginehelper;
 
-
+void TwoLevelSearch::setPathRestrictionSet(uint64_t hash, const std::vector<BaseOption*> &path) {
+    restrictedCellsByPath_[hash].clear();
+    PLOGD_(logger::FileLogger) << "setting path restrictions";
+    for (auto const & pairHash : tlshash::givenPathItemPairHashes(availableOptions_, multiplier_, path)) {
+        for (auto const & r : restrictedCellsByOption_[pairHash]) {
+            if (restrictedCellsByPath_[hash].find(r) == restrictedCellsByPath_[hash].end()) {
+                restrictedCellsByPath_[hash].insert(r);
+                PLOGD_(logger::FileLogger) << "x=" << gridinfo::indexToCell(r).x << ", y=" << gridinfo::indexToCell(r).y;
+            }
+        }
+    }
+    for (auto const & r : restrictedCellsByPath_[hash]) {
+        PLOGD_(logger::FileLogger) << "x=" << gridinfo::indexToCell(r).x << ", y=" << gridinfo::indexToCell(r).y;
+    }
+}
 
 int TwoLevelSearch::restrictionCountForPath(const std::vector<BaseOption*> &path) {
     std::vector<uint64_t> pathHashes = tlshash::givenPathItemPairHashes(availableOptions_, multiplier_, path);
@@ -45,19 +59,27 @@ bool playerCausedObjectFall(const enginetype::GridCell &playerCell, const engine
 /**
  * Update any nodes in LevinTS open that had a new constraint added on its path.
  */
-void TwoLevelSearch::updateAffectedLevinNodes(uint64_t hash) {
+void TwoLevelSearch::updateAffectedLevinNodes(uint64_t optionPairHash) {
     std::set<NodeLevin, CompareLevinNode> updatedNodes;
+
+    // Walk over levin nodes and check if nodes path contains affected option pair
     for (auto it = openLevinNodes_.begin(); it != openLevinNodes_.end(); ) {
         std::vector<uint64_t> nodePathHashes = tlshash::pathHashToItemPairHash(it->hash, availableOptions_, multiplier_);
 
         // Levin node in open wasn't affected by new constraint
-        if (std::find(nodePathHashes.begin(), nodePathHashes.end(), hash) == nodePathHashes.end()) {
+        if (std::find(nodePathHashes.begin(), nodePathHashes.end(), optionPairHash) == nodePathHashes.end()) {
             ++it;
             continue;
         } 
         else {
+        #ifndef SET_RESTRICTIONS
             auto lambda = [&](int sum, uint64_t hash) {return sum + restrictedCellsByOptionCount_[hash];};
             int totalConstraintCount = std::accumulate(nodePathHashes.begin(), nodePathHashes.end(), 0, lambda);
+        #else
+            setPathRestrictionSet(it->hash, tlshash::hashToItemPath(it->hash, multiplier_, availableOptions_));
+            int totalConstraintCount = restrictedCellsByPath_[it->hash].size();
+            PLOGD_(logger::ConsoleLogger) << "numconstraints " << totalConstraintCount;
+        #endif
 
             // New node will be added back once we complete iteration
             NodeLevin node = *it;
@@ -89,6 +111,7 @@ void TwoLevelSearch::checkForMovedObjects() {
     
     for (auto const & cell : gridinfo::getMapSprites()) {
         // Wasn't just falling or falling but not by player, so skip.
+        if (initialState.Feld_[playerCells_[0].x][playerCells_[0].y] != enginetype::ELEMENT_SAND) {continue;}
         if (!gridinfo::getWasJustFalling(cell) || !playerCausedObjectFall(playerCells_[0], cell)) {continue;}
 
         uint64_t hash = tlshash::itemPairHash(availableOptions_, multiplier_, currentOption_, previousOption_);

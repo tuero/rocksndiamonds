@@ -11,6 +11,8 @@
 
 // Standard Libary/STL
 #include <cstdint>              // fixed-width datatypes
+#include <unordered_map>
+#include <unordered_set>
 
 // Includes
 #include "util/tls_combinatorial_node.h"

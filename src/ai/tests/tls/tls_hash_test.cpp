@@ -116,10 +116,12 @@ TEST_CASE("TLS hash to item index pair", "[tls_hash]") {
  * Test the itemPathToHash and hashToItemPath function s
  */
 TEST_CASE("TLS hashing and pathing", "[tls_hash]") {
-    std::vector<int> allItems{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+    // std::vector<int> allItems{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+    std::vector<int> allItems{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     uint64_t multiplier = getMultiplier(allItems);
 
-    std::vector<int> subsetItems{1, 6, 10, 11};
+    // std::vector<int> subsetItems{1, 6, 10, 11};
+    std::vector<int> subsetItems{6, 1, 2, 0, 7, 4, 3, 7, 8, 10, 5, 9, 5};
     uint64_t hash = 1061011;
 
     REQUIRE(tlshash::itemPathToHash(allItems, subsetItems, multiplier) == hash);
