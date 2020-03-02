@@ -4,6 +4,10 @@ dist: bionic
 language: cpp
 compiler: gcc
 
+branches:
+  only:
+  - master
+
 addons:
   apt:
     sources:
