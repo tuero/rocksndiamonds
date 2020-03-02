@@ -8,12 +8,12 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 # C compiler flags
 set(CMAKE_C_FLAGS "-Wall -Wstrict-prototypes -Wmissing-prototypes")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS} -g")
-set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS} -O3")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS} -O3 ")
 
 # C++ compiler flags
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -DDEBUG ")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3 ")
 
 # Special flags for clang
 if (CMAKE_C_COMPILER_ID STREQUAL "Clang")

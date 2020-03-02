@@ -1,0 +1,9 @@
+8 19
+.. .. .. 10 .. NK .. .. 30 34 31 RR .. .. NK .. .. .. ..
+XX XX XX XX XX XX XX XX XX 35 XX XX XX XX XX XX XX XX XX
+.. .. YB AB 23 .. .. 20 XX .. XX 20 .. .. 23 .. RR .. ..
+.. XX XX XX XX XX XX .. XX .. XX .. XX XX XX XX XX XX ..
+.. .. .. .. .. .. .. 21 R1 .. B1 22 .. .. .. .. .. .. ..
+XX XX XX XX XX XX XX XX XX 34 XX XX XX XX XX XX XX XX XX
+.. AR NK YR 00 YR .. .. 32 35 33 .. AR GG .. NK .. .. ..
+XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX

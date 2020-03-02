@@ -4,32 +4,25 @@ import random
 from tilesets.sprite import BitField, Sprite, TRANSPOSITION_BIT_FLAGS
 
 
-# Tile information
+# Tile feature identification
+class TileProperty(enum.IntEnum):
+    has_gem             = 1 << 0
+    has_rock            = 1 << 1
+    has_exit            = 1 << 2
+    has_key             = 1 << 3
+    has_gate            = 1 << 4
+    has_agent           = 1 << 5
+    is_filler           = 1 << 6
+    is_slippery         = 1 << 7
+    has_key_red         = 1 << 8
+    has_key_green       = 1 << 9
+    has_key_blue        = 1 << 10
+    has_key_yellow      = 1 << 11
+
+
+
 class TileSetInfo():
-    def __init__(self, width, height, defaultTile, blockingTile, padTile, allTiles, metaTiles=[], metaExitTiles=[]):
-        """
-        Holds information regarding the tileset
-
-        Args:
-            width (int) : The number of sprites the tile holds in width
-            height (int) : The number of sprites the tile holds in height
-            defaultTile (Tile) : Default tile the level will use
-            padTile (Tile) : Tile to check for boarder elements
-            allTiles (array of Tiles) : All tiles contained in the tileset
-        """
-
-        self.width = width
-        self.height = height
-        self.defaultTile = defaultTile
-        self.blockingTile = blockingTile
-        self.padTile = padTile
-        self.allTiles = allTiles
-        self.metaTiles = metaTiles
-        self.metaExitTiles = metaExitTiles
-
-
-class TileSetInfo1():
-    def __init__(self, width, height, tiles, metaTiles=[]):
+    def __init__(self, width, height, tiles):
         """
         Holds information regarding the tileset
 
@@ -44,7 +37,6 @@ class TileSetInfo1():
         self.width = width
         self.height = height
         self.tiles = []
-        self.metaTiles = metaTiles
 
         for tile in tiles:
             self.tiles.append(tile)
@@ -62,6 +54,18 @@ class TileSetInfo1():
     def getKeyTiles(self):
         return self._getTilesProperty(TileProperty.has_key)
 
+    def getKeyRedTiles(self):
+        return self._getTilesProperty(TileProperty.has_key_red)
+
+    def getKeyGreenTiles(self):
+        return self._getTilesProperty(TileProperty.has_key_green)
+
+    def getKeyBlueTiles(self):
+        return self._getTilesProperty(TileProperty.has_key_blue)
+
+    def getKeyYellowTiles(self):
+        return self._getTilesProperty(TileProperty.has_key_yellow)
+
     def getGemTiles(self):
         return self._getTilesProperty(TileProperty.has_gem)
 
@@ -73,18 +77,6 @@ class TileSetInfo1():
 
     def getRockMetaTiles(self):
         return [mt for mt in self.metaTiles if mt.hasProperty(TileProperty.has_rock) and not mt.hasProperty(TileProperty.has_gem)]
-
-
-# Tile feature identification
-class TileProperty(enum.IntEnum):
-    has_gem             = 1 << 0
-    has_rock            = 1 << 1
-    has_exit            = 1 << 2
-    has_key             = 1 << 3
-    has_gate            = 1 << 4
-    has_agent           = 1 << 5
-    is_filler           = 1 << 6
-    is_slippery         = 1 << 7
 
 
 
@@ -129,14 +121,26 @@ class Tile():
         insert_row = self.data.shape[0] - 2
         insert_col_range = range(1, self.data.shape[1] - 1)
         empty_indices = [(insert_row, i) for i in insert_col_range if self.data[(insert_row, i)] == Sprite.empty]
-        assert len(empty_indices) > 0
-        self.data[random.choice(empty_indices)] = Sprite.wall_steel
+        # print(self.getNumberRockBits())
+        # assert len(empty_indices) > 0
+        self.data[random.choice(empty_indices)] = Sprite.bitwall
+
+    def removeAllBits(self):
+        remove_row = self.data.shape[0] - 2
+        remove_col_range = range(1, self.data.shape[1] - 1)
+        for i in remove_col_range:
+            if self.data[(remove_row, i)] == Sprite.bitwall: self.data[(remove_row, i)] = Sprite.empty
+
 
     def getNumberRockBits(self):
         bottom_row = self.data.shape[0] - 2
-        return (self.data[bottom_row].tolist()[1:-1]).count(Sprite.wall_steel)
+        return (self.data[bottom_row].tolist()[1:-1]).count(Sprite.bitwall)
 
     def canAddRockBit(self):
+        insert_row = self.data.shape[0] - 2
+        insert_col_range = range(1, self.data.shape[1] - 1)
+        empty_indices = [(insert_row, i) for i in insert_col_range if self.data[(insert_row, i)] == Sprite.empty]
+        return len(empty_indices) > 0
         return self.getNumberRockBits() < self.data.shape[1] - 2
 
 

@@ -1,0 +1,70 @@
+agent           PP
+gem             GG
+rocks           RR
+door_red        R1
+door_green      G1
+door_blue       B1
+door_yellow     Y1
+key_red         KR
+key_green       KG
+key_blue        KB
+key_yellow      KY
+meta_exit       ME
+meta_traps
+
+agent, gem, rock, key_red, bits         AR
+agent, gem, rock, key_green, bits       AG
+agent, gem, rock, key_blue, bits        AB
+agent, gem, rock, key_yellow, bits      AY
+
+agent, gem, rock, key_red         XR
+agent, gem, rock, key_green       XG
+agent, gem, rock, key_blue        XB
+agent, gem, rock, key_yellow      XY
+
+agent, gem, key_red, bits         CR
+agent, gem, key_green, bits       CG
+agent, gem, key_blue, bits        CB
+agent, gem, key_yellow, bits      CY
+
+agent, gem, key_red         YR
+agent, gem, key_green       YG
+agent, gem, key_blue        YB
+agent, gem, key_yellow      YY
+
+agent, gem, rock, bits      NK
+agent, gem, rock            ZK
+
+
+00 -> meta exit
+10 -> rocks with gem traps 
+20 -> 3 rocks 
+21 -> gate blocking 
+30 -> bottom right corner for forced middle
+31 -> bottom left corner for forced middle
+32 -> upper right corner for forced middle
+33 -> upper left corner for forced middle
+
+GG, AR -> Bits
+---------------------------------------
+| .. .. .. .. .. .. .. .. .. .. .. .. |
+| XX XX XX XX XX XX XX XX XX XX XX .. |
+| XX XX .. .. .. .. .. .. .. .. XX .. |
+| XX XX .. XX XX XX XX XX XX .. XX .. |
+| XX XX .. .. .. .. .. .. .. .. R1 .. |
+| XX XX XX XX XX XX XX XX XX XX XX .. |
+| .. .. .. .. .. .. ME .. .. .. .. .. |
+| XX XX XX XX XX XX XX XX XX XX XX XX |
+---------------------------------------
+
+
+---------------------------------------
+| AR AR AR AR AR 10 AR AR AR AR AR CR |
+| XX XX XX XX XX XX XX XX XX XX XX PP |
+| XX XX .. .. .. .. GG GG .. 20 XX PP |
+| XX XX .. XX XX XX XX XX XX .. XX PP |
+| XX XX .. .. .. .. .. .. .. 21 DR PP |
+| XX XX XX XX XX XX XX XX XX XX XX PP |
+| AR AR AR AR AR AR 00 AR AR AR AR CR |
+| XX XX XX XX XX XX XX XX XX XX XX XX |
+---------------------------------------

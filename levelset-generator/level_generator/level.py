@@ -34,7 +34,7 @@ class LevelDifficulty():
 
 class Level():
 
-    def __init__(self, numTilesWidth, numTilesHeight, tileSetInfo, levelDifficulty, levelTemplate):
+    def __init__(self, tileSetInfo, levelDifficulty, levelTemplate):
         """
         Level definition
 
@@ -44,13 +44,14 @@ class Level():
             tileSetInfo (TileSetInfo) : Information regarding tiles available to the level to use
             levelDifficulty (LevelDifficulty) : Difficulty requirements for level randomization
         """
-        self.numTilesWidth = levelTemplate.numTilesWidth
-        self.numTilesHeight = levelTemplate.numTilesHeight
+        self.numTilesWidth = levelTemplate.getNumTilesWidth()
+        self.numTilesHeight = levelTemplate.getNumTilesHeight()
         self.tileSetInfo = tileSetInfo
         self.levelDifficulty = levelDifficulty
         self.levelTemplate = levelTemplate
-        # self.tiles = np.array([[tileSetInfo.defaultTile]*numTilesWidth]*numTilesHeight, dtype=Tile)
         self.tiles = self.levelTemplate.getTiles()
+
+        self.set_bits_indices = []
 
         # -- reference ranges
         referenceRange_l = [(self.tileSetInfo.width + 1, y) for y in range(self.tileSetInfo.height+2)] + [(self.tileSetInfo.width, y) for y in range(self.tileSetInfo.height+2)]
@@ -69,20 +70,9 @@ class Level():
                                'down'    : [referenceRange_d, tileRange_d]
                         }
 
-        # Get all tile transpositions and remove duplicates
-        # self.availableTiles = [tile for tile in tileSetInfo.allTiles] + [tileSetInfo.defaultTile]
-        # for tile in tileSetInfo.allTiles:
-        #     self.availableTiles += tile.getAllTranspositions()
-
-        # self.availableTiles = list(set(self.availableTiles))
-
-    def canOverwriteTile(self, tile):
-        return tile == self.tileSetInfo.defaultTile or tile == self.tileSetInfo.blockingTile
-
 
     def resetLevel(self):
         # Set the level back to the default tile
-        # self.tiles = np.array([[self.tileSetInfo.defaultTile]*self.numTilesWidth]*self.numTilesHeight, dtype=Tile)
         self.tiles = self.levelTemplate.getTiles()
 
 
@@ -94,223 +84,6 @@ class Level():
     def getHeight(self):
         # height of level in sprites
         return self.numTilesHeight * (self.tileSetInfo.height)
-
-
-    def _validateTileToReference(self, tile1, tile2, tile1Range, tile2Range):
-        if self.canOverwriteTile(tile1): return True
-        # For given tile pair, check tile padding is null or both are matching
-        for tile1Coord, tile2Coord in zip(tile1Range, tile2Range):
-            col1, row1 = tile1Coord
-            col2, row2 = tile2Coord
-            if not (tile1.getData(row1, col1) == tile2.getData(row2, col2) or (tile1.getData(row1, col1) == Sprite.null or tile2.getData(row2, col2) == Sprite.null)):
-                return False
-        return True
-
-
-    def _validateTileToAllNeighbours(self, tile, row, col):        
-        # Check each neighbour for the given tile, and check padding rules
-        validLeft, validRight, validAbove, validBelow = True, True, True, True
-
-        # Check if tile is valid with reference tile to the left
-        tileReference = self.tiles[row, col-1] if col > 0 else self.tileSetInfo.padTile
-        validLeft = self._validateTileToReference(tileReference, tile, *self.refence_ranges['left'])
-
-        # Check if tile is valid with reference tile to the right
-        tileReference = self.tiles[row, col+1] if (col < self.numTilesWidth - 1) else self.tileSetInfo.padTile
-        validRight = self._validateTileToReference(tileReference, tile, *self.refence_ranges['right'])
-
-        # Check if tile is valid with reference tile above
-        tileReference = self.tiles[row-1, col] if row > 0 else self.tileSetInfo.padTile
-        validAbove = self._validateTileToReference(tileReference, tile, *self.refence_ranges['up'])
-
-        # Check if tile is valid with reference tile below
-        tileReference = self.tiles[row+1, col] if (row < self.numTilesHeight - 1) else self.tileSetInfo.padTile
-        validBelow = self._validateTileToReference(tileReference, tile, *self.refence_ranges['down'])
-
-        return validLeft and validRight and validAbove and validBelow
-
-
-    def placeExit(self):
-        """
-        Place an exit tile on the map. 
-        The exit tile is always assumed to be the first tile placed, and only one tile can contain the exit.
-
-        Note: We assume that the exit is placed on the bottom row.
-        """
-        empty_indices = [(self.numTilesHeight-1, col) for col in range(1, self.numTilesWidth-1) if self.canOverwriteTile(self.tiles[self.numTilesHeight-1, col])]
-        exit_tiles = [tile for tile in self.availableTiles if tile.propertyFlags & TileProperty.has_exit]
-        exit_index = random.choice(empty_indices)
-        self.tiles[exit_index] = random.choice(exit_tiles)
-
-
-    def placeAgent(self):
-        """
-        Place an agent tile on the map. 
-        The agent tile is always assumed to be the second tile placed, and only one tile can contain the agent.
-        """
-        empty_indices = [(row, col) for row in range(self.numTilesHeight) for col in range(self.numTilesWidth) if self.canOverwriteTile(self.tiles[row, col])]
-        agent_tiles = [tile for tile in self.availableTiles if tile.propertyFlags & TileProperty.has_agent]
-        agent_index = random.choice(empty_indices)
-        self.tiles[agent_index] = random.choice(agent_tiles)
-
-
-    def _validateMetaTile(self, empty_tile, meta_tile):
-        start_row, start_col = empty_tile
-
-        # Walk along left
-        for r in range(start_row, start_row + meta_tile.height):
-            tile = self.tiles[r, start_col]
-            tileReference = self.tiles[r, start_col-1] if start_col > 0 else self.tileSetInfo.padTile
-            if not self._validateTileToReference(tileReference, tile, *self.refence_ranges['left']): 
-                return False
-
-        # Walk along right
-        for r in range(start_row, start_row + meta_tile.height):
-            tile = self.tiles[r, start_col + meta_tile.width - 1]
-            tileReference = self.tiles[r, start_col + meta_tile.width] if (start_col + meta_tile.width < self.numTilesWidth - 1) else self.tileSetInfo.padTile
-            if not self._validateTileToReference(tileReference, tile, *self.refence_ranges['right']): 
-                return False
-
-        # Walk along top
-        for c in range(start_col, start_col + meta_tile.width):
-            tile = self.tiles[start_row, c]
-            tileReference = self.tiles[start_row-1, c] if start_row > 0 else self.tileSetInfo.padTile
-            if not self._validateTileToReference(tileReference, tile, *self.refence_ranges['up']): 
-                return False
-
-        # Walk along bottom
-        for c in range(start_col, start_col + meta_tile.width):
-            tile = self.tiles[start_row + meta_tile.height - 1, c]
-            print('{} {} {}'.format(start_row, meta_tile.height, self.numTilesHeight))
-            tileReference = self.tiles[start_row + meta_tile.height, c] if (start_row + meta_tile.height < self.numTilesHeight - 1) else self.tileSetInfo.padTile
-            if not self._validateTileToReference(tileReference, tile, *self.refence_ranges['down']): 
-                return False
-
-        return True
-
-
-    def findPlacementMetaTile(self, empty_tiles, meta_tile):
-        for empty_tile in empty_tiles:
-            if self._validateMetaTile(empty_tile, meta_tile):
-                # Place cells represented by the tile
-                start_row, start_col = empty_tile
-                tiles_indices = [(row, col) for row in range(start_row, start_row + meta_tile.height) for col in range(start_col, start_col + meta_tile.width)]
-                tiles = meta_tile.tiles.reshape(1, -1)[0]
-                for index, tile in zip(tiles_indices, tiles):
-                    row, col = index
-                    self.tiles[row][col] = tile
-                return True
-        return False
-
-    def _getEmptyMetaTiles(self, width, height):
-        empty_indices = []
-        for row_t in range(self.numTilesHeight - height+1):
-            for col_t in range(self.numTilesWidth - width+1):
-                # (row_t, col) is start of meta tile coverage top left, need to verify all interior tiles are empty
-                interior_cells = [self.canOverwriteTile(self.tiles[r, c]) for r in range(row_t, row_t+height) for c in range(col_t, col_t+width)]
-                if False not in interior_cells:
-                    empty_indices.append([row_t, col_t])
-        return empty_indices
-
-    def placeMetaTile(self):
-        for _ in range(1000):
-            flag = True
-            for meta_tile in self.tileSetInfo.metaTiles:
-                # Find empty locations of same size of meta tile
-                empty_indices = self._getEmptyMetaTiles(meta_tile.width, meta_tile.height)
-                random.shuffle(empty_indices)
-
-                # Successfully found and placed meta tile
-                if not self.findPlacementMetaTile(empty_indices, meta_tile): 
-                    flag = False
-                    break
-
-            if flag: return True
-
-        return False
-
-
-    def placeExitMetaTile(self):
-        random.shuffle(self.tileSetInfo.metaExitTiles)
-        exit_meta_tile = self.tileSetInfo.metaExitTiles[0]
-        empty_indices = self._getEmptyMetaTiles(exit_meta_tile.width, exit_meta_tile.height)
-        # exit starts on lowest row, cant be on boarder column
-        empty_indices = [e for e in empty_indices if e[0] == max(empty_indices, key=lambda x : x[0])[0] and e[1] > 0 and e[1] < self.numTilesWidth-1]
-
-        # randomly choose viable option and place exit meta tile
-        random.shuffle(empty_indices)
-        self.findPlacementMetaTile(empty_indices, exit_meta_tile)
-
-
-
-
-    def findValidPlacement(self, empty_indices, sprite_tiles):
-        """
-        Find a valid placement for the given tile/
-
-        Note:   Methods as defined in (PROCEDURAL GENERATION OF SOKOBAN LEVELS, Taylor & Parberry 2011)
-                are used to determine valid placement of tiles. Each nxn tile has a padding boarder, which
-                determines rules for boarding tiles to match.
-
-        Args:
-            empty_indices (array of index pairs) : List of indicies to try and insert a tile in
-            sprite_tiles (array of Tile) : List of Tile objects
-
-        Returns: True if the tile is inserted, False otherwise (i.e. no valid placement found).
-        """
-        for i in range(len(empty_indices)):
-            empty_index = empty_indices[i]
-            for j in range(len(sprite_tiles)):
-                if self._validateTileToAllNeighbours(sprite_tiles[j], empty_index[0], empty_index[1]):
-                    self.tiles[empty_index] = sprite_tiles[j]
-                    empty_indices.pop(i)
-                    return True
-        return False
-
-
-    def _placeTileCategoryType(self, numOfType, tiles_of_type):
-        # Given a type of tile, randomly select tile of that type and find valid placement
-        empty_indices = [(row, col) for row in range(self.numTilesHeight) for col in range(self.numTilesWidth) if self.canOverwriteTile(self.tiles[row, col])]
-        
-        # For each gem, find random gem tile and random location
-        for _ in range(numOfType):
-            random.shuffle(tiles_of_type)
-            random.shuffle(empty_indices)
-
-            # Try all possibilities until we have valid placement
-            if not self.findValidPlacement(empty_indices, tiles_of_type):
-                return False
-        return True
-
-
-    def placeGems(self):
-        """
-        Place a gem tile on the map. 
-        
-        Note: Depending on the padding rules, it may not be possible to place a gem tile.
-
-        Returns:
-            True if a gem tile can successfully inserted, false otherwise.
-        """
-        gem_tiles = [tile for tile in self.availableTiles if tile.propertyFlags & TileProperty.has_gem]
-        return self._placeTileCategoryType(self.levelDifficulty.numGemTiles, gem_tiles)
-
-    def placeRoundWalls(self):
-        slip_tiles = [tile for tile in self.availableTiles if tile.propertyFlags & TileProperty.is_slippery]
-        return self._placeTileCategoryType(3, slip_tiles)
-
-
-    def placeRocks(self):
-        """
-        Place a rock tile on the map. 
-        
-        Note: Depending on the padding rules, it may not be possible to place a rock tile.
-
-        Returns:
-            True if a rock tile can successfully inserted, false otherwise.
-        """
-        rock_tiles = [tile for tile in self.availableTiles if tile.propertyFlags & TileProperty.has_rock]
-        return self._placeTileCategoryType(self.levelDifficulty.numRockTiles, rock_tiles)
 
     
     def getUnderlyingData(self):
@@ -335,10 +108,25 @@ class Level():
         return data
 
 
-    def _removeIndex(self, index, *lists):
+    def _removeIndex(self, index, lists):
         for l in lists:
             if index in l: l.remove(index)
-        
+
+    def remove_bits(self):
+        for index in self.set_bits_indices:
+            self.tiles[index].removeAllBits()
+
+    def add_bits(self):
+        #Place rock bit complexity
+        bit_indices = self.levelTemplate.getBitIndices()
+        num_bits = self.levelDifficulty.bitComplexity
+        num_bits = random.randint(1, self.levelDifficulty.bitComplexity)
+        self.set_bits_indices.clear()
+
+        for _ in range(num_bits):
+            index = random.choice([i for i in self.rock_placements if self.tiles[i].canAddRockBit()])
+            self.set_bits_indices.append(index)
+            self.tiles[index].addBit()
 
     def randomizeLevel(self):
         """
@@ -349,35 +137,48 @@ class Level():
         """
         self.resetLevel()
         
-        empty_indices = self.levelTemplate.getEmptyIndices()
         agent_indices = self.levelTemplate.getAgentIndices()
-        key_indices = self.levelTemplate.getKeyIndices()
         gem_indices = self.levelTemplate.getGemIndices()
         rock_indices = self.levelTemplate.getRockIndices()
+        key_red_indices = self.levelTemplate.getKeyRedIndices()
+        key_green_indices = self.levelTemplate.getKeyGreenIndices()
+        key_blue_indices = self.levelTemplate.getKeyBlueIndices()
+        key_yellow_indices = self.levelTemplate.getKeyYellowIndices()
+        all_key_info = [
+            (key_red_indices, self.tileSetInfo.getKeyRedTiles),
+            (key_green_indices, self.tileSetInfo.getKeyGreenTiles),
+            (key_blue_indices, self.tileSetInfo.getKeyBlueTiles),
+            (key_yellow_indices, self.tileSetInfo.getKeyYellowTiles)
+        ]
+        all_indices = [
+            agent_indices, gem_indices, rock_indices, key_red_indices, 
+            key_green_indices, key_blue_indices, key_yellow_indices
+        ]
 
         # Place agent
         agent_tiles = self.tileSetInfo.getAgentTiles()
         agent_index = random.choice(agent_indices)
-        self._removeIndex(agent_index, empty_indices, gem_indices, rock_indices, key_indices)
+        self._removeIndex(agent_index, all_indices)
         self.tiles[agent_index] = random.choice(agent_tiles)
 
         # Place key
-        if len(key_indices) > 0:
-            key_tiles = self.tileSetInfo.getKeyTiles()
-            key_index = random.choice(key_indices)
-            self._removeIndex(key_index, empty_indices, gem_indices, rock_indices, key_indices)
-            self.tiles[key_index] = random.choice(key_tiles)
+        for key_indices, key_func in all_key_info:
+            if len(key_indices) > 0:
+                key_tiles = key_func()
+                key_index = random.choice(key_indices)
+                self._removeIndex(key_index, all_indices)
+                self.tiles[key_index] = random.choice(key_tiles)
 
         # Place rocks
         rock_tiles = self.tileSetInfo.getRockTiles()
         num_rocks = self.levelDifficulty.numRockTiles
-        rock_placements = []
+        self.rock_placements = []
         assert num_rocks <= len(rock_indices), "Not enough empty tiles for number of rocks."
         for _ in range(num_rocks):
             rock_index = random.choice(rock_indices)
-            self._removeIndex(rock_index, empty_indices, gem_indices, rock_indices, key_indices)
+            self._removeIndex(rock_index, all_indices)
             self.tiles[rock_index] = copy.deepcopy(random.choice(rock_tiles))
-            rock_placements.append(rock_index)
+            self.rock_placements.append(rock_index)
 
         # Place gems
         gem_tiles = self.tileSetInfo.getGemTiles()
@@ -385,16 +186,11 @@ class Level():
         assert num_gems <= len(gem_indices), "Not enough empty tiles for number of gems."
         for _ in range(num_gems):
             gem_index = random.choice(gem_indices)
-            self._removeIndex(gem_index, empty_indices, gem_indices, rock_indices, key_indices)
+            self._removeIndex(gem_index, all_indices)
             self.tiles[gem_index] = copy.deepcopy(random.choice(gem_tiles))
 
-        #Place rock bit complexity
-        for _ in range(self.levelDifficulty.bitComplexity):
-            # Get tiles with rock and has bit room
-            index = random.choice([i for i in rock_placements if self.tiles[i].canAddRockBit()])
-            self.tiles[index].addBit()
-
-        return
+        # self.add_bits()
+        # self.remove_bits()
         
 
     def _setTileImage(self, image, tile_row, tile_col):

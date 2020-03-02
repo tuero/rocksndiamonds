@@ -1,5 +1,5 @@
 from tilesets.sprite import Sprite, BitField, TRANSPOSITION_BIT_FLAGS
-from tilesets.tile import Tile, TileSetInfo, TileProperty, MetaTile, TileSetInfo1
+from tilesets.tile import Tile, TileSetInfo, TileProperty, MetaTile
 import numpy as np
 
 TILE_WIDTH = 3
@@ -173,6 +173,18 @@ ROCK_TILE4 = Tile(
     TileProperty.has_rock
 )
 
+ROCK_TILE5 = Tile(
+    np.array([
+        [Sprite.null,   Sprite.null,    Sprite.null,    Sprite.null,    Sprite.null],
+        [Sprite.null,   Sprite.empty,    Sprite.rock,    Sprite.empty,    Sprite.null],
+        [Sprite.null,   Sprite.empty,    Sprite.dirt,    Sprite.empty,    Sprite.null],
+        [Sprite.null,   Sprite.empty,    Sprite.empty,    Sprite.empty,    Sprite.null],
+        [Sprite.null,   Sprite.null,    Sprite.null,    Sprite.null,    Sprite.null]
+    ]),
+    0,
+    TileProperty.has_rock
+)
+
 
 # Single gem (corner)
 GEM_TILE1 = Tile(
@@ -243,7 +255,7 @@ GEM_TILE5 = Tile(
 GEM_TILE6 = Tile(
     np.array([
         [Sprite.null,   Sprite.null,            Sprite.empty,       Sprite.null,    Sprite.null],
-        [Sprite.null,   Sprite.empty,           Sprite.rock,        Sprite.rock,    Sprite.null],
+        [Sprite.null,   Sprite.empty,           Sprite.rock,        Sprite.empty,    Sprite.null],
         [Sprite.empty,   Sprite.gem_diamond,    Sprite.dirt,        Sprite.dirt,    Sprite.null],
         [Sprite.null,   Sprite.dirt,            Sprite.empty,       Sprite.empty,   Sprite.null],
         [Sprite.null,   Sprite.null,            Sprite.null,        Sprite.null,    Sprite.null]
@@ -315,6 +327,103 @@ GATE_TILE1 = Tile(
     TileProperty.has_gate
 )
 
+
+DOOR_RED_HORZ_TILE = Tile(
+    np.array([
+        [Sprite.null,   Sprite.null,        Sprite.empty,       Sprite.null,        Sprite.null],
+        [Sprite.null,   Sprite.wall_steel,  Sprite.wall_steel,  Sprite.wall_steel,  Sprite.null],
+        [Sprite.null,   Sprite.wall_steel,  Sprite.wall_steel,  Sprite.wall_steel,  Sprite.null],
+        [Sprite.null,   Sprite.empty,       Sprite.gate_red,    Sprite.empty,       Sprite.null],
+        [Sprite.null,   Sprite.null,        Sprite.null,        Sprite.null,        Sprite.null]
+    ]),
+    0,
+    TileProperty.has_gate
+)
+
+DOOR_BLUE_HORZ_TILE = Tile(
+    np.array([
+        [Sprite.null,   Sprite.null,        Sprite.empty,       Sprite.null,        Sprite.null],
+        [Sprite.null,   Sprite.wall_steel,  Sprite.wall_steel,  Sprite.wall_steel,  Sprite.null],
+        [Sprite.null,   Sprite.wall_steel,  Sprite.wall_steel,  Sprite.wall_steel,  Sprite.null],
+        [Sprite.null,   Sprite.empty,       Sprite.gate_blue,    Sprite.empty,       Sprite.null],
+        [Sprite.null,   Sprite.null,        Sprite.null,        Sprite.null,        Sprite.null]
+    ]),
+    0,
+    TileProperty.has_gate
+)
+
+DOOR_GREEN_HORZ_TILE = Tile(
+    np.array([
+        [Sprite.null,   Sprite.null,        Sprite.empty,       Sprite.null,        Sprite.null],
+        [Sprite.null,   Sprite.wall_steel,  Sprite.wall_steel,  Sprite.wall_steel,  Sprite.null],
+        [Sprite.null,   Sprite.wall_steel,  Sprite.wall_steel,  Sprite.wall_steel,  Sprite.null],
+        [Sprite.null,   Sprite.empty,       Sprite.gate_green,    Sprite.empty,       Sprite.null],
+        [Sprite.null,   Sprite.null,        Sprite.null,        Sprite.null,        Sprite.null]
+    ]),
+    0,
+    TileProperty.has_gate
+)
+
+DOOR_YELLOW_HORZ_TILE = Tile(
+    np.array([
+        [Sprite.null,   Sprite.null,        Sprite.empty,       Sprite.null,        Sprite.null],
+        [Sprite.null,   Sprite.wall_steel,  Sprite.wall_steel,  Sprite.wall_steel,  Sprite.null],
+        [Sprite.null,   Sprite.wall_steel,  Sprite.wall_steel,  Sprite.wall_steel,  Sprite.null],
+        [Sprite.null,   Sprite.empty,       Sprite.gate_yellow,    Sprite.empty,       Sprite.null],
+        [Sprite.null,   Sprite.null,        Sprite.null,        Sprite.null,        Sprite.null]
+    ]),
+    0,
+    TileProperty.has_gate
+)
+
+KEY_RED_TILE = Tile(
+    np.array([
+        [Sprite.null,   Sprite.null,   Sprite.empty,    Sprite.null,        Sprite.null],
+        [Sprite.null,   Sprite.empty,  Sprite.empty,    Sprite.empty,  Sprite.null],
+        [Sprite.null,   Sprite.empty,  Sprite.key_red,  Sprite.empty,  Sprite.null],
+        [Sprite.null,   Sprite.empty,  Sprite.dirt,     Sprite.empty,  Sprite.null],
+        [Sprite.null,   Sprite.null,   Sprite.null,     Sprite.null,        Sprite.null]
+    ]),
+    0,
+    TileProperty.has_key_red
+)
+
+KEY_GREEN_TILE = Tile(
+    np.array([
+        [Sprite.null,   Sprite.null,   Sprite.empty,    Sprite.null,        Sprite.null],
+        [Sprite.null,   Sprite.empty,  Sprite.empty,    Sprite.empty,  Sprite.null],
+        [Sprite.null,   Sprite.empty,  Sprite.key_green,  Sprite.empty,  Sprite.null],
+        [Sprite.null,   Sprite.empty,  Sprite.dirt,     Sprite.empty,  Sprite.null],
+        [Sprite.null,   Sprite.null,   Sprite.null,     Sprite.null,        Sprite.null]
+    ]),
+    0,
+    TileProperty.has_key_green
+)
+
+KEY_BLUE_TILE = Tile(
+    np.array([
+        [Sprite.null,   Sprite.null,   Sprite.empty,    Sprite.null,        Sprite.null],
+        [Sprite.null,   Sprite.empty,  Sprite.empty,    Sprite.empty,  Sprite.null],
+        [Sprite.null,   Sprite.empty,  Sprite.key_blue,  Sprite.empty,  Sprite.null],
+        [Sprite.null,   Sprite.empty,  Sprite.dirt,     Sprite.empty,  Sprite.null],
+        [Sprite.null,   Sprite.null,   Sprite.null,     Sprite.null,        Sprite.null]
+    ]),
+    0,
+    TileProperty.has_key_blue
+)
+
+KEY_YELLOW_TILE = Tile(
+    np.array([
+        [Sprite.null,   Sprite.null,   Sprite.empty,    Sprite.null,        Sprite.null],
+        [Sprite.null,   Sprite.empty,  Sprite.empty,    Sprite.empty,  Sprite.null],
+        [Sprite.null,   Sprite.empty,  Sprite.key_yellow,  Sprite.empty,  Sprite.null],
+        [Sprite.null,   Sprite.empty,  Sprite.dirt,     Sprite.empty,  Sprite.null],
+        [Sprite.null,   Sprite.null,   Sprite.null,     Sprite.null,        Sprite.null]
+    ]),
+    0,
+    TileProperty.has_key_yellow
+)
+
 GATE_BLOCKING_TILE1 = Tile(
     np.array([
         [Sprite.null,   Sprite.null,        Sprite.empty,       Sprite.null,        Sprite.null],
@@ -327,11 +436,95 @@ GATE_BLOCKING_TILE1 = Tile(
     TileProperty.has_gate
 )
 
+GATE_BLOCKING_TILE2 = Tile(
+    np.array([
+        [Sprite.null,   Sprite.null,        Sprite.empty,       Sprite.null,        Sprite.null],
+        [Sprite.null,   Sprite.empty,       Sprite.empty,       Sprite.wall_round,  Sprite.null],
+        [Sprite.null,   Sprite.empty,       Sprite.wall_round,  Sprite.empty,  Sprite.null],
+        [Sprite.null,   Sprite.empty,       Sprite.empty,       Sprite.empty,       Sprite.null],
+        [Sprite.null,   Sprite.null,        Sprite.null,        Sprite.null,        Sprite.null]
+    ]),
+    0,
+    TileProperty.has_gate
+)
+
+BOTTOM_RIGHT_WALL = Tile(
+    np.array([
+        [Sprite.null,   Sprite.null,   Sprite.empty,    Sprite.null,        Sprite.null],
+        [Sprite.null,   Sprite.empty,  Sprite.empty,    Sprite.empty,  Sprite.null],
+        [Sprite.null,   Sprite.empty,  Sprite.empty,    Sprite.empty,  Sprite.null],
+        [Sprite.null,   Sprite.empty,  Sprite.empty,    Sprite.wall_steel,  Sprite.null],
+        [Sprite.null,   Sprite.null,   Sprite.null,     Sprite.null,        Sprite.null]
+    ]),
+    0,
+    0
+)
+
+BOTTOM_LEFT_WALL = Tile(
+    np.array([
+        [Sprite.null,   Sprite.null,   Sprite.empty,    Sprite.null,        Sprite.null],
+        [Sprite.null,   Sprite.empty,  Sprite.empty,    Sprite.empty,  Sprite.null],
+        [Sprite.null,   Sprite.empty,  Sprite.empty,    Sprite.empty,  Sprite.null],
+        [Sprite.null,   Sprite.wall_steel,  Sprite.empty,    Sprite.empty,  Sprite.null],
+        [Sprite.null,   Sprite.null,   Sprite.null,     Sprite.null,        Sprite.null]
+    ]),
+    0,
+    0
+)
+
+UPPER_RIGHT_WALL = Tile(
+    np.array([
+        [Sprite.null,   Sprite.null,   Sprite.empty,    Sprite.null,        Sprite.null],
+        [Sprite.null,   Sprite.empty,  Sprite.empty,    Sprite.wall_steel,  Sprite.null],
+        [Sprite.null,   Sprite.empty,  Sprite.empty,    Sprite.empty,  Sprite.null],
+        [Sprite.null,   Sprite.empty,  Sprite.empty,     Sprite.empty,  Sprite.null],
+        [Sprite.null,   Sprite.null,   Sprite.null,     Sprite.null,        Sprite.null]
+    ]),
+    0,
+    TileProperty.has_key
+)
+
+UPPER_LEFT_WALL = Tile(
+    np.array([
+        [Sprite.null,   Sprite.null,   Sprite.empty,    Sprite.null,        Sprite.null],
+        [Sprite.null,   Sprite.wall_steel,  Sprite.empty,    Sprite.empty,  Sprite.null],
+        [Sprite.null,   Sprite.empty,  Sprite.empty,    Sprite.empty,  Sprite.null],
+        [Sprite.null,   Sprite.empty,  Sprite.empty,     Sprite.empty,  Sprite.null],
+        [Sprite.null,   Sprite.null,   Sprite.null,     Sprite.null,        Sprite.null]
+    ]),
+    0,
+    TileProperty.has_key
+)
+
+BOTTOM_ALL_WALL = Tile(
+    np.array([
+        [Sprite.null,   Sprite.null,   Sprite.empty,    Sprite.null,        Sprite.null],
+        [Sprite.null,   Sprite.empty,  Sprite.empty,    Sprite.empty,  Sprite.null],
+        [Sprite.null,   Sprite.empty,  Sprite.empty,    Sprite.empty,  Sprite.null],
+        [Sprite.null,   Sprite.wall_steel,  Sprite.empty,     Sprite.wall_steel,  Sprite.null],
+        [Sprite.null,   Sprite.null,   Sprite.null,     Sprite.null,        Sprite.null]
+    ]),
+    0,
+    TileProperty.has_key
+)
+
+UPPER_ALL_WALL = Tile(
+    np.array([
+        [Sprite.null,   Sprite.null,   Sprite.empty,    Sprite.null,        Sprite.null],
+        [Sprite.null,   Sprite.wall_steel,  Sprite.empty,    Sprite.wall_steel,  Sprite.null],
+        [Sprite.null,   Sprite.empty,  Sprite.empty,    Sprite.empty,  Sprite.null],
+        [Sprite.null,   Sprite.empty,  Sprite.empty,     Sprite.empty,  Sprite.null],
+        [Sprite.null,   Sprite.null,   Sprite.null,     Sprite.null,        Sprite.null]
+    ]),
+    0,
+    TileProperty.has_key
+)
+
 KEY_TILE1 = Tile(
     np.array([
         [Sprite.null,   Sprite.null,   Sprite.empty,    Sprite.null,        Sprite.null],
         [Sprite.null,   Sprite.empty,  Sprite.empty,    Sprite.empty,  Sprite.null],
-        [Sprite.null,   Sprite.empty,  Sprite.key_red,  Sprite.empty,  Sprite.null],
+        [Sprite.null,   Sprite.empty,  Sprite.empty,  Sprite.empty,  Sprite.null],
         [Sprite.null,   Sprite.empty,  Sprite.dirt,     Sprite.empty,  Sprite.null],
         [Sprite.null,   Sprite.null,   Sprite.null,     Sprite.null,        Sprite.null]
     ]),
@@ -378,14 +571,31 @@ META_GATE = MetaTile(1, 1, np.array([[GATE_TILE1]]))
 META_ROCK1 = MetaTile(1, 1, np.array([[ROCK_TILE4]]))
 META_GATE_BLOCKING1 = MetaTile(1, 1, np.array([[GATE_BLOCKING_TILE1]]))
 
-# Info for level to use
-tileSetInfo = TileSetInfo(TILE_WIDTH, TILE_HEIGHT, EMPTY_TILE, BLOCKING_TILE, PAD_TILE, ALL_TILES, [META_2, META_2, META_1], [META_4])
+# ---------------------------
 
 META_EXIT1 = MetaTile(1, 2, np.array([[ROCK_TILE2], [EXIT_TILE4]]))
 ALL_TILES1 = [
     AGENT_TILE,
     ROCK_TILE1, ROCK_TILE2, ROCK_TILE3,
-    GEM_TILE1, GEM_TILE3, GEM_TILE4,
-    GATE_TILE1, KEY_TILE1
+    # ROCK_TILE5,
+    # GEM_TILE1, GEM_TILE3, GEM_TILE4,
+    GEM_TILE4,
+    GATE_TILE1, 
+    KEY_RED_TILE, KEY_GREEN_TILE, KEY_BLUE_TILE, KEY_YELLOW_TILE,
+    DOOR_RED_HORZ_TILE, DOOR_GREEN_HORZ_TILE, DOOR_BLUE_HORZ_TILE, DOOR_YELLOW_HORZ_TILE
 ]
-tileSetInfo1 = TileSetInfo1(TILE_WIDTH, TILE_HEIGHT, ALL_TILES1)
+tileSetInfo = TileSetInfo(TILE_WIDTH, TILE_HEIGHT, ALL_TILES1)
+
+META_00 = MetaTile(1, 2, np.array([[ROCK_TILE2], [EXIT_TILE4]]))        # Exit with 2 rocks above
+# META_00 = MetaTile(1, 2, np.array([[ROCK_TILE5], [EXIT_TILE4]]))        # Exit with 2 rocks above
+META_10 = MetaTile(1, 2, np.array([[GEM_TILE6], [GEM_TILE5]]))          # Diamond with trap
+META_20 = MetaTile(1, 1, np.array([[ROCK_TILE4]]))                      # 3 rocks
+META_21 = MetaTile(1, 1, np.array([[GATE_BLOCKING_TILE1]]))             # Gate blocking (door on right)
+META_22 = MetaTile(1, 1, np.array([[GATE_BLOCKING_TILE2]]))             # Gate blocking (door on left)
+META_23 = MetaTile(1, 1, np.array([[GEM_TILE4]]))                       # single diamond
+META_30 = MetaTile(1, 1, np.array([[BOTTOM_RIGHT_WALL]]))               # bottom right corner for forced middle
+META_31 = MetaTile(1, 1, np.array([[BOTTOM_LEFT_WALL]]))                # bottom left corner for forced middle
+META_32 = MetaTile(1, 1, np.array([[UPPER_RIGHT_WALL]]))                # upper right corner for forced middle
+META_33 = MetaTile(1, 1, np.array([[UPPER_LEFT_WALL]]))                 # upper left corner for forced middle
+META_34 = MetaTile(1, 1, np.array([[BOTTOM_ALL_WALL]]))                 # bottom left and right corner for forced middle
+META_35 = MetaTile(1, 1, np.array([[UPPER_ALL_WALL]]))                  # upper left and right corner for forced middle

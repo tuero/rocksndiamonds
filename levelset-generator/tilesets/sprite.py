@@ -21,6 +21,7 @@ class Sprite(enum.IntEnum):
     wall_round      = 0x0003
     gem_diamond     = 0x0038
     agent           = 0x0050
+    bitwall         = 0x0002
 
 
 # Transposition flags
@@ -71,6 +72,7 @@ SPRITE_IMG = {
     Sprite.gate_green   :    Image.open(SPRITES_DIR + 'gate_green.png'),
     Sprite.door_exit    :    Image.open(SPRITES_DIR + 'door_exit.png'),
     Sprite.wall_steel   :    Image.open(SPRITES_DIR + 'wall_steel.png'),
+    Sprite.bitwall      :    Image.open(SPRITES_DIR + 'wall_steel.png'),
     Sprite.wall_round   :    Image.open(SPRITES_DIR + 'wall_round.png'),
     Sprite.agent        :    Image.open(SPRITES_DIR + 'agent.png')
 }

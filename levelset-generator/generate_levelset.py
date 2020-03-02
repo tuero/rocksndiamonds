@@ -3,8 +3,8 @@ import pathlib
 import argparse
 
 from level_generator.level import Level, LevelDifficulty
-from tilesets.tileset_3by3 import tileSetInfo, tileSetInfo1
-from tilesets.leveltemplates import template_1, template_2, template_3
+from tilesets.tileset_3by3 import tileSetInfo
+from tilesets.leveltemplates import LevelTemplate
 
 # Byte offsets for level information
 GEM_OFFSET              = int("0x8D", 16)
@@ -93,7 +93,7 @@ def makeFileFromLevel(filename, level):
     return
 
 
-def createLevelset(name, size, width, height, gem_tiles, rock_tiles, gems_required, bit_complexity):
+def createLevelset(name, size, gem_tiles, rock_tiles, gems_required, bit_complexity, args_template):
     # if (gems_required > gem_tiles):
     #     print('Error: gems_required shouldn\'t be greater than gem_tiles')
     #     return
@@ -111,11 +111,14 @@ def createLevelset(name, size, width, height, gem_tiles, rock_tiles, gems_requir
 
     # Create template level
     levelDifficulty = LevelDifficulty(numGemTiles=gem_tiles, numRockTiles=rock_tiles, numGemsRequired=gems_required, bitComplexity=bit_complexity)
-    level = Level(width, height, tileSetInfo1, levelDifficulty, template_3)
+    template_dir = str(pathlib.Path(__file__).parent.absolute()) + '/level_templates/' + args_template + '.txt'
+    level = Level(tileSetInfo, levelDifficulty, LevelTemplate(template_dir))
 
     # Create levels
+    level.randomizeLevel()
     for i in range(1, size+1):
-        level.randomizeLevel()
+        level.remove_bits()
+        level.add_bits()
         makeFileFromLevel(levelset_dir + LEVEL_NAME.format(i), level)
 
 
@@ -130,8 +133,6 @@ def _check_levelset_size(value):
         raise argparse.ArgumentTypeError
 
 
-DEFAULT_WIDTH = 5
-DEFAULT_HEIGHT = 5
 DEFAULT_GEM_TILES = 3
 DEFAULT_ROCK_TILES = 2
 
@@ -139,12 +140,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Levelset generator')
     parser.add_argument("-n", "--name", required=True, help="Levelset name")
     parser.add_argument("-s", "--size", required=True, type=_check_levelset_size, help="Number of levels to generate.")
-    parser.add_argument("--width", required=False, type=int, default=DEFAULT_WIDTH, help="Width of levels in number of tiles.")
-    parser.add_argument("--height", required=False, type=int, default=DEFAULT_HEIGHT, help="Height of levels in number of tiles.")
     parser.add_argument("--gem_tiles", required=False, type=int, default=DEFAULT_GEM_TILES, help="Number of gem tiles.")
     parser.add_argument("--rock_tiles", required=False, type=int, default=DEFAULT_ROCK_TILES, help="Number of rock tiles.")
     parser.add_argument("--gems_required", required=False, type=int, default=1, help="Number of gem required to solve the level.")
     parser.add_argument("--bit_complexity", required=False, type=int, default=0, help="Number wall bits to add.")
+    parser.add_argument("--template", required=False, type=str, default="01", help="Level template.")
     args = parser.parse_args()
 
-    createLevelset(args.name, args.size, args.width, args.height, args.gem_tiles, args.rock_tiles, args.gems_required, args.bit_complexity)
+    createLevelset(args.name, args.size, args.gem_tiles, args.rock_tiles, args.gems_required, args.bit_complexity, args.template)
