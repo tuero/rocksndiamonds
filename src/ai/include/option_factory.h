@@ -40,6 +40,11 @@ private:
     std::vector<BaseOption*> createSingleActionOptions();
 
     /**
+     * Create options for each of the single step actions (excluding NOOP).
+     */
+    std::vector<BaseOption*> createSingleActionNoNoopOptions();
+
+    /**
      * Create options for path finding for each sprite on screen
      *
      * @return Vector containing pointers to each sprite option.

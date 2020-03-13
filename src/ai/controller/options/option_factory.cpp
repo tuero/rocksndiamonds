@@ -30,6 +30,24 @@ std::vector<BaseOption*> OptionFactory::createSingleActionOptions() {
     options_.clear();
 
     // Single action for each available 
+    for (Action action : enginetype::ALL_ACTIONS) {
+        std::unique_ptr<OptionSingleStep> option = std::make_unique<OptionSingleStep>(action, 1);
+        options_.push_back(std::move(option));
+        optionPointers.push_back(options_.back().get());
+    }
+
+    return optionPointers;
+}
+
+
+/**
+ * Create options for each of the single step actions (excluding NOOP).
+ */
+std::vector<BaseOption*> OptionFactory::createSingleActionNoNoopOptions() {
+    std::vector<BaseOption*> optionPointers;
+    options_.clear();
+
+    // Single action for each available 
     for (Action action : enginetype::ALL_ACTIONS_NO_NOOP) {
         std::unique_ptr<OptionSingleStep> option = std::make_unique<OptionSingleStep>(action, 1);
         options_.push_back(std::move(option));
@@ -84,9 +102,11 @@ std::vector<BaseOption*> OptionFactory::createCustomOptions() {
 std::vector<BaseOption*> OptionFactory::createOptions(OptionFactoryType optionFactoryType) {
     optionFactoryType_ = optionFactoryType;
     switch (optionFactoryType) {
-        case OptionFactoryType::SINGLE_ACTION :
+        case OptionFactoryType::SINGLE_ACTION:
             return createSingleActionOptions();
-        case OptionFactoryType::PATH_TO_SPRITE :
+        case OptionFactoryType::SINGLE_ACTION_NO_NOOP:
+            return createSingleActionNoNoopOptions();
+        case OptionFactoryType::PATH_TO_SPRITE:
             return createPathToSpriteOptions();
         case OptionFactoryType::CUSTOM :
             return createCustomOptions();

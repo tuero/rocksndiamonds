@@ -17,7 +17,7 @@
  * 
  * @note Add new option types here.
  */
-enum OptionType {SingleAction, ToCollectibleSprite, ToExit, Misc};
+enum OptionType {SingleAction, SingleActionNoNoop, ToCollectibleSprite, ToExit, Misc};
 
 
 /**
@@ -27,6 +27,7 @@ enum OptionType {SingleAction, ToCollectibleSprite, ToExit, Misc};
  */
 enum class OptionFactoryType {
     SINGLE_ACTION = 0,
+    SINGLE_ACTION_NO_NOOP,
     PATH_TO_SPRITE,
     TWO_LEVEL_SEARCH,
     CUSTOM

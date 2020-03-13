@@ -214,6 +214,11 @@ void MCTS::handleLevelStart() {
     setParamsFromConfig();
     optionStatusFlag_ = true;
     nextOption_ = &noopOption;
+
+    // Set options to try and avoid pathing into cells which cause an auto death (rock immediately above)
+    for (auto const & option : availableOptions_) {
+        option->setPrioritizeSafeCells(true);
+    }
 }
 
 
