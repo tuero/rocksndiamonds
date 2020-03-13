@@ -15,6 +15,7 @@
 #include "engine_types.h"
 #include "engine_helper.h"
 #include "logger.h"
+#include "../../util/file_dir_naming.h"
 
 using namespace enginehelper;
 
@@ -29,7 +30,7 @@ Replay::Replay(){
     try{
         requestReset_ = false;
         replayFileName = enginestate::getReplayFileName();
-        replayFileStream.open(REPLAY_DIR + replayFileName, std::ifstream::in);
+        replayFileStream = getFileStreamIn(REPLAY_DIR + replayFileName);
 
         uint64_t seed;
         std::string level_set;
@@ -43,9 +44,6 @@ Replay::Replay(){
 
         // Call respective methods to set above data
         RNG::setEngineSeed(seed);
-        options.level_set = (char*)level_set.c_str();
-        levelinfo::setLevelSet();
-        levelinfo::loadLevel(level_num);
     }
     catch (...) {
         PLOGE_(logger::ConsoleLogger) << "An error occured trying to initialize levelset/level from replay file. Exiting.";

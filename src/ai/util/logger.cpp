@@ -110,6 +110,8 @@ namespace logger {
     }
 
     void initReplayDirectory() {
+        if (options.controller_type == CONTROLLER_REPLAY) {return;}
+        
         // Initialize the replay directory (needs to be done here in the event initReplayFile is not set but )
         REPLAY_DIR_FULL = REPLAY_DIR_BASE + getFileDirName() + "/";
         int rc = mkdir(REPLAY_DIR_FULL.c_str(), 0777);

@@ -7808,10 +7808,18 @@ int main(int argc, char *argv[])
     // save the levelsetup as last series played, then let OpenAll() load. By default, OpenAll() will
     // load the levelset last played, which we mask to the one we want now.
     initLogger(argc, argv);
-    if (options.controller_type != CONTROLLER_DEFAULT) {
+
+    // If we are replaying a run, load levelset info from the replay file manually
+    if (options.controller_type == CONTROLLER_REPLAY) {
+        if (loadReplayLevelSetAndLevel()) {return 1;}
+    }
+
+    // Only save replay/stats if not already in a replay
+    if (options.controller_type != CONTROLLER_DEFAULT && options.controller_type != CONTROLLER_REPLAY) {
         initStatsFile();
         initReplayDirectory();
     }
+
     setLevelSet();
 
   OpenAll();

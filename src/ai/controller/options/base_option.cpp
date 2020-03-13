@@ -184,7 +184,7 @@ struct CompareNode {
     bool operator() (Node* left, Node* right) const {
         float vleft = left->g + left->h;
         float vright = right->g + right->h;
-        return vleft < vright || (vleft == vright && left < right);
+        return vleft < vright || (vleft == vright && left->id < right->id);
     }
 };
 

@@ -13,6 +13,8 @@
 // Standard Libary/STL
 #include <string>
 #include <vector>
+#include <iostream>
+#include <fstream>
 
 // Includes
 #include "engine_helper.h"      // Engine helper functions
@@ -20,6 +22,7 @@
 #include "logger.h"             // Logger
 #include "statistics.h"
 #include "level_programming.h"
+#include "util/file_dir_naming.h"
 
 // Controller
 #include "controller/controller.h"
@@ -182,6 +185,43 @@ extern "C" void setLevelSet(void) {
  */
 extern "C" void loadLevel(int levelNumber) {
     levelinfo::loadLevel(levelNumber);
+}
+
+
+const std::string REPLAY_DIR = "./src/ai/replays/";         // Replay files location
+
+/**
+ * Set the levelset and level if using a replay file
+ */
+extern "C" int loadReplayLevelSetAndLevel(void) {
+    std::string fileName = REPLAY_DIR + enginestate::getReplayFileName();
+    std::ifstream replayFileStream;
+
+    try {
+        std::ifstream replayFileStream = getFileStreamIn(fileName);
+    }
+    catch (...) {
+        std::cerr << "Unable to open replay file " << fileName << std::endl;
+        return 1;
+    }
+
+    uint64_t seed;
+    std::string level_set;
+    int level_num;
+
+    // File order is seed, levelset, level number
+    // Reset of file are actions taken
+    replayFileStream >> seed;
+    replayFileStream >> level_set;
+    replayFileStream >> level_num;
+
+    replayFileStream.close();
+
+    // Set levelset to as if it were manually set
+    options.level_set = (char*)level_set.c_str();
+    options.level_number = level_num;
+
+    return 0;
 }
 
 // ----------------------- Action Handler --------------------------

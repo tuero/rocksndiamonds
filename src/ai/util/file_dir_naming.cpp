@@ -42,3 +42,14 @@ std::string getFileDirName() {
     pid_t pid = getpid();
     return datetimeToString() + "_" + std::to_string(pid);
 }
+
+
+/**
+ * Get an input filestream for the given filename.
+ */
+std::ifstream getFileStreamIn(const std::string &fileName) {
+    std::ifstream fileStream;                             // Replay file stream
+    fileStream.open(fileName, std::ifstream::in);
+    if (fileStream.fail()) {throw std::exception();}
+    return fileStream;
+}

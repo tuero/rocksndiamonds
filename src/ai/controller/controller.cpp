@@ -102,9 +102,6 @@ void Controller::handleLevelSolved() {
     PLOGI_(logger::FileLogger) << "Game solved.";
     PLOGI_(logger::ConsoleLogger) << "Game solved.";
 
-    // Stats
-    statistics::numLevelTries += 1;
-
     PLOGI_(logger::FileLogger) << "Number of attempts = " << statistics::numLevelTries;
     PLOGI_(logger::ConsoleLogger) << "Number of attempts = " << statistics::numLevelTries;
 

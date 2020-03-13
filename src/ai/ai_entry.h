@@ -93,6 +93,13 @@ extern "C"
      */
     void setLevel(int levelNumber);
 
+    /**
+     * Set the levelset and level if using a replay file
+     * 
+     * @return 0 if successful, 1 if a failure occurs
+     */
+    extern int loadReplayLevelSetAndLevel(void);
+
 
     // --------------- Action Handler ------------------
 
