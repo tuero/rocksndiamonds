@@ -39,12 +39,12 @@ void TwoLevelSearch::setLowLevelConstraints(const NodeLevin &node) {
 #ifdef SKIP_REQUIRED_GEMS_DOOR
     if (node.numGems >= levelinfo::getLevelGemsNeeded() && node.hasDoor) {
 #endif
-        highlevelPlannedPath_ = tlshash::hashToItemPath(node.hash, multiplier_, availableOptions_);
+        highlevelPlannedPath_ = node.path;
         uint64_t constraintBits = tlsbits::getNextConstraintBits(node.combinatorialPartition);
 
         // Set constraints from bits for each option in the high level path
         uint64_t mask = 1;
-        std::vector<uint64_t> pathHashes = tlshash::givenPathItemPairHashes(availableOptions_, multiplier_, highlevelPlannedPath_);
+        std::vector<uint64_t> pathHashes = tlshash::pathToPairHashes(availableOptions_, highlevelPlannedPath_);
         for (int i = 0; i < (int)pathHashes.size(); i++) {
             highlevelPlannedPath_[i]->clearRestrictedCells();
             for (auto const & constraint : restrictedCellsByOption_[pathHashes[i]]) {
@@ -69,13 +69,13 @@ void TwoLevelSearch::setLowLevelConstraints(const NodeLevin &node) {
 #ifdef SKIP_REQUIRED_GEMS_DOOR
     if (node.numGems >= levelinfo::getLevelGemsNeeded() && node.hasDoor) {
 #endif
-        highlevelPlannedPath_ = tlshash::hashToItemPath(node.hash, multiplier_, availableOptions_);
+        highlevelPlannedPath_ = node.path;
         if (node.combinatorialPartition.isComplete()) {
             PLOGE_(logger::FileLogger) << "All constraints checked.";
             throw std::exception();
         }
         uint64_t constraintBits = tlsbits::getNextConstraintBits(node.combinatorialPartition);
-        PLOGD_(logger::FileLogger) << std::bitset<12>(constraintBits);
+        // PLOGD_(logger::FileLogger) << std::bitset<12>(constraintBits);
 
         // Set constraints from bits for each option in the high level path
         uint64_t mask = 1;
@@ -105,8 +105,8 @@ void TwoLevelSearch::setLowLevelConstraints(const NodeLevin &node) {
         //         }
         //     }
         // }
-        PLOGD_(logger::FileLogger) << "Node: " << node.hash << ", constraints: " << node.numConstraints 
-            << " , visited: " << node.timesVisited;
+        // PLOGD_(logger::FileLogger) << "Node: " << node.hash << ", constraints: " << node.numConstraints 
+        //     << " , visited: " << node.timesVisited;
 #ifdef SKIP_REQUIRED_GEMS_DOOR
     }
 #endif
@@ -130,26 +130,26 @@ void TwoLevelSearch::modifiedLevinTS() {
 
     // Add children (additional high-level action)
     if (node.timesVisited == 0) {
-        std::vector<BaseOption*> nodeOptions = tlshash::hashToItemPath(node.hash, multiplier_, availableOptions_);
-        std::vector<BaseOption*> childOptions = nodeOptions;
-        childOptions.push_back(nullptr);
+        std::vector<BaseOption*> nodePath = node.path;
+        std::vector<BaseOption*> childPath = nodePath;
+        childPath.push_back(nullptr);
 
         // If option not already on path, add as a child
         for (auto const & option : availableOptions_) {
-            bool in_path = std::find(nodeOptions.begin(), nodeOptions.end(), option) != nodeOptions.end();
-            bool valid_door = option->getOptionType() == OptionType::ToDoor && nodeOptions[nodeOptions.size()-1]->getOptionType() != OptionType::ToDoor;
+            bool in_path = std::find(nodePath.begin(), nodePath.end(), option) != nodePath.end();
+            bool valid_door = option->getOptionType() == OptionType::ToDoor && nodePath[nodePath.size()-1]->getOptionType() != OptionType::ToDoor;
             if (valid_door || !in_path) {
-                childOptions.back() = option;
-                uint64_t hash = tlshash::itemPathToHash(availableOptions_, childOptions, multiplier_);
+                childPath.back() = option;
+                uint64_t nodeHash = tlshash::hashPath(availableOptions_, childPath);
                 int numGems = node.numGems + elementproperty::getItemGemCount(gridinfo::getSpriteGridCell(option->getSpriteID()));
                 bool hasDoor = elementproperty::isExit(gridinfo::getSpriteGridCell(option->getSpriteID()));
             #ifndef SET_RESTRICTIONS
-                int restriction_count = restrictionCountForPath(childOptions);
-                openLevinNodes_.insert({hash, childOptions.size(), 0, restriction_count, CombinatorialPartition(restriction_count), numGems, hasDoor});
+                int restriction_count = restrictionCountForPath(childPath);
+                openLevinNodes_.insert({nodeHash, childPath.size(), 0, restriction_count, CombinatorialPartition(restriction_count), numGems, hasDoor});
             #else
-                setPathRestrictionSet(hash, childOptions);
-                int restriction_count = restrictedCellsByPath_[hash].size();
-                openLevinNodes_.insert({hash, childOptions.size(), 0, restriction_count, CombinatorialPartition(restriction_count), numGems, hasDoor});
+                setPathRestrictionSet(nodeHash, childPath);
+                int restriction_count = restrictedCellsByPath_[nodeHash].size();
+                openLevinNodes_.insert({childPath, nodeHash, childPath.size(), 0, restriction_count, CombinatorialPartition(restriction_count), numGems, hasDoor});
             #endif
             }
         }
@@ -179,7 +179,7 @@ void TwoLevelSearch::singlePath() {
  * low level path algorithm is called.
  */
 void TwoLevelSearch::highLevelSearch() {
-    PLOGD_(logger::FileLogger) << "Starting high level search.";
+    // PLOGD_(logger::FileLogger) << "Starting high level search.";
 
     // High level search
     highlevelPlannedPath_.clear();
@@ -191,7 +191,7 @@ void TwoLevelSearch::highLevelSearch() {
     singlePath();
 #endif
 
-    currentHighLevelPathHash_ = tlshash::itemPathToHash(availableOptions_, highlevelPlannedPath_, multiplier_);
+    currentHighLevelPathHash_ = tlshash::hashPath(availableOptions_, highlevelPlannedPath_);
     // incrementPathTimesVisited();
 }
 

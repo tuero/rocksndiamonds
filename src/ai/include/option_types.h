@@ -17,7 +17,7 @@
  * 
  * @note Add new option types here.
  */
-enum OptionType {SingleAction, SingleActionNoNoop, ToCollectibleSprite, ToExit, Misc};
+enum OptionType {SingleAction, SingleActionNoNoop, ToCollectibleSprite, ToExit, ToDoor, Misc};
 
 
 /**

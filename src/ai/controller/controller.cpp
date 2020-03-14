@@ -73,7 +73,7 @@ void Controller::handleFirstLevelStart() {
  */
 void Controller::reset() {
     PLOGD_(logger::FileLogger) << "Resetting controller.";
-    PLOGD_(logger::ConsoleLogger) << "Resetting controller.";
+    // PLOGD_(logger::ConsoleLogger) << "Resetting controller.";
 
     actionsTaken_.clear();
 
@@ -124,7 +124,7 @@ void Controller::handleLevelSolved() {
  * Depending on the controller, this will either terminate or attempt the level again.
  */
 void Controller::handleLevelFailed() {
-    static const int MSG_FREQ = 10000;
+    static const int MSG_FREQ = 1000;
     statistics::numLevelTries += 1;
 
     if (baseController_.get()->retryOnLevelFail()) {

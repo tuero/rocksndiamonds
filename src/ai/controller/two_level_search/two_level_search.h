@@ -28,7 +28,7 @@
 #include "base_option.h"
 #include "game_state.h"
 
-#define SINGLE_PATH
+// #define SINGLE_PATH
 #define SET_RESTRICTIONS
 // #define MANUAL_CONSTRAINTS
 
@@ -41,7 +41,6 @@ class TwoLevelSearch : public BaseController {
 private:
     bool optionStatusFlag_ = true;                                                  // Flag signifying current option is complete
     int solutionIndex_;                                                             // Current index in the high level path
-    uint64_t multiplier_;                                                           // Multiplier used for hashing
     BaseOption* previousOption_;                                                    // Pointer to previous option in high level path
     BaseOption* currentOption_;                                                     // Pointer to current option in high level path
 

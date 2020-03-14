@@ -16,7 +16,7 @@ key_red = ['KR', 'AR', 'CR']
 key_green = ['KG', 'AG', 'CG']
 key_blue = ['KB', 'AB', 'CB']
 key_yellow = ['KY', 'AY', 'CY']
-bits = ['AR', 'AG', 'AB', 'AY', 'CR', 'CG', 'CB', 'CY', 'NK']
+bits = ['AR', 'AG', 'AB', 'AY', 'CR', 'CG', 'CB', 'CY', 'NK', 'RR']
 
 codes_list = [
     agent_codes, gem_codes, rock_codes, 

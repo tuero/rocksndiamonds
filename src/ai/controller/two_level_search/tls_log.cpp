@@ -61,16 +61,21 @@ void TwoLevelSearch::logHighLevelPath() {
  */
 void TwoLevelSearch::logRestrictedSprites() {
     PLOGD_(logger::FileLogger) << "Cells with restrictions: " << highlevelPlannedPath_.size();
-    for (auto const & hash : tlshash::allItemsPairHashes(availableOptions_, multiplier_)) {
-        std::array<std::size_t, 2> optionIndexPair = tlshash::hashToItemIndexPair(hash, multiplier_);
-        if (optionIndexPair[0] == optionIndexPair[1]) {
-            PLOGD_(logger::FileLogger) << "Restrictions for root to option " << availableOptions_[optionIndexPair[0]]->toString();
-        } else {
-            PLOGD_(logger::FileLogger) << "Restrictions for option " << availableOptions_[optionIndexPair[0]]->toString() 
-            << " to option " << availableOptions_[optionIndexPair[1]]->toString();
-        }
-        for (auto const & restriction : restrictedCellsByOption_[hash]) {
-            PLOGD_(logger::FileLogger) << "x = " << gridinfo::indexToCell(restriction).x << ", y = " << gridinfo::indexToCell(restriction).y ;
+
+    for (auto const & prev : availableOptions_) {
+        for (auto const & curr : availableOptions_) {
+            uint64_t hash;
+            if (prev == curr) {
+                hash = tlshash::hashPath(availableOptions_, {prev});
+                PLOGD_(logger::FileLogger) << "Restrictions for root to option " << prev->toString();
+            }
+            else {
+                hash = tlshash::hashPath(availableOptions_, {prev, curr});
+                PLOGD_(logger::FileLogger) << "Restrictions for option " << prev->toString() << " to option " << curr->toString();
+            }
+            for (auto const & restriction : restrictedCellsByOption_[hash]) {
+                PLOGD_(logger::FileLogger) << "x = " << gridinfo::indexToCell(restriction).x << ", y = " << gridinfo::indexToCell(restriction).y ;
+            }
         }
     }
 }
@@ -84,7 +89,7 @@ void TwoLevelSearch::logLevinNodes() {
         //     << " , visited: " << node.timesVisited << ", cost: " << node.cost();
         PLOGD_(logger::FileLogger) << "Node: " << node.hash << ", constraints: " << node.numConstraints 
             << " , visited: " << node.timesVisited;
-        for (auto const & option : tlshash::hashToItemPath(node.hash, multiplier_, availableOptions_)) {
+        for (auto const & option : node.path) {
             PLOGD_(logger::FileLogger) << option->toString();
         }
     }

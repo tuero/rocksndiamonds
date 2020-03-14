@@ -36,12 +36,6 @@ std::string TwoLevelSearch::controllerDetailsToString() {
 
 void TwoLevelSearch::initializeOptions() {
     availableOptions_ = optionFactory_.createOptions(optionFactoryType_);
-
-    multiplier_ = 10;
-    while (multiplier_ < (uint64_t)availableOptions_.size()) {
-        multiplier_ *= 10;
-    }
-    PLOGD_(logger::FileLogger) << "Multiplier used for hashing: " << multiplier_;
 }
 
 
@@ -51,12 +45,6 @@ void TwoLevelSearch::initializeOptions() {
 void TwoLevelSearch::resetOptions() {
     if (highlevelPlannedPath_.empty()) {
         availableOptions_ = optionFactory_.createOptions(optionFactoryType_);
-
-        multiplier_ = 10;
-        while (multiplier_ <= (uint64_t)availableOptions_.size()) {
-            multiplier_ *= 10;
-        }
-        PLOGD_(logger::FileLogger) << "Multiplier used for hashing: " << multiplier_;
     }
 }
 
@@ -93,7 +81,7 @@ void TwoLevelSearch::initializationForEveryLevelStart() {
     PLOGD_(logger::FileLogger) << "------------------------";
     highLevelSearch();
     incrementPathTimesVisited();
-    logHighLevelPath();
+    // logHighLevelPath();
     // logRestrictedSprites();
 }
 
@@ -122,7 +110,7 @@ void TwoLevelSearch::handleLevelStart() {
     restrictedCellsByOption_.clear();
     restrictedCellsByPath_.clear();
     restrictedCellsByOptionCount_.clear();
-    for (auto const & hash : tlshash::allItemsPairHashes(availableOptions_, multiplier_)) {
+    for (auto const & hash : tlshash::allItemsPairHashes(availableOptions_)) {
         restrictedCellsByOption_[hash] = {};
         restrictedCellsByOptionCount_[hash] = 0;
     }
@@ -153,7 +141,7 @@ void TwoLevelSearch::handleLevelStart() {
     // Agent starting position to each highlevel action
     enginetype::GridCell startCell = gridinfo::getPlayerPosition();
     for (auto const & option : availableOptions_) {
-        uint64_t hash = tlshash::itemPairHash(availableOptions_, multiplier_, option, option);
+        uint64_t hash = tlshash::pathHash(availableOptions_, {option});
         option->runAStar(startCell, option->getGoalCell());
         // Walk along base path and if a rock is above, set as restriction
         // addRestrictionsIfApplicable(hash, option->getSolutionPath());
@@ -167,23 +155,23 @@ void TwoLevelSearch::handleLevelStart() {
     }
     PLOGE_(logger::FileLogger) << "----------------";
     // Pair options
-    for (auto const & hash : tlshash::allItemsPairHashes(availableOptions_, multiplier_)) {
-        std::array<std::size_t, 2> pair = tlshash::hashToItemIndexPair(hash, multiplier_);
-        BaseOption* prev = availableOptions_[pair[0]];
-        BaseOption* curr = availableOptions_[pair[1]];
-        curr->runAStar(prev->getGoalCell(), curr->getGoalCell());
+    for (auto & prev : availableOptions_) {
+        for (auto & curr : availableOptions_) {
+            // Same option means starting position to option, handled above
+            if (prev == curr) {continue;}
+            uint64_t hash = tlshash::pathHash(availableOptions_, {prev, curr});
+            
+            // Set path
+            curr->runAStar(prev->getGoalCell(), curr->getGoalCell());
 
-        if (pair[0] == 1 && pair[1] == 4) {
-            PLOGE_(logger::FileLogger) << curr->getSolutionPath().size();
-        }
-
-        // Walk along base path and if a rock is above, set as restriction
-        // addRestrictionsIfApplicable(hash, curr->getSolutionPath());
-        for (auto const & cell :curr->getSolutionPath()) {
-            if (std::find(rockCells.begin(), rockCells.end(), cell) != rockCells.end()) {
-                restrictedCellsByOption_[hash].insert(gridinfo::cellToIndex(cell));
-                ++restrictedCellsByOptionCount_[hash];
-                PLOGE_(logger::FileLogger) << prev->toString() << " -> " << curr->toString() << ", (" << cell.x << ", " << cell.y << ")";
+            // Walk along base path and if a rock is above, set as restriction
+            // addRestrictionsIfApplicable(hash, curr->getSolutionPath());
+            for (auto const & cell :curr->getSolutionPath()) {
+                if (std::find(rockCells.begin(), rockCells.end(), cell) != rockCells.end()) {
+                    restrictedCellsByOption_[hash].insert(gridinfo::cellToIndex(cell));
+                    ++restrictedCellsByOptionCount_[hash];
+                    PLOGE_(logger::FileLogger) << prev->toString() << " -> " << curr->toString() << ", (" << cell.x << ", " << cell.y << ")";
+                }
             }
         }
     }
@@ -199,33 +187,32 @@ void TwoLevelSearch::handleLevelStart() {
     for (auto const & option : availableOptions_) {
         int numGem = elementproperty::getItemGemCount(gridinfo::getSpriteGridCell(option->getSpriteID()));
         bool hasDoor = elementproperty::isExit(gridinfo::getSpriteGridCell(option->getSpriteID()));
-        uint64_t itemPairHash = tlshash::itemPairHash(availableOptions_, multiplier_, option, option);
+        uint64_t singleStepHash = tlshash::hashPath(availableOptions_, {option});
     #ifndef MANUAL_CONSTRAINTS
-        openLevinNodes_.insert({itemPairHash, 0, 0, 0, CombinatorialPartition(0), numGem, hasDoor});
+        openLevinNodes_.insert({{option}, singleStepHash, 0, 0, 0, CombinatorialPartition(0), numGem, hasDoor});
     #else
-        std::vector<BaseOption*> path = {option, option};
-        setPathRestrictionSet(itemPairHash, path);
-        int restriction_count = restrictedCellsByPath_[itemPairHash].size();
-        openLevinNodes_.insert({itemPairHash, 0, 0, restriction_count, CombinatorialPartition(restriction_count), numGem, hasDoor});
+        setPathRestrictionSet(singleStepHash, {option});
+        int restriction_count = restrictedCellsByPath_[singleStepHash].size();
+        openLevinNodes_.insert({{option}, singleStepHash, 0, 0, restriction_count, CombinatorialPartition(restriction_count), numGem, hasDoor});
     #endif
     }
 #else
-PLOGE_(logger::ConsoleLogger) << availableOptions_.size();
+    PLOGE_(logger::ConsoleLogger) << availableOptions_.size();
     // std::vector<BaseOption*> path{availableOptions_[6], availableOptions_[1], availableOptions_[2], availableOptions_[0], availableOptions_[7], 
     //     availableOptions_[4] , availableOptions_[3], availableOptions_[7], availableOptions_[8],
     //     availableOptions_[10], availableOptions_[8], availableOptions_[9], availableOptions_[5]
     // };
-    std::vector<BaseOption*> path{availableOptions_[1], availableOptions_[6], availableOptions_[3], availableOptions_[2], availableOptions_[7], 
-        availableOptions_[5], availableOptions_[7], availableOptions_[4]
+    std::vector<BaseOption*> path{availableOptions_[7], availableOptions_[4], availableOptions_[3], availableOptions_[1], availableOptions_[8],
+        availableOptions_[6], availableOptions_[8], availableOptions_[2], availableOptions_[0], availableOptions_[5]
     };
-    uint64_t hash = tlshash::itemPathToHash(availableOptions_, path, multiplier_);
-    // PLOGE_(logger::FileLogger) << hash << " " << path.size();
-    setPathRestrictionSet(hash, path);
-    int restriction_count = restrictedCellsByPath_[hash].size();
-    // for (auto const & r : restrictedCellsByPath_[hash]) {
+    uint64_t pathHash = tlshash::hashPath(availableOptions_, path);
+    // PLOGE_(logger::FileLogger) << pathHash << " " << path.size();
+    setPathRestrictionSet(pathHash, path);
+    int restriction_count = restrictedCellsByPath_[pathHash].size();
+    // for (auto const & r : restrictedCellsByPath_[pathHash]) {
     //     PLOGE_(logger::FileLogger) << "restriction: (" << gridinfo::indexToCell(r).x << ", " << gridinfo::indexToCell(r).y << ")";
     // }
-    openLevinNodes_.insert({hash, 0, 0, restriction_count, CombinatorialPartition(restriction_count), 6, true});
+    openLevinNodes_.insert({path, pathHash, 0, 0, restriction_count, CombinatorialPartition(restriction_count), 6, true});
 #endif
     // throw std::exception();
     initializationForEveryLevelStart();
@@ -260,7 +247,7 @@ Action TwoLevelSearch::getAction() {
         // If option is not valid, we cannot progress further, and so set request reset flag
         if (!currentOption_->isValid()) {
             PLOGD_(logger::FileLogger) << "Option invalid, requesting reset";
-            PLOGD_(logger::ConsoleLogger) << "Option invalid, requesting reset";
+            // PLOGD_(logger::ConsoleLogger) << "Option invalid, requesting reset";
             requestReset_ = true;
         }
     }

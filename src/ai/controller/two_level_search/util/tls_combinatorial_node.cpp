@@ -11,12 +11,9 @@
 #include "tls_combinatorial_node.h"
 
 // Standard Libary/STL
-#include <vector>
 #include <cstdint>
 #include <algorithm>
 #include <numeric>
-#include <unordered_set>
-#include <iostream>
 
 // Includes
 #include "logger.h"
@@ -26,7 +23,7 @@
 uint64_t nextBinaryString(int numBitsSet, uint64_t current) {
 
     // number of bits set is zero
-    if (numBitsSet == 0) {return {0};}
+    if (numBitsSet == 0) {return 0;}
 #ifdef __GNUC__
     uint64_t t = (current | (current - 1));
     return (t + 1) | (((~t & -~t) - 1) >> (__builtin_ctz(current) + 1));
@@ -36,6 +33,9 @@ uint64_t nextBinaryString(int numBitsSet, uint64_t current) {
 #endif
 }
 
+/**
+ * https://stackoverflow.com/questions/9330915/number-of-combinations-n-choose-r-in-c
+ */
 uint64_t nChoosek(uint64_t n, uint64_t k) {
     if (k > n) {return 0;}
     if (k * 2 > n) {k = n-k;}
@@ -52,6 +52,11 @@ uint64_t nChoosek(uint64_t n, uint64_t k) {
 
 namespace tlsbits {
 
+/**
+ * Given a Combinatorial Partition, gets the next bit pattern.
+ * 
+ * Ordering of the bits are by combinatorial complexity i.e. (n choose k)
+ */
 uint64_t getNextConstraintBits(CombinatorialPartition &cPartition)
 {
     // return cPartition.currentBit++;
@@ -66,9 +71,13 @@ uint64_t getNextConstraintBits(CombinatorialPartition &cPartition)
     if (cPartition.counter % 2 == 0 && cPartition.counter > 0) {
         cPartition.currentBit = nextBinaryString(cPartition.currentSumToDistribute, cPartition.currentBit);
     }
+
+    // Send bit and save the complement to send for next time
     uint64_t bitsToSend = cPartition.currentBit;
     cPartition.currentBit = ~cPartition.currentBit;
     ++cPartition.counter;
+
+    // 
     if (cPartition.currentSumToDistribute == cPartition.maxSumToDistribute && cPartition.totalConstraintCount % 2 == 0) {
         cPartition.currentBit = ~cPartition.currentBit;
         ++cPartition.counter;

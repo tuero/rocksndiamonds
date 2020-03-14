@@ -15,6 +15,7 @@
 #include <unordered_set>
 
 // Includes
+#include "base_option.h"
 #include "util/tls_combinatorial_node.h"
 
 
@@ -22,6 +23,7 @@
  * LevinTS node, contains enough info for policy to determine cost
  */
 struct NodeLevin {
+    std::vector<BaseOption*> path;
     uint64_t hash;
     int pathLength;
     int timesVisited;

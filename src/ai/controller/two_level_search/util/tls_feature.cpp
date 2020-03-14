@@ -36,9 +36,7 @@ using namespace enginehelper;
  * Get the vector of HLA ordering flags.
  */
 template <typename T>
-std::vector<double> _orderings(uint64_t path_hash, std::size_t multiplier, std::vector<T> &allItems) {
-    std::vector<T> path = tlshash::hashToItemPath(path_hash, multiplier, allItems);
-
+std::vector<double> _orderings(std::vector<T> &allItems, std::vector<T> &path) {
     std::size_t num_pairs = allItems.size() * (allItems.size() - 1);
     std::vector<double> feature_orderings(num_pairs, 0);
     for (std::size_t i = 0; i < path.size(); ++i) {
@@ -87,13 +85,11 @@ double _count_bitwalls(std::vector<BaseOption*> &path) {
 }
 
 
-double _total_bitwalls(uint64_t path_hash, std::size_t multiplier, std::vector<BaseOption*> &allItems) {
-    std::vector<BaseOption*> path = tlshash::hashToItemPath(path_hash, multiplier, allItems);
+double _total_bitwalls(std::vector<BaseOption*> &path) {
     return _count_bitwalls(path);
 }
 
-double _avg_bitwalls(uint64_t path_hash, std::size_t multiplier, std::vector<BaseOption*> &allItems) {
-    std::vector<BaseOption*> path = tlshash::hashToItemPath(path_hash, multiplier, allItems);
+double _avg_bitwalls(std::vector<BaseOption*> &path) {
     return _count_bitwalls(path) / path.size();
 }
 
