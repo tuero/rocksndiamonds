@@ -3,7 +3,7 @@
 If you don't already have a basic controller setup, see the [Creating a basic controller](controller.md) section.
 
 ## Interleaving planning and execution
-While not every type of controller needs to do so, it can be useful to interleave planning and execution. Since it takes `enginetype::ENGINE_RESOLUTION` (8) game engine ticks (with each game tick equating to 20ms in real time) to move the agent from one gridcell to another after receiving the given action, we can utilize the time during those 8 game ticks to plan the next action take after the current one is complete. 
+While not every type of controller needs to do so, it can be useful to interleave planning and execution. Since it takes `enginestate::getEngineUpdateRate()` (8) game engine ticks (with each game tick equating to 20ms in real time) to move the agent from one gridcell to another after receiving the given action, we can utilize the time during those 8 game ticks to plan the next action take after the current one is complete. 
 
 For example, consider the MCTS controller. At game tick `n`, the controller sends the action `left`. For the next 8 game ticks, the agent will be in the middle of going from its current gridcell the cell on the left. For each of these 8 game ticks, the controller can plan the next action to send on game tick `n+8`. In the case of MCTS, we can set our planning tree to the state which would occur after the agent has completed its current move. The idea is that once we are at game tick `n+8`, our MCTS agent would have already spent 8 game ticks of planning to determine the next move to make immediately.
 

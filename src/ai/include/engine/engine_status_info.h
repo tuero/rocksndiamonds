@@ -81,6 +81,11 @@ namespace enginestate {
     void setEngineGameStatusModePlaying();
 
     /**
+     * Get the rate (number of engine ticks) for which it takes the agent to make a move.
+     */
+    int getEngineUpdateRate();
+
+    /**
      * Check if the player is currently in the middle of executing an action.
      * 
      * @return True if the player is in the middle of grid cells (moving)
@@ -134,14 +139,14 @@ namespace enginestate {
     void engineSimulateSingle();
 
     /**
-     * Simulate the engine ahead ENGINE_RESOLUTION=8 ticks.
+     * Simulate the engine ahead enginestate::getEngineUpdateRate()=8 ticks.
      *
      * At normal speed, objects take 8 game ticks to take an action (move completely to a 
-     * neighbouring grid cell). Objects take multiples or fractions of ENGINE_RESOLUTION
+     * neighbouring grid cell). Objects take multiples or fractions of enginestate::getEngineUpdateRate()
      * if they have a faster/slower movement speed, but the player always takes 
-     * ENGINE_RESOLUTION to perform and complete an action.
+     * enginestate::getEngineUpdateRate() to perform and complete an action.
      *
-     * This calls the HandleGameActions() engine function ENGINE_RESOLUTION times. 
+     * This calls the HandleGameActions() engine function enginestate::getEngineUpdateRate() times. 
      * The players action needs to be set before calling this function. 
      */
     void engineSimulate();

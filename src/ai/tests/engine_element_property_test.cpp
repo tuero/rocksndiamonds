@@ -162,7 +162,7 @@ TEST_CASE("Check Door Statuses", "[element_information]") {
     _checkDoorStatuses(door, 0 | CLOSED_FLAG);
 
     // Move right picking up diamonds
-    for (int i = 0; i < 5*enginetype::ENGINE_RESOLUTION; i++) {
+    for (int i = 0; i < 5*enginestate::getEngineUpdateRate(); i++) {
         enginestate::setEnginePlayerAction(Action::right);
         enginestate::engineSimulateSingle();
         _checkDoorStatuses(door, 0 | CLOSED_FLAG);
@@ -181,7 +181,7 @@ TEST_CASE("Check Door Statuses", "[element_information]") {
     }
 
     // Door is now open, move towards goal
-    for (int i = 0; i < 9*enginetype::ENGINE_RESOLUTION; i++) {
+    for (int i = 0; i < 9*enginestate::getEngineUpdateRate(); i++) {
         enginestate::setEnginePlayerAction(Action::right);
         enginestate::engineSimulateSingle();
         _checkDoorStatuses(door, 0 | OPEN_FLAG);

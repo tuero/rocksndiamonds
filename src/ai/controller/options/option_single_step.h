@@ -35,7 +35,7 @@ public:
     OptionSingleStep(Action action, int numTimes);
 
     /**
-     * Performs the saved action numTimes_ number of ENGINE_RESOLUTION 
+     * Performs the saved action numTimes_ number of enginestate::getEngineUpdateRate() 
      * game ticks.
      * 
      * @return True if there was no failure during performing the action.

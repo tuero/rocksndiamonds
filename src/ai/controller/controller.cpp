@@ -159,7 +159,7 @@ int Controller::getAction() {
 
         // Handle empty action solution queue (ask controller for next action)
         if (currentAction_.empty()) {
-            currentAction_.insert(currentAction_.end(), enginetype::ENGINE_RESOLUTION, baseController_.get()->getAction());
+            currentAction_.insert(currentAction_.end(), enginestate::getEngineUpdateRate(), baseController_.get()->getAction());
         }
 
         // Continue to run controller to find the next option which should be taken.
@@ -174,7 +174,7 @@ int Controller::getAction() {
 
         // Send action information to logger
         // We only care about information at the engine resolution
-        if (step_counter_++ % enginetype::ENGINE_RESOLUTION == 0) {
+        if (step_counter_++ % enginestate::getEngineUpdateRate() == 0) {
             // Save action to replay file
             logger::savePlayerMove(actioninfo::actionToString(action));
             logger::logPlayerMove(actioninfo::actionToString(action));

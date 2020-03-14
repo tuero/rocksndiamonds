@@ -35,11 +35,11 @@ OptionSingleStep::OptionSingleStep(Action action, int numTimes) {
 
 
 /**
- * Performs the saved action numTimes_ number of ENGINE_RESOLUTION 
+ * Performs the saved action numTimes_ number of enginestate::getEngineUpdateRate() 
  * game ticks.
  */
 bool OptionSingleStep::run() {
-    for (int i = 0; i < enginetype::ENGINE_RESOLUTION * numTimes_; i++) {
+    for (int i = 0; i < enginestate::getEngineUpdateRate() * numTimes_; i++) {
         enginestate::setEnginePlayerAction(action_);
         enginestate::engineSimulateSingle();
     }

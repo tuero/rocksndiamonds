@@ -17,7 +17,6 @@ enginetype::GridCell cell = actioninfo::getPlayerPosition();
 The `enginetype` namespace provides the common types which are used to interface with the engine. 
 - `enum Action` defines the action/direction types which the agent takes or directions objects move in.
 - `enginetype::GridCell` represents a tile cell in the engine. All functions which reference tiles in the game using `GridCell`.
-- `enginetype::ENGINE_RESOLUTION` defines the number of game engine ticks common movements. When the agent initiates a move action, it takes `ENGINE_RESOLUTION` (being 8 in the standard game) game ticks to move the agent from one cell to another.
 - There are also many common engine item `int` definitions which correspond to their defined `int` code in the engine. For example, we can refer to a diamond element (56 in the engine) by using `enginetype::ELEMENT_DIAMOND`.
 
 ## namespace `actioninfo`
@@ -60,6 +59,7 @@ The `gridinfo` namespace provides helper functions relating to the level/levelse
 ## namespace `enginestatus`
 The `gridinfo` namespace provides helper functions relating to the current state of the engine.
 - Whether the level is solved or failed.
+- Getting the number of game engine ticks common movements. When the agent initiates a move action, it takes `enginestate::getEngineUpdateRate()` (being 8 in the standard game) game ticks to move the agent from one cell to another. 
 - Setting/getting the agents action (useful if you want to use simulation in your controller)
 - The current score, time left
-- Simulating the engine forward a single tick, or `ENGINE_RESOLUTION` (8) steps i.e. corresponding for the number of ticks required to transition the agent fully from one cell to a neighbouring cell.
+- Simulating the engine forward a single tick, or `enginestate::getEngineUpdateRate()` (8) steps i.e. corresponding for the number of ticks required to transition the agent fully from one cell to a neighbouring cell.

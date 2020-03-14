@@ -64,7 +64,7 @@ public:
     /**
      * Set action which agent should immediately take.
      * 
-     * Called every enginetype::ENGINE_RESOLUTION game steps (resolution the
+     * Called every enginestate::getEngineUpdateRate() game steps (resolution the
      * player moves by).
      * 
      * @return The action to perform

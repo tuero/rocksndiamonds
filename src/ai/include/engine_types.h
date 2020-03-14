@@ -106,7 +106,6 @@ namespace enginetype {
     static const int ENGINE_MV_UP      = MV_UP;
     static const int ENGINE_MV_DOWN    = MV_DOWN;
     static const int NUM_ACTIONS       = 5;
-    static const int ENGINE_RESOLUTION = 8;     // Engine ticks per time step the agent considers
     static const int DOOR_CHANGE_DELAY = 29;
 
 

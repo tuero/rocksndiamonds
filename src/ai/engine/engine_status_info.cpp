@@ -95,6 +95,13 @@ void setEngineGameStatusModePlaying() {
     game_status = GAME_MODE_PLAYING;
 }
 
+/**
+ * Get the rate (number of engine ticks) for which it takes the agent to make a move.
+ */
+int getEngineUpdateRate() {
+    return stored_player[0].move_delay_value;
+}
+
 
 /**
  * Check if the player is currently in the middle of executing an action.
@@ -160,11 +167,11 @@ void engineSimulateSingle() {
 
 
 /**
- * Simulate the engine ahead ENGINE_RESOLUTION game ticks.
+ * Simulate the engine ahead enginestate::getEngineUpdateRate() game ticks.
  */
 void engineSimulate() {
     is_simulating = true;
-    for (int i = 0; i < enginetype::ENGINE_RESOLUTION; i++) {
+    for (int i = 0; i < enginestate::getEngineUpdateRate(); i++) {
         HandleGameActions();
     }
     is_simulating = false;
