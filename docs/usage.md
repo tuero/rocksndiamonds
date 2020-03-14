@@ -10,9 +10,9 @@ To play a level with your controller, you need to specify the following command 
 - `-all_levels`: Instead of specifying one level to play, using this option will test the agent on all levels in the defined levelset.
 
 ## Examples
-To use the controller `MCTS` on level `3` of the levelset `classic_boulderdash`:
+To use the controller `simple_pathing` on level `0` of the levelset `classic_boulderdash`:
 ```shell
-./rocksndiamonds -controller MCTS -levelset classic_boulderdash -loadlevel 3
+./rocksndiamonds -controller simple_pathing -levelset classic_boulderdash -loadlevel 0
 ```
 
 To use the controller `MCTS` on all levels of the levelset `classic_boulderdash`:
@@ -23,7 +23,7 @@ To use the controller `MCTS` on all levels of the levelset `classic_boulderdash`
 ## Saving your controllers actions
 To save the actions made by your controller to view them later during replays, use the `-save_run` argument. The replay file name is a combination of the current datetime and PID that is used when running the client. Inside the replay file, the levelset and level number are specified. If your controller is set to replay levels if it fails, an additional replay file is created with the suffix `_INDIVIDUAL' which is the actions the agent made at for the replay that solved the level.
 ```shell
-./rocksndiamonds -controller MCTS -levelset classic_boulderdash -loadlevel 3 -save_run
+./rocksndiamonds -controller simple_pathing -levelset classic_boulderdash -loadlevel 0 -save_run
 ```
 
 ## Replaying a previous run
