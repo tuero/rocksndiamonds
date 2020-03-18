@@ -146,6 +146,12 @@ public:
     virtual void handleLevelRestartAfter() {};
 
     /**
+     * Handle necessary items after the level is solved
+     * For example, maybe you want to save instance features for offline training.
+     */
+    virtual void handleLevelSolved() {};
+
+    /**
      * Set the available options for the controller to plan with.
      *
      * @param optionFactoryType Enum type to represent set of options to build

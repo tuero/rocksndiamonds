@@ -8,7 +8,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 # C compiler flags
 set(CMAKE_C_FLAGS "-O3 -Wall -Wstrict-prototypes -Wmissing-prototypes")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS} -g")
-set(CMAKE_C_FLAGS_RELEASE "{CMAKE_C_FLAGS}")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS}")
 
 # C++ compiler flags
 set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra")

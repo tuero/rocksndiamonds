@@ -65,6 +65,11 @@ For a detailed listing of the usage, see the [usage](docs/usage.md) section of t
 
 # Changelog
 
+## [v1.2](https://github.com/tuero/rocksndiamonds/tree/v1.2) (2020-03-18)
+- Added handleLevelSolved method for BaseController use, to handle actions on successful level completion.
+
+[Full Changelog](https://github.com/tuero/rocksndiamonds/compare/v1.1...v1.2)
+
 ## [v1.1](https://github.com/tuero/rocksndiamonds/tree/v1.1) (2020-02-11)
 - Added clear/add individual restrictions for BaseOption.
 - Added simple pathing example controller

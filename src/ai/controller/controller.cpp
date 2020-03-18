@@ -98,6 +98,10 @@ bool Controller::requestReset() {
  * This will close logging and cleanup.
  */
 void Controller::handleLevelSolved() {
+    // Controller handles any necessary actions before quitting due to level solved.
+    // For example, saving feature data for offline training
+    baseController_->handleLevelSolved();
+
     // Log info to user
     PLOGI_(logger::FileLogger) << "Game solved.";
     PLOGI_(logger::ConsoleLogger) << "Game solved.";
