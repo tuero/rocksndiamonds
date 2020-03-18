@@ -72,6 +72,13 @@ private:
     // --------------- HLS --------------- 
 
     /**
+     * Sets the constraints for the given bitpattern
+     * 
+     * @param node The node which represents the path for which we want to set contraints
+     */
+    void setConstraintsFromBitpattern(const NodeLevin &node);
+
+    /**
      * Set the constraints for each node on the high-level path, before we 
      * initiaze the low-level search
      * 
@@ -91,12 +98,27 @@ private:
      */
     void highLevelSearch();
 
+    // for testing
     void singlePath();
 
     // --------------- Constraints --------------- 
 
-    void setPathRestrictionSet(uint64_t hash, const std::vector<BaseOption*> &path);
+    /**
+     * For each HLA pair, insert cell restrictions into a set for the whole path
+     * If a restriction occurs twice in the path (once at different steps in the path),
+     * then we only consider it once
+     * 
+     * @param pathHash The hash of the given path
+     * @param path The path of high level actions to consider
+     */
+    void setPathRestrictionSet(uint64_t pathHash, const std::vector<BaseOption*> &path);
 
+    /**
+     * Get the restriction count for the given path
+     * 
+     * @param path The path of high level actions to consider
+     * @return The integer count of restrictions
+     */
     int restrictionCountForPath(const std::vector<BaseOption*> &path);
 
     /**

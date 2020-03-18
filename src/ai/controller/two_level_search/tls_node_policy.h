@@ -25,7 +25,7 @@
 struct NodeLevin {
     std::vector<BaseOption*> path;
     uint64_t hash;
-    int pathLength;
+    std::size_t pathLength;
     int timesVisited;
     int numConstraints;
     mutable CombinatorialPartition combinatorialPartition;

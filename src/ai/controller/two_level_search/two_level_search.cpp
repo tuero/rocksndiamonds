@@ -36,15 +36,21 @@ std::string TwoLevelSearch::controllerDetailsToString() {
 
 void TwoLevelSearch::initializeOptions() {
     availableOptions_ = optionFactory_.createOptions(optionFactoryType_);
+    for (auto & option : availableOptions_) {
+        option->setAvoidNonGoalCollectibleCells(true);
+    }
 }
 
 
 /**
- * 
+ * Reset the options (only if we don't currently have a high level plan)
  */
 void TwoLevelSearch::resetOptions() {
     if (highlevelPlannedPath_.empty()) {
         availableOptions_ = optionFactory_.createOptions(optionFactoryType_);
+        for (auto & option : availableOptions_) {
+            option->setAvoidNonGoalCollectibleCells(true);
+        }
     }
 }
 
@@ -127,7 +133,6 @@ void TwoLevelSearch::handleLevelStart() {
             PLOGE_(logger::FileLogger) <<  cell.x << "," << cell.y+1;
         }
     }
-
     auto addRestrictionsIfApplicable = [&](uint64_t hash, const std::deque<enginetype::GridCell> &solutionPath) {
         for (auto const & cell :solutionPath) {
             if (std::find(rockCells.begin(), rockCells.end(), cell) != rockCells.end()) {
@@ -177,44 +182,28 @@ void TwoLevelSearch::handleLevelStart() {
     }
 #endif
 
-    // Set initial levin node
     openLevinNodes_.clear(); 
-    for (auto const & option : availableOptions_) {
-        option->setAvoidNonGoalCollectibleCells(true);
-    }
 
 #ifndef SINGLE_PATH
+
+    // Create starting levin node for each 1 step path 
     for (auto const & option : availableOptions_) {
         int numGem = elementproperty::getItemGemCount(gridinfo::getSpriteGridCell(option->getSpriteID()));
         bool hasDoor = elementproperty::isExit(gridinfo::getSpriteGridCell(option->getSpriteID()));
         uint64_t singleStepHash = tlshash::hashPath(availableOptions_, {option});
-    #ifndef MANUAL_CONSTRAINTS
-        openLevinNodes_.insert({{option}, singleStepHash, 0, 0, 0, CombinatorialPartition(0), numGem, hasDoor});
-    #else
-        setPathRestrictionSet(singleStepHash, {option});
-        int restriction_count = restrictedCellsByPath_[singleStepHash].size();
+        int restriction_count = restrictionCountForPath({option});
         openLevinNodes_.insert({{option}, singleStepHash, 0, 0, restriction_count, CombinatorialPartition(restriction_count), numGem, hasDoor});
-    #endif
     }
 #else
     PLOGE_(logger::ConsoleLogger) << availableOptions_.size();
-    // std::vector<BaseOption*> path{availableOptions_[6], availableOptions_[1], availableOptions_[2], availableOptions_[0], availableOptions_[7], 
-    //     availableOptions_[4] , availableOptions_[3], availableOptions_[7], availableOptions_[8],
-    //     availableOptions_[10], availableOptions_[8], availableOptions_[9], availableOptions_[5]
-    // };
     std::vector<BaseOption*> path{availableOptions_[7], availableOptions_[4], availableOptions_[3], availableOptions_[1], availableOptions_[8],
         availableOptions_[6], availableOptions_[8], availableOptions_[2], availableOptions_[0], availableOptions_[5]
     };
     uint64_t pathHash = tlshash::hashPath(availableOptions_, path);
-    // PLOGE_(logger::FileLogger) << pathHash << " " << path.size();
     setPathRestrictionSet(pathHash, path);
     int restriction_count = restrictedCellsByPath_[pathHash].size();
-    // for (auto const & r : restrictedCellsByPath_[pathHash]) {
-    //     PLOGE_(logger::FileLogger) << "restriction: (" << gridinfo::indexToCell(r).x << ", " << gridinfo::indexToCell(r).y << ")";
-    // }
     openLevinNodes_.insert({path, pathHash, 0, 0, restriction_count, CombinatorialPartition(restriction_count), 6, true});
 #endif
-    // throw std::exception();
     initializationForEveryLevelStart();
 }
 
@@ -234,6 +223,7 @@ Action TwoLevelSearch::getAction() {
             return Action::noop;
         }
 
+        // Get next option
         previousOption_ = (solutionIndex_ == 0) ? highlevelPlannedPath_[solutionIndex_] : currentOption_;
         currentOption_ = highlevelPlannedPath_[solutionIndex_];
         optionStatusFlag_ = false;
@@ -247,7 +237,6 @@ Action TwoLevelSearch::getAction() {
         // If option is not valid, we cannot progress further, and so set request reset flag
         if (!currentOption_->isValid()) {
             PLOGD_(logger::FileLogger) << "Option invalid, requesting reset";
-            // PLOGD_(logger::ConsoleLogger) << "Option invalid, requesting reset";
             requestReset_ = true;
         }
     }

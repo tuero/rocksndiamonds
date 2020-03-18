@@ -23,27 +23,37 @@
 
 using namespace enginehelper;
 
-void TwoLevelSearch::setPathRestrictionSet(uint64_t hash, const std::vector<BaseOption*> &path) {
-    restrictedCellsByPath_[hash].clear();
-    PLOGD_(logger::FileLogger) << "setting path restrictions";
 
+/**
+ * For each HLA pair, insert cell restrictions into a set for the whole path
+ * If a restriction occurs twice in the path (once at different steps in the path),
+ * then we only consider it once
+ */
+void TwoLevelSearch::setPathRestrictionSet(uint64_t pathHash, const std::vector<BaseOption*> &path) {
+    restrictedCellsByPath_[pathHash].clear();
     for (auto const & pairHash : tlshash::pathToPairHashes(availableOptions_, path)) {
         for (auto const & r : restrictedCellsByOption_[pairHash]) {
-            if (restrictedCellsByPath_[hash].find(r) == restrictedCellsByPath_[hash].end()) {
-                restrictedCellsByPath_[hash].insert(r);
-                // PLOGD_(logger::FileLogger) << "x=" << gridinfo::indexToCell(r).x << ", y=" << gridinfo::indexToCell(r).y;
+            if (restrictedCellsByPath_[pathHash].find(r) == restrictedCellsByPath_[pathHash].end()) {
+                restrictedCellsByPath_[pathHash].insert(r);
             }
         }
     }
-    for (auto const & r : restrictedCellsByPath_[hash]) {
-        PLOGD_(logger::FileLogger) << "x=" << gridinfo::indexToCell(r).x << ", y=" << gridinfo::indexToCell(r).y;
-    }
 }
 
+
+/**
+ * Get the restriction count for the given path
+ */
 int TwoLevelSearch::restrictionCountForPath(const std::vector<BaseOption*> &path) {
-    std::vector<uint64_t> pathHashes = tlshash::pathToPairHashes(availableOptions_, path);
+#ifndef SET_RESTRICTIONS
+    std::vector<uint64_t> nodePathHashes = tlshash::pathToPairHashes(availableOptions_, path);
     auto lambda = [&](int sum, uint64_t hash) {return sum + restrictedCellsByOptionCount_[hash];};
-    return std::accumulate(pathHashes.begin(), pathHashes.end(), 0, lambda);
+    return std::accumulate(nodePathHashes.begin(), nodePathHashes.end(), 0, lambda);
+#else
+    uint64_t pathHash = tlshash::hashPath(availableOptions_, path);
+    setPathRestrictionSet(pathHash, path);
+    return restrictedCellsByPath_[pathHash].size();
+#endif
 }
 
 
@@ -72,24 +82,17 @@ void TwoLevelSearch::updateAffectedLevinNodes(uint64_t optionPairHash) {
             ++it;
             continue;
         } 
-        else {
-        #ifndef SET_RESTRICTIONS
-            auto lambda = [&](int sum, uint64_t hash) {return sum + restrictedCellsByOptionCount_[hash];};
-            int totalConstraintCount = std::accumulate(nodePathHashes.begin(), nodePathHashes.end(), 0, lambda);
-        #else
-            setPathRestrictionSet(it->hash, it->path);
-            int totalConstraintCount = restrictedCellsByPath_[it->hash].size();
-            // PLOGD_(logger::ConsoleLogger) << "numconstraints " << totalConstraintCount;
-        #endif
+        // Otherwise, new constraint seen affects the node in open. 
+        // Update constraints for that node and reset counter back to 0
+        int totalConstraintCount = restrictionCountForPath(it->path);
 
-            // New node will be added back once we complete iteration
-            NodeLevin node = *it;
-            node.timesVisited = 0;
-            node.numConstraints = totalConstraintCount;
-            node.combinatorialPartition.reset(totalConstraintCount);
-            updatedNodes.insert(node);
-            openLevinNodes_.erase(it++);
-        }
+        // New node will be added back once we complete iteration
+        NodeLevin node = *it;
+        node.timesVisited = 0;
+        node.numConstraints = totalConstraintCount;
+        node.combinatorialPartition.reset(totalConstraintCount);
+        updatedNodes.insert(node);
+        openLevinNodes_.erase(it++);
     }
 
     // Add back updated nodes
