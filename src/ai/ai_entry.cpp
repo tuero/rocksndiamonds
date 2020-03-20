@@ -198,7 +198,8 @@ extern "C" int loadReplayLevelSetAndLevel(void) {
     std::ifstream replayFileStream;
 
     try {
-        std::ifstream replayFileStream = getFileStreamIn(fileName);
+        replayFileStream.open(fileName, std::ifstream::in);
+        if (replayFileStream.fail()) {throw std::exception();}
     }
     catch (...) {
         std::cerr << "Unable to open replay file " << fileName << std::endl;
@@ -218,7 +219,10 @@ extern "C" int loadReplayLevelSetAndLevel(void) {
     replayFileStream.close();
 
     // Set levelset to as if it were manually set
-    options.level_set = (char*)level_set.c_str();
+    char * writable = new char[level_set.size() + 1];
+    std::copy(level_set.begin(), level_set.end(), writable);
+    writable[level_set.size()] = '\0'; // don't forget the terminating 0
+    options.level_set = writable;
     options.level_number = level_num;
 
     return 0;

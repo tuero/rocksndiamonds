@@ -30,7 +30,7 @@ Replay::Replay(){
     try{
         requestReset_ = false;
         replayFileName = enginestate::getReplayFileName();
-        replayFileStream = getFileStreamIn(REPLAY_DIR + replayFileName);
+        replayFileStream.open(REPLAY_DIR + replayFileName, std::ifstream::in);
 
         uint64_t seed;
         std::string level_set;
