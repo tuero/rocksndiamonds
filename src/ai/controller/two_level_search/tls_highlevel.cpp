@@ -18,6 +18,7 @@
 
 // Includes
 #include "util/tls_hash.h"
+#include "util/tls_feature.h"
 #include "base_option.h"
 #include "option_types.h"
 #include "engine_helper.h"
@@ -74,7 +75,7 @@ void TwoLevelSearch::setConstraintsFromBitpattern(const NodeLevin &node) {
  * Set the constraints for each node on the high-level path, before we 
  * initiaze the low-level search
  */
-void TwoLevelSearch::setLowLevelConstraints(const NodeLevin &node) {
+void TwoLevelSearch::setLowLevelConstraints(NodeLevin &node) {
     highlevelPlannedPath_.clear();
 #ifdef SKIP_REQUIRED_GEMS_DOOR
     if (node.numGems >= levelinfo::getLevelGemsNeeded() && node.hasDoor) {
@@ -91,6 +92,9 @@ void TwoLevelSearch::setLowLevelConstraints(const NodeLevin &node) {
         setConstraintsFromBitpattern(node);     
 
 #ifdef SKIP_REQUIRED_GEMS_DOOR
+    }
+    else {
+        node.wasSkipped = true;
     }
 #endif
 }
@@ -110,13 +114,15 @@ void TwoLevelSearch::modifiedLevinTS() {
     // Pull node
     NodeLevin node = *(openLevinNodes_.begin());
     openLevinNodes_.erase(openLevinNodes_.begin());
+    node.timesVisited += 1;
 
     // Set high level path
     // This is the node which will be simulated (after we add children to open)
     setLowLevelConstraints(node);
 
     // Add children (additional high-level action)
-    if (node.timesVisited == 0) {
+    if (!node.hasExpanded) {
+        node.hasExpanded = true;
         std::vector<BaseOption*> nodePath = node.path;
         std::vector<BaseOption*> childPath = nodePath;
         childPath.push_back(nullptr);
@@ -140,14 +146,20 @@ void TwoLevelSearch::modifiedLevinTS() {
             int restriction_count = restrictionCountForPath(childPath);
 
             // Add child node to open
-            openLevinNodes_.insert({childPath, childHash, childPath.size(), 0, restriction_count, CombinatorialPartition(restriction_count), numGems, hasDoor});
+            openLevinNodes_.insert({childPath, tlsfeature::getNodePath(childPath), childHash, childPath.size(), 0, 
+                restriction_count, CombinatorialPartition(restriction_count), numGems, hasDoor, false, false
+            });
         }
     }
 
     // If not exhausted, add child (same high-level path but increment bitwise index)
-    if (!node.combinatorialPartition.isComplete()) {
-        ++node.timesVisited;
+    if (!node.combinatorialPartition.isComplete() && !node.wasSkipped) {
+        // ++node.timesVisited;
         openLevinNodes_.insert(node);
+    }
+    // Otherwise, node exhausted, and so we add to close (as we've observed this runtime)
+    else {
+        closedLevinNodes_.insert(node);
     }
 }
 

@@ -8,183 +8,127 @@
  * Contact: tuero@ualberta.ca
  */
 
+#include "tls_feature.h"
 
 // Standard Libary/STL
-#include <cstdint>              // fixed-width datatypes
-#include <vector>
-#include <deque>
-#include <algorithm>            // std::find, distance
+#include <unordered_map>
+#include <algorithm>            // iota
+
+// Pytorch
+#include <torch/torch.h>
 
 // Includes
-#include "base_option.h"
 #include "engine_types.h"
 #include "engine_helper.h"
-#include "tls_hash.h"
+#include "logger.h"
 
+// namespace
 using namespace enginehelper;
 
-#ifdef RUN_TESTS
-#include <catch2/catch.hpp>
-#include <iostream>
-#include "option_types.h"
-#include "option_factory.h"
-#include "../../../tests/test_util.h"
-#endif
+
+namespace tlsfeature {
 
 
 /**
- * Get the vector of HLA ordering flags.
+ * Given a node, find a path of gridcells that that visits each 
+ * high level action without constraints.
  */
-template <typename T>
-std::vector<double> _orderings(std::vector<T> &allItems, std::vector<T> &path) {
-    std::size_t num_pairs = allItems.size() * (allItems.size() - 1);
-    std::vector<double> feature_orderings(num_pairs, 0);
-    for (std::size_t i = 0; i < path.size(); ++i) {
-        for (std::size_t j = i+1; j < path.size(); ++j) {
-            std::size_t index_prev = std::distance(allItems.begin(), std::find(allItems.begin(), allItems.end(), path[i]));
-            std::size_t index_curr = std::distance(allItems.begin(), std::find(allItems.begin(), allItems.end(), path[j]));
-            std::size_t index = ((index_prev * allItems.size()) + index_curr - index_prev) - ((index_prev < index_curr) ? 1 : 0);
-            feature_orderings[index] = 1;
-        }
-    }
-    
-    return feature_orderings;
-}
-
-
-double _total_constraints(int numConstraints) {
-    return (double)numConstraints;
-}
-
-double _avg_constraints(int numConstraints, int pathLength) {
-    return (double)numConstraints / pathLength;
-}
-
-
-double _count_bitwalls(std::vector<BaseOption*> &path) {
-    double bit_counter = 0.0;
-
-    // Walk along the path and count the number of bitwalls
+std::deque<enginetype::GridCell> getNodePath(const std::vector<BaseOption*> &path) {
     enginetype::GridCell prev_cell;
     enginetype::GridCell next_cell = gridinfo::getPlayerPosition();
+    std::deque<enginetype::GridCell> totalPath{next_cell};
+
+    // Get path from prev highlevel path to curr highlevel path, over all HLA in the path
     for (std::size_t i = 0; i < path.size(); ++i) {
         prev_cell = next_cell;
         next_cell = path[i]->getGoalCell();
         path[i]->runAStar(prev_cell, next_cell);
         std::deque<enginetype::GridCell> solution_path = path[i]->getSolutionPath();
-        
-        // For path, check cell below for bit wall
-        for (auto & cell : solution_path) {
-            ++cell.y;
-            if (gridinfo::getGridElement(cell) == enginetype::ELEMENT_WALL) {
-                ++bit_counter;
-            }
+        totalPath.insert(totalPath.end(), solution_path.begin(), solution_path.end());
+    }
+    return totalPath;
+}
+
+
+// Create object map of random floats [0,1]
+// 7 193 183 88 23 126 176 115 240 143 214 191 71 101 79 155
+std::unordered_map<int, float> objectMap{
+    {0x0000, 0},        // empty
+    {0x0001, 193},      // dirt
+    {0x006A, 183},      // rock
+    {0x0268, 88},       // key_red
+    {0x0269, 23},       // key_yellow
+    {0x026A, 126},      // key_green
+    {0x026B, 176},      // key_blue
+    {0x00CB, 115},      // gate_red
+    {0x00CC, 240},      // gate_yellow
+    {0x00CD, 143},      // gate_green
+    {0x00CE, 214},      // gate_blue
+    {0x0007, 191},      // door_exit
+    {0x000D, 71},       // wall_steel
+    {0x0003, 101},      // wall_round
+    {0x0038, 7},        // gem_diamond
+    {0x0050, 79},       // agent
+    {0x0002, 155}       // bitwall
+};
+
+
+/**
+ * Get the input feature representation for the levin node
+ * 2-channel tensor (2 x width x height) representing the gameboard and highlevel path taken
+ */
+at::Tensor getNodeFeature(const NodeLevin &node, short Feld[128][128]) {
+    int levelWidth = levelinfo::getLevelWidth();
+    int levelHeight = levelinfo::getLevelHeight();
+
+    // Data vector for map represented by rands (0,1)
+    std::vector<float> levelData;
+    for (int y = 0; y < levelHeight; y++) {
+        for (int x = 0; x < levelWidth; x++) {
+            levelData.push_back((float)objectMap.at(Feld[x][y]) / (float)255);
         }
     }
-    return bit_counter;
-}
 
+    // path vector representing high level path on actual map board
+    std::vector<float> pathData(levelData.size(), 0);
 
-double _total_bitwalls(std::vector<BaseOption*> &path) {
-    return _count_bitwalls(path);
-}
+    // Gradient representing path ordering
+    std::vector<float> pathGradient(node.fullGridPath.size());
+    std::iota(pathGradient.begin(), pathGradient.end(), 1);
+    for (auto & p : pathGradient) {p = p / pathGradient.size();}
 
-double _avg_bitwalls(std::vector<BaseOption*> &path) {
-    return _count_bitwalls(path) / path.size();
-}
-
-
-
-std::vector<double> getFeatureFector() {
-    std::vector<double> features;
-
-    // Bool flags for pariwise ordering
-
-    return features;
-}
-
-
-
-// ------------------------------ Tests ---------------------------------
-#ifdef RUN_TESTS
-template <typename T>
-uint64_t _getMultiplier(std::vector<T> &allItems) {
-    uint64_t multiplier = 10;
-    while (multiplier < (uint64_t)allItems.size()) {
-        multiplier *= 10;
+    // Set pathData
+    std::unordered_map<int, int> cellCountMap;
+    for (std::size_t i = 0; i < pathGradient.size(); i++) {
+        enginetype::GridCell cell = node.fullGridPath[i];
+        pathData[cell.y*levelWidth + cell.x] += pathGradient[i];
+        cellCountMap[gridinfo::cellToIndex(cell)] += 1;
     }
-    return multiplier;
+
+    // Average out the multiple visits
+    for (auto const & itr : cellCountMap) {
+        enginetype::GridCell cell = gridinfo::indexToCell(itr.first);
+        pathData[cell.y*levelWidth + cell.x] /= itr.second;
+    }
+
+    // Combine the 2channel maps into one 
+    levelData.insert(levelData.end(), pathData.begin(), pathData.end());
+
+    // Create tensor (2 x height x width)
+    return torch::from_blob(&levelData[0], {2, levelHeight, levelWidth}).clone();
 }
 
-TEST_CASE("TLS feature orderings", "[tls_features]") {
-    std::vector<int> allItems{1, 2, 3, 4, 5};
-    uint64_t multiplier = _getMultiplier(allItems);
 
-    SECTION("Path 1") {
-        std::vector<int> partial_path{1, 2, 3, 4, 5};
-        uint64_t path_hash = tlshash::itemPathToHash(allItems, partial_path, multiplier);
-        std::vector<double> flags = _orderings(path_hash, multiplier, allItems);
-        std::vector<double> set_flags{1, 1, 1, 1,           // 1, i
-                                      0, 1, 1, 1,           // 2, i
-                                      0, 0, 1, 1,           // 3, i
-                                      0, 0, 0, 1,           // 4, i
-                                      0, 0, 0, 0            // 5, i
-                                    };
-        REQUIRE(flags == set_flags);
-    }
-    SECTION("Path 2") {
-        std::vector<int> partial_path{5, 4, 3, 2, 1};
-        uint64_t path_hash = tlshash::itemPathToHash(allItems, partial_path, multiplier);
-        std::vector<double> flags = _orderings(path_hash, multiplier, allItems);
-        std::vector<double> set_flags{0, 0, 0, 0,           // 1, i
-                                      1, 0, 0, 0,           // 2, i
-                                      1, 1, 0, 0,           // 3, i
-                                      1, 1, 1, 0,           // 4, i
-                                      1, 1, 1, 1            // 5, i
-                                    };
-        REQUIRE(flags == set_flags);
-    }
-    SECTION("Path 3") {
-        std::vector<int> partial_path{3, 1, 5};
-        uint64_t path_hash = tlshash::itemPathToHash(allItems, partial_path, multiplier);
-        std::vector<double> flags = _orderings(path_hash, multiplier, allItems);
-        std::vector<double> set_flags{0, 0, 0, 1,           // 1, i
-                                      0, 0, 0, 0,           // 2, i
-                                      1, 0, 0, 1,           // 3, i
-                                      0, 0, 0, 0,           // 4, i
-                                      0, 0, 0, 0            // 5, i
-                                    };
-        REQUIRE(flags == set_flags);
-    }
+/**
+ * Get the observed runtime from the levin node.
+ */
+at::Tensor getNodeObservation(const NodeLevin &node, bool isSolution, bool wasExhausted) {
+    // PLOGE_(logger::ConsoleLogger) << node.timesVisited << " " << isSolution << " " << wasExhausted << " " << node.wasSkipped << 
+    //     " "  << node.numConstraints;
+    // PLOGE_(logger::ConsoleLogger) << node.timesVisited;
+    // PLOGE_(logger::ConsoleLogger) << node.numConstraints;
+    std::array<float, 4> observation{(float)node.timesVisited, (float)isSolution, (float)wasExhausted, (float)node.wasSkipped};
+    return torch::from_blob(&observation, {4}).clone();
 }
 
-TEST_CASE("TLS feature bits", "[tls_features]") {
-
-    SECTION("Path 1") {
-        OptionFactory factory;
-        testutil::loadTestLevelAndStart(3);
-        std::vector<BaseOption*> allOptions = factory.createOptions(OptionFactoryType::TWO_LEVEL_SEARCH);
-        uint64_t multiplier = _getMultiplier(allOptions);
-
-        std::vector<BaseOption*> partial_path{allOptions[6], allOptions[3]};
-        uint64_t path_hash = tlshash::itemPathToHash(allOptions, partial_path, multiplier);
-        double totalBits = _total_bitwalls(path_hash, multiplier, allOptions);
-        REQUIRE(totalBits == 3);
-    }
-    SECTION("Path 2") {
-        OptionFactory factory;
-        testutil::loadTestLevelAndStart(3);
-        std::vector<BaseOption*> allOptions = factory.createOptions(OptionFactoryType::TWO_LEVEL_SEARCH);
-        uint64_t multiplier = _getMultiplier(allOptions);
-
-        std::vector<BaseOption*> partial_path{allOptions[6], allOptions[0], allOptions[5], allOptions[4], allOptions[5], allOptions[3]};
-        uint64_t path_hash = tlshash::itemPathToHash(allOptions, partial_path, multiplier);
-        double totalBits = _total_bitwalls(path_hash, multiplier, allOptions);
-        REQUIRE(totalBits == 11);
-    }
-    
-    
-}
-
-#endif
-
+} //namespace tlsfeature

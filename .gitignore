@@ -49,3 +49,5 @@ src/ai/stats/*
 src/ai/logs/*
 src/ai/replays/*
 build
+src/ai/training_data/*.zip
+*.pyc

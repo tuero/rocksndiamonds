@@ -28,7 +28,7 @@ uint64_t getMultiplier(std::vector<int> &allItems) {
 }
 
 
-
+#if 0
 /**
  * Test the itemIndexPairToHash function 
  */
@@ -139,3 +139,5 @@ TEST_CASE("TLS hashing and pathing", "[tls_hash]") {
         REQUIRE(tlshash::itemPathToHash(allItems, tlshash::hashToItemPath(hash, multiplier, allItems), multiplier) == hash);
     }
 }
+
+#endif

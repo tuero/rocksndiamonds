@@ -1,9 +1,14 @@
-8 12
-XX .. NK NK NK .. RR .. NK NK NK XX
-XX XX XX XX XX XX .. XX XX XX XX XX
-XX .. NK NK NK .. RR .. NK NK NK XX
-XX XX XX XX XX XX .. XX XX XX XX XX
-XX .. NK NK NK .. RR .. NK NK NK XX
-XX XX XX XX XX XX .. XX XX XX XX XX
-XX .. NK NK NK .. 00 .. NK NK NK XX
-XX XX XX XX XX XX XX XX XX XX XX XX
+13 13
+.. .. .. .. .. .. .. .. .. .. .. .. ..
+XX XX XX XX XX XX XX XX XX XX XX XX ..
+XX XX XX XX XX XX XX XX XX XX XX XX ..
+.. .. .. .. .. .. .. .. .. .. .. .. ..
+.. XX XX XX XX XX XX XX XX XX XX XX XX
+.. XX XX XX XX XX XX XX XX XX XX XX XX
+.. .. .. .. .. .. .. .. .. .. .. .. ..
+XX XX XX XX XX XX XX XX XX XX XX XX ..
+XX XX XX XX XX XX XX XX XX XX XX XX ..
+.. .. .. .. .. .. .. .. .. .. .. .. ..
+XX XX XX XX XX XX XX XX XX XX XX XX XX
+XX XX XX XX XX XX XX XX XX XX XX XX XX
+XX XX XX XX XX XX XX XX XX XX XX XX XX

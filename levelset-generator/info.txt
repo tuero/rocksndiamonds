@@ -1,3 +1,44 @@
+
+python -m generate_levelset --size 40 --name t3 --gem_tiles 3 --rock_tiles 4 --bit_complexity 7 --gems_required 5 --template easy1
+python -m generate_levelset --size 40 --name t3 --gem_tiles 3 --rock_tiles 4 --bit_complexity 7 --gems_required 5 --template easy2
+python -m generate_levelset --size 40 --name t3 --gem_tiles 3 --rock_tiles 4 --bit_complexity 7 --gems_required 5 --template easy3
+python -m generate_levelset --size 40 --name t3 --gem_tiles 2 --rock_tiles 4 --bit_complexity 6 --gems_required 4 --template easy5
+python -m generate_levelset --size 40 --name t3 --gem_tiles 2 --rock_tiles 4 --bit_complexity 6 --gems_required 4 --template easy6
+
+
+
+python -m generate_levelset --size 40 --name t3 --gem_tiles 3 --rock_tiles 4 --bit_complexity 7 --gems_required 5 --template easy10
+python -m generate_levelset --size 40 --name t3 --gem_tiles 3 --rock_tiles 4 --bit_complexity 7 --gems_required 5 --template easy11
+python -m generate_levelset --size 40 --name t3 --gem_tiles 3 --rock_tiles 4 --bit_complexity 7 --gems_required 5 --template easy12
+python -m generate_levelset --size 40 --name t3 --gem_tiles 3 --rock_tiles 4 --bit_complexity 7 --gems_required 5 --template easy13
+
+
+parallel --verbose --jobs 8 < train2_commands.txt
+python -m generate_levelset --size 198 --name train1 --gem_tiles 3 --rock_tiles 4 --bit_complexity 7 --gems_required 5 --template easy10
+for i in {1..990}; do echo "./rocksndiamonds_headless -levelset train1 -loadlevel $i -controller two_level -loglevel 4" >> train1_commands.txt; done
+
+python -m generate_levelset --size 198 --name train2 --gem_tiles 3 --rock_tiles 4 --bit_complexity 7 --gems_required 5 --template easy11
+python -m generate_levelset --size 198 --name train3 --gem_tiles 3 --rock_tiles 4 --bit_complexity 7 --gems_required 5 --template easy12
+python -m generate_levelset --size 198 --name train4 --gem_tiles 3 --rock_tiles 4 --bit_complexity 7 --gems_required 5 --template easy13
+for i in {660..990}; do echo "./rocksndiamonds_headless -levelset train1 -loadlevel $i -controller two_level -loglevel 4" >> train2_commands.txt; done
+for i in {1..990}; do echo "./rocksndiamonds_headless -levelset train2 -loadlevel $i -controller two_level -loglevel 4" >> train2_commands.txt; done
+for i in {1..990}; do echo "./rocksndiamonds_headless -levelset train3 -loadlevel $i -controller two_level -loglevel 4" >> train2_commands.txt; done
+for i in {1..990}; do echo "./rocksndiamonds_headless -levelset train4 -loadlevel $i -controller two_level -loglevel 4" >> train2_commands.txt; done
+
+
+
+
+python -m generate_levelset --size 198 --name train2 --gem_tiles 2 --rock_tiles 3 --bit_complexity 6 --gems_required 4 --template easy20
+for i in {1..990}; do echo "./rocksndiamonds_headless -levelset train2 -loadlevel $i -controller two_level -loglevel 4" >> train2_commands.txt; done
+
+
+
+validate this applies to me (prof + res) for grad
+apply for more time
+figure out how to work with prof remote
+pac bags
+
+
 agent           PP
 gem             GG
 rocks           RR

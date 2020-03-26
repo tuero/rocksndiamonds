@@ -18,19 +18,20 @@
 #include <unordered_set>
 #include <set>
 #include <array>
-#include <algorithm>
+#include <algorithm>            // sort
 #include <cmath>                // pow
 #include <cstdint>              // fixed-width datatypes
 
 // Includes
-#include "tls_node_policy.h"
+#include "util/tls_levin_node.h"
 #include "base_controller.h"
 #include "base_option.h"
 #include "game_state.h"
 
 // #define SINGLE_PATH
 #define SET_RESTRICTIONS
-// #define MANUAL_CONSTRAINTS
+#define TRAINING
+#define MANUAL_CONSTRAINTS
 
 /**
  * Default controller
@@ -48,6 +49,7 @@ private:
     std::vector<BaseOption*> highlevelPlannedPath_ = {};                            // Current path of high level options
     uint64_t currentHighLevelPathHash_;                                             // Hash representing the current high level option path
     std::set<NodeLevin, CompareLevinNode> openLevinNodes_;                  // Open list for LevinTS
+    std::set<NodeLevin, CompareLevinNode> closedLevinNodes_;                  // Open list for LevinTS
     std::unordered_map<uint64_t, int> hashPathTimesVisited;                 // Map tracking number of visits for each (partial) path
 
     // Constraint identification
@@ -84,7 +86,7 @@ private:
      * 
      * @param node The Levin node which represents the high-level path.
      */
-    void setLowLevelConstraints(const NodeLevin &node);
+    void setLowLevelConstraints(NodeLevin &node);
 
     /**
      * Modified leveinTS.
@@ -199,6 +201,12 @@ public:
      * controller that wouldn't otherwise be done during each game tick, should be setup here.
      */
     void handleLevelStart() override;
+
+    /**
+     * Handle necessary items after the level is solved
+     * Here we will dump the training data in tensor format to a zip for python use later
+     */
+    void handleLevelSolved() override;
 
     /**
      * Get the action from the controller.

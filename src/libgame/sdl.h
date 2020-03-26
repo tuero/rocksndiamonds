@@ -112,7 +112,7 @@ typedef struct UserEventInfo	UserEvent;
 
 // SDL symbol definitions
 
-#define None			0L
+#define _None			0L
 
 #define BLACK_PIXEL		0x000000
 #define WHITE_PIXEL		0xffffff

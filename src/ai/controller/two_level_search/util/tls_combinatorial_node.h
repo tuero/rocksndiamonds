@@ -9,6 +9,9 @@
  */
 
 
+#ifndef TLS_COMBINATORIAL_H
+#define TLS_COMBINATORIAL_H
+
 // Standard Libary/STL
 #include <cstdint>
 
@@ -72,3 +75,6 @@ namespace tlsbits {
 
     uint64_t getNextConstraintBits(CombinatorialPartition &cPartition);
 }
+
+
+#endif

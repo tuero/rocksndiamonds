@@ -1,0 +1,14 @@
+13 13
+.. .. .. .. .. .. .. .. .. .. .. .. ..
+.. XX XX XX XX XX XX XX XX XX XX XX ..
+.. .. .. .. .. .. .. .. .. .. .. XX ..
+XX XX XX XX XX XX XX XX XX XX .. XX ..
+.. .. .. .. .. .. .. .. .. .. .. XX ..
+.. XX XX XX XX XX XX XX XX XX XX XX ..
+.. .. .. .. .. .. .. .. .. .. .. XX ..
+XX XX XX XX XX XX XX XX XX XX .. XX ..
+XX XX .. NK NK NK NK NK NK .. .. XX ..
+41 42 .. XX XX XX XX XX XX .. .. XX ..
+.. XX .. NK NK NK NK NK NK .. XX XX ..
+.. XX XX XX XX XX XX XX XX XX XX XX ..
+40 .. .. NK NK NK NK NK NK .. .. .. ..

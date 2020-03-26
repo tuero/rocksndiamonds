@@ -115,11 +115,14 @@ def createLevelset(name, size, gem_tiles, rock_tiles, gems_required, bit_complex
     level = Level(tileSetInfo, levelDifficulty, LevelTemplate(template_dir))
 
     # Create levels
-    level.randomizeLevel()
-    for i in range(1, size+1):
-        level.remove_bits()
-        level.add_bits()
-        makeFileFromLevel(levelset_dir + LEVEL_NAME.format(i), level)
+    counter = 1
+    for _ in range(1, size+1):
+        level.randomizeLevel()
+        for _ in range(5):
+            level.remove_bits()
+            level.add_bits()
+            makeFileFromLevel(levelset_dir + LEVEL_NAME.format(counter), level)
+            counter += 1
 
 
 MAX_LEVELSET_SIZE = 1000

@@ -23,11 +23,22 @@
 
 namespace tlshash {
 
+
+/**
+ * Taken from boost::hash_combine
+ */
 inline void _hash_combine(size_t & seed, uint64_t h) {
     seed ^= h + 0x9e3779b9 + (seed << 6) + (seed >> 2);    
 }
 
 
+/**
+ * Create hash for the given path
+ * 
+ * @param allItems Vector of items to create pairwise hashes.
+ * @param path Subset of allItems which we wish to hash
+ * @return A single hash representing the path.
+ */
 template <typename T>
 uint64_t hashPath(const std::vector<T> &allItems, const std::vector<T> &path) {
     uint64_t hash = 0;

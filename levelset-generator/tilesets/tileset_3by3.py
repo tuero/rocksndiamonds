@@ -303,12 +303,36 @@ SLIPPERY_TILE3 = Tile(
 )
 
 
-BLOCKING_TILE = Tile(
+BLOCKING_TILE1 = Tile(
     np.array([
         [Sprite.null,   Sprite.null,        Sprite.empty,       Sprite.null,        Sprite.null],
         [Sprite.null,   Sprite.wall_steel,  Sprite.wall_steel,  Sprite.wall_steel,  Sprite.null],
         [Sprite.null,   Sprite.wall_steel,  Sprite.wall_steel,  Sprite.wall_steel,  Sprite.null],
         [Sprite.null,   Sprite.wall_steel,  Sprite.wall_steel,  Sprite.wall_steel,  Sprite.null],
+        [Sprite.null,   Sprite.null,        Sprite.null,        Sprite.null,        Sprite.null]
+    ]),
+    0,
+    0
+)
+
+BLOCKING_TILE2 = Tile(
+    np.array([
+        [Sprite.null,   Sprite.null,        Sprite.empty,       Sprite.null,        Sprite.null],
+        [Sprite.null,   Sprite.wall_steel,  Sprite.wall_steel,  Sprite.wall_steel,  Sprite.null],
+        [Sprite.null,   Sprite.empty,       Sprite.empty,       Sprite.empty,  Sprite.null],
+        [Sprite.null,   Sprite.wall_steel,  Sprite.wall_steel,  Sprite.wall_steel,  Sprite.null],
+        [Sprite.null,   Sprite.null,        Sprite.null,        Sprite.null,        Sprite.null]
+    ]),
+    0,
+    0
+)
+
+BLOCKING_TILE3 = Tile(
+    np.array([
+        [Sprite.null,   Sprite.null,        Sprite.empty,       Sprite.null,        Sprite.null],
+        [Sprite.null,   Sprite.wall_steel,  Sprite.wall_steel,  Sprite.wall_steel,  Sprite.null],
+        [Sprite.null,   Sprite.wall_steel,  Sprite.wall_steel,  Sprite.wall_steel,  Sprite.null],
+        [Sprite.null,   Sprite.empty,       Sprite.empty,       Sprite.empty,  Sprite.null],
         [Sprite.null,   Sprite.null,        Sprite.null,        Sprite.null,        Sprite.null]
     ]),
     0,
@@ -424,7 +448,7 @@ KEY_YELLOW_TILE = Tile(
     TileProperty.has_key_yellow
 )
 
-GATE_BLOCKING_TILE1 = Tile(
+GATE_BLOCKING_TILE11 = Tile(
     np.array([
         [Sprite.null,   Sprite.null,        Sprite.empty,       Sprite.null,        Sprite.null],
         [Sprite.null,   Sprite.wall_round,  Sprite.empty,       Sprite.empty,  Sprite.null],
@@ -436,7 +460,7 @@ GATE_BLOCKING_TILE1 = Tile(
     TileProperty.has_gate
 )
 
-GATE_BLOCKING_TILE2 = Tile(
+GATE_BLOCKING_TILE12 = Tile(
     np.array([
         [Sprite.null,   Sprite.null,        Sprite.empty,       Sprite.null,        Sprite.null],
         [Sprite.null,   Sprite.empty,       Sprite.empty,       Sprite.wall_round,  Sprite.null],
@@ -569,7 +593,7 @@ META_3 = MetaTile(1, 2, np.array([[GEM_TILE6], [GEM_TILE5]]))
 META_4 = MetaTile(1, 2, np.array([[ROCK_TILE2], [EXIT_TILE4]]))
 META_GATE = MetaTile(1, 1, np.array([[GATE_TILE1]]))
 META_ROCK1 = MetaTile(1, 1, np.array([[ROCK_TILE4]]))
-META_GATE_BLOCKING1 = MetaTile(1, 1, np.array([[GATE_BLOCKING_TILE1]]))
+META_GATE_BLOCKING1 = MetaTile(1, 1, np.array([[GATE_BLOCKING_TILE11]]))
 
 # ---------------------------
 
@@ -590,8 +614,8 @@ META_00 = MetaTile(1, 2, np.array([[ROCK_TILE2], [EXIT_TILE4]]))        # Exit w
 # META_00 = MetaTile(1, 2, np.array([[ROCK_TILE5], [EXIT_TILE4]]))        # Exit with 2 rocks above
 META_10 = MetaTile(1, 2, np.array([[GEM_TILE6], [GEM_TILE5]]))          # Diamond with trap
 META_20 = MetaTile(1, 1, np.array([[ROCK_TILE4]]))                      # 3 rocks
-META_21 = MetaTile(1, 1, np.array([[GATE_BLOCKING_TILE1]]))             # Gate blocking (door on right)
-META_22 = MetaTile(1, 1, np.array([[GATE_BLOCKING_TILE2]]))             # Gate blocking (door on left)
+META_21 = MetaTile(1, 1, np.array([[GATE_BLOCKING_TILE11]]))             # Gate blocking (door on right)
+META_22 = MetaTile(1, 1, np.array([[GATE_BLOCKING_TILE12]]))             # Gate blocking (door on left)
 META_23 = MetaTile(1, 1, np.array([[GEM_TILE4]]))                       # single diamond
 META_30 = MetaTile(1, 1, np.array([[BOTTOM_RIGHT_WALL]]))               # bottom right corner for forced middle
 META_31 = MetaTile(1, 1, np.array([[BOTTOM_LEFT_WALL]]))                # bottom left corner for forced middle
@@ -599,3 +623,9 @@ META_32 = MetaTile(1, 1, np.array([[UPPER_RIGHT_WALL]]))                # upper 
 META_33 = MetaTile(1, 1, np.array([[UPPER_LEFT_WALL]]))                 # upper left corner for forced middle
 META_34 = MetaTile(1, 1, np.array([[BOTTOM_ALL_WALL]]))                 # bottom left and right corner for forced middle
 META_35 = MetaTile(1, 1, np.array([[UPPER_ALL_WALL]]))                  # upper left and right corner for forced middle
+
+META_40 = MetaTile(1, 1, np.array([[EXIT_TILE4]]))                      # Just the exit
+META_41 = MetaTile(1, 1, np.array([[ROCK_TILE1]]))                      # 3 rocks in the top row
+META_42 = MetaTile(1, 1, np.array([[BLOCKING_TILE2]]))                  # Only middle row is open
+META_43 = MetaTile(1, 1, np.array([[BLOCKING_TILE3]]))                  # Only bottom row is open
+

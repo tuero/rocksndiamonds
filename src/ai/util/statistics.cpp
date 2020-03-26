@@ -75,11 +75,11 @@ void closeStatsFile() {
 
 void outputRunLengthToFile(int run, int level) {
     std::vector<int> counts;
-    for (auto const & run : pathCounts[level]) {
-        counts.push_back(run.second);
+    for (auto const & r : pathCounts[level]) {
+        counts.push_back(r.second);
     }
     int total_count = std::accumulate(counts.begin(), counts.end(), 0);
-    statsFile <<  run << ",constraints=" << solutionConstraintCount[level] << ",paths=" << 
+    statsFile << run << ",constraints=" << solutionConstraintCount[level] << ",paths=" << 
     pathCounts[level].size() << ",total=" << total_count << std::endl;
 }
 

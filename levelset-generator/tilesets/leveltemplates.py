@@ -27,7 +27,7 @@ codes_list = [
 class LevelTemplate():
 
     def __init__(self, template_file_name):
-        self.backgroundTile = tilesets.tileset_3by3.BLOCKING_TILE
+        self.backgroundTile = tilesets.tileset_3by3.BLOCKING_TILE1
         self.emptyTile = tilesets.tileset_3by3.EMPTY_TILE
 
         door_map = {
@@ -50,6 +50,10 @@ class LevelTemplate():
             "33" : tilesets.tileset_3by3.META_33,           # upper left corner for forced middle
             "34" : tilesets.tileset_3by3.META_34,           # bottom left and right corner for forced middle
             "35" : tilesets.tileset_3by3.META_35,           # upper left and right corner for forced middle
+            "40" : tilesets.tileset_3by3.META_40,           # Just the exit
+            "41" : tilesets.tileset_3by3.META_41,           # 3 rocks in the top row
+            "42" : tilesets.tileset_3by3.META_42,           # Only middle row is open
+            "43" : tilesets.tileset_3by3.META_43,           # Only bottom row is open
         }
 
         # Valid indices for random placement

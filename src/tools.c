@@ -5985,7 +5985,7 @@ void CreateToolButtons(void)
     struct GraphicInfo *gfx = &graphic_info[graphic];
     struct TextPosInfo *pos = toolbutton_info[i].pos;
     struct GadgetInfo *gi;
-    Bitmap *deco_bitmap = None;
+    Bitmap *deco_bitmap = _None;
     int deco_x = 0, deco_y = 0, deco_xpos = 0, deco_ypos = 0;
     unsigned int event_mask = GD_EVENT_RELEASED;
     boolean is_touch_button = toolbutton_info[i].is_touch_button;
