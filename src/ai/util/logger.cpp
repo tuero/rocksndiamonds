@@ -114,7 +114,7 @@ namespace logger {
         
         // Initialize the replay directory (needs to be done here in the event initReplayFile is not set but )
         REPLAY_DIR_FULL = REPLAY_DIR_BASE + getFileDirName() + "/";
-        int rc = mkdir(REPLAY_DIR_FULL.c_str(), 0777);
+        int rc = mkdir(REPLAY_DIR_FULL.c_str(), 0755);
         if (rc != 0) {
             PLOGE_(logger::FileLogger) << "Replay directory " << REPLAY_DIR_FULL << " already exists";
         }

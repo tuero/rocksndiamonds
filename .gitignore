@@ -51,3 +51,5 @@ src/ai/replays/*
 build
 src/ai/training_data/*.zip
 *.pyc
+*.ipynb_checkpoints
+*__pycache__

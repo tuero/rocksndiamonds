@@ -29,7 +29,7 @@
 #include "game_state.h"
 
 // #define SINGLE_PATH
-#define SET_RESTRICTIONS
+// #define SET_RESTRICTIONS
 #define TRAINING
 #define MANUAL_CONSTRAINTS
 

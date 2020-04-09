@@ -1,4 +1,0 @@
-
-./rocksndiamonds_headless -levelset train1 -loadlevel 648 -controller two_level -loglevel 4
-./rocksndiamonds_headless -levelset train1 -loadlevel 649 -controller two_level -loglevel 4
-./rocksndiamonds_headless -levelset train1 -loadlevel 650 -controller two_level -loglevel 4

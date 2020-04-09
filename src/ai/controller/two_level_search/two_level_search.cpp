@@ -11,11 +11,17 @@
 
 #include "two_level_search.h"
 
+// System libraries
+#include <sys/stat.h>           // mkdir
+#include <sys/types.h>
+
 // Standard Libary/STL
 #include <queue>
 #include <unordered_map>
 #include <limits>
 #include <algorithm>
+#include <stdlib.h>
+#include <time.h>
 
 // Pytorch
 #include <torch/torch.h>
@@ -228,26 +234,50 @@ void TwoLevelSearch::handleLevelSolved() {
 #ifdef TRAINING
     std::vector<torch::Tensor> featureTensors;
     std::vector<torch::Tensor> observationTensors;
+    std::vector<torch::Tensor> featureTensors_closed;
+    std::vector<torch::Tensor> observationTensors_closed;
 
-    const int NUM_OPEN = 100;
+    const int NUM_OPEN = 200;
     const int NUM_CLOSED = 100;
+
+    // Create data dir if it doesn't exist
+    mkdir(DATA_DIR.c_str(), 0755);
 
 
     // Add solution node
-    for (auto const node : openLevinNodes_) {
-        // Never visited during search, skip
-        if (node.timesVisited == 0) {continue;}
-        if (node.hash == currentHighLevelPathHash_) {
-            featureTensors.push_back(tlsfeature::getNodeFeature(node, initialState.Feld_));
-            observationTensors.push_back(tlsfeature::getNodeObservation(node, true, false));
-            break;
+    // for (auto const node : openLevinNodes_) {
+    //     // Never visited during search, skip
+    //     if (node.timesVisited == 0) {continue;}
+    //     if (node.hash == currentHighLevelPathHash_) {
+    //         featureTensors.push_back(tlsfeature::getNodeFeature(node, initialState.Feld_));
+    //         observationTensors.push_back(tlsfeature::getNodeObservation(node, true, false));
+    //         break;
+    //     }
+    // }
+    for (auto iter = openLevinNodes_.begin(); iter != openLevinNodes_.end(); ) {
+        if (iter->timesVisited == 0) {
+            iter = openLevinNodes_.erase(iter);
+        }
+        else if (iter->hash == currentHighLevelPathHash_) {
+            featureTensors.push_back(tlsfeature::getNodeFeature(*iter, initialState.Feld_));
+            observationTensors.push_back(tlsfeature::getNodeObservation(*iter, true, false));
+            iter = openLevinNodes_.erase(iter);
+        }
+        else {
+            ++iter;
         }
     }
+
+    srand(time(0));
 
     // Open nodes
     std::vector<NodeLevin> openVec(openLevinNodes_.begin(), openLevinNodes_.end());
     std::sort(openVec.begin(), openVec.end(), [](const NodeLevin & l, const NodeLevin & r) {return l.timesVisited > r.timesVisited;});
     for (int i = 0; i < std::min(NUM_OPEN, (int)openVec.size()); ++i) {
+        // int randomIndex = rand() % openVec.size();
+        // featureTensors.push_back(tlsfeature::getNodeFeature(openVec[randomIndex], initialState.Feld_));
+        // observationTensors.push_back(tlsfeature::getNodeObservation(openVec[randomIndex], false, false));
+        // openVec.erase(openVec.begin() + randomIndex);
         featureTensors.push_back(tlsfeature::getNodeFeature(openVec[i], initialState.Feld_));
         observationTensors.push_back(tlsfeature::getNodeObservation(openVec[i], false, false));
     }
@@ -257,8 +287,12 @@ void TwoLevelSearch::handleLevelSolved() {
     std::vector<NodeLevin> closedVec(closedLevinNodes_.begin(), closedLevinNodes_.end());
     std::sort(closedVec.begin(), closedVec.end(), [](const NodeLevin & l, const NodeLevin & r) {return l.timesVisited > r.timesVisited;});
     for (int i = 0; i < std::min(NUM_CLOSED, (int)closedVec.size()); ++i) {
-        featureTensors.push_back(tlsfeature::getNodeFeature(closedVec[i], initialState.Feld_));
-        observationTensors.push_back(tlsfeature::getNodeObservation(closedVec[i], false, true));
+        // int randomIndex = rand() % closedVec.size();
+        // featureTensors_closed.push_back(tlsfeature::getNodeFeature(closedVec[randomIndex], initialState.Feld_));
+        // observationTensors_closed.push_back(tlsfeature::getNodeObservation(closedVec[randomIndex], false, true));
+        // closedVec.erase(closedVec.begin() + randomIndex);
+        featureTensors_closed.push_back(tlsfeature::getNodeFeature(closedVec[i], initialState.Feld_));
+        observationTensors_closed.push_back(tlsfeature::getNodeObservation(closedVec[i], false, true));
     }
 
     // Save featureTensors for python training
@@ -275,6 +309,20 @@ void TwoLevelSearch::handleLevelSolved() {
     auto bytesObservation = torch::jit::pickle_save(totalObservationTensor);
     ofObservation.write(bytesObservation.data(), bytesObservation.size());
     ofObservation.close();
+
+    // Save featureTensors of closed list for python training
+    std::ofstream ofFeature_closed(baseDataFileName + "feature_closed.zip", std::ios::out | std::ios::binary);
+    auto totalFeatureTensor_closed = torch::stack(featureTensors_closed, 0);
+    auto bytesFeature_closed = torch::jit::pickle_save(totalFeatureTensor_closed);
+    ofFeature_closed.write(bytesFeature_closed.data(), bytesFeature_closed.size());
+    ofFeature_closed.close();
+
+    // Save observationTensors of closed list for python training
+    std::ofstream ofObservation_closed(baseDataFileName + "observation_closed.zip", std::ios::out | std::ios::binary);
+    auto totalObservationTensor_closed = torch::stack(observationTensors_closed, 0);
+    auto bytesObservation_closed = torch::jit::pickle_save(totalObservationTensor_closed);
+    ofObservation_closed.write(bytesObservation_closed.data(), bytesObservation_closed.size());
+    ofObservation_closed.close();
 #endif
 }
 
