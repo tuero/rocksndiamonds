@@ -53,3 +53,8 @@ src/ai/training_data/*.zip
 *.pyc
 *.ipynb_checkpoints
 *__pycache__
+**/wandb/*
+**/ssl_compare_dfs_copy/*
+**/distnet/logs/*
+**/training_loss_dfs/*
+**/gridsearch_dfs/*

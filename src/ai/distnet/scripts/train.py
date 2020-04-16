@@ -13,6 +13,8 @@ from typing import Tuple
 import numpy as np
 import pandas as pd
 
+# import wandb
+
 # Pytorch
 import torch
 import torch.nn as nn
@@ -20,15 +22,15 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 
 # Module
-from data_handler import DataMode, PreprocessMode
+from data_handler import PreprocessMode
 from model import weights_init
-from loss_functions import LossFunctionTypes, getLossFunction
+from loss_functions import LossFunctionTypes, getLossFunction, runKSTest
 
 
 def getTrainingConfig(n_epochs: int = 100, batch_size: int = 32, loss_fn: LossFunctionTypes = LossFunctionTypes.MSE,
                       start_rate: float = 1e-3, end_rate: float = 1e-5, clip_gradient_norm: float = 1e-2,
-                      split_ration: float = 0.8, data_mode: DataMode = DataMode.NOKEY_SOLUTIONS,
-                      preprocess_mode: PreprocessMode = PreprocessMode.NORMALIZE, seed : int = -1) -> dict:
+                      split_ration: float = 0.8, preprocess_mode: PreprocessMode = PreprocessMode.NORMALIZE,
+                      seed : int = -1) -> dict:
     """
     Get the config dictionary which defines the specs for training
 
@@ -40,7 +42,6 @@ def getTrainingConfig(n_epochs: int = 100, batch_size: int = 32, loss_fn: LossFu
         end_rate (float): The end learning rate
         clip_gradient_norm (float): The size of gradient before clipping takes place
         split_ration (float): Percentage of data to use for training
-        data_mode (DataMode): The data type to train on
         preprocess_mode (PreprocessMode): Type of preprocessing to perform
         seed (int): Seed to use, or -1 if no seed.
 
@@ -55,7 +56,6 @@ def getTrainingConfig(n_epochs: int = 100, batch_size: int = 32, loss_fn: LossFu
         'end_rate'             : end_rate,
         'clip_gradient_norm'   : clip_gradient_norm,
         'split_ration'         : split_ration,
-        'data_mode'            : data_mode,
         'preprocess_mode'      : preprocess_mode,
         'seed'                 : seed
     }
@@ -74,12 +74,11 @@ def trainingConfigToStr(config: dict) -> str:
     return "Training Config:\n" + \
            "\tNumber of Epochs: {}\n".format(config['n_epochs']) + \
            "\tBatch size: {}\n".format(config['batch_size']) + \
-           "\tLoss function: {}\n".format(config['loss_fn'].__name__) + \
+           "\tLoss function: {}\n".format(config['loss_fn'].name) + \
            "\tStart rate: {}\n".format(config['start_rate']) + \
            "\tEnd rate: {}\n".format(config['end_rate']) + \
            "\tGradient Clipping: {}\n".format(config['clip_gradient_norm']) + \
            "\tSplit ratio: {}\n".format(config['split_ration']) + \
-           "\tData Mode: {}\n".format(config['data_mode'].name) + \
            "\tPreprocess Mode:{}\n".format(config['preprocess_mode'].name) + \
            "\tSeed: {}\n".format(config['seed'])
 
@@ -100,7 +99,7 @@ def getEmptyDataFrame() -> pd.DataFrame:
 # - batch normalization (as a layer)
 # - L2 regularization of 1e-4
 def train(model: nn.Module, device: torch.device, train_loader: DataLoader, validation_loader: DataLoader,
-          training_config: dict = getTrainingConfig()) -> Tuple[pd.DataFrame, nn.Module]:
+          training_config: dict = getTrainingConfig(), run: int = 1) -> Tuple[pd.DataFrame, nn.Module]:
     """
     Train the model using the given training configuration
     Args:
@@ -109,6 +108,7 @@ def train(model: nn.Module, device: torch.device, train_loader: DataLoader, vali
         train_loader (torch.DataLoader) : Dataloader for training data
         validation_loader (torch.DataLoader) : Dataloader for validation data
         training_config (dict): Configuration for training
+        run (int): The run number (for multiple runs like in kfold testing)
 
     Returns:
         DataFrame of loss data during training with testing every epoch
@@ -127,9 +127,10 @@ def train(model: nn.Module, device: torch.device, train_loader: DataLoader, vali
     clip_gradient_norm = training_config['clip_gradient_norm']
 
     # Optimizer and scheduler
-    optimizer = optim.SGD(model.parameters(), lr=start_rate, weight_decay=0.01)
+    optimizer = optim.SGD(model.parameters(), lr=start_rate, weight_decay=0.001)
     decay_rate = np.exp(np.log(end_rate / start_rate) / n_epochs)
     lr_scheduler = optim.lr_scheduler.ExponentialLR(optimizer=optimizer, gamma=decay_rate)
+    logger.info('Decay rate: {}'.format(decay_rate))
 
     # Output loss information during training
     df_losses = getEmptyDataFrame()
@@ -139,9 +140,12 @@ def train(model: nn.Module, device: torch.device, train_loader: DataLoader, vali
         training_loss = 0.0
         model.train()
 
+        # Train with dropout
+        train_data = []
         for i, data in enumerate(train_loader):
             # get the inputs; data is a list of [features, runtime]
             inputs, rts = data
+            train_data.append((inputs, rts))
             inputs, rts = inputs.to(device), rts.to(device)
 
             # zero the parameter gradients
@@ -150,8 +154,6 @@ def train(model: nn.Module, device: torch.device, train_loader: DataLoader, vali
             # Propogate input to model and calculate loss
             outputs = model(inputs)
             loss = loss_fn(outputs, rts)
-
-            # Add l2 loss
 
             # Propogate loss backwards and step optimizer
             loss.backward()
@@ -166,7 +168,19 @@ def train(model: nn.Module, device: torch.device, train_loader: DataLoader, vali
             training_loss += loss.item()
 
         # Get validation loss
+        training_loss_eval = 0.0
+        model.eval()
+        with torch.no_grad():
+            for data in train_data:
+                inputs, rts = data
+                inputs, rts = inputs.to(device), rts.to(device)
+                outputs = model(inputs)
+                loss = loss_fn(outputs, rts)
+                training_loss_eval += loss.item()
+
         validation_loss = 0.0
+        ks_counter = 0.0
+        ks_total = 0.0
         model.eval()
         with torch.no_grad():
             for i, data in enumerate(validation_loader):
@@ -176,14 +190,27 @@ def train(model: nn.Module, device: torch.device, train_loader: DataLoader, vali
                 loss = loss_fn(outputs, rts)
                 validation_loss += loss.item()
 
+                for j in range(len(inputs)):
+                    ks_total += 1
+                    D, p = runKSTest(rts[j], training_config['loss_fn'], outputs[j])
+                    if p < 0.01:
+                        ks_counter += 1
+
         # Store training and validation loss
+        ks_avg = ks_counter / ks_total * 100
         train_row = (epoch, training_loss / len(train_loader), 'Train', model.toStr())
+        train_eval_row = (epoch, training_loss_eval / len(train_loader), 'Train_Eval', model.toStr())
         valid_row = (epoch, validation_loss / len(validation_loader), 'Test', model.toStr())
+        ks_row = (epoch, ks_avg, 'KS', model.toStr())
         df_losses = df_losses.append(pd.Series(train_row, index=df_losses.columns), ignore_index=True)
+        df_losses = df_losses.append(pd.Series(train_eval_row, index=df_losses.columns), ignore_index=True)
         df_losses = df_losses.append(pd.Series(valid_row, index=df_losses.columns), ignore_index=True)
-        if epoch % 10 == 9:
-            output_msg = "Epoch: {:>4d}, Training Loss {:>18,.4f}, Validation Loss {:>18,.4f}"
-            logger.info(output_msg.format(epoch + 1, float(train_row[1]), float(valid_row[1])))
+        df_losses = df_losses.append(pd.Series(ks_row, index=df_losses.columns), ignore_index=True)
+
+        output_msg = "Epoch: {:>4d}, Training Loss {:>18,.4f}, Training Eval Loss {:>18,.4f}, Validation Loss {:>18,.4f}, %KS < 0.01 = {:.2f}"
+        logger.info(output_msg.format(epoch + 1, float(train_row[1]), float(train_eval_row[1]), float(valid_row[1]), ks_avg))
+        # wandb.log({'batch': run, 'epoch': epoch, 'train_loss': float(train_row[1]), 'train_eval_loss': float(train_eval_row[1]),
+        #            'validation_loss': float(valid_row[1]), 'ks_avg': ks_avg})
 
         # Update learning rate
         lr_scheduler.step()

@@ -258,8 +258,9 @@ def weights_init(m: torch.nn.Module):
         m (torch.nn.Module): The module to initalize the weights
     """
     if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
-        torch.nn.init.xavier_uniform_(m.weight.data, gain=nn.init.calculate_gain('relu'))
+        torch.nn.init.xavier_uniform_(m.weight, gain=nn.init.calculate_gain('relu'))
         m.bias.data.zero_()
+        m.bias.data.fill_(0.01)
 
 
 def count_parameters(model: nn.Module) -> int:
