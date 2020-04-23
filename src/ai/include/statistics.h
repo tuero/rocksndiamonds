@@ -16,6 +16,7 @@
 // Standard library and STL
 #include <string>
 #include <map>
+#include <string>
 #include <unordered_map>
 #include <array>
 
@@ -53,7 +54,7 @@ void outputStatsToFile();
 
 void outputPathCounts();
 
-void outputRunLengthToFile(int run, int level);
+void outputRunLengthToFile(int run, const std::string & levelset, int level);
 
 }
 

@@ -109,7 +109,8 @@ void Controller::handleLevelSolved() {
 
     PLOGI_(logger::FileLogger) << "Number of attempts = " << statistics::numLevelTries;
     PLOGI_(logger::ConsoleLogger) << "Number of attempts = " << statistics::numLevelTries;
-    statistics::outputRunLengthToFile(statistics::solutionPathCounts[levelinfo::getLevelNumber()][1], levelinfo::getLevelNumber());
+    statistics::outputRunLengthToFile(statistics::solutionPathCounts[levelinfo::getLevelNumber()][1], levelinfo::getLevelSet(), 
+        levelinfo::getLevelNumber());
 
     // Signal game over and close logs
     logger::createReplayForIndividualRun(levelinfo::getLevelSet(), levelinfo::getLevelNumber(), actionsTaken_);
