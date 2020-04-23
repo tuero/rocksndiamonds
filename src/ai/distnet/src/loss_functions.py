@@ -21,11 +21,11 @@ from scipy import stats
 import torch
 import torch.nn as nn
 # from torch.distributions.exponential import Exponential
-from torch.distributions.log_normal import LogNormal
+from torch.distributions.log_normal import LogNormal, Normal
 
 
 # Constants
-EPSILON = 1e-5
+EPSILON = 1e-10
 TWO_PI = 2 * np.pi
 LOG_2PI = 1.837877066
 LOG_2PI = np.log(TWO_PI)
@@ -41,6 +41,7 @@ class LossFunctionTypes(IntEnum):
     INVERSE_GAUSSIAN = 2
     LOG_NORMAL = 3
     NORMAL = 4
+    BAYESIAN = 5
 
 
 def runKSTest(target: float, loss_fn: LossFunctionTypes, dist_params: torch.Tensor):
@@ -71,6 +72,60 @@ def runKSTest(target: float, loss_fn: LossFunctionTypes, dist_params: torch.Tens
         return ks[0], ks[1]
 
 
+def runTTest(target: float, loss_fn: LossFunctionTypes, dist_params: torch.Tensor):
+    """
+    Run the KS test for the given target, following the distribution
+
+    Args:
+        target (float): The observed target runtime
+        loss_fn (LossFunctionTypes): The type of distribution (loss function) being used
+        dist_params (torch.Tensor): Tensor of distribution parameters
+
+    Returns
+        Pair of KS D (distance) and p-value
+    """
+    param = dist_params.data.cpu().numpy()
+    obs_time = target.data.cpu().numpy()[0]
+    return abs((param[0] + EPSILON) - obs_time) / (np.sqrt(param[1]) + EPSILON)
+
+
+def runKSTestBBB(target: float, mu, sigma_squared: torch.Tensor):
+    """
+    Run the KS test for the given target, following the distribution
+
+    Args:
+        target (float): The observed target runtime
+        loss_fn (LossFunctionTypes): The type of distribution (loss function) being used
+        dist_params (torch.Tensor): Tensor of distribution parameters
+
+    Returns
+        Pair of KS D (distance) and p-value
+    """
+    obs_time = target.data.cpu().numpy()[0]
+    mu = mu.data.cpu().numpy()[0]
+    sigma_squared = sigma_squared.data.cpu().numpy()[0]
+    ks = stats.kstest([obs_time], "norm", [mu, np.sqrt(sigma_squared)])
+    return ks[0], ks[1]
+
+
+def runTTestBBB(target: float, mu, sigma_squared: torch.Tensor):
+    """
+    Run the KS test for the given target, following the distribution
+
+    Args:
+        target (float): The observed target runtime
+        loss_fn (LossFunctionTypes): The type of distribution (loss function) being used
+        dist_params (torch.Tensor): Tensor of distribution parameters
+
+    Returns
+        Pair of KS D (distance) and p-value
+    """
+    obs_time = target.data.cpu().numpy()[0]
+    mu = mu.data.cpu().numpy()[0]
+    sigma_squared = sigma_squared.data.cpu().numpy()[0]
+    return abs(obs_time - mu) / np.sqrt(sigma_squared)
+
+
 def getNumberOfParameters(loss_function_type: LossFunctionTypes) -> int:
     """
     Get the number of distribution parameters for the given loss function
@@ -92,6 +147,8 @@ def getNumberOfParameters(loss_function_type: LossFunctionTypes) -> int:
         return 2
     if loss_function_type == LossFunctionTypes.NORMAL:
         return 2
+    if loss_function_type == LossFunctionTypes.BAYESIAN:
+        return 1
 
     # Othewise, we have an unknown loss function
     logger.error("Unknown loss function: {}".format(loss_function_type))
@@ -119,6 +176,8 @@ def getLossFunction(loss_function_type: LossFunctionTypes) -> Callable:
         return lognormal_loss
     if loss_function_type == LossFunctionTypes.NORMAL:
         return normal_loss
+    if loss_function_type == LossFunctionTypes.BAYESIAN:
+        return normal_loss_bayesian
 
     # Othewise, we have an unknown loss function
     logger.error("Unknown loss function: {}".format(loss_function_type))
@@ -441,9 +500,9 @@ def normal_loss(prediction: torch.Tensor, observation: torch.Tensor, reduce: boo
     Returns:
         A single dim tensor representing the mean log-likelihood of the observation
     """
-    mu = prediction[:, 0:1] + EPSILON
+    mu = prediction[:, 0:1]
     sigma_squared = prediction[:, 1:2] + EPSILON
-    target = observation[:, 0:1] + EPSILON
+    target = observation[:, 0:1]
     sol_flag = observation[:, 1] == 1
 
     mu_1 = mu.clone()[sol_flag]
@@ -459,13 +518,57 @@ def normal_loss(prediction: torch.Tensor, observation: torch.Tensor, reduce: boo
     llh = torch.zeros([prediction.shape[0]], dtype=torch.float32).to(device)
 
     # Observation seen i.e. use pointwise pdf
-    pdf_help = HALF * (1 / sigma_squared_1) * ((target_1 - mu_1)**2)
+    pdf_help = HALF * ((target_1 - mu_1)**2) / sigma_squared_1
     llh[sol_flag] = torch.flatten(-(HALF * LOG_2PI) - (HALF * log_sigma_squared_1) - pdf_help)
 
     # Upperbound i.e. use survival function = 1-CDF
     cdf = _standard_gaussian_cdf((target_2 - mu_2) / torch.sqrt(sigma_squared_2))
-    llh[~sol_flag] = torch.flatten(torch.log(1 - cdf + EPSILON))
+    llh[~sol_flag] = torch.flatten(torch.log(1.0 - cdf + EPSILON))
 
+    return torch.mean(-llh) if reduce else -llh
+
+
+def normal_loss_bayesian(outputs, observation: torch.Tensor, reduce: bool = True) -> torch.Tensor:
+    """
+    Calculates the mean log-likelihood following the Normal distribution
+    for the given sample
+
+    Args:
+        prediction (torch.Tensor): The predicted distribution parameters
+        observation (torch.Tensor): The observation as an input to the distribution
+        reduce (bool): Whether to reduce to mean or not
+
+    Returns:
+        A single dim tensor representing the mean log-likelihood of the observation
+    """
+    mu = outputs.mean(dim=2)
+    sigma_squared = outputs.var(dim=2)
+    # mu = prediction[:, 0:1]
+    # sigma_squared = prediction[:, 1:2] + EPSILON
+    target = observation[:, 0:1]
+    sol_flag = observation[:, 1] == 1
+
+    mu_1 = mu.clone()[sol_flag]
+    mu_2 = mu.clone()[~sol_flag]
+    target_1 = target.clone()[sol_flag]
+    target_2 = target.clone()[~sol_flag]
+    sigma_squared_1 = sigma_squared.clone()[sol_flag]
+    sigma_squared_2 = sigma_squared.clone()[~sol_flag]
+    log_sigma_squared = torch.log(sigma_squared)
+    log_sigma_squared_1 = log_sigma_squared.clone()[sol_flag]
+
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    llh = torch.zeros([mu.shape[0]], dtype=torch.float32).to(device)
+
+    # Observation seen i.e. use pointwise pdf
+    pdf_help = HALF * ((target_1 - mu_1)**2) / sigma_squared_1
+    llh[sol_flag] = torch.flatten(-(HALF * LOG_2PI) - (HALF * log_sigma_squared_1) - pdf_help)
+
+    # Upperbound i.e. use survival function = 1-CDF
+    cdf = _standard_gaussian_cdf((target_2 - mu_2) / torch.sqrt(sigma_squared_2))
+    llh[~sol_flag] = torch.flatten(torch.log(1.0 - cdf + EPSILON))
+
+    # return torch.mean(torch.exp(llh)) if reduce else torch.exp(llh)
     return torch.mean(-llh) if reduce else -llh
 
 

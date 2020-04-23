@@ -73,6 +73,7 @@ class CustomDataset(Dataset):
         self.level_names = []
         self.sample_counts = []
         self.preprocess_mode = preprocess_mode
+        self.sol_observation = []
         logger = logging.getLogger()
 
         # Set level data file names
@@ -111,6 +112,7 @@ class CustomDataset(Dataset):
 
                 # Look for max runtime to normalize
                 self.max_runtime = max(self.max_runtime, obs[0])
+                self.sol_observation.append(obs[1])
 
             del level_features
             del level_obs
@@ -135,6 +137,8 @@ class CustomDataset(Dataset):
             torch.save(self.std, dataset_std_path)
 
         elif initialize_mode == InitializeMode.LOAD_FROM_FILE:
+            if self.preprocess_mode & PreprocessMode.LOG_TRANSFORM:
+                self.max_runtime = torch.log(self.max_runtime)
             self.mean = torch.load(DATASET_ATTRIBUTE_PATH + attribute_prefix + '_mean.pt')
             self.std = torch.load(DATASET_ATTRIBUTE_PATH + attribute_prefix + '_std.pt')
             logger.info('Dataset mean: {}'.format(self.mean))
@@ -168,8 +172,14 @@ class CustomDataset(Dataset):
 
         return (feat, obs)
 
+    def findSolutionIdx(self):
+        return [i for i, obs in enumerate(self.sol_observation) if obs == 1]
 
-def splitData(dataset: Dataset, split_ratio: int, seed: int, max_sol: int = -1,
+    def findLowerboundIdx(self):
+        return [i for i, obs in enumerate(self.sol_observation) if obs == 0]
+
+
+def splitData(dataset: Dataset, split_ratio: int, max_sol: int = -1,
               max_lb: int = -1) -> Tuple[torch.Tensor, torch.Tensor]:
     """
     Split the features and observations randomly into subsets sized by split_ratio
@@ -177,37 +187,44 @@ def splitData(dataset: Dataset, split_ratio: int, seed: int, max_sol: int = -1,
     Args:
         dataset (torch.tensor) : The complete dateset to use for training/testing
         split_ration (float): Percentage of data to use for training
-        seed (int): Seed to use, or -1 if no seed.
 
     Returns:
         The incides for the train/test set
     """
-    # Seed
-    if seed == -1:
-        np.random.seed(0)
+    # Ensure we get proper mix of solution/lower bound data
+    dataset_sol_idx = dataset.findSolutionIdx()
+    dataset_lb_idx = dataset.findLowerboundIdx()
 
     # Shuffle
-    dataset_size = len(dataset)
-    dataset_indices = list(range(dataset_size))
-    np.random.shuffle(dataset_indices)
+    np.random.shuffle(dataset_sol_idx)
+    np.random.shuffle(dataset_lb_idx)
 
-    adjusted_indices = []
-    max_sol_counter = 0
-    max_lb_counter = 0
-    for idx in dataset_indices:
-        _, obs = dataset[idx]
-        if (max_sol_counter < max_sol or max_sol == -1) and obs[1] == 1:
-            adjusted_indices.append(idx)
-            max_sol_counter += 1
-        elif (max_lb_counter < max_lb or max_lb == -1) and obs[1] == 0:
-            adjusted_indices.append(idx)
-            max_lb_counter += 1
+    # Find splits
+    _sol_split = int(np.floor(split_ratio * len(dataset_sol_idx)))
+    _lb_split = int(np.floor(split_ratio * len(dataset_lb_idx)))
 
-    # Get split indices
-    split = int(np.floor(split_ratio * len(adjusted_indices)))
-    train_indices, val_indices = adjusted_indices[split:], adjusted_indices[:split]
+    # Train on mix on solution/lower bound, but we only can validate on solution observations
+    train_indices = dataset_sol_idx[_sol_split:] + dataset_lb_idx[_lb_split:]
+    val_indices = dataset_sol_idx[:_sol_split]
 
     return train_indices, val_indices
+
+
+def divideAndClipData(indices: list, data_divider: int = 1, max_samples: int = 0):
+    """
+    Divide the train/test set by data_divider and set max number of training samples
+
+    Args:
+        indicies: Indices to parce
+        data_divider (int): Ratio of indices to use
+        max_samples (int): If greater than 0, will clip the number of samples
+    """
+    np.random.shuffle(indices)
+    indices = indices[:int(len(indices) / data_divider)]
+    if max_samples > 0 and len(indices) > max_samples:
+        indices = indices[:max_samples]
+
+    return indices
 
 
 def getTrainTestSubsetSampler(training_idx: List[int], test_idx: List[int]):
@@ -222,7 +239,7 @@ def getTrainTestSubsetSampler(training_idx: List[int], test_idx: List[int]):
         Subset samplers for training and testing respectively
     """
     train_sampler = SubsetRandomSampler(training_idx)
-    test_sampler = SubsetRandomSampler(training_idx)
+    test_sampler = SubsetRandomSampler(test_idx)
     return train_sampler, test_sampler
 
 
