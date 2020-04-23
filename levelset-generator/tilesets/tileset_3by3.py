@@ -613,6 +613,7 @@ tileSetInfo = TileSetInfo(TILE_WIDTH, TILE_HEIGHT, ALL_TILES1)
 META_00 = MetaTile(1, 2, np.array([[ROCK_TILE2], [EXIT_TILE4]]))        # Exit with 2 rocks above
 # META_00 = MetaTile(1, 2, np.array([[ROCK_TILE5], [EXIT_TILE4]]))        # Exit with 2 rocks above
 META_10 = MetaTile(1, 2, np.array([[GEM_TILE6], [GEM_TILE5]]))          # Diamond with trap
+META_11 = MetaTile(1, 2, np.array([[ROCK_TILE2], [GEM_TILE5]]))          # Diamond with trap
 META_20 = MetaTile(1, 1, np.array([[ROCK_TILE4]]))                      # 3 rocks
 META_21 = MetaTile(1, 1, np.array([[GATE_BLOCKING_TILE11]]))             # Gate blocking (door on right)
 META_22 = MetaTile(1, 1, np.array([[GATE_BLOCKING_TILE12]]))             # Gate blocking (door on left)

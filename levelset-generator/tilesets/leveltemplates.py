@@ -40,6 +40,7 @@ class LevelTemplate():
         meta_tile_map = {
             "00" : tilesets.tileset_3by3.META_00,           # Exit with 2 rocks above
             "10" : tilesets.tileset_3by3.META_10,           # Diamond with trap
+            "11" : tilesets.tileset_3by3.META_11,
             "20" : tilesets.tileset_3by3.META_20,           # 3 rocks
             "21" : tilesets.tileset_3by3.META_21,           # Gate blocking (door right)
             "22" : tilesets.tileset_3by3.META_22,           # Gate blocking (door left)
