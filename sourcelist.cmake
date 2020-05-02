@@ -92,7 +92,6 @@ set(sources_ai
     ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/tls_highlevel.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/tls_constraint_detection.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/util/tls_levin_node.cpp
-    ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/util/tls_node_policy.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/util/tls_feature.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/util/tls_combinatorial_node.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/controller/two_level_search/tls_log.cpp
@@ -123,6 +122,7 @@ set(sources_tests
     ${PROJECT_SOURCE_DIR}/src/ai/tests/test_util.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/tests/tls/tls_hash_test.cpp
     ${PROJECT_SOURCE_DIR}/src/ai/tests/tls/tls_combinatorial_node_test.cpp
+    ${PROJECT_SOURCE_DIR}/src/ai/tests/tls/tls_distribution_test.cpp
 )
 
 set(AUTOCONF

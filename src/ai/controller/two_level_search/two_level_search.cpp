@@ -23,10 +23,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-// Pytorch
-#include <torch/torch.h>
-#include <torch/script.h>
-
 // Includes
 #include "util/tls_feature.h"
 #include "util/tls_hash.h"
@@ -34,7 +30,49 @@
 #include "statistics.h"
 #include "logger.h"
 
+// Pytorch
+#include <torch/torch.h>
+#include <torch/script.h>
+
 using namespace enginehelper;
+
+
+const std::string MODEL_DIR = "./src/ai/distnet/src/export/";
+const std::string MODEL_EXT = ".pt";
+
+
+TwoLevelSearch::TwoLevelSearch(OptionFactoryType optionType, const std::string & modelPath, PolicyType policyType) : BaseController(optionType) {
+    try {
+        // Device is CPU by default, CUDA if available
+        torch::Device device = torch::kCPU;
+        if (torch::cuda::is_available()) {
+            PLOGE_(logger::FileLogger) << "CUDA is available, using GPU";
+            PLOGE_(logger::ConsoleLogger) << "CUDA is available, using GPU";
+            device = torch::kCUDA;
+        }
+
+        // Deserialize the ScriptModule from a file using torch::jit::load().
+        PLOGE_(logger::FileLogger) << "Loading model  " << modelPath;
+        PLOGE_(logger::ConsoleLogger) << "Loading model  " << modelPath;
+        std::cout << "Tring to load model: " << MODEL_DIR << modelPath << MODEL_EXT << std::endl;
+        model_ = torch::jit::load(MODEL_DIR + modelPath + MODEL_EXT, device);
+    }
+    catch (const c10::Error& e) {
+        PLOGE_(logger::FileLogger) << "A failure occured: can't load module.";
+        PLOGE_(logger::ConsoleLogger) << "A failure occured: can't load module.";
+        std::cerr << "A failure occured: can't load module." << std::endl;
+        enginestate::setEngineGameStatusModeQuit();
+        exit(1);
+    }
+
+    PLOGE_(logger::FileLogger) << "Model " << modelPath << " loaded successfully.";
+    PLOGE_(logger::ConsoleLogger) << "Model " << modelPath << " loaded successfully.";
+
+    statistics::output_msg = modelPath;
+
+    // Set policy type
+    policyType_ = policyType;
+}
 
 
 /**
@@ -74,11 +112,14 @@ void TwoLevelSearch::handleLevelRestartBefore() {
 }
 
 
+/**
+ * Increment the path counter for stats logging.
+ */
 void TwoLevelSearch::incrementPathTimesVisited() {
     // Statistics logging
     ++(statistics::pathCounts[levelinfo::getLevelNumber()][currentHighLevelPathHash_]);
     statistics::solutionPathCounts[levelinfo::getLevelNumber()][0] = currentHighLevelPathHash_;
-    statistics::solutionPathCounts[levelinfo::getLevelNumber()][1] = ++hashPathTimesVisited[currentHighLevelPathHash_];
+    statistics::solutionPathCounts[levelinfo::getLevelNumber()][1] = ++hashPathTimesVisited_[currentHighLevelPathHash_];
 }
 
 
@@ -123,7 +164,7 @@ void TwoLevelSearch::handleLevelStart() {
     initialState.setFromEngineState();
 
     // Clear and intialize data structures
-    hashPathTimesVisited.clear();
+    hashPathTimesVisited_.clear();
     restrictedCellsByOption_.clear();
     restrictedCellsByPath_.clear();
     restrictedCellsByOptionCount_.clear();
@@ -132,83 +173,35 @@ void TwoLevelSearch::handleLevelStart() {
         restrictedCellsByOptionCount_[hash] = 0;
     }
 
+    if (policyType_ == PolicyType::Trivial) {
+        statistics::output_msg = "Trivial";
+    }
+
 
 // Manally adding constraints
 #ifdef MANUAL_CONSTRAINTS
-    // Find rocks (potential restrictions)
-    std::vector<enginetype::GridCell> rockCells;
-    PLOGE_(logger::FileLogger) << "Rocks";
-    for (auto const & cell : gridinfo::getMapSprites()) {
-        if (gridinfo::getGridElement(cell) == enginetype::ELEMENT_BD_ROCK) {
-            rockCells.push_back({cell.x, cell.y + 1});
-            PLOGE_(logger::FileLogger) <<  cell.x << "," << cell.y+1;
-        }
-    }
-    auto addRestrictionsIfApplicable = [&](uint64_t hash, const std::deque<enginetype::GridCell> &solutionPath) {
-        for (auto const & cell :solutionPath) {
-            if (std::find(rockCells.begin(), rockCells.end(), cell) != rockCells.end()) {
-                restrictedCellsByOption_[hash].insert(gridinfo::cellToIndex(cell));
-                ++restrictedCellsByOptionCount_[hash];
-                PLOGE_(logger::FileLogger) <<  cell.x << "," << cell.y+1;
-            }
-        }
-    };
-
-    // Agent starting position to each highlevel action
-    enginetype::GridCell startCell = gridinfo::getPlayerPosition();
-    for (auto const & option : availableOptions_) {
-        uint64_t hash = tlshash::hashPath(availableOptions_, {option});
-        option->runAStar(startCell, option->getGoalCell());
-        // Walk along base path and if a rock is above, set as restriction
-        // addRestrictionsIfApplicable(hash, option->getSolutionPath());
-        for (auto const & cell :option->getSolutionPath()) {
-            if (std::find(rockCells.begin(), rockCells.end(), cell) != rockCells.end()) {
-                restrictedCellsByOption_[hash].insert(gridinfo::cellToIndex(cell));
-                ++restrictedCellsByOptionCount_[hash];
-                PLOGE_(logger::FileLogger) << option->toString() << ", (" << cell.x << ", " << cell.y << ")";
-            }
-        }
-    }
-    PLOGE_(logger::FileLogger) << "----------------";
-    // Pair options
-    for (auto & prev : availableOptions_) {
-        for (auto & curr : availableOptions_) {
-            // Same option means starting position to option, handled above
-            if (prev == curr) {continue;}
-            uint64_t hash = tlshash::hashPath(availableOptions_, {prev, curr});
-            
-            // Set path
-            curr->runAStar(prev->getGoalCell(), curr->getGoalCell());
-
-            // Walk along base path and if a rock is above, set as restriction
-            // addRestrictionsIfApplicable(hash, curr->getSolutionPath());
-            for (auto const & cell :curr->getSolutionPath()) {
-                if (std::find(rockCells.begin(), rockCells.end(), cell) != rockCells.end()) {
-                    restrictedCellsByOption_[hash].insert(gridinfo::cellToIndex(cell));
-                    ++restrictedCellsByOptionCount_[hash];
-                    PLOGE_(logger::FileLogger) << prev->toString() << " -> " << curr->toString() << ", (" << cell.x << ", " << cell.y << ")";
-                }
-            }
-        }
-    }
+    addManualConstraints();
 #endif
 
     openLevinNodes_.clear(); 
     closedLevinNodes_.clear();
 
 #ifndef SINGLE_PATH
-
     // Create starting levin node for each 1 step path 
     for (auto const & option : availableOptions_) {
         int numGem = elementproperty::getItemGemCount(gridinfo::getSpriteGridCell(option->getSpriteID()));
         bool hasDoor = elementproperty::isExit(gridinfo::getSpriteGridCell(option->getSpriteID()));
         uint64_t singleStepHash = tlshash::hashPath(availableOptions_, {option});
         int restriction_count = restrictionCountForPath({option});
-        openLevinNodes_.insert({{option}, tlsfeature::getNodePath({option}), singleStepHash, 0, 0, 
-            restriction_count, CombinatorialPartition(restriction_count), numGem, hasDoor, false, false
+
+        std::vector<BaseOption*> temp_vec{option};
+        openLevinNodes_.insert({{option}, tlsfeature::getNodePath({option}), singleStepHash, 0,
+            restriction_count, numGem, hasDoor, false, false,
+            policyType_, model_, initialState
         });
     }
 #else
+    // Single path for testing
     PLOGE_(logger::ConsoleLogger) << availableOptions_.size();
     std::vector<BaseOption*> path{availableOptions_[7], availableOptions_[4], availableOptions_[3], availableOptions_[1], availableOptions_[8],
         availableOptions_[6], availableOptions_[8], availableOptions_[2], availableOptions_[0], availableOptions_[5]
@@ -237,23 +230,13 @@ void TwoLevelSearch::handleLevelSolved() {
     std::vector<torch::Tensor> featureTensors_closed;
     std::vector<torch::Tensor> observationTensors_closed;
 
-    const int NUM_OPEN = 200;
-    const int NUM_CLOSED = 100;
+    const int NUM_OPEN = 50;
+    const int NUM_CLOSED = 50;
 
     // Create data dir if it doesn't exist
     mkdir(DATA_DIR.c_str(), 0755);
 
-
-    // Add solution node
-    // for (auto const node : openLevinNodes_) {
-    //     // Never visited during search, skip
-    //     if (node.timesVisited == 0) {continue;}
-    //     if (node.hash == currentHighLevelPathHash_) {
-    //         featureTensors.push_back(tlsfeature::getNodeFeature(node, initialState.Feld_));
-    //         observationTensors.push_back(tlsfeature::getNodeObservation(node, true, false));
-    //         break;
-    //     }
-    // }
+    // Walk through nodes, remove nodes which were not visited, and save solution node
     for (auto iter = openLevinNodes_.begin(); iter != openLevinNodes_.end(); ) {
         if (iter->timesVisited == 0) {
             iter = openLevinNodes_.erase(iter);
@@ -272,27 +255,27 @@ void TwoLevelSearch::handleLevelSolved() {
 
     // Open nodes
     std::vector<NodeLevin> openVec(openLevinNodes_.begin(), openLevinNodes_.end());
-    std::sort(openVec.begin(), openVec.end(), [](const NodeLevin & l, const NodeLevin & r) {return l.timesVisited > r.timesVisited;});
+    // std::sort(openVec.begin(), openVec.end(), [](const NodeLevin & l, const NodeLevin & r) {return l.timesVisited > r.timesVisited;});
     for (int i = 0; i < std::min(NUM_OPEN, (int)openVec.size()); ++i) {
-        // int randomIndex = rand() % openVec.size();
-        // featureTensors.push_back(tlsfeature::getNodeFeature(openVec[randomIndex], initialState.Feld_));
-        // observationTensors.push_back(tlsfeature::getNodeObservation(openVec[randomIndex], false, false));
-        // openVec.erase(openVec.begin() + randomIndex);
-        featureTensors.push_back(tlsfeature::getNodeFeature(openVec[i], initialState.Feld_));
-        observationTensors.push_back(tlsfeature::getNodeObservation(openVec[i], false, false));
+        int randomIndex = rand() % openVec.size();
+        featureTensors.push_back(tlsfeature::getNodeFeature(openVec[randomIndex], initialState.Feld_));
+        observationTensors.push_back(tlsfeature::getNodeObservation(openVec[randomIndex], false, false));
+        openVec.erase(openVec.begin() + randomIndex);
+        // featureTensors.push_back(tlsfeature::getNodeFeature(openVec[i], initialState.Feld_));
+        // observationTensors.push_back(tlsfeature::getNodeObservation(openVec[i], false, false));
     }
 
 
     // Closed nodes (exhausted i.e. timeout but not lower bound)
     std::vector<NodeLevin> closedVec(closedLevinNodes_.begin(), closedLevinNodes_.end());
-    std::sort(closedVec.begin(), closedVec.end(), [](const NodeLevin & l, const NodeLevin & r) {return l.timesVisited > r.timesVisited;});
+    // std::sort(closedVec.begin(), closedVec.end(), [](const NodeLevin & l, const NodeLevin & r) {return l.timesVisited > r.timesVisited;});
     for (int i = 0; i < std::min(NUM_CLOSED, (int)closedVec.size()); ++i) {
-        // int randomIndex = rand() % closedVec.size();
-        // featureTensors_closed.push_back(tlsfeature::getNodeFeature(closedVec[randomIndex], initialState.Feld_));
-        // observationTensors_closed.push_back(tlsfeature::getNodeObservation(closedVec[randomIndex], false, true));
-        // closedVec.erase(closedVec.begin() + randomIndex);
-        featureTensors_closed.push_back(tlsfeature::getNodeFeature(closedVec[i], initialState.Feld_));
-        observationTensors_closed.push_back(tlsfeature::getNodeObservation(closedVec[i], false, true));
+        int randomIndex = rand() % closedVec.size();
+        featureTensors_closed.push_back(tlsfeature::getNodeFeature(closedVec[randomIndex], initialState.Feld_));
+        observationTensors_closed.push_back(tlsfeature::getNodeObservation(closedVec[randomIndex], false, true));
+        closedVec.erase(closedVec.begin() + randomIndex);
+        // featureTensors_closed.push_back(tlsfeature::getNodeFeature(closedVec[i], initialState.Feld_));
+        // observationTensors_closed.push_back(tlsfeature::getNodeObservation(closedVec[i], false, true));
     }
 
     // Save featureTensors for python training

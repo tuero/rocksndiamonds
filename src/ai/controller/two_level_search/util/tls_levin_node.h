@@ -19,8 +19,14 @@
 
 // Includes
 #include "tls_combinatorial_node.h"
+#include "tls_policy_type.h"
+#include "game_state.h"
 #include "base_option.h"
 #include "engine_types.h"
+
+// Pytorch
+#include <torch/torch.h>
+#include <torch/script.h>
 
 
 /**
@@ -38,7 +44,16 @@ struct NodeLevin {
     bool hasDoor;
     bool hasExpanded;
     bool wasSkipped;
+    PolicyType policyType;
     // NN dist params
+    at::Tensor networkOutput;
+
+    NodeLevin(const std::vector<BaseOption*> &path, const std::deque<enginetype::GridCell> &fullGridPath, uint64_t hash, 
+              std::size_t pathLength, int numConstraints, int numGems, 
+              bool hasDoor, bool hasExpanded, bool wasSkipped, PolicyType policyType, torch::jit::script::Module &module, GameState &initialState);
+
+
+    double cost() const;
 };
 
 

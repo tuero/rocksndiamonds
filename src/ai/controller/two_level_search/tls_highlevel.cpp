@@ -146,15 +146,14 @@ void TwoLevelSearch::modifiedLevinTS() {
             int restriction_count = restrictionCountForPath(childPath);
 
             // Add child node to open
-            openLevinNodes_.insert({childPath, tlsfeature::getNodePath(childPath), childHash, childPath.size(), 0, 
-                restriction_count, CombinatorialPartition(restriction_count), numGems, hasDoor, false, false
+            openLevinNodes_.insert({childPath, tlsfeature::getNodePath(childPath), childHash, childPath.size(), 
+                restriction_count, numGems, hasDoor, false, false, policyType_, model_, initialState
             });
         }
     }
 
     // If not exhausted, add child (same high-level path but increment bitwise index)
     if (!node.combinatorialPartition.isComplete() && !node.wasSkipped) {
-        // ++node.timesVisited;
         openLevinNodes_.insert(node);
     }
     // Otherwise, node exhausted, and so we add to close (as we've observed this runtime)
@@ -198,6 +197,5 @@ void TwoLevelSearch::highLevelSearch() {
 #endif
 
     currentHighLevelPathHash_ = tlshash::hashPath(availableOptions_, highlevelPlannedPath_);
-    // incrementPathTimesVisited();
 }
 

@@ -14,13 +14,13 @@
 #include <unordered_map>
 #include <algorithm>            // iota
 
-// Pytorch
-#include <torch/torch.h>
-
 // Includes
 #include "engine_types.h"
 #include "engine_helper.h"
 #include "logger.h"
+
+// Pytorch
+#include <torch/torch.h>
 
 // namespace
 using namespace enginehelper;

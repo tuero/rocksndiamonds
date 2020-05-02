@@ -24,42 +24,50 @@
 
 // Includes
 #include "util/tls_levin_node.h"
+#include "util/tls_policy_type.h"
 #include "base_controller.h"
 #include "base_option.h"
 #include "game_state.h"
+
+// Pytorch
+#include <torch/torch.h>
+#include <torch/script.h>
 
 // #define SINGLE_PATH
 // #define SET_RESTRICTIONS
 #define TRAINING
 #define MANUAL_CONSTRAINTS
 
+
 /**
- * Default controller
+ * Custom controller for masters thesis
  *
- * This does nothing, and acts as a backup to prevent unknown controller input from breaking
+ * Uses levinTS, with node policy being hazard function of model output distribution
  */
 class TwoLevelSearch : public BaseController {
 private:
-    bool optionStatusFlag_ = true;                                                  // Flag signifying current option is complete
-    int solutionIndex_;                                                             // Current index in the high level path
-    BaseOption* previousOption_;                                                    // Pointer to previous option in high level path
-    BaseOption* currentOption_;                                                     // Pointer to current option in high level path
+    bool optionStatusFlag_ = true;                                           // Flag signifying current option is complete
+    int solutionIndex_;                                                      // Current index in the high level path
+    BaseOption* previousOption_;                                             // Pointer to previous option in high level path
+    BaseOption* currentOption_;                                              // Pointer to current option in high level path
 
     // HLS 
-    std::vector<BaseOption*> highlevelPlannedPath_ = {};                            // Current path of high level options
-    uint64_t currentHighLevelPathHash_;                                             // Hash representing the current high level option path
-    std::set<NodeLevin, CompareLevinNode> openLevinNodes_;                  // Open list for LevinTS
-    std::set<NodeLevin, CompareLevinNode> closedLevinNodes_;                  // Open list for LevinTS
-    std::unordered_map<uint64_t, int> hashPathTimesVisited;                 // Map tracking number of visits for each (partial) path
+    std::vector<BaseOption*> highlevelPlannedPath_ = {};                     // Current path of high level options
+    uint64_t currentHighLevelPathHash_;                                      // Hash representing the current high level option path
+    std::set<NodeLevin, CompareLevinNode> openLevinNodes_;                   // Open list for LevinTS
+    std::set<NodeLevin, CompareLevinNode> closedLevinNodes_;                 // Open list for LevinTS
+    std::unordered_map<uint64_t, int> hashPathTimesVisited_;                 // Map tracking number of visits for each (partial) path
 
     // Constraint identification
-    std::unordered_map<uint64_t, std::unordered_set<int>> restrictedCellsByOption_;        // Restricted cells for each option pair
-    std::unordered_map<uint64_t, std::set<int>> restrictedCellsByPath_;        // Restricted cells for each option pair
+    std::unordered_map<uint64_t, std::unordered_set<int>> restrictedCellsByOption_; // Restricted cells for each option pair
+    std::unordered_map<uint64_t, std::set<int>> restrictedCellsByPath_;             // Restricted cells for each option pair
     std::unordered_map<uint64_t, int> restrictedCellsByOptionCount_;                // Count of restricted cells for each option, faster access
-    typedef std::array<uint64_t, 2> OptionIndexPair;                        // Typedef for pairs of options (for return types)
-    std::array<enginetype::GridCell, 2> playerCells_;                       // Player cell on the current/prev game step
+    std::array<enginetype::GridCell, 2> playerCells_;                               // Player cell on the current/prev game step
 
-    GameState initialState;
+    // Model
+    GameState initialState;                         // Used to create feature input for model
+    PolicyType policyType_ = PolicyType::Trivial;   // Controls for which type of model to use
+    torch::jit::script::Module model_;             // Trained model to load
 
 
     /**
@@ -68,6 +76,9 @@ private:
      */
     void initializationForEveryLevelStart();
 
+    /**
+     * Increment the path counter for stats logging.
+     */
     void incrementPathTimesVisited();
 
 
@@ -104,6 +115,11 @@ private:
     void singlePath();
 
     // --------------- Constraints --------------- 
+
+    /**
+     * Add manual constraints instead of detecting while solving
+     */
+    void addManualConstraints();
 
     /**
      * For each HLA pair, insert cell restrictions into a set for the whole path
@@ -167,6 +183,8 @@ public:
     TwoLevelSearch() {}
 
     TwoLevelSearch(OptionFactoryType optionType) : BaseController(optionType) {}
+
+    TwoLevelSearch(OptionFactoryType optionType, const std::string & modelPath, PolicyType policyType);
 
     void initializeOptions() override;
 

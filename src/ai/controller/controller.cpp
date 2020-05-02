@@ -30,6 +30,7 @@
 
 using namespace enginehelper;
 
+const int TIMEOUT = 0;
 
 /**
  * Default constructor which gets the controller type from the engine
@@ -126,6 +127,11 @@ void Controller::handleLevelSolved() {
 void Controller::handleLevelFailed() {
     static const int MSG_FREQ = 1000;
     statistics::numLevelTries += 1;
+
+    if (TIMEOUT > 0 and TIMEOUT == statistics::numLevelTries) {
+        handleLevelSolved();
+        return;
+    }
 
     if (baseController_.get()->retryOnLevelFail()) {
         // Handle necessary changes before/after level reload
@@ -246,6 +252,12 @@ void Controller::initController(ControllerType controller) {
     }
     else if (controller == CONTROLLER_TWOLEVEL) {
         baseController_ = std::make_unique<TwoLevelSearch>(OptionFactoryType::TWO_LEVEL_SEARCH);
+    }
+    else if (controller == CONTROLLER_TWOLEVEL_DISTNET) {
+        baseController_ = std::make_unique<TwoLevelSearch>(OptionFactoryType::TWO_LEVEL_SEARCH, enginestate::getModelPathParam(), PolicyType::DistNet);
+    }
+    else if (controller == CONTROLLER_TWOLEVEL_BAYESIAN) {
+        baseController_ = std::make_unique<TwoLevelSearch>(OptionFactoryType::TWO_LEVEL_SEARCH, enginestate::getModelPathParam(), PolicyType::Bayesian);
     }
     else {
         PLOGE_(logger::FileLogger) << "Unknown controller type: " << controller;

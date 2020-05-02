@@ -25,6 +25,62 @@ using namespace enginehelper;
 
 
 /**
+ * If we are using manual constraints (less accurate but faster loop throughput), we need to try and guess
+ * what the constraints would be. Here, we look for rock positions, between high level options (sprites)
+ * that would occur from walking along shortest path.
+ */
+void TwoLevelSearch::addManualConstraints() {
+    // Find rocks (potential restrictions)
+    std::vector<enginetype::GridCell> rockCells;
+    PLOGE_(logger::FileLogger) << "Rock restrictions";
+    for (auto const & cell : gridinfo::getMapSprites()) {
+        if (gridinfo::getGridElement(cell) == enginetype::ELEMENT_BD_ROCK) {
+            rockCells.push_back({cell.x, cell.y + 1});
+            PLOGE_(logger::FileLogger) <<  cell.x << "," << cell.y+1;
+        }
+    }
+
+    // Agent starting position to each highlevel action
+    PLOGE_(logger::FileLogger) << "Setting restrictions for single step path (agent starting position -> first option)";
+    enginetype::GridCell startCell = gridinfo::getPlayerPosition();
+    for (auto const & option : availableOptions_) {
+        uint64_t hash = tlshash::hashPath(availableOptions_, {option});
+        option->runAStar(startCell, option->getGoalCell());
+        // Walk along base path and if a rock is above, set as restriction
+        for (auto const & cell :option->getSolutionPath()) {
+            if (std::find(rockCells.begin(), rockCells.end(), cell) != rockCells.end()) {
+                restrictedCellsByOption_[hash].insert(gridinfo::cellToIndex(cell));
+                ++restrictedCellsByOptionCount_[hash];
+                PLOGE_(logger::FileLogger) << option->toString() << ", (" << cell.x << ", " << cell.y << ")";
+            }
+        }
+    }
+
+    // Pair options
+    PLOGE_(logger::FileLogger) << "Setting restrictions for pair of options";
+    for (auto & prev : availableOptions_) {
+        for (auto & curr : availableOptions_) {
+            // Same option means starting position to option, handled above
+            if (prev == curr) {continue;}
+            uint64_t hash = tlshash::hashPath(availableOptions_, {prev, curr});
+            
+            // Set path
+            curr->runAStar(prev->getGoalCell(), curr->getGoalCell());
+
+            // Walk along base path and if a rock is above, set as restriction
+            for (auto const & cell :curr->getSolutionPath()) {
+                if (std::find(rockCells.begin(), rockCells.end(), cell) != rockCells.end()) {
+                    restrictedCellsByOption_[hash].insert(gridinfo::cellToIndex(cell));
+                    ++restrictedCellsByOptionCount_[hash];
+                    PLOGE_(logger::FileLogger) << prev->toString() << " -> " << curr->toString() << ", (" << cell.x << ", " << cell.y << ")";
+                }
+            }
+        }
+    }
+}
+
+
+/**
  * For each HLA pair, insert cell restrictions into a set for the whole path
  * If a restriction occurs twice in the path (once at different steps in the path),
  * then we only consider it once
@@ -106,11 +162,13 @@ void TwoLevelSearch::updateAffectedLevinNodes(uint64_t optionPairHash) {
  * In addNewConstraints(), we store only the intersection of gridcells in restrictedCellsByOption_
  */
 void TwoLevelSearch::checkForMovedObjects() {
+    // Increment player buffered positions
     if (gridinfo::getPlayerPosition() != playerCells_[1]) {
         playerCells_[0] = playerCells_[1];
         playerCells_[1] = gridinfo::getPlayerPosition();
     }
 
+    // First tick, no movement, break early
     if (playerCells_[0] == (enginetype::GridCell){-1, -1}) {return;}
     
     for (auto const & cell : gridinfo::getMapSprites()) {

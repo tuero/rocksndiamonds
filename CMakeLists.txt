@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 # C compiler flags
-set(CMAKE_C_FLAGS "-Wall -Wstrict-prototypes -Wmissing-prototypes")
+set(CMAKE_C_FLAGS "-Wall -Wstrict-prototypes -Wmissing-prototypes -Wno-sign-compare -Wno-implicit-fallthrough")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS} -g")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS} -O3 ")
 
@@ -28,11 +28,9 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 endif()
 
 # Options for comparing different LevinTS policies
-option(TRIVIAL_POLICY "Trivial LevinTS policy" OFF)
+option(DISTNET_POLICY "DistNet LevinTS policy" OFF)
+option(BAYESIAN_POLICY "BayesianLevinTS policy" OFF)
 
-if(TRIVIAL_POLICY)
-    add_definitions(-DTRIVIAL_POLICY)
-endif()
 
 # Log/replay/stat directories 
 message(STATUS "Creating log/replay/stat directories.")

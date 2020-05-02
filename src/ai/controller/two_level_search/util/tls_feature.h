@@ -14,12 +14,12 @@
 // Standard Library/STL
 #include <deque>
 
-// Pytorch
-#include <torch/torch.h>
-
 // Includes
 #include "engine_types.h"
 #include "tls_levin_node.h"
+
+// Pytorch
+#include <torch/torch.h>
 
 
 
