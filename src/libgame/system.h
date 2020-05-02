@@ -1015,6 +1015,7 @@ struct OptionInfo
   char* level_set;                       // Name of levelset to load
   boolean save_run;                      // Flag to save replay file of actions taken
   int opt;                               // Option int argument for controllers
+  char *model_path;                      // Model to use for TLS controller
 };
 
 struct VideoSystemInfo

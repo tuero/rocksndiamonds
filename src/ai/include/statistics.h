@@ -30,6 +30,7 @@ extern std::map<int, uint64_t> nodesExpanded;
 extern std::map<int, std::unordered_map<uint64_t, int>> pathCounts;
 extern std::map<int, std::array<uint64_t, 2>> solutionPathCounts;
 extern std::map<int, int> solutionConstraintCount;
+extern std::string output_msg;
 
 /**
  * Reset the statistic values

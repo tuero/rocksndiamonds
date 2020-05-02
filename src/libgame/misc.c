@@ -968,6 +968,7 @@ void GetOptions(int argc, char *argv[],
   options.delay = GAME_FRAME_DELAY;
   options.save_run = FALSE;
   options.opt = 0;
+  options.model_path = NULL;
 
 #if 1
   options.verbose = TRUE;
@@ -1245,6 +1246,18 @@ void GetOptions(int argc, char *argv[],
         }
         else {
             options.opt = atoi(option_arg);
+        }
+        if (option_arg == next_option) {
+            options_left++;
+        }
+    }
+    else if (strncmp(option, "-model_path", option_len) == 0)
+    {
+        if (option_arg == NULL) {
+            Error(ERR_EXIT_HELP, "option '%s' requires an argument", option_str);
+        }
+        else {
+            options.model_path = option_arg;
         }
         if (option_arg == next_option) {
             options_left++;

@@ -39,19 +39,13 @@ void setLevelSet() {
     // Kind of messy, need a better
 
     // No levelset given
-    // std::cout << "2Setting levelset: \"" << options.level_set << "\"\n";
     if (options.level_set == NULL) {return;}
 
     std::string level_set(options.level_set);
 
     try{
         // Initialize leveldir_current and related objects
-        // PLOGI_(logger::FileLogger) << "before: \"\n";
         LoadLevelInfo();
-        // PLOGI_(logger::FileLogger) << "Setting levelset: \"" << level_set << "\"\n";
-        // PLOGI_(logger::ConsoleLogger) << "Setting levelset: \"" << level_set << "\"\n";
-        // std::cout << "3Setting levelset: \"" << level_set << "\"\n";
-        // std::cout << "3Setting levelset: \"" << options.level_set << "\"\n";
 
         // Set levelset to save
         leveldir_current->fullpath = options.level_set;
@@ -77,7 +71,8 @@ void setLevelSet() {
  * Get the levelset currently set in the engine.
  */
 const std::string getLevelSet() {
-    return leveldir_current->subdir;
+    // return leveldir_current->subdir;
+    return options.level_set;
 }
 
 

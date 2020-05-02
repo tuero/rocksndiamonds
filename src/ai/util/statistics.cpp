@@ -37,6 +37,7 @@ std::map<int, uint64_t> nodesExpanded;
 std::map<int, std::unordered_map<uint64_t, int>> pathCounts;
 std::map<int, std::array<uint64_t, 2>> solutionPathCounts;
 std::map<int, int> solutionConstraintCount;
+std::string output_msg = "";
 
 // File output
 const std::string STATS_DIR = "./src/ai/stats/";
@@ -82,7 +83,8 @@ void outputRunLengthToFile(int run, const std::string & levelset, int level) {
     // statsFile << run << ",constraints=" << solutionConstraintCount[level] << ",paths=" << 
     // pathCounts[level].size() << ",total=" << total_count << std::endl;
 
-    statsFile << "levelset=" << levelset << ",level=" << level << ",total_count=" << total_count << std::endl;
+    statsFile << "levelset=" << levelset << ",level=" << level << ",total_count=" << total_count <<
+    ",model=" << output_msg << std::endl;
 }
 
 

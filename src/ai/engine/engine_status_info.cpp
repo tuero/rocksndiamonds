@@ -56,6 +56,15 @@ int getOptParam() {
 
 
 /**
+ * Get the model path CLA
+ */
+std::string getModelPathParam() {
+    std::string model_path(options.model_path);
+    return model_path;
+}
+
+
+/**
  * Check if the current status of the engine is loss of life.
  */
 bool engineGameFailed() {

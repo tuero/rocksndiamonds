@@ -46,6 +46,13 @@ namespace enginestate {
     int getOptParam();
 
     /**
+     * Get the model path CLA
+     * 
+     * @return String relative path for the model to use
+     */
+    std::string getModelPathParam();
+
+    /**
      * Check if the current status of the engine is loss of life.
      * The internal engine checkGameFailed() function is called. 
      *
