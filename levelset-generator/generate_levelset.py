@@ -68,9 +68,25 @@ def _setLevelSize(file, level_width, level_height):
 def _setLevelSprites(file, level):
     # Set the map data sprites for the given level
     data = level.getUnderlyingData()
+    counter = 0
     for sprite in data:
         sprite_high = (sprite & 0xFF00) >> 8
         sprite_low = sprite & 0x00FF
+        file.write(bytes([sprite_high]))
+        file.write(bytes([sprite_low]))
+        counter += 1
+
+        if counter % 39 == 0:
+            wall_steel = 0x000D
+            sprite_high = (wall_steel & 0xFF00) >> 8
+            sprite_low = wall_steel & 0x00FF
+            file.write(bytes([sprite_high]))
+            file.write(bytes([sprite_low]))
+
+    for _ in range(40):
+        wall_steel = 0x000D
+        sprite_high = (wall_steel & 0xFF00) >> 8
+        sprite_low = wall_steel & 0x00FF
         file.write(bytes([sprite_high]))
         file.write(bytes([sprite_low]))
 
@@ -83,7 +99,7 @@ def makeFileFromLevel(filename, level):
     output.write(header_data)
 
     _setNumGems(output, level.levelDifficulty.numGemsRequired)
-    _setLevelSize(output, level.getWidth(), level.getHeight())
+    _setLevelSize(output, level.getWidth() + 1, level.getHeight() + 1)
     _setLevelSprites(output, level)
 
     # Write footer
