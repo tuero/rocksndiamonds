@@ -22,7 +22,7 @@ from torch.utils.data import DataLoader
 # Module
 from data.learning_metrics import getEmptyDataFrame, addMetricRow
 from config.config_handler import getModelConfig, getTrainingConfig, trainingConfigToStr, modelConfigToStr
-from models.model_util import weights_init, getModel
+from models.model_util import weights_init, getModel, count_parameters
 from models.bayes_distnet import BayesDistNetCNN
 from models.distnet import DistNetCNN
 from loss_functions import getLossFunction, getNumberOfParameters, runKSTest, runKSTestBBB, runTTest, runTTestBBB
@@ -56,7 +56,7 @@ def train_model(model, device, train_loader, optimizer, training_config, total_l
                 kl += _kl
                 outputs[:, :, j] = net_out
             kl = kl / n_ens
-            loss = kl + total_len * loss_fn(outputs, rts)
+            loss = kl*0.35 + total_len * loss_fn(outputs, rts)
         elif type(model) is DistNetCNN:
             outputs = model(inputs)
             loss = loss_fn(outputs, rts)
@@ -102,7 +102,7 @@ def validate_model(model, device, validation_loader, training_config, val_len, v
                 kl += _kl
                 outputs[:, :, j] = net_out
             kl = kl / n_ens
-            val_loss = kl + val_len * loss_fn(outputs, val_rts)
+            val_loss = kl*0.35 + val_len * loss_fn(outputs, val_rts)
 
             # Find distribution parameters of samples
             mu = outputs.mean(dim=2)
@@ -115,13 +115,13 @@ def validate_model(model, device, validation_loader, training_config, val_len, v
                 p2 = runTTestBBB(val_rts[j], mu[j], sigma_squared[j])
                 if p1 < 0.01:
                     ks_counter += 1
-                if p2 < 0.05:
+                if p2 > 1.960:
                     t_counter += 1
                 dist_from_means.append(abs(mu[j].item() - val_rts[j][0].item()))
                 variances.append(sigma_squared[j].item())
                 # Verbose printing
                 if verbose_length > 0:
-                    verb_str = 't={:>10.5f} mu={:.4f} sigma2={:.4f} ks_p={:.4f} t_p={:.4f}'
+                    verb_str = 't={:>10.5f} mu={:.4f} sigma2={:.4f} ks_p={:.4f} z_p={:.4f}'
                     logger.info(verb_str.format(val_rts[j][0].item(), mu[j].item(), sigma_squared[j].item(), p1, p2))
 
         elif type(model) is DistNetCNN:
@@ -135,13 +135,13 @@ def validate_model(model, device, validation_loader, training_config, val_len, v
                 p2 = runTTest(val_rts[j], training_config['loss_fn'], outputs[j])
                 if p1 < 0.01:
                     ks_counter += 1
-                if p2 < 0.05:
+                if p2 > 1.960:
                     t_counter += 1
                 dist_from_means.append(abs(outputs[j][0].item() - val_rts[j][0].item()))
                 variances.append(outputs[j][1].item())
                 # Verbose printing
                 if verbose_length > 0:
-                    verb_str = 't={:>10.5f} mu={:.4f} sigma2={:.4f} ks_p={:.4f} t_p={:.4f}'
+                    verb_str = 't={:>10.5f} mu={:.4f} sigma2={:.4f} ks_p={:.4f} z_p={:.4f}'
                     logger.info(verb_str.format(val_rts[j][0].item(), outputs[j][0].item(), outputs[j][1].item(), p1, p2))
         else:
             raise ValueError('Unknown net type.')
@@ -185,6 +185,7 @@ def train(net_type: str, device: torch.device, train_loader: DataLoader, validat
     # Log the current configurations
     logger.info(trainingConfigToStr(training_config))
     logger.info(modelConfigToStr(model_config))
+    logger.info('Number of parameters: {}'.format(count_parameters(model)))
 
     # Reset model and send model to device
     model.apply(weights_init)
@@ -223,7 +224,7 @@ def train(net_type: str, device: torch.device, train_loader: DataLoader, validat
         df_losses = addMetricRow(df_losses, epoch, np.mean(dist_from_means), "D-MEAN", model.toStr())
         df_losses = addMetricRow(df_losses, epoch, np.mean(variances), "VAR", model.toStr())
 
-        output_msg = "Epoch: {:>4d}, Training Loss {:>18,.4f}, Training Eval Loss {:>18,.4f}, Validation Loss {:>18,.4f}, %KS < 0.01 = {:.2f}, %T < 0.05 = {:.2f}"
+        output_msg = "Epoch: {:>4d}, Training Loss {:>18,.4f}, Training Eval Loss {:>18,.4f}, Validation Loss {:>18,.4f}, %KS < 0.01 = {:.2f}, %Z < 0.05 = {:.2f}"
         logger.info(output_msg.format(epoch + 1, train_avg, eval_avg, test_avg, ks_avg, t_avg))
 
         # Update learning rate

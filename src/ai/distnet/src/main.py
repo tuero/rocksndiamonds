@@ -21,7 +21,7 @@ from train import train, validate_model
 from model_assessment import gridSearch, getParamGrid, kfoldValidation
 
 
-def runKFold(net_type, config_section, attribute_prefix, samples_per_level, data_divider=1, max_samples=0):
+def runKFold(net_type, config_section, attribute_prefix, samples_per_level, data_divider=1, max_samples=0, save_name=None):
     logger = logging.getLogger()
 
     # Parse and get configs
@@ -29,14 +29,13 @@ def runKFold(net_type, config_section, attribute_prefix, samples_per_level, data
 
     # Get data
     levelsets = ["train1", "train2", "train3", "train4"]
-    # levelsets = ["train1", "train2"]
     dataset = CustomDataset(levelsets, samples_per_level, attribute_prefix, training_config['preprocess_mode'], InitializeMode.LOAD_FROM_FILE)
 
     # Run kfold
-    kfold_df_, avg_loss, ks_avg, t_avg = kfoldValidation(net_type, dataset, training_config, model_config,
-                                                         data_divider=data_divider, num_folds=5, max_samples=max_samples)
+    kfold_df_, avg_loss, ks_avg, t_avg = kfoldValidation(net_type, dataset, training_config, model_config, data_divider=data_divider, 
+                                                         num_folds=5, max_samples=max_samples, save_name=save_name)
     kfold_df_['config'] = 'samp-{}-lb-{}-div-{}'.format(max_samples, samples_per_level - 1, data_divider)
-    kfold_df_.to_pickle('../kfold_dfs/df_{}_samp-{}-lb-{}-div-{}.pkl'.format(config_section, max_samples, samples_per_level - 1, data_divider))
+    kfold_df_.to_pickle('../kfold_dfs/df_{}_samp-{}-lb-{}-div-{}_2.pkl'.format(config_section, max_samples, samples_per_level - 1, data_divider))
     output_msg = "Average Validation Loss {:>18,.4f}, %KS < 0.01 = {:.2f}, %T < 0.01 = {:.2f}"
     logger.info(output_msg.format(avg_loss, ks_avg, t_avg))
 
@@ -118,11 +117,10 @@ if __name__ == "__main__":
     parser.add_argument("--attribute_prefix", help="Name prefix of dataset attributes", required=False,
                         default="", type=str.lower)
     parser.add_argument("--ssl", help="Samples per level", required=False,
-                        default=1, type=int)
+                        default=1, type=float)
     parser.add_argument("--data_divider", help="Amount to divide number of samples", required=False,
                         default=1, type=int)
-    parser.add_argument("--save_model", help="Flag to save model", required=False,
-                        default=1, type=int)
+    parser.add_argument("--save", help="Flag to save model", required=False, default=None)
     parser.add_argument("--max_samples", help="Maximum number of samples to train on", required=False,
                         default=-1, type=int)
     parser.add_argument("--max_sol", help="Maximum number of solution samples", required=False,
@@ -151,7 +149,7 @@ if __name__ == "__main__":
     elif args.mode == "unit_test":
         testLossFunctions(args.config_section)
     elif args.mode == "kfold":
-        runKFold(args.net_type, args.config_section, args.attribute_prefix, args.ssl, args.data_divider, args.max_samples)
+        runKFold(args.net_type, args.config_section, args.attribute_prefix, args.ssl, args.data_divider, args.max_samples, args.save)
     if args.mode == "grid_search":
         runGridSearch(args.net_type, args.config_section, args.attribute_prefix, args.ssl)
 

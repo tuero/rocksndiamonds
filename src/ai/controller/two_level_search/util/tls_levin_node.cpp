@@ -14,6 +14,8 @@
 // Standard Libary/STL
 #include <vector>
 
+#include <boost/math/distributions/empirical_cumulative_distribution_function.hpp>
+
 // Includes
 #include "tls_distribution.h"
 #include "tls_feature.h"

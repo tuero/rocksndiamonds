@@ -30,13 +30,15 @@ class BBBLinear(ModuleWrapper):
         self.alpha_shape = alpha_shape
         self.W = Parameter(torch.Tensor(out_features, in_features))
         self.log_alpha = Parameter(torch.Tensor(*alpha_shape))
-        if bias:
-            self.bias = Parameter(torch.Tensor(1, out_features))
-        else:
-            self.register_parameter('bias', None)
+        self.bias = Parameter(torch.Tensor(1, out_features))
+        # if bias:
+        #     self.bias = Parameter(torch.Tensor(1, out_features))
+        # else:
+        #     self.register_parameter('bias', None)
         self.reset_parameters()
         self.kl_value = metrics.calculate_kl
         self.name = name
+        # self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         # if cfg.record_mean_var:
         #     self.mean_var_path = cfg.mean_var_dir + f"{self.name}.txt"
 
@@ -50,16 +52,18 @@ class BBBLinear(ModuleWrapper):
     def forward(self, x):
 
         mean = F.linear(x, self.W)
-        if self.bias is not None:
-            mean = mean + self.bias
+        mean = mean + self.bias
+        # if self.bias is not None:
+        #     mean = mean + self.bias
 
         sigma = torch.exp(self.log_alpha) * self.W * self.W
 
         std = torch.sqrt(1e-16 + F.linear(x * x, sigma))
-        if self.training:
-            epsilon = std.data.new(std.size()).normal_()
-        else:
-            epsilon = 0.0
+        epsilon = std.new_empty(std.size()).normal_()
+        # if self.training:
+        #     epsilon = std.data.new(std.size()).normal_()
+        # else:
+        #     epsilon = 0.0
         # Local reparameterization trick
         out = mean + std * epsilon
 

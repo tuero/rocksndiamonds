@@ -177,7 +177,7 @@ def parseConfig(config_section):
         if config.has_option(config_section, 'filter_mode'):
             model_config['filter_mode'] = FilterMode[config.get(config_section, 'filter_mode')]
         if config.has_option(config_section, 'single_out_filter'):
-            model_config['single_out_filter'] = bool(config.get(config_section, 'single_out_filter'))
+            model_config['single_out_filter'] = bool(config.get(config_section, 'single_out_filter') == 'True')
     except Exception:
         logger.error("Unknown error parsing configuration.")
         logger.error(traceback.format_exc())

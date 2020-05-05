@@ -24,6 +24,7 @@ from torch.utils.data import Dataset
 from data.data_handler import getTrainTestSubsetSampler, getDataLoader, divideAndClipData
 from models.model_util import FilterMode
 from train import train, validate_model
+from export.export import exportModel
 
 
 def getParamGrid(mode: FilterMode) -> dict:
@@ -60,7 +61,7 @@ def getParamGrid(mode: FilterMode) -> dict:
 
 
 def kfoldValidation(net_type: str, dataset: Dataset, training_config: dict, model_config: dict,
-                    num_folds: int = 5, data_divider: int = 1, max_samples: int = 0) -> pd.DataFrame:
+                    num_folds: int = 5, data_divider: int = 1, max_samples: int = 0, save_name: str = None) -> pd.DataFrame:
     """
     Runs K-fold validation on the given model and data
 
@@ -79,39 +80,15 @@ def kfoldValidation(net_type: str, dataset: Dataset, training_config: dict, mode
     """
     logger = logging.getLogger()
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    kf_train = KFold(n_splits=num_folds, shuffle=True, random_state=0)
-    kf_test = KFold(n_splits=num_folds, shuffle=True, random_state=0)
-
-    # Get solution and lowerbound indices so we can split properly
-    dataset_sol_idx = dataset.findSolutionIdx()
-    dataset_lb_idx = dataset.findLowerboundIdx()
-
-    # Split solution indices by fold
-    sol_idx = []
-    kf_train = KFold(n_splits=num_folds, shuffle=True, random_state=0)
-    for training_sol_idx, test_sol_idx in kf_train.split(dataset_sol_idx):
-        sol_idx.append((training_sol_idx.tolist(), test_sol_idx.tolist()))
-
-    # Split lowerbound indices by fold
-    lb_idx = []
-    if len(dataset_lb_idx) > num_folds:
-        kf_test = KFold(n_splits=num_folds, shuffle=True, random_state=0)
-        for training_lb_idx, test_lb_idx in kf_test.split(dataset_lb_idx):
-            lb_idx.append((training_lb_idx.tolist(), test_lb_idx.tolist()))
-    else:
-        lb_idx = [([], []) for _ in range(num_folds)]
+    kf = KFold(n_splits=num_folds, shuffle=True, random_state=0)
 
     # Kfold testing
     loss_data = []
     total_testloss, total_ks, total_t = (0.0, 0.0, 0.0)
-    for fold_count, (_sol_idx, _lb_idx) in enumerate(zip(sol_idx, lb_idx)):
-        # Get indices
-        training_sol_idx, test_sol_idx = _sol_idx
-        training_lb_idx, test_lb_idx = _lb_idx
-
-        # Training on both solution/lower bound, test only on solution
-        training_idx = training_sol_idx + training_lb_idx
-        test_idx = test_sol_idx
+    all_levels = dataset.getLevelSamples()
+    for fold_count, (train_lvls, test_lvls) in enumerate(kf.split(all_levels)):
+        training_idx = dataset.getSamplesFromLevelIndices(train_lvls)
+        test_idx = dataset.getSamplesFromLevelIndices(test_lvls, True)
 
         # Split data
         train_indices = divideAndClipData(training_idx, data_divider, max_samples)
@@ -137,6 +114,11 @@ def kfoldValidation(net_type: str, dataset: Dataset, training_config: dict, mode
         total_testloss += avg_testloss
         total_ks += avg_ks
         total_t += avg_t
+
+        # If we going to validate by using model in engine, need to save model
+        # along with the level split being used (so we can test on levels not trained on)
+        if save_name is not None:
+            exportModel(trained_model, dataset, test_indices, '{}_{}'.format(save_name, fold_count + 1))
 
     return pd.concat(loss_data), total_testloss / num_folds, total_ks / num_folds, total_t / num_folds
 

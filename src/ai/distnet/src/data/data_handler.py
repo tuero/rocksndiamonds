@@ -63,52 +63,111 @@ DATASET_ATTRIBUTE_PATH = "../dataset_attributes/"
 FEATURE_EXT = "feature.zip"
 OBSERVATION_EXT = "observation.zip"
 LEVEL_RANGE = 990
+MAX_LBD = 10        # Maximum lowerbound samples per level. If this is too large, one level may dominate with its samples
 
 
+def calculateDatasetMeanVar(levelsets: List[str], attribute_prefix: str):
+    logger = logging.getLogger()
+    channel_sums = torch.tensor([0.0, 0.0])
+    channel_squared_sums = torch.tensor([0.0, 0.0])
+    sample_counts = []
+
+    # Set level data file names
+    for levelset in levelsets:
+        for level_num in range(1, LEVEL_RANGE + 1):
+            counts = 0
+            level_str = levelset + '_' + str(level_num)
+            level_features = torch.load(ENGINE_DATA_PATH + level_str + '_' + FEATURE_EXT)
+            level_obs = torch.load(ENGINE_DATA_PATH + level_str + '_' + OBSERVATION_EXT)
+
+            # Level has multiple samples
+            for idx, (feature, obs) in enumerate(zip(level_features, level_obs)):
+                for i, channel in enumerate(feature):
+                    for row in channel:
+                        for d in row:
+                            channel_sums[i].add_(d)
+                            channel_squared_sums[i].add_(d**2)
+                            counts += 1
+            del level_features
+            del level_obs
+            sample_counts.append(counts)
+
+    # Get statistics
+    N = sum(sample_counts)
+    mean = channel_sums.div_(N)
+    variance = channel_squared_sums.div_(N - 1) - (channel_sums**2).div_(N * (N - 1))
+    std = torch.sqrt(variance)
+    logger.info('Dataset mean: {}'.format(mean))
+    logger.info('Dataset std: {}'.format(std))
+
+    dataset_mean_path = DATASET_ATTRIBUTE_PATH + attribute_prefix + '_mean.pt'
+    dataset_std_path = DATASET_ATTRIBUTE_PATH + attribute_prefix + '_std.pt'
+    logger.info('Saving dataset mean to: {}'.format(dataset_mean_path))
+    logger.info('Saving dataset std to: {}'.format(dataset_std_path))
+    torch.save(mean, dataset_mean_path)
+    torch.save(std, dataset_std_path)
+
+
+# lbd_per_level -> Should be ratio of TOTAL DATA to be lower bound
+# Datadivider outside then controlls for total amount of data
+# To hold total amount of data constant while varying ratio, we increase lbd and increase datadivider
 class CustomDataset(Dataset):
 
-    def __init__(self, levelsets: List[str], lbd_per_level: int, attribute_prefix: str,
+    def __init__(self, levelsets: List[str], lbd_per_level: float, attribute_prefix: str,
                  preprocess_mode: PreprocessMode = PreprocessMode.NORMALIZE,
                  initialize_mode: InitializeMode = InitializeMode.LOAD_FROM_FILE):
         self.level_names = []
-        self.sample_counts = []
         self.preprocess_mode = preprocess_mode
         self.sol_observation = []
         logger = logging.getLogger()
 
-        # Set level data file names
+        # Set level data file names and count number of total samples
+        total_available_samples = []
         for levelset in levelsets:
             for level_num in range(1, LEVEL_RANGE + 1):
-                self.level_names.append(levelset + '_' + str(level_num))
+                level_str = levelset + '_' + str(level_num)
+                self.level_names.append(level_str)
+                level_features = torch.load(ENGINE_DATA_PATH + level_str + '_' + FEATURE_EXT)
+                total_available_samples.append(min(level_features.shape[0] - 1, MAX_LBD))
+                del level_features
+
+        # Calculate number of lowerbound samples to also pull
+        total_num_lowerbound = int(len(levelsets) * LEVEL_RANGE * lbd_per_level)
+        lbd_indices = np.random.choice(list(range(sum(total_available_samples))), size=total_num_lowerbound, replace=False)
+        total = 0
+        samples_per_level = []
+        for num in total_available_samples:
+            inner_total = 1
+            for _ in range(num):
+                if total in lbd_indices:
+                    inner_total += 1
+                total += 1
+            samples_per_level.append(inner_total)
 
         logger.info('Number of total levels: {}'.format(len(self.level_names)))
+        logger.info('Number of lower bound samples: {}'.format(len(lbd_indices)))
 
         self.samples = []
+        self.samples_dict = {}
         self.max_runtime = 0
 
         # Get raw feature/obs data and aggregate
-        channel_sums = torch.tensor([0.0, 0.0])
-        channel_squared_sums = torch.tensor([0.0, 0.0])
-        for level in self.level_names:
-            counts = 0
+        global_counter = -1
+        for level_idx, level in enumerate(self.level_names):
+            global_counter += 1
+            self.samples_dict[level_idx] = []
 
             # Feature data
             level_features = torch.load(ENGINE_DATA_PATH + level + '_' + FEATURE_EXT)
             level_obs = torch.load(ENGINE_DATA_PATH + level + '_' + OBSERVATION_EXT)
             for idx, (feature, obs) in enumerate(zip(level_features, level_obs)):
                 # Found enough samples
-                if idx >= lbd_per_level:
+                if idx >= samples_per_level[level_idx]:
                     break
-                # Aggregate feature data for each channel
-                if initialize_mode == InitializeMode.SAVE_TO_FILE:
-                    for i, channel in enumerate(_addRowAndCol(feature)):
-                        for row in channel:
-                            for d in row:
-                                channel_sums[i].add_(d)
-                                channel_squared_sums[i].add_(d**2)
-                                counts += 1
+
                 # Save level with its index
                 self.samples.append((level, idx))
+                self.samples_dict[level_idx].append((level, idx, global_counter))
 
                 # Look for max runtime to normalize
                 self.max_runtime = max(self.max_runtime, obs[0])
@@ -116,27 +175,10 @@ class CustomDataset(Dataset):
 
             del level_features
             del level_obs
-            self.sample_counts.append(counts)
 
         logger.info('Total Number of samples: {}'.format(len(self.samples)))
 
-        # Calculate mean/std of features
-        if initialize_mode == InitializeMode.SAVE_TO_FILE:
-            N = sum(self.sample_counts)
-            self.mean = channel_sums.div_(N)
-            self.variance = channel_squared_sums.div_(N - 1) - (channel_sums**2).div_(N * (N - 1))
-            self.std = torch.sqrt(self.variance)
-            logger.info('Dataset mean: {}'.format(self.mean))
-            logger.info('Dataset std: {}'.format(self.std))
-
-            dataset_mean_path = DATASET_ATTRIBUTE_PATH + attribute_prefix + '_mean.pt'
-            dataset_std_path = DATASET_ATTRIBUTE_PATH + attribute_prefix + '_std.pt'
-            logger.info('Saving dataset mean to: {}'.format(dataset_mean_path))
-            logger.info('Saving dataset std to: {}'.format(dataset_std_path))
-            torch.save(self.mean, dataset_mean_path)
-            torch.save(self.std, dataset_std_path)
-
-        elif initialize_mode == InitializeMode.LOAD_FROM_FILE:
+        if initialize_mode == InitializeMode.LOAD_FROM_FILE:
             if self.preprocess_mode & PreprocessMode.LOG_TRANSFORM:
                 self.max_runtime = torch.log(self.max_runtime)
             self.mean = torch.load(DATASET_ATTRIBUTE_PATH + attribute_prefix + '_mean.pt')
@@ -155,9 +197,6 @@ class CustomDataset(Dataset):
         level_name, row = self.samples[idx]
         feat = torch.load(ENGINE_DATA_PATH + level_name + '_' + FEATURE_EXT)[row]
         obs = torch.load(ENGINE_DATA_PATH + level_name + '_' + OBSERVATION_EXT)[row]
-
-        # Add extra row/col to feat
-        feat = _addRowAndCol(feat.clone())
 
         # Standardize features
         for i, (mean, std) in enumerate(zip(self.mean, self.std)):
@@ -178,6 +217,22 @@ class CustomDataset(Dataset):
     def findLowerboundIdx(self):
         return [i for i, obs in enumerate(self.sol_observation) if obs == 0]
 
+    def getLevelsFromIndices(self, indices):
+        return list(set([self.samples[i][0] for i in indices]))
+
+    def getLevelSamples(self):
+        return [i for i in range(len(self.samples_dict))]
+
+    def getSamplesFromLevelIndices(self, indices, only_sol=False):
+        samples = []
+        for idx in indices:
+            for i, s in enumerate(self.samples_dict[idx]):
+                if only_sol and i > 0:
+                    break
+                samples.append(s[2])
+        return samples
+        # return [i[2] for idx in indices for i in self.samples_dict[idx]]
+
 
 def splitData(dataset: Dataset, split_ratio: int, max_sol: int = -1,
               max_lb: int = -1) -> Tuple[torch.Tensor, torch.Tensor]:
@@ -191,23 +246,21 @@ def splitData(dataset: Dataset, split_ratio: int, max_sol: int = -1,
     Returns:
         The incides for the train/test set
     """
-    # Ensure we get proper mix of solution/lower bound data
-    dataset_sol_idx = dataset.findSolutionIdx()
-    dataset_lb_idx = dataset.findLowerboundIdx()
+    all_levels = dataset.getLevelSamples()
 
-    # Shuffle
-    np.random.shuffle(dataset_sol_idx)
-    np.random.shuffle(dataset_lb_idx)
+    # Shuffle levels
+    np.random.shuffle(all_levels)
 
-    # Find splits
-    _sol_split = int(np.floor(split_ratio * len(dataset_sol_idx)))
-    _lb_split = int(np.floor(split_ratio * len(dataset_lb_idx)))
+    # Split
+    split = int(np.floor(split_ratio * len(all_levels)))
+    train_levels = all_levels[split:]
+    test_levels = all_levels[:split]
 
-    # Train on mix on solution/lower bound, but we only can validate on solution observations
-    train_indices = dataset_sol_idx[_sol_split:] + dataset_lb_idx[_lb_split:]
-    val_indices = dataset_sol_idx[:_sol_split]
+    # Get samples from split levels
+    train_indices = dataset.getSamplesFromLevelIndices(train_levels)
+    test_indices = dataset.getSamplesFromLevelIndices(test_levels, True)
 
-    return train_indices, val_indices
+    return train_indices, test_indices
 
 
 def divideAndClipData(indices: list, data_divider: int = 1, max_samples: int = 0):

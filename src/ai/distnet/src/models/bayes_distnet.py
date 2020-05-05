@@ -57,9 +57,11 @@ class BayesDistNetCNN(ModuleWrapper):
             BBBConv2d(in_channel, out_channel, kernel_size=self.kernel_size, alpha_shape=(1, 1), stride=1, padding=1, name='conv1'),
             # nn.ReLU(),
             nn.Softplus(),
+            nn.AvgPool2d(kernel_size=2, stride=2),
             nn.BatchNorm2d(out_channel)
         )
         current_dim = current_dim - self.kernel_size + (2 * 1) + 1
+        current_dim = int((current_dim - 0) / 2)
 
         # Layer 2: Convolutional, ReLU Activation, with Batch Normalization
         in_channel = out_channel
@@ -68,9 +70,11 @@ class BayesDistNetCNN(ModuleWrapper):
             BBBConv2d(in_channel, out_channel, kernel_size=self.kernel_size, alpha_shape=(1, 1), stride=1, padding=1, name='conv2'),
             # nn.ReLU(),
             nn.Softplus(),
+            # nn.AvgPool2d(kernel_size=2, stride=2),
             nn.BatchNorm2d(out_channel)
         )
         current_dim = current_dim - self.kernel_size + (2 * 1) + 1
+        # current_dim = int((current_dim - 0) / 2)
 
         # Layer 3: Convolutional, ReLU Activation, with Batch Normalization
         in_channel = out_channel
@@ -116,4 +120,4 @@ class BayesDistNetCNN(ModuleWrapper):
 
     # Helper function for debugging
     def toStr(self) -> str:
-        return "Bayes Distnet" + " " + self.name_suffix
+        return "Bayes_Distnet" + "_" + self.name_suffix

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 project(rocksndiamonds_headless)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -50,6 +50,7 @@ find_package(SDL2)
 find_package(SDL2_image)
 find_package(SDL2_mixer)
 find_package(SDL2_net)
+find_package(Boost)
 
 # Find Pytorch libary
 find_package(Torch REQUIRED)
@@ -77,6 +78,9 @@ endif()
 if(NOT SDL2_net_FOUND)
     message(STATUS "SDL2_net not found.")
 endif()
+
+#include_directories(${Boost_INCLUDE_DIRS})
+
 
 
 set(CNFS_CMD ${PROJECT_SOURCE_DIR}/build-scripts/create_element_defs.pl)
@@ -128,9 +132,9 @@ if (SDL2_FOUND AND SDL2_image_FOUND AND SDL2_mixer_FOUND AND SDL2_net_FOUND)
 endif()
 
 # These are always added as they don't depend on SDL2
-add_executable(rocksndiamonds_headless ${sources_rnd} ${sources_ai})
-add_dependencies(rocksndiamonds_headless auto_conf auto_conftime)
-set_target_properties(rocksndiamonds_headless PROPERTIES COMPILE_FLAGS "-DHEADLESS")
+add_executable(rocksndiamonds_headless_temp ${sources_rnd} ${sources_ai})
+add_dependencies(rocksndiamonds_headless_temp auto_conf auto_conftime)
+set_target_properties(rocksndiamonds_headless_temp PROPERTIES COMPILE_FLAGS "-DHEADLESS")
 
 add_executable(run_tests ${sources_rnd} ${sources_ai} ${sources_tests})
 add_dependencies(run_tests auto_conf auto_conftime)
@@ -143,5 +147,9 @@ if (SDL2_FOUND AND SDL2_image_FOUND AND SDL2_mixer_FOUND AND SDL2_net_FOUND)
     target_link_libraries(rocksndiamonds m z ${SDL2_IMAGE_LIBRARIES} ${SDL2_MIXER_LIBRARIES} ${SDL2_NET_LIBRARIES} ${SDL2_LIBRARIES} ${TORCH_LIBRARIES})
 endif()
 
-target_link_libraries(rocksndiamonds_headless m z ${TORCH_LIBRARIES})
+target_link_libraries(rocksndiamonds_headless_temp m z ${TORCH_LIBRARIES})
 target_link_libraries(run_tests m z ${TORCH_LIBRARIES})
+
+#target_link_libraries(rocksndiamonds Boost)
+#target_link_libraries(rocksndiamonds_headless_temp Boost)
+#target_link_libraries(run_tests Boost)
