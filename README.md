@@ -2,6 +2,7 @@
 [![Generic badge](https://img.shields.io/badge/Artsoft_version-v4.1.4.1-green.svg)](https://shields.io/)
 [![GitHub release](https://img.shields.io/github/v/tag/tuero/rocksndiamonds)](https://img.shields.io/github/v/tag/tuero/rocksndiamonds)
 [![GitHub language](https://img.shields.io/badge/language-C/C++-blue.svg)](https://img.shields.io/badge/language-C/C++-blue.svg)
+[![DOI](https://zenodo.org/badge/189304660.svg)](https://zenodo.org/badge/latestdoi/189304660)
 
 
 
