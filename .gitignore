@@ -58,3 +58,7 @@ src/ai/training_data/*.zip
 **/distnet/logs/*
 **/training_loss_dfs/*
 **/gridsearch_dfs/*
+*.pkl
+*.pt
+**/src/ai/distnet/**/*.png
+**/src/ai/distnet/**/*.txt
