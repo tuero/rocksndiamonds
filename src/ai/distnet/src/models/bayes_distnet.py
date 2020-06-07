@@ -54,7 +54,7 @@ class BayesDistNetCNN(ModuleWrapper):
         in_channel = n_input_channels
         out_channel = self.n_convdepth
         self.layer1 = nn.Sequential(
-            BBBConv2d(in_channel, out_channel, kernel_size=self.kernel_size, alpha_shape=(1, 1), stride=1, padding=1, name='conv1'),
+            BBBConv2d(in_channel, out_channel, kernel_size=self.kernel_size, stride=1, padding=1, name='conv1'),
             # nn.ReLU(),
             nn.Softplus(),
             nn.AvgPool2d(kernel_size=2, stride=2),
@@ -67,22 +67,23 @@ class BayesDistNetCNN(ModuleWrapper):
         in_channel = out_channel
         out_channel = getChannelTransform(out_channel, self.filter_mode)
         self.layer2 = nn.Sequential(
-            BBBConv2d(in_channel, out_channel, kernel_size=self.kernel_size, alpha_shape=(1, 1), stride=1, padding=1, name='conv2'),
+            BBBConv2d(in_channel, out_channel, kernel_size=self.kernel_size, stride=1, padding=1, name='conv2'),
             # nn.ReLU(),
             nn.Softplus(),
-            # nn.AvgPool2d(kernel_size=2, stride=2),
+            nn.AvgPool2d(kernel_size=2, stride=2),
             nn.BatchNorm2d(out_channel)
         )
         current_dim = current_dim - self.kernel_size + (2 * 1) + 1
-        # current_dim = int((current_dim - 0) / 2)
+        current_dim = int((current_dim - 0) / 2)
 
         # Layer 3: Convolutional, ReLU Activation, with Batch Normalization
         in_channel = out_channel
         out_channel = getChannelTransform(out_channel, self.filter_mode)
         ks_last = 1 if self.single_out_filter else self.kernel_size
         padding_last = 0 if self.single_out_filter else 1
+        out_channel = 1
         self.layer3 = nn.Sequential(
-            BBBConv2d(in_channel, out_channel, kernel_size=ks_last, stride=1, alpha_shape=(1, 1), padding=padding_last, name='conv3'),
+            BBBConv2d(in_channel, out_channel, kernel_size=ks_last, stride=1, padding=padding_last, name='conv3'),
             # nn.ReLU(),
             nn.Softplus(),
             nn.BatchNorm2d(out_channel)
@@ -95,7 +96,7 @@ class BayesDistNetCNN(ModuleWrapper):
         out_channel = self.n_fcdepth
         self.flatten = FlattenLayer(in_channel)
         self.layer4 = nn.Sequential(
-            BBBLinear(in_channel, out_channel, alpha_shape=(1, 1), bias=False, name='fc1'),
+            BBBLinear(in_channel, out_channel, name='fc1'),
             # nn.ReLU(),
             nn.Softplus()
         )
@@ -104,7 +105,7 @@ class BayesDistNetCNN(ModuleWrapper):
         in_channel = out_channel
         out_channel = out_channel // 2
         self.layer5 = nn.Sequential(
-            BBBLinear(in_channel, out_channel, alpha_shape=(1, 1), bias=False, name='fc2'),
+            BBBLinear(in_channel, out_channel, name='fc2'),
             # nn.ReLU(),
             nn.Softplus(),
         )
@@ -112,7 +113,7 @@ class BayesDistNetCNN(ModuleWrapper):
         # Layer 6: Final output from model
         in_channel = out_channel
         self.layer_end = nn.Sequential(
-            BBBLinear(in_channel, self.output_size, alpha_shape=(1, 1), bias=False, name='fc3'),
+            BBBLinear(in_channel, self.output_size, name='fc3'),
             # nn.ReLU(),
             nn.Softplus()
             # nn.Linear()

@@ -1,0 +1,6 @@
+python main.py --mode kfold --config_section bayesian --net_type bayes_distnet --attribute_prefix with_key --ssl 0 --save full_lb00
+python main.py --mode kfold --config_section bayesian --net_type bayes_distnet --attribute_prefix with_key --ssl 0.25 --save full_lb20 --data_divider 1.25
+python main.py --mode kfold --config_section bayesian --net_type bayes_distnet --attribute_prefix with_key --ssl 0.67 --save full_lb40 --data_divider 1.67
+python main.py --mode kfold --config_section bayesian --net_type bayes_distnet --attribute_prefix with_key --ssl 1 --save full_lb50 --data_divider 2
+python main.py --mode kfold --config_section bayesian --net_type bayes_distnet --attribute_prefix with_key --ssl 1.5 --save full_lb60 --data_divider 2.5
+python main.py --mode kfold --config_section bayesian --net_type bayes_distnet --attribute_prefix with_key --ssl 4 --save full_lb80 --data_divider 5

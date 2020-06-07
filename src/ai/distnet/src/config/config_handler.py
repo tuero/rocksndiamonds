@@ -20,7 +20,7 @@ from loss_functions import LossFunctionTypes
 def getTrainingConfig(n_epochs: int = 100, batch_size: int = 32, loss_fn: LossFunctionTypes = LossFunctionTypes.MSE,
                       start_rate: float = 1e-3, end_rate: float = 1e-5, clip_gradient_norm: float = 1e-2,
                       split_ration: float = 0.8, preprocess_mode: PreprocessMode = PreprocessMode.NORMALIZE,
-                      seed : int = -1, n_ens: int = 20) -> dict:
+                      seed : int = -1, n_ens: int = 20, beta_type=0.1) -> dict:
     """
     Get the config dictionary which defines the specs for training
 
@@ -49,7 +49,8 @@ def getTrainingConfig(n_epochs: int = 100, batch_size: int = 32, loss_fn: LossFu
         'split_ration'         : split_ration,
         'preprocess_mode'      : preprocess_mode,
         'seed'                 : seed,
-        'n_ens'                : n_ens
+        'n_ens'                : n_ens,
+        'beta_type'            : beta_type
     }
 
 
@@ -73,7 +74,8 @@ def trainingConfigToStr(config: dict) -> str:
            "\tSplit ratio: {}\n".format(config['split_ration']) + \
            "\tPreprocess Mode: {}\n".format(config['preprocess_mode'].name) + \
            "\tSeed: {}\n".format(config['seed']) + \
-           "\tSamples for Variational Inference: {}\n".format(config['n_ens'])
+           "\tSamples for Variational Inference: {}\n".format(config['n_ens']) + \
+           "\tVariational Inference beta type: {}\n".format(config['beta_type'])
 
 
 def getModelConfig(n_convdepth: int = 32, kernel_size: int = 3, n_fcdepth: int = 64,
@@ -162,6 +164,12 @@ def parseConfig(config_section):
             training_config['seed'] = int(config.get(config_section, 'seed'))
         if config.has_option(config_section, 'n_ens'):
             training_config['n_ens'] = int(config.get(config_section, 'n_ens'))
+        if config.has_option(config_section, 'beta_type'):
+            beta_type = config.get(config_section, 'beta_type')
+            try:
+                training_config['beta_type'] = float(beta_type)
+            except ValueError:
+                training_config['beta_type'] = beta_type
 
         # Model config items
         if config.has_option(config_section, 'n_convdepth'):

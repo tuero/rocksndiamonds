@@ -26,18 +26,20 @@ from models.model_util import weights_init, getModel, count_parameters
 from models.bayes_distnet import BayesDistNetCNN
 from models.distnet import DistNetCNN
 from loss_functions import getLossFunction, getNumberOfParameters, runKSTest, runKSTestBBB, runTTest, runTTestBBB
+from metrics import get_beta
 
 
-def train_model(model, device, train_loader, optimizer, training_config, total_len):
+def train_model(model, device, train_loader, optimizer, training_config, total_len, epoch, num_epochs):
     training_loss = 0.0
     model.train()
     loss_fn = getLossFunction(training_config['loss_fn'])
     n_ens = training_config['n_ens']
     clip_gradient_norm = training_config['clip_gradient_norm']
+    beta_type = training_config['beta_type']
 
     # Train with dropout
     train_data = []
-    for i, data in enumerate(train_loader):
+    for batch_idx, data in enumerate(train_loader):
         # get the inputs; data is a list of [features, runtime]
         inputs, rts = data
         train_data.append((inputs, rts))
@@ -56,7 +58,8 @@ def train_model(model, device, train_loader, optimizer, training_config, total_l
                 kl += _kl
                 outputs[:, :, j] = net_out
             kl = kl / n_ens
-            loss = kl*0.35 + total_len * loss_fn(outputs, rts)
+            beta = get_beta(batch_idx, len(train_loader), beta_type, epoch, num_epochs)
+            loss = (kl * beta) + total_len * loss_fn(outputs, rts)
         elif type(model) is DistNetCNN:
             outputs = model(inputs)
             loss = loss_fn(outputs, rts)
@@ -78,10 +81,11 @@ def train_model(model, device, train_loader, optimizer, training_config, total_l
     return training_loss / len(train_loader)
 
 
-def validate_model(model, device, validation_loader, training_config, val_len, verbose_length=-1):
+def validate_model(model, device, validation_loader, training_config, val_len, epoch=1, num_epochs=1, verbose_length=-1):
     logger = logging.getLogger()
     loss_fn = getLossFunction(training_config['loss_fn'])
     n_ens = training_config['n_ens']
+    beta_type = training_config['beta_type']
 
     # Bayesian can't be in eval mode so that we can sample and get a distribution
     if not type(model) is BayesDistNetCNN:
@@ -90,7 +94,7 @@ def validate_model(model, device, validation_loader, training_config, val_len, v
     validation_loss, ks_counter, t_counter, ks_total = (0.0, 0.0, 0.0, 0.0)
     dist_from_means = []
     variances = []
-    for i, val_data in enumerate(validation_loader):
+    for batch_idx, val_data in enumerate(validation_loader):
         val_inputs, val_rts = val_data
         val_inputs, val_rts = val_inputs.to(device), val_rts.to(device)
 
@@ -102,7 +106,8 @@ def validate_model(model, device, validation_loader, training_config, val_len, v
                 kl += _kl
                 outputs[:, :, j] = net_out
             kl = kl / n_ens
-            val_loss = kl*0.35 + val_len * loss_fn(outputs, val_rts)
+            beta = get_beta(batch_idx, len(validation_loader), beta_type, epoch, num_epochs)
+            val_loss = (kl * beta) + val_len * loss_fn(outputs, val_rts)
 
             # Find distribution parameters of samples
             mu = outputs.mean(dim=2)
@@ -197,9 +202,11 @@ def train(net_type: str, device: torch.device, train_loader: DataLoader, validat
     n_epochs = training_config['n_epochs']
 
     # Optimizer and scheduler
-    optimizer = optim.SGD(model.parameters(), lr=start_rate, weight_decay=0.001)
+    # optimizer = optim.SGD(model.parameters(), lr=start_rate, weight_decay=0.001, momentum=0.9)
+    optimizer = optim.Adam(model.parameters(), lr=start_rate, weight_decay=0.001, amsgrad=True)
     decay_rate = np.exp(np.log(end_rate / start_rate) / n_epochs)
     lr_scheduler = optim.lr_scheduler.ExponentialLR(optimizer=optimizer, gamma=decay_rate)
+    # lr_scheduler = optim.lr_scheduler.StepLR(optimizer=optimizer, step_size=5, gamma=0.5)
     logger.info('Decay rate: {}'.format(decay_rate))
 
     # Output loss information during training
@@ -209,11 +216,11 @@ def train(net_type: str, device: torch.device, train_loader: DataLoader, validat
     val_len = len(validation_loader) * training_config['batch_size']
     for epoch in range(n_epochs):
         # Next epoch for training
-        train_avg = train_model(model, device, train_loader, optimizer, training_config, total_len)
+        train_avg = train_model(model, device, train_loader, optimizer, training_config, total_len, epoch, n_epochs)
         eval_avg = 0.0
         if type(model) is DistNetCNN:
-            eval_avg, _, _, _, _ = validate_model(model, device, train_loader, training_config, total_len)
-        test_avg, ks_avg, t_avg, dist_from_means, variances = validate_model(model, device, validation_loader, training_config, total_len)
+            eval_avg, _, _, _, _ = validate_model(model, device, train_loader, training_config, total_len, epoch, n_epochs)
+        test_avg, ks_avg, t_avg, dist_from_means, variances = validate_model(model, device, validation_loader, training_config, total_len, epoch, n_epochs)
 
         # Calcualte and store metrics
         df_losses = addMetricRow(df_losses, epoch, train_avg, "Train", model.toStr())

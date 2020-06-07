@@ -68,17 +68,18 @@ class DistNetCNN(nn.Module):
             nn.Conv2d(in_channel, out_channel, kernel_size=self.kernel_size, stride=1, padding=1),
             # nn.ReLU(),
             nn.Softplus(),
-            # nn.AvgPool2d(kernel_size=2, stride=2),
+            nn.AvgPool2d(kernel_size=2, stride=2),
             nn.BatchNorm2d(out_channel)
         )
         current_dim = current_dim - self.kernel_size + (2 * 1) + 1
-        # current_dim = int((current_dim - 0) / 2)
+        current_dim = int((current_dim - 0) / 2)
 
         # Layer 3: Convolutional, ReLU Activation, with Batch Normalization
         in_channel = out_channel
         out_channel = getChannelTransform(out_channel, self.filter_mode)
         ks_last = 1 if self.single_out_filter else self.kernel_size
         padding_last = 0 if self.single_out_filter else 1
+        out_channel = 1
         self.layer3 = nn.Sequential(
             nn.Conv2d(in_channel, out_channel, kernel_size=ks_last, stride=1, padding=padding_last),
             # nn.ReLU(),

@@ -6,72 +6,82 @@ Description: Bayesian CNN Linear layer Implementation
 Source: Taken from https://github.com/kumar-shridhar/PyTorch-BayesianCNN
 """
 
-# Library
-import math
-
-# PyTorch
 import torch
 import torch.nn.functional as F
 from torch.nn import Parameter
 
-# Modules
-import metrics
+from metrics import calculate_kl as KL_DIV
 from layers.misc import ModuleWrapper
-# import utils
-# import config_bayesian as cfg
+
+import sys
+sys.path.append("..")
 
 
 class BBBLinear(ModuleWrapper):
-
-    def __init__(self, in_features, out_features, alpha_shape=(1, 1), bias=True, name='BBBLinear'):
+    
+    def __init__(self, in_features, out_features, bias=True, name='BBBLinear'):
         super(BBBLinear, self).__init__()
         self.in_features = in_features
         self.out_features = out_features
-        self.alpha_shape = alpha_shape
-        self.W = Parameter(torch.Tensor(out_features, in_features))
-        self.log_alpha = Parameter(torch.Tensor(*alpha_shape))
-        self.bias = Parameter(torch.Tensor(1, out_features))
-        # if bias:
-        #     self.bias = Parameter(torch.Tensor(1, out_features))
-        # else:
-        #     self.register_parameter('bias', None)
-        self.reset_parameters()
-        self.kl_value = metrics.calculate_kl
+        self.use_bias = bias
+        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.name = name
-        # self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        # if cfg.record_mean_var:
-        #     self.mean_var_path = cfg.mean_var_dir + f"{self.name}.txt"
+
+        self.prior_mu = 0.0
+        self.prior_sigma = 0.1
+
+        self.W_mu = Parameter(torch.Tensor(out_features, in_features))
+        self.W_rho = Parameter(torch.Tensor(out_features, in_features))
+
+        self.bias_mu = Parameter(torch.Tensor(out_features))
+        self.bias_rho = Parameter(torch.Tensor(out_features))
+        # if self.use_bias:
+        #     self.bias_mu = Parameter(torch.Tensor(out_features))
+        #     self.bias_rho = Parameter(torch.Tensor(out_features))
+        # else:
+        #     self.register_parameter('bias_mu', None)
+        #     self.register_parameter('bias_rho', None)
+
+        self.reset_parameters()
 
     def reset_parameters(self):
-        stdv = 1.0 / math.sqrt(self.W.size(1))
-        self.W.data.uniform_(-stdv, stdv)
-        self.log_alpha.data.fill_(-5.0)
-        if self.bias is not None:
-            self.bias.data.zero_()
+        self.W_mu.data.normal_(0.0, 0.1)
+        self.W_rho.data.normal_(-3, 0.1)
+
+        self.bias_mu.data.normal_(0.0, 0.1)
+        self.bias_rho.data.normal_(-3.0, 0.1)
+        # if self.use_bias:
+        #     self.bias_mu.data.normal_(0, 0.1)
+        #     self.bias_rho.data.normal_(-3, 0.1)
 
     def forward(self, x):
 
-        mean = F.linear(x, self.W)
-        mean = mean + self.bias
-        # if self.bias is not None:
-        #     mean = mean + self.bias
+        self.W_sigma = torch.log1p(torch.exp(self.W_rho))
 
-        sigma = torch.exp(self.log_alpha) * self.W * self.W
-
-        std = torch.sqrt(1e-16 + F.linear(x * x, sigma))
-        epsilon = std.new_empty(std.size()).normal_()
-        # if self.training:
-        #     epsilon = std.data.new(std.size()).normal_()
+        self.bias_sigma = torch.log1p(torch.exp(self.bias_rho))
+        bias_var = self.bias_sigma ** 2
+        # if self.use_bias:
+        #     self.bias_sigma = torch.log1p(torch.exp(self.bias_rho))
+        #     bias_var = self.bias_sigma ** 2
         # else:
-        #     epsilon = 0.0
-        # Local reparameterization trick
-        out = mean + std * epsilon
+        #     self.bias_sigma = bias_var = None
 
-        # if cfg.record_mean_var and cfg.record_now and self.training and self.name in cfg.record_layers:
-        #     utils.save_array_to_file(mean.cpu().detach().numpy(), self.mean_var_path, "mean")
-        #     utils.save_array_to_file(std.cpu().detach().numpy(), self.mean_var_path, "std")
+        act_mu = F.linear(x, self.W_mu, self.bias_mu)
+        act_var = 1e-16 + F.linear(x ** 2, self.W_sigma ** 2, bias_var)
+        act_std = torch.sqrt(act_var)
 
-        return out
+        eps = torch.empty(act_mu.size()).normal_(0.0, 1.0).to(self.device)
+        return act_mu + act_std * eps
+        # if self.training or sample:
+        #     eps = torch.empty(act_mu.size()).normal_(0, 1).to(self.device)
+        #     return act_mu + act_std * eps
+        # else:
+        #     return act_mu
 
     def kl_loss(self):
-        return self.W.nelement() * self.kl_value(self.log_alpha) / self.log_alpha.nelement()
+        kl = KL_DIV(self.prior_mu, self.prior_sigma, self.W_mu, self.W_sigma)
+
+        kl += KL_DIV(self.prior_mu, self.prior_sigma, self.bias_mu, self.bias_sigma)
+        # if self.use_bias:
+        #     kl += KL_DIV(self.prior_mu, self.prior_sigma, self.bias_mu, self.bias_sigma)
+        return kl

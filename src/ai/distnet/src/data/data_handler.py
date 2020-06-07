@@ -79,9 +79,11 @@ def calculateDatasetMeanVar(levelsets: List[str], attribute_prefix: str):
             level_str = levelset + '_' + str(level_num)
             level_features = torch.load(ENGINE_DATA_PATH + level_str + '_' + FEATURE_EXT)
             level_obs = torch.load(ENGINE_DATA_PATH + level_str + '_' + OBSERVATION_EXT)
+            logger.info('{} : {}'.format(levelset, level_num))
 
             # Level has multiple samples
             for idx, (feature, obs) in enumerate(zip(level_features, level_obs)):
+                if idx > 20: break
                 for i, channel in enumerate(feature):
                     for row in channel:
                         for d in row:
@@ -218,7 +220,8 @@ class CustomDataset(Dataset):
         return [i for i, obs in enumerate(self.sol_observation) if obs == 0]
 
     def getLevelsFromIndices(self, indices):
-        return list(set([self.samples[i][0] for i in indices]))
+        # return list(set([self.samples[i][0] for i in indices]))
+        return list(set([self.level_names[i] for i in indices]))
 
     def getLevelSamples(self):
         return [i for i in range(len(self.samples_dict))]

@@ -6,25 +6,19 @@ Description: Bayesian CNN Conv2D Implementation
 Source: Taken from https://github.com/kumar-shridhar/PyTorch-BayesianCNN
 """
 
-# Library
-import math
-
-# PyTorch
 import torch
 import torch.nn.functional as F
 from torch.nn import Parameter
 
-# Modules
-import metrics
+from metrics import calculate_kl as KL_DIV
 from layers.misc import ModuleWrapper
-# import config_bayesian as cfg
-# import utils
+
+import sys
+sys.path.append("..")
 
 
 class BBBConv2d(ModuleWrapper):
-
-    def __init__(self, in_channels, out_channels, kernel_size, alpha_shape, stride=1,
-                 padding=0, dilation=1, bias=True, name='BBBConv2d'):
+    def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, bias=True, name='BBBLinear'):
         super(BBBConv2d, self).__init__()
         self.in_channels = in_channels
         self.out_channels = out_channels
@@ -32,59 +26,64 @@ class BBBConv2d(ModuleWrapper):
         self.stride = stride
         self.padding = padding
         self.dilation = dilation
-        self.alpha_shape = alpha_shape
         self.groups = 1
-        self.weight = Parameter(torch.Tensor(out_channels, in_channels, *self.kernel_size))
-        self.bias = Parameter(torch.Tensor(out_channels))
-        # if bias:
-        #     # self.bias = Parameter(torch.Tensor(1, out_channels, 1, 1))
-        #     self.bias = Parameter(torch.Tensor(out_channels))
-        # else:
-        #     self.register_parameter('bias', None)
-        # self.out_bias = lambda input, kernel: F.conv2d(input, kernel, self.bias, self.stride, self.padding, self.dilation, self.groups)
-        # self.out_nobias = lambda input, kernel: F.conv2d(input, kernel, None, self.stride, self.padding, self.dilation, self.groups)
-        self.log_alpha = Parameter(torch.Tensor(*alpha_shape))
-        self.reset_parameters()
+        self.use_bias = bias
+        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.name = name
-        # self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        # if cfg.record_mean_var:
-        #     self.mean_var_path = cfg.mean_var_dir + f"{self.name}.txt"
+
+        self.prior_mu = 0.0
+        self.prior_sigma = 0.1
+
+        self.W_mu = Parameter(torch.Tensor(out_channels, in_channels, *self.kernel_size))
+        self.W_rho = Parameter(torch.Tensor(out_channels, in_channels, *self.kernel_size))
+
+        self.bias_mu = Parameter(torch.Tensor(out_channels))
+        self.bias_rho = Parameter(torch.Tensor(out_channels))
+        # if self.use_bias:
+        #     self.bias_mu = Parameter(torch.Tensor(out_channels))
+        #     self.bias_rho = Parameter(torch.Tensor(out_channels))
+        # else:
+        #     self.register_parameter('bias_mu', None)
+        #     self.register_parameter('bias_rho', None)
+
+        self.reset_parameters()
 
     def reset_parameters(self):
-        n = self.in_channels
-        for k in self.kernel_size:
-            n *= k
-        stdv = 1. / math.sqrt(n)
-        self.weight.data.uniform_(-stdv, stdv)
-        self.bias.data.uniform_(-stdv, stdv)
-        # if self.bias is not None:
-        #     self.bias.data.uniform_(-stdv, stdv)
-        self.log_alpha.data.fill_(-5.0)
+        self.W_mu.data.normal_(0.0, 0.1)
+        self.W_rho.data.normal_(-3.0, 0.1)
+
+        self.bias_mu.data.normal_(0.0, 0.1)
+        self.bias_rho.data.normal_(-3.0, 0.1)
+        # if self.use_bias:
+        #     self.bias_mu.data.normal_(0, 0.1)
+        #     self.bias_rho.data.normal_(-3, 0.1)
 
     def forward(self, x):
 
-        # mean = self.out_bias(x, self.weight)
-        mean = F.conv2d(x, self.weight, self.bias, self.stride, self.padding, self.dilation, self.groups)
-
-        sigma = torch.exp(self.log_alpha) * self.weight * self.weight
-        
-        # std = torch.sqrt(1e-16 + self.out_nobias(x * x, sigma))
-        temp = F.conv2d(x * x, sigma, None, self.stride, self.padding, self.dilation, self.groups)
-        std = torch.sqrt(1e-16 + temp)
-        epsilon = std.new_empty(std.size()).normal_()
-        # if self.training:
-        #     epsilon = std.data.new(std.size()).normal_()
+        self.W_sigma = torch.log1p(torch.exp(self.W_rho))
+        self.bias_sigma = torch.log1p(torch.exp(self.bias_rho))
+        bias_var = self.bias_sigma ** 2
+        # if self.use_bias:
+        #     self.bias_sigma = torch.log1p(torch.exp(self.bias_rho))
+        #     bias_var = self.bias_sigma ** 2
         # else:
-        #     epsilon = 0.0
+        #     self.bias_sigma = bias_var = None
 
-        # Local reparameterization trick
-        out = mean + std * epsilon
+        act_mu = F.conv2d(x, self.W_mu, self.bias_mu, self.stride, self.padding, self.dilation, self.groups)
+        act_var = 1e-16 + F.conv2d(x ** 2, self.W_sigma ** 2, bias_var, self.stride, self.padding, self.dilation, self.groups)
+        act_std = torch.sqrt(act_var)
 
-        # if cfg.record_mean_var and cfg.record_now and self.training and self.name in cfg.record_layers:
-        #     utils.save_array_to_file(mean.cpu().detach().numpy(), self.mean_var_path, "mean")
-        #     utils.save_array_to_file(std.cpu().detach().numpy(), self.mean_var_path, "std")
-
-        return out
+        eps = torch.empty(act_mu.size()).normal_(0.0, 1.0).to(self.device)
+        return act_mu + act_std * eps
+        # if self.training or sample:
+        #     eps = torch.empty(act_mu.size()).normal_(0, 1).to(self.device)
+        #     return act_mu + act_std * eps
+        # else:
+        #     return act_mu
 
     def kl_loss(self):
-        return self.weight.nelement() / self.log_alpha.nelement() * metrics.calculate_kl(self.log_alpha)
+        kl = KL_DIV(self.prior_mu, self.prior_sigma, self.W_mu, self.W_sigma)
+        kl += KL_DIV(self.prior_mu, self.prior_sigma, self.bias_mu, self.bias_sigma)
+        # if self.use_bias:
+        #     kl += KL_DIV(self.prior_mu, self.prior_sigma, self.bias_mu, self.bias_sigma)
+        return kl

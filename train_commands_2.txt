@@ -1,0 +1,100 @@
+./rocksndiamonds_headless_temp -levelset train4 -loadlevel 664 -controller two_level -loglevel 4
+./rocksndiamonds_headless_temp -levelset train3 -loadlevel 37 -controller two_level -loglevel 4
+./rocksndiamonds_headless_temp -levelset train1 -loadlevel 892 -controller two_level -loglevel 4
+./rocksndiamonds_headless_temp -levelset train3 -loadlevel 812 -controller two_level -loglevel 4
+./rocksndiamonds_headless_temp -levelset train4 -loadlevel 742 -controller two_level -loglevel 4
+./rocksndiamonds_headless_temp -levelset train3 -loadlevel 590 -controller two_level -loglevel 4
+./rocksndiamonds_headless_temp -levelset train1 -loadlevel 662 -controller two_level -loglevel 4
+./rocksndiamonds_headless_temp -levelset train1 -loadlevel 34 -controller two_level -loglevel 4
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 53 -controller two_level -loglevel 4
+./rocksndiamonds_headless_temp -levelset train3 -loadlevel 889 -controller two_level -loglevel 4
+./rocksndiamonds_headless_temp -levelset train4 -loadlevel 540 -controller two_level -loglevel 4
+./rocksndiamonds_headless_temp -levelset train3 -loadlevel 378 -controller two_level -loglevel 4
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 942 -controller two_level -loglevel 4
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 310 -controller two_level -loglevel 4
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 347 -controller two_level -loglevel 4
+./rocksndiamonds_headless_temp -levelset train1 -loadlevel 962 -controller two_level -loglevel 4
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 777 -controller two_level -loglevel 4
+./rocksndiamonds_headless_temp -levelset train1 -loadlevel 171 -controller two_level -loglevel 4
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 686 -controller two_level -loglevel 4
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 133 -controller two_level -loglevel 4
+./rocksndiamonds_headless_temp -levelset train4 -loadlevel 664 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_0_1
+./rocksndiamonds_headless_temp -levelset train3 -loadlevel 37 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_0_1
+./rocksndiamonds_headless_temp -levelset train1 -loadlevel 892 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_0_1
+./rocksndiamonds_headless_temp -levelset train3 -loadlevel 812 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_0_1
+./rocksndiamonds_headless_temp -levelset train4 -loadlevel 742 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_0_1
+./rocksndiamonds_headless_temp -levelset train3 -loadlevel 590 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_0_1
+./rocksndiamonds_headless_temp -levelset train1 -loadlevel 662 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_0_1
+./rocksndiamonds_headless_temp -levelset train1 -loadlevel 34 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_0_1
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 53 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_0_1
+./rocksndiamonds_headless_temp -levelset train3 -loadlevel 889 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_0_1
+./rocksndiamonds_headless_temp -levelset train4 -loadlevel 540 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_0_1
+./rocksndiamonds_headless_temp -levelset train3 -loadlevel 378 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_0_1
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 942 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_0_1
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 310 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_0_1
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 347 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_0_1
+./rocksndiamonds_headless_temp -levelset train1 -loadlevel 962 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_0_1
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 777 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_0_1
+./rocksndiamonds_headless_temp -levelset train1 -loadlevel 171 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_0_1
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 686 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_0_1
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 133 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_0_1
+./rocksndiamonds_headless_temp -levelset train4 -loadlevel 664 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_0_1
+./rocksndiamonds_headless_temp -levelset train3 -loadlevel 37 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_0_1
+./rocksndiamonds_headless_temp -levelset train1 -loadlevel 892 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_0_1
+./rocksndiamonds_headless_temp -levelset train3 -loadlevel 812 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_0_1
+./rocksndiamonds_headless_temp -levelset train4 -loadlevel 742 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_0_1
+./rocksndiamonds_headless_temp -levelset train3 -loadlevel 590 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_0_1
+./rocksndiamonds_headless_temp -levelset train1 -loadlevel 662 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_0_1
+./rocksndiamonds_headless_temp -levelset train1 -loadlevel 34 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_0_1
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 53 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_0_1
+./rocksndiamonds_headless_temp -levelset train3 -loadlevel 889 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_0_1
+./rocksndiamonds_headless_temp -levelset train4 -loadlevel 540 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_0_1
+./rocksndiamonds_headless_temp -levelset train3 -loadlevel 378 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_0_1
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 942 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_0_1
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 310 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_0_1
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 347 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_0_1
+./rocksndiamonds_headless_temp -levelset train1 -loadlevel 962 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_0_1
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 777 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_0_1
+./rocksndiamonds_headless_temp -levelset train1 -loadlevel 171 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_0_1
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 686 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_0_1
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 133 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_0_1
+./rocksndiamonds_headless_temp -levelset train4 -loadlevel 664 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_8_1
+./rocksndiamonds_headless_temp -levelset train3 -loadlevel 37 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_8_1
+./rocksndiamonds_headless_temp -levelset train1 -loadlevel 892 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_8_1
+./rocksndiamonds_headless_temp -levelset train3 -loadlevel 812 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_8_1
+./rocksndiamonds_headless_temp -levelset train4 -loadlevel 742 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_8_1
+./rocksndiamonds_headless_temp -levelset train3 -loadlevel 590 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_8_1
+./rocksndiamonds_headless_temp -levelset train1 -loadlevel 662 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_8_1
+./rocksndiamonds_headless_temp -levelset train1 -loadlevel 34 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_8_1
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 53 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_8_1
+./rocksndiamonds_headless_temp -levelset train3 -loadlevel 889 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_8_1
+./rocksndiamonds_headless_temp -levelset train4 -loadlevel 540 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_8_1
+./rocksndiamonds_headless_temp -levelset train3 -loadlevel 378 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_8_1
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 942 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_8_1
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 310 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_8_1
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 347 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_8_1
+./rocksndiamonds_headless_temp -levelset train1 -loadlevel 962 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_8_1
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 777 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_8_1
+./rocksndiamonds_headless_temp -levelset train1 -loadlevel 171 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_8_1
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 686 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_8_1
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 133 -controller two_level_bayesian -loglevel 4 -model_path Bayesian/bayesian_lb_8_1
+./rocksndiamonds_headless_temp -levelset train4 -loadlevel 664 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_8_1
+./rocksndiamonds_headless_temp -levelset train3 -loadlevel 37 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_8_1
+./rocksndiamonds_headless_temp -levelset train1 -loadlevel 892 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_8_1
+./rocksndiamonds_headless_temp -levelset train3 -loadlevel 812 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_8_1
+./rocksndiamonds_headless_temp -levelset train4 -loadlevel 742 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_8_1
+./rocksndiamonds_headless_temp -levelset train3 -loadlevel 590 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_8_1
+./rocksndiamonds_headless_temp -levelset train1 -loadlevel 662 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_8_1
+./rocksndiamonds_headless_temp -levelset train1 -loadlevel 34 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_8_1
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 53 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_8_1
+./rocksndiamonds_headless_temp -levelset train3 -loadlevel 889 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_8_1
+./rocksndiamonds_headless_temp -levelset train4 -loadlevel 540 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_8_1
+./rocksndiamonds_headless_temp -levelset train3 -loadlevel 378 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_8_1
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 942 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_8_1
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 310 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_8_1
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 347 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_8_1
+./rocksndiamonds_headless_temp -levelset train1 -loadlevel 962 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_8_1
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 777 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_8_1
+./rocksndiamonds_headless_temp -levelset train1 -loadlevel 171 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_8_1
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 686 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_8_1
+./rocksndiamonds_headless_temp -levelset train2 -loadlevel 133 -controller two_level_distnet -loglevel 4 -model_path DistNet/distnet_lb_8_1

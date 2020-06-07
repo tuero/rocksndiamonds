@@ -1,0 +1,9 @@
+python main.py --mode train --config_section inv_gauss --attribute_prefix lb_8 --ssl 9 --num_train 20 --max_sol 1000 --max_lb 0
+python main.py --mode train --config_section inv_gauss --attribute_prefix lb_8 --ssl 9 --num_train 20 --max_sol 1000 --max_lb 500
+python main.py --mode train --config_section inv_gauss --attribute_prefix lb_8 --ssl 9 --num_train 20 --max_sol 1000 --max_lb 1000
+python main.py --mode train --config_section inv_gauss --attribute_prefix lb_8 --ssl 9 --num_train 20 --max_sol 1000 --max_lb 1500
+python main.py --mode train --config_section inv_gauss --attribute_prefix lb_8 --ssl 9 --num_train 20 --max_sol 1000 --max_lb 2000
+python main.py --mode train --config_section inv_gauss --attribute_prefix lb_8 --ssl 9 --num_train 20 --max_sol 1000 --max_lb 2500
+python main.py --mode train --config_section inv_gauss --attribute_prefix lb_8 --ssl 9 --num_train 20 --max_sol 1000 --max_lb 3000
+python main.py --mode train --config_section inv_gauss --attribute_prefix lb_8 --ssl 9 --num_train 20 --max_sol 1000 --max_lb 3500
+python main.py --mode train --config_section inv_gauss --attribute_prefix lb_8 --ssl 9 --num_train 20 --max_sol 1000 --max_lb 4000

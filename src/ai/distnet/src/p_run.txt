@@ -1,0 +1,3 @@
+python main.py --mode grid_search --config_section normal_constant --attribute_prefix only_sol --ssl 1
+python main.py --mode grid_search --config_section normal_double --attribute_prefix only_sol --ssl 1
+python main.py --mode grid_search --config_section normal_half --attribute_prefix only_sol --ssl 1

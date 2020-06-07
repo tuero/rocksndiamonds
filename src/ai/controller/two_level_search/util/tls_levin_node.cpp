@@ -22,11 +22,15 @@
 #include "game_state.h"
 
 
-const int NUM_SAMPLES       = 32;
-const float FEAT_MEAN_0     = 0.0564;
-const float FEAT_MEAN_1     = 0.0224;
-const float FEAT_STDEV_0    = 0.1287;
-const float FEAT_STDEV_1    = 0.1206;
+const int NUM_SAMPLES       = 64;
+// const float FEAT_MEAN_0     = 0.0564;
+// const float FEAT_MEAN_1     = 0.0224;
+// const float FEAT_STDEV_0    = 0.1287;
+// const float FEAT_STDEV_1    = 0.1206;
+const float FEAT_MEAN_0     = 0.0325;
+const float FEAT_MEAN_1     = 0.0197;
+const float FEAT_STDEV_0    = 0.1056;
+const float FEAT_STDEV_1    = 0.1124;
 
 
 NodeLevin::NodeLevin(const std::vector<BaseOption*> &path, const std::deque<enginetype::GridCell> &fullGridPath, uint64_t hash, 

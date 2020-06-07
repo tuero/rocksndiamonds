@@ -1,0 +1,5 @@
+python main.py --mode train --config_section bayesian1 --attribute_prefix key_full --ssl 0 --net_type bayes_distnet
+python main.py --mode train --config_section bayesian2 --attribute_prefix key_full --ssl 0 --net_type bayes_distnet
+python main.py --mode train --config_section bayesian3 --attribute_prefix key_full --ssl 0 --net_type bayes_distnet
+python main.py --mode train --config_section bayesian4 --attribute_prefix key_full --ssl 0 --net_type bayes_distnet
+python main.py --mode train --config_section bayesian5 --attribute_prefix key_full --ssl 0 --net_type bayes_distnet

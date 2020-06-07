@@ -84,7 +84,7 @@ def kfoldValidation(net_type: str, dataset: Dataset, training_config: dict, mode
 
     # Kfold testing
     loss_data = []
-    total_testloss, total_ks, total_t = (0.0, 0.0, 0.0)
+    # total_testloss, total_ks, total_t = (0.0, 0.0, 0.0)
     all_levels = dataset.getLevelSamples()
     for fold_count, (train_lvls, test_lvls) in enumerate(kf.split(all_levels)):
         training_idx = dataset.getSamplesFromLevelIndices(train_lvls)
@@ -96,7 +96,7 @@ def kfoldValidation(net_type: str, dataset: Dataset, training_config: dict, mode
         train_sampler, test_sampler = getTrainTestSubsetSampler(train_indices, test_indices)
 
         # Log current fold
-        logger.info('Fold {}'.format(fold_count + 1))
+        logger.info('Fold {} of {}'.format(fold_count + 1, num_folds))
         logger.info('Number of training samples: {}'.format(len(train_indices)))
         logger.info('Number of testing samples: {}'.format(len(test_indices)))
 
@@ -106,21 +106,22 @@ def kfoldValidation(net_type: str, dataset: Dataset, training_config: dict, mode
         test_loader = getDataLoader(dataset, batch_size, test_sampler)
 
         # Train model
-        val_len = len(test_loader) * training_config['batch_size']
-        total_len = len(train_loader) * training_config['batch_size']
+        # val_len = len(test_loader) * training_config['batch_size']
+        # total_len = len(train_loader) * training_config['batch_size']
         df_run, trained_model = train(net_type, device, train_loader, test_loader, training_config, model_config)
         loss_data.append(df_run)
-        avg_testloss, avg_ks, avg_t, _, _ = validate_model(trained_model, device, test_loader, training_config, total_len)
-        total_testloss += avg_testloss
-        total_ks += avg_ks
-        total_t += avg_t
+        # avg_testloss, avg_ks, avg_t, _, _ = validate_model(trained_model, device, test_loader, training_config, total_len)
+        # total_testloss += avg_testloss
+        # total_ks += avg_ks
+        # total_t += avg_t
 
         # If we going to validate by using model in engine, need to save model
         # along with the level split being used (so we can test on levels not trained on)
         if save_name is not None:
-            exportModel(trained_model, dataset, test_indices, '{}_{}'.format(save_name, fold_count + 1))
+            exportModel(trained_model, dataset, test_lvls, '{}_{}'.format(save_name, fold_count + 1))
 
-    return pd.concat(loss_data), total_testloss / num_folds, total_ks / num_folds, total_t / num_folds
+    # return pd.concat(loss_data), total_testloss / num_folds, total_ks / num_folds, total_t / num_folds
+    return pd.concat(loss_data)
 
 
 def gridSearch(net_type: str, model_base_config: dict, training_base_config: dict, param_grid: dict, dataset: Dataset,
@@ -167,4 +168,5 @@ def gridSearch(net_type: str, model_base_config: dict, training_base_config: dic
 
         # Run K-fold
         kfold_df_, _, _, _ = kfoldValidation(net_type, dataset, current_training_config, current_model_config, num_folds)
+        kfold_df_ = kfoldValidation(net_type, dataset, current_training_config, current_model_config, num_folds)
         kfold_df_.to_pickle('../gridsearch_dfs/df_{}_{}.pkl'.format(start_msg, i + 1))

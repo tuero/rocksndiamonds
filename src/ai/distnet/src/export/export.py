@@ -38,6 +38,11 @@ def exportModel(model, dataset, indices, save_name):
         for level in level_names:
             file_out.write(level + '\n')
 
+    # Set model parameters to not require gradient
+    model.eval()
+    for p in model.parameters():
+        p.requires_grad_(False)
+
     # Export the model
     logger.info('Exporting model to {}{}'.format(path, EXT_MODEL))
     traced_model = torch.jit.script(model)
